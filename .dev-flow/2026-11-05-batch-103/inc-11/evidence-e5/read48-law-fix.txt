@@ -1,0 +1,6 @@
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+...                                                                      [100%]
+============================= QC-TM timing margins =============================
+68.1%  38.323 s / 120.000 s  R-A2L-READ.48/1 tracked files  tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
+QC-TM: 1 bounds, 0 under 20 % margin
+3 passed in 110.16s (0:01:50)

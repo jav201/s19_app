@@ -1,0 +1,39 @@
+# mutant M11 — forward typedefs (typedef pre-pass removed)
+
+requirement: R-A2L-READ.42
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_42_instance_forward_typedef_ref']
+
+---- pytest transcript ----
+
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_a2l_read_42_instance_forward_typedef_ref _______________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32612/test_r_a2l_read_42_instance_fo0')
+ref = <function ref_read_a2l at 0x00000220FF7F05E0>
+
+    def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.42 (oracle): an INSTANCE declared before its typedef is sized."""
+        text = _body(
+            '/begin INSTANCE I1 "" T_FWD 0x10\n/end INSTANCE\n'
+            '/begin TYPEDEF_MEASUREMENT T_FWD "" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT'
+        )
+        spans = _spans(_parse(tmp_path, text))
+>       assert any(s["name"] == "I1" and s["length"] == 2 for s in spans)
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_42_instance_forward_typedef_ref.<locals>.<genexpr> at 0x00000220FF7DC5F0>)
+
+tests\test_b103_a2l_reader.py:1575: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_42_instance_forward_typedef_ref
+1 failed in 1.16s
+
+[exit=1 elapsed=2.1s tag=M11]
+
+VERDICT: KILLED (exit 1)

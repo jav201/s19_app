@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.21s",
+  "req": "R-A2L-READ.19",
+  "mutation": "/begin matches by prefix (glued /beginMEASUREMENT opens a section)",
+  "anchor": "if low == \"/begin\":",
+  "replacement": "if low.startswith(\"/begin\"):",
+  "applied": 1,
+  "baseline": "1 passed in 1.00s",
+  "verdict": "KILLED"
+}

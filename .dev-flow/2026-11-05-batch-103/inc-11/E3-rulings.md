@@ -57,3 +57,9 @@ Round 3 (security): **PASS-WITH-NOTES** — E3S-18, -19, -21, -22, -23, -25 clos
   - READ.66/1's bound is now 312 characters, and /2's cases are 256 and 257 characters.
   - Authority: `../inc-3/E3-rulings.md`, round-5 correction note.
 - **R-A2L-READ.69** was added from Inc 12's E3 rulings (E3A-07). It follows .38 and .60 in giving no address without a parse error.
+
+## E5 security addendum (2026-11-08, orchestrator Kimi)
+
+- **R-A2L-READ.70:** an A2L file that ends before a BLOB, INSTANCE or typedef used to construct a declared span is closed gives every affected span `address=None` and `length=None`. A valid-looking unclosed header may not export usable values, and an unclosed typedef may not size an INSTANCE.
+- Three cases: unclosed BLOB, unclosed INSTANCE, and a closed INSTANCE whose typedef is unclosed. Negative control: exporting the header's address and length. The requirement is traced to `extract_declared_spans` with three graph examples; no new node.
+- This closes the E5 security review's design gap before implementation. Scope grows from 80 to 81 rows, one above the approximate cap, declared because the overlap-index consumer requires complete records.

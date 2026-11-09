@@ -1,0 +1,9 @@
+=== direct lexer probe, PRISTINE ===
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+[(1, 'A'), (3, 'B'), (4, 'C'), (5, 'D')]
+
+=== direct lexer probe, MUTATED (CRLF counts two ends) ===
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+[(1, 'A'), (4, 'B'), (6, 'C'), (7, 'D')]
+
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

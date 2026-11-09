@@ -29,7 +29,7 @@ ________ test_r_paste_21_1_windows_not_github_hosted_stops_before_open _________
             "windows",
             environ={"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "self-hosted"},
             platform="win32",
-            account="runneradmin",
+            account="<user>",
         )
 >       assert ok is False and "RUNNER_ENVIRONMENT='self-hosted'" == reason, (ok, reason)
 E       AssertionError: (True, '')

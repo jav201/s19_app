@@ -537,18 +537,18 @@ module: tests/support/b103_clipboard.py
 examples: (R-PASTE.21/1) kind `windows`, platform `win32`, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `self-hosted` → the test fails with `OS clipboard not isolated: RUNNER_ENVIRONMENT='self-hosted'`; a spy on the clipboard-opening functions counts `0` calls; the same with `RUNNER_ENVIRONMENT` unset
 examples: (R-PASTE.21/1 c, E3S-03) both variables set, `account` `username_subject` → fails with `OS clipboard not isolated: account='username_subject'`; the spy counts `0`
 examples: (R-PASTE.21/2) LinuxH, kind `x`, `DISPLAY` `:99`, no Xvfb started by the session → fails before any open; the spy counts `0`; no X connection is attempted
-examples: (R-PASTE.21/3) WinCI, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `github-hosted`, `account` `runneradmin` → returns `None`; the test goes on to the probe
+examples: (R-PASTE.21/3) WinCI, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `github-hosted`, `account` `<user>` → returns `None`; the test goes on to the probe
 examples: (R-PASTE.21 neg) the guard skipped → the spy counts ≥ `1` open → RED
 
 clipboard_isolated
 req: R-PASTE.21
 in: str kind; Mapping[str, str]? environ = None; str? platform = None; str? account = None
 out: tuple(bool isolated, str reason)
-func: new (test support; E3S-03, E3S-17). The predicate that the guard and the suite-wide fixture share; it never fails a test itself. `environ` defaults to `os.environ`; `platform` to `host_platform()`, a one-line seam of this module (`sys.platform` by default) that the LinuxH pytester runs set, and that `clipboard_probe`'s skip mark, `os_clipboard_ready` and `os_clipboard_isolation` read too (E3A-20); `account` to the logged-on account (`GetUserNameW` / `os.getlogin()` on Windows, not `%USERNAME%`). kind `windows`: isolated iff platform `win32` and `GITHUB_ACTIONS` = `true` and `RUNNER_ENVIRONMENT` = `github-hosted` and `account` = `runneradmin`. kind `x`: isolated iff `DISPLAY` equals the display the session's own Xvfb fixture started (none until it starts; LinuxX, blocked). `reason` names the first term that fails; `""` when isolated. Opens nothing.
+func: new (test support; E3S-03, E3S-17). The predicate that the guard and the suite-wide fixture share; it never fails a test itself. `environ` defaults to `os.environ`; `platform` to `host_platform()`, a one-line seam of this module (`sys.platform` by default) that the LinuxH pytester runs set, and that `clipboard_probe`'s skip mark, `os_clipboard_ready` and `os_clipboard_isolation` read too (E3A-20); `account` to the logged-on account (`GetUserNameW` / `os.getlogin()` on Windows, not `%USERNAME%`). kind `windows`: isolated iff platform `win32` and `GITHUB_ACTIONS` = `true` and `RUNNER_ENVIRONMENT` = `github-hosted` and `account` = `<user>`. kind `x`: isolated iff `DISPLAY` equals the display the session's own Xvfb fixture started (none until it starts; LinuxX, blocked). `reason` names the first term that fails; `""` when isolated. Opens nothing.
 module: tests/support/b103_clipboard.py
 examples: (R-PASTE.21/1) kind `windows`, platform `win32`, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `self-hosted` → `(False, "RUNNER_ENVIRONMENT='self-hosted'")`; with `RUNNER_ENVIRONMENT` unset → `False`, the reason naming `RUNNER_ENVIRONMENT`
 examples: (R-PASTE.21/1 c) both variables set, `account` `username_subject` → `(False, "account='username_subject'")`
-examples: (R-PASTE.21/3) WinCI, both variables set, `account` `runneradmin` → `(True, "")`
+examples: (R-PASTE.21/3) WinCI, both variables set, `account` `<user>` → `(True, "")`
 
 clipboard_probe
 req: R-PASTE.22, R-PASTE.23

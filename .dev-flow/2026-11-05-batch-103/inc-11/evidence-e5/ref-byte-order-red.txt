@@ -1,0 +1,25 @@
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_cov_read_68_byte_order_error_exact ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-567/test_cov_read_68_byte_order_er0')
+
+    def test_cov_read_68_byte_order_error_exact(tmp_path: Path) -> None:
+        """R-A2L-READ.68/1: exactly one not-a-byte-order error each, on line 23."""
+        for w in ("MSB_FRIST", "MSB_LAST_MSW_FIRST", '"MSB_FIRST"', "1"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" BYTE_ORDER {w}"))
+            data = _parse(tmp_path, text)
+            errs = [e for e in data["errors"] if f"BYTE_ORDER {w} is not a byte order" in e]
+            assert len(errs) == 1, w
+            assert errs[0] == f"Line 23: BYTE_ORDER {w} is not a byte order", w
+            assert _tag(data, "X")["address"] is None
+            ref_data = _ref_read()(text)
+>           assert _tag(ref_data, "X")["address"] is None, w
+E           AssertionError: "MSB_FIRST"
+E           assert 16 is None
+
+tests/test_b103_a2l_reader_coverage.py:1167: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_68_byte_order_error_exact
+1 failed in 1.08s

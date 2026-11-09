@@ -1,0 +1,32 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M06 apply ==
+file: s19_app/tui/a2l.py
+anchor: '_MAX_ADDRESS = 0xFFFFFFFFFFFFFFFF'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  55d0e7030a70a547a24a77d68cf000ee3b0ff855aec99361da4654ed48473874
+== M06 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_a2l_read_69_address_above_64_bits ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-43/test_r_a2l_read_69_address_abo0')
+
+    def test_r_a2l_read_69_address_above_64_bits(tmp_path: Path) -> None:
+        """R-A2L-READ.69/1, /2, /3: addresses above 2^64-1 give no address."""
+        for w in ("18446744073709551616", "99999999999999999999"):
+            data = _parse(tmp_path, _body(meas("X", f" ECU_ADDRESS {w}")))
+            assert _tag(data, "X")["address"] is None
+            assert not [e for e in data["errors"] if "is not a number" in e]
+        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 18446744073709551615")))
+>       assert _tag(data, "X")["address"] == 0xFFFFFFFFFFFFFFFF
+E       assert None == 18446744073709551615
+
+tests/test_b103_a2l_reader.py:1317: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_69_address_above_64_bits
+1 failed in 0.63s
+== M06 pytest exit code: 1 ==
+== M06 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

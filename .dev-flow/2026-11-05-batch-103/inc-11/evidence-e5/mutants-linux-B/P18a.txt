@@ -1,0 +1,32 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P18a apply ==
+file: s19_app/tui/a2l.py
+anchor: '                elif has_standing_size:'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  888432fe1c3724bcdb5bd5755b4a85bf1d84117c00ae211de99d0599a6eaf9ee
+== P18a test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_e5_p18_data_size_only_unresolved_span_uses_standing_size _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-57/test_e5_p18_data_size_only_unr0')
+
+    def test_e5_p18_data_size_only_unresolved_span_uses_standing_size(tmp_path: Path) -> None:
+        """A CURVE with DATA_SIZE 4 and no resolvable span keeps 4, never the
+        generic UWORD scalar length 2."""
+        text = _body(
+            char("C", "CURVE", "0x2000", "RL_U16", " DATA_SIZE 4")
+        )
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4
+E       assert None == 4
+
+tests/test_b103_a2l_reader_e5.py:465: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p18_data_size_only_unresolved_span_uses_standing_size
+1 failed in 0.60s
+== P18a pytest exit code: 1 ==
+== P18a restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

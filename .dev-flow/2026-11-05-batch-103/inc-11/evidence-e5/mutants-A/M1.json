@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.15s",
+  "req": "R-A2L-READ.7",
+  "mutation": "comment no longer a word break (/* glues neighbours)",
+  "anchor": "_SLOW_WORD_RE = re.compile(r'(?:[^ \\t\\x0b\\x0c\"/\\r\\n]|/(?![/*]))+')",
+  "replacement": "_SLOW_WORD_RE = re.compile(r'(?:[^ \\t\\x0b\\x0c\"\\r\\n])+')",
+  "applied": 1,
+  "baseline": "1 passed in 1.03s",
+  "verdict": "KILLED"
+}

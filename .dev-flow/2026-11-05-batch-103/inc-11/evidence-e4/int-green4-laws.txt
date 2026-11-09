@@ -1,0 +1,14 @@
+/home/<user>/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+============================= QC-TM timing margins =============================
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+219 passed in 79.13s (0:01:19)
+LAWS_EXIT=0

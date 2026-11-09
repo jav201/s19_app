@@ -1,0 +1,5 @@
+/tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+PRIVATE_BASE [(1, 'A'), (3, 'B'), (4, 'C'), (5, 'D')]
+PRIVATE_MUTANT [(1, 'A'), (4, 'B'), (6, 'C'), (7, 'D')]
+PUBLIC_EQUAL True
+M10_NOT_REALISABLE_ON_PUBLIC_ROUTE

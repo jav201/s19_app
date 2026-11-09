@@ -1,0 +1,81 @@
+host:
+<runner>
+Sat Nov  7 11:27:44 AM CST 2026
+0.92 3.88 5.50 1/585 503251
+s19_app __file__:
+/home/<user>/work/b103-inc11-base/s19_app/__init__.py
+
+== RED pins (behavioural) on base ==
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_extract_declared_spans_is_public _____________________
+
+    def test_extract_declared_spans_is_public() -> None:
+        """The public name ``extract_declared_spans`` exists on s19_app.tui.a2l_extract."""
+>       assert _extract_declared_spans is not None, "extract_declared_spans missing (base)"
+E       AssertionError: extract_declared_spans missing (base)
+E       assert None is not None
+
+tests/test_b103_a2l_reader.py:1533: AssertionError
+_______________ test_r_a2l_read_7_comment_between_digits_splits ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_7_comment_betw0')
+
+    def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
+        """R-A2L-READ.7/1: MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
+        text = _body(
+            '/begin CHARACTERISTIC Synthetic map ""\n MAP 0x1C2D3E00/*c*/4026 RL_SYN_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC\n'
+            "/begin RECORD_LAYOUT RL_SYN_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        )
+        data = _parse(tmp_path, text)
+>       tag = _tag(data, "Synthetic map", "CHARACTERISTIC")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_reader.py:521: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_7_comment_betw0/x.a2l', ...}
+name = 'Synthetic map', section = 'CHARACTERISTIC'
+
+    def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
+        for tag in data["tags"]:
+            if tag.get("name") == name and tag.get("section") == section:
+                return tag
+>       raise AssertionError(f"no {section} tag {name!r} in {[t['name'] for t in data['tags']]}")
+E       AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
+
+tests/test_b103_a2l_reader.py:112: AssertionError
+________________________ test_r_a2l_read_17_v171_clean _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_17_v171_clean0')
+
+    def test_r_a2l_read_17_v171_clean(tmp_path: Path) -> None:
+        """R-A2L-READ.17/1: V171 has 0 parse errors and depth-3 MEASUREMENTs."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l")
+>       assert data["errors"] == []
+E       AssertionError: assert ['Unclosed /b...ns detected.'] == []
+E         
+E         Left contains one more item: 'Unclosed /begin sections detected.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:729: AssertionError
+------------------------------ Captured log call -------------------------------
+_______________________ test_r_a2l_read_40_tracked_blobs _______________________
+
+    def test_r_a2l_read_40_tracked_blobs() -> None:
+        """R-A2L-READ.40/2: 7 BLOB spans over the 35 files."""
+        total = 0
+        for path in _tracked_a2l():
+            data = parse_a2l_file(path)
+            total += len([s for s in _spans(data) if s["kind"] == "BLOB"])
+>       assert total == 7
+E       assert 0 == 7
+
+tests/test_b103_a2l_reader.py:1456: AssertionError
+------------------------------ Captured log call -------------------------------
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_extract_declared_spans_is_public
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_7_comment_between_digits_splits
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_17_v171_clean - Asserti...
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_40_tracked_blobs - asse...
+4 failed in 7.31s

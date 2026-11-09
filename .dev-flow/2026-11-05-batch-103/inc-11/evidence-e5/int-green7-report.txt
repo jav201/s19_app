@@ -1,0 +1,35 @@
+Run 7 executed end-to-end. **Result: NOT green — 3 failures** (no timing run, as instructed).
+
+## What ran
+
+Fresh full clone of branch `b103-inc11-code` @ `21a0c56b` under `/tmp/b103-e5-11-int7/tree` on `<runner>`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, closed stdin, `HOME`/`XDG_*`/`LOCALAPPDATA` isolated under `/tmp/b103-e5-11-int7/<user>` (HOME basename `zqisolated7`, never `home`). Every transcript opens with `s19_app.__file__` → the fresh tree and carries the pytest exit code. Did not touch `~/work/b103-int11`.
+
+| Group | Files | Result | Exit |
+|---|---|---|---|
+| A — reader | `test_b103_a2l_reader.py` + `test_b103_a2l_reader_e5.py` | **2 failed, 204 passed** | 1 |
+| B — Inc 2a | `test_b103_a2l_definition.py` + `test_b103_synth_definitions.py` | **200 passed** | 0 |
+| C — changed legacy | 6 files | **389 passed, 1 skipped** | 0 |
+| D — laws | 7 files | **1 failed, 215 passed, 3 skipped** | 1 |
+
+Totals: **1008 passed, 4 skipped, 3 failed**. All 23 E5 nodes (reader_e5) are green; the 3 failures are outside them.
+
+## Failures (file + cause)
+
+**1 & 2 — Group A, `tests/test_b103_a2l_reader.py`** (same root cause):
+- `test_r_a2l_read_48_tracked_files_equal_ref`
+- `test_r_a2l_read_49_no_regression`
+
+Both fail on `('CHARACTERISTIC', 'ASAM.C.CUBOID.ROW_DIR')` in `examples/case_00_public/ASAP2_Demo_V171.a2l`: the product now derives **`length = 36`**, while the independent oracle `tests/support/b103_a2l_ref.py::ref_read_a2l` and the golden fixture `tests/fixtures/b103_i11/e07fb00_tags.jsonl` both expect **`None`**.
+
+Cause: the E5 correction P13 (CUBOID/CUBE_4/CUBE_5 span resolution through `_CURVE_MAP_FAMILY`) makes the product derive the full record-layout span for CUBOID tags. For `RL.CUBOID.ROW_DIR` with MATRIX_DIM 2×3×4 the span is 36 (NO_AXIS_PTS 1+1+1, AXIS_PTS 2+3+4, FNC_VALUES 24, all 1-byte). The reference oracle still computes inline axis counts only for `kind in ("CURVE", "MAP")` (`b103_a2l_ref.py` ~line 1182), so its `_layout_span` returns `None` for CUBOID; the fixture was generated from pre-correction `e07fb00` and encodes the same `None`. Neither oracle nor fixture was updated when P13 landed — a test-side consistency gap, not a runtime product fault.
+
+**3 — Group D, `tests/test_id_registry.py`**:
+- `test_tc607_scanned_corpus_matches_the_declared_bound`
+
+Guard scanned **276** test modules vs declared **275**: `tests/test_b103_a2l_reader_e5.py` was added during E5 without bumping `EXPECTED_SCANNED_TEST_FILES` in the same PR (the test's own message directs exactly this bump).
+
+## Deliverables & cleanup
+
+Transcripts landed byte-identical (md5 verified) in `inc-11/evidence-e5/` as `int-green7-{a,b,c,d}.txt`. Nothing edited in product/tests, nothing committed. Runner scratch `/tmp/b103-e5-11-int7*` and my local bundle/script removed.
+
+Note: `steps.log` shows one pre-existing one-line orchestrator append ("E5 functional integration run 7 start …"), not made by me; my only writes are the 4 transcript files.

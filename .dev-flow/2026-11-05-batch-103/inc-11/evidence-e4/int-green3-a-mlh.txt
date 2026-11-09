@@ -1,0 +1,79 @@
+/home/<user>/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......................F..F..F.                                           [100%]
+=================================== FAILURES ===================================
+_____ test_at101_hostile_comment_corpus[unterminated_block_eats_mandatory] _____
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw3/test_at101_hostile_comment_cor0')
+case_id = 'unterminated_block_eats_mandatory'
+body = '      VALUE /* runaway to EOF with no close', expected = None
+
+    @pytest.mark.parametrize("case_id,body,expected", _HOSTILE_CASES, ids=[c[0] for c in _HOSTILE_CASES])
+    def test_at101_hostile_comment_corpus(tmp_path: Path, case_id: str, body: str, expected: str | None) -> None:
+        """8 hostile comment/quote bodies: 0 raise; malformed→None; valid→parse.
+    
+        Intent: R-A2L-013 (C-17) — the stripper is crash-free and content-preserving
+        over malformed input. Driving through ``parse_a2l_file`` exercises the whole
+        load path, not just the helper. The per-case ``expected`` distinguishes
+        genuine degradation (None) from cases where valid mandatory params must
+        survive the hostile syntax around them.
+        """
+        char = _parse_single_char(tmp_path, body, name=f"{case_id}.a2l")
+>       assert char is not None  # the block always yields a tag; only its header may be None
+        ^^^^^^^^^^^^^^^^^^^^^^^
+E       assert None is not None
+
+tests/test_a2l_multiline_headers.py:277: AssertionError
+____________ test_at101_hostile_comment_corpus[unterminated_quote] _____________
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw4/test_at101_hostile_comment_cor1')
+case_id = 'unterminated_quote', body = '      VALUE 0x810000 RL "never closes'
+expected = None
+
+    @pytest.mark.parametrize("case_id,body,expected", _HOSTILE_CASES, ids=[c[0] for c in _HOSTILE_CASES])
+    def test_at101_hostile_comment_corpus(tmp_path: Path, case_id: str, body: str, expected: str | None) -> None:
+        """8 hostile comment/quote bodies: 0 raise; malformed→None; valid→parse.
+    
+        Intent: R-A2L-013 (C-17) — the stripper is crash-free and content-preserving
+        over malformed input. Driving through ``parse_a2l_file`` exercises the whole
+        load path, not just the helper. The per-case ``expected`` distinguishes
+        genuine degradation (None) from cases where valid mandatory params must
+        survive the hostile syntax around them.
+        """
+        char = _parse_single_char(tmp_path, body, name=f"{case_id}.a2l")
+>       assert char is not None  # the block always yields a tag; only its header may be None
+        ^^^^^^^^^^^^^^^^^^^^^^^
+E       assert None is not None
+
+tests/test_a2l_multiline_headers.py:277: AssertionError
+_______________ test_at101_megabyte_unterminated_block_is_linear _______________
+[gw6] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw6/test_at101_megabyte_unterminat0')
+
+    @pytest.mark.slow
+    @pytest.mark.serial_timing
+    def test_at101_megabyte_unterminated_block_is_linear(tmp_path: Path) -> None:
+        """sec-F1: an MB-scale unterminated ``/*`` completes well under a wall bound.
+    
+        Locks the O(n) contract for the gate-blocking SAFE requirement — a naive
+        backtracking/regex stripper would blow up here.
+        """
+        body = "      VALUE 0x810000 RL_X 0 CM 0 255 /*" + ("A" * 2_000_000)
+        started = time.perf_counter()
+        char = _parse_single_char(tmp_path, body, name="dos.a2l")
+        elapsed = time.perf_counter() - started
+>       assert char is not None
+E       assert None is not None
+
+tests/test_a2l_multiline_headers.py:323: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_block_eats_mandatory]
+FAILED tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_quote]
+FAILED tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+3 failed, 27 passed in 1.70s
+EXIT=1

@@ -1,0 +1,7 @@
+=== BASELINE (fresh process) ===
+direct: [(1, 'A'), (3, 'B'), (4, 'C'), (5, 'D')]
+start_lines: [1] errors: []
+=== M10 mutated (fresh process) ===
+direct: [(1, 'A'), (4, 'B'), (6, 'C'), (7, 'D')]
+start_lines: [1] errors: []
+restored clean: True

@@ -1,0 +1,27 @@
+=== M5 (R-A2L-READ.8) ===
+anchor: '                j = body.find("*/", i)'
+mutation: '                j = body.rfind("*/", i)'
+applied count: 1
+mutated hash: ba767a5a6adc047cb970e51c1008fe8833ad46330dad2b3d2b1e66959b589054
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_read_8_comments_do_not_nest ____________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-27/test_r_a2l_read_8_comments_do_0')
+
+    def test_r_a2l_read_8_comments_do_not_nest(tmp_path: Path) -> None:
+        """R-A2L-READ.8/2 (RP-B40): c is a word; the stray */ gives .11's error."""
+        text = _body(meas("X", " /* a /* b */ c */", " ECU_ADDRESS 0x1234"))
+        data = _parse(tmp_path, text)
+        assert _tag(data, "X")["address"] == 0x1234
+>       assert any("*/ without /*" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_8_comments_do_not_nest.<locals>.<genexpr> at 0x7f2f16344520>)
+
+tests/test_b103_a2l_reader.py:552: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_8_comments_do_not_nest
+1 failed in 0.85s

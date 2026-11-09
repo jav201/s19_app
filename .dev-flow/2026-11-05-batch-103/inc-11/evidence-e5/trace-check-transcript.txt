@@ -1,0 +1,5 @@
+[trace 60e78942] Inc 11 trace evidence
+ 1 file changed, 8 insertions(+)
+ create mode 100644 .dev-flow/2026-11-05-batch-103/evidence/inc-11/trace-check-transcript.txt
+/tmp/b103-e5-11-trace-14fdc3b9/s19_app/__init__.py
+trace_check: 3 US, 81 active requirements (2 withdrawn), 0 gap(s)

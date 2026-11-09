@@ -1,0 +1,46 @@
+# Inc 11 E4 — R-A2L-READ.52/2 string-path perf fix (<runner>)
+
+Bound: <= 1.5 x e07fb00 (BASE_STRING_S = 0.075 s) -> 0.1125 s.
+Before (integration run 4, int-green4-perf.txt): 0.1797 s = 2.40 x  -> FAIL.
+After: 0.0790 s = 1.05 x (least of 20, GC off) -> 30.2 % margin -> PASS.
+
+pytest (single arm, -m serial_timing):
+  test_r_a2l_read_52_string_time  0.079 s / 0.112 s  margin 30.2 %  PASS
+  (QC-TM: 1 bounds, 0 under 20 % margin)
+
+## Hot spot (cProfile, 10 parses, string fixture)
+Before (perf-profile round): 20,028,391 calls, 9.433 s
+  _lex_a2l_lines tottime 5.120 s
+  _find_string_end       2,000,050 calls  1.077 s tottime / 1.546 s cum
+  _elements              2,000,190 calls  1.055 s
+  endswith               4,000,370 calls  0.632 s
+  _count_line_ends       2,000,050 calls  0.448 s
+After: 8,028,451 calls, 3.164 s (2.98 x fewer calls)
+  _lex_a2l_lines tottime 1.741 s
+  _elements              2,000,190 calls  0.534 s
+  str.count              1,999,990 calls  0.359 s
+  endswith               2,000,380 calls  0.274 s
+  append                 2,000,780 calls  0.135 s
+  _find_string_end / _count_line_ends  -> eliminated from the string path.
+
+## Change (s19_app/tui/a2l.py only)
+1. Tier 0a fast path in _lex_a2l_lines: a string continuation whose element is
+   content + exactly one trailing \n (no quote/CR/NUL/embedded end) is appended
+   verbatim — one append, no slice, no endswith, no _find_string_end /
+   _count_line_ends.
+2. Tier 0 fast path for the no-terminator (final) string line.
+3. endswith reordered \n-first (single-char checks).
+4. _elements: no-progress/no-BOM fast path drops enumerate + 2 if-checks.
+
+## Correctness
+- Hash of the full parse of all 35 tracked .a2l files (json.dumps sort_keys
+  default=str, sha256): before = after = 0348835945bca25c50adee9e0d4e95a3cbf478d46109b86400690987e42525ec
+- test_b103_a2l_reader.py: 175 passed, 3 failed — the same 3 pre-existing test/
+  oracle faults as base (read_7, read_28: "Synthetic map" stray word; read_48:
+  _layout_span naive product), not caused by this change.
+- A/B under identical load: case_06 base 11.528 s vs modified 11.486 s;
+  software_a base 1.140 s vs modified 1.106 s (no regression; slight gain).
+  case_06 / software_a time arms still flake under the concurrent Nightreign
+  load (known from run 4), for both base and modified; the string arm is fixed.
+
+Host load during measure: up 1:10, load average ~5.6 (Nightreign ~500 % CPU).

@@ -1,0 +1,30 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M02 apply ==
+file: s19_app/tui/a2l.py
+anchor: '        header_m = 6 if section_name == "MEASUREMENT" else 7'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  3c903a18f4ba72b2acbda0c283036adf2ae47cfd9d239f644ac064ce2dec4585
+== M02 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_read_28_short_header_error _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-39/test_r_a2l_read_28_short_heade0')
+
+    def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
+        """R-A2L-READ.28/1, /2, /4 (/2 name = first word, R-A2L-READ.23): short header errors."""
+        text = _body(meas("SX", " ECU_ADDRESS 0x10", hdr=" UWORD CM_ID 0 0 0"))
+        data = _parse(tmp_path, text)
+>       assert any("MEASUREMENT SX has 5 of its 6 header words" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_28_short_header_error.<locals>.<genexpr> at 0x7f67527d6330>)
+
+tests/test_b103_a2l_reader.py:1031: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_28_short_header_error
+1 failed in 0.63s
+== M02 pytest exit code: 1 ==
+== M02 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

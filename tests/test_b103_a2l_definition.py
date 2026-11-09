@@ -242,7 +242,7 @@ V171_ENUM = "ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE"
 V171_ENUM_NODEF = "ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE"
 V171_RANGE = "ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE"
 V171_RANGE_NODEF = "ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE"
-V171_ASCII = "UNKNOWN"
+V171_ASCII = "ASAM.C.ASCII.UBYTE.NUMBER_42"
 V171_SBYTE = "ASAM.C.SCALAR.SBYTE.IDENTICAL"
 V171_UBYTE = "ASAM.C.SCALAR.UBYTE.IDENTICAL"
 
@@ -297,7 +297,7 @@ def test_r_a2l_def_2_3_commented_tab_verb_header_is_an_enum(tube):
 
 
 def test_r_a2l_def_3_1_ascii_characteristic_is_a_text(v171):
-    """R-A2L-DEF.3/1 - V171 ASCII object (the parser names it UNKNOWN)."""
+    """R-A2L-DEF.3/1 - V171 ASCII object (R-A2L-READ.23 names it ASAM.C.ASCII.UBYTE.NUMBER_42)."""
     d = describe_definition(V171_ASCII, v171)
     assert d.kind == "text" and d.byte_length == 42 and d.address == 0x810200
 
@@ -318,10 +318,10 @@ def _kind_msg(name: str, kind: str) -> tuple[str, str]:
 
 
 def test_r_a2l_def_4_1_val_blk_is_refused(c08):
-    """R-A2L-DEF.4/1 - VAL_BLK refused; address and byte length 256 still given."""
+    """R-A2L-DEF.4/1 - VAL_BLK refused; address still given, byte length None (R-A2L-READ.61)."""
     d = describe_definition("VAL_BLK_0001", c08["a2l"])
     _is_refused(d, *_kind_msg("VAL_BLK_0001", "VAL_BLK"))
-    assert d.byte_length == 256
+    assert d.byte_length is None
     assert d.address == c08["by_name"]["VAL_BLK_0001"]["address"]
 
 
@@ -415,12 +415,13 @@ def test_r_a2l_def_139_2_case08_issues_duplicate(c08):
     _is_refused(d, "A2L-DEF-NAME", "VALUE_0001: the A2L declares that name more than once")
 
 
-def test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration(tmp_path):
-    """R-A2L-DEF.139/3 - the builder opens the commented-out copy: two tags."""
+def test_r_a2l_def_139_3_commented_out_old_copy_is_not_a_second_declaration(tmp_path):
+    """R-A2L-DEF.139/3 - a commented-out copy gives no tag (R-A2L-READ.12): one live tag."""
     old = "\n".join(["/*", '/begin MEASUREMENT X "old"', "  UWORD CM_ID 0 0 0 65535", "  ECU_ADDRESS 0x10",
                      "/end MEASUREMENT", "*/"])
     a2l = _inline(tmp_path, _cm("CM_ID", "IDENTICAL"), old, _meas("X", "UWORD", "CM_ID", addr="0x20"))
-    _is_refused(describe_definition("X", a2l), "A2L-DEF-NAME", "X: the A2L declares that name more than once")
+    d = describe_definition("X", a2l)
+    assert d.refusal is None and d.address == 0x20
 
 
 # ==========================================================================
@@ -447,25 +448,25 @@ def _ascii(name: str, addr: str, number: str, *extra: str) -> str:
 def test_r_a2l_def_7_2_1_length_zero_is_refused(tmp_path):
     """R-A2L-DEF.7.2/1 - NUMBER 0."""
     a2l = _inline(tmp_path, _ascii("Z0", "0x10", "0"))
-    _is_refused(describe_definition("Z0", a2l), "A2L-DEF-ADDRESS", "Z0: its span of 0 bytes at 0x10 cannot be read")
+    _is_refused(describe_definition("Z0", a2l), "A2L-DEF-ADDRESS", "Z0: the object has no address or no length")
 
 
 def test_r_a2l_def_7_2_2_negative_length_is_refused(tmp_path):
     """R-A2L-DEF.7.2/2 - NUMBER -5."""
     a2l = _inline(tmp_path, _ascii("ZN", "0x10", "-5"))
-    _is_refused(describe_definition("ZN", a2l), "A2L-DEF-ADDRESS", "ZN: its span of -5 bytes at 0x10 cannot be read")
+    _is_refused(describe_definition("ZN", a2l), "A2L-DEF-ADDRESS", "ZN: the object has no address or no length")
 
 
 def test_r_a2l_def_7_2_3_length_above_one_mib_is_refused(tmp_path):
     """R-A2L-DEF.7.2/3 - NUMBER 1048577 (one past the bound)."""
     a2l = _inline(tmp_path, _ascii("ZH", "0x10", "1048577"))
-    _is_refused(describe_definition("ZH", a2l), "A2L-DEF-ADDRESS", "ZH: its span of 1048577 bytes at 0x10 cannot be read")
+    _is_refused(describe_definition("ZH", a2l), "A2L-DEF-ADDRESS", "ZH: the object has no address or no length")
 
 
 def test_r_a2l_def_7_2_4_negative_address_is_refused(tmp_path):
     """R-A2L-DEF.7.2/4 - address -0x10 (a UWORD object)."""
     a2l = _inline(tmp_path, _meas("NA2", "UWORD", addr="-0x10"))
-    _is_refused(describe_definition("NA2", a2l), "A2L-DEF-ADDRESS", "NA2: its span of 2 bytes at -0x10 cannot be read")
+    _is_refused(describe_definition("NA2", a2l), "A2L-DEF-ADDRESS", "NA2: the object has no address or no length")
 
 
 def test_r_a2l_def_7_2_5_span_ending_above_32_bits_is_refused(tmp_path):
@@ -502,9 +503,9 @@ def test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused(tmp_path):
 
 
 def test_r_a2l_def_9_1_length_not_the_datatypes_is_refused(tmp_path):
-    """R-A2L-DEF.9/1 - UWORD with LENGTH 4."""
+    """R-A2L-DEF.9/1 - UWORD with LENGTH 4 (R-A2L-READ.61: sizes disagree -> no length)."""
     a2l = _inline(tmp_path, _val("LX", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "LENGTH 4"))
-    _is_refused(describe_definition("LX", a2l), "A2L-DEF-LENGTH", "LX: its length 4 differs from the 2 bytes of UWORD")
+    _is_refused(describe_definition("LX", a2l), "A2L-DEF-ADDRESS", "LX: the object has no address or no length")
 
 
 # ==========================================================================
@@ -1235,9 +1236,9 @@ def test_r_a2l_def_58_2_13_all_zero_rat_func(tmp_path):
     _no_exception_triplet(d, a2l, {0x10: 0, 0x11: 3})
 
 
-def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text(tmp_path):
-    """R-A2L-DEF.58.2/14 - ESC shows as U+FFFD; no exception on an unterminated quote."""
-    pairs = ('0 "A\x1bB', )
+def test_r_a2l_def_58_2_14_esc_in_an_entry_text(tmp_path):
+    """R-A2L-DEF.58.2/14 - ESC shows as U+FFFD (closed quote; R-A2L-READ.15 spans an unterminated quote to EOF)."""
+    pairs = ('0 "A\x1bB"', )
     a2l = _inline(tmp_path, *_enum_blocks("CM_Q", "VT_Q", "1", *pairs), _val("T14", "0x10", "RL_U8", "CM_Q"))
     d = describe_definition("T14", a2l)
     assert d.kind == "enum" and d.refusal is None
@@ -1247,8 +1248,8 @@ def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text(tmp_path)
 
 
 def test_r_a2l_def_58_2_15_v171_unclosed_begin(v171):
-    """R-A2L-DEF.58.2/15 - V171 parses with 'Unclosed /begin'; every object still describes and decodes."""
-    assert v171["errors"]
+    """R-A2L-DEF.58.2/15 - V171 parses clean (R-A2L-READ.17); every object still describes and decodes."""
+    assert v171["errors"] == []
     defs = describe_definitions([t["name"] for t in v171["tags"]], v171)
     image = _zero_image(defs.values())
     for d in defs.values():
@@ -1280,9 +1281,12 @@ def _vtab_nul(tmp_path, name: str, text: str, tab: str):
     return _decoded(d, a2l, _img(0x10, b"\x00"))
 
 
-def test_r_a2l_def_137_1_nul_in_an_enum_text(tmp_path):
-    """R-A2L-DEF.137/1 - NUL in the entry text shows as U+FFFD."""
-    assert _vtab_nul(tmp_path, "N1", "A\x00B", "VT_C1").text == "A" + FFFD + "B"
+def test_r_a2l_def_137_1_nul_in_an_entry_text_refuses_the_file(tmp_path):
+    """R-A2L-DEF.137/1 - a NUL byte in the entry text refuses the file (R-A2L-READ.55): 0 tags."""
+    a2l = _inline(tmp_path, *_enum_blocks("CM_C", "VT_C1", "1", '0 "A\x00B"'), _val("N1", "0x10", "RL_U8", "CM_C"))
+    assert a2l["tags"] == []
+    assert any("File is not UTF-8 text" in e for e in a2l["errors"])
+    _is_refused(describe_definition("N1", a2l), "A2L-DEF-NAME", "N1: no tag of that name in the A2L")
 
 
 def test_r_a2l_def_137_2_esc_in_an_enum_text(tmp_path):
@@ -2280,7 +2284,7 @@ def _huge_span_case(tmp_path: Path, name: str, block: str) -> None:
     """One 58.2/20-22 object: its describe refusal, the 1,024-character bound, and the decode of the same refusal."""
     a2l = _inline(tmp_path, block)
     d = describe_definition(name, a2l)                                         # 0 exceptions
-    want = Refusal("A2L-DEF-ADDRESS", f"{name}: its span of {HEX256} bytes at 0x10 cannot be read")
+    want = Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length")  # R-A2L-READ.34: >16 hex digits
     assert d.refusal == want, d.refusal
     assert len(d.refusal.message) <= 1024
     assert decode_definition(d, a2l, {0x10: 1, 0x11: 2}) == want
@@ -2308,7 +2312,7 @@ def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_e
     a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
                                   addr="0x10"))
     d = describe_definition("MD", a2l)                                         # 0 exceptions
-    want = Refusal("A2L-DEF-KIND", f"MD: the system has no definition for a MATRIX_DIM {HEX256} MEASUREMENT object")
+    want = Refusal("A2L-DEF-ADDRESS", "MD: the object has no address or no length")  # R-A2L-READ.34/.63
     assert d.refusal == want, d.refusal
     assert len(d.refusal.message) <= 1024
     assert describe_definitions(["MD"], a2l)["MD"] == d
@@ -2334,22 +2338,21 @@ def _fresh_thread(fn, padding: int = 0):
     return box["value"]
 
 
-NEST_DEPTH = 980                          # the app's parser reads this depth in a fresh thread; it fails itself at >= 990
+NEST_DEPTH = 980                          # deeper than the reader's cap of 32 (R-A2L-READ.64)
 
 
-def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order(tmp_path):
-    """R-A2L-DEF.58.2/24 (E5S-04) - (N) 980 nested sections: 0 exceptions, same definition, same decode;
-    (O) the first COMPU_METHOD of a name in file order wins (each section before its children, children in order)."""
+def test_r_a2l_def_58_2_24_deep_nesting_is_refused_and_the_walk_keeps_file_order(tmp_path):
+    """R-A2L-DEF.58.2/24 - (N) 980 nested sections: R-A2L-READ.64 refuses nesting deeper
+    than 32 (0 tags, one error), so no definition; (O) the first COMPU_METHOD of a name in
+    file order wins (each section before its children, children in order)."""
     nested_block = "\n".join(['/begin GROUP G%d ""' % k for k in range(NEST_DEPTH)] + ["/end GROUP"] * NEST_DEPTH)
     obj = _val("DN", "0x10", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255")
     flat = _inline(tmp_path, obj)
     nested = _fresh_thread(lambda: _inline(tmp_path, obj, nested_block))     # the parser reads the depth itself
     alone = describe_definition("DN", flat)
     assert alone.refusal is None and alone.kind == "number" and alone.address == 0x10
-    # described and decoded 50 frames deep in a fresh thread: a recursive walk needs 980 more frames
-    got = _fresh_thread(lambda: describe_definitions(["DN"], nested)["DN"], padding=50)       # 0 exceptions
-    assert got == alone
-    assert _fresh_thread(lambda: decode_definition(got, nested, {0x10: 7}), padding=50) == Decoded(7, 7, "7")
+    assert nested["tags"] == []                                              # R-A2L-READ.64: deeper than 32
+    assert any("sections nested deeper than 32" in e for e in nested["errors"])
 
     # (O) CM_D is declared twice: inside a section (LINEAR 2 0) and later at module level (LINEAR 3 0)
     inner = '/begin GROUP G ""\n' + _cm("CM_D", "LINEAR", "2", "0") + "\n/end GROUP"
@@ -2361,22 +2364,20 @@ def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_o
 
 
 def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
-    """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
+    """R-A2L-DEF.151/4 - an oversized MATRIX_DIM number gives no length (R-A2L-READ.34/.63)."""
     a2l = _inline(
         tmp_path,
         _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
         _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
     )
     got = describe_definitions(["MD4", "MD5"], a2l)
-    t4 = "0x" + format(10 ** 4000 - 1, "X")[:254] + ELLIPSIS
-    assert got["MD4"].refusal == Refusal("A2L-DEF-KIND", f"MD4: the system has no definition for a MATRIX_DIM {t4} MEASUREMENT object")
-    assert got["MD5"].refusal == Refusal("A2L-DEF-KIND", f"MD5: the system has no definition for a MATRIX_DIM {HEX256} MEASUREMENT object")
     for name in ("MD4", "MD5"):
+        assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), got[name].refusal
         assert len(got[name].refusal.message) <= 1024, (name, len(got[name].refusal.message))
 
 
 def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
-    """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
+    """R-A2L-DEF.151/5 - oversized address/length words give no address/length (R-A2L-READ.34/.38/.63)."""
     a2l = _inline(
         tmp_path,
         _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
@@ -2385,11 +2386,8 @@ def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_boun
         _ascii("B2", "0x20", "18446744073709551616"),
     )
     got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
-    assert got["AH"].refusal == Refusal("A2L-DEF-ADDRESS", f"AH: its span of 1 bytes at {HEX256} cannot be read")
-    assert got["CH"].refusal == Refusal("A2L-DEF-ADDRESS", f"CH: its span of 1 bytes at {HEX256} cannot be read")
-    assert got["B1"].refusal == Refusal("A2L-DEF-ADDRESS", "B1: its span of 18446744073709551615 bytes at 0x10 cannot be read")
-    assert got["B2"].refusal == Refusal("A2L-DEF-ADDRESS", "B2: its span of 0x10000000000000000 bytes at 0x20 cannot be read")
     for name in ("AH", "CH", "B1", "B2"):
+        assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), (name, got[name].refusal)
         assert len(got[name].refusal.message) <= 1024, (name, len(got[name].refusal.message))
 
 

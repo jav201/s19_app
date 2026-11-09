@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.13s",
+  "req": "R-A2L-READ.64",
+  "mutation": "nesting cap raised to 10000",
+  "anchor": "_MAX_NESTING = 32",
+  "replacement": "_MAX_NESTING = 10000",
+  "applied": 1,
+  "baseline": "1 passed in 1.05s",
+  "verdict": "KILLED"
+}

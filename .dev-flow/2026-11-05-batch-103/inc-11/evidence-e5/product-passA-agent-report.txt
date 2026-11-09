@@ -1,0 +1,16 @@
+Implemented P1–P8 in `s19_app/tui/a2l.py` only; no commits or test/record edits.
+
+Changed helpers:
+
+- **P2:** `_WORD_SPLIT_RE` / `_line_words` — backslash plus LF/CRLF/CR remains inside quoted words using the bounded, unrolled regex (`s19_app/tui/a2l.py:377`).
+- **P1:** `_tag_header` preserves raw header words (`s19_app/tui/a2l.py:420`); `_characteristic_from_tokens` parses raw addresses and unquotes only string fields (`s19_app/tui/a2l.py:1355`).
+- **P6, P8:** `_tag_keyword_lines` now retains structured `(word, line)` arguments alongside canonical text (`s19_app/tui/a2l.py:456`).
+- **P1, P6:** `_tag_sizes`, `_matrix_dim_product`, `_infer_length_measurement`, and `_infer_length_characteristic` consume quote-preserving arguments instead of naively splitting on spaces (`s19_app/tui/a2l.py:519`, `s19_app/tui/a2l.py:594`, `s19_app/tui/a2l.py:1936`, `s19_app/tui/a2l.py:1973`).
+- **P5:** `_lex_a2l_lines` flushes pending words before non-string line advances, including multiline comments (`s19_app/tui/a2l.py:683`).
+- **P4:** `_build_section_tree_into` / `_process_text` use `/begin` and `/end` word lines for depth errors, close diagnostics, and `end_line` (`s19_app/tui/a2l.py:882`, `s19_app/tui/a2l.py:928`).
+- **P1, P3, P6, P7, P8:** `extract_a2l_tags` preserves numeric/byte-order quoted status, unquotes string arguments, reports argument lines, inherits nested MODULE sources, and carries `start_line` privately through the external-axis post-pass (`s19_app/tui/a2l.py:3372`, `s19_app/tui/a2l.py:3768`, `s19_app/tui/a2l.py:3812`). No public tag key added.
+- **P1, P6:** `extract_declared_spans` and its instance-length path preserve quoted numeric refusal while unquoting typedef identifiers (`s19_app/tui/a2l.py:3824`, `s19_app/tui/a2l.py:3845`).
+
+Verification: `python -m py_compile s19_app/tui/a2l.py` passed; `git diff --check` passed. Pytest was not run, as instructed.
+
+Incomplete P1–P8 items: **none**. Linux behavioral verification remains with the orchestrator. The independently modified `steps.log` and untracked brief/evidence files were left untouched.

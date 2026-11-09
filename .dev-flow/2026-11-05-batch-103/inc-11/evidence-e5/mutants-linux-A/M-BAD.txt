@@ -1,0 +1,8 @@
+=== M-BAD (control) ===
+anchor: 'def _no_such_anchor_xyz_mutant_control():'
+mutation: None
+applied count: 0
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 0.79s

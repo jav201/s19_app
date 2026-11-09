@@ -1,0 +1,8 @@
+>       assert sec["start_line"] == 3  # PROJECT's LF line 2 -> 2*2 - 1
+E       assert 4 == 3
+
+tests\test_b103_a2l_reader.py:214: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends
+2 failed, 181 passed in 146.98s (0:02:26)

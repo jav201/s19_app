@@ -456,32 +456,10 @@ def _describe_one(
 
     tag, section = found
 
-    # Copy the tag so the MEASUREMENT fill never mutates the parse payload
+    # Copy the tag so the definition never mutates the parse payload
     # (R-A2L-DEF.58.1).
     tag = dict(tag)
     object_lines = _read_object_lines(section)
-
-    # E2-1 / R-A2L-014: a MEASUREMENT whose tag lacks them is filled from the
-    # header words (datatype, conversion word, limit words) and, with a
-    # datatype, the length = size × MATRIX_DIM (1 when absent).
-    if tag.get("section") == "MEASUREMENT":
-        header = object_lines.get("header") or []
-        if tag.get("datatype") is None and len(header) > 2:
-            tag["datatype"] = header[2]
-        if tag.get("conversion") is None and len(header) > 3:
-            tag["conversion"] = header[3]
-        if tag.get("lower_limit") is None and len(header) > 6:
-            tag["lower_limit"] = header[6]
-        if tag.get("upper_limit") is None and len(header) > 7:
-            tag["upper_limit"] = header[7]
-        if tag.get("length") is None and tag.get("datatype") in DATATYPE_SIZES:
-            matrix_dim = tag.get("matrix_dim")
-            mult = (
-                matrix_dim
-                if isinstance(matrix_dim, int) and not isinstance(matrix_dim, bool)
-                else 1
-            )
-            tag["length"] = DATATYPE_SIZES[tag["datatype"]] * mult
 
     address = tag.get("address")
     byte_length = tag.get("length")

@@ -1,0 +1,28 @@
+Hecho. La corrección de consistencia CUBOID está aplicada y verificada en verde.
+
+## Cambios (solo los 4 archivos autorizados)
+
+1. **`tests/fixtures/b103_i11/e07fb00_tags.jsonl`** — `ASAM.C.CUBOID.COLUMN_DIR` (V171, 8455520): `length: null → 36`, `class: null → D8`.
+2. **`tests/test_b103_a2l_reader.py`** — solo docstring/cuentas: `234,426 tags identical; 228 defect tags` → `234,425 tags identical; 229 defect tags`.
+3. **`.dev-flow/.../inc-11/01-requirements.md`** — READ.49 threshold `234,425/234,425` y `229 listed`; clase D8 ahora nombra `ROW_DIR` **y** `COLUMN_DIR`; fila de defecto nueva para `COLUMN_DIR`; total `229 tags (234,425 identical)`.
+4. **`.dev-flow/.../inc-11/02-test-cases.md`** — READ.49/1: `229 defect tags`, `234,425`, `each of the 229`, `Inc 11 E5: +2 by P13`.
+
+## Verificación
+
+- **Esta PC:** `python -m py_compile tests/test_b103_a2l_reader.py` → OK; fixture JSON válida.
+- **Linux runner (<runner>):** copié los 2 archivos de prueba al clon `/tmp/b103-e5-11-consistency/tree` (HEAD `21a0c56b`, mismas modificaciones previas) y corrí el nodo pedido con el entorno aislado (`s19ci` Python absoluto, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados).
+
+Transcripción completa guardada en `inc-11/evidence-e5/test-consistency2-green.txt`:
+
+```
+== s19_app.__file__ ==
+/tmp/b103-e5-11-consistency/tree/s19_app/__init__.py
+== pytest (1 targeted node) ==
+.                                                                        [100%]
+1 passed in 12.11s
+PYTEST_EXIT_CODE=0
+```
+
+`test_r_a2l_read_49_no_regression` → **1 passed, exit code 0**.
+
+No hice commit (dejo esa decisión al orquestador, como en los passes previos). El transcript queda en el working tree sin commitear junto con los demás artefactos de E5.

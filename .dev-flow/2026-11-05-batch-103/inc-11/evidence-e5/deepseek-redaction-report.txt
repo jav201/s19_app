@@ -1,0 +1,28 @@
+Done. The sweep is complete and the gate passes.
+
+## Result
+
+**`test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses`: 1 passed** (5.75s).
+
+## Changed files
+
+**174 tracked text files**, all under `.dev-flow/2026-11-05-batch-103/` (the batch-101 root held no leaks). Line counts preserved exactly (byte-level replacement, `\n` count asserted per file; diff is 878 −/878 + balanced). No product/test code, no verdicts/counts, no corpus touched. 3 binary files skipped (same criterion the law uses). Nothing committed.
+
+## Exact replacements (1321 substrings)
+
+| Source → placeholder | Occurrences |
+|---|---|
+| `<user>` → `<user>` | 471 |
+| `<user>` → `<user>` | 546 |
+| `<user>` → `<user>` | 153 |
+| `<user>` → `<user>` | 57 |
+| `<user>` → `<user>` | 46 |
+| `<runner>` → `<runner>` | 31 |
+| `<runner>` → `<runner>` | 6 |
+| `<runner-ip>` → `<runner-ip>` | 9 |
+| `<runner-ip>` → `<runner-ip>` | 1 |
+| `<runner-ip>` → `<runner-ip>` | 1 |
+
+Derived forms all follow: `/home/<user>` → `/home/<user>`, `C:\Users\<user>` / `C:\Users\<user>` → `C:\Users\<user>`, `pytest-of-<name>` → `pytest-of-<user>`, `<user>@<runner-ip>` → `<user>@<runner-ip>`.
+
+Two flags the law raised beyond the brief's list, handled consistently and without weakening anything: **`<user>`** (Windows CI `C:/Users/<user>` and `pytest-of-<user>`) → `<user>`, and **`<runner-ip>`** (LAN address) → `<runner-ip>`.

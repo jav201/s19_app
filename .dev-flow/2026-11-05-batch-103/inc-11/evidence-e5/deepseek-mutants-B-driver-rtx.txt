@@ -1,0 +1,35 @@
+Done. Canonical Linux mutant unit B re-run complete on `<runner>` against the frozen tree `/tmp/b103-e5-11-mutB-rtx/tree`.
+
+## Results
+
+**Baseline** (`reader` + `reader_e5` + `coverage` + `b103_a2l_definition`): **522 passed** in 341.68s, exit 0 (no Windows-only CR/CRLF failures on Linux).
+
+**22 arms, all KILLED, all anchors applied exactly once, all restored with SHA-256 verification:**
+
+| Group | Arms | Verdict |
+|---|---|---|
+| Known-bad control | CONTROL | KILLED (harness proven able to fail) |
+| Reader mutants | M01–M14 | 14 KILLED |
+| P16 full-span precedence | P16 | KILLED |
+| P17 exact TAB_VERB / missing-table / missing-entry | P17a–P17d | 4 KILLED |
+| P18 DATA_SIZE standing precedence / external agreeing span | P18a–P18b | 2 KILLED |
+
+**Totals:** KILLED 22 · SURVIVED 0 · CRASH 0 · BAD 0.
+
+**Key correction vs the Windows reference:** M09 was SURVIVED on Windows (oracle never contained the refused-length + inline-span shape). On this corrected tree, M09 now uses the direct synthetic test `test_e5_p15_length_zero_inline_axis_refusal_final` and is **KILLED** — the mutant re-derived `length=13` instead of keeping the final refusal `None` (`assert 13 is None`).
+
+**Survivors:** none.
+
+**Test gap (minor):** P17a proves `TAB_VERB → enum` in the positive direction and `IDENTICAL → number`; there is no synthetic near-`TAB_VERB` conversion type, so a widened match (substring/prefix) would apply but SURVIVE. The "exact" contract is only guarded one way.
+
+## Outputs (all under `/tmp/b103-e5-11-mutB-rtx/out/`)
+
+- `mutant-table-B.md` — rebuilt table with exact anchors, applied counts, discriminating nodes, verdicts
+- `mutants-B/` — 22 per-arm transcripts (`CONTROL.txt` … `P18b.txt`), each starting with `s19_app.__file__`, showing the pytest short-summary line + the assertion
+- `baseline.txt`, `final-green.txt`
+
+## Discipline verified
+
+- Tree clean after every arm: `git diff --stat` empty; `a2l.py` / `a2l_definition.py` / `a2l_extract.py` SHA-256 all match their pre-mutation values.
+- Final green re-run: **522 passed**, exit 0.
+- No git checkout/stash/commit; one mutation at a time; isolated HOME/XDG/LOCALAPPDATA; `-I -B`; `PYTHONDONTWRITEBYTECODE=1`; closed stdin; no child agents; no clipboard.

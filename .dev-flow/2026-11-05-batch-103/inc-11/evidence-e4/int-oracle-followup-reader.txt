@@ -1,0 +1,21 @@
+=== s19_app.__file__ ===
+/tmp/b103-e4-11-oracle-kimi/tree/s19_app/__init__.py
+exit=0
+
+=== TEST 1: focused synthetic differential cases ===
+.....                                                                    [100%]
+5 passed in 0.63s
+exit=0
+
+=== TEST 2: test_r_a2l_read_48_tracked_files_equal_ref ===
+.                                                                        [100%]
+1 passed in 35.29s
+exit=0
+
+=== TEST 3: whole tests/test_b103_a2l_reader.py -m 'not serial_timing' ===
+........................................................................ [ 39%]
+........................................................................ [ 78%]
+.......................................                                  [100%]
+183 passed in 223.97s (0:03:43)
+exit=0
+

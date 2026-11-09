@@ -1,0 +1,10 @@
+=== M10 (R-A2L-READ.1) ===
+anchor: '                if ch == "\\r" and i + 1 < n and body[i + 1] == "\\n":'
+mutation: '                if ch == "\\r" and False:'
+applied count: 1
+mutated hash: db9e67d8558bf9744c2b0c7b567b20503974a602cc92c7e825a99ab59971da48
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+..                                                                       [100%]
+2 passed in 43.46s

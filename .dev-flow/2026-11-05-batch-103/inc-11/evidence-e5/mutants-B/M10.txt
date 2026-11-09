@@ -1,0 +1,36 @@
+# mutant M10 — byte order (invalid byte order keeps address)
+
+requirement: R-A2L-READ.68 / R-A2L-READ.60
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_error']
+
+---- pytest transcript ----
+
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_r_a2l_read_68_byte_order_error _____________________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32611/test_r_a2l_read_68_byte_order_0')
+
+    def test_r_a2l_read_68_byte_order_error(tmp_path: Path) -> None:
+        """R-A2L-READ.68/1: BYTE_ORDER not-a-byte-order errors."""
+        for w in ("MSB_FRIST", "MSB_LAST_MSW_FIRST", '"MSB_FIRST"', "1"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" BYTE_ORDER {w}"))
+            data = _parse(tmp_path, text)
+            assert any(f"BYTE_ORDER {w} is not a byte order" in e for e in data["errors"]), w
+>           assert _tag(data, "X")["address"] is None
+E           assert 16 is None
+
+tests\test_b103_a2l_reader.py:1265: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_error - a...
+1 failed in 1.13s
+
+[exit=1 elapsed=2.0s tag=M10]
+
+VERDICT: KILLED (exit 1)

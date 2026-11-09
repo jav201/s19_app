@@ -1,0 +1,40 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P17d apply ==
+file: s19_app/tui/a2l_definition.py
+anchor: '        elif not enum_entries:'
+applied_count: 1 (expected 1 )
+sha256_before: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69
+sha256_after:  262444eb1895b51bfd76f384fbfc3eaddf74da8381082892fb854ff8b4904bf0
+== P17d test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_17_1_count_zero_is_refused ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-56/test_r_a2l_def_17_1_count_zero0')
+
+    def test_r_a2l_def_17_1_count_zero_is_refused(tmp_path):
+        """R-A2L-DEF.17/1 - ``TAB_VERB 0``."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_0", "VT_0", "0"), _val("E0", "0x10", "RL_U8", "CM_0"))
+>       _is_refused(describe_definition("E0", a2l), "A2L-DEF-TABLE-EMPTY", "E0: the table VT_0 has no entries")
+
+tests/test_b103_a2l_definition.py:670: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='E0', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..._table='VT_0', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_0', refusal=None)
+code = 'A2L-DEF-TABLE-EMPTY', message = 'E0: the table VT_0 has no entries'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-TABLE-EMPTY', message='E0: the table VT_0 has no entries')
+E        +  where None = Definition(name='E0', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..._table='VT_0', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_0', refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='E0: the table VT_0 has no entries') = Refusal('A2L-DEF-TABLE-EMPTY', 'E0: the table VT_0 has no entries')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_17_1_count_zero_is_refused
+1 failed in 0.73s
+== P17d pytest exit code: 1 ==
+== P17d restore ==
+restore_hash_ok: True
+sha256_restored: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69

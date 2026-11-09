@@ -1,0 +1,24 @@
+=== M16 (R-A2L-READ.22) ===
+anchor: '            if low == "/include":'
+mutation: '            if False:'
+applied count: 1
+mutated hash: adb607d72825193007c98e34b29ce182ad19c002e9a8be5cff2a3ff20a3e264b
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_read_22_include_error _______________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-38/test_r_a2l_read_22_include_err0')
+
+    def test_r_a2l_read_22_include_error(tmp_path: Path) -> None:
+        """R-A2L-READ.22/1, /2: /include gives one error; in a comment, none."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "merge_inc_test.a2l")
+>       assert [e for e in data["errors"] if "is not read" in e]
+E       assert []
+
+tests/test_b103_a2l_reader.py:841: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_22_include_error - asse...
+1 failed in 0.84s

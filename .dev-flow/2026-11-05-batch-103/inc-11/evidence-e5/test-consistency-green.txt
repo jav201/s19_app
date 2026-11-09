@@ -1,0 +1,39 @@
+== s19_app.__file__ ==
+/tmp/b103-e5-11-consistency/tree/s19_app/__init__.py
+== pytest (4 targeted nodes) ==
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_read_49_no_regression _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-53/test_r_a2l_read_49_no_regressi0')
+
+    def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
+        """R-A2L-READ.49/1: 234,426 tags identical; 228 defect tags take their values."""
+        if not FIXTURE_PATH.exists():
+            pytest.skip("e07fb00 fixture not yet generated on the runner")
+        fixture = _load_fixture()
+        total_tags = 0
+        for entry in fixture:
+            path = REPO_ROOT / entry["file"]
+            data = parse_a2l_file(path)
+            assert len(data["tags"]) == entry["tag_count"], entry["file"]
+            expected = {(t["section"], t["name"]): t for t in entry["tags"]}
+            for tag in data["tags"]:
+                key = (tag["section"], tag["name"])
+                assert key in expected, (entry["file"], key)
+                want = expected[key]
+>               assert _six_fields(tag) == (
+                    want["name"], want["address"], want["length"], want["datatype"],
+                    want["byte_order"], want["bit_mask"],
+                ), (entry["file"], key)
+E               AssertionError: ('examples/case_00_public/ASAP2_Demo_V171.a2l', ('CHARACTERISTIC', 'ASAM.C.CUBOID.COLUMN_DIR'))
+E               assert ('ASAM.C.CUBO...little', None) == ('ASAM.C.CUBO...little', None)
+E                 
+E                 At index 2 diff: 36 != None
+E                 Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:1731: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_49_no_regression - Asse...
+1 failed, 3 passed in 40.30s
+PYTEST_EXIT_CODE=1

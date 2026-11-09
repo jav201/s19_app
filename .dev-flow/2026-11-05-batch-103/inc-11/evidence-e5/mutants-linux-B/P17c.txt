@@ -1,0 +1,49 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P17c apply ==
+file: s19_app/tui/a2l_definition.py
+anchor: '        elif table_form is None:'
+applied_count: 1 (expected 1 )
+sha256_before: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69
+sha256_after:  eb04a9480753d2781630193e3b6efdb4276203b8a657dff648aec764ea0a4c0f
+== P17c test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_a2l_def_13_2_dangling_table_is_refused _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-55/test_r_a2l_def_13_2_dangling_t0')
+
+    def test_r_a2l_def_13_2_dangling_table_is_refused(tmp_path):
+        """R-A2L-DEF.13/2 - COMPU_TAB_REF VT_GONE."""
+        a2l = _inline(tmp_path, _cm("CM_V", "TAB_VERB", fmt='"%.0"', ref="VT_GONE"), _val("EN", "0x10", "RL_U8", "CM_V"))
+>       _is_refused(describe_definition("EN", a2l), "A2L-DEF-TABLE",
+                    "EN: the table VT_GONE of CM_V is not declared in the A2L")
+
+tests/test_b103_a2l_definition.py:594: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='EN', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..., compu_tab_ref='VT_GONE', refusal=Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table VT_GONE has no entries'))
+code = 'A2L-DEF-TABLE'
+message = 'EN: the table VT_GONE of CM_V is not declared in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table VT_GONE has no entries')
+E       assert Refusal(code=...s no entries') == Refusal(code=...d in the A2L')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-TABLE-EMPTY' != 'A2L-DEF-TABLE'
+E           - A2L-DEF-TABLE...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_2_dangling_table_is_refused
+1 failed in 0.74s
+== P17c pytest exit code: 1 ==
+== P17c restore ==
+restore_hash_ok: True
+sha256_restored: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69

@@ -1,0 +1,51 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P18b apply ==
+file: s19_app/tui/a2l.py
+anchor: '            if not agree:'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  ca349ece95066be3e6be5e6378874ea1267e767e15b222f5829abf80185bf704
+== P18b test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_e5_p18_external_full_span_agrees_with_standing_data_size _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-58/test_e5_p18_external_full_span0')
+
+    def test_e5_p18_external_full_span_agrees_with_standing_data_size(tmp_path: Path) -> None:
+        """A later-resolved full span 4 agrees with standing DATA_SIZE 4 and is
+        exported as the characteristic length."""
+        text = _body(
+            char(
+                "C",
+                "CURVE",
+                "0x2000",
+                "RL_U16",
+                " DATA_SIZE 4",
+                " /begin AXIS_DESCR",
+                " COM_AXIS NO_INPUT_QUANTITY CM_ID 2 0 1 AXIS_PTS_REF AP",
+                " /end AXIS_DESCR",
+            )
+            + "\n"
+            + char(
+                "AP",
+                "VALUE",
+                "0x3000",
+                "RL_U16",
+                " /begin AXIS_DESCR",
+                " STD_AXIS NO_INPUT_QUANTITY CM_ID 2 0 1",
+                " /end AXIS_DESCR",
+            )
+        )
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4
+E       assert None == 4
+
+tests/test_b103_a2l_reader_e5.py:494: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p18_external_full_span_agrees_with_standing_data_size
+1 failed in 0.60s
+== P18b pytest exit code: 1 ==
+== P18b restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

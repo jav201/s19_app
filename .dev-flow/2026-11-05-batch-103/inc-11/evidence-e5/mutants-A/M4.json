@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.13s",
+  "req": "R-A2L-READ.11",
+  "mutation": "stray */ records no error",
+  "anchor": "if \"*/\" in word:",
+  "replacement": "if False:",
+  "applied": 1,
+  "baseline": "1 passed in 1.03s",
+  "verdict": "KILLED"
+}

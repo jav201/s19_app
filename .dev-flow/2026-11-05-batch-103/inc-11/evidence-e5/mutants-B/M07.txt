@@ -1,0 +1,43 @@
+# mutant M07 — sizes that stop agreeing
+
+requirement: R-A2L-READ.59 / R-A2L-READ.61
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_61_no_length_when_disagree']
+
+---- pytest transcript ----
+
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_r_a2l_read_61_no_length_when_disagree __________________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32608/test_r_a2l_read_61_no_length_w0')
+
+    def test_r_a2l_read_61_no_length_when_disagree(tmp_path: Path) -> None:
+        """R-A2L-READ.61/1..7: no length when sizes disagree."""
+        cases = [
+            meas("X", " ECU_ADDRESS 0x10", " LENGTH 4", " LENGTH 8"),
+            meas("X", " ECU_ADDRESS 0x10", " DATA_SIZE 2", " LENGTH 8"),
+            '/begin CHARACTERISTIC X ""\n VALUE 0x10 RL_U16 0 CM_ID 0 65535\n LENGTH 4\n/end CHARACTERISTIC',
+            '/begin CHARACTERISTIC X ""\n VAL_BLK 0x10 RL_U16 0 CM_ID 0 65535\n MATRIX_DIM 4\n NUMBER 5\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", " ARRAY_SIZE 4", " MATRIX_DIM 3"),
+            '/begin CHARACTERISTIC X ""\n ASCII 0x10 RL_U8 0 CM_ID 0 65535\n NUMBER 8\n MATRIX_DIM 4\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", " LENGTH 2 4"),
+        ]
+        for body in cases:
+            data = _parse(tmp_path, _body(body))
+>           assert _tag(data, "X", _section_of(data, "X"))["length"] is None
+E           assert 8 is None
+
+tests\test_b103_a2l_reader.py:1429: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_61_no_length_when_disagree
+1 failed in 1.07s
+
+[exit=1 elapsed=2.0s tag=M07]
+
+VERDICT: KILLED (exit 1)

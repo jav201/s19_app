@@ -1,0 +1,36 @@
+/home/<user>/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+...........................................................F............ [ 98%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing _____________
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+        from tests.support import suite_census
+    
+        assert set(suite_census.SAMPLED_TIMING_ARMS) == _SAMPLED_PIN
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        lost = sorted(_BASE_STATIC_ARMS - arms)
+        assert not lost, f"census lost base timing arms: {lost}"
+        marked, refusals = _marked_set(TESTS_ROOT)
+        assert not refusals, "\n".join(refusals)
+        arm_set = arms | set(suite_census.SAMPLED_TIMING_ARMS)
+        guard_lines = _marker_guard_lines(arm_set, set(), marked)
+>       assert not guard_lines, "\n".join(guard_lines)
+E       AssertionError: serial_timing on a test that is not a timing arm: tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_no_exception_and_one_error
+E       assert not ['serial_timing on a test that is not a timing arm: tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_no_exception_and_one_error']
+
+tests/test_suite_hygiene.py:403: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+1 failed, 218 passed in 86.36s (0:01:26)
+EXIT=1

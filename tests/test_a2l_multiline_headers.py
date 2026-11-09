@@ -271,9 +271,14 @@ def test_at101_hostile_comment_corpus(tmp_path: Path, case_id: str, body: str, e
     over malformed input. Driving through ``parse_a2l_file`` exercises the whole
     load path, not just the helper. The per-case ``expected`` distinguishes
     genuine degradation (None) from cases where valid mandatory params must
-    survive the hostile syntax around them.
+    survive the hostile syntax around them. An unclosed ``/*`` or ``"`` now
+    swallows ``/end CHARACTERISTIC`` (R-A2L-READ.10/.15), so those two cases
+    yield no tag at all (R-A2L-READ.12).
     """
     char = _parse_single_char(tmp_path, body, name=f"{case_id}.a2l")
+    if case_id in ("unterminated_block_eats_mandatory", "unterminated_quote"):
+        assert char is None  # unclosed /* or " swallows /end CHARACTERISTIC
+        return
     assert char is not None  # the block always yields a tag; only its header may be None
     assert char.get("char_type") == expected
 
@@ -320,7 +325,7 @@ def test_at101_megabyte_unterminated_block_is_linear(tmp_path: Path) -> None:
     started = time.perf_counter()
     char = _parse_single_char(tmp_path, body, name="dos.a2l")
     elapsed = time.perf_counter() - started
-    assert char is not None
+    assert char is None  # an unterminated /* swallows /end CHARACTERISTIC -> no tag
     assert elapsed < report_margin("AT101", elapsed, 5.0)
 
 
@@ -385,8 +390,8 @@ def test_at103_deposit_with_markup_metachars_renders_verbatim() -> None:
 def test_tc097_strip_removes_block_and_line_comments() -> None:
     # Spanning block comment (across the newline sentinel) removed as one unit.
     assert _strip_a2l_comments("A /* c\n more c */ B") == "A  B"
-    # Adjacent (no-space) block comment fuses the surrounding tokens.
-    assert _strip_a2l_comments("CURVE/*c*/0x1") == "CURVE0x1"
+    # Adjacent (no-space) block comment is a word break (R-A2L-READ.7).
+    assert _strip_a2l_comments("CURVE/*c*/0x1") == "CURVE 0x1"
 
 
 def test_tc097_line_comment_truncates_to_next_newline_only() -> None:

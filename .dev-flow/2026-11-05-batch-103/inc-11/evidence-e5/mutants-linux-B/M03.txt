@@ -1,0 +1,31 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M03 apply ==
+file: s19_app/tui/a2l.py
+anchor: '    raw = (token or "").strip().upper()'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  74c9f4c67fbaf0fd4d650be79e5a94258f10688020cc479bed5c5a60133635c5
+== M03 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_read_68_byte_order_words_no_error _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-40/test_r_a2l_read_68_byte_order_0')
+
+    def test_r_a2l_read_68_byte_order_words_no_error(tmp_path: Path) -> None:
+        """R-A2L-READ.68/3: valid byte-order words give no error."""
+        for w in ("MSB_FIRST", "MSB_LAST", "BIG_ENDIAN", "LITTLE_ENDIAN", "msb_first", "msb_last", "big_endian", "little_endian"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" BYTE_ORDER {w}"))
+            data = _parse(tmp_path, text)
+>           assert not [e for e in data["errors"] if "not a byte order" in e], w
+E           AssertionError: msb_first
+E           assert not ['Line 23: BYTE_ORDER msb_first is not a byte order']
+
+tests/test_b103_a2l_reader.py:1275: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_words_no_error
+1 failed in 0.63s
+== M03 pytest exit code: 1 ==
+== M03 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

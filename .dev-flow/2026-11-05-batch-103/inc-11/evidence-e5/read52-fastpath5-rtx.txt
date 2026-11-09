@@ -1,0 +1,26 @@
+/tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+F
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_52_case06_time ________________________
+
+big_files = {'case06': PosixPath('/tmp/b103-e5-11-mutB-rtx/tree/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': Po...eader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-<user>/pytest-30/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_time(big_files: dict) -> None:
+        current = _median_metrics(REPO_ROOT, big_files["case06"])["elapsed"]
+        root = _base_root()
+        base = _median_metrics(root, big_files["case06"])["elapsed"] if root else BASE_CASE06_S
+        bound = base * 1.5
+>       assert current < report_margin("R-A2L-READ.52/1 case_06 time", current, timing_bound(bound)), (current, base)
+E       AssertionError: (8.656049346000145, 5.65956300300013)
+E       assert 8.656049346000145 < 8.489344504500195
+E        +  where 8.489344504500195 = report_margin('R-A2L-READ.52/1 case_06 time', 8.656049346000145, 8.489344504500195)
+E        +    where 8.489344504500195 = timing_bound(8.489344504500195)
+
+tests/test_b103_a2l_reader_perf.py:206: AssertionError
+============================= QC-TM timing margins =============================
+LOW -2.0%  8.656 s / 8.489 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time - A...
+1 failed in 55.64s

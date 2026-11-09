@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.14s",
+  "req": "R-A2L-READ.10",
+  "mutation": "unclosed block comment records no error",
+  "anchor": "errors.append(f\"Line {comment_line}: comment not closed\")",
+  "replacement": "pass",
+  "applied": 1,
+  "baseline": "1 passed in 1.09s",
+  "verdict": "KILLED"
+}

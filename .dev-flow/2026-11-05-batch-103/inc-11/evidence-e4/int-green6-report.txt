@@ -1,0 +1,29 @@
+Integration run 6 executed end-to-end. Full report below.
+
+## Result: GREEN (all five groups passed)
+
+Ran on the Linux runner (`<runner>`) from a fresh full clone of `3926b710` under `/tmp/b103-e4-11-int6/tree`, with the `s19ci` env, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e4-11-int6/<user>`. Every transcript opens with `s19_app.__file__` → the fresh tree, and carries the pytest exit code.
+
+| Group | Files | Result |
+|---|---|---|
+| A — reader | `test_b103_a2l_reader.py` | **183 passed** (exit 0) |
+| B — Inc 2a regression | `test_b103_a2l_definition.py` + `test_b103_synth_definitions.py` | **200 passed** (exit 0) |
+| C — changed legacy | 6 files | **389 passed, 1 skipped** (exit 0) |
+| D — laws | 7 files | **216 passed, 3 skipped** (exit 0) |
+| E — timing (`-m serial_timing`, one file at a time) | reader perf **7 passed, 1 deselected**; definition perf **22 passed** (both exit 0) |
+
+Totals: **1017 passed, 4 skipped, 0 failed, 1 deselected**. No failures.
+
+**Timing (R-A2L-READ.52):** reader time bounds hold — case_06 8.688 s vs 8.847 s bound, software_a 0.871 s vs 0.980 s, string 0.066 s vs 0.112 s; peak-RSS bounds all well under 2× (worst: case_06 588.9 MB vs 1070 MB). `QC-TM` flags two "LOW" margins on time but both are positive (elapsed < bound). Definition perf: 52 bounds, 0 under 20% margin. Uptime before/after recorded in the E transcript.
+
+## One environment note (not a test failure)
+
+The laws group D initially ran red (2 failures) purely because I set the isolated `HOME` to `…/<user>/home`, making `Path.home().name == "home"`; the redaction laws then matched the literal word "home" across committed inc-6/7/8 evidence. I corrected `HOME` to a unique basename (`<user>/zqisolated6`, verified absent from the repo) and re-ran A–D uniformly. No product, test, or reference file was touched.
+
+## Deliverables
+
+Transcripts landed in `.dev-flow/2026-11-05-batch-103/inc-11/evidence-e4/` as `int-green6-{a,b,c,d,e}.txt` (checksums verified byte-identical to the runner copies). Nothing committed.
+
+Two files (`HANDOFF-2026-11-07.md`, `inc-11/steps.log`) show as modified in the worktree — those are pre-existing orchestrator edits, not mine. My only additions are the 5 untracked transcript files.
+
+Runner scratch `/tmp/b103-e4-11-int6*` and the local bundle were removed after the evidence was verified.

@@ -1,0 +1,32 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M08 apply ==
+file: s19_app/tui/a2l_definition.py
+anchor: '    byte_length = tag.get("length")'
+applied_count: 1 (expected 1 )
+sha256_before: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69
+sha256_after:  6f8269340550493ce30be7cb3551f888d61091083ca493904a32e671b9d29acf
+== M08 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_read_38_definition_stays_refused __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-45/test_r_a2l_read_38_definition_0')
+
+    def test_r_a2l_read_38_definition_stays_refused(tmp_path: Path) -> None:
+        """R-A2L-READ.38/4 and .61/4: describe_definition keeps a refused length."""
+        for w in ("0", "99999999999"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}"))
+            data = _parse(tmp_path, text)
+            definition = describe_definition("X", data)
+>           assert definition.byte_length is None
+E           AssertionError: assert 1 is None
+E            +  where 1 = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UWORD'...ompu_tab_ref=None, refusal=Refusal(code='A2L-DEF-LENGTH', message='X: its length 1 differs from the 2 bytes of UWORD')).byte_length
+
+tests/test_b103_a2l_reader.py:1450: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_38_definition_stays_refused
+1 failed in 0.63s
+== M08 pytest exit code: 1 ==
+== M08 restore ==
+restore_hash_ok: True
+sha256_restored: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69

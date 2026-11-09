@@ -279,18 +279,18 @@ def test_r_val_032_3_software_a_raises_no_unrecognized_block() -> None:
 
 
 def test_r_val_032_3_v171_one_line_if_data() -> None:
-    """Why: a one-line IF_DATA stays open in the section tree (parser limit, backlog);
-    the exemption must still hold and the structure ERROR must still be raised."""
+    """Why: a one-line IF_DATA closes on its line (R-A2L-READ.17), so V171 has
+    0 parse errors; the IF_DATA exemption must still hold."""
     data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l")
     issues = validate_a2l_structure(data)
     assert _unrecognized(issues) == []
+    assert data["errors"] == []
     structure = [
         i
         for i in issues
-        if i.code == "A2L_STRUCTURE_ERROR" and i.message == "Unclosed /begin sections detected."
+        if i.code == "A2L_STRUCTURE_ERROR"
     ]
-    assert len(structure) == 1, [(i.code, i.message) for i in issues]
-    assert structure[0].severity == ValidationSeverity.ERROR
+    assert structure == [], [(i.code, i.message) for i in issues]
 
 
 # ---------------------------------------------------------------------------
@@ -361,11 +361,13 @@ def test_r_a2l_036_2_leading_zero_decimal(tmp_path: Path) -> None:
 
 
 def test_r_a2l_036_2_open_quote_ends_at_line(tmp_path: Path) -> None:
-    """Why: an unterminated quote ends at its line; it must not swallow the next line's
-    comment/words (carried quote state would give base 0x10, size 0x20)."""
+    """Why: a closed quote ends at its line; it must not swallow the next line's
+    comment/words (carried quote state would give base 0x10, size 0x20). An
+    unterminated quote now spans to EOF (R-A2L-READ.14/.15), so this pins the
+    closed-quote shape."""
     seg = _one_segment(
         tmp_path,
-        '/begin MEMORY_SEGMENT S7 "oops',
+        '/begin MEMORY_SEGMENT S7 "oops"',
         "/* 0x10 0x20 */ DATA FLASH INTERN 0x1000 0x200 -1",
     )
     assert (seg["base"], seg["size"], seg["offset"]) == (0x1000, 0x200, -1)

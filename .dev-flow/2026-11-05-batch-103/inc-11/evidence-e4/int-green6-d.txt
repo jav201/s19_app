@@ -1,0 +1,25 @@
+s19_app.__file__ = /tmp/b103-e4-11-int6/tree/s19_app/__init__.py
+commit = 3926b710b4b7978b6a48f5abdac1b426ba88dfda
+run_start = 2026-11-08T16:37:22-06:00
+command = tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py -n 8
+================================================================
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/b103-e4-11-int6/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 8/8 workers
+8 workers [219 items]
+
+....................s................................................... [ 32%]
+.............................................................s.......... [ 65%]
+..........................................................s............. [ 98%]
+...                                                                      [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+================== 216 passed, 3 skipped in 77.97s (0:01:17) ===================
+PYTEST_EXIT_CODE = 0
+================================================================
+run_end = 2026-11-08T16:38:41-06:00

@@ -1,0 +1,6 @@
+== s19_app.__file__ ==
+/tmp/b103-e5-11-consistency/tree/s19_app/__init__.py
+== pytest (1 targeted node) ==
+.                                                                        [100%]
+1 passed in 12.11s
+PYTEST_EXIT_CODE=0

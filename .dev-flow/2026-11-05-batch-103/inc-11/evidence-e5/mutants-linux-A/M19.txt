@@ -1,0 +1,26 @@
+=== M19 (R-A2L-001.5) ===
+anchor: '                    matched = top["name"] == word'
+mutation: '                    matched = True'
+applied count: 1
+mutated hash: d0f9554c8c2cb41d2d252f7b1585305c574796bd1e48118b51c97fc65ca9a456
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________ test_r_a2l_001_5_end_name_mismatch ______________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-41/test_r_a2l_001_5_end_name_mism0')
+
+    def test_r_a2l_001_5_end_name_mismatch(tmp_path: Path) -> None:
+        """R-A2L-001.5/1, /2 and R-A2L-READ.21/1: /end name mismatch and innermost close."""
+        text = _body(meas("X", " ECU_ADDRESS 0x10", " /end IF_DATA"))
+        data = _parse(tmp_path, text)
+>       assert any("/end IF_DATA does not close /begin MEASUREMENT" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_001_5_end_name_mismatch.<locals>.<genexpr> at 0x7eff41364520>)
+
+tests/test_b103_a2l_reader.py:832: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_001_5_end_name_mismatch - as...
+1 failed in 0.84s

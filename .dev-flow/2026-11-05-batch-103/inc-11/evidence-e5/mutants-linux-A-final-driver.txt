@@ -1,0 +1,24 @@
+pristine==target 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+M1: applied=1 rc=1
+M2: applied=1 rc=1
+M3: applied=1 rc=1
+M4: applied=1 rc=1
+M5: applied=1 rc=1
+M6: applied=1 rc=1
+M7: applied=1 rc=1
+M8: applied=1 rc=1
+M9: applied=1 rc=1
+M10: applied=1 rc=0
+M11: applied=1 rc=1
+M12: applied=1 rc=1
+M13: applied=1 rc=1
+M14: applied=1 rc=1
+M15: applied=1 rc=1
+M16: applied=1 rc=1
+M17: applied=1 rc=1
+M18: applied=1 rc=1
+M19: applied=1 rc=1
+M20: applied=1 rc=1
+M-BAD: applied=0 BAD (control) rc=0
+final baseline rc=0
+DONE

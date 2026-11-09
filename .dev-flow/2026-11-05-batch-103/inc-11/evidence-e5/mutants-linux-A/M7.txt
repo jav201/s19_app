@@ -1,0 +1,26 @@
+=== M7 (R-A2L-READ.15) ===
+anchor: '        errors.append(f"Line {string_line}: quoted string not closed")'
+mutation: '        pass'
+applied count: 1
+mutated hash: e5a5ab46f9c8ff8f27a9f2ce9083b717b8c7eb7bbf0974df0d903675d68dce8d
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_read_15_quoted_string_not_closed __________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-29/test_r_a2l_read_15_quoted_stri0')
+
+    def test_r_a2l_read_15_quoted_string_not_closed(tmp_path: Path) -> None:
+        """R-A2L-READ.15/1: an unclosed quote ends the reading."""
+        text = _body(meas("X", ' FORMAT "%5.0', " ECU_ADDRESS 0x1234"))
+        data = _parse(tmp_path, text)
+>       assert any("quoted string not closed" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_15_quoted_string_not_closed.<locals>.<genexpr> at 0x7f6a578645f0>)
+
+tests/test_b103_a2l_reader.py:683: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_15_quoted_string_not_closed
+1 failed in 0.84s

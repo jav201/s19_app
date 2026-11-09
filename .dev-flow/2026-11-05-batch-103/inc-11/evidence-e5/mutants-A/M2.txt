@@ -1,0 +1,103 @@
+# M2  R-A2L-READ.9  verdict=KILLED
+mutation: line comment // opens a block comment (runs past the line end)
+applied: 1
+
+=== baseline pytest ===
+...                                                                      [100%]
+3 passed in 1.05s
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\n] _____________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment0')
+nl = '\n'
+
+    @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
+    def test_r_a2l_read_9_line_comment_ends_at_line_end(tmp_path: Path, nl: str) -> None:
+        """R-A2L-READ.9/1..3: a line comment ends at LF, CRLF or CR."""
+        text = _body(meas("X", f" // c{nl} ECU_ADDRESS 0x1234")).replace("\n", nl)
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "X")["address"] == 0x1234
+
+tests\test_b103_a2l_reader.py:558: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s': ['Line 22: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], ...}
+name = 'X', section = 'MEASUREMENT'
+
+    def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
+        for tag in data["tags"]:
+            if tag.get("name") == name and tag.get("section") == section:
+                return tag
+>       raise AssertionError(f"no {section} tag {name!r} in {[t['name'] for t in data['tags']]}")
+E       AssertionError: no MEASUREMENT tag 'X' in []
+
+tests\test_b103_a2l_reader.py:112: AssertionError
+____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n] ____________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment1')
+nl = '\r\n'
+
+    @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
+    def test_r_a2l_read_9_line_comment_ends_at_line_end(tmp_path: Path, nl: str) -> None:
+        """R-A2L-READ.9/1..3: a line comment ends at LF, CRLF or CR."""
+        text = _body(meas("X", f" // c{nl} ECU_ADDRESS 0x1234")).replace("\n", nl)
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "X")["address"] == 0x1234
+
+tests\test_b103_a2l_reader.py:558: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s': ['Line 43: comment not closed', 'Unclosed /begin sections detected.', 'Line 39: MEASUREMENT X is not closed'], ...}
+name = 'X', section = 'MEASUREMENT'
+
+    def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
+        for tag in data["tags"]:
+            if tag.get("name") == name and tag.get("section") == section:
+                return tag
+>       raise AssertionError(f"no {section} tag {name!r} in {[t['name'] for t in data['tags']]}")
+E       AssertionError: no MEASUREMENT tag 'X' in []
+
+tests\test_b103_a2l_reader.py:112: AssertionError
+_____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r] _____________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment2')
+nl = '\r'
+
+    @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
+    def test_r_a2l_read_9_line_comment_ends_at_line_end(tmp_path: Path, nl: str) -> None:
+        """R-A2L-READ.9/1..3: a line comment ends at LF, CRLF or CR."""
+        text = _body(meas("X", f" // c{nl} ECU_ADDRESS 0x1234")).replace("\n", nl)
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "X")["address"] == 0x1234
+
+tests\test_b103_a2l_reader.py:558: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s': ['Line 22: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], ...}
+name = 'X', section = 'MEASUREMENT'
+
+    def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
+        for tag in data["tags"]:
+            if tag.get("name") == name and tag.get("section") == section:
+                return tag
+>       raise AssertionError(f"no {section} tag {name!r} in {[t['name'] for t in data['tags']]}")
+E       AssertionError: no MEASUREMENT tag 'X' in []
+
+tests\test_b103_a2l_reader.py:112: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\n]
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n]
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r]
+3 failed in 1.30s
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

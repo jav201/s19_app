@@ -1,0 +1,203 @@
+===== s19_app.__file__ =====
+/tmp/b103-e5-11-product-red/tree/s19_app/__init__.py
+===== pytest tests/test_b103_a2l_reader_e5.py =====
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/<user>/miniconda3/envs/s19ci/bin/python
+rootdir: /tmp/b103-e5-11-product-red/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 23 items
+
+tests/test_b103_a2l_reader_e5.py::test_e5_p1_quoted_header_words_give_no_number FAILED [  4%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\n] FAILED [  8%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\r\n] FAILED [ 13%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\r] FAILED [ 17%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p3_nested_module_inherits_byte_order FAILED [ 21%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p3_nested_module_inherits_invalid_source FAILED [ 26%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p4_end_line_uses_end_word_line FAILED [ 30%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p4_end_mismatch_uses_end_word_line FAILED [ 34%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p4_nesting_cap_uses_begin_word_line FAILED [ 39%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p5_words_after_multiline_comment_get_actual_line FAILED [ 43%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p6_quoted_keyword_arguments_keep_boundaries FAILED [ 47%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p7_external_axis_disagreement_has_begin_line FAILED [ 52%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p8_argument_diagnostics_use_argument_line FAILED [ 56%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p9_invalid_byte_order_keeps_address_disagreement FAILED [ 60%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p9_no_number_keeps_size_disagreement FAILED [ 65%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p10_every_invalid_byte_order_argument_diagnosed FAILED [ 69%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p11_typedef_refused_length_not_reappearing FAILED [ 73%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p12_declared_fnc_values_datatype_wins FAILED [ 78%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBOID] FAILED [ 82%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_4] FAILED [ 86%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_5] FAILED [ 91%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p14_unclosed_declared_sections_no_span FAILED [ 95%]
+tests/test_b103_a2l_reader_e5.py::test_e5_p15_length_zero_inline_axis_refusal_final PASSED [100%]
+
+=================================== FAILURES ===================================
+________________ test_e5_p1_quoted_header_words_give_no_number _________________
+tests/test_b103_a2l_reader_e5.py:51: in test_e5_p1_quoted_header_words_give_no_number
+    assert _tag(c, "CX", "CHARACTERISTIC")["address"] is None
+E   assert 8192 is None
+___________ test_e5_p2_backslash_lineend_keeps_end_inside_string[\n] ___________
+tests/test_b103_a2l_reader_e5.py:76: in test_e5_p2_backslash_lineend_keeps_end_inside_string
+    assert data["errors"] == []
+E   AssertionError: assert ['Line 25: /e...thout /begin'] == []
+E     
+E     Left contains 3 more items, first extra item: 'Line 25: /end MEASUREMENT does not close /begin MODULE'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'Line 25: /end MEASUREMENT does not close /begin MODULE',...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+__________ test_e5_p2_backslash_lineend_keeps_end_inside_string[\r\n] __________
+tests/test_b103_a2l_reader_e5.py:76: in test_e5_p2_backslash_lineend_keeps_end_inside_string
+    assert data["errors"] == []
+E   AssertionError: assert ['Line 25: /e...thout /begin'] == []
+E     
+E     Left contains 3 more items, first extra item: 'Line 25: /end MEASUREMENT does not close /begin MODULE'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'Line 25: /end MEASUREMENT does not close /begin MODULE',...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+___________ test_e5_p2_backslash_lineend_keeps_end_inside_string[\r] ___________
+tests/test_b103_a2l_reader_e5.py:76: in test_e5_p2_backslash_lineend_keeps_end_inside_string
+    assert data["errors"] == []
+E   AssertionError: assert ['Line 25: /e...thout /begin'] == []
+E     
+E     Left contains 3 more items, first extra item: 'Line 25: /end MEASUREMENT does not close /begin MODULE'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'Line 25: /end MEASUREMENT does not close /begin MODULE',...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+_________________ test_e5_p3_nested_module_inherits_byte_order _________________
+tests/test_b103_a2l_reader_e5.py:105: in test_e5_p3_nested_module_inherits_byte_order
+    assert _tag(data, "X")["effective_byte_order"] == "big"
+E   AssertionError: assert 'little' == 'big'
+E     
+E     - big
+E     + little
+_______________ test_e5_p3_nested_module_inherits_invalid_source _______________
+tests/test_b103_a2l_reader_e5.py:112: in test_e5_p3_nested_module_inherits_invalid_source
+    assert _tag(data, "X")["address"] is None
+E   assert 16 is None
+____________________ test_e5_p4_end_line_uses_end_word_line ____________________
+tests/test_b103_a2l_reader_e5.py:130: in test_e5_p4_end_line_uses_end_word_line
+    assert sec["end_line"] == text.split("\n").index("/end") + 1
+E   assert 24 == (22 + 1)
+E    +  where 22 = <built-in method index of list object at 0x7fa21ba7b480>('/end')
+E    +    where <built-in method index of list object at 0x7fa21ba7b480> = ['ASAP2_VERSION 1 71', '/begin PROJECT P ""', '/begin MODULE M ""', '/begin MOD_COMMON ""', 'BYTE_ORDER MSB_FIRST', '/end MOD_COMMON', ...].index
+E    +      where ['ASAP2_VERSION 1 71', '/begin PROJECT P ""', '/begin MODULE M ""', '/begin MOD_COMMON ""', 'BYTE_ORDER MSB_FIRST', '/end MOD_COMMON', ...] = <built-in method split of str object at 0x55621101d560>('\n')
+E    +        where <built-in method split of str object at 0x55621101d560> = 'ASAP2_VERSION 1 71\n/begin PROJECT P ""\n/begin MODULE M ""\n/begin MOD_COMMON ""\nBYTE_ORDER MSB_FIRST\n/end MOD_COMMON\n/begin COMPU_METHOD CM_ID "" IDENTICAL "%.0" ""\n/end COMPU_METHOD\n/begin RECORD_LAYOUT RL_U8\nFNC_VALUES 1 UBYTE ROW_DIR DIRECT\n/end RECORD_LAYOUT\n/begin RECORD_LAYOUT RL_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n/begin RECORD_LAYOUT RL_U32\nFNC_VALUES 1 ULONG ROW_DIR DIRECT\n/end RECORD_LAYOUT\n/begin TYPEDEF_MEASUREMENT T_U16 "" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT\n/begin MEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x10\n/end\nMEASUREMENT\n/end MODULE\n/end PROJECT\n'.split
+__________________ test_e5_p4_end_mismatch_uses_end_word_line __________________
+tests/test_b103_a2l_reader_e5.py:142: in test_e5_p4_end_mismatch_uses_end_word_line
+    assert any(
+E   assert False
+E    +  where False = any(<generator object test_e5_p4_end_mismatch_uses_end_word_line.<locals>.<genexpr> at 0x7fa21b663140>)
+_________________ test_e5_p4_nesting_cap_uses_begin_word_line __________________
+tests/test_b103_a2l_reader_e5.py:153: in test_e5_p4_nesting_cap_uses_begin_word_line
+    assert data["errors"] == ["Line 65: sections nested deeper than 32"]
+E   AssertionError: assert ['Line 66: se...eper than 32'] == ['Line 65: se...eper than 32']
+E     
+E     At index 0 diff: 'Line 66: sections nested deeper than 32' != 'Line 65: sections nested deeper than 32'
+E     
+E     Full diff:
+E       [
+E     -     'Line 65: sections nested deeper than 32',
+E     ?            ^...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+___________ test_e5_p5_words_after_multiline_comment_get_actual_line ___________
+tests/test_b103_a2l_reader_e5.py:168: in test_e5_p5_words_after_multiline_comment_get_actual_line
+    assert any(f"Line {close_line}: LENGTH x4 is not a number" in e for e in data["errors"])
+E   assert False
+E    +  where False = any(<generator object test_e5_p5_words_after_multiline_comment_get_actual_line.<locals>.<genexpr> at 0x7fa21baf67a0>)
+_____________ test_e5_p6_quoted_keyword_arguments_keep_boundaries ______________
+tests/test_b103_a2l_reader_e5.py:181: in test_e5_p6_quoted_keyword_arguments_keep_boundaries
+    assert _tag(d, "X")["display_identifier"] == "XM disp"
+E   assert '"XM' == 'XM disp'
+E     
+E     - XM disp
+E     + "XM
+_____________ test_e5_p7_external_axis_disagreement_has_begin_line _____________
+tests/test_b103_a2l_reader_e5.py:221: in test_e5_p7_external_axis_disagreement_has_begin_line
+    assert all(e.startswith(f"Line {begin_line}:") for e in size_errors)
+E   assert False
+E    +  where False = all(<generator object test_e5_p7_external_axis_disagreement_has_begin_line.<locals>.<genexpr> at 0x7fa21b5af6a0>)
+______________ test_e5_p8_argument_diagnostics_use_argument_line _______________
+tests/test_b103_a2l_reader_e5.py:236: in test_e5_p8_argument_diagnostics_use_argument_line
+    assert any(f"Line {l1}: ECU_ADDRESS x4 is not a number" in e for e in d1["errors"])
+E   assert False
+E    +  where False = any(<generator object test_e5_p8_argument_diagnostics_use_argument_line.<locals>.<genexpr> at 0x7fa21baf7920>)
+___________ test_e5_p9_invalid_byte_order_keeps_address_disagreement ___________
+tests/test_b103_a2l_reader_e5.py:256: in test_e5_p9_invalid_byte_order_keeps_address_disagreement
+    assert any("declares the addresses 0x00000010 and 0x00000020" in e for e in data["errors"])
+E   assert False
+E    +  where False = any(<generator object test_e5_p9_invalid_byte_order_keeps_address_disagreement.<locals>.<genexpr> at 0x7fa21b9c6e90>)
+_________________ test_e5_p9_no_number_keeps_size_disagreement _________________
+tests/test_b103_a2l_reader_e5.py:265: in test_e5_p9_no_number_keeps_size_disagreement
+    assert any("declares the sizes 4 and 8" in e for e in data["errors"])
+E   assert False
+E    +  where False = any(<generator object test_e5_p9_no_number_keeps_size_disagreement.<locals>.<genexpr> at 0x7fa21ba93780>)
+___________ test_e5_p10_every_invalid_byte_order_argument_diagnosed ____________
+tests/test_b103_a2l_reader_e5.py:278: in test_e5_p10_every_invalid_byte_order_argument_diagnosed
+    assert len([e for e in d1["errors"] if "BYTE_ORDER MSB_FRIST is not a byte order" in e]) == 2
+E   AssertionError: assert 1 == 2
+E    +  where 1 = len(['Line 23: BYTE_ORDER MSB_FRIST is not a byte order'])
+______________ test_e5_p11_typedef_refused_length_not_reappearing ______________
+tests/test_b103_a2l_reader_e5.py:299: in test_e5_p11_typedef_refused_length_not_reappearing
+    assert any(s["name"] == "I1" and s["length"] is None for s in _spans(_parse(tmp_path, t1)))
+E   assert False
+E    +  where False = any(<generator object test_e5_p11_typedef_refused_length_not_reappearing.<locals>.<genexpr> at 0x7fa21bb99f20>)
+________________ test_e5_p12_declared_fnc_values_datatype_wins _________________
+tests/test_b103_a2l_reader_e5.py:331: in test_e5_p12_declared_fnc_values_datatype_wins
+    assert _tag(data, "CX", "CHARACTERISTIC")["length"] == 4
+E   assert 1 == 4
+__________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBOID] ___________
+tests/test_b103_a2l_reader_e5.py:360: in test_e5_p13_cuboid_cube_span_disagreement_refused
+    assert _tag(data, "CCUBE", "CHARACTERISTIC")["length"] is None
+E   assert 4 is None
+__________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_4] ___________
+tests/test_b103_a2l_reader_e5.py:360: in test_e5_p13_cuboid_cube_span_disagreement_refused
+    assert _tag(data, "CCUBE", "CHARACTERISTIC")["length"] is None
+E   assert 4 is None
+__________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_5] ___________
+tests/test_b103_a2l_reader_e5.py:360: in test_e5_p13_cuboid_cube_span_disagreement_refused
+    assert _tag(data, "CCUBE", "CHARACTERISTIC")["length"] is None
+E   assert 4 is None
+________________ test_e5_p14_unclosed_declared_sections_no_span ________________
+tests/test_b103_a2l_reader_e5.py:374: in test_e5_p14_unclosed_declared_sections_no_span
+    assert any(
+E   assert False
+E    +  where False = any(<generator object test_e5_p14_unclosed_declared_sections_no_span.<locals>.<genexpr> at 0x7fa21ba62f60>)
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p1_quoted_header_words_give_no_number
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\n]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\r\n]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p2_backslash_lineend_keeps_end_inside_string[\r]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p3_nested_module_inherits_byte_order
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p3_nested_module_inherits_invalid_source
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p4_end_line_uses_end_word_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p4_end_mismatch_uses_end_word_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p4_nesting_cap_uses_begin_word_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p5_words_after_multiline_comment_get_actual_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p6_quoted_keyword_arguments_keep_boundaries
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p7_external_axis_disagreement_has_begin_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p8_argument_diagnostics_use_argument_line
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p9_invalid_byte_order_keeps_address_disagreement
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p9_no_number_keeps_size_disagreement
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p10_every_invalid_byte_order_argument_diagnosed
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p11_typedef_refused_length_not_reappearing
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p12_declared_fnc_values_datatype_wins
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBOID]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_4]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_5]
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p14_unclosed_declared_sections_no_span
+========================= 22 failed, 1 passed in 0.72s =========================
+PYTEST_EXIT=1

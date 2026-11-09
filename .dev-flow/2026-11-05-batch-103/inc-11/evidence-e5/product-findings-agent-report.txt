@@ -1,0 +1,39 @@
+Ejecución completada. Resumen de lo hecho y del resultado.
+
+## Entregables (sin editar producto ni commitear)
+
+- **`tests/test_b103_a2l_reader_e5.py`** — 23 nodos de test (P1–P15), cada uno con el id de requisito en el docstring, reutilizando helpers de `tests/test_b103_a2l_reader.py` (nada copiado, texto A2L sintético, solo rutas públicas).
+- **`inc-11/evidence-e5/product-findings-red.txt`** — transcripta completa (abre con `s19_app.__file__` → clon fresco, termina con `PYTEST_EXIT=1`), checksum verificado idéntico runner↔local (`3c45b3eb…`).
+
+Entorno: clon Git completo de `f4206433` (via `git bundle` del árbol local, HEAD verificado `f42064330c…`, branch `b103-inc11-code`), Python `s19ci` 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados bajo `/tmp/b103-e5-11-product-red/<user>/` (basename único `zqisolated5`, nunca `home`). Runner scratch ya eliminado.
+
+## Resultado: 22 RED, 1 GREEN (exit 1)
+
+| Finding | Clasificación | Evidencia de la transcripta |
+|---|---|---|
+| **P1** quoted header words | **reproducido** (quotes strippeados antes de validar número) | `VALUE "0x2000"` → address `8192`, no `None` |
+| **P2** backslash+line end (×3 LF/CRLF/CR) | **reproducido** (`\\.` sin DOTALL parte la string) | `errors == []` falla con `/end MEASUREMENT does not close /begin MODULE` |
+| **P3** nested MODULE byte-order (×2) | **reproducido** (fuente del módulo se reemplaza) | `effective_byte_order` `little` (no `big`); invalid source → address `16` (no `None`) |
+| **P4** line identities (×3) | **reproducido** | `end_line` 24 vs 23; mismatch usa línea del nombre; nesting `Line 66` vs `65` |
+| **P5** words after multiline comment close | **reproducido** (pending no se flushea) | `LENGTH x4` reporta la línea de apertura del comentario |
+| **P6** quoted keyword arguments | **reproducido** (split naïve por `" "`) | `display_identifier` `"XM` en vez de `XM disp` |
+| **P7** external-axis `Line None` | **reproducido** (tag no tiene `start_line`) | el error de tamaños existe pero no empieza con la línea del `/begin` |
+| **P8** argument diagnostics line | **reproducido** (línea del argumento colapsada) | `ECU_ADDRESS x4` reporta la línea del keyword |
+| **P9** independent disagreements (×2) | **reproducido** (`address_invalid`/`no_number` saltan el reporte) | ni `declares the addresses` ni `declares the sizes` aparecen |
+| **P10** every invalid BYTE_ORDER (×2) | **reproducido** (solo valida el primero) | 1 error `.68` en vez de 2; válido+inválido → 0 |
+| **P11** typedef refused length | **reproducido** (`_infer_length_characteristic` directo) | `I1` length no `None` (4) |
+| **P12** declared FNC_VALUES datatype | **reproducido** (hint del deposit gana) | `__UBYTE_Z`/ULONG → length `1` en vez de `4` |
+| **P13** CUBOID/CUBE_4/CUBE_5 span (×3) | **reproducido** (span restringido a CURVE/MAP) | length `4` (no `None`), sin error de desacuerdo |
+| **P14** unclosed BLOB/INSTANCE/typedef | **reproducido** (sin chequeo de `end_line`) | span exporta address/length usables |
+| **P15** inline refusal final (mutant B M09) | **ya correcto** en el baseline | `PASSED`: length `None` + `declares the sizes 0 and 13` |
+
+## Hallazgos que NO reprodujeron
+
+- **Ninguno como "wrong test premise"** — los 22 RED son reproducciones genuinas del bug declarado (verificados contra el código de `a2l.py` además de la transcripta).
+- **P15 es el único "already correct"**: el guard `id(tag) not in refused_length_ids` ya está en el baseline, así que el MAP con `LENGTH 0` + STD_AXIS inline conserva `length=None` y el error de desacuerdo.
+
+## Cumplimiento de restricciones
+
+- No se editó código de producto, ni requisitos, ni el grafo, ni otros tests, ni fixtures.
+- No se commitó ni se hizo push; no se tocó `~/work/b103-int11` ni el portapapeles.
+- En esta PC solo corrí `python -m py_compile tests/test_b103_a2l_reader_e5.py` (OK).

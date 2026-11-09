@@ -1,0 +1,10 @@
+{
+  "mutant": "2 failed in 1.22s",
+  "req": "R-A2L-READ.6",
+  "mutation": "UTF-16 BOM is not refused",
+  "anchor": "if head[:2] in (b\"\\xff\\xfe\", b\"\\xfe\\xff\"):",
+  "replacement": "if False:",
+  "applied": 1,
+  "baseline": "2 passed in 1.08s",
+  "verdict": "KILLED"
+}

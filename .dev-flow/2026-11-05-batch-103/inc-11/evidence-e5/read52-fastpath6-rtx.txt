@@ -1,0 +1,6 @@
+/tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+.
+============================= QC-TM timing margins =============================
+LOW 0.9%  8.431 s / 8.510 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+QC-TM: 1 bounds, 1 under 20 % margin
+1 passed in 54.79s

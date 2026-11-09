@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/<user>/miniconda3/envs/s19ci/bin/python
+rootdir: /home/<user>/work/b103-int11
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 30 items / 1 deselected / 29 selected
+
+tests/test_a2l_multiline_headers.py::test_at096_std_com_golden_header_values PASSED [  3%]
+tests/test_a2l_multiline_headers.py::test_at097_all_fifty_characteristics_have_type_and_address PASSED [  6%]
+tests/test_a2l_multiline_headers.py::test_at098_single_line_characteristics_unchanged PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_at099_measurement_and_synthetic_no_kind_preserved PASSED [ 13%]
+tests/test_a2l_multiline_headers.py::test_at100_axis_descr_max_points_and_external_flag PASSED [ 17%]
+tests/test_a2l_multiline_headers.py::test_at100_axis_descr_short_body_no_crash PASSED [ 20%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_block_eats_mandatory] FAILED [ 24%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[multiline_block_removed] PASSED [ 27%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[quoted_metachars_preserved] PASSED [ 31%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_quote] FAILED [ 34%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[line_comment_truncates_to_newline] PASSED [ 37%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[block_comment_between_params] PASSED [ 41%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[stray_close_no_open] PASSED [ 44%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[comment_only_body] PASSED [ 48%]
+tests/test_a2l_multiline_headers.py::test_at101_positive_control_clean_multiline_parses PASSED [ 51%]
+tests/test_a2l_multiline_headers.py::test_at101_quoted_metachar_bytes_preserved PASSED [ 55%]
+tests/test_a2l_multiline_headers.py::test_at102_curve_map_length_stays_none PASSED [ 58%]
+tests/test_a2l_multiline_headers.py::test_at103_deposit_with_markup_metachars_renders_verbatim PASSED [ 62%]
+tests/test_a2l_multiline_headers.py::test_tc097_strip_removes_block_and_line_comments FAILED [ 65%]
+tests/test_a2l_multiline_headers.py::test_tc097_line_comment_truncates_to_next_newline_only EXIT=124

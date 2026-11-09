@@ -1,0 +1,27 @@
+=== M18 (R-A2L-READ.19) ===
+anchor: '            if low == "/begin":'
+mutation: '            if low.startswith("/begin"):'
+applied count: 1
+mutated hash: c8a5f19a97d9e9953f9693abb9cd0df39ddfb8e304fbd219af6e661cfe4d0158
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________ test_r_a2l_read_19_glued_begin_end ______________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-40/test_r_a2l_read_19_glued_begin0')
+
+    def test_r_a2l_read_19_glued_begin_end(tmp_path: Path) -> None:
+        """R-A2L-READ.19/1, /2: /beginMEASUREMENT and /endX are ordinary words."""
+        text = _body('/beginMEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x1234\n/end MEASUREMENT')
+        data = _parse(tmp_path, text)
+        assert _tags_named(data, "X") == []
+>       assert any("does not close /begin MODULE" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_19_glued_begin_end.<locals>.<genexpr> at 0x7ff7d3030520>)
+
+tests/test_b103_a2l_reader.py:760: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_19_glued_begin_end - as...
+1 failed in 0.84s

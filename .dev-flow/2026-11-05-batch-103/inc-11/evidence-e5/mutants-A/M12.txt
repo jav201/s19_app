@@ -1,0 +1,62 @@
+# M12  R-A2L-READ.6  verdict=KILLED
+mutation: UTF-16 BOM is not refused
+applied: 1
+
+=== baseline pytest ===
+..                                                                       [100%]
+2 passed in 1.08s
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] __________________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32661/test_r_a2l_read_6_utf16_refusa0')
+bom = b'\xff\xfe'
+
+    @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
+    def test_r_a2l_read_6_utf16_refusal(tmp_path: Path, bom: bytes) -> None:
+        """R-A2L-READ.6/1, /2: UTF-16 BOM refuses with one error, 0 tags."""
+        body = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        enc = "utf-16-le" if bom == b"\xff\xfe" else "utf-16-be"
+        raw = bom + body.encode(enc)
+        data = _parse(tmp_path, raw=raw)
+>       assert data["errors"] == ["File is UTF-16 encoded; save it as UTF-8 and load it again."]
+E       AssertionError: assert ['File is not...ad it again.'] == ['File is UTF...ad it again.']
+E         
+E         At index 0 diff: 'File is not UTF-8 text; save it as UTF-8 and load it again.' != 'File is UTF-16 encoded; save it as UTF-8 and load it again.'
+E         Use -v to get more diff
+
+tests\test_b103_a2l_reader.py:361: AssertionError
+__________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] __________________
+
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32661/test_r_a2l_read_6_utf16_refusa1')
+bom = b'\xfe\xff'
+
+    @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
+    def test_r_a2l_read_6_utf16_refusal(tmp_path: Path, bom: bytes) -> None:
+        """R-A2L-READ.6/1, /2: UTF-16 BOM refuses with one error, 0 tags."""
+        body = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        enc = "utf-16-le" if bom == b"\xff\xfe" else "utf-16-be"
+        raw = bom + body.encode(enc)
+        data = _parse(tmp_path, raw=raw)
+>       assert data["errors"] == ["File is UTF-16 encoded; save it as UTF-8 and load it again."]
+E       AssertionError: assert ['File is not...ad it again.'] == ['File is UTF...ad it again.']
+E         
+E         At index 0 diff: 'File is not UTF-8 text; save it as UTF-8 and load it again.' != 'File is UTF-16 encoded; save it as UTF-8 and load it again.'
+E         Use -v to get more diff
+
+tests\test_b103_a2l_reader.py:361: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xff\xfe]
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xfe\xff]
+2 failed in 1.22s
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

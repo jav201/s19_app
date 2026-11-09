@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<string>", line 42, in <module>
+  File "/tmp/b103-e5-11-p16/tree/tests/test_b103_a2l_reader.py", line 1680, in _assert_tags_equal
+    assert _reader_to_ref(reader[k]) == _ref_native(ref[k]), (k, _reader_to_ref(reader[k]), _ref_native(ref[k]))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (('CHARACTERISTIC', 'Synthetic map'), {'name': 'Synthetic map', 'long_identifier': None, 'address': None, 'datatype': None, 'byte_order': 'little', 'bit_mask': None, 'matrix_dim': None, 'kind': 'MAP', 'deposit': 'RL_SYN_U16', 'conversion': 'CM_SYN', 'length': 4026, 'record_layout_name': 'RL_SYN_U16'}, {'name': 'Synthetic map', 'long_identifier': None, 'address': 472727040, 'datatype': None, 'byte_order': 'little', 'bit_mask': None, 'matrix_dim': None, 'kind': 'MAP', 'deposit': 'RL_SYN_U16', 'conversion': 'CM_SYN', 'length': 4026, 'record_layout_name': 'RL_SYN_U16'})
+/tmp/b103-e5-11-p16/tree/s19_app/__init__.py
+MIXED normalized equals LF: False
+MIXED lengths: 157553 157606 first difference: 51
+MIXED normalized slice: 'ASAP2_VERSION 1 61\n/begin PROJECT ASAP2_Example ""\n  /begin HEADER "ASAP2 Example File"\n    VERSION "V1.61"\n   '
+MIXED LF slice: 'ASAP2_VERSION 1 61\n/begin PROJECT ASAP2_Example ""\n\n  /begin HEADER "ASAP2 Example File"\n    VERSION "V1.61"\n  '
+CORPUS first failure: H2f
+CORPUS reader tags: [{'section': 'CHARACTERISTIC', 'name': 'Synthetic map', 'description': None, 'address': None, 'length': 4026, 'source': 'formula', 'unit': None, 'lower_limit': '0', 'upper_limit': '4095', 'bit_org': None, 'datatype': None, 'deposit': 'RL_SYN_U16', 'conversion': 'CM_SYN', 'matrix_dim': None, 'symbol_link': None, 'display_identifier': None, 'link_map': None, 'memory_region': 'unknown', 'endian': None, 'virtual': False, 'function_group': None, 'access': None, 'record_layout_name': 'RL_SYN_U16', 'compu_method_name': 'CM_SYN', 'effective_byte_order': 'little', 'axis_meta': [{'name': 'UNKNOWN', 'header_tokens': ['FIX_AXIS', 'NO_INPUT_QUANTITY', 'CM_SYN', '33', '0', '32', 'FIX_AXIS_PAR', '0', '1', '33'], 'max_axis_points': '33', 'external': False}, {'name': 'UNKNOWN', 'header_tokens': ['FIX_AXIS', 'NO_INPUT_QUANTITY', 'CM_SYN', '61', '0', '60', 'FIX_AXIS_PAR', '0', '1', '61'], 'max_axis_points': '61', 'external': False}], 'char_type': 'MAP', 'max_diff': '4095'}]
+CORPUS REF tags: [{'section': 'CHARACTERISTIC', 'name': 'Synthetic map', 'long_identifier': None, 'address': 472727040, 'datatype': None, 'byte_order': 'little', 'bit_mask': None, 'matrix_dim': None, 'kind': 'MAP', 'deposit': 'RL_SYN_U16', 'conversion': 'CM_SYN', 'length': 4026, 'axis_counts': [33, 61], 'record_layout_name': 'RL_SYN_U16'}]
+PROBE_EXIT=1

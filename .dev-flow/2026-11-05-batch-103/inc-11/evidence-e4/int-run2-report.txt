@@ -1,0 +1,13 @@
+All runs complete, transcripts saved, cleanup done. Here is the report.
+
+---
+
+**Inc 11 E4 Run 2 — NOT GREEN.**
+
+- **(a) tester:** reader `15F/147P` + `48` ERROR (oracle shared-string) + `49` FAIL (fixture mismatch); multiline-headers `3F` + **1 hang**; other-7 `1F/372P`.
+- **(b) Inc 2a:** `24F/176P`.
+- **(c) 7 laws:** `1F/218P`.
+- **(d) READ.52:** `7F/1P`. case_06 time **11.93s vs 8.85s = 2.02×** (>1.5×); peak RSS 6.28 GB (12× base 535 MB).
+
+**Causes — implementation:** infinite loop `_split_line_respecting_quotes` (`a2l.py:1093/1106`; `\n` not in `_BLANKS`) → the hang; 15 reader mis-reads; READ.52 time/memory; `48` copied oracle error text; `49` tag-count; `b101:371` MEMORY_SEGMENT regression. **Test faults:** reader `:1418` `.refusals`→`.refusal`; hygiene `:403` `serial_timing` on non-timing arm; (b) stale fill-pins (I-11.8f re-point).
+pi exit=0

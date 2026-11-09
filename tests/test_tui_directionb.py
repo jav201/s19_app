@@ -6557,10 +6557,8 @@ _ENGINE_PATHS: tuple[str, ...] = (
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # ``s19_app/tui/a2l.py`` was UNFROZEN for batch-56 (operator-approved
-    # alignment-aware summer, PR #114) and is now RE-FROZEN (PR-B): it is a
-    # read-only oracle again. Any further edit needs an explicit unfreeze.
-    "s19_app/tui/a2l.py",
+    # ``s19_app/tui/a2l.py`` UNFROZEN for batch-103 Inc 11 (A2L reader);
+    # re-frozen by a separate post-merge PR.
     "s19_app/tui/mac.py",
     "s19_app/tui/color_policy.py",
 )

@@ -1,0 +1,31 @@
+# mutant M14 — public export (extract_declared_spans dropped)
+
+requirement: public export
+file: s19_app/tui/a2l_extract.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_extract_declared_spans_is_public']
+
+---- pytest transcript ----
+
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_extract_declared_spans_is_public ____________________
+
+    def test_extract_declared_spans_is_public() -> None:
+        """The public name ``extract_declared_spans`` exists on s19_app.tui.a2l_extract."""
+>       assert _extract_declared_spans is not None, "extract_declared_spans missing (base)"
+E       AssertionError: extract_declared_spans missing (base)
+E       assert None is not None
+
+tests\test_b103_a2l_reader.py:1601: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_extract_declared_spans_is_public
+1 failed in 1.09s
+
+[exit=1 elapsed=2.0s tag=M14]
+
+VERDICT: KILLED (exit 1)

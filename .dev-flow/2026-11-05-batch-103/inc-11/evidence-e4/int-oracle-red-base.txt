@@ -1,0 +1,43 @@
+/tmp/b103-e4-11-oracle-base/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_read_48_tracked_files_equal_ref __________________
+
+ref = <function ref_read_a2l at 0x7ff72f9e9c60>
+
+    def test_r_a2l_read_48_tracked_files_equal_ref(ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.48/1: the 35 tracked files equal the reference reading."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            data = parse_a2l_file(path)
+            reading = ref(text)
+            _assert_sections_equal(data["sections"], reading["sections"])
+            _assert_tags_equal(data["tags"], reading["tags"])
+>           _assert_spans_equal(_spans(data), reading["spans"])
+
+tests/test_b103_a2l_reader.py:1585: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_spans = [{'address': 8454144, 'kind': 'INSTANCE', 'length': 2, 'name': 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'}, {'address': 845414... 'name': 'ASAM_S_EXAMPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}]
+ref_spans = [{'address': 8454144, 'kind': 'INSTANCE', 'length': 2, 'name': 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'}, {'address': 845414... 'name': 'ASAM_S_EXAMPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}]
+
+    def _assert_spans_equal(reader_spans: list, ref_spans: list) -> None:
+        rkey = sorted((s.get("name"), s.get("kind")) for s in reader_spans)
+        fkey = sorted((s.get("name"), s.get("kind")) for s in ref_spans)
+        assert rkey == fkey
+        reader = {(s.get("name"), s.get("kind")): s for s in reader_spans}
+        ref = {(s.get("name"), s.get("kind")): s for s in ref_spans}
+        for k in reader:
+            assert reader[k].get("address") == ref[k].get("address"), k
+>           assert reader[k].get("length") == ref[k].get("length"), k
+E           AssertionError: ('ASAM_I_MAP_COM_AXIS_FIX_AXIS', 'INSTANCE')
+E           assert None == 2
+E            +  where None = <built-in method get of dict object at 0x7ff72eff1b80>('length')
+E            +    where <built-in method get of dict object at 0x7ff72eff1b80> = {'address': 8454192, 'kind': 'INSTANCE', 'length': None, 'name': 'ASAM_I_MAP_COM_AXIS_FIX_AXIS'}.get
+E            +  and   2 = <built-in method get of dict object at 0x7ff72fa43940>('length')
+E            +    where <built-in method get of dict object at 0x7ff72fa43940> = {'address': 8454192, 'kind': 'INSTANCE', 'length': 2, 'name': 'ASAM_I_MAP_COM_AXIS_FIX_AXIS'}.get
+
+tests/test_b103_a2l_reader.py:1634: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
+1 failed in 0.82s

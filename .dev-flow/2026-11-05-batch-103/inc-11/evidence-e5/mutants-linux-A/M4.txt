@@ -1,0 +1,26 @@
+=== M4 (R-A2L-READ.11) ===
+anchor: '    if "*/" in word:'
+mutation: '    if False:'
+applied count: 1
+mutated hash: 0a78289e83e6cee704943e220b4e4ddfae7664a31d37aaaf2e583556f4ace4b0
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_11_stray_close ________________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_11_stray_close0')
+
+    def test_r_a2l_read_11_stray_close(tmp_path: Path) -> None:
+        """R-A2L-READ.11/1: a stray */ alone."""
+        text = _body("*/")
+        data = _parse(tmp_path, text)
+>       assert any("*/ without /*" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_11_stray_close.<locals>.<genexpr> at 0x7f205d9686c0>)
+
+tests/test_b103_a2l_reader.py:575: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_11_stray_close - assert...
+1 failed in 0.85s

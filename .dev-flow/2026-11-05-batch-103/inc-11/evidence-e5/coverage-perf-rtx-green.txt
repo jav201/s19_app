@@ -1,0 +1,36 @@
+/tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+F..R-A2L-READ.52/1 case_06 peak RSS: peak=582.1 MB pre-parse=61.8 MB peak-minus-before=520.2 MB
+.R-A2L-READ.52/1 software_a peak RSS: peak=98.9 MB pre-parse=61.7 MB peak-minus-before=37.2 MB
+.R-A2L-READ.52/2 string peak RSS: peak=88.9 MB pre-parse=61.8 MB peak-minus-before=27.1 MB
+.R-A2L-READ.52/3 words peak RSS: peak=135.1 MB pre-parse=61.8 MB peak-minus-before=73.2 MB
+.
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_52_case06_time ________________________
+
+big_files = {'case06': PosixPath('/tmp/b103-e5-11-mutB-rtx/tree/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': Po...eader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-<user>/pytest-28/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_time(big_files: dict) -> None:
+        current = _median_metrics(REPO_ROOT, big_files["case06"])["elapsed"]
+        root = _base_root()
+        base = _median_metrics(root, big_files["case06"])["elapsed"] if root else BASE_CASE06_S
+        bound = base * 1.5
+>       assert current < report_margin("R-A2L-READ.52/1 case_06 time", current, timing_bound(bound)), (current, base)
+E       AssertionError: (8.92147347700029, 5.898)
+E       assert 8.92147347700029 < 8.847
+E        +  where 8.847 = report_margin('R-A2L-READ.52/1 case_06 time', 8.92147347700029, 8.847)
+E        +    where 8.847 = timing_bound(8.847)
+
+tests/test_b103_a2l_reader_perf.py:206: AssertionError
+============================= QC-TM timing margins =============================
+LOW -0.8%  8.921 s / 8.847 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+LOW 7.4%  0.907 s / 0.980 s  R-A2L-READ.52/1 software_a time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+28.4%  0.081 s / 0.112 s  R-A2L-READ.52/2 string time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time
+37.3%  88.879 s / 141.800 s  R-A2L-READ.52/2 string peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+40.8%  135.086 s / 228.000 s  R-A2L-READ.52/3 words peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory
+45.6%  582.066 s / 1070.000 s  R-A2L-READ.52/1 case_06 peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+47.9%  98.918 s / 190.000 s  R-A2L-READ.52/1 software_a peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+QC-TM: 7 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time - A...
+1 failed, 6 passed, 1 deselected in 91.87s (0:01:31)

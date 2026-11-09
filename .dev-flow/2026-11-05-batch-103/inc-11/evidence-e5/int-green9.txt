@@ -1,0 +1,89 @@
+GROUP=A
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+...........................................                              [100%]
+331 passed in 119.30s (0:01:59)
+GROUP_EXIT=A=0
+GROUP=B
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+........................................................                 [100%]
+200 passed in 12.43s
+GROUP_EXIT=B=0
+GROUP=C
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 18%]
+........................................................................ [ 36%]
+........................................................................ [ 55%]
+........................................................................ [ 73%]
+........................................................................ [ 92%]
+...............s..............                                           [100%]
+============================= QC-TM timing margins =============================
+99.6%  0.018 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+QC-TM: 1 bounds, 0 under 20 % margin
+389 passed, 1 skipped in 182.66s (0:03:02)
+GROUP_EXIT=C=0
+GROUP=D
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................s.......s....... [ 32%]
+.......................................................s................ [ 65%]
+.............................................................s....F..... [ 98%]
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing _____________
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+        from tests.support import suite_census
+    
+        assert set(suite_census.SAMPLED_TIMING_ARMS) == _SAMPLED_PIN
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        lost = sorted(_BASE_STATIC_ARMS - arms)
+        assert not lost, f"census lost base timing arms: {lost}"
+        marked, refusals = _marked_set(TESTS_ROOT)
+        assert not refusals, "\n".join(refusals)
+        arm_set = arms | set(suite_census.SAMPLED_TIMING_ARMS)
+        guard_lines = _marker_guard_lines(arm_set, set(), marked)
+>       assert not guard_lines, "\n".join(guard_lines)
+E       AssertionError: timing arm without serial_timing: tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
+E       assert not ['timing arm without serial_timing: tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref']
+
+tests/test_suite_hygiene.py:403: AssertionError
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported() -> None:
+        lines = _margin_guard_lines(TESTS_ROOT)
+>       assert lines == [], "\n".join(lines)
+E       AssertionError: timing bound without report_margin: tests/test_b103_a2l_reader.py:1648
+E       assert ['timing boun...ader.py:1648'] == []
+E         
+E         Left contains one more item: 'timing bound without report_margin: tests/test_b103_a2l_reader.py:1648'
+E         Use -v to get more diff
+
+tests/test_suite_hygiene.py:1453: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+2 failed, 213 passed, 4 skipped in 108.79s (0:01:48)
+GROUP_EXIT=D=1

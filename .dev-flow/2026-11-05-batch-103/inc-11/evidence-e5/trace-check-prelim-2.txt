@@ -1,0 +1,5 @@
+[trace 463bd2ca] trace requirements normalization
+ 1 file changed, 322 insertions(+), 322 deletions(-)
+/tmp/b103-e5-11-trace-99bdbbe8/s19_app/__init__.py
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-11/01-requirements.md
+trace_check: 3 US, 81 active requirements (2 withdrawn), 1 gap(s)

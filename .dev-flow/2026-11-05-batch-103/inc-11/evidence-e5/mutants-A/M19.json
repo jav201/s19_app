@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.19s",
+  "req": "R-A2L-001.5",
+  "mutation": "/end name mismatch records no error",
+  "anchor": "if top[\"name\"] != word:",
+  "replacement": "if False:",
+  "applied": 1,
+  "baseline": "1 passed in 1.00s",
+  "verdict": "KILLED"
+}

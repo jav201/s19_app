@@ -1,0 +1,30 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M13 apply ==
+file: s19_app/tui/a2l.py
+anchor: '"length": _bounded_length(length)'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  d84eb26c5347b963e8e0884fb21fc2036952a3b9cb8829a30167dc5bdfbfd900
+== M13 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_read_46_span_length_bounds _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-50/test_r_a2l_read_46_span_length0')
+
+    def test_r_a2l_read_46_span_length_bounds(tmp_path: Path) -> None:
+        """R-A2L-READ.46/1, /2: BLOB sizes 0/1048577 and a huge MATRIX_DIM."""
+        text = _body('/begin BLOB B0 "" 0x10 0\n/end BLOB\n/begin BLOB B1 "" 0x20 1048577\n/end BLOB')
+        spans = _spans(_parse(tmp_path, text))
+>       assert all(s["length"] is None for s in spans)
+E       assert False
+E        +  where False = all(<generator object test_r_a2l_read_46_span_length_bounds.<locals>.<genexpr> at 0x7fa37fbda330>)
+
+tests/test_b103_a2l_reader.py:1596: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_46_span_length_bounds
+1 failed in 0.63s
+== M13 pytest exit code: 1 ==
+== M13 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

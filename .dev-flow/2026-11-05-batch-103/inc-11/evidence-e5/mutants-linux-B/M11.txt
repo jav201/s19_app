@@ -1,0 +1,34 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M11 apply ==
+file: s19_app/tui/a2l.py
+anchor: '    _collect_typedefs(sections)'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  a57310223c16560afae3ba85cf9186024c8f904f9ac4867ac52389461299c5d3
+== M11 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_read_42_instance_forward_typedef_ref ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-48/test_r_a2l_read_42_instance_fo0')
+ref = <function ref_read_a2l at 0x7efea2db94e0>
+
+    def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.42 (oracle): an INSTANCE declared before its typedef is sized."""
+        text = _body(
+            '/begin INSTANCE I1 "" T_FWD 0x10\n/end INSTANCE\n'
+            '/begin TYPEDEF_MEASUREMENT T_FWD "" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT'
+        )
+        spans = _spans(_parse(tmp_path, text))
+>       assert any(s["name"] == "I1" and s["length"] == 2 for s in spans)
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_42_instance_forward_typedef_ref.<locals>.<genexpr> at 0x7efea2d753c0>)
+
+tests/test_b103_a2l_reader.py:1577: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_42_instance_forward_typedef_ref
+1 failed in 0.68s
+== M11 pytest exit code: 1 ==
+== M11 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

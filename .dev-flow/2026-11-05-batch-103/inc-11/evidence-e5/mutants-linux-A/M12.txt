@@ -1,0 +1,52 @@
+=== M12 (R-A2L-READ.6) ===
+anchor: '    if head[:2] in (b"\\xff\\xfe", b"\\xfe\\xff"):'
+mutation: '    if False:'
+applied count: 1
+mutated hash: 540864ffd44c4e415cb415b45e9d1a8059182b18333e8d2f59b394705b441a5a
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] ___________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-34/test_r_a2l_read_6_utf16_refusa0')
+bom = b'\xff\xfe'
+
+    @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
+    def test_r_a2l_read_6_utf16_refusal(tmp_path: Path, bom: bytes) -> None:
+        """R-A2L-READ.6/1, /2: UTF-16 BOM refuses with one error, 0 tags."""
+        body = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        enc = "utf-16-le" if bom == b"\xff\xfe" else "utf-16-be"
+        raw = bom + body.encode(enc)
+        data = _parse(tmp_path, raw=raw)
+>       assert data["errors"] == ["File is UTF-16 encoded; save it as UTF-8 and load it again."]
+E       AssertionError: assert ['File is not...ad it again.'] == ['File is UTF...ad it again.']
+E         
+E         At index 0 diff: 'File is not UTF-8 text; save it as UTF-8 and load it again.' != 'File is UTF-16 encoded; save it as UTF-8 and load it again.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:363: AssertionError
+__________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] ___________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-34/test_r_a2l_read_6_utf16_refusa1')
+bom = b'\xfe\xff'
+
+    @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
+    def test_r_a2l_read_6_utf16_refusal(tmp_path: Path, bom: bytes) -> None:
+        """R-A2L-READ.6/1, /2: UTF-16 BOM refuses with one error, 0 tags."""
+        body = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        enc = "utf-16-le" if bom == b"\xff\xfe" else "utf-16-be"
+        raw = bom + body.encode(enc)
+        data = _parse(tmp_path, raw=raw)
+>       assert data["errors"] == ["File is UTF-16 encoded; save it as UTF-8 and load it again."]
+E       AssertionError: assert ['File is not...ad it again.'] == ['File is UTF...ad it again.']
+E         
+E         At index 0 diff: 'File is not UTF-8 text; save it as UTF-8 and load it again.' != 'File is UTF-16 encoded; save it as UTF-8 and load it again.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:363: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xff\xfe]
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xfe\xff]
+2 failed in 0.89s

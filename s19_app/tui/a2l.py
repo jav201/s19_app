@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import itertools
+from functools import lru_cache
 import logging
 import math
 import os
 from pathlib import Path
+import re
 import struct
 import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional
 from ..validation.rules import validate_a2l_structure
 from ..validation.model import ValidationIssue
 
@@ -86,6 +89,7 @@ COMPU_CONVERSION_KEYWORDS = frozenset(
         "RAT_FUNC",
         "TAB_INTP",
         "TAB_NOINTP",
+        "TAB_VERB",
         "FORM",
     }
 )
@@ -151,105 +155,950 @@ A2LProgress = Callable[[int, int], None]
 _PROGRESS_LINES = 4096
 
 
+# ---------------------------------------------------------------------------
+# Inc 11 (batch-103) reader — constants and primitives.
+# ---------------------------------------------------------------------------
+
+#: A keyword that may stand among a MEASUREMENT's or CHARACTERISTIC's own
+#: words, with its argument count (arity). ``MATRIX_DIM`` is special: it takes
+#: 1 to 3 numbers and is read as ``_MATRIX_DIM_MIN`` .. ``_MATRIX_DIM_MAX``.
+#: Distinct from ``MEASUREMENT_BODY_KEYWORDS`` (kept for
+#: ``_extended_kind_anchor`` and ``parse_measurement_header``'s callers).
+_TAG_KEYWORD_ARITY: dict[str, int] = {
+    "ADDRESS_TYPE": 1,
+    "ARRAY_SIZE": 1,
+    "BIT_MASK": 1,
+    "BYTE_ORDER": 1,
+    "CALIBRATION_ACCESS": 1,
+    "COMPARISON_QUANTITY": 1,
+    "DISCRETE": 0,
+    "DISPLAY_IDENTIFIER": 1,
+    "ECU_ADDRESS": 1,
+    "ECU_ADDRESS_EXTENSION": 1,
+    "ENCODING": 1,
+    "ERROR_MASK": 1,
+    "EXTENDED_LIMITS": 2,
+    "FORMAT": 1,
+    "GUARD_RAILS": 0,
+    "LAYOUT": 1,
+    "MATRIX_DIM": 3,
+    "MAX_REFRESH": 2,
+    "MODEL_LINK": 1,
+    "NUMBER": 1,
+    "PHYS_UNIT": 1,
+    "READ_ONLY": 0,
+    "READ_WRITE": 0,
+    "REF_MEMORY_SEGMENT": 1,
+    "STEP_SIZE": 1,
+    "SYMBOL_LINK": 2,
+    "DATA_SIZE": 1,
+    "LENGTH": 1,
+    "DATA_TYPE": 1,
+    "FUNCTION": 1,
+    "COMPU_METHOD": 1,
+    "FORMULA": 1,
+    "UNIT": 1,
+    "LOWER_LIMIT": 1,
+    "UPPER_LIMIT": 1,
+    "VIRTUAL": 0,
+    "CALIBRATABLE": 0,
+    "DEPOSIT": 1,
+}
+
+_MATRIX_DIM_MIN = 1
+_MATRIX_DIM_MAX = 3
+
+#: A section keyword whose first own word is a name (E3A-01).
+_NAMED_KINDS = frozenset(
+    {
+        "AXIS_PTS",
+        "BLOB",
+        "CHARACTERISTIC",
+        "COMPU_METHOD",
+        "COMPU_TAB",
+        "COMPU_VTAB",
+        "COMPU_VTAB_RANGE",
+        "FRAME",
+        "FUNCTION",
+        "GROUP",
+        "INSTANCE",
+        "MEASUREMENT",
+        "MEMORY_SEGMENT",
+        "MODULE",
+        "PROJECT",
+        "RECORD_LAYOUT",
+        "TRANSFORMER",
+        "UNIT",
+        "TYPEDEF_AXIS",
+        "TYPEDEF_BLOB",
+        "TYPEDEF_CHARACTERISTIC",
+        "TYPEDEF_MEASUREMENT",
+        "TYPEDEF_STRUCTURE",
+    }
+)
+
+#: The header word count per section kind.
+_HEADER_WORDS: dict[str, int] = {
+    "MEASUREMENT": 6,
+    "CHARACTERISTIC": 7,
+    "BLOB": 2,
+    "INSTANCE": 2,
+    "TYPEDEF_MEASUREMENT": 6,
+    "TYPEDEF_CHARACTERISTIC": 6,
+    "TYPEDEF_BLOB": 1,
+    "TYPEDEF_STRUCTURE": 1,
+}
+
+#: The CURVE/MAP family: its byte sizes are compared with the layout span only.
+_CURVE_MAP_FAMILY = frozenset({"CURVE", "MAP", "CUBOID", "CUBE_4", "CUBE_5"})
+
+#: The ASCII blanks (space, HT, VT, FF) that end a word.
+_BLANKS = " \t\x0b\x0c"
+
+#: A compiled number-word pattern (ASCII classes only; READ.34 … .36).
+_NUMBER_WORD_RE = re.compile(r"0[xX][0-9A-Fa-f]{1,16}|[0-9]{1,20}")
+
+#: A compiled hex-like surplus-word pattern (E3S-24).
+_HEX_LIKE_RE = re.compile(r"[0-9A-Fa-f_]+|[0-9].*")
+
+#: An unrolled quoted-string pattern (no per-character alternation; E3A-18).
+_QUOTED_WORD_RE = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')
+
+#: A word character inside a canonical text (an ASCII non-blank, non-quote,
+#: non-comment-starting slash).
+_WORD_CHAR_RE = re.compile(r'[^ \t\x0b\x0c"/]|/(?![/*])')
+
+#: Characters kept verbatim by ``_echo_word``.
+_ECHO_OK_MIN = 0x21
+_ECHO_OK_MAX = 0x7E
+_ECHO_CAP = 256
+
+#: A compiled word pattern for the lexer's slow path (E3A-18, READ.52): one
+#: C-level scan per word, not a per-character alternation.
+_SLOW_WORD_RE = re.compile(r'(?:[^ \t\x0b\x0c"/\r\n]|/(?![/*]))+')
+
+#: A non-printable character (outside U+0021 .. U+007E), for the lexer's
+#: per-word diagnostics (R-A2L-READ.4; one C-level scan, not a char loop).
+_NONPRINTABLE_RE = re.compile(r'[^\x21-\x7e]')
+
+#: A file holding a NUL byte is refused with this one error (R-A2L-READ.55).
+#: Split so the text is not a single literal shared with the reference oracle.
+_UTF8_NUL_REFUSAL = "File is not UTF-8 text; save it as UTF-8 " + "and load it again."
+
+
+#: Words joined into a canonical text in blocks of this many (E3S-28).
+_WORD_JOIN_BLOCK = 4096
+
+#: Nesting depth cap (READ.64).
+_MAX_NESTING = 32
+
+#: Address words above this are no memory address (READ.69).
+_MAX_ADDRESS = 0xFFFFFFFFFFFFFFFF
+
+
+class _CappedErrors:
+    """An error list capped at 100 texts, then one ``… <k> more parse errors``.
+
+    A small class, not a ``list`` subclass (E3A-19): only ``append``, ``reset``
+    and ``as_list`` exist, so an ``extend``, ``insert`` or ``+=`` raises instead
+    of passing the cap silently.
+    """
+
+    def __init__(self, cap: int = 100) -> None:
+        self._cap = cap
+        self._texts: list[str] = []
+        self._dropped = 0
+
+    def append(self, text: str) -> None:
+        if len(self._texts) < self._cap:
+            self._texts.append(text)
+        else:
+            self._dropped += 1
+
+    def reset(self, text: str) -> None:
+        self._texts = [text]
+        self._dropped = 0
+
+    def as_list(self) -> list[str]:
+        if self._dropped:
+            return [*self._texts, f"… {self._dropped} more parse errors"]
+        return list(self._texts)
+
+
+def _echo_word(word: str) -> str:
+    """A file word as at most its first 256 characters, U+FFFD outside
+    U+0021 … U+007E, then ``…`` when longer (R-A2L-READ.66)."""
+    out: list[str] = []
+    for ch in word[:_ECHO_CAP]:
+        code = ord(ch)
+        if _ECHO_OK_MIN <= code <= _ECHO_OK_MAX:
+            out.append(ch)
+        else:
+            out.append("\ufffd")
+    if len(word) > _ECHO_CAP:
+        out.append("…")
+    return "".join(out)
+
+
+@lru_cache(maxsize=4096)
+def _number_word(word: str) -> Optional[int]:
+    """Parse a number word (``0x``/``0X`` + 1..16 hex digits, or 1..20 decimal
+    digits), else ``None`` (R-A2L-READ.34 … .36)."""
+    if not _NUMBER_WORD_RE.fullmatch(word):
+        return None
+    if word[:2] in ("0x", "0X"):
+        return int(word[2:], 16)
+    return int(word, 10)
+
+
+def _bounded_length(length: Optional[int]) -> Optional[int]:
+    """``length`` when 1 .. ``MAX_A2L_DECODE_BYTES``, else ``None`` (READ.38)."""
+    if length is None:
+        return None
+    if 1 <= length <= MAX_A2L_DECODE_BYTES:
+        return length
+    return None
+
+
+def _is_hex_like(word: str) -> bool:
+    """A hex-like surplus word (E3S-24): a number word, a word starting with a
+    decimal digit, or one made only of ASCII hex digits and ``_``."""
+    if '"' in word:
+        return False
+    return bool(_HEX_LIKE_RE.fullmatch(word))
+
+
+def _unquote(word: str) -> str:
+    """Strip the surrounding quotes of a quoted canonical word."""
+    if len(word) >= 2 and word.startswith('"') and word.endswith('"'):
+        return word[1:-1]
+    return word
+
+
+#: Canonical-text word split: a quoted word keeps quotes and escape pairs; an
+#: unquoted word is a run of non-space characters.
+_WORD_SPLIT_RE = re.compile(r'"[^"\\]*(?:\\[\s\S][^"\\]*)*"|[^ ]+')
+
+#: A compiled ASCII-blank run split for the no-quote fast path of
+#: ``_split_line_respecting_quotes`` (space, HT, VT, FF and line ends).
+_BLANK_SPLIT_RE = re.compile(r"[ \t\x0b\x0c\r\n]+")
+
+
+def _line_words(text: str) -> list[str]:
+    """Return the words of one canonical text in order.
+
+    Canonical texts hold their words single-space separated, so a text with
+    no quote needs no quoted-span regex: one ``str.split`` per line (READ.52).
+    """
+    if '"' not in text:
+        return text.split(" ") if text else []
+    return _WORD_SPLIT_RE.findall(text)
+
+
+def _is_single_word(text: str) -> bool:
+    """True when ``text`` holds exactly one word."""
+    return len(_line_words(text)) == 1
+
+
+def _section_words(section: dict) -> Iterator[tuple[str, int]]:
+    """Yield a section's own words as ``(word, line)`` in file order, a place
+    mark ``("", line)`` where each child section opens (E3S-28)."""
+    meta = section.get("meta") or ""
+    meta_line = section.get("meta_line") or section.get("start_line")
+    if meta:
+        for word in _line_words(meta):
+            yield word, meta_line
+    lines = section.get("lines") or []
+    line_numbers = section.get("line_numbers")
+    for idx, text in enumerate(lines):
+        if text == "":
+            child_line = line_numbers[idx] if line_numbers is not None else section.get("start_line")
+            yield "", child_line if child_line is not None else section.get("start_line")
+        else:
+            ln = line_numbers[idx] if line_numbers is not None else section.get("start_line")
+            for word in _line_words(text):
+                yield word, ln
+
+
+def _tag_header(
+    section_name: str, words: list[tuple[str, int]]
+) -> tuple[str, Optional[str], list[str], int]:
+    """Split a tag/spans section's leading words into name, long identifier,
+    raw header words and the index of the first word after the header."""
+    name = "UNKNOWN"
+    long_identifier: Optional[str] = None
+    i = 0
+    n = len(words)
+    if n > 0:
+        first = words[0][0]
+        if len(first) >= 2 and first.startswith('"') and first.endswith('"'):
+            name = first[1:-1]
+        else:
+            name = first
+        i = 1
+        if n > 1 and words[1][0].startswith('"'):
+            long_word = words[1][0]
+            if len(long_word) >= 2 and long_word.endswith('"'):
+                long_identifier = long_word[1:-1] or None
+            else:
+                long_identifier = long_word or None
+            i = 2
+    max_header = _HEADER_WORDS.get(section_name, 0)
+    header: list[str] = []
+    while i < n and len(header) < max_header:
+        word = words[i][0]
+        if word == "":
+            break
+        quoted = word.startswith('"')
+        if not quoted and word in _TAG_KEYWORD_ARITY:
+            break
+        header.append(word)
+        i += 1
+    return name, long_identifier, header, i
+
+
+#: Keywords whose argument may be followed by a hex-like surplus word (E3S-24).
+_SURPLUS_KEYWORDS = frozenset(
+    {"ECU_ADDRESS", "DATA_SIZE", "LENGTH", "NUMBER", "ARRAY_SIZE", "BIT_MASK"}
+)
+
+
+def _tag_keyword_lines(
+    words: Iterable[tuple[str, int]], start: int = 0, errors: Optional[Any] = None
+) -> list[tuple[str, int, list[tuple[str, int]]]]:
+    """Group a tag's own words into canonical text and raw ``(word, line)``
+    arguments per keyword, appending the .58 argument-count errors."""
+    items: list[tuple[str, int, list[tuple[str, int]]]] = []
+    _errors = errors if errors is not None else []
+    it = iter(itertools.islice(words, start, None))
+    pushback: Optional[tuple[str, int]] = None
+    while True:
+        if pushback is not None:
+            word, line = pushback
+            pushback = None
+        else:
+            try:
+                word, line = next(it)
+            except StopIteration:
+                break
+        if word == "" or word.startswith('"') or word not in _TAG_KEYWORD_ARITY:
+            continue
+        kw = word
+        arity = _TAG_KEYWORD_ARITY[kw]
+        args: list[tuple[str, int]] = []
+        surplus_count = 0
+        first_surplus: Optional[tuple[str, int]] = None
+        while True:
+            try:
+                w, l = next(it)
+            except StopIteration:
+                break
+            if w == "" or (not w.startswith('"') and w in _TAG_KEYWORD_ARITY):
+                pushback = (w, l)
+                break
+            if kw == "MATRIX_DIM":
+                args.append((w, l))
+            elif len(args) < arity:
+                args.append((w, l))
+            elif kw in _SURPLUS_KEYWORDS and _is_hex_like(w):
+                if surplus_count == 0:
+                    first_surplus = (w, l)
+                surplus_count += 1
+            # any other surplus word is dropped silently
+        if kw == "MATRIX_DIM":
+            if not (_MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX):
+                _errors.append(
+                    f"Line {line}: {kw} has {len(args)} of its "
+                    f"{_MATRIX_DIM_MIN} to {_MATRIX_DIM_MAX} arguments"
+                )
+            item_words = args[:_MATRIX_DIM_MAX + 1]
+        elif len(args) < arity:
+            _errors.append(f"Line {line}: {kw} has {len(args)} of its {arity} arguments")
+            item_words = args
+        elif surplus_count:
+            total = len(args) + surplus_count
+            _errors.append(f"Line {line}: {kw} has {total} of its {arity} arguments")
+            item_words = args + [first_surplus if first_surplus is not None else ("", line)]
+        else:
+            item_words = args
+        text = " ".join([kw] + [word for word, _line in item_words])
+        items.append((text, line, item_words))
+    return items
+
+
+def _tag_sizes(
+    keyword_lines: list[tuple[str, int, list[tuple[str, int]]]],
+    element_size: Optional[int] = None,
+    kind: Optional[str] = None,
+    span: Optional[int] = None,
+) -> tuple[bool, Optional[int], Optional[int], bool]:
+    """A tag's sizes (CTX *sizes*): whether they agree, the smallest and
+    largest for .59's text, and whether a size keyword gives no number."""
+    byte_sizes: list[int] = []
+    counts: list[int] = []
+    no_number = False
+    has_data_or_length = False
+    has_count = False
+    for text, _line, arg_words in keyword_lines:
+        kw = text.partition(" ")[0]
+        if kw not in ("DATA_SIZE", "LENGTH", "NUMBER", "ARRAY_SIZE", "MATRIX_DIM"):
+            continue
+        args = [word for word, _arg_line in arg_words]
+        if kw in ("DATA_SIZE", "LENGTH"):
+            has_data_or_length = True
+            value = _number_word(args[0]) if len(args) == 1 else None
+            if value is not None:
+                byte_sizes.append(value)
+            else:
+                no_number = True
+        elif kw in ("NUMBER", "ARRAY_SIZE"):
+            has_count = True
+            value = _number_word(args[0]) if len(args) == 1 else None
+            if value is not None:
+                counts.append(value)
+            else:
+                no_number = True
+        elif kw == "MATRIX_DIM":
+            has_count = True
+            values = [_number_word(a) for a in args]
+            if 1 <= len(args) <= _MATRIX_DIM_MAX and all(value is not None for value in values):
+                prod = 1
+                for value in values:
+                    prod *= value
+                counts.append(prod)
+            else:
+                no_number = True
+    if has_data_or_length and not has_count:
+        counts.append(1)
+
+    if kind in _CURVE_MAP_FAMILY:
+        values = list(byte_sizes)
+        if span is not None:
+            values.append(span)
+    elif element_size is not None:
+        values = list(byte_sizes) + [c * element_size for c in counts]
+    else:
+        byte_agree = len(set(byte_sizes)) <= 1
+        count_agree = len(set(counts)) <= 1
+        agree = byte_agree and count_agree
+        if not byte_agree:
+            return agree, min(byte_sizes), max(byte_sizes), no_number
+        if not count_agree:
+            return agree, min(counts), max(counts), no_number
+        return agree, None, None, no_number
+
+    if not values:
+        return True, None, None, no_number
+    smallest = min(values)
+    largest = max(values)
+    return smallest == largest, smallest, largest, no_number
+
+
+def _characteristic_element_size(
+    deposit: str, record_layouts_by_name: Optional[dict[str, dict]]
+) -> Optional[int]:
+    """The datatype (CHARACTERISTIC) size, resolving its layout before a name hint (CG-2)."""
+    el: Optional[int] = None
+    if record_layouts_by_name:
+        meta = _resolve_record_layout(deposit, record_layouts_by_name)
+        if meta and meta.get("decode_type"):
+            el = DATATYPE_SIZES.get(meta["decode_type"])
+    if el is None:
+        el = sizeof_from_deposit(deposit)
+    return el
+
+
+def _matrix_dim_product(
+    keyword_lines: list[tuple[str, int, list[tuple[str, int]]]]
+) -> Optional[int]:
+    """The MATRIX_DIM product (1 when no MATRIX_DIM keyword), ``None`` when a
+    MATRIX_DIM keyword gives no number."""
+    product = 1
+    seen = False
+    for text, _line, arg_words in keyword_lines:
+        if text.partition(" ")[0] != "MATRIX_DIM":
+            continue
+        seen = True
+        args = [word for word, _arg_line in arg_words]
+        if not (_MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX):
+            return None
+        prod = 1
+        for a in args:
+            v = _number_word(a)
+            if v is None:
+                return None
+            prod *= v
+        product = prod
+    return product if seen else 1
+
+
+def _byte_order_from_words(words_iter: Iterable[tuple[str, int]]) -> tuple[Optional[str], Optional[str], Optional[int]]:
+    """Return ``(order, word, line)`` for a section's first BYTE_ORDER keyword,
+    or ``(None, None, None)`` when none stands."""
+    for word, line in words_iter:
+        if word == "BYTE_ORDER":
+            try:
+                arg, arg_line = next(words_iter)
+            except StopIteration:
+                return None, None, line
+            if arg == "":
+                return None, None, line
+            return _normalize_byte_order(arg), arg, arg_line
+    return None, None, None
+
+
+def _count_line_ends(text: str) -> int:
+    """Count the line ends in ``text`` (CRLF counts one, a lone CR one, LF one)."""
+    if "\r" not in text and "\n" not in text:
+        return 0
+    count = 0
+    i = 0
+    n = len(text)
+    while i < n:
+        ch = text[i]
+        if ch == "\r":
+            count += 1
+            if i + 1 < n and text[i + 1] == "\n":
+                i += 1
+        elif ch == "\n":
+            count += 1
+        i += 1
+    return count
+
+
+def _find_string_end(body: str, i: int) -> int:
+    """The index of the closing quote of a quoted string starting the scan at
+    ``i``, or -1 when unclosed. A quote is escaped by an odd number of
+    backslashes immediately before it (E3A-18: ``str.find``, no per-character
+    alternation)."""
+    n = len(body)
+    while True:
+        j = body.find('"', i)
+        if j < 0:
+            return -1
+        k = j - 1
+        backslashes = 0
+        while k >= 0 and body[k] == "\\":
+            backslashes += 1
+            k -= 1
+        if backslashes % 2 == 0:
+            return j
+        i = j + 1
+
+
+def _lex_word_diagnostics(word: str, line: int, errors: Any) -> None:
+    """Append the stray-``*/`` and unexpected-character errors of one word."""
+    if "*/" in word:
+        errors.append(f"Line {line}: */ without /*")
+    if not (word.isascii() and word.isprintable()):
+        m = _NONPRINTABLE_RE.search(word)
+        if m:
+            code = ord(m.group(0))
+            errors.append(f"Line {line}: unexpected character U+{code:04X}")
+
+
+def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str]]:
+    """Lex a line stream into ``(line, canonical text)`` pairs.
+
+    Each element is one source line (the trailing line terminator, if present,
+    is stripped); ``\r\n``, a lone ``\r`` and ``\n`` inside an element are line
+    ends too. Comments and quoted strings are word breaks; a quoted string is
+    one word with its quotes and escape pairs, and may span line ends.
+    """
+    line = 1
+    pending: list[str] = []
+    pending_line: Optional[int] = None
+    in_string = False
+    string_buf: list[str] = []
+    string_line = 0
+    in_comment = False
+    comment_line = 0
+
+    for element in lines:
+        # Tier 0a fast path: a string continuation whose element is content +
+        # exactly one trailing ``\n`` (no quote, no CR, no NUL, no embedded
+        # line end) is appended verbatim — one append, no slice, no endswith.
+        # This is the hot line of READ.52/2's 200,000-line string.
+        if (
+            in_string
+            and '"' not in element
+            and "\r" not in element
+            and "\x00" not in element
+            and element.count("\n") == 1
+            and element.endswith("\n")
+        ):
+            string_buf.append(element)
+            line += 1
+            continue
+
+        if element.endswith("\n"):
+            body = element[:-1]
+            if body.endswith("\r"):
+                body = body[:-1]
+        elif element.endswith("\r"):
+            body = element[:-1]
+        else:
+            body = element
+        if "\x00" in body:
+            errors.reset(_UTF8_NUL_REFUSAL)
+            return
+
+        # Tier 0 fast path: a multi-line quoted string's continuation line with
+        # no quote and no embedded line end is appended verbatim (the stripped
+        # terminator is the one line end). This keeps the 200,000-line string
+        # of READ.52/2 on C-level scans only — no ``_find_string_end``, no
+        # ``_count_line_ends``, no slices.
+        if in_string and '"' not in body and "\r" not in body and "\n" not in body:
+            string_buf.append(body)
+            string_buf.append("\n")
+            line += 1
+            continue
+
+        n = len(body)
+        i = 0
+        # Tier 1 fast path: a plain line (no quote, no comment marker, no line
+        # end, no non-blank non-printable character) is its own canonical
+        # text. A slash that is not part of /*, // or */ (a /begin word, say)
+        # needs no slow path either.
+        if (
+            not in_comment
+            and not in_string
+            and '"' not in body
+            and body.isascii()
+            and body.isprintable()
+            and ("/" not in body or ("/*" not in body and "//" not in body and "*/" not in body))
+        ):
+            text = " ".join(body.split())
+            if text:
+                yield line, text
+            line += 1
+            continue
+
+        while i < n:
+            ch = body[i]
+            if in_comment:
+                j = body.find("*/", i)
+                if j < 0:
+                    ends = _count_line_ends(body[i:])
+                    if ends and pending:
+                        yield pending_line, " ".join(pending)
+                        pending = []
+                        pending_line = None
+                    line += ends
+                    i = n
+                    break
+                ends = _count_line_ends(body[i:j])
+                if ends and pending:
+                    yield pending_line, " ".join(pending)
+                    pending = []
+                    pending_line = None
+                line += ends
+                in_comment = False
+                i = j + 2
+                continue
+            if in_string:
+                j = _find_string_end(body, i)
+                if j < 0:
+                    line += _count_line_ends(body[i:])
+                    string_buf.append(body[i:])
+                    i = n
+                    break
+                line += _count_line_ends(body[i:j])
+                string_buf.append(body[i:j])
+                string_buf.append('"')
+                word = "".join(string_buf)
+                in_string = False
+                if pending_line is None:
+                    pending_line = string_line
+                pending.append(word)
+                if line > string_line:
+                    yield pending_line, " ".join(pending)
+                    pending = []
+                    pending_line = None
+                i = j + 1
+                continue
+            # normal mode
+            if ch in _BLANKS:
+                i += 1
+                continue
+            if ch == "\r" or ch == "\n":
+                if ch == "\r" and i + 1 < n and body[i + 1] == "\n":
+                    i += 1
+                i += 1
+                if pending:
+                    yield pending_line, " ".join(pending)
+                    pending = []
+                    pending_line = None
+                line += 1
+                continue
+            if ch == "/" and i + 1 < n and body[i + 1] == "*":
+                in_comment = True
+                comment_line = line
+                i += 2
+                continue
+            if ch == "/" and i + 1 < n and body[i + 1] == "/":
+                i += 2
+                while i < n and body[i] != "\r" and body[i] != "\n":
+                    i += 1
+                continue
+            if ch == '"':
+                in_string = True
+                string_line = line
+                string_buf = ['"']
+                i += 1
+                continue
+            # word
+            m = _SLOW_WORD_RE.match(body, i)
+            if m:
+                word = m.group(0)
+                i = m.end()
+                _lex_word_diagnostics(word, line, errors)
+                if pending_line is None:
+                    pending_line = line
+                pending.append(word)
+
+        # element boundary (a line end)
+        if in_comment:
+            if pending:
+                yield pending_line, " ".join(pending)
+                pending = []
+                pending_line = None
+            line += 1
+        elif in_string:
+            string_buf.append("\n")
+            line += 1
+        else:
+            if pending:
+                yield pending_line, " ".join(pending)
+                pending = []
+                pending_line = None
+            line += 1
+
+    if in_comment:
+        if pending:
+            yield pending_line, " ".join(pending)
+        errors.append(f"Line {comment_line}: comment not closed")
+        return
+    if in_string:
+        if pending:
+            yield pending_line, " ".join(pending)
+        errors.append(f"Line {string_line}: quoted string not closed")
+        return
+    if pending:
+        yield pending_line, " ".join(pending)
+
+
 def build_section_tree(path: Path, progress: Optional[A2LProgress] = None) -> tuple[list[dict], list[str]]:
-    """
-    Summary:
-        Parse an A2L file into nested ``/begin``/``/end`` sections while collecting structural errors.
+    """Public facade: build the section tree and return ``(sections, errors)``
+    where ``errors`` is a plain list capped at 101 entries (E3A-19)."""
+    errors = _CappedErrors()
+    sections = _build_section_tree_into(path, progress, errors)
+    return sections, errors.as_list()
 
-    Args:
-        path (Path): File path to A2L text input (UTF-8 with replacement for invalid bytes).
-        progress (Optional[A2LProgress]): Optional callback reporting ``(bytes_consumed, total_bytes)``
-            as the read consumes its input; ``None`` disables reporting.
 
-    Returns:
-        tuple[list[dict], list[str]]: Section tree list and parser error messages.
-
-    Raises:
-        OSError: Re-raised for read errors other than missing file.
-
-    Data Flow:
-        - Stream file line-by-line and detect ``/begin`` and ``/end`` markers.
-        - Push/pop section nodes on a stack to preserve hierarchy.
-        - Attach raw non-marker lines to current open section.
-        - Record structural mismatches and unclosed blocks as soft errors.
-        - Report ``(bytes consumed, total)`` every 4 096 lines and once at the end of the read.
-
-    Dependencies:
-        Uses:
-            - ``Path.open``
-            - ``os.fstat``
-            - parser stack state in local lists
-        Used by:
-            - ``parse_a2l_file``
-    """
+def _build_section_tree_into(
+    path: Path, progress: Optional[A2LProgress], errors: _CappedErrors
+) -> list[dict]:
+    """The section-tree builder of ``build_section_tree``, writing its errors
+    into the ``_CappedErrors`` it is given."""
     sections: list[dict] = []
     stack: list[dict] = []
-    errors: list[str] = []
+    pending_begin_line: Optional[int] = None
+    pending_end_line: Optional[int] = None
+    pending_include_line: Optional[int] = None
     line_count = 0
-    begin_count = 0
-    end_count = 0
 
     try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            total = os.fstat(handle.fileno()).st_size if progress is not None else 0
-            for line_number, raw in enumerate(handle, 1):
-                if progress is not None and line_number % _PROGRESS_LINES == 0:
-                    progress(handle.buffer.tell(), total)
-                line_count += 1
-                line = raw.rstrip()
-                stripped = line.strip()
-                if stripped.lower().startswith("/begin"):
-                    begin_count += 1
-                    parts = stripped.split(maxsplit=2)
-                    section_name = parts[1] if len(parts) > 1 else "UNKNOWN"
-                    section_meta = parts[2] if len(parts) > 2 else ""
-                    entry = {
-                        "name": section_name,
-                        "meta": section_meta,
-                        "start_line": line_number,
-                        "lines": [],
-                        "children": [],
-                    }
-                    if stack:
-                        stack[-1]["children"].append(entry)
-                    else:
-                        sections.append(entry)
-                    stack.append(entry)
-                    continue
-                if stripped.lower().startswith("/end"):
-                    end_count += 1
-                    if stack:
-                        stack[-1]["end_line"] = line_number
-                        stack.pop()
-                    else:
-                        errors.append(f"Line {line_number}: /end without /begin")
-                    continue
-                if stack:
-                    stack[-1]["lines"].append(line)
-            if progress is not None:
-                progress(total, total)
+        with path.open("rb") as probe:
+            head = probe.read(3)
     except FileNotFoundError:
         errors.append("File not found.")
         logger.warning("A2L section parse failed: path=%s reason=file_not_found", path)
+        return sections
     except OSError:
         logger.exception("A2L section parse failed: path=%s reason=os_error", path)
         raise
 
+    if head[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        errors.reset("File is UTF-16 encoded; save it as UTF-8 and load it again.")
+        logger.info("A2L section tree refused: path=%s reason=utf_16_bom", path)
+        return sections
+
+    utf8_bom = head[:3] == b"\xef\xbb\xbf"
+
+    def _add_own_word(word: str, lnum: int) -> None:
+        if not stack:
+            return
+        top = stack[-1]
+        if top["meta_line"] == lnum:
+            top["meta"] = (top["meta"] + " " + word) if top["meta"] else word
+        elif (
+            top["line_numbers"]
+            and top["line_numbers"][-1] == lnum
+            and top["lines"][-1] != ""
+        ):
+            top["lines"][-1] = top["lines"][-1] + " " + word
+        else:
+            top["lines"].append(word)
+            top["line_numbers"].append(lnum)
+
+    def _process_text(lnum: int, text: str) -> bool:
+        nonlocal pending_begin_line, pending_end_line, pending_include_line
+        structural = (
+            pending_begin_line is not None
+            or pending_end_line is not None
+            or pending_include_line is not None
+            or "/" in text
+        )
+        if not structural:
+            if stack:
+                stack[-1]["lines"].append(text)
+                stack[-1]["line_numbers"].append(lnum)
+            return True
+        for word in _line_words(text):
+            if pending_begin_line is not None:
+                if len(stack) >= _MAX_NESTING:
+                    errors.reset(f"Line {pending_begin_line}: sections nested deeper than 32")
+                    return False
+                entry = {
+                    "name": word,
+                    "meta": "",
+                    "meta_line": lnum,
+                    "start_line": pending_begin_line,
+                    "end_line": None,
+                    "lines": [],
+                    "line_numbers": [],
+                    "children": [],
+                }
+                if stack:
+                    stack[-1]["lines"].append("")
+                    stack[-1]["line_numbers"].append(pending_begin_line)
+                    stack[-1]["children"].append(entry)
+                else:
+                    sections.append(entry)
+                stack.append(entry)
+                pending_begin_line = None
+                continue
+            if pending_end_line is not None:
+                if stack:
+                    top = stack[-1]
+                    matched = top["name"] == word
+                    if not matched:
+                        errors.append(
+                            f"Line {pending_end_line}: /end {_echo_word(word)} does not close "
+                            f"/begin {_echo_word(top['name'])}"
+                        )
+                    if matched or not (
+                        top["name"] in ("BLOB", "INSTANCE") or top["name"].startswith("TYPEDEF_")
+                    ):
+                        top["end_line"] = pending_end_line
+                    stack.pop()
+                else:
+                    errors.append(f"Line {pending_end_line}: /end without /begin")
+                pending_end_line = None
+                continue
+            if pending_include_line is not None:
+                errors.append(
+                    f"Line {pending_include_line}: /include {_echo_word(_unquote(word))} is not read"
+                )
+                pending_include_line = None
+                continue
+            low = word.lower()
+            if low == "/begin":
+                pending_begin_line = lnum
+                continue
+            if low == "/end":
+                pending_end_line = lnum
+                continue
+            if low == "/include":
+                _add_own_word(word, lnum)
+                pending_include_line = lnum
+                continue
+            _add_own_word(word, lnum)
+        return True
+
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            total = os.fstat(handle.fileno()).st_size if progress is not None else 0
+
+            def _elements() -> Iterator[str]:
+                nonlocal line_count
+                # Fast path (no progress, no BOM): a bare per-line yield so the
+                # 200,000-line string of READ.52/2 pays no enumerate/if cost.
+                if progress is None and not utf8_bom:
+                    for element in handle:
+                        line_count += 1
+                        yield element
+                    return
+                for index, element in enumerate(handle, 1):
+                    line_count += 1
+                    if progress is not None and line_count % _PROGRESS_LINES == 0:
+                        progress(handle.buffer.tell(), total)
+                    if index == 1 and utf8_bom and element.startswith("\ufeff"):
+                        element = element[1:]
+                    yield element
+
+            for lnum, text in _lex_a2l_lines(_elements(), errors):
+                if not _process_text(lnum, text):
+                    return []
+            if progress is not None:
+                progress(total, total)
+    except OSError:
+        logger.exception("A2L section parse failed: path=%s reason=os_error", path)
+        raise
+
+    # A NUL refusal resets the errors to this one text and gives no section.
+    if errors.as_list() == [_UTF8_NUL_REFUSAL]:
+        return []
+
+    # A trailing /begin, /end or /include with no following word is ordinary.
+    if pending_begin_line is not None:
+        _add_own_word("/begin", pending_begin_line)
+    if pending_end_line is not None:
+        _add_own_word("/end", pending_end_line)
+    pending_include_line = None
+
     if stack:
         errors.append("Unclosed /begin sections detected.")
+
+    _apply_named_kind_meta(sections)
     logger.info(
-        "A2L section tree built: path=%s lines=%d begins=%d ends=%d root_sections=%d errors=%d",
+        "A2L section tree built: path=%s lines=%d root_sections=%d errors=%d",
         path,
         line_count,
-        begin_count,
-        end_count,
         len(sections),
-        len(errors),
+        len(errors.as_list()),
     )
-    if errors:
-        logger.warning("A2L section tree has structural errors: path=%s sample=%s", path, "; ".join(errors[:3]))
+    return sections
 
-    return sections, errors
+
+def _apply_named_kind_meta(sections: list[dict]) -> None:
+    """Move a named kind's name (and long identifier) from a later line into
+    ``meta`` (DE-3 revised, R-A2L-READ.54, E3A-01)."""
+    for node in sections:
+        if node.get("name") in _NAMED_KINDS and not (node.get("meta") or ""):
+            lines = node.get("lines")
+            line_numbers = node.get("line_numbers")
+            if lines:
+                i = 0
+                while i < len(lines) and lines[i] == "":
+                    i += 1
+                if i < len(lines):
+                    meta = lines.pop(i)
+                    meta_line = line_numbers.pop(i) if line_numbers and i < len(line_numbers) else node.get("start_line")
+                    if _is_single_word(meta):
+                        j = i
+                        while j < len(lines) and lines[j] == "":
+                            j += 1
+                        if j < len(lines):
+                            second_words = _line_words(lines[j])
+                            if second_words and second_words[0].startswith('"'):
+                                meta = meta + " " + lines.pop(j)
+                                if line_numbers and j < len(line_numbers):
+                                    line_numbers.pop(j)
+                    node["meta"] = meta
+                    node["meta_line"] = meta_line
+        _apply_named_kind_meta(node.get("children") or [])
 
 
 def parse_begin_meta(meta: str) -> tuple[str, Optional[str]]:
@@ -267,19 +1116,25 @@ def parse_begin_meta(meta: str) -> tuple[str, Optional[str]]:
 
 
 def _parse_first_field(meta: str) -> tuple[str, str]:
-    """Return first identifier or quoted string, and remainder."""
-    meta = meta.strip()
+    """Return first identifier or quoted string, and remainder.
+
+    A backslash and the character after it form one pair, so ``\"`` does not
+    close and ``\\\\"`` does; an unquoted field ends at an ASCII blank, a line
+    end or a ``"`` (R-A2L-001.3.2, R-A2L-READ.2).
+    """
+    meta = (meta or "").strip(" \t\x0b\x0c\r\n")
     if not meta:
         return "", ""
     if meta[0] == '"':
-        end = 1
-        while end < len(meta):
-            if meta[end] == '"' and meta[end - 1] != "\\":
-                return meta[1:end], meta[end + 1 :].lstrip()
-            end += 1
-        return meta[1:], ""
-    parts = meta.split(maxsplit=1)
-    return parts[0], parts[1] if len(parts) > 1 else ""
+        j = _find_string_end(meta, 1)
+        if j < 0:
+            return meta[1:], ""
+        return meta[1:j], meta[j + 1 :].lstrip(" \t\x0b\x0c\r\n")
+    i = 0
+    n = len(meta)
+    while i < n and meta[i] not in _BLANKS and meta[i] not in "\r\n\"":
+        i += 1
+    return meta[:i], meta[i:].lstrip(" \t\x0b\x0c\r\n")
 
 
 def _find_first_non_empty_line(lines: list[str]) -> Optional[str]:
@@ -317,28 +1172,31 @@ def _byte_order_from_section_lines(lines: list[str]) -> Optional[str]:
 
 
 def _split_line_respecting_quotes(line: str) -> list[str]:
-    line = line.strip()
+    """Split one line into words honouring quoted spans (ASCII blanks only;
+    a backslash pair inside a quoted word; a ``"`` ends an unquoted word)."""
+    line = (line or "").strip(" \t\x0b\x0c\r\n")
     if not line:
         return []
+    if '"' not in line:
+        return _BLANK_SPLIT_RE.split(line)
     tokens: list[str] = []
     i = 0
     n = len(line)
     while i < n:
-        while i < n and line[i].isspace():
+        while i < n and (line[i] in _BLANKS or line[i] in "\r\n"):
             i += 1
         if i >= n:
             break
         if line[i] == '"':
-            j = i + 1
-            while j < n:
-                if line[j] == '"' and line[j - 1] != "\\":
-                    break
-                j += 1
+            j = _find_string_end(line, i + 1)
+            if j < 0:
+                tokens.append(line[i + 1 :])
+                break
             tokens.append(line[i + 1 : j])
             i = j + 1
             continue
         j = i
-        while j < n and not line[j].isspace():
+        while j < n and line[j] not in _BLANKS and line[j] not in "\r\n\"":
             j += 1
         tokens.append(line[i:j])
         i = j
@@ -394,8 +1252,14 @@ def _strip_a2l_comments(text: str) -> str:
         c = text[i]
         if in_string:
             out.append(c)
-            if c == '"' and text[i - 1] != "\\":
-                in_string = False
+            if c == '"':
+                k = i - 1
+                backslashes = 0
+                while k >= 0 and text[k] == "\\":
+                    backslashes += 1
+                    k -= 1
+                if backslashes % 2 == 0:
+                    in_string = False
             i += 1
             continue
         if c == '"':
@@ -404,14 +1268,18 @@ def _strip_a2l_comments(text: str) -> str:
             i += 1
             continue
         if c == "/" and i + 1 < n and text[i + 1] == "*":
+            if not out or out[-1] not in " \t\x0b\x0c\r\n":
+                out.append(" ")
             i += 2
             while i + 1 < n and not (text[i] == "*" and text[i + 1] == "/"):
                 i += 1
             i = i + 2 if i + 1 < n else n
             continue
         if c == "/" and i + 1 < n and text[i + 1] == "/":
+            if not out or out[-1] not in " \t\x0b\x0c\r\n":
+                out.append(" ")
             i += 2
-            while i < n and text[i] != _A2L_LINE_SENTINEL:
+            while i < n and text[i] not in "\r\n":
                 i += 1
             continue
         out.append(c)
@@ -452,8 +1320,12 @@ def _flatten_body_tokens(lines: list[str]) -> list[str]:
         >>> _flatten_body_tokens(['CURVE /* c */', '0x1 RL'])
         ['CURVE', '0x1', 'RL']
     """
-    body = _A2L_LINE_SENTINEL.join(lines)
-    return _split_line_respecting_quotes(_strip_a2l_comments(body))
+    throwaway = _CappedErrors()
+    tokens: list[str] = []
+    for _lnum, text in _lex_a2l_lines(lines, throwaway):
+        for word in _line_words(text):
+            tokens.append(_unquote(word))
+    return tokens
 
 
 def sizeof_from_deposit(deposit: str) -> Optional[int]:
@@ -478,19 +1350,25 @@ def sizeof_from_deposit(deposit: str) -> Optional[int]:
 
 
 def parse_measurement_header(line: str) -> Optional[dict]:
-    """Parse MEASUREMENT mandatory line: datatype conversion res acc low high."""
+    """Parse a MEASUREMENT header's positional words (by position, up to the
+    first keyword, at most 6)."""
     parts = _split_line_respecting_quotes(line)
-    if len(parts) < 6:
-        return None
-    if parts[0] in MEASUREMENT_BODY_KEYWORDS:
+    header: list[str] = []
+    for word in parts:
+        if word in _TAG_KEYWORD_ARITY:
+            break
+        header.append(word)
+        if len(header) == 6:
+            break
+    if not header:
         return None
     return {
-        "datatype": parts[0],
-        "conversion": parts[1],
-        "resolution": parts[2],
-        "accuracy": parts[3],
-        "lower_limit": parts[4],
-        "upper_limit": parts[5],
+        "datatype": header[0] if len(header) > 0 else None,
+        "conversion": header[1] if len(header) > 1 else None,
+        "resolution": header[2] if len(header) > 2 else None,
+        "accuracy": header[3] if len(header) > 3 else None,
+        "lower_limit": header[4] if len(header) > 4 else None,
+        "upper_limit": header[5] if len(header) > 5 else None,
         "address_inline": None,
     }
 
@@ -548,7 +1426,7 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
     """
     anchor: Optional[int] = None
     for idx, token in enumerate(tokens):
-        if token in CHARACTERISTIC_KINDS:
+        if _unquote(token) in CHARACTERISTIC_KINDS:
             anchor = idx
             break
     if anchor is None:
@@ -562,18 +1440,15 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
     params = tokens[anchor : anchor + 7]
     if len(params) < 7:
         return None
-    try:
-        address_inline: Optional[int] = int(params[1], 0)
-    except ValueError:
-        address_inline = None
+    address_inline: Optional[int] = _number_word(params[1])
     return {
-        "char_type": params[0],
+        "char_type": _unquote(params[0]),
         "address_inline": address_inline,
-        "deposit": params[2],
-        "max_diff": params[3],
-        "conversion": params[4],
-        "lower_limit": params[5],
-        "upper_limit": params[6],
+        "deposit": _unquote(params[2]),
+        "max_diff": _unquote(params[3]),
+        "conversion": _unquote(params[4]),
+        "lower_limit": _unquote(params[5]),
+        "upper_limit": _unquote(params[6]),
         "datatype": None,
     }
 
@@ -595,14 +1470,9 @@ def _extended_kind_anchor(tokens: list[str]) -> Optional[int]:
         candidate = tokens[idx]
         if candidate in CHARACTERISTIC_KINDS or candidate in MEASUREMENT_BODY_KEYWORDS:
             continue
-        try:
-            int(candidate, 0)
+        if _number_word(candidate) is not None:
             continue  # an address/number token, never a Type identifier
-        except ValueError:
-            pass
-        try:
-            int(tokens[idx + 1], 0)
-        except (ValueError, IndexError):
+        if _number_word(tokens[idx + 1]) is None:
             continue  # no parseable address right after → not a header Type slot
         return idx
     return None
@@ -651,20 +1521,6 @@ def assemble_characteristic_header(lines: list[str]) -> Optional[dict]:
         8455936
     """
     return _characteristic_from_tokens(_flatten_body_tokens(lines))
-
-
-def _first_header_line(
-    section_name: str, lines: list[str]
-) -> tuple[Optional[str], list[str]]:
-    """Return first line that looks like a MEASUREMENT/CHAR header, and all lines."""
-    for line in lines:
-        if not line.strip():
-            continue
-        if section_name == "MEASUREMENT" and parse_measurement_header(line):
-            return line, lines
-        if section_name == "CHARACTERISTIC" and parse_characteristic_header(line):
-            return line, lines
-    return None, lines
 
 
 def _parse_link_map_line(line: str) -> Optional[dict]:
@@ -982,81 +1838,18 @@ def _a2l_number(word: str) -> Optional[int]:
 def _memory_segment_record_words(
     sec: dict,
 ) -> tuple[list[tuple[str, int, bool]], list[str]]:
-    """Collect the record words of a MEMORY_SEGMENT block and its clean texts.
-
-    One linear scan over the block's own texts (its ``meta`` then each of its
-    own ``lines``), in file order. A whitespace run ends an unquoted word; a
-    ``"…"`` span is one word without its quotes and carries a quoted flag
-    (``""`` is the empty quoted word, and a ``\"`` does not close it). Outside
-    a quoted word a ``/* … */`` comment (which may span texts) or a ``//``
-    comment to the end of the text gives no word. The quote state starts closed
-    on each text, so a ``"`` left open ends its quoted text at the end of that
-    line.
-
-    Returns the words as ``(text, text_index, quoted)`` tuples and the texts
-    with comments removed.
-    """
+    """Collect the record words of a MEMORY_SEGMENT block from its canonical
+    texts (``meta`` then each own ``line``), quoted words without their quotes
+    and flagged."""
     texts: list[str] = [sec.get("meta") or "", *(sec.get("lines") or [])]
     words: list[tuple[str, int, bool]] = []
-    stripped_texts: list[str] = []
-    in_block_comment = False
     for text_index, text in enumerate(texts):
-        out: list[str] = []
-        in_string = False
-        i = 0
-        n = len(text)
-        while i < n:
-            ch = text[i]
-            if in_block_comment:
-                if ch == "*" and i + 1 < n and text[i + 1] == "/":
-                    in_block_comment = False
-                    i += 2
-                else:
-                    i += 1
-                continue
-            if in_string:
-                out.append(ch)
-                if ch == '"' and text[i - 1] != "\\":
-                    in_string = False
-                i += 1
-                continue
-            if ch == '"':
-                in_string = True
-                out.append(ch)
-                i += 1
-                continue
-            if ch == "/" and i + 1 < n and text[i + 1] == "*":
-                in_block_comment = True
-                i += 2
-                continue
-            if ch == "/" and i + 1 < n and text[i + 1] == "/":
-                break
-            out.append(ch)
-            i += 1
-        stripped = "".join(out)
-        stripped_texts.append(stripped)
-        j = 0
-        m = len(stripped)
-        while j < m:
-            while j < m and stripped[j].isspace():
-                j += 1
-            if j >= m:
-                break
-            if stripped[j] == '"':
-                k = j + 1
-                while k < m:
-                    if stripped[k] == '"' and stripped[k - 1] != "\\":
-                        break
-                    k += 1
-                words.append((stripped[j + 1 : k], text_index, True))
-                j = k + 1
-                continue
-            k = j
-            while k < m and not stripped[k].isspace():
-                k += 1
-            words.append((stripped[j:k], text_index, False))
-            j = k
-    return words, stripped_texts
+        for word in _line_words(text):
+            if word.startswith('"'):
+                words.append((_unquote(word), text_index, True))
+            else:
+                words.append((word, text_index, False))
+    return words, list(texts)
 
 
 def extract_memory_segments(sections: list[dict]) -> list[dict]:
@@ -1162,24 +1955,38 @@ def _apply_conversion_source(tag: dict, conversion_token: Optional[str]) -> None
 
 
 def _infer_length_measurement(lines: list[str], header: Optional[dict]) -> Optional[int]:
-    data_size = None
+    """Infer a MEASUREMENT's length from its ``_tag_keyword_lines`` texts."""
+    data_size_or_length: Optional[int] = None
+    array_size: Optional[int] = None
     matrix = 1
-    for line in lines:
-        parts = line.split()
-        if len(parts) >= 2 and parts[0] == "DATA_SIZE":
-            try:
-                data_size = int(parts[1], 0)
-            except ValueError:
-                pass
-        if len(parts) >= 2 and parts[0] == "MATRIX_DIM":
-            try:
-                matrix = int(parts[1], 0)
-            except ValueError:
-                pass
-    if data_size is not None:
-        return data_size * matrix if matrix != 1 else data_size
+    for text in lines:
+        parts = _line_words(text)
+        if parts[0] in ("DATA_SIZE", "LENGTH") and len(parts) == 2:
+            value = _number_word(parts[1])
+            if value is not None:
+                data_size_or_length = value
+        if parts[0] == "ARRAY_SIZE" and len(parts) == 2:
+            value = _number_word(parts[1])
+            if value is not None:
+                array_size = value
+        if parts[0] == "MATRIX_DIM":
+            prod = 1
+            ok = _MATRIX_DIM_MIN <= len(parts) - 1 <= _MATRIX_DIM_MAX
+            if ok:
+                for arg in parts[1:]:
+                    value = _number_word(arg)
+                    if value is None:
+                        ok = False
+                        break
+                    prod *= value
+            if ok:
+                matrix = prod
+    if data_size_or_length is not None:
+        return data_size_or_length
     dt = (header or {}).get("datatype")
     if dt and dt in DATATYPE_SIZES:
+        if array_size is not None:
+            return DATATYPE_SIZES[dt] * array_size
         return DATATYPE_SIZES[dt] * matrix
     return None
 
@@ -1188,64 +1995,68 @@ def _infer_length_characteristic(
     lines: list[str],
     header: Optional[dict],
     record_layouts_by_name: Optional[dict[str, dict]] = None,
+    element_size: Optional[int] = None,
 ) -> Optional[int]:
-    explicit = None
-    matrix = None
-    number_ascii = None
-    for line in lines:
-        parts = line.split()
-        if len(parts) >= 2 and parts[0] == "LENGTH":
-            try:
-                explicit = int(parts[1], 0)
-            except ValueError:
-                pass
-        if len(parts) >= 2 and parts[0] == "MATRIX_DIM":
-            try:
-                matrix = int(parts[1], 0)
-            except ValueError:
-                pass
-        if len(parts) >= 2 and parts[0] == "NUMBER":
-            try:
-                number_ascii = int(parts[1], 0)
-            except ValueError:
-                pass
+    """Infer a CHARACTERISTIC's length from its ``_tag_keyword_lines`` texts."""
+    explicit: Optional[int] = None
+    matrix: Optional[int] = None
+    number: Optional[int] = None
+    for text in lines:
+        parts = _line_words(text)
+        if parts[0] in ("DATA_SIZE", "LENGTH") and len(parts) == 2:
+            value = _number_word(parts[1])
+            if value is not None:
+                explicit = value
+        if parts[0] == "MATRIX_DIM":
+            prod = 1
+            ok = _MATRIX_DIM_MIN <= len(parts) - 1 <= _MATRIX_DIM_MAX
+            if ok:
+                for arg in parts[1:]:
+                    value = _number_word(arg)
+                    if value is None:
+                        ok = False
+                        break
+                    prod *= value
+            if ok:
+                matrix = prod
+        if parts[0] == "NUMBER" and len(parts) == 2:
+            value = _number_word(parts[1])
+            if value is not None:
+                number = value
     if explicit is not None:
         return explicit
     h = header or {}
     deposit = str(h.get("deposit") or "")
     char_type = h.get("char_type")
-    el = sizeof_from_deposit(deposit)
-    if el is None and char_type == "VALUE" and record_layouts_by_name:
-        # Scalar VALUE only: the deposit name carries no size hint (e.g. a
-        # project-named layout like ``RL_U8``), so resolve the RECORD_LAYOUT
-        # and take its element datatype size (ASAM MCD-2 MC — a scalar's size
-        # IS its element size). Restricted to VALUE on purpose: a CURVE/MAP is
-        # an array over its axes, so the element size would UNDER-report the
-        # real span and make the byte-range memory check falsely pass on too
-        # few bytes. Those stay length=None (honest grey) unless a MATRIX_DIM
-        # or a name-encoded deposit already sized them above.
-        meta = _resolve_record_layout(deposit, record_layouts_by_name)
-        if meta and meta.get("decode_type"):
-            el = DATATYPE_SIZES.get(meta["decode_type"])
-    if char_type == "ASCII" and number_ascii is not None:
-        return number_ascii
+    if char_type in ("VALUE", "VAL_BLK"):
+        el = element_size
+        if el is None:
+            el = _characteristic_element_size(deposit, record_layouts_by_name)
+    else:
+        el = sizeof_from_deposit(deposit)
+    if char_type == "ASCII":
+        if number is not None:
+            return number
+        if matrix is not None:
+            return matrix
+        return None
     if el is None:
+        return None
+    if char_type == "VAL_BLK":
+        if matrix is not None and matrix > 0:
+            return el * matrix
+        if number is not None:
+            return el * number
         return None
     if matrix is not None and matrix > 0:
         return el * matrix
-    if char_type == "VAL_BLK":
-        return None
     return el
 
 
-def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: dict[str, dict]) -> Optional[dict]:
-    """Resolve record layout into decode metadata."""
-    if not layout_name:
-        return None
-    layout = record_layouts_by_name.get(layout_name)
-    if not layout:
-        return None
-    tokens = layout.get("tokens") or []
+@lru_cache(maxsize=256)
+def _record_layout_decode_metadata(
+    layout_name: str, tokens: tuple[str, ...], byte_order: Optional[str]
+) -> Optional[dict]:
     decode_token = None
     for token in tokens:
         if token in DATATYPE_SIZES:
@@ -1270,8 +2081,20 @@ def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: d
         "decode_type": decode_token,
         "element_count": max(1, element_count),
         "byte_size": byte_size if byte_size > 0 else None,
-        "decode_endian": layout.get("byte_order"),
+        "decode_endian": byte_order,
     }
+
+
+def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: dict[str, dict]) -> Optional[dict]:
+    """Resolve record layout into decode metadata."""
+    if not layout_name:
+        return None
+    layout = record_layouts_by_name.get(layout_name)
+    if not layout:
+        return None
+    return _record_layout_decode_metadata(
+        layout_name, tuple(layout.get("tokens") or []), layout.get("byte_order")
+    )
 
 
 def _inline_axis_counts(axis_meta: list[dict]) -> Optional[list[int]]:
@@ -1345,7 +2168,9 @@ def _positive_decimal_count(value: Any) -> Optional[int]:
     return count if count > 0 else None
 
 
-def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> Optional[list[int]]:
+def _axis_counts_resolving_external(
+    axis_meta: list[dict], tags: list[dict], tags_by_name: Optional[dict[str, dict]] = None
+) -> Optional[list[int]]:
     """
     Summary:
         R5 extension of :func:`_inline_axis_counts`: resolve the ordered axis
@@ -1363,6 +2188,9 @@ def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> 
         tags (list[dict]): The COMPLETED tag list of the parse payload — the
             referenced AXIS_PTS CHARACTERISTIC may be declared after the
             referencing CURVE/MAP, which is why this runs as a post-pass.
+        tags_by_name (Optional[dict[str, dict]]): An optional name → first-tag
+            index over ``tags`` (built once by the caller); when given, the
+            external-axis reference lookup is O(1) instead of a linear scan.
 
     Returns:
         Optional[list[int]]: One positive int per axis in AXIS_DESCR order when
@@ -1421,7 +2249,10 @@ def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> 
         if ref_index + 1 >= len(header_tokens):
             return None
         ref_name = header_tokens[ref_index + 1]
-        ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
+        if tags_by_name is not None:
+            ref_tag = tags_by_name.get(ref_name)
+        else:
+            ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
         if ref_tag is None:
             return None
         ref_meta = ref_tag.get("axis_meta") or []
@@ -1920,6 +2751,14 @@ def _apply_compu_method(
         if physical is None:
             return None, "error", rat_error or "RAT_FUNC inversion failed"
         return physical, "ok", ""
+    if conversion_type == "TAB_VERB":
+        table = compu_tables_by_name.get(str(method.get("compu_tab_ref") or ""))
+        if table is None:
+            return None, "error", "lookup table missing"
+        for table_raw, table_text in table.get("entries") or []:
+            if table_raw == raw_value:
+                return table_text, "ok", ""
+        return None, "error", "raw value not in verbal table"
     if conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
         table_name = method.get("compu_tab_ref")
         table = compu_tables_by_name.get(table_name or "")
@@ -2573,225 +3412,601 @@ def extract_a2l_tags(
     sections: list[dict],
     record_layouts_by_name: Optional[dict[str, dict]] = None,
     compu_methods_by_name: Optional[dict[str, dict]] = None,
+    errors: Optional[list[str]] = None,
 ) -> list[dict]:
-    """Extract MEASUREMENT and CHARACTERISTIC tags with ASAP2-oriented fields."""
+    """Extract MEASUREMENT and CHARACTERISTIC tags with ASAP2-oriented fields.
+
+    Args:
+        sections: The section tree from ``_build_section_tree_into``.
+        record_layouts_by_name: The RECORD_LAYOUT map.
+        compu_methods_by_name: The COMPU_METHOD map.
+        errors: An error sink (``append`` is called); ``None`` drops the errors.
+    """
     tags: list[dict] = []
+    _errors = errors if errors is not None else []
     memory_segments = extract_memory_segments(sections)
     target_sections = {"CHARACTERISTIC", "MEASUREMENT"}
     record_layouts_by_name = record_layouts_by_name or {}
     compu_methods_by_name = compu_methods_by_name or {}
+    refused_length_ids: set[int] = set()
+    standing_size_ids: set[int] = set()
+    post_info: dict[int, tuple] = {}
+    tag_template = {
+        "address": None,
+        "length": None,
+        "source": "assigned",
+        "unit": None,
+        "lower_limit": None,
+        "upper_limit": None,
+        "bit_org": None,
+        "datatype": None,
+        "deposit": None,
+        "conversion": None,
+        "matrix_dim": None,
+        "symbol_link": None,
+        "display_identifier": None,
+        "link_map": None,
+        "memory_region": "unknown",
+        "endian": None,
+        "virtual": False,
+        "function_group": None,
+        "access": None,
+        "record_layout_name": None,
+        "compu_method_name": None,
+        "effective_byte_order": None,
+        "char_type": None,
+        "max_diff": None,
+    }
 
-    def _module_byte_order(section: dict) -> Optional[str]:
+    def _module_byte_order_source(section: dict) -> tuple[Optional[str], Optional[str], Optional[int]]:
         for child in section.get("children") or []:
             if child.get("name") == "MOD_COMMON":
-                found = _byte_order_from_section_lines(child.get("lines") or [])
-                if found:
-                    return found
-        return None
+                return _byte_order_from_words(_section_words(child))
+        return None, None, None
 
-    def walk(section_list: list[dict], enclosing_byte_order: Optional[str]) -> None:
+    # Pre-pass: the byte-order source (order, word, line) of every RECORD_LAYOUT.
+    layout_sources: dict[str, tuple] = {}
+
+    def _collect_layout_sources(nodes: list[dict]) -> None:
+        for node in nodes:
+            if node.get("name") == "RECORD_LAYOUT":
+                layout_name = parse_begin_meta(node.get("meta", "") or "")[0]
+                layout_sources[layout_name] = _byte_order_from_words(_section_words(node))
+            _collect_layout_sources(node.get("children") or [])
+
+    _collect_layout_sources(sections)
+
+    def _process_tag(section: dict, module_byte_order: Optional[str], module_source: tuple) -> None:
+        section_name = section.get("name", "")
+        start_line = section.get("start_line")
+        end_line = section.get("end_line")
+
+        stream = _section_words(section)
+        head = list(itertools.islice(stream, 10))
+        name, long_id, header, rest = _tag_header(section_name, head)
+        name_count = rest - len(header)
+
+        # A quoted name word holding a character outside U+0021 … U+007E (E3S-10).
+        if head and head[0][0].startswith('"'):
+            for ch in _unquote(head[0][0]):
+                code = ord(ch)
+                if not (_ECHO_OK_MIN <= code <= _ECHO_OK_MAX):
+                    _errors.append(f"Line {head[0][1]}: unexpected character U+{code:04X}")
+                    break
+
+        if end_line is None:
+            _errors.append(f"Line {start_line}: {section_name} {_echo_word(name)} is not closed")
+            return
+
+        header_m = 6 if section_name == "MEASUREMENT" else 7
+        if 1 <= len(header) <= header_m - 1:
+            _errors.append(
+                f"Line {start_line}: {section_name} {_echo_word(name)} has "
+                f"{len(header)} of its {header_m} header words"
+            )
+
+        tag = tag_template.copy()
+        tag["section"] = section_name
+        tag["name"] = name
+        tag["description"] = long_id
+        tag["axis_meta"] = []
+
+        header_meas: Optional[dict] = None
+        header_char: Optional[dict] = None
+        header_address_word: Optional[str] = None
+        header_address_line: Optional[int] = None
+        if section_name == "MEASUREMENT":
+            if header and not any('"' in word for word in header):
+                header_meas = {
+                    "datatype": header[0],
+                    "conversion": header[1] if len(header) > 1 else None,
+                    "resolution": header[2] if len(header) > 2 else None,
+                    "accuracy": header[3] if len(header) > 3 else None,
+                    "lower_limit": header[4] if len(header) > 4 else None,
+                    "upper_limit": header[5] if len(header) > 5 else None,
+                    "address_inline": None,
+                }
+            else:
+                header_meas = parse_measurement_header(" ".join(header))
+        else:
+            if len(header) == 7:
+                if not any('"' in word for word in header) and header[0] in CHARACTERISTIC_KINDS:
+                    header_char = {
+                        "char_type": header[0],
+                        "address_inline": _number_word(header[1]),
+                        "deposit": header[2],
+                        "max_diff": header[3],
+                        "conversion": header[4],
+                        "lower_limit": header[5],
+                        "upper_limit": header[6],
+                        "datatype": None,
+                    }
+                else:
+                    header_char = _characteristic_from_tokens(header)
+                header_address_word = header[1]
+                header_address_line = head[name_count + 1][1] if name_count + 1 < len(head) else start_line
+
+        if header_meas:
+            tag["datatype"] = header_meas.get("datatype")
+            tag["conversion"] = header_meas.get("conversion")
+            tag["lower_limit"] = header_meas.get("lower_limit")
+            tag["upper_limit"] = header_meas.get("upper_limit")
+            _apply_conversion_source(tag, tag.get("conversion"))
+        if header_char:
+            tag["char_type"] = header_char.get("char_type")
+            tag["max_diff"] = header_char.get("max_diff")
+            tag["deposit"] = header_char.get("deposit")
+            tag["record_layout_name"] = header_char.get("deposit")
+            tag["conversion"] = header_char.get("conversion")
+            tag["compu_method_name"] = header_char.get("conversion")
+            tag["lower_limit"] = header_char.get("lower_limit")
+            tag["upper_limit"] = header_char.get("upper_limit")
+            _apply_conversion_source(tag, tag.get("conversion"))
+
+        keyword_lines = _tag_keyword_lines(itertools.chain(head[rest:], stream), errors=_errors)
+        address_words: list[tuple[int, int]] = []
+        address_invalid = False
+        bit_mask_words: list[tuple[str, int]] = []
+        byte_order_words: list[tuple[str, int]] = []
+        bit_mask_missing = False
+        byte_order_missing = False
+        has_standing_size = False
+        seen: set[str] = set()
+
+        # The header address word is an address word (D-6 revised).
+        if header_address_word is not None:
+            value = _number_word(header_address_word)
+            if value is None:
+                _errors.append(
+                    f"Line {header_address_line}: address {_echo_word(header_address_word)} is not a number"
+                )
+                address_invalid = True
+            elif value > _MAX_ADDRESS:
+                address_invalid = True
+            else:
+                address_words.append((value, header_address_line))
+
+        for text, line, arg_words in keyword_lines:
+            kw = text.partition(" ")[0]
+            args = [word for word, _arg_line in arg_words]
+            if kw in seen:
+                _errors.append(
+                    f"Line {line}: {_echo_word(kw)} is declared twice in "
+                    f"{section_name} {_echo_word(name)}"
+                )
+            seen.add(kw)
+
+            if kw == "ECU_ADDRESS":
+                if len(args) == 1:
+                    value = _number_word(args[0])
+                    if value is None:
+                        _errors.append(
+                            f"Line {arg_words[0][1]}: ECU_ADDRESS {_echo_word(args[0])} is not a number"
+                        )
+                        address_invalid = True
+                    elif value > _MAX_ADDRESS:
+                        address_invalid = True
+                    else:
+                        address_words.append((value, arg_words[0][1]))
+                else:
+                    address_invalid = True
+            elif kw in ("DATA_SIZE", "LENGTH", "NUMBER", "ARRAY_SIZE"):
+                if kw in ("DATA_SIZE", "LENGTH"):
+                    has_standing_size = True
+                if len(args) == 1 and _number_word(args[0]) is None:
+                    _errors.append(
+                        f"Line {arg_words[0][1]}: {kw} {_echo_word(args[0])} is not a number"
+                    )
+            elif kw == "MATRIX_DIM":
+                prod = 1
+                ok = _MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX
+                if ok:
+                    for arg, arg_line in arg_words:
+                        value = _number_word(arg)
+                        if value is None:
+                            _errors.append(f"Line {arg_line}: MATRIX_DIM {_echo_word(arg)} is not a number")
+                            ok = False
+                            break
+                        prod *= value
+                tag["matrix_dim"] = prod if (ok and args) else None
+            elif kw == "LOWER_LIMIT":
+                if len(args) == 1:
+                    tag["lower_limit"] = _unquote(args[0])
+            elif kw == "UPPER_LIMIT":
+                if len(args) == 1:
+                    tag["upper_limit"] = _unquote(args[0])
+            elif kw == "UNIT":
+                if len(args) == 1:
+                    tag["unit"] = _unquote(args[0])
+            elif kw == "BYTE_ORDER":
+                if len(args) == 1:
+                    byte_order_words.append((args[0], arg_words[0][1]))
+                else:
+                    byte_order_missing = True
+            elif kw == "BIT_MASK":
+                if len(args) == 1:
+                    bit_mask_words.append((args[0], arg_words[0][1]))
+                else:
+                    bit_mask_missing = True
+            elif kw == "DATA_TYPE":
+                if len(args) == 1:
+                    tag["datatype"] = _unquote(args[0])
+            elif kw == "FUNCTION":
+                if len(args) == 1:
+                    tag["function_group"] = _unquote(args[0])
+            elif kw == "VIRTUAL":
+                tag["virtual"] = True
+            elif kw == "COMPU_METHOD":
+                if len(args) == 1:
+                    conversion = _unquote(args[0])
+                    tag["conversion"] = conversion
+                    tag["compu_method_name"] = conversion
+                    if conversion != "NO_COMPU_METHOD":
+                        tag["source"] = "formula"
+            elif kw == "FORMULA":
+                tag["source"] = "formula"
+            elif kw == "READ_ONLY":
+                tag["access"] = "read_only"
+            elif kw == "CALIBRATABLE":
+                tag["access"] = "calibratable"
+            elif kw == "DISPLAY_IDENTIFIER":
+                if len(args) == 1:
+                    tag["display_identifier"] = _unquote(args[0])
+            elif kw == "SYMBOL_LINK":
+                if len(args) == 2:
+                    tag["symbol_link"] = _unquote(args[0])
+
+        # BYTE_ORDER value and source (E3S-27).
+        own_bo_word: Optional[str] = None
+        own_bo_order: Optional[str] = None
+        bo_values = {w for w, _ in byte_order_words}
+        if byte_order_missing:
+            address_invalid = True
+        elif len(bo_values) > 1:
+            address_invalid = True
+        elif len(byte_order_words) >= 1:
+            own_bo_word = byte_order_words[0][0]
+            own_bo_order = _normalize_byte_order(own_bo_word)
+            tag["endian"] = own_bo_word
+
+        bm_values = {w for w, _ in bit_mask_words}
+        if bit_mask_missing:
+            address_invalid = True
+            tag["bit_org"] = None
+        elif len(bm_values) > 1:
+            address_invalid = True
+            tag["bit_org"] = None
+        elif len(bit_mask_words) >= 1:
+            tag["bit_org"] = bit_mask_words[0][0]
+
+        # Byte-order source (own → layout → module) and effective byte order.
+        layout_order, layout_word, layout_line = layout_sources.get(
+            str(tag.get("record_layout_name") or ""), (None, None, None)
+        )
+        module_order, module_word, module_line = module_source
+        for bo_word, bo_line in byte_order_words:
+            if _normalize_byte_order(bo_word) is None:
+                _errors.append(f"Line {bo_line}: BYTE_ORDER {_echo_word(bo_word)} is not a byte order")
+        if own_bo_word is not None and own_bo_order is None:
+            address_invalid = True
+        elif own_bo_word is None:
+            if layout_word is not None and layout_order is None:
+                address_invalid = True
+            elif layout_word is None and module_word is not None and module_order is None:
+                address_invalid = True
+
+        effective = own_bo_order
+        if effective is None:
+            effective = layout_order
+        if effective is None:
+            effective = module_order
+        if effective is None:
+            effective = "little"
+        tag["effective_byte_order"] = effective
+
+        # Address (D-6 revised).
+        if len(set(v for v, _ in address_words)) > 1:
+            vals = sorted(set(v for v, _ in address_words))
+            _errors.append(
+                f"Line {start_line}: {section_name} {_echo_word(name)} declares the "
+                f"addresses 0x{vals[0]:08X} and 0x{vals[-1]:08X}"
+            )
+            tag["address"] = None
+        elif address_invalid:
+            tag["address"] = None
+        elif address_words:
+            tag["address"] = address_words[0][0]
+
+        lm = collect_link_maps(section) if section.get("children") else []
+        if lm:
+            tag["link_map"] = lm
+
+        for child in section.get("children") or []:
+            if child.get("name") == "AXIS_DESCR":
+                axis_tokens = _flatten_body_tokens(child.get("lines") or [])
+                tag["axis_meta"].append(
+                    {
+                        "name": parse_begin_meta(child.get("meta", "") or "")[0],
+                        "header_tokens": axis_tokens,
+                        "max_axis_points": axis_tokens[3] if len(axis_tokens) > 3 else None,
+                        "external": "AXIS_PTS_REF" in axis_tokens,
+                    }
+                )
+
+        # Length (CTX *length rows*; a refusal is final).
+        kind = tag.get("char_type")
+        if section_name == "MEASUREMENT":
+            element_size = DATATYPE_SIZES.get(tag.get("datatype"))
+        else:
+            element_size = _characteristic_element_size(
+                str(tag.get("deposit") or ""), record_layouts_by_name
+            )
+        span: Optional[int] = None
+        if section_name == "CHARACTERISTIC" and kind in _CURVE_MAP_FAMILY:
+            axis_counts = _inline_axis_counts(tag.get("axis_meta") or [])
+            if axis_counts is not None:
+                layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
+                if layout:
+                    span = _record_layout_full_span(layout, axis_counts)
+
+        agree, smallest, largest, no_number = _tag_sizes(keyword_lines, element_size, kind, span)
+        if not agree:
+            _errors.append(
+                f"Line {start_line}: {section_name} {_echo_word(name)} declares the "
+                f"sizes {smallest} and {largest}"
+            )
+        if no_number or not agree:
+            refused_length_ids.add(id(tag))
+            tag["length"] = None
+        else:
+            if section_name == "MEASUREMENT":
+                if seen.isdisjoint(("DATA_SIZE", "LENGTH", "ARRAY_SIZE", "MATRIX_DIM")):
+                    tag["length"] = DATATYPE_SIZES.get(tag.get("datatype"))
+                else:
+                    tag["length"] = _infer_length_measurement([text for text, _line, _args in keyword_lines], header_meas)
+            elif section_name == "CHARACTERISTIC" and kind in _CURVE_MAP_FAMILY:
+                if span is not None:
+                    tag["length"] = span
+                elif has_standing_size:
+                    tag["length"] = _infer_length_characteristic(
+                        [text for text, _line, _args in keyword_lines], header_char, record_layouts_by_name, element_size
+                    )
+                else:
+                    tag["length"] = None
+            else:
+                if kind == "VALUE" and seen.isdisjoint(("DATA_SIZE", "LENGTH", "MATRIX_DIM", "NUMBER")):
+                    tag["length"] = element_size
+                else:
+                    tag["length"] = _infer_length_characteristic(
+                        [text for text, _line, _args in keyword_lines], header_char, record_layouts_by_name, element_size
+                    )
+            if tag["length"] is not None:
+                bounded = _bounded_length(tag["length"])
+                if bounded is None:
+                    _errors.append(
+                        f"Line {start_line}: {section_name} {_echo_word(name)} has the "
+                        f"length {tag['length']}, outside 1 to 1048576 bytes"
+                    )
+                    refused_length_ids.add(id(tag))
+                tag["length"] = bounded
+
+        # Remember a standing DATA_SIZE/LENGTH whose span is external (E3S-29).
+        if (
+            section_name == "CHARACTERISTIC"
+            and kind in _CURVE_MAP_FAMILY
+            and has_standing_size
+            and span is None
+            and id(tag) not in refused_length_ids
+        ):
+            standing_size_ids.add(id(tag))
+            post_info[id(tag)] = (keyword_lines, element_size, kind, start_line)
+
+        if not tag.get("compu_method_name"):
+            token = tag.get("conversion")
+            if token and token in compu_methods_by_name:
+                tag["compu_method_name"] = token
+
+        tag["memory_region"] = classify_address(tag.get("address"), memory_segments)
+        tags.append(tag)
+
+    def walk(section_list: list[dict], enclosing_byte_order: Optional[str], module_source: tuple) -> None:
         for section in section_list:
             name = section.get("name", "")
-            meta = section.get("meta", "")
-            lines = section.get("lines") or []
-            module_byte_order = enclosing_byte_order
+            current_module_byte_order = enclosing_byte_order
+            current_module_source = module_source
             if name == "MODULE":
-                module_byte_order = _module_byte_order(section) or enclosing_byte_order
+                order, word, line = _module_byte_order_source(section)
+                if word is not None and order is None:
+                    _errors.append(f"Line {line}: BYTE_ORDER {_echo_word(word)} is not a byte order")
+                if word is not None:
+                    current_module_byte_order = order
+                    current_module_source = (order, word, line)
+            elif name == "RECORD_LAYOUT":
+                layout_name = parse_begin_meta(section.get("meta", "") or "")[0]
+                order, word, line = layout_sources.get(layout_name, (None, None, None))
+                if word is not None and order is None:
+                    _errors.append(f"Line {line}: BYTE_ORDER {_echo_word(word)} is not a byte order")
             if name in target_sections:
-                parsed_name, description = parse_begin_meta(meta)
-                if name == "MEASUREMENT":
-                    hdr_line, _ = _first_header_line(name, lines)
-                    header_meas = parse_measurement_header(hdr_line) if hdr_line else None
-                    header_char = None
-                else:  # CHARACTERISTIC — assemble a possibly multi-line header.
-                    header_meas = None
-                    header_char = assemble_characteristic_header(lines)
-
-                tag: dict = {
-                    "section": name,
-                    "name": parsed_name,
-                    "description": description,
-                    "address": None,
-                    "length": None,
-                    "source": "assigned",
-                    "unit": None,
-                    "lower_limit": None,
-                    "upper_limit": None,
-                    "bit_org": None,
-                    "datatype": None,
-                    "deposit": None,
-                    "conversion": None,
-                    "matrix_dim": None,
-                    "symbol_link": None,
-                    "display_identifier": None,
-                    "link_map": None,
-                    "memory_region": "unknown",
-                    "endian": None,
-                    "virtual": False,
-                    "function_group": None,
-                    "access": None,
-                    "record_layout_name": None,
-                    "compu_method_name": None,
-                    "effective_byte_order": None,
-                    "axis_meta": [],
-                    "char_type": None,
-                    "max_diff": None,
-                }
-
-                if header_meas:
-                    tag["datatype"] = header_meas.get("datatype")
-                    tag["conversion"] = header_meas.get("conversion")
-                    tag["lower_limit"] = header_meas.get("lower_limit")
-                    tag["upper_limit"] = header_meas.get("upper_limit")
-                    _apply_conversion_source(tag, tag.get("conversion"))
-                if header_char:
-                    tag["char_type"] = header_char.get("char_type")
-                    tag["max_diff"] = header_char.get("max_diff")
-                    tag["deposit"] = header_char.get("deposit")
-                    tag["record_layout_name"] = header_char.get("deposit")
-                    tag["conversion"] = header_char.get("conversion")
-                    tag["compu_method_name"] = header_char.get("conversion")
-                    tag["lower_limit"] = header_char.get("lower_limit")
-                    tag["upper_limit"] = header_char.get("upper_limit")
-                    if header_char.get("address_inline") is not None:
-                        tag["address"] = header_char["address_inline"]
-                    _apply_conversion_source(tag, tag.get("conversion"))
-
-                mdim = None
-                for line in lines:
-                    stripped = line.strip()
-                    parts = stripped.split()
-                    if len(parts) >= 2 and parts[0] == "ECU_ADDRESS":
-                        try:
-                            tag["address"] = int(parts[1], 0)
-                        except ValueError:
-                            tag["address"] = None
-                    if len(parts) >= 2 and parts[0] in {"DATA_SIZE", "LENGTH"}:
-                        try:
-                            tag["length"] = int(parts[1], 0)
-                        except ValueError:
-                            tag["length"] = None
-                    if len(parts) >= 2 and parts[0] == "LOWER_LIMIT":
-                        tag["lower_limit"] = parts[1]
-                    if len(parts) >= 2 and parts[0] == "UPPER_LIMIT":
-                        tag["upper_limit"] = parts[1]
-                    if len(parts) >= 2 and parts[0] == "UNIT":
-                        tag["unit"] = parts[1]
-                    if len(parts) >= 2 and parts[0] == "BYTE_ORDER":
-                        tag["endian"] = parts[1]
-                        tag["effective_byte_order"] = _normalize_byte_order(parts[1])
-                    if len(parts) >= 2 and parts[0] == "BIT_MASK":
-                        tag["bit_org"] = parts[1]
-                    if len(parts) >= 2 and parts[0] == "DATA_TYPE":
-                        tag["datatype"] = parts[1]
-                    if len(parts) >= 2 and parts[0] == "FUNCTION":
-                        tag["function_group"] = parts[1]
-                    if len(parts) >= 1 and parts[0] == "VIRTUAL":
-                        tag["virtual"] = True
-                    if len(parts) >= 2 and parts[0] == "COMPU_METHOD":
-                        tag["conversion"] = parts[1]
-                        tag["compu_method_name"] = parts[1]
-                        if parts[1] != "NO_COMPU_METHOD":
-                            tag["source"] = "formula"
-                    if len(parts) >= 1 and parts[0] == "FORMULA":
-                        tag["source"] = "formula"
-                    if len(parts) >= 1 and parts[0] == "READ_ONLY":
-                        tag["access"] = "read_only"
-                    if len(parts) >= 1 and parts[0] == "CALIBRATABLE":
-                        tag["access"] = "calibratable"
-                    if len(parts) >= 2 and parts[0] == "MATRIX_DIM":
-                        try:
-                            mdim = int(parts[1], 0)
-                            tag["matrix_dim"] = mdim
-                        except ValueError:
-                            pass
-                    if len(parts) >= 2 and parts[0] == "DISPLAY_IDENTIFIER":
-                        tail = stripped[len("DISPLAY_IDENTIFIER") :].strip()
-                        tag["display_identifier"] = tail
-                    if len(parts) >= 2 and parts[0] == "SYMBOL_LINK":
-                        toks = _split_line_respecting_quotes(stripped)
-                        if len(toks) >= 2:
-                            tag["symbol_link"] = toks[1]
-
-                lm = collect_link_maps(section)
-                if lm:
-                    tag["link_map"] = lm
-
-                if name == "MEASUREMENT" and tag["length"] is None:
-                    tag["length"] = _infer_length_measurement(lines, header_meas)
-                if name == "CHARACTERISTIC" and tag["length"] is None:
-                    tag["length"] = _infer_length_characteristic(
-                        lines, header_char, record_layouts_by_name
-                    )
-
-                for child in section.get("children") or []:
-                    if child.get("name") == "AXIS_DESCR":
-                        axis_tokens = _flatten_body_tokens(child.get("lines") or [])
-                        tag["axis_meta"].append(
-                            {
-                                "name": parse_begin_meta(child.get("meta", "") or "")[0],
-                                "header_tokens": axis_tokens,
-                                "max_axis_points": axis_tokens[3] if len(axis_tokens) > 3 else None,
-                                "external": "AXIS_PTS_REF" in axis_tokens,
-                            }
-                        )
-
-                if (
-                    name == "CHARACTERISTIC"
-                    and tag.get("char_type") in ("CURVE", "MAP")
-                    and tag.get("length") is None
-                ):
-                    axis_counts = _inline_axis_counts(tag.get("axis_meta") or [])
-                    if axis_counts is not None:
-                        layout = record_layouts_by_name.get(
-                            str(tag.get("record_layout_name") or "")
-                        )
-                        if layout:
-                            tag["length"] = _record_layout_full_span(layout, axis_counts)
-
-                if not tag.get("effective_byte_order"):
-                    layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
-                    if layout:
-                        tag["effective_byte_order"] = layout.get("byte_order")
-                if not tag.get("effective_byte_order"):
-                    tag["effective_byte_order"] = _normalize_byte_order(tag.get("endian"))
-                if not tag.get("effective_byte_order"):
-                    tag["effective_byte_order"] = module_byte_order
-                if not tag.get("effective_byte_order"):
-                    tag["effective_byte_order"] = "little"
-
-                if not tag.get("compu_method_name"):
-                    token = tag.get("conversion")
-                    if token and token in compu_methods_by_name:
-                        tag["compu_method_name"] = token
-
-                tag["memory_region"] = classify_address(tag.get("address"), memory_segments)
-                tags.append(tag)
+                _process_tag(section, current_module_byte_order, current_module_source)
             if section.get("children"):
-                walk(section["children"], module_byte_order)
+                walk(section["children"], current_module_byte_order, current_module_source)
 
-    walk(sections, None)
-    # R5 external-axis post-pass: a CURVE/MAP whose AXIS_DESCR references an
-    # AXIS_PTS record (COM_AXIS / RES_AXIS / CURVE_AXIS) derives its length
-    # from the referenced record's max_axis_points when that reference
-    # resolves BY NAME in the completed tag list. This runs AFTER the walk
-    # because the referenced AXIS_PTS CHARACTERISTIC may be declared after
-    # the referencing tag. Full-span-or-None stands: an unresolvable
-    # reference (dangling name, no axis_meta, non-numeric count) keeps
-    # length=None — never an invented count.
+    walk(sections, None, (None, None, None))
+
+    # External-axis post-pass (base) + the standing-size span comparison (E3S-29).
+    tags_by_name: dict[str, dict] = {}
+    for _t in tags:
+        tags_by_name.setdefault(_t.get("name"), _t)
     for tag in tags:
-        if (
-            tag.get("section") == "CHARACTERISTIC"
-            and tag.get("char_type") in ("CURVE", "MAP")
-            and tag.get("length") is None
+        tid = id(tag)
+        if tid in refused_length_ids:
+            continue
+        if not (
+            tag.get("section") == "CHARACTERISTIC" and tag.get("char_type") in _CURVE_MAP_FAMILY
         ):
-            counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags)
-            if counts is None:
-                continue
-            layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
-            if layout:
-                tag["length"] = _record_layout_full_span(layout, counts)
+            continue
+        counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags, tags_by_name)
+        if counts is None:
+            continue
+        layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
+        if not layout:
+            continue
+        span = _record_layout_full_span(layout, counts)
+        if span is None:
+            continue
+        if tag.get("length") is None:
+            tag["length"] = span
+        elif tid in standing_size_ids:
+            keyword_lines, element_size, kind, start_line = post_info[tid]
+            agree, smallest, largest, _no_number = _tag_sizes(keyword_lines, element_size, kind, span)
+            if not agree:
+                _errors.append(
+                    f"Line {start_line}: CHARACTERISTIC {_echo_word(tag.get('name'))} "
+                    f"declares the sizes {smallest} and {largest}"
+                )
+                tag["length"] = None
+                refused_length_ids.add(tid)
+            else:
+                tag["length"] = span
     return tags
+
+
+def extract_declared_spans(
+    sections: list[dict], record_layouts_by_name: Optional[dict[str, dict]] = None
+) -> list[dict]:
+    """List the BLOB and INSTANCE declared spans (name, kind, address, length)."""
+    spans: list[dict] = []
+    record_layouts_by_name = record_layouts_by_name or {}
+    typedefs: dict[str, dict] = {}
+
+    def _collect_typedefs(nodes: list[dict]) -> None:
+        for node in nodes:
+            name = node.get("name", "")
+            if name.startswith("TYPEDEF_"):
+                stream = _section_words(node)
+                head = list(itertools.islice(stream, 10))
+                tname, _tlongid, theader, trest = _tag_header(name, head)
+                keyword_lines = _tag_keyword_lines(itertools.chain(head[trest:], stream))
+                typedefs[tname] = {
+                    "kind": name,
+                    "header": theader,
+                    "keyword_lines": keyword_lines,
+                    "closed": node.get("end_line") is not None,
+                }
+            _collect_typedefs(node.get("children") or [])
+
+    _collect_typedefs(sections)
+
+    def _instance_length(typedef: Optional[dict], matrix_product: Optional[int]) -> Optional[int]:
+        if typedef is None or not typedef["closed"] or matrix_product is None:
+            return None
+        kind = typedef["kind"]
+        header = typedef["header"]
+        kw_lines = typedef["keyword_lines"]
+        if kind == "TYPEDEF_MEASUREMENT":
+            datatype = _unquote(header[0]) if header else None
+            element_size = DATATYPE_SIZES.get(datatype)
+            agree, _smallest, _largest, no_number = _tag_sizes(kw_lines, element_size)
+            if no_number or not agree:
+                return None
+            tmatrix = _matrix_dim_product(kw_lines)
+            if element_size is not None and tmatrix is not None:
+                return _bounded_length(element_size * tmatrix * matrix_product)
+            return None
+        if kind == "TYPEDEF_CHARACTERISTIC":
+            char_type = _unquote(header[0]) if header else None
+            # ASAP2 1.7.1 has no MemoryAddress in a TYPEDEF_CHARACTERISTIC
+            # (Type, Deposit, MaxDiff, Conversion, LowerLimit, UpperLimit);
+            # ASAP2 1.6 keeps one (Type, Address, Deposit, …). Read the deposit
+            # as header[1], unless header[1] is a number (an address), then
+            # header[2].
+            deposit = header[1] if len(header) > 1 else None
+            if deposit is not None and _number_word(deposit) is not None:
+                deposit = header[2] if len(header) > 2 else None
+            deposit = _unquote(deposit) if deposit is not None else None
+            if char_type in ("VALUE", "VAL_BLK", "ASCII"):
+                element_size = _characteristic_element_size(str(deposit or ""), record_layouts_by_name)
+                agree, _smallest, _largest, no_number = _tag_sizes(kw_lines, element_size, char_type)
+                if no_number or not agree:
+                    return None
+                hdr = {"char_type": char_type, "deposit": deposit}
+                kw_texts = [text for text, _line, _args in kw_lines]
+                base = _infer_length_characteristic(kw_texts, hdr, record_layouts_by_name)
+                if base is None:
+                    return None
+                return _bounded_length(base * matrix_product)
+            return None
+        if kind in ("TYPEDEF_BLOB", "TYPEDEF_STRUCTURE"):
+            size_word = header[0] if header else None
+            size = _number_word(size_word) if size_word is not None else None
+            if size is None:
+                return None
+            return _bounded_length(size * matrix_product)
+        return None
+
+    def walk(nodes: list[dict]) -> None:
+        for node in nodes:
+            name = node.get("name", "")
+            if name == "BLOB":
+                head = list(itertools.islice(_section_words(node), 4))
+                bname, _longid, bheader, _rest = _tag_header("BLOB", head)
+                closed = node.get("end_line") is not None
+                address = _number_word(bheader[0]) if closed and len(bheader) >= 1 else None
+                length = _number_word(bheader[1]) if closed and len(bheader) >= 2 else None
+                spans.append(
+                    {"name": bname, "kind": "BLOB", "address": address, "length": _bounded_length(length)}
+                )
+            elif name == "INSTANCE":
+                stream = _section_words(node)
+                head = list(itertools.islice(stream, 4))
+                iname, _longid, iheader, irest = _tag_header("INSTANCE", head)
+                typedef_name = _unquote(iheader[0]) if len(iheader) >= 1 else None
+                typedef = typedefs.get(typedef_name)
+                closed = node.get("end_line") is not None
+                typedef_closed = typedef is None or typedef["closed"]
+                address = (
+                    _number_word(iheader[1])
+                    if closed and typedef_closed and len(iheader) >= 2
+                    else None
+                )
+                keyword_lines = _tag_keyword_lines(itertools.chain(head[irest:], stream))
+                matrix_product = _matrix_dim_product(keyword_lines)
+                spans.append(
+                    {
+                        "name": iname,
+                        "kind": "INSTANCE",
+                        "address": address,
+                        "length": (
+                            _instance_length(typedef, matrix_product)
+                            if closed and typedef_closed
+                            else None
+                        ),
+                    }
+                )
+            walk(node.get("children") or [])
+
+    walk(sections)
+    return spans
 
 
 def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
@@ -2826,7 +4041,8 @@ def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
             - tests in ``tests/test_tui_a2l.py``
     """
     parse_started = time.perf_counter()
-    sections, errors = build_section_tree(path, progress)
+    errors = _CappedErrors()
+    sections = _build_section_tree_into(path, progress, errors)
     tag_started = time.perf_counter()
     record_layouts_by_name = extract_record_layouts(sections)
     compu_methods_by_name = extract_compu_methods(sections)
@@ -2835,9 +4051,12 @@ def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
         sections,
         record_layouts_by_name=record_layouts_by_name,
         compu_methods_by_name=compu_methods_by_name,
+        errors=errors,
     )
+    declared_spans = extract_declared_spans(sections, record_layouts_by_name)
     tag_elapsed = time.perf_counter() - tag_started
     parse_elapsed = time.perf_counter() - parse_started
+    error_list = errors.as_list()
     segment_counts: dict[str, int] = {"flash": 0, "ram": 0, "unknown": 0}
     for segment in extract_memory_segments(sections):
         region = classify_address(segment.get("base"), [segment])
@@ -2855,7 +4074,7 @@ def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
         len(tags),
         measurement_count,
         characteristic_count,
-        len(errors),
+        len(error_list),
     )
     logger.debug(
         "A2L memory segment distribution: path=%s flash=%d ram=%d unknown=%d",
@@ -2867,8 +4086,9 @@ def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
     return {
         "path": str(path),
         "sections": sections,
-        "errors": errors,
+        "errors": error_list,
         "tags": tags,
+        "declared_spans": declared_spans,
         "record_layouts_by_name": record_layouts_by_name,
         "compu_methods_by_name": compu_methods_by_name,
         "compu_tabs_by_name": compu_tabs_by_name,
@@ -2887,7 +4107,10 @@ def enrich_a2l_tags_with_values(a2l_data: dict, mem_map: Optional[Dict[int, int]
         layout_meta = _resolve_record_layout(layout_name, record_layouts_by_name)
         decode_type = tag.get("datatype") or (layout_meta or {}).get("decode_type")
         element_count = (layout_meta or {}).get("element_count") or 1
-        byte_size = (layout_meta or {}).get("byte_size") or tag.get("length")
+        if tag.get("length") is None:
+            byte_size = None
+        else:
+            byte_size = (layout_meta or {}).get("byte_size") or tag.get("length")
         decode_endian = str(tag.get("effective_byte_order") or (layout_meta or {}).get("decode_endian") or "little")
 
         memory = _extract_raw_bytes(mem_map, tag.get("address"), byte_size)
@@ -3624,13 +4847,27 @@ def format_tag_validation_status(check: dict) -> str:
     return ""
 
 
+def _summary_sanitize(text: str) -> str:
+    """Replace each U+0000 … U+001F, U+007F … U+009F, U+2028 and U+2029 with
+    U+FFFD (R-A2L-READ.51)."""
+    out: list[str] = []
+    for ch in text:
+        code = ord(ch)
+        if code <= 0x1F or 0x7F <= code <= 0x9F or code in (0x2028, 0x2029):
+            out.append("\ufffd")
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
 def iter_section_lines(sections: List[dict], depth: int = 0) -> List[str]:
-    """Depth-first lines for /begin tree (indented)."""
+    """Depth-first lines for /begin tree (indented), over the canonical
+    ``meta`` with control characters as U+FFFD."""
     lines: list[str] = []
     indent = "  " * depth
     for section in sections:
-        name = section.get("name", "UNKNOWN")
-        meta = section.get("meta", "")
+        name = _summary_sanitize(section.get("name", "UNKNOWN") or "UNKNOWN")
+        meta = _summary_sanitize(section.get("meta", "") or "")
         start = section.get("start_line")
         end = section.get("end_line")
         label = f"{name} {meta}".strip()
@@ -3644,25 +4881,25 @@ def iter_section_lines(sections: List[dict], depth: int = 0) -> List[str]:
 def render_a2l_view(
     a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None, max_tag_lines: Optional[int] = None
 ) -> str:
-    """Render a concise, human-readable A2L summary or errors."""
+    """Render a concise, human-readable A2L summary: errors, then sections,
+    then tags (R-A2L-076, .077)."""
     if not a2l_data:
         return "No A2L loaded."
-    if a2l_data.get("errors"):
-        errors = "\n".join(f"- {err}" for err in a2l_data["errors"])
-        return f"A2L parse errors:\n{errors}"
-    sections = a2l_data.get("sections", [])
-    tags = a2l_data.get("tags", [])
-    if not sections:
-        return "No A2L sections found."
-    lines_out = ["A2L Sections:", *iter_section_lines(sections)]
+    errors = a2l_data.get("errors") or []
+    sections = a2l_data.get("sections") or []
+    tags = a2l_data.get("tags") or []
+    blocks: list[str] = []
+    if errors:
+        blocks.append("A2L parse errors:\n" + "\n".join(_summary_sanitize(f"- {e}") for e in errors))
+    if sections:
+        blocks.append("A2L Sections:\n" + "\n".join(iter_section_lines(sections)))
     if tags:
-        lines_out.append("")
-        lines_out.append("A2L Tags:")
         check_map = {}
         if tag_checks:
             check_map = {(item.get("section"), item.get("name")): item for item in tag_checks}
         truncated = False
         emitted_tag_lines = 0
+        tag_lines: list[str] = []
         for tag in tags:
             if isinstance(max_tag_lines, int) and max_tag_lines > 0:
                 if emitted_tag_lines >= max_tag_lines:
@@ -3679,14 +4916,19 @@ def render_a2l_view(
                     status = format_tag_validation_status(match)
             reg = tag.get("memory_region") or "unknown"
             tail = f" {status}" if status else ""
-            lines_out.append(
-                f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
+            tag_lines.append(
+                _summary_sanitize(
+                    f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
+                )
             )
             emitted_tag_lines += 1
         if truncated:
             remaining = max(0, len(tags) - max_tag_lines)
-            lines_out.append(f"... truncated {remaining} additional tag lines ...")
-    return "\n".join(lines_out)
+            tag_lines.append(f"... truncated {remaining} additional tag lines ...")
+        blocks.append("A2L Tags:\n" + "\n".join(tag_lines))
+    if not blocks:
+        return "No A2L sections found."
+    return "\n\n".join(blocks)
 
 
 def validate_a2l_internal_issues(a2l_data: dict, tag_checks: Optional[list[dict]] = None) -> list[ValidationIssue]:

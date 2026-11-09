@@ -1,0 +1,31 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M10 apply ==
+file: s19_app/tui/a2l.py
+anchor: '        if own_bo_word is not None and own_bo_order is None:\r\n            address_invalid = True'
+applied_count: 1 (expected 1 )
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  e7ec58fc4f9e41c0383e5f83a8bad76de4c890524cdd39a57a985e07587df205
+== M10 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_read_68_byte_order_error ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-47/test_r_a2l_read_68_byte_order_0')
+
+    def test_r_a2l_read_68_byte_order_error(tmp_path: Path) -> None:
+        """R-A2L-READ.68/1: BYTE_ORDER not-a-byte-order errors."""
+        for w in ("MSB_FRIST", "MSB_LAST_MSW_FIRST", '"MSB_FIRST"', "1"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" BYTE_ORDER {w}"))
+            data = _parse(tmp_path, text)
+            assert any(f"BYTE_ORDER {w} is not a byte order" in e for e in data["errors"]), w
+>           assert _tag(data, "X")["address"] is None
+E           assert 16 is None
+
+tests/test_b103_a2l_reader.py:1267: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_error - a...
+1 failed in 0.62s
+== M10 pytest exit code: 1 ==
+== M10 restore ==
+restore_hash_ok: True
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
