@@ -33,6 +33,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     ProgressBar,
+    RichLog,
     Select,
     Static,
     TextArea,
@@ -1507,7 +1508,7 @@ class A2LTagTable(DataTable):
         self.post_message(self.Measured())
 
 
-class A2LDetailCard(Static):
+class A2LDetailCard(RichLog):
     """
     Summary:
         A one-widget A2L detail card mounted at the top of ``#a2l_hex_pane``
@@ -1543,10 +1544,9 @@ class A2LDetailCard(Static):
     }
     """
 
-    @property
-    def is_scrollable(self) -> bool:
-        """Return True because the bounded card scrolls its overflowing text."""
-        return True
+    def on_mount(self) -> None:
+        """Paint the placeholder before the first highlighted row."""
+        self.show_tag(None)
 
     def show_tag(self, tag: Optional[dict]) -> None:
         """
@@ -1561,8 +1561,8 @@ class A2LDetailCard(Static):
             None
 
         Data Flow:
-            - Delegates composition to :func:`_a2l_detail_card_text` and calls
-              ``Static.update`` with the resulting ``Text``.
+            - Delegates composition to :func:`_a2l_detail_card_text`, clears the
+              log and writes the resulting ``Text`` with markup disabled.
 
         Dependencies:
             Uses:
@@ -1570,7 +1570,8 @@ class A2LDetailCard(Static):
             Used by:
                 - on_data_table_row_highlighted
         """
-        self.update(_a2l_detail_card_text(tag))
+        self.clear()
+        self.write(_a2l_detail_card_text(tag))
 
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
@@ -8745,7 +8746,6 @@ class S19TuiApp(App):
         )
         _hex_pane = Container(
             A2LDetailCard(
-                _a2l_detail_card_text(None),
                 id="a2l_detail_card",
                 markup=False,
             ),
