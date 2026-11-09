@@ -793,13 +793,17 @@ def painted_cell(app, index: int, column: int) -> str:
 
     A fixed column paints at its left edge regardless of the horizontal
     scroll, so its start is the plain prefix of render widths; every later
-    column starts that prefix minus ``scroll_x`` (R-A2L-048/4)."""
+    column starts that prefix minus ``scroll_x``, clamped below the fixed
+    columns when the cell is the first partially visible one (R-A2L-048/4)."""
     table = tag_table(app)
     line = table.render_line(1 + index - int(table.scroll_y)).text
     columns = table.ordered_columns
     start = sum(c.get_render_width(table) for c in columns[:column])
     if column >= int(table.fixed_columns):
-        start -= int(table.scroll_x)
+        fixed_width = sum(
+            c.get_render_width(table) for c in columns[: int(table.fixed_columns)]
+        )
+        start = max(fixed_width, start - int(table.scroll_x))
     return line[start:start + columns[column].get_render_width(table)].strip()
 
 
