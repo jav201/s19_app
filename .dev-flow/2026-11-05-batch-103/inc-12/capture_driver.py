@@ -45,6 +45,7 @@ import os
 import subprocess
 import sys
 import time
+import traceback
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -233,6 +234,21 @@ def main() -> int:
                 await asyncio.sleep(0.05)
             return False
 
+        def _image_loaded(self, name: str) -> bool:
+            """True once the just-launched image load installed ``current_file``."""
+            return (
+                self.current_file is not None
+                and self.current_file.path.name == name
+            )
+
+        def _a2l_ready(self) -> bool:
+            """True once the A2L attach installed data and computed the enriched tags."""
+            return (
+                self.current_a2l_data is not None
+                and self._a2l_enriched_key is not None
+                and bool(self._a2l_enriched_tags)
+            )
+
         async def _show_explorer(self) -> DataTable:
             self.action_show_screen("a2l")
             await self._settle(0.6)
@@ -264,19 +280,24 @@ def main() -> int:
                     fixture_a2l.write_text(a2l_text, encoding="utf-8")
                     fixture_s19.write_text(synthetic_image(), encoding="ascii")
                     self.load_selected_file(fixture_s19)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == fixture_s19.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(fixture_s19.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    # ``load_selected_file`` applies synchronously but defers the
+                    # sections -> hex -> a2l refresh chain on ``call_later``; let
+                    # that chain drain so the A2L attach never races it.
+                    await self._settle(0.4)
                     self.load_a2l_from_path(fixture_a2l)
                     report_lines.append(f"synthetic_fixture={args.scenario}")
                 elif args.scenario == "curve":
                     assert curve_path is not None
                     self.load_selected_file(image_path)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == image_path.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(image_path.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    await self._settle(0.4)
                     self.load_a2l_from_path(curve_path)
                     report_lines.append(f"selected_file={curve_path.relative_to(root)}")
                     report_lines.append(f"curve_without_length_selected={_curve_count}")
@@ -285,13 +306,24 @@ def main() -> int:
                     )
                 else:  # v171, v171-nameline
                     self.load_selected_file(image_path)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == image_path.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(image_path.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    await self._settle(0.4)
                     self.load_a2l_from_path(v171_path)
                     report_lines.append("tracked_file=examples/case_00_public/ASAP2_Demo_V171.a2l")
-                await self.workers.wait_for_complete()
+                # A2L attach runs on its own worker; wait on the installed
+                # state (data + enriched tags/key), never on the global worker
+                # manager, whose ``wait_for_complete`` raises ``WorkerCancelled``
+                # if any unrelated worker was cancelled.
+                if not await self._wait_for(self._a2l_ready):
+                    raise TimeoutError(
+                        "A2L load did not finish: "
+                        f"current_a2l_data={'set' if self.current_a2l_data else 'unset'} "
+                        f"enriched_key={'set' if self._a2l_enriched_key else 'unset'} "
+                        f"tags={len(self._a2l_enriched_tags)}"
+                    )
                 await self._settle(0.6)
                 table = await self._show_explorer()
                 report_lines.append(f"tags={len(self._a2l_filtered_tags)}")
@@ -327,7 +359,10 @@ def main() -> int:
             except BaseException as exc:  # noqa: BLE001 - keep the app alive, report it
                 error = f"{type(exc).__name__}: {exc}"
                 report_lines.append(f"surface=error {error}")
+                for tb_line in traceback.format_exc().rstrip("\n").splitlines():
+                    report_lines.append(f"traceback: {tb_line}")
                 sys.stderr.write(f"capture drive failed: {error}\n")
+                sys.stderr.write(traceback.format_exc())
             finally:
                 if args.report is not None:
                     try:

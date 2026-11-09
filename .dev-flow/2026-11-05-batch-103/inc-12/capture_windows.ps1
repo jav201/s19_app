@@ -5,7 +5,10 @@
 # the window it opened and deletes only its own scratch. It never touches a
 # window it did not open (-w new plus a unique title), and the operator's real
 # HOME / XDG_* / LOCALAPPDATA (and with it the real recent-files store) are
-# isolated below a scratch ``zq_iso_user`` for the launched process.
+# isolated below a scratch ``zq_iso_user`` for the launched process. Instead
+# of a fixed settle it polls the driver's sidecar for surface=ready/error and
+# captures the moment the surface is ready; on surface=error it captures for
+# diagnosis, prints the failure and exits non-zero (never reports success).
 #
 #   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario synmap -OutPng out/synmap.80x50.png -Cols 80 -Rows 50
 #   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario curve -Cols 118 -Rows 54 -OutPng out/curve.118x54.png
@@ -145,7 +148,32 @@ try {
   if ($hwnd -eq [IntPtr]::Zero) { throw "window '$title' did not appear" }
   [void][ZqU32]::ShowWindow($hwnd, 9)
   [void][ZqU32]::SetForegroundWindow($hwnd)
-  Start-Sleep -Seconds $SettleSeconds
+  # Poll the driver's sidecar instead of a fixed settle: capture as soon as
+  # the surface is ready, and stop as soon as the driver reports an error.
+  $surface = $null
+  $deadline = (Get-Date).AddSeconds($SettleSeconds)
+  while ((Get-Date) -lt $deadline) {
+    if (Test-Path -LiteralPath $report) {
+      $surfaceLine = $null
+      try {
+        $surfaceLine = Get-Content -LiteralPath $report -ErrorAction Stop |
+          Where-Object { $_ -match '^surface=' } | Select-Object -Last 1
+      } catch { }
+      if ($surfaceLine) {
+        if ($surfaceLine -match '^surface=ready') { $surface = "ready"; break }
+        if ($surfaceLine -match '^surface=error') { $surface = "error"; break }
+      }
+    }
+    Start-Sleep -Milliseconds 200
+  }
+
+  if ($null -eq $surface) {
+    $still = Find-ByTitle $title
+    if ($still -eq [IntPtr]::Zero) {
+      throw "window '$title' vanished before the driver reported a surface"
+    }
+    throw "driver for '$title' did not report surface=ready/error within $SettleSeconds s"
+  }
 
   $rect = New-Object ZqU32+RECT
   $valid = $false
@@ -159,6 +187,16 @@ try {
     }
   }
   if (-not $valid) { throw "invalid rect for '$title'" }
+
+  if ($surface -eq "error") {
+    # Capture for diagnosis only; print the failure and never claim success.
+    $diagMethod = "not-captured"
+    try { $diagMethod = Save-WindowPng $hwnd $rect $outPath } catch { }
+    if (Test-Path -LiteralPath $report) {
+      foreach ($line in Get-Content -LiteralPath $report) { Write-Output ("REPORT " + $line) }
+    }
+    throw "driver reported surface=error for '$title' (diagnosis capture: $diagMethod)"
+  }
   $method = Save-WindowPng $hwnd $rect $outPath
   Write-Output ("CAPTURED {0}  {1}x{2}px  grid={3}x{4}  method={5}  bytes={6}" -f `
     $outPath, ($rect.Right - $rect.Left), ($rect.Bottom - $rect.Top), $Cols, $Rows, $method, (Get-Item $outPath).Length)
