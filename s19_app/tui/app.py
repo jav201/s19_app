@@ -7,6 +7,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import shutil
 import stat
@@ -16,6 +17,7 @@ from typing import Any, Callable, List, Literal, Mapping, Optional, Sequence, Tu
 
 from textual import events, work
 from textual.app import App, ComposeResult
+from textual.message import Message
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.timer import Timer
@@ -1247,13 +1249,53 @@ _STRIP_GAP_GLYPH = "╱"
 _A2L_CARD_HINT = "Highlight a tag to inspect its fields."
 
 
+def _card_value_text(value: object, style: str = VALUE) -> Text:
+    """
+    Summary:
+        Render one file-derived A2L detail-card value as a markup-safe Rich
+        ``Text`` in which each maximal run of break characters is one space and
+        every other control character is removed (R-TUI-042a.7.1, .7.2).
+
+    Args:
+        value (object): The field value to render; coerced via ``str(value)``.
+        style (str): Rich style applied to the whole value. Defaults to
+            ``VALUE``.
+
+    Returns:
+        Text: A literal ``Text`` holding the scrubbed value; never markup-parsed.
+
+    Data Flow:
+        - Coerce ``value`` to ``str``.
+        - Replace each maximal run of TAB (U+0009), LF (U+000A) and CR (U+000D)
+          with one space, preserving every other character.
+        - Hand the scrubbed string to ``safe_text`` (``utils.py:44``), which
+          deletes every other C0, DEL and C1 control character and wraps the
+          result as a literal ``Text``, never markup.
+
+    Dependencies:
+        Uses:
+            - ``safe_text``
+        Used by:
+            - ``_card_field``
+            - ``_a2l_detail_card_text``
+
+    Example:
+        ``_card_value_text("SYN  desc" + LF + TAB + "part two")`` paints
+        ``SYN  desc part two``; ``_card_value_text("m" + TAB + TAB + "s")``
+        paints ``m s``.
+    """
+    scrubbed = re.sub(r"[\t\n\r]+", " ", str(value))
+    return safe_text(scrubbed, style=style)
+
+
 def _card_field(text: Text, label: str, value: object) -> None:
     """
     Summary:
         Append a ``label value`` line to an A2L detail-card ``Text``, skipping
         blank/absent values (batch-47, LLR-069.2). The label is a fixed,
-        developer-supplied token (muted); the value is appended literally so a
-        file-derived value can never be interpreted as Rich markup (C-17).
+        developer-supplied token (muted); the value goes through
+        :func:`_card_value_text` so a file-derived value keeps no control
+        character and can never be interpreted as Rich markup (R-TUI-042a.7.1).
 
     Args:
         text (Text): The card ``Text`` being composed (mutated in place).
@@ -1265,11 +1307,14 @@ def _card_field(text: Text, label: str, value: object) -> None:
 
     Data Flow:
         - Called by :func:`_a2l_detail_card_text` per optional field.
-        - Uses ``Text.append`` (literal), never ``Text.from_markup``.
+        - Skips ``None`` and ``""``; otherwise appends the line end, the muted
+          label, then the value via :func:`_card_value_text`.
+        - Also builds the Name line (``"name"``) when the card's header shows
+          the display identifier (R-TUI-042a.8).
 
     Dependencies:
         Uses:
-            - rich.text.Text ; LABEL ; VALUE
+            - rich.text.Text ; LABEL ; _card_value_text
         Used by:
             - _a2l_detail_card_text
     """
@@ -1277,19 +1322,73 @@ def _card_field(text: Text, label: str, value: object) -> None:
         return
     text.append("\n")
     text.append(f"{label} ", style=LABEL)
-    text.append(str(value), style=VALUE)
+    text.append(_card_value_text(value, style=VALUE))
+
+
+def _shorten_tag_name(name: str, width: int) -> str:
+    """
+    Summary:
+        Project a tag name into its *painted tag name*: every character
+        outside U+0021 … U+007E is shown as U+FFFD, then the name is cut in the
+        middle to at most ``width`` cells (R-TUI-042a.3, .5, .6).
+
+    Args:
+        name (str): The tag's full name (file-derived, untrusted).
+        width (int): The target cell count of the painted name; values below 1
+            are taken as 1 (``…`` alone).
+
+    Returns:
+        str: The painted tag name, at most ``width`` cells. When ``name`` is
+        longer than ``width``, the result is ``head + "…" + tail`` with
+        ``head = (width - 1) // 2`` and ``tail = width - 1 - head`` cells.
+
+    Data Flow:
+        - Coerce ``width`` to at least 1.
+        - Project each character outside U+0021 … U+007E to U+FFFD so every
+          shown character occupies exactly one cell.
+        - When ``len(name) <= width``, project the whole name; otherwise
+          project only the two retained slices (head and tail), so the cost is
+          O(width) even when a hostile tail follows the cut (R-TUI-042a.6).
+
+    Dependencies:
+        Uses:
+            - none (pure)
+        Used by:
+            - ``S19TuiApp._build_a2l_table_cells``
+
+    Example:
+        ``_shorten_tag_name("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR", 14)``
+        returns ``ASAM.C…UMN_DIR``; the same name at width 1 returns ``…``.
+    """
+    if width < 1:
+        width = 1
+
+    def _project(slice_: str) -> str:
+        return "".join(
+            ch if "\u0021" <= ch <= "\u007E" else "\uFFFD" for ch in slice_
+        )
+
+    if len(name) <= width:
+        return _project(name)
+    head = (width - 1) // 2
+    tail = width - 1 - head
+    return _project(name[:head]) + "…" + _project(name[len(name) - tail:])
 
 
 def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
     """
     Summary:
         Compose the A2L detail card as a single markup-safe Rich ``Text`` from a
-        highlighted enriched tag: a header line (in-image glyph + name + cyan
-        address) followed by the tag's description, unit·conversion, record
-        layout, byte order, and limits (batch-47, LLR-069.2 / LLR-069.3). Every
-        file-derived value is appended literally (``Text.append``), never
-        f-strung into a markup string, so hostile bracket/link/ANSI/unbalanced
-        input renders verbatim with no ``MarkupError`` (C-17).
+        highlighted enriched tag: a header line (in-image glyph + display
+        identifier or name + cyan address), the Name line when the header shows
+        a display identifier (R-TUI-042a.8), then the tag's description,
+        unit·conversion, record layout, byte order, and limits (batch-47,
+        LLR-069.2 / LLR-069.3). Every file-derived value is appended through
+        :func:`_card_value_text`, so hostile bracket/link/ANSI/unbalanced input
+        renders verbatim with no ``MarkupError`` and with no control character
+        (C-17; R-TUI-042a.7.1, .7.2). The card reads the tag dict, so it always
+        shows the tag's full name — the Tag cell may cut it, the card never
+        does (R-TUI-042a.3).
 
     Args:
         tag (Optional[dict]): The highlighted enriched A2L tag, or ``None`` when
@@ -1300,12 +1399,17 @@ def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
 
     Data Flow:
         - ``None`` → a muted placeholder hint.
-        - Otherwise header (glyph/name/address) + per-field lines via
-          :func:`_card_field`; untrusted values appended literally.
+        - Otherwise the header (glyph / display identifier or name / address),
+          then the Name line when the header shows the display identifier,
+          then per-field lines via :func:`_card_field`.
+        - The unit·conversion line and the limits line append each file-derived
+          value via :func:`_card_value_text`; the absent limit is the empty
+          string.
 
     Dependencies:
         Uses:
-            - rich.text.Text ; _card_field ; VALUE ; CYAN ; GREEN ; DGRAY ; LABEL
+            - rich.text.Text ; _card_field ; _card_value_text
+            - VALUE ; CYAN ; GREEN ; DGRAY ; LABEL
         Used by:
             - A2LDetailCard.show_tag
     """
@@ -1314,24 +1418,28 @@ def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
     text = Text()
     in_mem = bool(tag.get("in_memory"))
     text.append("✓ " if in_mem else "· ", style=GREEN if in_mem else DGRAY)
-    text.append(
-        str(tag.get("display_identifier") or tag.get("name") or "UNKNOWN"),
-        style=VALUE,
-    )
+    display_id = tag.get("display_identifier")
+    name = tag.get("name")
+    text.append(_card_value_text(display_id or name or "UNKNOWN", style=VALUE))
     addr = tag.get("address")
     if isinstance(addr, int):
         text.append("  ")
         text.append(f"0x{addr:08X}", style=CYAN)
+    if display_id:
+        _card_field(text, "name", name)
     _card_field(text, "desc", tag.get("description"))
     unit = tag.get("unit")
     conversion = tag.get("conversion")
     if unit or conversion:
         text.append("\n")
         text.append("unit ", style=LABEL)
-        text.append(str(unit) if unit else "—", style=VALUE)
+        if unit:
+            text.append(_card_value_text(unit, style=VALUE))
+        else:
+            text.append("—", style=VALUE)
         if conversion:
             text.append(" · conv ", style=LABEL)
-            text.append(str(conversion), style=VALUE)
+            text.append(_card_value_text(conversion, style=VALUE))
     _card_field(text, "layout", tag.get("record_layout_name"))
     _card_field(text, "byteorder", tag.get("effective_byte_order"))
     lower = tag.get("lower_limit")
@@ -1339,11 +1447,64 @@ def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
     if lower is not None or upper is not None:
         text.append("\n")
         text.append("limits ", style=LABEL)
-        text.append(
-            f"{lower if lower is not None else ''}..{upper if upper is not None else ''}",
-            style=VALUE,
-        )
+        text.append(_card_value_text(lower if lower is not None else ""))
+        text.append("..", style=VALUE)
+        text.append(_card_value_text(upper if upper is not None else ""))
     return text
+
+
+class A2LTagTable(DataTable):
+    """
+    Summary:
+        The A2L Explorer's tag table, which REPORTS ITS OWN RESIZE
+        (R-TUI-042a.5, batch-103 Inc 12). ``events.Resize`` does not bubble, so
+        this subclass re-emits its own resize as a bubbling :class:`Measured`
+        message, letting ``S19TuiApp`` re-fit the Tag cells exactly when the
+        table's visible width becomes knowable — after a terminal resize or
+        after the table is shown (a hidden table's size is ``(0, 0)``).
+
+    Data Flow:
+        - Composed by ``S19TuiApp._compose_screen_a2l`` as ``#a2l_tags_list``
+          with ``cell_padding=1`` and ``fixed_columns=2`` (I-12.2).
+        - ``on_resize`` posts :class:`Measured` →
+          ``S19TuiApp.on_a2l_tag_table_measured`` →
+          ``S19TuiApp._fit_a2l_tag_cells``.
+
+    Dependencies:
+        Uses:
+            - textual.widgets.DataTable ; textual.message.Message
+        Used by:
+            - ``S19TuiApp._compose_screen_a2l``
+            - ``S19TuiApp.on_a2l_tag_table_measured``
+    """
+
+    class Measured(Message, namespace="a2l_tag_table"):
+        """The tag table's size changed, so its visible width is now knowable."""
+
+    def on_resize(self, event: events.Resize) -> None:
+        """
+        Summary:
+            Post the bubbling :class:`Measured` message on the table's own
+            resize, since ``events.Resize`` does not bubble on its own
+            (R-TUI-042a.5).
+
+        Args:
+            event (events.Resize): The table's resize event.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Re-emit the non-bubbling resize as a bubbling message, the house
+              idiom of ``BandBar.Measured`` (``screens_directionb.py``).
+
+        Dependencies:
+            Uses:
+                - ``Widget.post_message``
+            Used by:
+                - Textual layout, when the table's size changes
+        """
+        self.post_message(self.Measured())
 
 
 class A2LDetailCard(Static):
@@ -8523,13 +8684,12 @@ class S19TuiApp(App):
               ``Horizontal`` of a left tags pane (``#a2l_tags_pane``,
               ``1fr``) and a right hex pane (``#a2l_hex_pane``, fixed-40 at
               >=120 cols / 35% under ``width-narrow`` — LLR-009.1).
-            - Every widget subtree is reused verbatim so the A2L renderers
-              keep working unchanged: the tags pane keeps ``#a2l_tags_list``,
-              ``#a2l_tags_summary``, the filter row inputs/buttons, the
-              ``#a2l_filter_menu`` overlay and its list; the hex pane keeps
-              ``#alt_hex_view`` / ``#alt_hex_scroll`` / ``#alt_search_input`` /
-              ``#alt_goto_input`` and the find/goto buttons. No
-              renderer / paging / jump / filter logic is touched (LLR-009.2).
+            - The widget ids are kept as the A2L renderers' mount targets: the
+              tags pane keeps ``#a2l_tags_list``, ``#a2l_tags_summary``, the
+              filter row inputs/buttons, the ``#a2l_filter_menu`` overlay and
+              its list; the hex pane keeps ``#alt_hex_view`` /
+              ``#alt_hex_scroll`` / ``#alt_search_input`` / ``#alt_goto_input``
+              and the find/goto buttons.
 
         Dependencies:
             Used by:
@@ -8537,10 +8697,14 @@ class S19TuiApp(App):
 
         US-038 polish (LLR-042.2): the tags pane carries the queryable
         ``density-compact`` class (tightened pane padding, mirroring the
-        ``#workspace_body.density-compact`` precedent) and the DataTable renders
-        with ``cell_padding=0`` for compact rows. The fixed column header is the
-        Textual ``DataTable`` default (LLR-042.1, verify-not-build); no change to
-        the tag enrichment / paging / per-row severity colouring.
+        ``#workspace_body.density-compact`` precedent). The tag table is an
+        ``A2LTagTable`` with ``cell_padding=1`` (at least one blank column
+        between adjacent cells, R-TUI-042a.2) and ``fixed_columns=2`` (the
+        Address and Length columns stay at their own x under a horizontal
+        scroll while the other columns scroll under them, R-TUI-042a.4); the
+        fixed column header is the Textual ``DataTable`` default
+        (LLR-042.1, verify-not-build). Tag enrichment, paging and per-row
+        severity colouring layer on the same widget ids.
         """
         _tags_pane = Container(
             Label("A2L Tags", id="a2l_tags_title"),
@@ -8563,11 +8727,12 @@ class S19TuiApp(App):
                 id="a2l_filter_menu",
                 classes="hidden",
             ),
-            DataTable(
+            A2LTagTable(
                 id="a2l_tags_list",
                 zebra_stripes=True,
                 cursor_type="row",
-                cell_padding=0,
+                cell_padding=1,
+                fixed_columns=2,
             ),
             Label("", id="a2l_tags_summary"),
             id="a2l_tags_pane",
@@ -8781,9 +8946,9 @@ class S19TuiApp(App):
             a2l_table = self.query_one("#a2l_tags_list", DataTable)
             if not a2l_table.columns:
                 a2l_table.add_columns(
-                    "Tag",
                     "Address",
                     "Length",
+                    "Tag",
                     "Source",
                     "Raw",
                     "Physical",
@@ -20913,6 +21078,11 @@ class S19TuiApp(App):
             - Build 16-cell tuples with the same fields the prior renderer produced,
               wrap each cell in a severity-styled ``rich.text.Text``, and insert
               via per-row ``add_row`` with ``a2l:<absolute_index>`` keys.
+            - Measure the name width once per page (``_a2l_tag_name_width``) and
+              hand it to every row's build; after the summary, schedule
+              ``_fit_a2l_tag_cells`` for the next refresh so a page whose
+              Address/Length widths or vertical scrollbar differ from the
+              previous page's is re-fitted on its own layout (R-TUI-042a.5).
 
         Dependencies:
             Uses:
@@ -20920,6 +21090,7 @@ class S19TuiApp(App):
                 - ``_a2l_issue_severity_map``
                 - ``_a2l_tag_row_severity`` / ``_severity_style``
                 - ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display``
+                - ``_a2l_tag_name_width`` / ``_fit_a2l_tag_cells``
                 - ``safe_text``
             Used by:
                 - ``_refresh_a2l_filtered_tags``
@@ -20949,12 +21120,13 @@ class S19TuiApp(App):
         start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
         self._a2l_window_start = start
         visible_tags = tags[start:end]
+        name_width = self._a2l_tag_name_width(a2l_table)
         issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
         for i, tag in enumerate(visible_tags):
             absolute_index = start + i
             row_key = f"a2l:{absolute_index}"
             self._a2l_row_key_to_tag[row_key] = tag
-            cells = self._build_a2l_table_cells(tag)
+            cells = self._build_a2l_table_cells(tag, name_width)
             severity = _a2l_tag_row_severity(tag, issue_severity_map)
             style = _severity_style(severity)
             # LLR-068.1: the builder returns markup-safe Rich ``Text`` cells with
@@ -20978,6 +21150,7 @@ class S19TuiApp(App):
         summary_text.append("  ·  ")
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
+        self.call_after_refresh(self._fit_a2l_tag_cells)
         self.logger.info(
             "Load phase boundary: populate_a2l_table_done rows=%d total=%d elapsed=%.3f",
             len(visible_tags),
@@ -20985,6 +21158,127 @@ class S19TuiApp(App):
             time.perf_counter() - populate_started,
         )
         self._flush_logger()
+
+    def _a2l_tag_name_width(self, a2l_table: DataTable) -> Optional[int]:
+        """
+        Summary:
+            Compute the name width *w* of the A2L tag table: the visible width
+            minus the Address and Length column widths minus the Tag column's
+            padding, glyph and trailing blank (R-TUI-042a.5).
+
+        Args:
+            a2l_table (DataTable): The ``#a2l_tags_list`` table, laid out.
+
+        Returns:
+            Optional[int]: The name width in cells, or ``None`` when the table
+            has no visible width (a hidden table has a null region) or fewer
+            than two columns.
+
+        Data Flow:
+            - Read the visible width from ``scrollable_content_region.width``
+              (the content region minus a shown scrollbar).
+            - Subtract ``Column.get_render_width`` of the Address and Length
+              columns (each already includes its two padding cells).
+            - Subtract ``2 * cell_padding + 2``: the Tag column's padding, the
+              in-image glyph and the blank after it.
+
+        Dependencies:
+            Uses:
+                - ``DataTable.scrollable_content_region`` / ``ordered_columns``
+                - ``Column.get_render_width``
+            Used by:
+                - ``update_a2l_tags_view``
+                - ``_repaint_a2l_tag_cells``
+                - ``_fit_a2l_tag_cells``
+        """
+        visible = a2l_table.scrollable_content_region.width
+        if visible == 0:
+            return None
+        ordered = a2l_table.ordered_columns
+        if len(ordered) < 2:
+            return None
+        address_width = ordered[0].get_render_width(a2l_table)
+        length_width = ordered[1].get_render_width(a2l_table)
+        return (
+            visible
+            - address_width
+            - length_width
+            - 2 * a2l_table.cell_padding
+            - 2
+        )
+
+    def _fit_a2l_tag_cells(self) -> None:
+        """
+        Summary:
+            Repaint the shown A2L tag-table page's Tag cells in place when the
+            measured name width *w* no longer matches what is painted, keeping
+            the cursor, scroll and detail card (R-TUI-042a.3, .5).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Measure *w* via ``_a2l_tag_name_width``; return when it is
+              ``None``, the page has no rows, or the row count differs from
+              ``_a2l_row_key_to_tag``.
+            - Compare each painted Tag cell (``get_row_at(i)[2].plain``)
+              against ``_build_a2l_table_cells(tag, w)[2].plain`` for the
+              row's tag.
+            - Only when one differs, call ``_repaint_a2l_tag_cells()`` once:
+              an in-place rewrite, so the cursor and scroll stay (E3A-06).
+
+        Dependencies:
+            Uses:
+                - ``_a2l_tag_name_width`` / ``_build_a2l_table_cells``
+                - ``_repaint_a2l_tag_cells``
+            Used by:
+                - ``update_a2l_tags_view`` (after each non-empty page build)
+                - ``on_a2l_tag_table_measured``
+        """
+        a2l_table = self.query_one("#a2l_tags_list", DataTable)
+        name_width = self._a2l_tag_name_width(a2l_table)
+        if name_width is None:
+            return
+        if not self._a2l_row_key_to_tag:
+            return
+        if a2l_table.row_count != len(self._a2l_row_key_to_tag):
+            return
+        for i, tag in enumerate(self._a2l_row_key_to_tag.values()):
+            painted = a2l_table.get_row_at(i)[2].plain
+            wanted = self._build_a2l_table_cells(tag, name_width)[2].plain
+            if painted != wanted:
+                self._repaint_a2l_tag_cells()
+                return
+
+    def on_a2l_tag_table_measured(self, event: A2LTagTable.Measured) -> None:
+        """
+        Summary:
+            Re-fit the A2L tag table's Tag cells when the table reports its own
+            resize, at which point the screen is laid out and the region the fit
+            reads is current (R-TUI-042a.5).
+
+        Args:
+            event (A2LTagTable.Measured): The table's re-emitted resize message.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Stop the bubbling message so no other handler re-runs the fit.
+            - Run ``_fit_a2l_tag_cells`` directly (no ``call_after_refresh``:
+              the table's resize already follows layout).
+
+        Dependencies:
+            Uses:
+                - ``_fit_a2l_tag_cells``
+            Used by:
+                - Textual dispatch of ``A2LTagTable.Measured``
+        """
+        event.stop()
+        self._fit_a2l_tag_cells()
 
     def _repaint_a2l_tag_cells(self) -> None:
         """
@@ -21004,9 +21298,11 @@ class S19TuiApp(App):
             - Read ``_a2l_filtered_tags`` and ``_a2l_window_start``; compute
               the page bounds ``update_a2l_tags_view`` uses.
             - For each shown row, rebuild its 16 cells with the row's
-              severity style and write only the cells whose plain text or
-              style differs (``update_cell_at`` with ``update_width=True``
-              so a widened Raw/Physical value is not clipped).
+              severity style — the Tag cell sized by the current name width
+              (``_a2l_tag_name_width``) — and write only the cells whose
+              plain text or style differs (``update_cell_at`` with
+              ``update_width=True`` so a widened Raw/Physical value is not
+              clipped and the Tag column can shrink).
             - Re-point ``_a2l_row_key_to_tag`` for each shown row and
               recompute the summary label with ``update_a2l_tags_view``'s
               text. No ``clear()``, no ``move_cursor``, no ``scroll_to`` and
@@ -21021,6 +21317,7 @@ class S19TuiApp(App):
                 - ``_get_window_bounds`` / ``_clamp_viewer_page_size``
             Used by:
                 - ``_refresh_a2l_values_after_write``
+                - ``_fit_a2l_tag_cells``
         """
         table = self.query_one("#a2l_tags_list", DataTable)
         summary_label = self.query_one("#a2l_tags_summary", Label)
@@ -21038,7 +21335,9 @@ class S19TuiApp(App):
         for i in range(end - start):
             absolute_index = start + i
             tag = tags[absolute_index]
-            cells = self._build_a2l_table_cells(tag)
+            cells = self._build_a2l_table_cells(
+                tag, self._a2l_tag_name_width(table)
+            )
             severity = _a2l_tag_row_severity(tag, issue_severity_map)
             style = _severity_style(severity)
             if style:
@@ -21068,32 +21367,43 @@ class S19TuiApp(App):
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
 
-    def _build_a2l_table_cells(self, tag: dict) -> tuple[Text, ...]:
+    def _build_a2l_table_cells(
+        self, tag: dict, name_width: Optional[int] = None
+    ) -> tuple[Text, ...]:
         """
         Summary:
-            Project one enriched A2L tag into the 16-cell tuple the DataTable row
-            expects, keeping every field the previous ListView renderer surfaced
-            (batch-47, LLR-068.1/068.3). Every cell is a markup-safe Rich
-            ``Text`` (built via ``safe_text``), so every file-derived value —
-            name, source, unit, function group, memory region, raw/physical
-            value — renders literally and can never be interpreted as Rich
-            markup (C-17). The name cell carries a leading in-image glyph
-            (``✓`` when ``tag["in_memory"]`` is truthy, else ``·``); the name is
-            bright, the address cyan, the source muted. Row-level severity
-            colouring is layered on top by ``update_a2l_tags_view`` (it overrides
-            these accent styles when a severity applies), preserving the A2L
-            Red/Green/White/Grey row-colour contract.
+            Project one enriched A2L tag into the 16-cell tuple the DataTable
+            row expects, in CTX-A2L-SCREEN order — Address, Length, Tag, then
+            Source … Dtype unchanged (batch-47, LLR-068.1/068.3;
+            R-TUI-042a.4). Every cell is a markup-safe Rich ``Text`` (built via
+            ``safe_text``), so every file-derived value — name, source, unit,
+            function group, memory region, raw/physical value — renders
+            literally and can never be interpreted as Rich markup (C-17). The
+            Tag cell carries a leading in-image glyph (``✓`` when
+            ``tag["in_memory"]`` is truthy, else ``·``) and the name as its
+            *painted tag name*, shortened in the middle by
+            :func:`_shorten_tag_name` to at most ``min(34, name_width)`` cells
+            (R-TUI-042a.3, .5, .6); the name is bright, the address cyan, the
+            source muted. Row-level severity colouring is layered on top by
+            ``update_a2l_tags_view`` (it overrides these accent styles when a
+            severity applies), preserving the A2L Red/Green/White/Grey
+            row-colour contract. The detail card keeps the full name.
 
         Args:
             tag (dict): Enriched A2L tag with value, memory, and schema fields.
+            name_width (Optional[int]): The measured name width *w* in cells;
+                ``None`` gives the 34-cell form (R-TUI-042a.3).
 
         Returns:
             tuple[Text, ...]: 16-cell tuple of Rich ``Text`` aligned with the
-            DataTable columns; the name cell (index 0) carries the leading
-            in-image glyph.
+            DataTable columns — index 0 Address, 1 Length, 2 Tag, 3 Source …
+            15 Dtype. The Tag cell (index 2) carries the leading in-image
+            glyph.
 
         Data Flow:
             - Format address/length/limits defensively so missing fields stay blank.
+            - Compute the Tag cell's cap as ``34 if name_width is None else
+              min(34, name_width)`` and paint the glyph plus the shortened name.
             - Reuse ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display`` helpers
               so display conventions remain centralized.
             - Wrap each cell via ``safe_text`` (``Text`` constructor, never
@@ -21103,16 +21413,21 @@ class S19TuiApp(App):
             Uses:
                 - ``_a2l_tag_in_memory_display``
                 - ``_a2l_tag_unit_display``
+                - ``_shorten_tag_name``
                 - ``safe_text`` ; ``VALUE`` / ``CYAN`` / ``DGRAY``
             Used by:
                 - ``update_a2l_tags_view``
+                - ``_repaint_a2l_tag_cells``
+                - ``_fit_a2l_tag_cells``
         """
         addr = tag.get("address")
         length = tag.get("length")
         addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
         len_text = str(length) if isinstance(length, int) else "n/a"
-        name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
+        name_text = str(tag.get("name") or "UNKNOWN")
         glyph = "✓" if tag.get("in_memory") else "·"
+        cap = 34 if name_width is None else min(34, name_width)
+        tag_text = f"{glyph} {_shorten_tag_name(name_text, cap)}"
         source_text = str(tag.get("source") or "assigned")
         raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
         if tag.get("physical_value") is not None:
@@ -21136,9 +21451,9 @@ class S19TuiApp(App):
         access_text = str(tag.get("access") or "")
         dtype_text = str(tag.get("datatype") or "")
         return (
-            safe_text(f"{glyph} {name_text}", style=VALUE),
             safe_text(addr_text, style=CYAN),
             safe_text(len_text),
+            safe_text(tag_text, style=VALUE),
             safe_text(source_text, style=DGRAY),
             safe_text(raw_value_text),
             safe_text(physical_value_text),
