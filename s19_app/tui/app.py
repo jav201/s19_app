@@ -8684,13 +8684,12 @@ class S19TuiApp(App):
               ``Horizontal`` of a left tags pane (``#a2l_tags_pane``,
               ``1fr``) and a right hex pane (``#a2l_hex_pane``, fixed-40 at
               >=120 cols / 35% under ``width-narrow`` — LLR-009.1).
-            - Every widget subtree is reused verbatim so the A2L renderers
-              keep working unchanged: the tags pane keeps ``#a2l_tags_list``,
-              ``#a2l_tags_summary``, the filter row inputs/buttons, the
-              ``#a2l_filter_menu`` overlay and its list; the hex pane keeps
-              ``#alt_hex_view`` / ``#alt_hex_scroll`` / ``#alt_search_input`` /
-              ``#alt_goto_input`` and the find/goto buttons. No
-              renderer / paging / jump / filter logic is touched (LLR-009.2).
+            - The widget ids are kept as the A2L renderers' mount targets: the
+              tags pane keeps ``#a2l_tags_list``, ``#a2l_tags_summary``, the
+              filter row inputs/buttons, the ``#a2l_filter_menu`` overlay and
+              its list; the hex pane keeps ``#alt_hex_view`` /
+              ``#alt_hex_scroll`` / ``#alt_search_input`` / ``#alt_goto_input``
+              and the find/goto buttons.
 
         Dependencies:
             Used by:
@@ -8704,8 +8703,8 @@ class S19TuiApp(App):
         Address and Length columns stay at their own x under a horizontal
         scroll while the other columns scroll under them, R-TUI-042a.4); the
         fixed column header is the Textual ``DataTable`` default
-        (LLR-042.1, verify-not-build). No change to the tag enrichment /
-        paging / per-row severity colouring.
+        (LLR-042.1, verify-not-build). Tag enrichment, paging and per-row
+        severity colouring layer on the same widget ids.
         """
         _tags_pane = Container(
             Label("A2L Tags", id="a2l_tags_title"),
@@ -21091,6 +21090,7 @@ class S19TuiApp(App):
                 - ``_a2l_issue_severity_map``
                 - ``_a2l_tag_row_severity`` / ``_severity_style``
                 - ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display``
+                - ``_a2l_tag_name_width`` / ``_fit_a2l_tag_cells``
                 - ``safe_text``
             Used by:
                 - ``_refresh_a2l_filtered_tags``
@@ -21317,6 +21317,7 @@ class S19TuiApp(App):
                 - ``_get_window_bounds`` / ``_clamp_viewer_page_size``
             Used by:
                 - ``_refresh_a2l_values_after_write``
+                - ``_fit_a2l_tag_cells``
         """
         table = self.query_one("#a2l_tags_list", DataTable)
         summary_label = self.query_one("#a2l_tags_summary", Label)
@@ -21423,7 +21424,7 @@ class S19TuiApp(App):
         length = tag.get("length")
         addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
         len_text = str(length) if isinstance(length, int) else "n/a"
-        name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
+        name_text = str(tag.get("name") or "UNKNOWN")
         glyph = "✓" if tag.get("in_memory") else "·"
         cap = 34 if name_width is None else min(34, name_width)
         tag_text = f"{glyph} {_shorten_tag_name(name_text, cap)}"
