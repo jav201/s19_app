@@ -35,7 +35,7 @@ F..                                                                      [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_21_1_one_number_gives_no_extended_limits ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-992/test_r_a2l_def_21_1_one_number0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-992/test_r_a2l_def_21_1_one_number0')
 
     def test_r_a2l_def_21_1_one_number_gives_no_extended_limits(tmp_path):
         """R-A2L-DEF.21/1 - ``EXTENDED_LIMITS 0`` (next word is a keyword)."""

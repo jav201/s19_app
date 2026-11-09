@@ -1,13 +1,13 @@
 # E3 correction pass 4 (Inc 2, batch-103) - R-A2L-DEF.138 overlap census
-# host cachyos-rtx; run 2026-11-06T20:24:06-06:00 .. 20:24:24-06:00; Python 3.11.18 (conda env s19ci), python -I
+# host <runner>; run 2026-11-06T20:24:06-06:00 .. 20:24:24-06:00; Python 3.11.18 (conda env s19ci), python -I
 # base parser imported from the read-only clone ~/work/s19_app at e07fb00f (0 changed files before and after the run)
 # HOME, XDG_CACHE/CONFIG/DATA_HOME and LOCALAPPDATA under /tmp/b103-e3c4-2/home; DISPLAY/WAYLAND_DISPLAY unset; stdin </dev/null; no clipboard
 # command: python -I corr4-overlap-census.py ~/work/s19_app /tmp/b103-e3c4-2/scratch /tmp/b103-e3c4-2/corr4-overlap-census-list.txt
 # list file: corr4-overlap-census-list.txt (one line per refused object for files with <= 400 refusals; one line per start address otherwise)
 # the 'A2L section tree has structural errors' lines are the base parser's own log output (kept)
 
-A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 tracked .a2l files: 35
 [FX] examples/case_00_public/ASAP2_Demo_V161.a2l: tags=75 spans=67 addr-no-len=8 masks-read=6 overlapping-pairs=153 exempt-pairs=3 | refused=41 (A=37, B-only=4) describe-clean-refused=38 | duplicate-names=0
 [FX] examples/case_00_public/ASAP2_Demo_V171.a2l: tags=118 spans=98 addr-no-len=20 masks-read=6 overlapping-pairs=199 exempt-pairs=3 | refused=51 (A=47, B-only=4) describe-clean-refused=43 | duplicate-names=0

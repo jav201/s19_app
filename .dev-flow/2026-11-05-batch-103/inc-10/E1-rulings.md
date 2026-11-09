@@ -1,6 +1,6 @@
 # Inc 10 — E1 rulings: scope, canon changes, decisions
 
-Base `e07fb00`. Rows: `01-requirements.md`; cases: `02-test-cases.md`; slice: `E1-slice.md`; evidence: `evidence-e1/`. Every decision in §3 is **PROPOSED — awaiting orchestrator ruling** (and, where marked, **awaits G2**: prototype round 2 shows the variants `px_A` docked export bar, `px_B` Inspector card, `px_C` export dialog — `C:\Users\jjgh8\Github\s19_app\prototypes\b103_ux\round2\variants\px_*.py`, read only). The table of `01-requirements.md` carries the recommended option of each decision; the other options' rows are written out here.
+Base `e07fb00`. Rows: `01-requirements.md`; cases: `02-test-cases.md`; slice: `E1-slice.md`; evidence: `evidence-e1/`. Every decision in §3 is **PROPOSED — awaiting orchestrator ruling** (and, where marked, **awaits G2**: prototype round 2 shows the variants `px_A` docked export bar, `px_B` Inspector card, `px_C` export dialog — `C:\Users\<user>\Github\s19_app\prototypes\b103_ux\round2\variants\px_*.py`, read only). The table of `01-requirements.md` carries the recommended option of each decision; the other options' rows are written out here.
 
 ## 1. Scope and what the census found
 
@@ -73,7 +73,7 @@ Context notes (`01-requirements.md` Definitions): CTX-SAVEBACK gains *output for
 - **A — unchanged** (R-CHG-003.8: the open project's folder, or the work area; CTX-SAVEBACK *destination*). No reason found to change the rule: the operator asked for the format, not the place.
 - **Recommendation: A.** Noted for the backlog, not a decision: the verified status names the file and not its folder (`Saved + verified: firmware-patched.s19 — …`), and the Patch Editor's `📂 Open patches/` chip opens `patches/`, not the folder the image lands in.
 
-## 4. Open code changes that touch this increment's rows (`C:\Users\jjgh8\Github\s19w\review\CODE-CHANGES.md`)
+## 4. Open code changes that touch this increment's rows (`C:\Users\<user>\Github\s19w\review\CODE-CHANGES.md`)
 
 | Code change | Row | Effect here |
 |---|---|---|
@@ -88,7 +88,7 @@ Context notes (`01-requirements.md` Definitions): CTX-SAVEBACK gains *output for
 
 ## 5. Id check
 
-`R-PE-EXPORT` (`R-PE-EXPORT.1` … `.16`, and `.17`, `.18` reserved for the D-1 B / D-2 B alternatives) is unused: `git grep -n "R-PE-EXPORT"` on `batch-103` (HEAD `08ad2ae`) finds only the steps.log line that opened this stage; `git grep "R-PE-EXPORT" b101-inc9 b101-inc10 b101-inc12 b101-inc12b` finds nothing; no file under `docs/requirements/review/`, `C:\Users\jjgh8\Github\s19w\review\` or any `.dev-flow/` folder of the worktree names it (grep, 2026-11-06). The changed rows keep their canon ids.
+`R-PE-EXPORT` (`R-PE-EXPORT.1` … `.16`, and `.17`, `.18` reserved for the D-1 B / D-2 B alternatives) is unused: `git grep -n "R-PE-EXPORT"` on `batch-103` (HEAD `08ad2ae`) finds only the steps.log line that opened this stage; `git grep "R-PE-EXPORT" b101-inc9 b101-inc10 b101-inc12 b101-inc12b` finds nothing; no file under `docs/requirements/review/`, `C:\Users\<user>\Github\s19w\review\` or any `.dev-flow/` folder of the worktree names it (grep, 2026-11-06). The changed rows keep their canon ids.
 
 ## 6. Observations outside the scope (no change here)
 

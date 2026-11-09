@@ -1,4 +1,4 @@
-# i3e3a-arch-probe 2026-11-06T22:45:41-06:00 host cachyos-rtx; load 3.14 1.91 1.76
+# i3e3a-arch-probe 2026-11-06T22:45:41-06:00 host <runner>; load 3.14 1.91 1.76
 s19_app.__file__ = /tmp/b103-e3-3-architect/clone/s19_app/__init__.py
 a2l_definition.__file__ = /tmp/b103-e3-3-architect/clone/s19_app/tui/a2l_definition.py
 [Q0 software_a tags] 13990

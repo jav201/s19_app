@@ -1,9 +1,9 @@
 === s19_app.__file__ ===
-/home/javiergr/mutr4B-work/s19_app/__init__.py
+/home/<user>/mutr4B-work/s19_app/__init__.py
 
 === DIFF base -> M-36b (s19_app/tui/services/label_match.py) ===
 --- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
-+++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:47:42.632416421 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:47:42.632416421 -0600
 @@ -1179,9 +1179,13 @@
              sorted and disjoint (possibly empty), and the number of nodes
              visited (0 for ``allowed`` 0 or ``budget`` 0).

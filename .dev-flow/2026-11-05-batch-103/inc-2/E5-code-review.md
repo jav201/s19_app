@@ -15,7 +15,7 @@ The rest of the change matches the records:
 The fixes go to `software-dev`. The verdict changes only after a re-read of the fixed diff and a re-run of `cr-probe.py` [P2] and [P3]. A recommended fix does not close a finding.
 
 **Scope reviewed.**
-- The diff: `git diff a2043cfd 069171cd -- s19_app tools tests` in `C:\Users\jjgh8\Github\s19_app-b103-inc2a-code`, branch `b103-inc2a-code`. It covers 6 files: `s19_app/tui/a2l_definition.py` (+1428, read in full), `tools/synth/make_release_case.py` (+322/−2), the three new test files and `tests/test_id_registry.py`.
+- The diff: `git diff a2043cfd 069171cd -- s19_app tools tests` in `C:\Users\<user>\Github\s19_app-b103-inc2a-code`, branch `b103-inc2a-code`. It covers 6 files: `s19_app/tui/a2l_definition.py` (+1428, read in full), `tools/synth/make_release_case.py` (+322/−2), the three new test files and `tests/test_id_registry.py`.
 - The commits behind it: E4 (`42165fa4`, `707c9b92`, `82f5f8e5`), gap pass 1 (`f2f955aa`, `37168255`) and gap pass 2 (`6071a385`, `e9bad3ca`). Gap pass 2's own diff is `f2f955aa..6071a385`.
 - The records, read in full: `01-requirements.md` (with its split notes), `E3-rulings.md` (with "known design gaps", "gap pass 2 rulings", the round-6 addendum, "records done" and "GREEN"), and `codewire/graph-inc2.md` (the I-2 pin, P-2, the 2a nodes `describe_definitions` … `display_text`, `_table_value` and the entities).
 - Also read: `../inc-3/E3-rulings.md` "Round 7 rulings" and the cases of `02-test-cases.md` that the findings cite.
@@ -25,7 +25,7 @@ The fixes go to `software-dev`. The verdict changes only after a re-read of the 
 - `cr-measure.py` → `cr-measure-transcript.txt` (run 2) and `cr-measure-run1-transcript.txt` (run 1, partial): sections [M0] … [M9];
 - `cr-static-census.txt`: a grep at HEAD.
 
-Both scripts ran on cachyos-rtx (Python 3.11.18) in a copy of `~/work/b103-int2a`, made at `/tmp/b103-e5-2-code/tree` (e9bad3ca, `a2l_definition.py` md5 `820a4c3a`, the same product files as 069171cd). HOME, XDG_* and LOCALAPPDATA pointed to `/tmp/b103-e5-2-code/zq_iso_user`. Each transcript prints `s19_app.__file__` = `/tmp/b103-e5-2-code/tree/s19_app/__init__.py`.
+Both scripts ran on <runner> (Python 3.11.18) in a copy of `~/work/b103-int2a`, made at `/tmp/b103-e5-2-code/tree` (e9bad3ca, `a2l_definition.py` md5 `820a4c3a`, the same product files as 069171cd). HOME, XDG_* and LOCALAPPDATA pointed to `/tmp/b103-e5-2-code/<user>`. Each transcript prints `s19_app.__file__` = `/tmp/b103-e5-2-code/tree/s19_app/__init__.py`.
 
 Three notes on how the probes ran:
 - `cr-probe.py` ran under `python -I`. That flag drops `PYTHONDONTWRITEBYTECODE`, so the copy may have gained `__pycache__` folders. The copy was deleted after the runs (`rm -rf /tmp/b103-e5-2-code`, checked absent, no process left).

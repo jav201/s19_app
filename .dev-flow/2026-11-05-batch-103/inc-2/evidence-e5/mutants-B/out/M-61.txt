@@ -19,7 +19,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________ test_r_a2l_def_61_1_two_disjoint_masks_at_one_address _____________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-932/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-932/b103_defc0'), ...}
 
     def test_r_a2l_def_61_1_two_disjoint_masks_at_one_address(defc):
         """R-A2L-DEF.61/1 - MASK_BIT_0001 and MASK_FIELD_0001: one address, disjoint masks, popcounts 1 and >= 2."""

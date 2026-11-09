@@ -1,6 +1,6 @@
-# probe widgetnoshow long-few transcript 2026-11-07T01:57:00-06:00 host cachyos-rtx
+# probe widgetnoshow long-few transcript 2026-11-07T01:57:00-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 1.03 1.56 1.89
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 1.03 1.56 1.89
 s19_app.__file__ = /tmp/b103-e2-12/widgetnoshow/s19_app/__init__.py | textual 8.2.8 | variant widgetnoshow | scenario long-few
 [widgetnoshow LONGMAP(48) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/95 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=36 | rows=1 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
 [widgetnoshow LONGMAP(48) 118x54 unscrolled] header|  Address     Length  Tag                                   S

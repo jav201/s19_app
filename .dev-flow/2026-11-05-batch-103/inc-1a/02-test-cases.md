@@ -6,8 +6,8 @@ One case per coverage item `<requirement id>/<n>` of `01-requirements.md`, for i
 
 **Platforms.**
 - **WinCI** — the Windows job (`E1-rulings.md` D-6) on a GitHub-hosted runner. Every WinCI case first passes the isolation guard (R-PASTE.21) and is skipped by the probe rule when the probe fails (R-PASTE.22). **Blocked until** a branch is pushed (operator approval) and the probe passes.
-- **LinuxH** — cachyos-rtx headless or the `ubuntu-latest` CI job: `DISPLAY` and `WAYLAND_DISPLAY` unset (the test asserts it), no OS clipboard reachable. Runs now.
-- **LinuxX** — cachyos-rtx with a private Xvfb display started by the test session (`-nolisten tcp`, a private auth file) and `xclip`. **Blocked until** the operator installs `xorg-server-xvfb` and `xclip`.
+- **LinuxH** — <runner> headless or the `ubuntu-latest` CI job: `DISPLAY` and `WAYLAND_DISPLAY` unset (the test asserts it), no OS clipboard reachable. Runs now.
+- **LinuxX** — <runner> with a private Xvfb display started by the test session (`-nolisten tcp`, a private auth file) and `xclip`. **Blocked until** the operator installs `xorg-server-xvfb` and `xclip`.
 
 **Apps and boxes.**
 - **Real app** — `S19TuiApp(base_dir=<tmp>)` under `run_test(size=(160, 48))`; `LOCALAPPDATA` isolated by `tests/conftest.py`.
@@ -51,7 +51,7 @@ One case per coverage item `<requirement id>/<n>` of `01-requirements.md`, for i
 | R-TUI-043.10.1/6 | Verify the same for a multi-line box | robustness | as /5, Box M | as /5 | as /5 | | gap | not_run |
 | R-TUI-043.10.2/1 | Verify that a Ctrl+V in a single-line box ends within 2.5 s when another program holds the clipboard | robustness | WinCI; real app; Box A; app clipboard `APP-TEXT`; Held clipboard (8 s) | `ctrl+v` | the box holds `APP-TEXT` ≤ `timing_bound(2.5)` s after the key (base with a Tk root: up to 5.3 s, B/F) | | gap | not_run |
 | R-TUI-043.10.2/2 | Verify the same for a multi-line box | robustness | as /1, Box M | `ctrl+v` | as /1 | | gap | not_run |
-| R-TUI-043.9/1 | Verify that the screen stays responsive while a read waits on a held clipboard | robustness | WinCI; Box 1 (the one-box app); Held clipboard (8 s); Tick lateness armed | `ctrl+v` | ≥ 10 ticks due after the read has started, before its end; every tick late by ≤ `timing_bound(0.1)` s (negative control: the read on the event loop's thread → ticks stall ≥ 1 s → RED) | | gap | not_run |
+| R-TUI-043.9/1 | Verify that the screen stays responsive while a read waits on a held clipboard | robustness | WinCI; Box 1 (the one-box app); Held clipboard (8 s); Tick lateness armed | `ctrl+v` | ≥ 10 ticks due after the read has started, before its end; every tick late by ≤ `timing_bound(0.1)` s (negative control: the read on the event loop's thread → ticks stall ≥ 1 s → RED) | test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive | partial (Windows CI pending) | not_run |
 | R-TUI-043.6/1 | Verify that on Linux a Ctrl+V pastes the app clipboard | robustness | LinuxH; real app; app clipboard `APP-TEXT` | `ctrl+v` in Box A, then in Box M | Box A `APP-TEXT`; Box M `APP-TEXT` (base: holds, B pilot P4a/P9) | | gap | not_run |
 | R-TUI-043.6/2 | Verify that a held clipboard pastes the app clipboard | robustness | WinCI; as R-TUI-043.10.2/1 | `ctrl+v` in Box A, then Box M | both hold `APP-TEXT`; no paste failure warning | | gap | not_run |
 | R-TUI-043.6/3 | Verify that an empty OS text pastes the app clipboard without starting PowerShell | robustness | WinCI; app clipboard `APP-TEXT`; Empty Unicode text; Process spy | `ctrl+v` in Box A, then Box M | both hold `APP-TEXT`; no paste failure warning; the Process spy counts 0 starts (base: the warning and the box selected; 0 starts, as the base cascade ends at the Win32 `''`, R `os_clipboard_input.py:652`; the 0-starts check guards against a cascade that goes on after `''`, E3A-21 b) | | gap | not_run |
@@ -131,7 +131,7 @@ One case per coverage item `<requirement id>/<n>` of `01-requirements.md`, for i
 | R-PASTE.12/2 | Verify the same on the OS clipboard | robustness | WinCI; as /1 | as /1 | Other-program read: 65,536 characters (2/2) | | gap | not_run |
 | R-PASTE.13/1 | Verify that a copy ends within 2.5 s when another program holds the clipboard, single-line | robustness | WinCI; Held clipboard (8 s); Notices | Box A: Select, `ctrl+c` | the warning shows ≤ `timing_bound(2.5)` s after the key | | gap | not_run |
 | R-PASTE.13/2 | Verify the same, multi-line, Ctrl+X | robustness | as /1, Box M | `f7`, `ctrl+x` | as /1 | | gap | not_run |
-| R-PASTE.14/1 | Verify that the screen stays responsive while a write waits on a held clipboard | robustness | WinCI; Box 1 (the one-box app); Held clipboard (8 s); Tick lateness armed | Select, `ctrl+c` | ≥ 10 ticks due after the write has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | | gap | not_run |
+| R-PASTE.14/1 | Verify that the screen stays responsive while a write waits on a held clipboard | robustness | WinCI; Box 1 (the one-box app); Held clipboard (8 s); Tick lateness armed | Select, `ctrl+c` | ≥ 10 ticks due after the write has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | test_r_paste_14_1_held_write_ctrl_c_stays_responsive | partial (Windows CI pending) | not_run |
 | R-PASTE.15/1 | Verify one OSC 52 request for a Ctrl+C, single-line | normal | LinuxH; OSC 52 spy; Box A P1 | Select, `ctrl+c` | exactly 1 request; it decodes to P1 (base: holds, B pilot P5) | | gap | not_run |
 | R-PASTE.15/2 | Verify the same for a Ctrl+X, single-line | normal | as /1 | Select, `ctrl+x` | 1 request, P1 | | gap | not_run |
 | R-PASTE.15/3 | Verify the same for a Ctrl+C, multi-line | normal | LinuxH; OSC 52 spy; Box M P2 | `f7`, `ctrl+c` | 1 request, P2 | | gap | not_run |
@@ -175,13 +175,13 @@ The first block covers the right-click rows R-PASTE.24 … .33 (R-PASTE.33's cas
 | R-PASTE.9/4 | Verify the write failure warning on Linux after every right-click copy | robustness | LinuxH; Notices | Box A and Box M: Select, Right-click (2 actions) | 2/2: the warning "Clipboard write failed — copied inside the app only.", severity warning, 6 s | | gap | not_run |
 | R-PASTE.10/2 | Verify a WARNING line per failed right-click copy, without the copied text | robustness | LinuxH; Log capture | Box A `SECRET-RC-44`, then Box M: Select, Right-click | ≥ 1 WARNING record per copy; no record holds `SECRET-RC-44` | | gap | not_run |
 | R-PASTE.12/3 | Verify that a right-click copy over the limit keeps its first 65,536 characters | robustness | LinuxH and WinCI; Box M holds P70k; Box A's value set to P70k; OSC 52 spy | in each box: Select, Right-click | the app clipboard and the decoded OSC 52 request hold 65,536 characters (2/2); WinCI: Other-program read 65,536 | | gap | not_run |
-| R-PASTE.14/2 | Verify that the screen stays responsive while a right-click write waits on a held clipboard | robustness | WinCI; Box 1; Held clipboard (8 s); Tick lateness armed | Select, Right-click (App route) | ≥ 10 ticks due after the write has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | | gap | not_run |
+| R-PASTE.14/2 | Verify that the screen stays responsive while a right-click write waits on a held clipboard | robustness | WinCI; Box 1; Held clipboard (8 s); Tick lateness armed | Select, Right-click (App route) | ≥ 10 ticks due after the write has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | test_r_paste_14_2_held_write_right_click_stays_responsive | partial (Windows CI pending) | not_run |
 | R-PASTE.15/6 | Verify one OSC 52 request for a right-click copy, single-line | normal | LinuxH; OSC 52 spy; Box A P1 | Select, Right-click | exactly 1 request; it decodes to P1 | | gap | not_run |
 | R-PASTE.15/7 | Verify the same, multi-line | normal | LinuxH; OSC 52 spy; Box M P2 | `f7`, Right-click | 1 request, P2 | | gap | not_run |
 | R-TUI-043.6/5 | Verify that on Linux a right-click with no selection pastes the app clipboard | robustness | LinuxH; real app; app clipboard `APP-TEXT`; Box A and Box M empty | Right-click in Box A, then in Box M | Box A `APP-TEXT`; Box M `APP-TEXT` | | gap | not_run |
 | R-TUI-043.7/2 | Verify the paste failure warning on a right-click when neither clipboard holds text | robustness | LinuxH; app clipboard empty; Box A `KEEP`, then Box M `KEEP`, cursor at the end, no selection | Right-click in each | a warning notice "Clipboard read failed — try Ctrl+Shift+V or type the path manually.", severity warning, 6 s, once per right-click | | gap | not_run |
 | R-TUI-043.8/2 | Verify that the box text is selected after that right-click | robustness | as R-TUI-043.7/2 | as R-TUI-043.7/2 | the selection covers `KEEP` whole in both boxes; the text unchanged | | gap | not_run |
-| R-TUI-043.9/2 | Verify that the screen stays responsive while a right-click read waits on a held clipboard | robustness | WinCI; Box 1 empty; Held clipboard (8 s); Tick lateness armed | Right-click (App route) | ≥ 10 ticks due after the read has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | | gap | not_run |
+| R-TUI-043.9/2 | Verify that the screen stays responsive while a right-click read waits on a held clipboard | robustness | WinCI; Box 1 empty; Held clipboard (8 s); Tick lateness armed | Right-click (App route) | ≥ 10 ticks due after the read has started, before its end; every tick late by ≤ `timing_bound(0.1)` s | test_r_tui_043_9_2_held_read_right_click_stays_responsive | partial (Windows CI pending) | not_run |
 | R-TUI-043.11/2 | Verify that a right-click paste keeps characters outside the code page | normal | WinCI; Other-program write P1 | Right-click in Box A, then Box M (Clear between) | both hold P1 exactly (code points compared) | | gap | not_run |
 | R-TUI-043.12/3 | Verify a WARNING line when a right-click paste reads no text (Linux) | robustness | LinuxH; Log capture; app clipboard `APP-TEXT` | Right-click in Box A, then Box M | ≥ 1 WARNING record of `s19_app.tui.os_clipboard_input` per paste | | gap | not_run |
 | R-TUI-043.13/2 | Verify that no clipboard text reaches the log on a right-click | normal | LinuxH and WinCI; Log capture | a right-click paste of `SECRET-TEXT-45` (app clipboard on LinuxH, Other-program write on WinCI) and a right-click copy of `SECRET-COPY-46` from Box A | no record holds either string | | gap | not_run |
@@ -289,3 +289,46 @@ Addendum re-cut (right-click): copy way **C1** `ctrl+c` (AT-I1a-1 … 8, 12 … 
 | AT-I1a-27 | … C2 multi-line → multi-line by right-click | normal | real app | Box M → Box M', C2, route 3 | Box M' P2 — R-PASTE.30 | | gap | not_run |
 
 **Counts (after the E1 addendum and the E3 corrections, rounds 1 to 3):** 194 cases: 167 coverage items over the 40 active rows and the 12 cited rows (R-LOADDLG.20 2; R-TUI-043.10.1 6, .10.2 2, .9 2, .6 5, .4 1, R-TUI-044.3 1, R-TUI-043.5 3, .7 2, .8 2, .11 2, .12 3, .13 2; R-PASTE.1 2, R-TUI-044.4 1, R-TUI-044.2 8; R-PASTE.2 2, .3 2, .4 2, .5 3, .6 2, .7 2, .8 1, .9 4, .10 2, .11 3, .12 3, .13 2, .14 2, .15 7; R-PASTE.16 3, .17 2; R-TUI-044.1 18, R-PASTE.18 8, .19 2; R-PASTE.20 2, .21 5, .22 2, .23 2; R-PASTE.24 3, .25 3, .26 3, .27 3, .28 2, .29 4, .30 2, .31 6, .32 2, .33 2; R-PASTE.34 6, .35 4, .36 2) and 27 acceptance cases. By platform (a case "as /1" takes /1's platform): 62 LinuxH only (runnable now; R-PASTE.36/2 is RED until the batch records are redacted); 74 on both LinuxH and WinCI (their LinuxH arm runnable now; the 24 walk cases, AT-I1a-1 … 8 and 12 … 27, the copy rules, the right-click placement cases); 54 WinCI only (blocked until a push and the probe); 2 LinuxX only (R-TUI-043.6/4, R-PASTE.9/3; blocked until Xvfb and xclip, as are the X half of R-PASTE.21/3 and the Linux RED-on-base runs of R-TUI-043.10.1, R-PASTE.11, R-PASTE.27 and R-PASTE.31 (now on LinuxH with a `tkinter.Tcl()` stand-in root, E3A-03)); 2 operator-run (AT-I1a-10, AT-I1a-11). Addendum delta: + 41 coverage items (27 on R-PASTE.24 … .33; 14 right-click cases of rows whose trigger is any copy or paste: R-PASTE.9/4, .10/2, .12/3, .14/2, .15/6, .15/7, R-TUI-043.6/5, .7/2, .8/2, .9/2, .11/2, .12/3, .13/2, R-TUI-044.2/6), + 17 acceptance cases (AT-I1a-11 … 27); changed: AT-I1a-9 (the right-click route) and the walk procedure (each of the 24 walk cases gains a right-click round trip). E3 round 2 delta: + 4 coverage items, all LinuxH only (R-PASTE.34/5, R-TUI-044.2/8, R-PASTE.36/1, /2); changed: the strip cases R-PASTE.34/1 … /4 and R-PASTE.35/1 … /4 (value oracles, exact expected values, the WinCI arms by Own write), R-TUI-044.2/7, R-TUI-043.10.1/5, R-PASTE.31/5 (an image arm), R-TUI-043.6/3 (base note), R-PASTE.21/4. E3 round 3 delta: + 4 coverage items, 3 LinuxH only (R-PASTE.34/6, E3A-25; R-LOADDLG.20/1, /2, E3S-24, E3A-26) and 1 WinCI only (R-PASTE.21/5, E3S-25); changed: the NUL kept in the LinuxH arms of R-PASTE.34/1, /3, /4 and R-PASTE.35/1, /3, /4 (the WinCI arms' NUL-free twins unchanged), R-PASTE.34/5's negative control and note, R-PASTE.22/1 and R-PASTE.23/1, /2 (the skip at setup, E3A-28). Before the addendum: 113 cases (103 + 10; 34 / 44 / 32 / 2 / 1). Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+
+---
+
+## E4 test fill (independent tester; appended at E4, not the E1 table)
+
+The **Tests / Coverage / Result** columns of the rows above are filled here
+per case id, because the table was written at E1 before any test existed.
+Each test function name carries its case id (`r_tui_043_6_1`, `r_paste_1_1`,
+`at_i1a_matrix_copy_then_paste[<cell>]`, …), so `trace_check.py` resolves every
+active requirement. Files: G-T1 `tests/test_b103_clipboard_core.py` (87 tests),
+G-T2 `tests/test_b103_clipboard_windows.py` (57 tests, skip `Windows only`),
+G-T3 `tests/test_b103_clipboard_matrix.py` (53 tests); support
+`tests/support/b103_clipboard.py`; the suite-wide isolation in
+`tests/conftest.py`; the redaction-gate roots in `tests/test_suite_hygiene.py`.
+Total collected on base: **197**.
+
+- **full (verified on base, RED where the base lacks the behaviour).** The
+  LinuxH cases of the paste/copy/cut rules, the terminal route, the paste
+  limit, the unsafe-character strip (R-PASTE.34/.35, R-LOADDLG.20), the OSC 52
+  copy (R-PASTE.15), the right-click (LinuxH arms), the censuses
+  (R-TUI-044.1/18, R-PASTE.18/8, .19/1, .33/1), the workflow guard
+  (R-PASTE.20/1), the isolation predicate (R-PASTE.21/1-3) and the probe
+  skip/fail pytester cases (R-PASTE.22/1, .23/1-2), the redaction root case
+  (R-PASTE.36/1). RED on base: `AttributeError` for `_system_powershell` /
+  `_strip_paste_controls` / the right-click handlers / `focus_on_click`; the
+  workflow test RED because `clipboard-windows.yml` does not exist on base;
+  the walk's right-click round trip RED because the base has no right-click.
+  Result on base: **70 failed, 48 passed, 57 skipped, 22 deselected** (the
+  skipped are the 54 WinCI arms + 2 LinuxX + 1; the deselected are the
+  `serial_timing` arms).
+- **partial (Windows CI pending).** The 54 WinCI-only arms (G-T2): every test
+  skips off Windows with `Windows only`; they run only in the
+  `windows-latest` job after the orchestrator's redacted push (R-PASTE.20).
+- **partial (unit of a private layer).** R-TUI-044.2/8 (fake-`ctypes`
+  `_read_via_ctypes` bound by `GlobalSize`); it calls the private
+  `_read_via_ctypes`.
+- **partial (RED mutant).** The LinuxH timing arms (R-TUI-043.10.1/3-4,
+  R-PASTE.11/3, .27/3, .31/3-4) are `serial_timing` arms; their RED-on-base
+  run needs the `tkinter.Tcl()` stand-in root (E3A-03) — run separately, not
+  in the transcript above (which deselected `serial_timing`).
+- **not covered by me (operator-run).** AT-I1a-10, AT-I1a-11.
+- **not covered by me (WinCI first-run log).** R-PASTE.20/2, R-PASTE.22/2 are
+  observed in the Windows job log, not a test on this host.

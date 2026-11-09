@@ -1,4 +1,4 @@
-# host: cachyos-rtx | 2026-11-07T07:01:29-06:00 | load: 4.94 7.13 7.08
+# host: <runner> | 2026-11-07T07:01:29-06:00 | load: 4.94 7.13 7.08
 # a2l_definition.py md5: 427e262ac47c6bd0a1b8aa0370969d4e  make_release_case.py md5: 82fba4c34fb9cad1888a30d06025a725
 # cmd: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition_perf.py -m serial_timing -k 150_10
 /tmp/b103-e5fix/mut/s19_app/__init__.py
@@ -7,7 +7,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _ test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-924/test_r_a2l_def_150_10_a_run_of0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-924/test_r_a2l_def_150_10_a_run_of0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element(tmp_path):
@@ -27,7 +27,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-924/test_r_a2l_def_150_10_a
 tests/test_b103_a2l_definition_perf.py:662: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-924/test_r_a2l_def_150_10_a_run_of0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-924/test_r_a2l_def_150_10_a_run_of0')
 case = 'tab_run', label = '150/10 TAB_NOINTP run of repeated x decode'
 work = <function _decode_all at 0x7f6503bedf80>
 check = <function test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element.<locals>.check at 0x7f6503bef100>

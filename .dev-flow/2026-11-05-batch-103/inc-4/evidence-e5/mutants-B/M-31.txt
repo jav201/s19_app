@@ -33,7 +33,7 @@ E         At index 1 diff: (9, 10) != (6, 8)
 E         Right contains one more item: (9, 10)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:510: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:510: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_rows_31_subsequence_spans - asser...
 1 failed, 128 deselected in 4.89s

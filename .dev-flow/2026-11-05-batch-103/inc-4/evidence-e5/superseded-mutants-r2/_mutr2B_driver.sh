@@ -1,14 +1,14 @@
 #!/bin/bash
-# E5 mutant-B round-2 driver — run on cachyos-rtx. Reads mutants/manifest.txt.
+# E5 mutant-B round-2 driver — run on <runner>. Reads mutants/manifest.txt.
 set -u
 ROOT=/tmp/b103-e5-4-mutr2B
 BASE=$ROOT/base
-PY=/home/javiergr/miniconda3/envs/s19ci/bin/python
-export HOME=$ROOT/zq_iso_user
-export XDG_CONFIG_HOME=$ROOT/zq_iso_user/.config
-export XDG_CACHE_HOME=$ROOT/zq_iso_user/.cache
-export XDG_DATA_HOME=$ROOT/zq_iso_user/.local/share
-export LOCALAPPDATA=$ROOT/zq_iso_user/.localappdata
+PY=/home/<user>/miniconda3/envs/s19ci/bin/python
+export HOME=$ROOT/<user>
+export XDG_CONFIG_HOME=$ROOT/<user>/.config
+export XDG_CACHE_HOME=$ROOT/<user>/.cache
+export XDG_DATA_HOME=$ROOT/<user>/.local/share
+export LOCALAPPDATA=$ROOT/<user>/.localappdata
 export PYTHONDONTWRITEBYTECODE=1
 mkdir -p $ROOT/out
 

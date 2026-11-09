@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1 census: the A2L name shapes the label matcher must handle.
 
-Run on cachyos-rtx only (it imports s19_app). Reads the read-only clone at
+Run on <runner> only (it imports s19_app). Reads the read-only clone at
 REPO; writes nothing but its stdout and the case-08 output under OUT.
 
 1. Generates the release case 08 (tools/synth/make_release_case.py, seed

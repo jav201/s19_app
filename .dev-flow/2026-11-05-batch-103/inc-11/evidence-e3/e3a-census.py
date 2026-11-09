@@ -1,4 +1,4 @@
-"""Inc 11 E3 architect (batch-103): two read-only censuses of the 35 tracked A2L files, run on cachyos-rtx only.
+"""Inc 11 E3 architect (batch-103): two read-only censuses of the 35 tracked A2L files, run on <runner> only.
 
     python -I e3a-census.py <repo> <scratch> sizes     the size keywords of every MEASUREMENT / CHARACTERISTIC
     python -I e3a-census.py <repo> <scratch> issues    the Issues screen's A2L codes, e07fb00 vs projected

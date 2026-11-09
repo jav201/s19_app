@@ -1,6 +1,6 @@
-# i11e2-pilot-time transcript 2026-11-06T22:19:17-06:00 host cachyos-rtx
+# i11e2-pilot-time transcript 2026-11-06T22:19:17-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 3.69 4.17 2.63
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 3.69 4.17 2.63
 python 3.11.18; runs per mode 3; interleaved baseTree, baseFull, candL, candW; one process per run
 [run 1] firmware.a2l {"mode": "baseTree", "s": 0.974, "objects": 220040, "sections": 242103, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.1}
 [run 1] firmware.a2l {"mode": "baseFull", "s": 6.125, "tags": 220040, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 535.4}

@@ -1,4 +1,4 @@
-"""E3 round-2 security probe 2, batch-103 Inc 1a (cachyos-rtx, headless, no clipboard).
+"""E3 round-2 security probe 2, batch-103 Inc 1a (<runner>, headless, no clipboard).
 
 Question: can the drawn-line oracle of cases R-PASTE.34/1 and R-PASTE.35/1
 ("the drawn box line holds no ESC"; graph examples: "0 code points of the

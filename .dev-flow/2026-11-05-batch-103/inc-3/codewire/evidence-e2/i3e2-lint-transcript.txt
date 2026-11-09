@@ -1,4 +1,4 @@
-# i3e2-lint transcript 2026-11-06T18:35:06-06:00 host cachyos-rtx
+# i3e2-lint transcript 2026-11-06T18:35:06-06:00 host <runner>
 # code-wire: code-wire v3.1.0 e436a08; codewire_extract.py sha256 78d54439f2c95b6e35f31f02b1ed9564b160774622c253624f78e155f23a8599; graph sha256 0edb402424413beb
 nodes=33 entities=9 edges=13 findings=15 not read=0
 # exit 0

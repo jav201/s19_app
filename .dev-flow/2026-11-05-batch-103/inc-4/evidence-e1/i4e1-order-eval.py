@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1: which rule order serves the operator's queries? (decision D-3)
 
-THROWAWAY EVIDENCE. Run on cachyos-rtx next to i4e1-pilot.py and
+THROWAWAY EVIDENCE. Run on <runner> next to i4e1-pilot.py and
 i4e1-pilot2.py. For generated queries over the 13,990 real-shape names of
 software_a.a2l it finds the rank of the name each query was made from (the
 target) under two rule orders:

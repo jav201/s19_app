@@ -1,0 +1,24 @@
+# M-PASTE.6
+# row: R-PASTE.6
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the cut writes only the app clipboard (stock cut) — WinCI control, LinuxH cannot observe
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..bb03c31f 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -936,7 +936,7 @@ class OsClipboardInput(Input):
+         if not selected_text:
+             raise SkipAction()
+         self.delete_selection()
+-        await _mirror_and_write_os_clipboard(self.app, selected_text)
++        self.app.copy_to_clipboard(selected_text)  # mutant: cut writes only the app clipboard
+ 
+     async def action_paste(self) -> None:
+         """Paste the OS clipboard text at the selection, stripped and capped.
+
+# --- pytest (rc=0) ---
+.                                                                        [100%]
+1 passed, 86 deselected in 2.61s
+
+===== stderr =====

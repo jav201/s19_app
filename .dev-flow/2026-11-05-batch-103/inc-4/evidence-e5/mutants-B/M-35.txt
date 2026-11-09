@@ -42,7 +42,7 @@ E       AssertionError: assert 97.31421403799322 <= 5.0
 E        +  where 5.0 = report_margin('R-A2L-MATCH.35 prepare REF', 97.31421403799322, 5.0)
 E        +    where 5.0 = timing_bound(5.0)
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match_perf.py:248: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match_perf.py:248: AssertionError
 ----------------------------- Captured stdout call -----------------------------
 host load before: 0.58 1.18 0.85
 host load after: 1.33 1.47 1.09 prep times [97.314, 97.619, 96.867]

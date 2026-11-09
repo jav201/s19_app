@@ -1,0 +1,26 @@
+# M-PASTE.10
+# row: R-PASTE.10
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the OS-write-failure WARNING log line removed
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..ba2c0131 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -744,9 +744,7 @@ async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
+         )
+     except Exception:  # pragma: no cover — notify is best-effort.
+         pass
+-    logger.warning(
+-        "OS clipboard write failed; retained Textual internal clipboard only"
+-    )
++    pass  # mutant: WARNING log line removed
+ 
+ 
+ class OsClipboardInput(Input):
+
+# --- pytest (rc=0) ---
+.                                                                        [100%]
+1 passed, 86 deselected in 2.56s
+
+===== stderr =====

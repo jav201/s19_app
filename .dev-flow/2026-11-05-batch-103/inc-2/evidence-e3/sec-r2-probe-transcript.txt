@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [Q1-A] A full header, BIT_MASK own line: tag bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 upper='65535' | header=['MA', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] | model mask='0x0FF0' | BOTH MISS=False
 [Q1-B] B short header (no upper), BIT_MASK own line: tag bit_org='0x0FF0' datatype=None addr=16 len=None upper=None | header=['MB', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] | model mask=None | BOTH MISS=False
 [Q1-C] C short header (no upper), BIT_MASK same line: tag bit_org=None datatype='UWORD' addr=16 len=2 upper='BIT_MASK' | header=['MC', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] | model mask=None | BOTH MISS=True

@@ -1,6 +1,6 @@
 """Inc 2 E3 round-2 architect probe (batch-103): re-measure the corrected graph's one-walk describe.
 
-Runs on cachyos-rtx against the read-only clone at e07fb00. Imports ``s19_app`` from the clone and drives
+Runs on <runner> against the read-only clone at e07fb00. Imports ``s19_app`` from the clone and drives
 PURE functions only (parse, tokenizer, section walk, the reused conversion); no Textual app, no display,
 no clipboard. It writes only into the scratch folder given as argv[2]. It is a cost prototype of the
 graph's ``describe_definitions`` walk (graph-inc2.md at 9acf0bc9), not the model.

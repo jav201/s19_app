@@ -52,7 +52,7 @@ E       ValueError: Exceeds the limit (4300 digits) for integer string conversio
 s19_app/tui/a2l_definition.py:244: ValueError
 _ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-990/test_r_a2l_def_58_2_23_a_matri0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-990/test_r_a2l_def_58_2_23_a_matri0')
 
     def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
         """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""

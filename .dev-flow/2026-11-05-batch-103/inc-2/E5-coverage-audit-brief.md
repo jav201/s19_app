@@ -1,9 +1,9 @@
 # E5 coverage audit — Inc 2a (DeepSeek v4 Pro; the Sonnet run hit its weekly limit)
 
-**Rules:** `C:\Users\jjgh8\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\design\E5-brief-common.md`, with N = 2 and role `coverage`. Read it first.
+**Rules:** `C:\Users\<user>\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\design\E5-brief-common.md`, with N = 2 and role `coverage`. Read it first.
 
 **Shape:** follow Inc 4's audit as a read-only example:
-- the brief, `C:\Users\jjgh8\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\inc-4\E5-coverage-audit.md`;
+- the brief, `C:\Users\<user>\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\inc-4\E5-coverage-audit.md`;
 - the output it produced, which is under `inc-4/` in the same folder.
 
 **Scope.** Audit only the **2a** cases of `inc-2/02-test-cases.md`, as its section "Split (amendment A2)" divides them. The 2b cases stay `gap` / `not_run` by design. For each 2a case, check four things:

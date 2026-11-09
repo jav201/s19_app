@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18  PYTHONHASHSEED = None
-host = cachyos-rtx  load = (0.60302734375, 0.47216796875, 1.7763671875)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e3a-4/home  LOCALAPPDATA = /tmp/b103-e3a-4/home/localappdata  PILOT_DIR = /tmp/b103-e3a-4/pilot
+host = <runner>  load = (0.60302734375, 0.47216796875, 1.7763671875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3a-4/home  LOCALAPPDATA = /tmp/b103-e3a-4/home/<localappdata>  PILOT_DIR = /tmp/b103-e3a-4/pilot
   PSET: 6 REF queries, 23 REF6 queries -> out/addenda-pset.txt
 
 === R-A2L-MATCH.36: QSET over REF (A); limit 20, median of 7; load (0.66455078125, 0.48974609375, 1.767578125)

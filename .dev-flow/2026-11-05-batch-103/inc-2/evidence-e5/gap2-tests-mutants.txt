@@ -1,5 +1,5 @@
 # mutant M1: plain bisect over ranges sorted by min replaces the segment index (.150/6)
-# host: cachyos-rtx | 2026-11-07T05:06:45-06:00 | load: 15.47 12.03 9.14
+# host: <runner> | 2026-11-07T05:06:45-06:00 | load: 15.47 12.03 9.14
 # a2l_definition.py md5: 1297e5a370647e08052513f7622dcb07
 /tmp/b103-e5g2t/m1/s19_app/__init__.py
 # python Python 3.11.18
@@ -11,7 +11,7 @@ FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_150_6_the_enum_form_loo
 1 failed, 181 deselected in 3.26s
 exit=1
 # mutant M2: _ECHO_LIMIT = 255 (.151)
-# host: cachyos-rtx | 2026-11-07T05:06:51-06:00 | load: 15.44 12.08 9.17
+# host: <runner> | 2026-11-07T05:06:51-06:00 | load: 15.44 12.08 9.17
 # a2l_definition.py md5: f5836dfb632128955ecb57a1d7eaa179
 /tmp/b103-e5g2t/m2/s19_app/__init__.py
 # python Python 3.11.18

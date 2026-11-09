@@ -21,7 +21,7 @@ FFF                                                                      [100%]
 =================================== FAILURES ===================================
 _____________ test_r_a2l_def_139_1_name_declared_twice_is_refused ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-936/test_r_a2l_def_139_1_name_decl0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-936/test_r_a2l_def_139_1_name_decl0')
 
     def test_r_a2l_def_139_1_name_declared_twice_is_refused(tmp_path):
         """R-A2L-DEF.139/1 - two VALUEs named DUP."""
@@ -45,7 +45,7 @@ E        +  and   Refusal(code='A2L-DEF-NAME', message='DUP: the A2L declares th
 tests/test_b103_a2l_definition.py:165: AssertionError
 _________________ test_r_a2l_def_139_2_case08_issues_duplicate _________________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-936/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-936/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_139_2_case08_issues_duplicate(c08):
         """R-A2L-DEF.139/2 - firmware_issues.a2l declares VALUE_0001 twice."""
@@ -69,7 +69,7 @@ E        +  and   Refusal(code='A2L-DEF-NAME', message='VALUE_0001: the A2L decl
 tests/test_b103_a2l_definition.py:165: AssertionError
 __ test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration __
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-936/test_r_a2l_def_139_3_commented0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-936/test_r_a2l_def_139_3_commented0')
 
     def test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration(tmp_path):
         """R-A2L-DEF.139/3 - the builder opens the commented-out copy: two tags."""

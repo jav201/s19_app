@@ -22,7 +22,7 @@ F.......                                                                 [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_def_4_1_val_blk_is_refused _____________________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-943/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-943/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_4_1_val_blk_is_refused(c08):
         """R-A2L-DEF.4/1 - VAL_BLK refused; address and byte length 256 still given."""

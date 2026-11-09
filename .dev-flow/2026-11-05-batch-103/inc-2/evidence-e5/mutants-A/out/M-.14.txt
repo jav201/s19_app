@@ -21,7 +21,7 @@ index 7b4d1416..74120c77 100644
 =================================== FAILURES ===================================
 _______ test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-955/test_r_a2l_def_14_3_file_order0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-955/test_r_a2l_def_14_3_file_order0')
 
     def test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written(tmp_path):
         """R-A2L-DEF.14/3 - ``2 "B"`` then ``1 "10"``: not sorted, text not a float."""

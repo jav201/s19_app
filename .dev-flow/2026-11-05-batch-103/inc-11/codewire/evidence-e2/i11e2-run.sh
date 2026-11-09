@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Inc 11 E2 runner (batch-103) for the LAN host cachyos-rtx: runs one evidence script against the read-only clone
-# ~/work/s19_app (e07fb00) with HOME/XDG/LOCALAPPDATA isolated under /tmp/b103-e2-11/zq_iso_user (basename is not
+# Inc 11 E2 runner (batch-103) for the LAN host <runner>: runs one evidence script against the read-only clone
+# ~/work/s19_app (e07fb00) with HOME/XDG/LOCALAPPDATA isolated under /tmp/b103-e2-11/<user> (basename is not
 # `home`), no DISPLAY, closed stdin, a timeout; writes /tmp/b103-e2-11/out/<name>-transcript.txt.
 # Copied from Inc 3's i3e2-run.sh; the scratch folder, the HOME basename and the script names differ.
 # Usage: bash i11e2-run.sh <script name without .py> [extra args...]
@@ -9,7 +9,7 @@ name="$1"; shift
 base=/tmp/b103-e2-11
 py="$HOME/miniconda3/envs/s19ci/bin/python"
 clone="$HOME/work/s19_app"
-iso="$base/zq_iso_user"
+iso="$base/<user>"
 mkdir -p "$iso/lad" "$base/out"
 out="$base/out/$name-transcript.txt"
 {

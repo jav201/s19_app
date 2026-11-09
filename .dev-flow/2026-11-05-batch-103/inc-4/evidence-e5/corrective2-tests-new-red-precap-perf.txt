@@ -1,7 +1,7 @@
-date 2026-11-07T00:00:27-06:00 host cachyos-rtx load 0.15 0.87 1.71
+date 2026-11-07T00:00:27-06:00 host <runner> load 0.15 0.87 1.71
 label pre-perf; label_match sha256 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 /tmp/c2-pre/s19_app/__init__.py
-cmd: /home/javiergr/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match_perf.py -k 37_2 or 40_5 or d3 or fam6 or w40 or subo --durations=0
+cmd: /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match_perf.py -k 37_2 or 40_5 or d3 or fam6 or w40 or subo --durations=0
 B4MAX tracemalloc peak 74479560 bytes (71.0 MiB)
 Fhost load before: 0.48 0.88 1.68
 Fhost load before: 0.66 0.89 1.66

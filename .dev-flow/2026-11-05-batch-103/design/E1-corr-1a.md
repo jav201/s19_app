@@ -1,6 +1,6 @@
 # E1 correction pass — Inc 1a (records only)
 
-You apply the orchestrator's E1 rulings to the Inc 1a records of s19_app batch-103. Worktree: `C:\Users\jjgh8\Github\s19_app-b103`. Records folder: `.dev-flow/2026-11-05-batch-103/inc-1a/`. Read the ruling table at the end of `inc-1a/E1-rulings.md` ("Orchestrator rulings") first.
+You apply the orchestrator's E1 rulings to the Inc 1a records of s19_app batch-103. Worktree: `C:\Users\<user>\Github\s19_app-b103`. Records folder: `.dev-flow/2026-11-05-batch-103/inc-1a/`. Read the ruling table at the end of `inc-1a/E1-rulings.md` ("Orchestrator rulings") first.
 
 ## Rules
 - Edit ONLY `inc-1a/01-requirements.md`, `inc-1a/02-test-cases.md`, `inc-1a/E1-slice.md`, and append one line to `inc-1a/steps.log`. Nothing else, no source files, no git command that writes.

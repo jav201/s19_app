@@ -1,5 +1,5 @@
 """Inc 11 E3 architect: where the e07fb00 parse of one large file spends its time (cProfile, top 14 by cumulative and
-by own time). Run on cachyos-rtx only: python -I e3a-prof.py <repo> <file>. Prints function names and times only."""
+by own time). Run on <runner> only: python -I e3a-prof.py <repo> <file>. Prints function names and times only."""
 import cProfile, io, pathlib, pstats, sys
 repo = pathlib.Path(sys.argv[1]); f = pathlib.Path(sys.argv[2])
 sys.path.insert(0, str(repo))

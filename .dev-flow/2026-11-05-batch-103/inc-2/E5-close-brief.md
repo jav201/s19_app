@@ -1,8 +1,8 @@
 # Inc 2a E5 close: write `04-validation.md` (DeepSeek v4 Pro)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc2a-code`, folder `.dev-flow/2026-11-05-batch-103/inc-2/`.
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc2a-code`, folder `.dev-flow/2026-11-05-batch-103/inc-2/`.
 
-1. **Write `inc-2/04-validation.md`** with the sections and tone of Inc 4's record. That record is read-only: `C:\Users\jjgh8\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\inc-4\04-validation.md`. Take every fact from these sources in this folder:
+1. **Write `inc-2/04-validation.md`** with the sections and tone of Inc 4's record. That record is read-only: `C:\Users\<user>\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\inc-4\04-validation.md`. Take every fact from these sources in this folder:
    - `E5-rulings.md`
    - `E5-code-review.md`
    - `E5-security.md`, both rounds

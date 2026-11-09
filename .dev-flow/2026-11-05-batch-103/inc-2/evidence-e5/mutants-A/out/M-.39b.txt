@@ -24,7 +24,7 @@ FFF                                                                      [100%]
 =================================== FAILURES ===================================
 ___________________________ test_r_a2l_def_39_1_nan ____________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-986/test_r_a2l_def_39_1_nan0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_1_nan0')
 
     def test_r_a2l_def_39_1_nan(tmp_path):
         """R-A2L-DEF.39/1."""
@@ -37,7 +37,7 @@ E         + NaN
 ../base/tests/test_b103_a2l_definition.py:1079: AssertionError
 ____________________ test_r_a2l_def_39_2_positive_infinity _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-986/test_r_a2l_def_39_2_positive_i0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_2_positive_i0')
 
     def test_r_a2l_def_39_2_positive_infinity(tmp_path):
         """R-A2L-DEF.39/2."""
@@ -50,7 +50,7 @@ E         + Infinity
 ../base/tests/test_b103_a2l_definition.py:1084: AssertionError
 ____________________ test_r_a2l_def_39_3_negative_infinity _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-986/test_r_a2l_def_39_3_negative_i0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_3_negative_i0')
 
     def test_r_a2l_def_39_3_negative_infinity(tmp_path):
         """R-A2L-DEF.39/3."""

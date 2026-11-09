@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18  PYTHONHASHSEED = None
-host = cachyos-rtx  load = (3.56787109375, 6.396484375, 5.64501953125)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+host = <runner>  load = (3.56787109375, 6.396484375, 5.64501953125)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
 
 === REF (50000 names) built in 1.74 s [ok]; limit 20, median of 7; load (3.55419921875, 6.30029296875, 5.62158203125)
   -- QSET (22)

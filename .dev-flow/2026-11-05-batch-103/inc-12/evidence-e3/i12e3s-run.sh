@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Inc 12 E3 security (batch-103), runner cachyos-rtx only. Scratch /tmp/b103-e3-12-S/ (deleted at the end).
+# Inc 12 E3 security (batch-103), runner <runner> only. Scratch /tmp/b103-e3-12-S/ (deleted at the end).
 #   bash i12e3s-run.sh setup                 -> /tmp/b103-e3-12-S/design: `git archive e07fb00 s19_app` of the read-only
 #                                               clone, patched by Inc 12 E2's i12e2-mkproto.py (variant design = the
 #                                               graph's prototype as E2 measured it; not the E4 implementation)
 #   bash i12e3s-run.sh probe <variant> <scen> -> i12e3s-probe.py against the clone (base) or the design copy
-# HOME/XDG/LOCALAPPDATA isolated under $base/zq_iso_user (basename not `home`), no DISPLAY, closed stdin, timeout.
+# HOME/XDG/LOCALAPPDATA isolated under $base/<user> (basename not `home`), no DISPLAY, closed stdin, timeout.
 set -u
 base=/tmp/b103-e3-12-S
 py="$HOME/miniconda3/envs/s19ci/bin/python"
 clone="$HOME/work/s19_app"
-iso="$base/zq_iso_user"
+iso="$base/<user>"
 mkdir -p "$iso/lad" "$base/out" "$base/scratch"
 mode="$1"; shift
 isoenv=(env -i PATH=/usr/bin:/bin HOME="$iso" XDG_CONFIG_HOME="$iso/.config" XDG_DATA_HOME="$iso/.local/share"

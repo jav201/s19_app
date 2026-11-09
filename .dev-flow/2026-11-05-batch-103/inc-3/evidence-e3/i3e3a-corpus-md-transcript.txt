@@ -1,4 +1,4 @@
-# i3e3a-corpus-md 2026-11-06T22:47:44-06:00 host cachyos-rtx
+# i3e3a-corpus-md 2026-11-06T22:47:44-06:00 host <runner>
 CHARACTERISTIC ('ASCII', 'plain') 44 files 5
 CHARACTERISTIC ('CUBE_5', 'plain') 3 files 3
 CHARACTERISTIC ('CUBOID', 'plain') 1 files 1

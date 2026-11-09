@@ -3,8 +3,8 @@ label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.
 label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
 tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
 mode = build  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 2286154715802249739
-host = cachyos-rtx  load = (0.57, 1.09, 1.29)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+host = <runner>  load = (0.57, 1.09, 1.29)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
 names of one unique random lowercase token each (E3S-03 B5 shape; the trie keeps 258 characters per token)
   5,000 x 1000 chars (4.8 MiB of names): build 13.55 s under tracemalloc [ok], trie nodes 1,280,023, peak 32.2 MiB = 6.7 B per name character
   20,000 x 1024 chars (19.5 MiB of names): build 55.47 s under tracemalloc [ok], trie nodes 5,112,237, peak 130.7 MiB = 6.7 B per name character

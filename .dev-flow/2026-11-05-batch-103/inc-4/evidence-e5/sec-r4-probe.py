@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E5 security probe, ROUND 4. THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, against the REAL module s19_app/tui/services/label_match.py (sha256 b97d19eb...)
+Runs on <runner> only, against the REAL module s19_app/tui/services/label_match.py (sha256 b97d19eb...)
 of a read-only COPY of the integrated tree (env TREE, first on PYTHONPATH). It loads the round-3 probe
 (sec-r3-probe.py, unchanged; it loads the round-1 probe sec-e5-probe.py, unchanged) for its fixtures, list
 builders, the E1 oracle, the address-space cap and the per-case alarm.

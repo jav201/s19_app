@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E5 design-gap correction probe (E5S-01, E5S-02). THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, against the REAL module s19_app/tui/services/label_match.py of a
+Runs on <runner> only, against the REAL module s19_app/tui/services/label_match.py of a
 read-only COPY of the integrated tree (env TREE, first on PYTHONPATH). The fixtures and the
 crafted list are those of evidence-e5/sec-e5-probe.py (loaded with runpy, unchanged), so the
 strings are identical to the E5 security review's.

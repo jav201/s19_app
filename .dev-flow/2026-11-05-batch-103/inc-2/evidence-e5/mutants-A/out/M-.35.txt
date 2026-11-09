@@ -28,7 +28,7 @@ index 7b4d1416..9ff6fc11 100644
 =================================== FAILURES ===================================
 ______________________ test_r_a2l_def_35_3_four_decimals _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-980/test_r_a2l_def_35_3_four_decim0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-980/test_r_a2l_def_35_3_four_decim0')
 
     def test_r_a2l_def_35_3_four_decimals(tmp_path):
         """R-A2L-DEF.35/3 - 3.14159 with %8.4 -> ``3.1416``."""

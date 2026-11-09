@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_mat
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
 mode = r2 extra  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6411133711778748898
-host = cachyos-rtx  load = (2.74, 3.26, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+host = <runner>  load = (2.74, 3.26, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
 probe = sec-r2-probe.py sha256 ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
 _FUZZY_SWITCH_CAP = 512
 === _classify cost per listed FUZZY name (limit x distinct tokens x name tokens): 40 names head + 'Ab' x 507 + tag (1,023 chars, 509 tokens; mode switch's 'Ab' x 508 made 1,025-char names, left out by .39) among REF

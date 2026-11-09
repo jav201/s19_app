@@ -25,7 +25,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_def_17_1_count_zero_is_refused ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-959/test_r_a2l_def_17_1_count_zero0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-959/test_r_a2l_def_17_1_count_zero0')
 
     def test_r_a2l_def_17_1_count_zero_is_refused(tmp_path):
         """R-A2L-DEF.17/1 - ``TAB_VERB 0``."""
@@ -48,7 +48,7 @@ E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='E0: the table VT_
 ../base/tests/test_b103_a2l_definition.py:165: AssertionError
 ______________ test_r_a2l_def_17_2_count_not_a_number_is_refused _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-959/test_r_a2l_def_17_2_count_not_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-959/test_r_a2l_def_17_2_count_not_0')
 
     def test_r_a2l_def_17_2_count_not_a_number_is_refused(tmp_path):
         """R-A2L-DEF.17/2 - ``TAB_VERB X`` then ``0 "A"``."""

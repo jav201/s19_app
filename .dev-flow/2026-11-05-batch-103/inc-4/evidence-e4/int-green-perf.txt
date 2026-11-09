@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int4/s19_app/__init__.py
+/home/<user>/work/b103-int4/s19_app/__init__.py
  20:36:46 up 1 day, 12:08,  2 users,  load average: 0.08, 0.05, 0.33
 92.5%  0.075 s / 1.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
 92.6%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref

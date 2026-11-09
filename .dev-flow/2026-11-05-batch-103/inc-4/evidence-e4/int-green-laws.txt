@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int4/s19_app/__init__.py
+/home/<user>/work/b103-int4/s19_app/__init__.py
         assert not absent, f"archive files not tracked, nothing to scan: {absent}"
         hits = []
         for rel in files:

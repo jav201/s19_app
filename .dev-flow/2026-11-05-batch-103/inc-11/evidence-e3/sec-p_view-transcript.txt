@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8
 [V w=118 pad=0 name_len=40] table_width=60 address cell: full | row tail='0x1C2D3E002     fo'
 [V w=118 pad=0 name_len=44] table_width=60 address cell: full | row tail='0x1C2D3E002'
 [V w=118 pad=0 name_len=46] table_width=60 address cell: full | row tail='0x1C2D3E002'

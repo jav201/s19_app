@@ -28,7 +28,7 @@ E         At index 0 diff: (4, 7) != (0, 3)
 E         Right contains one more item: (8, 10)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:531: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:531: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_rows_34_spans_in_offset_order_and_joined
 1 failed, 1 passed, 127 deselected in 5.00s

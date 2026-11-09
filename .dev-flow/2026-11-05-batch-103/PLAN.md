@@ -1,13 +1,13 @@
 # PLAN — s19_app — batch 2026-11-05-batch-103 (editors + A2L)
 
 - **Status:** G1 approved 2026-11-05; amended 2026-11-06 (amendment A1 below). E1 running for Inc 1a, 1b, 2 and 4.
-- **Branch:** `batch-103`, rebased 2026-11-06 onto `main` `e07fb00` (batch-101 Incs 1–8, 11, 13–16 merged); first opened from `9f9f6af`. Worktree `C:/Users/jjgh8/Github/s19_app-b103`.
+- **Branch:** `batch-103`, rebased 2026-11-06 onto `main` `e07fb00` (batch-101 Incs 1–8, 11, 13–16 merged); first opened from `9f9f6af`. Worktree `C:/Users/<user>/Github/s19_app-b103`.
   - The draft's base was `f11b3f4`, the batch-102 merge.
   - `9f9f6af` is that base plus the batch-101 Inc 2 merge.
 - **Process:** `dev-flow-v3-beta` (E0–E5 per increment, batch end once).
 - **Method versions (checked 2026-11-05; use only these):**
-  - dev-flow v3 beta: `C:\Users\jjgh8\.claude\skills\dev-flow-v3-beta\SKILL.md` and `trace_check.py`, commit `d858a9a` of the skills repo, working tree clean. Not the public `jav201/dev-flow` (rev94) and not the old `skills\dev-flow\` kit.
-  - Code-Wire v3.1.0: tag `v3.1.0` (annotated, 2026-11-05) = commit `e436a08` = `origin/main` (corrected 2026-11-06: the E0 text said `ebc3bb7`, a commit off that line; `tools/` is identical). Local clone `C:\Users\jjgh8\Github\code-wire`. Core only: examples from the requirement, real callers from `tools/codewire_extract.py`, and a test that fails. Lint and recordings are records, not gates.
+  - dev-flow v3 beta: `C:\Users\<user>\.claude\skills\dev-flow-v3-beta\SKILL.md` and `trace_check.py`, commit `d858a9a` of the skills repo, working tree clean. Not the public `jav201/dev-flow` (rev94) and not the old `skills\dev-flow\` kit.
+  - Code-Wire v3.1.0: tag `v3.1.0` (annotated, 2026-11-05) = commit `e436a08` = `origin/main` (corrected 2026-11-06: the E0 text said `ebc3bb7`, a commit off that line; `tools/` is identical). Local clone `C:\Users\<user>\Github\code-wire`. Core only: examples from the requirement, real callers from `tools/codewire_extract.py`, and a test that fails. Lint and recordings are records, not gates.
 - **Inputs:**
   - Operator verdict: `prototypes/b103_ux/veredicto-b103.json`.
   - Evidence: `prototypes/b103_ux/findings/{A,B,C}-*.md`.
@@ -129,7 +129,7 @@ Overlap with batch-101 that must not be fixed twice:
 
 ## Test platform (operator rule, 2026-11-05)
 
-- All test runs and probes run on the CachyOS host `cachyos-rtx` (`ssh javiergr@192.168.1.67`, env `s19ci` at `~/miniconda3/envs/s19ci`, clone `~/work/s19_app`; login shell fish, wrap in `bash -lc`). Nothing runs on the main PC except the G1 exception (real Windows Terminal captures, isolated `LOCALAPPDATA`, no clipboard, every window closed).
+- All test runs and probes run on the CachyOS host `<runner>` (`ssh <user>@<runner-ip>`, env `s19ci` at `~/miniconda3/envs/s19ci`, clone `~/work/s19_app`; login shell fish, wrap in `bash -lc`). Nothing runs on the main PC except the G1 exception (real Windows Terminal captures, isolated `LOCALAPPDATA`, no clipboard, every window closed).
 - **Test scope (operator, 2026-11-06):** between increments, run only the tests of what the increment modified or added (new and changed requirements, tests the increment changed, the law guards). The full suite runs once, at the batch end, after every increment is implemented.
 - Clipboard tests run under a private Xvfb display: real X clipboard, isolated by construction.
 - The Win32/PowerShell clipboard layer runs only in the new `windows-latest` CI job.

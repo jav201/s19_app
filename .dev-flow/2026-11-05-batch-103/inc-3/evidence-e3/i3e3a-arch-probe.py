@@ -1,6 +1,6 @@
 """Inc 3a E3 architect probe (batch-103). THROWAWAY; writes nothing outside its scratch dir.
 
-Runs on cachyos-rtx against a git-archive of the Inc 2a implementation (b103-inc2a-code @ 82f5f8e5),
+Runs on <runner> against a git-archive of the Inc 2a implementation (b103-inc2a-code @ 82f5f8e5),
 extracted under /tmp/b103-e3-3-architect/clone. Pure functions only; no app, no display, no clipboard.
 
 Q1  Inc 2a's real describe_definitions over every software_a name (median of 3) -- the base of

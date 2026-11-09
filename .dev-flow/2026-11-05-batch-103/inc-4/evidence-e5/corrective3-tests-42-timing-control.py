@@ -1,5 +1,5 @@
 """Inc 4 E5 corrective 3 (tester): R-A2L-MATCH.42's timing control. THROWAWAY EVIDENCE, NOT A TEST.
-Runs on cachyos-rtx only, in a /tmp copy of the integrated tree whose label_match.py has NO node budget
+Runs on <runner> only, in a /tmp copy of the integrated tree whose label_match.py has NO node budget
 (or the budget removed). Times R-A2L-MATCH.42/2 (W40, 6 tokens) with the test module's own builders:
 median of 3 > 2.0 s means the control is RED."""
 import statistics

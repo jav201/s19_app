@@ -1,6 +1,6 @@
 # Probe: Patch Editor apply and save-back on `main` `e07fb00` (2026-11-06)
 
-Why: the operator (US-103-06): "I saw the Apply button, but I did not see the change applied. When I saved the file with the button, only the JSON was saved." Model: Sonnet; headless Pilot on cachyos-rtx at 118x54 and 220x60, isolated HOME/XDG/LOCALAPPDATA, no clipboard. Scripts and transcripts: `pe-probe/` (`s19_app.__file__` at line 1 of each transcript).
+Why: the operator (US-103-06): "I saw the Apply button, but I did not see the change applied. When I saved the file with the button, only the JSON was saved." Model: Sonnet; headless Pilot on <runner> at 118x54 and 220x60, isolated HOME/XDG/LOCALAPPDATA, no clipboard. Scripts and transcripts: `pe-probe/` (`s19_app.__file__` at line 1 of each transcript).
 
 **Verdict: the apply works; the save-back prompt appears in a tab the operator is not looking at.**
 

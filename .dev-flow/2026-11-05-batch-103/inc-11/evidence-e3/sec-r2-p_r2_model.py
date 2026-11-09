@@ -543,18 +543,18 @@ def shapes():
 
 
 def corpus():
-    sys.path.insert(0, "/home/javiergr/work/s19_app")
+    sys.path.insert(0, "/home/<user>/work/s19_app")
     import s19_app
     from s19_app.tui import a2l as A
     from pathlib import Path
     print("s19_app.__file__ =", s19_app.__file__)
     man = {}
-    for row in Path("/home/javiergr/a2l-corpus/manifest.tsv").read_text(encoding="utf-8", errors="replace").splitlines()[1:]:
+    for row in Path("/home/<user>/a2l-corpus/manifest.tsv").read_text(encoding="utf-8", errors="replace").splitlines()[1:]:
         parts = row.split("\t")
         if len(parts) > 2:
             man[parts[2] if len(parts[2]) == 64 else parts[-1]] = parts[0]
     agg = collections.Counter(); per = collections.defaultdict(list); seen_sha = set()
-    files = sorted(Path("/home/javiergr/a2l-corpus/files").iterdir())
+    files = sorted(Path("/home/<user>/a2l-corpus/files").iterdir())
     for k, f in enumerate(files):
         if not f.is_file():
             continue
@@ -641,7 +641,7 @@ def diag():
     global DIAG
     from pathlib import Path
     DIAG = collections.Counter(); seen = set()
-    for f in sorted(Path("/home/javiergr/a2l-corpus/files").iterdir()):
+    for f in sorted(Path("/home/<user>/a2l-corpus/files").iterdir()):
         raw = f.read_bytes(); sha = hashlib.sha256(raw).hexdigest()
         if sha in seen or raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
             continue

@@ -21,7 +21,7 @@ index 7b4d1416..fc8007ac 100644
  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
-a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-985/test_r_a2l_def_39_1_nan0/inline_1.a2l', ...}
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_1_nan0/inline_1.a2l', ...}
 image = {16: 127, 17: 192, 18: 0, 19: 0}
 
     def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
@@ -34,7 +34,7 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-DECODE', message='F1:
 ../base/tests/test_b103_a2l_definition.py:170: AssertionError
 ____________________ test_r_a2l_def_39_2_positive_infinity _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-985/test_r_a2l_def_39_2_positive_i0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_2_positive_i0')
 
     def test_r_a2l_def_39_2_positive_infinity(tmp_path):
         """R-A2L-DEF.39/2."""
@@ -52,7 +52,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
-a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-985/test_r_a2l_def_39_2_positive_i0/inline_2.a2l', ...}
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_2_positive_i0/inline_2.a2l', ...}
 image = {16: 127, 17: 128, 18: 0, 19: 0}
 
     def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
@@ -65,7 +65,7 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-DECODE', message='F1:
 ../base/tests/test_b103_a2l_definition.py:170: AssertionError
 ____________________ test_r_a2l_def_39_3_negative_infinity _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-985/test_r_a2l_def_39_3_negative_i0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_3_negative_i0')
 
     def test_r_a2l_def_39_3_negative_infinity(tmp_path):
         """R-A2L-DEF.39/3."""
@@ -83,7 +83,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
-a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-985/test_r_a2l_def_39_3_negative_i0/inline_3.a2l', ...}
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_3_negative_i0/inline_3.a2l', ...}
 image = {16: 255, 17: 128, 18: 0, 19: 0}
 
     def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:

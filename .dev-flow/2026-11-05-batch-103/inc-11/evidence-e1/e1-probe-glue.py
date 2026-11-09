@@ -1,4 +1,4 @@
-"""Inc 11 E1 probe (batch-103), run on cachyos-rtx only: python e1-probe-glue.py <repo> <scratch>
+"""Inc 11 E1 probe (batch-103), run on <runner> only: python e1-probe-glue.py <repo> <scratch>
 
 Which inputs make the e07fb00 reader itself give an address (or a length) with extra digits?
 Synthetic MAP / VALUE shapes only. For each shape: the tag's address and length as the reader gives them.

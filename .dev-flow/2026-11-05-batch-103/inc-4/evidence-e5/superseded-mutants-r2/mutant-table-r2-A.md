@@ -1,6 +1,6 @@
 # E5 mutant table A (round 2, corrected code sha256 394bf2f9) — Inc 4, rows R-A2L-MATCH.1 … .20 (role `mutA`, N = 4)
 
-Method: each row's Negative control applied as the smallest edit to a copy of `s19_app/tui/services/label_match.py`; the row's own tests run with `python -m pytest -q -rf --tb=short -p no:cacheprovider tests/test_b103_label_match.py -k "<ids>"`. All on cachyos-rtx, Python 3.11.18, isolated `HOME`/`XDG_*`/`LOCALAPPDATA` (`zq_iso_user`), `PYTHONDONTWRITEBYTECODE=1`, source tree `~/work/b103-int4` (read-only; copied once to `/tmp/b103-e5-4-mutr2A/base`). Per-mutant diff + pytest tail in `evidence-e5/mutants-r2-A/M-<row>.txt`. Row `.20` names two controls in its cell (order by name alone; handoff order), so two mutants (`M-20`, `M-20b`).
+Method: each row's Negative control applied as the smallest edit to a copy of `s19_app/tui/services/label_match.py`; the row's own tests run with `python -m pytest -q -rf --tb=short -p no:cacheprovider tests/test_b103_label_match.py -k "<ids>"`. All on <runner>, Python 3.11.18, isolated `HOME`/`XDG_*`/`LOCALAPPDATA` (`<user>`), `PYTHONDONTWRITEBYTECODE=1`, source tree `~/work/b103-int4` (read-only; copied once to `/tmp/b103-e5-4-mutr2A/base`). Per-mutant diff + pytest tail in `evidence-e5/mutants-r2-A/M-<row>.txt`. Row `.20` names two controls in its cell (order by name alone; handoff order), so two mutants (`M-20`, `M-20b`).
 
 **Result: 21 killed / 0 survived / 0 not realisable.**
 

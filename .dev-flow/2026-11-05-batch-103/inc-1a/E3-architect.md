@@ -8,7 +8,7 @@ Batch 2026-11-05-batch-103, increment 1a (clipboard core: instant paste; right-c
 
 **Tests grepped:** I searched `tests/` for every removed name, `_read_via_powershell`, `_write_via_powershell`, `_STRATEGIES`, `"powershell"`, `ctrl+c/x/v`, `lambda: ""`, `pytester` and `TC-1815`.
 
-**Toolkit read:** textual 8.2.8 on cachyos-rtx (`~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/`), read only with `sed` and `grep`:
+**Toolkit read:** textual 8.2.8 on <runner> (`~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/`), read only with `sed` and `grep`:
 - `screen.py` :687-712, :1097-1150 and :1820-1955 (`_forward_event`), plus :2003-2016;
 - `widget.py` :328-331, :360, :720-729, :2825-2831, :4315-4317, :4632-4634, :4689-4703 and :4765-4772;
 - `widgets/_input.py` :729-810 and :1116-1133;
@@ -157,7 +157,7 @@ None new. E2-2, E2-3, E2-4 and E2-5 are marked as resolved at E3, as ruled.
 - Base `e07fb00`: `os_clipboard_input.py:893-937`; `capped_text_area.py:131-237`; `utils.py:41`; `screens.py:395-415`; `flow_screens.py:1632-1671`, `:3530-3537`.
 - Base tests: `tests/test_b97_flow_builder.py:1393-1495`, `:1570-1630`; `tests/test_b97_chips_help.py:1253-1260`, `:1823-1909`, `:2303-2420`.
 - `REQUIREMENTS.md:450`, `:2654-2655`, `:2764-2777`, `:4486` (R-VAR-002.13), `:6509` (R-FB-ADD.5).
-- textual 8.2.8 on cachyos-rtx, read with `sed` only: `widgets/_input.py:750-764`, `:833-839`, `:976-1021`.
+- textual 8.2.8 on <runner>, read with `sed` only: `widgets/_input.py:750-764`, `:833-839`, `:976-1021`.
 
 **Counted by script:**
 - 190 cases = 163 coverage items + 27 AT, with no duplicate id;

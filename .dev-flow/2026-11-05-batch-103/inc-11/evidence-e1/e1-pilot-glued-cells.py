@@ -1,4 +1,4 @@
-"""Inc 11 E1 pilot (batch-103), run on cachyos-rtx only: python e1-pilot-glued-cells.py <repo> <scratch>
+"""Inc 11 E1 pilot (batch-103), run on <runner> only: python e1-pilot-glued-cells.py <repo> <scratch>
 
 Question: can the A2L Explorer tag table show a declared address with extra digits appended
 (for example `0x1C2D3E00` read as `0x1C2D3E004026`) when the reader reads the address correctly?

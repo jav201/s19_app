@@ -1,11 +1,11 @@
-# red-base-model-collection transcript 2026-11-06T22:07:56-06:00 host cachyos-rtx tree /home/javiergr/work/b103-inc2a-base
+# red-base-model-collection transcript 2026-11-06T22:07:56-06:00 host <runner> tree /home/<user>/work/b103-inc2a-base
 # command: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition.py tests/test_b103_a2l_definition_perf.py
-# cwd: /home/javiergr/work/b103-inc2a-base; python Python 3.11.18; HOME=/tmp/b103-e4-2a-tests/zq_iso_user
-/home/javiergr/work/b103-inc2a-base/s19_app/__init__.py
+# cwd: /home/<user>/work/b103-inc2a-base; python Python 3.11.18; HOME=/tmp/b103-e4-2a-tests/<user>
+/home/<user>/work/b103-inc2a-base/s19_app/__init__.py
 
 ==================================== ERRORS ====================================
 ______________ ERROR collecting tests/test_b103_a2l_definition.py ______________
-ImportError while importing test module '/home/javiergr/work/b103-inc2a-base/tests/test_b103_a2l_definition.py'.
+ImportError while importing test module '/home/<user>/work/b103-inc2a-base/tests/test_b103_a2l_definition.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ../../miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
@@ -15,7 +15,7 @@ tests/test_b103_a2l_definition.py:48: in <module>
     from s19_app.tui.a2l_definition import (  # noqa: E402
 E   ModuleNotFoundError: No module named 's19_app.tui.a2l_definition'
 ___________ ERROR collecting tests/test_b103_a2l_definition_perf.py ____________
-ImportError while importing test module '/home/javiergr/work/b103-inc2a-base/tests/test_b103_a2l_definition_perf.py'.
+ImportError while importing test module '/home/<user>/work/b103-inc2a-base/tests/test_b103_a2l_definition_perf.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ../../miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module

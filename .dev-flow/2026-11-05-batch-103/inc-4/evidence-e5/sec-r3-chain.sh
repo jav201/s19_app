@@ -1,5 +1,5 @@
 #!/bin/bash
-# Round-3 chains on cachyos-rtx. usage: sec-r3-chain.sh timing|check
+# Round-3 chains on <runner>. usage: sec-r3-chain.sh timing|check
 # timing: the timing modes one after another (serial); check: correctness and memory modes.
 cd /tmp/b103-e5r3-4-sec || exit 1
 if [ "$1" = timing ]; then

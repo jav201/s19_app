@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1 pilot v3: the RECOMMENDED design (rule order B, decision D-3).
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx next to i4e1-pilot.py
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> next to i4e1-pilot.py
 (v1) and i4e1-pilot2.py (v2). Order B: exact > prefix > substring > token >
 fuzzy > subsequence (v1/v2 used the handoff order A, with subsequence before
 fuzzy; i4e1-order-eval-transcript.txt measured both).

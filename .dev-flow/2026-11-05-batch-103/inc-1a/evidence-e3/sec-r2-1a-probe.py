@@ -1,4 +1,4 @@
-"""E3 round-2 security probe, batch-103 Inc 1a (cachyos-rtx, headless, no clipboard).
+"""E3 round-2 security probe, batch-103 Inc 1a (<runner>, headless, no clipboard).
 
 Question: does the corrected design of E3S-01 (graph-inc1a.md after the
 correction pass, commit 15129b64) close round 1's P1/P2 shapes, and does it

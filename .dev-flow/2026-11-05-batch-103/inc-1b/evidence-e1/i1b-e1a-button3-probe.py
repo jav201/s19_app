@@ -1,5 +1,5 @@
 """batch-103 Inc 1b E1 addendum probe: the right mouse button (button 3) and Ctrl+C
-in textual 8.2.8, on the base tree (e07fb00). Run on cachyos-rtx only.
+in textual 8.2.8, on the base tree (e07fb00). Run on <runner> only.
 
 Run from the read-only clone root (cwd = ~/work/s19_app) with PYTHONPATH set to it,
 PYTHONDONTWRITEBYTECODE=1, and HOME / XDG_* / LOCALAPPDATA under /tmp/b103-e1-1b/.

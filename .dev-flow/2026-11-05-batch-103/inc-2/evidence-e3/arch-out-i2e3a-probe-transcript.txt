@@ -1,8 +1,8 @@
-# i2e3a-probe transcript 2026-11-06T18:13:46-06:00 host cachyos-rtx
+# i2e3a-probe transcript 2026-11-06T18:13:46-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
 # HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-2-architect/home; no DISPLAY; no clipboard; stdin closed
-A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [P0 tracked a2l files] 35
 [P1a SOFTA parse ms / tags / tags with address and length] (624.5, 13990, 3189)
 [P1b SOFTA one index walk ms (objects / methods / tables mapped)] (40.37, 13990, 438, 163)

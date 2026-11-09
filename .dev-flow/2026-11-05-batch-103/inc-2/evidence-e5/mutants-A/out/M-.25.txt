@@ -22,7 +22,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_25_1_decode_gives_the_definitions_refusal ___________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-967/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-967/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_25_1_decode_gives_the_definitions_refusal(c08):
         """R-A2L-DEF.25/1 - MISSING_CM decodes to its A2L-DEF-METHOD refusal, no value."""

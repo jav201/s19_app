@@ -1,7 +1,7 @@
-date 2026-11-07T00:06:46-06:00 host cachyos-rtx load 1.79 1.83 1.89
+date 2026-11-07T00:06:46-06:00 host <runner> load 1.79 1.83 1.89
 label green; label_match sha256 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
 /tmp/c2-green/s19_app/__init__.py
-cmd: /home/javiergr/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match.py tests/test_b103_label_match_perf.py --durations=0
+cmd: /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match.py tests/test_b103_label_match_perf.py --durations=0
 ............................................................................................................................................host load before: 1.81 1.83 1.89
 host load after: 1.84 1.84 1.90 prep times [2.049, 2.061, 2.051]
     2051.05 ms    59.0 % margin  R-A2L-MATCH.35 prepare REF

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E2: the fuzzy-walk variants, timed per query token on REF.
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx in PILOT_DIR next to
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> in PILOT_DIR next to
 i4e2-pilot4.py and the E1 pilots. Four walks that must give the same
 {token: prefix distance} map, over the 77,256 distinct tokens of REF:
   * trie         -- v3's dict trie (IndexB._trie_search), the ~78 MiB baseline;

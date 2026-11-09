@@ -6,7 +6,7 @@ Batch 2026-11-05-batch-103, increment 2 (A2L definition model I: scalar kinds). 
 
 **Code read on the base tree:** `a2l.py` :170-299 (section parser, `parse_begin_meta`, `_to_float`), :319-470 (`_split_line_respecting_quotes`, `_strip_a2l_comments`, `_flatten_body_tokens`), :1891-1990 (`_apply_compu_method`, RAT_FUNC), :2368-2560 (`encode_physical_to_raw_bytes`), :2572-2794 (`extract_a2l_tags`); `a2l_parameter_picker.py` :63, :500-575 (`PAGE_SIZE`, `set_parameters`); `tests/test_engine_unchanged.py` :120-180; `CLAUDE.md` :52-79; `REQUIREMENTS.md` R-CHKED-001 … 009; `make_release_case.py` :1034-1043; fixtures `ASAP2_Demo_V171.a2l` :3114-3153, `BalanceTube_STMicro.a2l` :34-50, `case_07_stress_smoke/firmware.a2l` :90-103.
 
-**Run (LAN host cachyos-rtx, read-only clone `e07fb00`, Python 3.11.18, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-2-architect/home`, no display, no clipboard, stdin closed, pure functions only):** `i2e3a-probe.py` → `/tmp/b103-e3-2-architect/out/i2e3a-probe-transcript.txt` (tag `[P…]`) and `i2e3a-probe2.py` → `…/i2e3a-probe2-transcript.txt` (tag `[Q…]`), plus one arithmetic one-liner (no `s19_app` import; tag `[H]`). Scripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\`. The lines this review cites are copied verbatim in §5; this file is the only record I may write, so the orchestrator may commit the transcripts under `inc-2/evidence-e3/` if it wants them in git. On this PC: read, grep and `py_compile` only.
+**Run (LAN host <runner>, read-only clone `e07fb00`, Python 3.11.18, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-2-architect/home`, no display, no clipboard, stdin closed, pure functions only):** `i2e3a-probe.py` → `/tmp/b103-e3-2-architect/out/i2e3a-probe-transcript.txt` (tag `[P…]`) and `i2e3a-probe2.py` → `…/i2e3a-probe2-transcript.txt` (tag `[Q…]`), plus one arithmetic one-liner (no `s19_app` import; tag `[H]`). Scripts: `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\`. The lines this review cites are copied verbatim in §5; this file is the only record I may write, so the orchestrator may commit the transcripts under `inc-2/evidence-e3/` if it wants them in git. On this PC: read, grep and `py_compile` only.
 
 ## Verdict: FAIL
 
@@ -72,7 +72,7 @@ Batch 2026-11-05-batch-103, increment 2 (A2L definition model I: scalar kinds). 
 - [✓] **Constraints that do not apply are marked** `n/a — <reason>` (above).
 - [✓] **Each recommendation has its rationale**, tied to measured numbers (P1, P3, [H]) or to tracked shapes (P2, Q1).
 - [✓] **Risks listed.** Operational: E3A-01, E3A-03. Correctness: E3A-02, E3A-05, E3A-07, E3A-14. Test gaps: E3A-10, E3A-11. Lock-in: none (stdlib and `a2l.py`).
-- [✓] **Cost and latency estimated.** 21.11 ms per describe, 3.75 ms per method walk, 0.52 s for the batch, 4.2 s per page under option A, ≈ 0.3 s per map redraw (`executed` on cachyos-rtx).
+- [✓] **Cost and latency estimated.** 21.11 ms per describe, 3.75 ms per method walk, 0.52 s for the batch, 4.2 s per page under option A, ≈ 0.3 s per map redraw (`executed` on <runner>).
 - [✓] **Diagram:** `n/a`. The flow is the graph's node list. No new boundary is drawn.
 - [✓] **What would change the recommendation.** E3A-01: if Inc 6's E1 shows the picker needs no per-row definition (scalars from the tag table, arrays lazily), A suffices for the scalars. Then only the index refactor of E3A-01's item 2 is needed. E3A-18: reading the ASAM text for float range ends.
 - [✓] **Two-layer requirements.** US-103-05 → R-A2L-DEF.1 … .63 → cases. AT-B103-I2-1 … -3 are the black-box layer at I-2, with the keys-and-dialogs acceptance owed by Inc 8/9 (`01-requirements.md:211-213`). Gaps: E3A-10, E3A-11.
@@ -80,9 +80,9 @@ Batch 2026-11-05-batch-103, increment 2 (A2L definition model I: scalar kinds). 
 ## 5. Probe lines cited (verbatim)
 
 ```text
-# i2e3a-probe transcript 2026-11-06T18:13:46-06:00 host cachyos-rtx
+# i2e3a-probe transcript 2026-11-06T18:13:46-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [P0 tracked a2l files] 35
 [P1a SOFTA parse ms / tags / tags with address and length] (624.5, 13990, 3189)
 [P1b SOFTA one index walk ms (objects / methods / tables mapped)] (40.37, 13990, 438, 163)
@@ -107,7 +107,7 @@ s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
 [P3y FLOAT32 0.1 stored: repr, '%.15g', f'{:.15f}', '%.9g'] ('0.10000000149011612', '0.100000001490116', '0.100000001490116', '0.100000001')
 # exit 0
 
-# i2e3a-probe2 transcript 2026-11-06T18:19:07-06:00 host cachyos-rtx
+# i2e3a-probe2 transcript 2026-11-06T18:19:07-06:00 host <runner>
 [Q1 masked TAB_VERB objects: total / with an address / per file] (0, 0, {})
 
 [H] (same host, python -I, no s19_app import; p = 0.1*k + 0.0 as _apply_compu_method computes LINEAR)
@@ -131,9 +131,9 @@ s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
 - Every row's N/N threshold equals its case count. The one exception is .59, whose 22/22 counts digests.
 - The section counts are 74 / 41 / 85 / 7, plus 33 cited cases of 29 rows: 243 cases in total. This matches `02-test-cases.md:232`.
 
-**Run on cachyos-rtx:** `i2e3ar2-probe.py`, tag `[R…]`; the cited lines are in §R2.4.
+**Run on <runner>:** `i2e3ar2-probe.py`, tag `[R…]`; the cited lines are in §R2.4.
 - Setup: the clone at `e07fb00` (0 changed files), Python 3.11.18, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r2-2-architect/home`, no display, stdin closed, load 4.1 on 16 cores.
-- Transcript: `/tmp/b103-e3r2-2-architect/out/i2e3ar2-probe-transcript.txt`. Script: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i2e3ar2-probe.py`.
+- Transcript: `/tmp/b103-e3r2-2-architect/out/i2e3ar2-probe-transcript.txt`. Script: `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i2e3ar2-probe.py`.
 - What it runs: a cost prototype of the corrected `describe_definitions` (the graph's one walk, its field reads and its refusal order). It also runs the reused `a2l.py` conversion on the inputs of the new cases.
 
 ### R2.1 Round-1 findings
@@ -201,9 +201,9 @@ So the rebase must move both lookups into `describe_definitions`'s single walk: 
 ### R2.4 Probe lines cited (verbatim)
 
 ```text
-# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host cachyos-rtx
+# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; load 4.12 5.13 3.32
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [R0 software_a tags / distinct names] (13990, 13990)
 [R1 describe_definitions prototype over every name: runs s / median s] ([0.817, 0.757, 0.823], 0.817)
 [R1 kinds of the prototype's definitions] [('', 270), ('enum', 2124), ('number', 11570), ('text', 26)]

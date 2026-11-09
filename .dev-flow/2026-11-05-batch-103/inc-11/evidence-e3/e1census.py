@@ -1,6 +1,6 @@
 """Inc 11 E1 census (batch-103): the A2L reader at e07fb00 against an independent reference reading.
 
-Run on cachyos-rtx only:  python e1-census.py <repo> <scratch> <mode>   mode = chars | fixtures | hostile | repro
+Run on <runner> only:  python e1-census.py <repo> <scratch> <mode>   mode = chars | fixtures | hostile | repro
 
 REF (written for this census, NOT a2ltool, imports nothing from s19_app):
   - the file is UTF-8 with a leading BOM dropped; CRLF and a lone CR are line ends like LF;

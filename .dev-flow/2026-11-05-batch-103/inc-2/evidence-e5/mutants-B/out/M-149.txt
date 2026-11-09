@@ -19,7 +19,7 @@ FFFFFFFFFFFFFF                                                           [100%]
 =================================== FAILURES ===================================
 ______________ test_r_a2l_def_149_5_cached_read_form_is_immutable ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_5_cached_re0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_5_cached_re0')
 
     def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
         """R-A2L-DEF.149/5 (E5 gap pass 2) - every stored form is immutable, the enum / table forms and their indexes included.
@@ -70,7 +70,7 @@ E            +  and   _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(ra
 tests/test_b103_a2l_definition.py:1791: AssertionError
 _______ test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_1_shared_me0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_shared_me0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object(tmp_path):
@@ -80,7 +80,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_1_sh
 tests/test_b103_a2l_definition_perf.py:247: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_1_shared_me0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_shared_me0')
 case = 'method', label = '/1 COMPU_METHOD'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -102,7 +102,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:210: AssertionError
 _____ test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object _____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_2_shared_en0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_shared_en0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object(tmp_path):
@@ -112,7 +112,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_2_sh
 tests/test_b103_a2l_definition_perf.py:253: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_2_shared_en0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_shared_en0')
 case = 'vtab', label = '/2 COMPU_VTAB'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -134,7 +134,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:210: AssertionError
 ____ test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object _____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_3_shared_ra0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_shared_ra0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object(tmp_path):
@@ -144,7 +144,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_3_sh
 tests/test_b103_a2l_definition_perf.py:259: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_3_shared_ra0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_shared_ra0')
 case = 'range', label = '/3 COMPU_VTAB_RANGE'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -166,7 +166,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:210: AssertionError
 ____ test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_shared_la0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object(tmp_path):
@@ -176,7 +176,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_sh
 tests/test_b103_a2l_definition_perf.py:265: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_shared_la0')
 case = 'layout', label = '/4 RECORD_LAYOUT'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -252,7 +252,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_1_scaling_m0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_scaling_m0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_1_scaling_method(tmp_path):
@@ -349,7 +349,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_2_scaling_e0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_scaling_e0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_2_scaling_enum_table(tmp_path):
@@ -448,7 +448,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_3_scaling_r0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_scaling_r0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_3_scaling_range_table(tmp_path):
@@ -491,7 +491,7 @@ E           Failed: R-A2L-DEF.149: a describe call timed out at 60 s (the shared
 tests/test_b103_a2l_definition_perf.py:101: Failed
 _____________________ test_r_a2l_def_149_4_scaling_layout ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_scaling_l0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_scaling_l0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_4_scaling_layout(tmp_path):
@@ -501,7 +501,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_sc
 tests/test_b103_a2l_definition_perf.py:289: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_4_scaling_l0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_scaling_l0')
 case = 'layout', label = '/4 RECORD_LAYOUT'
 
     def _scaling(tmp_path: Path, case: str, label: str) -> None:
@@ -533,7 +533,7 @@ E        +    where 1.5 = timing_bound(1.5)
 tests/test_b103_a2l_definition_perf.py:234: AssertionError
 _ test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_6_long_form0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_6_long_form0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object(tmp_path):
@@ -550,7 +550,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_6_lo
 tests/test_b103_a2l_definition_perf.py:509: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_6_long_form0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_6_long_form0')
 case = 'fmt', label = '149/6 FORMAT word'
 work = <function _describe_all at 0x7f3fd2e9e520>
 check = <function test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object.<locals>.check at 0x7f3f6fc41c60>
@@ -581,7 +581,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:440: AssertionError
 ___ test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_7_long_conv0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_7_long_conv0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object(tmp_path):
@@ -600,7 +600,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_7_lo
 tests/test_b103_a2l_definition_perf.py:524: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_7_long_conv0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_7_long_conv0')
 case = 'type', label = '149/7 conversion type word'
 work = <function _describe_all at 0x7f3fd2e9e520>
 check = <function test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object.<locals>.check at 0x7f3f6fc437e0>
@@ -631,7 +631,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:440: AssertionError
 ______ test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_8_long_tabl0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_8_long_tabl0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object(tmp_path):
@@ -650,7 +650,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_8_lo
 tests/test_b103_a2l_definition_perf.py:539: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_8_long_tabl0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_8_long_tabl0')
 case = 'tabref', label = '149/8 COMPU_TAB_REF word'
 work = <function _describe_all at 0x7f3fd2e9e520>
 check = <function test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object.<locals>.check at 0x7f3f6fc41760>
@@ -681,7 +681,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:440: AssertionError
 ____ test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_9_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_9_shared_la0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid(tmp_path):
@@ -698,7 +698,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_9_sh
 tests/test_b103_a2l_definition_perf.py:552: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_9_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_9_shared_la0')
 case = 'cuboid', label = '149/9 CUBOID layout'
 work = <function _describe_all at 0x7f3fd2e9e520>
 check = <function test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid.<locals>.check at 0x7f3f6fc42340>
@@ -729,7 +729,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:440: AssertionError
 _ test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_10_long_nam0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_10_long_nam0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object(tmp_path):
@@ -746,7 +746,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_10_l
 tests/test_b103_a2l_definition_perf.py:565: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-995/test_r_a2l_def_149_10_long_nam0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_10_long_nam0')
 case = 'emptyname', label = '149/10 empty table name'
 work = <function _describe_all at 0x7f3fd2e9e520>
 check = <function test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object.<locals>.check at 0x7f3f6fc43f60>

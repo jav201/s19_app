@@ -1,6 +1,6 @@
-# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host cachyos-rtx
+# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; load 4.12 5.13 3.32
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [R0 software_a tags / distinct names] (13990, 13990)
 [R1 describe_definitions prototype over every name: runs s / median s] ([0.817, 0.757, 0.823], 0.817)
 [R1 kinds of the prototype's definitions] [('', 270), ('enum', 2124), ('number', 11570), ('text', 26)]

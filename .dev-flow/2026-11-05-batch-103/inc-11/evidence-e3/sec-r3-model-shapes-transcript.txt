@@ -1,4 +1,4 @@
-# scripts/sec-r3-p_r3_model.py shapes 2026-11-07T01:35:59-06:00 host cachyos-rtx clone e07fb00f status 0 changed; corpus files 168 (read-only); load 0.94 0.81 1.24
+# scripts/sec-r3-p_r3_model.py shapes 2026-11-07T01:35:59-06:00 host <runner> clone e07fb00f status 0 changed; corpus files 168 (read-only); load 0.94 0.81 1.24
 == [S3-SURPLUS] the split-address family against E3S-24 as corrected ('number') and three wider rules ==
 [S3-SURPLUS ecu 0x1C2D 3E00 (one line)] number: address=0x1C2D length=2 | digit: address=None length=2 | hexlike: address=None length=2 | any: address=None length=2 || errors(number)=[]
 [S3-SURPLUS ecu 0x1C2D / 3E00 (next line)] number: address=0x1C2D length=2 | digit: address=None length=2 | hexlike: address=None length=2 | any: address=None length=2 || errors(number)=[]

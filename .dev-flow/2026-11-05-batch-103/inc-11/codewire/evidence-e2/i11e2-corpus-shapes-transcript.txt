@@ -1,6 +1,6 @@
-# i11e2-corpus-shapes transcript 2026-11-06T22:35:43-06:00 host cachyos-rtx
+# i11e2-corpus-shapes transcript 2026-11-06T22:35:43-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 0.21 1.29 2.02
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 0.21 1.29 2.02
 A2L section tree has structural errors: path=/tmp/b103-e2-11/tmp/tmpihon29ed/K5.a2l sample=Unclosed /begin sections detected.
 A2L section tree has structural errors: path=/tmp/b103-e2-11/tmp/tmpihon29ed/K7b.a2l sample=Unclosed /begin sections detected.
 s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py

@@ -1,5 +1,5 @@
 """Inc 11 E3 architect round 2: peak memory of the quoted-string pattern on the E3S-14 file (one string over 200,000
-lines), one fresh process per pattern. Run on cachyos-rtx only.
+lines), one fresh process per pattern. Run on <runner> only.
 
     python -I e3a2-strmem.py <file> alt|unrolled|perline|base <repo>
 

@@ -60,7 +60,7 @@ E       OverflowError: cannot convert float infinity to integer
 s19_app/tui/a2l_definition.py:276: OverflowError
 _______________________ test_r_a2l_def_58_2_2_count_nan ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-987/test_r_a2l_def_58_2_2_count_na0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_2_count_na0')
 
     def test_r_a2l_def_58_2_2_count_nan(tmp_path):
         """R-A2L-DEF.58.2/2."""
@@ -100,7 +100,7 @@ E       ValueError: cannot convert float NaN to integer
 s19_app/tui/a2l_definition.py:276: ValueError
 _______________________ test_r_a2l_def_58_2_4_count_2_5 ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
 
     def test_r_a2l_def_58_2_4_count_2_5(tmp_path):
         """R-A2L-DEF.58.2/4."""
@@ -109,7 +109,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-987/test_r_a2l_def_58_2_4_c
 ../base/tests/test_b103_a2l_definition.py:1163: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
 count = '2.5'
 
     def _enum_count_object(tmp_path, count: str):

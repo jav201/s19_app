@@ -1,9 +1,9 @@
 === s19_app.__file__ ===
-/home/javiergr/mutr4B-work/s19_app/__init__.py
+/home/<user>/mutr4B-work/s19_app/__init__.py
 
 === DIFF base -> M-37b (s19_app/tui/services/label_match.py) ===
 --- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
-+++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:53:48.551472272 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:53:48.551472272 -0600
 @@ -205,12 +205,12 @@
      del add
      tokens = tuple(sorted(distinct))

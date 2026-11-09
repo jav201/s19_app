@@ -1,4 +1,4 @@
-"""Inc 11 E3 architect round 2 (batch-103), follow-up of e3a2-named.py. Run on cachyos-rtx only.
+"""Inc 11 E3 architect round 2 (batch-103), follow-up of e3a2-named.py. Run on <runner> only.
 
     python -I e3a2-followup.py <repo> <files_dir> <manifest.tsv>
 

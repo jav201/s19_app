@@ -8,7 +8,7 @@ datatypes, MOD_COMMON alignments). Usage: sec3-corpus.py worker <file> | sec3-co
 import json, math, os, subprocess, sys, time, traceback
 from collections import Counter
 
-TREE = "/home/javiergr/work/b103-int2a"
+TREE = "/home/<user>/work/b103-int2a"
 
 
 def worker(path):

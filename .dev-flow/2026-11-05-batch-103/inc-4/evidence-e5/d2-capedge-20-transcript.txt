@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 capedge N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -3056386722993361628
-host = cachyos-rtx  load = (1.95, 2.6, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (1.95, 2.6, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 pilot cap N = 20; each query holds exactly n distinct query tokens; median of 7, limit 20
 U6 sha256 of the 50,000 names joined by newline: 3540f73d2c12242674453036becd9db53f3536c42b7e7ac03625c4b4c3811532; 2,050,000 characters; names 0-1: ['abaaaa_abbaaa_abcaaa_abdaaa_abeaaa_abfaaa', 'abgaaa_abhaaa_abiaaa_abjaaa_abkaaa_ablaaa']
 

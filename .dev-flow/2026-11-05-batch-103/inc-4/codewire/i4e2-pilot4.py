@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E2 pilot v4: a compact prepared index for R-A2L-MATCH.35-.37.
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx next to the E1
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> next to the E1
 pilots v1-v3, copied unchanged from inc-4/evidence-e1/ into PILOT_DIR; their
 oracle (naive_rank_b, evaluate_b) and their index (IndexB, v3) are the
 reference this pilot is checked against.

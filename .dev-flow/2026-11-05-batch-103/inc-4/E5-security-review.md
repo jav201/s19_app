@@ -2,7 +2,7 @@
 
 Batch 2026-11-05-batch-103, increment 4, stage E5. Reviewer: security-reviewer (Opus 5.5). The change under review is `git diff a2043cfd HEAD -- s19_app tests` on branch `b103-inc4-code` (HEAD `885634bf`): `s19_app/tui/services/label_match.py` (new, 1,050 lines, sha256 `24564b32…edb9b`), `tests/test_b103_label_match.py`, `tests/test_b103_label_match_perf.py`, and `tests/test_id_registry.py` (a count, 267 → 269). The yardstick is `E3-security.md` (rounds 1–2), `E3-rulings.md` (with addenda A-1…A-4), `01-requirements.md`, `codewire/graph-inc4.md` and `E1-rulings.md` §7. This review is read-only toward the code and the records: this file, `evidence-e5/sec-e5-*` and two lines in `steps.log` are the only writes.
 
-**Probes (state `executed`).** All runs used cachyos-rtx, Python 3.11.18, under an 8 GiB address-space cap with a per-case alarm. They imported the real module from `/tmp/b103-e5-4-sec/tree`, a `cp -a` of the read-only `~/work/b103-int4`; every transcript prints `s19_app.__file__` and the module's sha256, and all 13 show the same pair. HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5-4-sec/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1`. No clipboard was touched.
+**Probes (state `executed`).** All runs used <runner>, Python 3.11.18, under an 8 GiB address-space cap with a per-case alarm. They imported the real module from `/tmp/b103-e5-4-sec/tree`, a `cp -a` of the read-only `~/work/b103-int4`; every transcript prints `s19_app.__file__` and the module's sha256, and all 13 show the same pair. HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5-4-sec/<user>`, with `PYTHONDONTWRITEBYTECODE=1`. No clipboard was touched.
 - **Probe:** `evidence-e5/sec-e5-probe.py`, adapted from the E3 probes (`i4e3s-probe.py`, `sec-r2-probe.py`, `sec-r2-band.py`), with the pilot class replaced by `build_label_index` + `rank`. The runner is `sec-e5-run.sh`.
 - **Fixtures:** REF, REF6, LONG, QSET, PSET and the LONG queries come from the test module's own builders, so the strings are identical.
 - **Oracle:** the E1 `evaluate_b`, from an unchanged copy of the E3 pilot (sha256 equal to E3's).
@@ -100,7 +100,7 @@ Count: 0 CRITICAL, 0 HIGH, **1 MAJOR**, 1 MEDIUM, 2 MINOR, 1 LOW, 1 INFO. Every 
 Re-review of E5S-01 and E5S-02 as `E3-rulings.md` "## E5 rulings" rules them (posting variant C with the switch at ≤ 512 name-token occurrences; .35/.37/.40 scoped by total characters; cases .40/3 CRAFT and .40/4 BAND), against the corrected code: `label_match.py` sha256 `394bf2f9…83a0` (diff `885634bf..HEAD -- s19_app tests`, HEAD `46128ab3`). Reviewer: security-reviewer (Opus 5.5), read-only toward the code and the records.
 
 **Probes (state `executed`).**
-- **Where:** cachyos-rtx, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5-4-sec-r2/tree` (a `cp -a` of the read-only `~/work/b103-int4`). HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5-4-sec-r2/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1`. Every transcript prints `s19_app.__file__` and the module's sha256, and all 19 show the same pair.
+- **Where:** <runner>, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5-4-sec-r2/tree` (a `cp -a` of the read-only `~/work/b103-int4`). HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5-4-sec-r2/<user>`, with `PYTHONDONTWRITEBYTECODE=1`. Every transcript prints `s19_app.__file__` and the module's sha256, and all 19 show the same pair.
 - **Round-1 probe:** `sec-e5-probe.py` (`8700b63b`, unchanged) re-ran caps, perf, paste, mem, spans, adv, and det under 4 seeds.
 - **New probe:** `sec-r2-probe.py` loads the round-1 probe for its fixtures, the oracle (E1 `evaluate_b`, uncapped OSA) and the instrumentation. It builds CRAFT and BAND with the test module's own builders. It can force either fuzzy path: `_FUZZY_SWITCH_CAP` 0 runs the map path only, and 10**9 runs the per-id path right after the first walk.
 - **Probe versions:** dense and fuzz ran on `86ef259a`; craft, band, switch, fixcheck, subkey and buildscope on `97ba0957`; extra on `ecda78d6` (final). Each edit only added a mode.
@@ -180,7 +180,7 @@ Count (round 2): 0 CRITICAL, 0 HIGH, **1 MAJOR** (E5S-07), 1 MEDIUM (E5S-08), 1 
 Re-review of E5S-07 and E5S-08 as `E3-rulings.md` "E5 round-2 rulings" and "E5 round-2 design rulings" rule them: the N = 20 distinct-token cap (R-A2L-MATCH.41), range tables, C-level totals, the compact build, R-A2L-MATCH.40's bound at 2.0 s, .41's behavioural control and .37's ASCII scope. Code: `label_match.py` sha256 `8f396c15…a94d` (diff `7a771e59..HEAD -- s19_app tests`, HEAD `47bc083f`; GREEN `evidence-e5/green-after-corrective2.txt`). Reviewer: security-reviewer (Opus 5.5), read-only toward the code and the records.
 
 **Probes (state `executed`).**
-- **Where:** cachyos-rtx, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5r3-4-sec/tree` (a `cp -a` of the read-only `~/work/b103-int4`). HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5r3-4-sec/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1`. All 20 transcripts print `s19_app.__file__` and the same module sha256.
+- **Where:** <runner>, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5r3-4-sec/tree` (a `cp -a` of the read-only `~/work/b103-int4`). HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5r3-4-sec/<user>`, with `PYTHONDONTWRITEBYTECODE=1`. All 20 transcripts print `s19_app.__file__` and the same module sha256.
 - **New probe:** `sec-r3-probe.py` loads the round-1 probe (`sec-e5-probe.py`, `8700b63b`, unchanged) for the fixtures, the E1 oracle and the alarm. U6, D3, E2, W40, SUBO, CRAFT, BAND and B4MAX come from the test module's own builders. The oracle gets the .41 cap (past 20 distinct tokens a fuzzy row becomes the subsequence row or nothing). A node counter is an instrumented copy of the shipped `_fuzzy_token_distances` (its own source plus one counter line); every timing median uses the shipped function.
 - **Probe versions:** walk, check and det3 (seed 0) ran on `eb161db9`; cap, build37 and det3 (seeds 1, 4242, random) on `174ceb23`; shapes, subs, budget, fixb and detnocap on the final `9cf29242`. Each edit only added a mode (fixb, detnocap).
 - **Host load:** 1.2–10.3 on 16 cores. Another batch's probes shared the host, and the check chain ran beside the timing chain; every transcript prints the load. Timing medians are of 3 (adversarial lists) or 7 (the row's lists).
@@ -260,7 +260,7 @@ Count (round 3): 0 CRITICAL, 0 HIGH, **1 MAJOR** (E5S-10), 1 MINOR (E5S-11), 1 L
 - **Transcripts of the round-1 probe** (each `sec-r3-r1-<mode>-transcript.txt`):
   - perf (`32a0f488`), paste (`79bc2423`), mem (`eda189c6`)
   - det-{0,1,4242,random} (`e57941f7`, `8bf8b135`, `7d03fd4e`, `b6bfeebc`)
-- **Not run:** the Windows PC and CI (the brief's rule); CPython 3.12. The scratch `/tmp/b103-e5r3-4-sec` is kept on cachyos-rtx until this evidence is committed.
+- **Not run:** the Windows PC and CI (the brief's rule); CPython 3.12. The scratch `/tmp/b103-e5r3-4-sec` is kept on <runner> until this evidence is committed.
 
 ### Evidence checklist (round 3)
 
@@ -274,9 +274,9 @@ Count (round 3): 0 CRITICAL, 0 HIGH, **1 MAJOR** (E5S-10), 1 MINOR (E5S-11), 1 L
 Re-review of E5S-10, E5S-11 and E5S-12 as `E3-rulings.md` "E5 round-3 rulings" rules them (with its design-pass-3 line): the per-ranking budget of 400,000 trie-node visits (R-A2L-MATCH.42), non-ASCII names left out of the prepared list (R-A2L-MATCH.43), and the 2.0 s texts. Code: `label_match.py` sha256 `b97d19eb…9ecc` (corrective 3, by Sonnet; diff `1c5314ec..HEAD -- s19_app tests`, HEAD `08a703cf`). GREEN: `evidence-e5/green-after-corrective3.txt` (behaviour 145, perf 20, law guards 219). Reviewer: security-reviewer (Opus 5.5), read-only toward the code and the records.
 
 **Probes (state `executed`).**
-- **Where:** cachyos-rtx, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5r4-4-sec/tree`.
+- **Where:** <runner>, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5r4-4-sec/tree`.
   - **The tree** is a copy of the read-only `~/work/b103-int4` without `.dev-flow/`, `docs/` and `.git`. The runner's `/tmp` had 0.7 GiB free, and the probe reads none of the three.
-  - **Isolation:** HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5r4-4-sec/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1`.
+  - **Isolation:** HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5r4-4-sec/<user>`, with `PYTHONDONTWRITEBYTECODE=1`.
   - **Every transcript** prints `s19_app.__file__` and the module sha256.
 - **New probe:** `sec-r4-probe.py` loads the round-3 probe (`9cf29242`, unchanged), which loads the round-1 probe (`8700b63b`, unchanged).
   - **No instrumented copy is needed:** the shipped walk now returns its own visit count.
@@ -376,7 +376,7 @@ Count (round 4): 0 CRITICAL, 0 HIGH, 0 MAJOR, 0 MEDIUM, 0 MINOR, 1 LOW (E5S-15),
   - perf (`390d2450`), paste (`a02e7191`), mem (`9c0f7917`)
   - det-{0,1,4242,random} (`69af35eb`, `526b3e24`, `19a28a0a`, `f027e835`)
   - det-r3tree (`c78d90c0`), run on the round-3 tree copy, read-only
-- **Not run:** the Windows PC and CI (the brief's rule); CPython 3.12. The scratch `/tmp/b103-e5r4-4-sec` is kept on cachyos-rtx until this evidence is committed.
+- **Not run:** the Windows PC and CI (the brief's rule); CPython 3.12. The scratch `/tmp/b103-e5r4-4-sec` is kept on <runner> until this evidence is committed.
 
 ### Evidence checklist (round 4)
 

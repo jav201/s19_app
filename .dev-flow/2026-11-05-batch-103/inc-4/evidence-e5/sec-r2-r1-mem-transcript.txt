@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_mat
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
 mode = mem  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -8566277940255960953
-host = cachyos-rtx  load = (5.94, 3.4, 2.35)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+host = <runner>  load = (5.94, 3.4, 2.35)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
 REF build: tracemalloc peak 21,306,149 B (20.3 MiB; .37 bound 67,108,864) 16.52 s under tracemalloc [ok]
 
 === REF: 58 shapes; tracemalloc peak of one ranking, top 6

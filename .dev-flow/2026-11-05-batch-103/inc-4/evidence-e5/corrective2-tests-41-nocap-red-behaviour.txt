@@ -1,7 +1,7 @@
-date 2026-11-07T00:00:11-06:00 host cachyos-rtx load 0.10 0.90 1.73
+date 2026-11-07T00:00:11-06:00 host <runner> load 0.10 0.90 1.73
 label pre; label_match sha256 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 /tmp/c2-pre/s19_app/__init__.py
-cmd: /home/javiergr/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match.py -k MATCH.41 or cap_boundary
+cmd: /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match.py -k MATCH.41 or cap_boundary
 .F......FFF
 =================================== FAILURES ===================================
 ________________ test_ranked_list_is_exactly[R-A2L-MATCH.41/2] _________________

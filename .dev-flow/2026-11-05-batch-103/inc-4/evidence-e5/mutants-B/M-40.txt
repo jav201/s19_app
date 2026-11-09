@@ -18,7 +18,7 @@
 E            +  where 1.0 = report_margin('R-A2L-MATCH.40 LONG a x255 + b', 1.1549409860017477, 1.0)
 E            +    where 1.0 = timing_bound(1.0)
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match_perf.py:334: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match_perf.py:334: AssertionError
 ----------------------------- Captured stdout call -----------------------------
 host load before: 1.26 1.77 1.52
 host load after: 1.19 1.72 1.51

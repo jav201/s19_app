@@ -60,7 +60,7 @@ graph_out.write_text("\n".join(g), encoding="utf-8")
 outdir = scratch / "out"
 if outdir.exists():
     shutil.rmtree(outdir)
-cw = Path(r"C:\Users\jjgh8\Github\code-wire\tools\codewire_extract.py")
+cw = Path(r"C:\Users\<user>\Github\code-wire\tools\codewire_extract.py")
 r = subprocess.run([sys.executable, str(cw), "--repo", str(repo), "--graph", str(graph_out), "--out", str(outdir)],
                    capture_output=True, text=True)
 data = json.loads((outdir / "extract.json").read_text(encoding="utf-8"))

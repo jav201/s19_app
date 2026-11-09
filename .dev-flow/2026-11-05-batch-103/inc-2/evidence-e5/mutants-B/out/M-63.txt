@@ -27,7 +27,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________ test_r_a2l_def_63_1_the_definitions_case_is_deterministic ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-934/test_r_a2l_def_63_1_the_defini0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-934/test_r_a2l_def_63_1_the_defini0')
 
     def test_r_a2l_def_63_1_the_definitions_case_is_deterministic(tmp_path):
         """R-A2L-DEF.63/1 - two runs, same seed, two folders: every file byte-identical."""

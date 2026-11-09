@@ -23,7 +23,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________ test_r_a2l_def_29_1_first_of_two_entries_with_one_raw _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-972/test_r_a2l_def_29_1_first_of_t0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-972/test_r_a2l_def_29_1_first_of_t0')
 
     def test_r_a2l_def_29_1_first_of_two_entries_with_one_raw(tmp_path):
         """R-A2L-DEF.29/1 - ``1 "A"`` ``1 "B"``, stored 1 -> A."""

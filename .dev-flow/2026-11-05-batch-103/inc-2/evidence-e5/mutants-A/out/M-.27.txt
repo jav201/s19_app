@@ -53,7 +53,7 @@ E        +        where b'\x10\x00' = bytes([16, 0])
 ../base/tests/test_b103_a2l_definition.py:868: AssertionError
 __________ test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-969/test_r_a2l_def_27_3_field_of_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-969/test_r_a2l_def_27_3_field_of_a0')
 
     def test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned(tmp_path):
         """R-A2L-DEF.27/3 - SWORD, mask 0xFF00, word F0 F0 -> 240."""
@@ -62,7 +62,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-969/test_r_a2l_def_27_3_fie
 >       assert _decoded(d, a2l, _img(0x10, bytes([0xF0, 0xF0]))).stored == 240
 E       AssertionError: assert -3856 == 240
 E        +  where -3856 = Decoded(stored=-3856, value=-3856, text='-3856').stored
-E        +    where Decoded(stored=-3856, value=-3856, text='-3856') = _decoded(Definition(name='SM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-969/test_r_a2l_def_27_3_field_of_a0/inline_1.a2l', ...}, {16: 240, 17: 240})
+E        +    where Decoded(stored=-3856, value=-3856, text='-3856') = _decoded(Definition(name='SM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-969/test_r_a2l_def_27_3_field_of_a0/inline_1.a2l', ...}, {16: 240, 17: 240})
 E        +      where {16: 240, 17: 240} = _img(16, b'\xf0\xf0')
 E        +        where b'\xf0\xf0' = bytes([240, 240])
 

@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int4/s19_app/__init__.py
+/home/<user>/work/b103-int4/s19_app/__init__.py
 8f396c15
  00:10:20 up 1 day, 15:42,  2 users,  load average: 0.66, 1.34, 1.69
 ....................................................................     [100%]

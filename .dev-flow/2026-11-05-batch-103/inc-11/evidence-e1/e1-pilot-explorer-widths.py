@@ -1,4 +1,4 @@
-"""Inc 11 E1 pilot (batch-103), run on cachyos-rtx only: python e1-pilot-explorer-widths.py <repo> <scratch>
+"""Inc 11 E1 pilot (batch-103), run on <runner> only: python e1-pilot-explorer-widths.py <repo> <scratch>
 
 Hypothesis 5 (display adjacency), on the REAL app: does the A2L Explorer paint a declared address next to the
 computed length with no separator, so that the two read as one hex string, and at which terminal widths?

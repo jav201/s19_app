@@ -40,7 +40,7 @@ Design note: superseded by the graph's compact index (`codewire/graph-inc4.md`, 
 
 ## 3. Callers read (rule 8: read before you write)
 
-- **No existing function changes**, so no caller of a changed function exists and `codewire_extract.py` has nothing to extract. Code-Wire checked: `git -C C:\Users\jjgh8\Github\code-wire describe --tags` = `v3.1.0` (tag commit `e436a08`; PLAN names `ebc3bb7`, same tree `6af5232…`).
+- **No existing function changes**, so no caller of a changed function exists and `codewire_extract.py` has nothing to extract. Code-Wire checked: `git -C C:\Users\<user>\Github\code-wire describe --tags` = `v3.1.0` (tag commit `e436a08`; PLAN names `ebc3bb7`, same tree `6af5232…`).
 - **Where the names come from:** `parse_a2l_file(path)["tags"][i]["name"]` (`s19_app/tui/a2l.py:2797`, the tag dict built at `:2611-2612`), the reader the census and the pilots used; the A2L views list these names (S2.2).
 - **Who will call it (Inc 7, not now):** the A2L Viewer's autocomplete and the paste modal (I-3), building the index on each A2L load (I-4).
 - **Beside it, unchanged:** `S19TuiApp._filter_a2l_tags` and `_tag_matches_filter` (`app.py:20475`, `:20494`; R-A2L-007.1, .2), `S19TuiApp._a2l_tag_matches_find_query` (`app.py:16641`; R-A2L-090), the picker filter `A2LParameterPicker.on_input_changed` and its rebuild (`a2l_parameter_picker.py:694-700`, `:806-809`; R-CHKED-003), `parse_parameter_list` (`a2l_parameter_picker.py:75`; I-5). Evidence: `evidence-e1/i4e1-base-grep.txt`.

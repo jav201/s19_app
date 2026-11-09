@@ -14,7 +14,7 @@ OS clipboard write failed; retained Textual internal clipboard only
 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18; platform = linux; DISPLAY=None; WAYLAND_DISPLAY=None
 textual = 8.2.8
 

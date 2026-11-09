@@ -2,7 +2,7 @@
 characters in a layout / ref / name echoed in a message. Model m3a.py + Inc 2a `_clean`; read-only trees.
 """
 import pathlib, sys, time
-sys.path.insert(0, "/home/javiergr/work/b103-int2a")
+sys.path.insert(0, "/home/<user>/work/b103-int2a")
 sys.path.insert(1, "/tmp/b103-e3-3-security")
 import s19_app, s19_app.tui.a2l as a  # noqa: E402
 import s19_app.tui.a2l_definition as d2  # noqa: E402

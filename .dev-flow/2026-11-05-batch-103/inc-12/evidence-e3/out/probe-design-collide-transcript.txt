@@ -1,6 +1,6 @@
-# probe design collide transcript 2026-11-07T02:52:02-06:00 host cachyos-rtx
+# probe design collide transcript 2026-11-07T02:52:02-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 17.74 15.26 13.90
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/<user>; no DISPLAY; no clipboard; stdin closed; load: 17.74 15.26 13.90
 s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario collide
 [collide tracked] files with tags 26, distinct names 234654
 [collide tracked] w=34: names shortened 9969; names whose shortened Tag cell equals another name's on the SAME 200-row page 46 (in 4 files); file-wide 46

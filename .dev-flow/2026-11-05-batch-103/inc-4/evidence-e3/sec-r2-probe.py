@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E3 ROUND-2 security probe. THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, next to an unchanged copy of the E1/E2 pilot files
+Runs on <runner> only, next to an unchanged copy of the E1/E2 pilot files
 (PILOT_DIR). Class R2 follows the CORRECTED pinned procedure of
 graph-inc4.md:176-182 (records at 15129b64):
   step 1  parse (strip, fold, tokens), None -> [], then the stripped query

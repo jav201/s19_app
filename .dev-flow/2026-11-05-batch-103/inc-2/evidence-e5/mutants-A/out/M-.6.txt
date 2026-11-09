@@ -32,7 +32,7 @@ index 7b4d1416..8407a098 100644
 =================================== FAILURES ===================================
 _______________ test_r_a2l_def_6_2_name_is_matched_with_its_case _______________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-945/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-945/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_6_2_name_is_matched_with_its_case(c08):
         """R-A2L-DEF.6/2 - value_0001 is not VALUE_0001."""

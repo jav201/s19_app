@@ -39,7 +39,7 @@ E         Use -v to get more diff
 WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.33b/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
 _______________________ test_r_a2l_def_33_2_case08_text ________________________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-978/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-978/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_33_2_case08_text(c08):
         """R-A2L-DEF.33/2 - ASCII_0001 decodes to the planned string."""

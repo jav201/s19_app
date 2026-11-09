@@ -9,7 +9,7 @@
 # code-wire: v3.1.0 e436a0812325e85a78ca2bdeaaf0fbfe39e8b4c5
 # copy: cp -r s19_app tests tools <scratch>/tree from the WORKTREE (corrective2 edits
 # uncommitted). __pycache__ removed from the copy.
-# scratch: /tmp/b103-inc4-corrective2.i207ED (Windows: C:\Users\jjgh8\AppData\Local\Temp\b103-inc4-corrective2.i207ED)
+# scratch: /tmp/b103-inc4-corrective2.i207ED (Windows: C:\Users\<user>\AppData\Local\Temp\b103-inc4-corrective2.i207ED)
 # sha256 worktree s19_app/tui/services/label_match.py (corrective2):
 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d *<worktree>/s19_app/tui/services/label_match.py
 # marks: one '# node: <name>' line above each of the 17 new defs (copy only) and above
@@ -37,6 +37,6 @@ s19_app/tui/services/label_match.py:1151:# node: _fuzzy_token_distances
 # mark count: 18
 $ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
 rc=0
-$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/out
+$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/out
 marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
 ===EXIT===

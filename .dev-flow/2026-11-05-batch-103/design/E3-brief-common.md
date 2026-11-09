@@ -3,10 +3,10 @@
 You review ONE increment's design of s19_app batch-103 under `dev-flow-v3-beta`, with no code: the requirements, the Code-Wire graph and the real callers. Goal of the stage: no open finding of MAJOR, HIGH or worse on the design.
 
 ## Read first
-1. `C:\Users\jjgh8\.claude\skills\dev-flow-v3-beta\SKILL.md` (E1–E4).
+1. `C:\Users\<user>\.claude\skills\dev-flow-v3-beta\SKILL.md` (E1–E4).
 2. The increment's records: `inc-<N>/01-requirements.md`, `02-test-cases.md`, `E1-rulings.md` (with every "Orchestrator rulings" / "Operator rulings" section at its end — they override the PROPOSED rows above), `E1-slice.md`, `codewire/graph-inc<N>.md`, any `E2-rulings.md`, and the evidence folders.
 3. `.dev-flow/2026-11-05-batch-103/PLAN.md` (interfaces I-1..I-5, amendment A1), `REQUIREMENTS.md` "Rules for every row" and the cited modules, `CLAUDE.md`, `PROJECT_RULES.md`.
-4. Code-Wire v3.1.0 core (`C:\Users\jjgh8\Github\code-wire`, `docs/Metodologia.md`): examples from the requirement, real callers from `tools/codewire_extract.py`, a test that fails before the change.
+4. Code-Wire v3.1.0 core (`C:\Users\<user>\Github\code-wire`, `docs/Metodologia.md`): examples from the requirement, real callers from `tools/codewire_extract.py`, a test that fails before the change.
 5. Format example: `git show b101-inc12:.dev-flow/2026-11-01-batch-101/inc-12/E3-architect.md` (and `E3-security.md`).
 
 ## What you check
@@ -20,7 +20,7 @@ You review ONE increment's design of s19_app batch-103 under `dev-flow-v3-beta`,
 
 ## Rules
 - Read-only everywhere except your one output file and the steps.log lines. No git command that writes. Do not edit the records — the orchestrator rules and a correction pass edits.
-- Platform and safety: as `design/E1-brief-common.md` ("Platform and safety rules"): on this PC only read, grep, `py_compile`, `codewire_extract.py`; anything importing `s19_app` on cachyos-rtx (`/tmp/b103-e3-<N>-<role>/`), never a clipboard, never the operator's name. English.
+- Platform and safety: as `design/E1-brief-common.md` ("Platform and safety rules"): on this PC only read, grep, `py_compile`, `codewire_extract.py`; anything importing `s19_app` on <runner> (`/tmp/b103-e3-<N>-<role>/`), never a clipboard, never the operator's name. English.
 - A correction pass may be running on the same increment's `02-test-cases.md` while you read (the orchestrator's accepted E2 case fixes); judge the cases by the graph's corrected inputs where the rulings say so.
 
 ## Report (≤ 250 words)

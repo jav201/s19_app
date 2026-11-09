@@ -1,7 +1,7 @@
-# e3c2-fixedcols transcript 2026-11-07T01:02:59-06:00 host cachyos-rtx
+# e3c2-fixedcols transcript 2026-11-07T01:02:59-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3c2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 0.90 1.14 2.09
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8 | config B | reorder False | fixed_columns 0
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3c2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 0.90 1.14 2.09
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8 | config B | reorder False | fixed_columns 0
 [B N20 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=109 fixed_w=0 cols: Tag=24, Address=16, Length=9, Source=9
     row0: Address='0x1C2D3E00':whole, Length='2266':not shown, Tag cell 22 cells
     row1: Address='0x1C2D3E004026':PREFIX, Length='2':not shown, Tag cell 22 cells

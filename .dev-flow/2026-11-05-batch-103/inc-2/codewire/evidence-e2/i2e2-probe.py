@@ -1,6 +1,6 @@
 """Inc 2 E2 probe (batch-103): the facts the Code-Wire graph's examples cite, read from the base tree.
 
-Runs on the LAN host (cachyos-rtx) against the read-only clone at e07fb00. It imports ``s19_app`` and the
+Runs on the LAN host (<runner>) against the read-only clone at e07fb00. It imports ``s19_app`` and the
 synth generator from the clone and drives PURE functions only: no Textual app, no display, no clipboard,
 no write outside ``<out dir>``. It does not implement the definition model; it prints the inputs the
 graph's examples name (tags, object records, method and table records, case 08 objects, the reused

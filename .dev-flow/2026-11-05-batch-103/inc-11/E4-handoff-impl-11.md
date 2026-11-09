@@ -1,13 +1,13 @@
 # E4 handoff — Inc 11 implementer (DeepSeek v4 Pro): A2L reader, read side
 
 ## 1. Reference (dev-flow v3 + Code-Wire v3.1; latest as of 2026-11-07)
-s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2026-11-05-batch-103/` (start with `PLAN.md`, amendment A2). Versions: **dev-flow v3 beta** `C:\Users\jjgh8\.claude\skills\dev-flow-v3-beta\SKILL.md` (commit `d858a9a`; read stage E4 whole); **Code-Wire v3.1.0** `C:\Users\jjgh8\Github\code-wire` tag `v3.1.0` = `e436a08` (core only: examples from the requirements; `tools/codewire_extract.py` finds callers and drift; testers turn examples into failing tests). **tui-design:** not used.
+s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2026-11-05-batch-103/` (start with `PLAN.md`, amendment A2). Versions: **dev-flow v3 beta** `C:\Users\<user>\.claude\skills\dev-flow-v3-beta\SKILL.md` (commit `d858a9a`; read stage E4 whole); **Code-Wire v3.1.0** `C:\Users\<user>\Github\code-wire` tag `v3.1.0` = `e436a08` (core only: examples from the requirements; `tools/codewire_extract.py` finds callers and drift; testers turn examples into failing tests). **tui-design:** not used.
 
 ## 2. Role
 **E4 implementer: implement the approved graph's Inc 11 side; do not write tests.** An independent tester writes the tests in parallel in another worktree.
 
 ## 3. Where you work
-- Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc11-code` (branch `b103-inc11-code`, cut from `batch-103`). Only there.
+- Worktree `C:\Users\<user>\Github\s19_app-b103-inc11-code` (branch `b103-inc11-code`, cut from `batch-103`). Only there.
 - Your unit's files (exactly the Inc 11 source files of `inc-11/E1-slice.md`; respect the 4-source-file cap — Inc 11 uses 3):
   - **`s19_app/tui/a2l.py`** — **unfrozen for Inc 11 by amendment A2.** Every new, changed and removed node of the graph with `module: s19_app/tui/a2l.py` (the reader: `_lex_a2l_lines`/`_lex_a2l_words`, `_number_word`, `extract_declared_spans`, `_bounded_length`, `_tag_sizes`, `_echo_word`, `_CappedErrors`, `_build_section_tree_into`, and the changed nodes of `E1-slice.md` §2).
   - **`s19_app/tui/a2l_extract.py`** — its re-export list (`__all__`) gains `extract_declared_spans` (I-11.7).
@@ -26,8 +26,8 @@ s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2
 ## 5. Rules
 - English code, comments, docstrings; match the repo's style. Standard library only (`re` is fine — the graph's lexer uses a compiled pattern, `E3-rulings.md` round 3). Deterministic; no global mutable state beyond what the graph pins (`_CappedErrors` per parse). No whole-file regex; the open string's continuation is found with `str.find` or the unrolled pattern (READ.52's memory clause, E3A-18).
 - **R-A2L-READ.52's 1.5× time bound holds for every file, the 19.8 MB file included** (`E3-rulings.md` "Ruling on the time of the largest file"); peak memory ≤ 2× the base reader's. The tester measures it (`serial_timing`, GC off, least of ≥ 15 runs, host load recorded) — your job is to meet it, not to measure it.
-- **On this PC you may run only** `python -m py_compile <your file>` and `python C:\Users\jjgh8\Github\code-wire\tools\codewire_extract.py`. **Do not run pytest, the app, or any Python that imports or loads your module or `s19_app`** (not even through `importlib`; a previous run did that and it was a rule breach). No standalone check scripts either — `py_compile` and the extractor only. The orchestrator runs every test on the Linux runner.
-- **Runner facts (cachyos-rtx only):** `ssh -o BatchMode=yes javiergr@192.168.1.67 "bash -lc '…'"` (fish login shell — always `bash -lc`); Python is `/home/javiergr/miniconda3/envs/s19ci/bin/python`, an absolute path because HOME is changed; isolate `HOME`, `XDG_*` and `LOCALAPPDATA` in a directory named `zq_iso_user`; kill processes by PID only. The public corpus `~/a2l-corpus/files` is read-only, and only derived numbers may leave it.
+- **On this PC you may run only** `python -m py_compile <your file>` and `python C:\Users\<user>\Github\code-wire\tools\codewire_extract.py`. **Do not run pytest, the app, or any Python that imports or loads your module or `s19_app`** (not even through `importlib`; a previous run did that and it was a rule breach). No standalone check scripts either — `py_compile` and the extractor only. The orchestrator runs every test on the Linux runner.
+- **Runner facts (<runner> only):** `ssh -o BatchMode=yes <user>@<runner-ip> "bash -lc '…'"` (fish login shell — always `bash -lc`); Python is `/home/<user>/miniconda3/envs/s19ci/bin/python`, an absolute path because HOME is changed; isolate `HOME`, `XDG_*` and `LOCALAPPDATA` in a directory named `<user>`; kill processes by PID only. The public corpus `~/a2l-corpus/files` is read-only, and only derived numbers may leave it.
 - **The operator's proprietary A2L fragment does not exist in any file, and none may be created.** Use only synthetic data and the derived corpus numbers in `design/a2l-corpus/`; never copy file content from the public corpus into a record.
 - Never push, merge, force, `reset --hard`, delete a branch, or commit. Never write the operator's name. No secrets.
 - If the graph or a requirement looks wrong, write it down as a deviation. Never change a requirement or a pinned interface to match your code.

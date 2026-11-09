@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E2: the values the graph's private-node examples quote.
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx in PILOT_DIR next to
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> in PILOT_DIR next to
 i4e2-pilot4.py and the E1 pilots v1-v3. Every value comes from the E1 oracle
 helpers (tokens, allowed, osa_prefix, merge, evaluate_b, naive_rank_b) or from
 the two v4 helpers the graph adds (at_boundary, fuzzy_walk), and each v4

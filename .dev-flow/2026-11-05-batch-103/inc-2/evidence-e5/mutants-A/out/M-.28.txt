@@ -22,7 +22,7 @@ FFF                                                                      [100%]
 =================================== FAILURES ===================================
 ___________________ test_r_a2l_def_28_1_rat_func_no_solution ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_1_rat_func_n0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-971/test_r_a2l_def_28_1_rat_func_n0')
 
     def test_r_a2l_def_28_1_rat_func_no_solution(tmp_path):
         """R-A2L-DEF.28/1."""
@@ -34,7 +34,7 @@ E        +  where Refusal(code='A2L-DEF-DECODE', message='R1: RAT_FUNC has no so
 ../base/tests/test_b103_a2l_definition.py:887: AssertionError
 __________________ test_r_a2l_def_28_2_rat_func_no_real_root ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_2_rat_func_n0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-971/test_r_a2l_def_28_2_rat_func_n0')
 
     def test_r_a2l_def_28_2_rat_func_no_real_root(tmp_path):
         """R-A2L-DEF.28/2."""
@@ -46,7 +46,7 @@ E        +  where Refusal(code='A2L-DEF-DECODE', message='R2: RAT_FUNC has no re
 ../base/tests/test_b103_a2l_definition.py:893: AssertionError
 ________________ test_r_a2l_def_28_3_rat_func_zero_denominator _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_3_rat_func_z0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-971/test_r_a2l_def_28_3_rat_func_z0')
 
     def test_r_a2l_def_28_3_rat_func_zero_denominator(tmp_path):
         """R-A2L-DEF.28/3."""

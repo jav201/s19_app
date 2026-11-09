@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_mat
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
 mode = caps  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 5544259789870767815
-host = cachyos-rtx  load = (3.33, 2.1, 1.83)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+host = <runner>  load = (3.33, 2.1, 1.83)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
 
 === A. R-A2L-MATCH.38: the 256-character cap runs before any parse (C08, 462 names, limit 20)
   stripped len    256: result  1 entries; _parse_query calls 1; other matcher calls     310  .38/1 'VALUE_0001_' x 23 + 'VAL' (256)

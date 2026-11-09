@@ -1,5 +1,5 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-python = 3.11.18  host = cachyos-rtx  load = (1.1064453125, 0.89697265625, 1.88232421875)
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>  load = (1.1064453125, 0.89697265625, 1.88232421875)
 REF distinct tokens 77256, trie nodes 177148, longest token 42
   'nzukij'                   k=2 within k    5  trie   46.3 ms  sorted   81.9 ms  sorted+band   71.4 ms  nodes   45.0 ms  all equal True
   'ierxjr'                   k=2 within k    7  trie   48.5 ms  sorted   83.4 ms  sorted+band   72.9 ms  nodes   46.4 ms  all equal True

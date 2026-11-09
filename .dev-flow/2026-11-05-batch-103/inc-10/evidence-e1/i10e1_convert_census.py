@@ -2,14 +2,14 @@
 
 Read-only toward the product: calls the shipped emitters / save_patched_image / verify_written_image the way
 the save-back handler does (app.py:5026-5050), with ``source_kind`` set to the OUTPUT format, which is what
-Inc 10 will pass. Run on cachyos-rtx with HOME/XDG/LOCALAPPDATA under /tmp/b103-e1-10/. No clipboard, no app.
+Inc 10 will pass. Run on <runner> with HOME/XDG/LOCALAPPDATA under /tmp/b103-e1-10/. No clipboard, no app.
 """
 import os
 import sys
 from collections import Counter
 from pathlib import Path
 
-ROOT = Path("/home/javiergr/work/s19_app")  # absolute: HOME is isolated
+ROOT = Path("/home/<user>/work/s19_app")  # absolute: HOME is isolated
 sys.path.insert(0, str(ROOT))
 import s19_app  # noqa: E402
 

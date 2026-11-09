@@ -4,7 +4,7 @@ label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_mat
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
 mode = det  python = 3.11.18  PYTHONHASHSEED = 1  hash('abc') = -4667308735975688587
-host = cachyos-rtx  load = (3.35, 1.53, 1.63)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+host = <runner>  load = (3.35, 1.53, 1.63)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
 PYTHONHASHSEED=1 hash('abc')=-4667308735975688587 rankings=1287 sha256=b528ae214670677c009c5a4527ed554bc9397a1a0c474637d7f7b51c4852844c (32 s)
 probe exit 0

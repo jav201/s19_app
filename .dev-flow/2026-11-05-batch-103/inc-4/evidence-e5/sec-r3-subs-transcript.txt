@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_matc
 label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
 tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
 mode = r3 subs  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2030542657862475053
-host = cachyos-rtx  load = (2.63, 3.74, 3.54)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5r3-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+host = <runner>  load = (2.63, 3.74, 3.54)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
 probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
 _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
 

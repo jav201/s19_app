@@ -19,7 +19,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _ test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits _
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-933/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-933/b103_defc0'), ...}
 
     def test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits(defc):
         """R-A2L-DEF.62/1 - DISPLAY_0001: FORMAT, PHYS_UNIT, EXTENDED_LIMITS wider than the limits."""

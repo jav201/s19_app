@@ -33,7 +33,7 @@ E
 E         At index 0 diff: ('ABSValue', 'token', 0, ((0, 3), (3, 8))) != ('ABSValue', 'token', 0, ((0, 8),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 ________________ test_rows_34_spans_in_offset_order_and_joined _________________
 
 prep = <function prep.<locals>.get at 0x7f1163f94f40>
@@ -51,7 +51,7 @@ E         At index 0 diff: (0, 1) != (0, 6)
 E         Left contains one more item: (1, 6)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:533: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:533: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.34/1]
 FAILED tests/test_b103_label_match.py::test_rows_34_spans_in_offset_order_and_joined

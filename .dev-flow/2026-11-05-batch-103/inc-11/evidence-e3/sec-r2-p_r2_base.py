@@ -11,7 +11,7 @@
             COMPU_VTAB names the base readers find.
   depth   - a 32-level tree (the cap) through every base recursive walker, and render."""
 import io, sys, time, hashlib, collections, re
-sys.path.insert(0, "/home/javiergr/work/s19_app")
+sys.path.insert(0, "/home/<user>/work/s19_app")
 import s19_app
 from pathlib import Path
 from s19_app.tui import a2l as A
@@ -89,12 +89,12 @@ elif MODE == "named":
              "TRANSFORMER", "UNIT"}
     from s19_app.validation import rules as V
     man = {}
-    for row in Path("/home/javiergr/a2l-corpus/manifest.tsv").read_text(encoding="utf-8", errors="replace").splitlines()[1:]:
+    for row in Path("/home/<user>/a2l-corpus/manifest.tsv").read_text(encoding="utf-8", errors="replace").splitlines()[1:]:
         parts = row.split("\t")
         if len(parts) > 2:
             man[parts[2] if len(parts[2]) == 64 else parts[-1]] = parts[0]
     agg = collections.Counter(); seen = set(); excs = collections.Counter()
-    for k, f in enumerate(sorted(Path("/home/javiergr/a2l-corpus/files").iterdir())):
+    for k, f in enumerate(sorted(Path("/home/<user>/a2l-corpus/files").iterdir())):
         raw = f.read_bytes(); sha = hashlib.sha256(raw).hexdigest()
         if sha in seen:
             continue

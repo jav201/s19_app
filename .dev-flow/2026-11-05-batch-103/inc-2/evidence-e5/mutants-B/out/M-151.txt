@@ -23,7 +23,7 @@ s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-151/s19_app/__init__.py
 =================================== FAILURES ===================================
 _ test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_2_a_word_of0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-938/test_r_a2l_def_151_2_a_word_of0')
 
     def test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode(tmp_path):
         """R-A2L-DEF.151/2 - the first 256 characters and an ellipsis; describe and decode messages alike; each message <= 1,024."""
@@ -77,7 +77,7 @@ E             ...Full output truncated (7 lines hidden), use '-vv' to show
 tests/test_b103_a2l_definition.py:1964: AssertionError
 _ test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_3_each_char0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-938/test_r_a2l_def_151_3_each_char0')
 
     def test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd(tmp_path):
         """R-A2L-DEF.151/3 - ESC, E-acute and DEL in an echoed word are each U+FFFD (not control characters only)."""
@@ -109,7 +109,7 @@ E         ...Full output truncated (5 lines hidden), use '-vv' to show
 tests/test_b103_a2l_definition.py:1992: AssertionError
 ____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_4_a_matrix_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-938/test_r_a2l_def_151_4_a_matrix_0')
 
     def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
         """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
@@ -135,7 +135,7 @@ E         ...Full output truncated (4 lines hidden), use '-vv' to show
 tests/test_b103_a2l_definition.py:2372: AssertionError
 _ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_5_the_numbe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-938/test_r_a2l_def_151_5_the_numbe0')
 
     def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
         """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
@@ -162,7 +162,7 @@ E         ...Full output truncated (4 lines hidden), use '-vv' to show
 tests/test_b103_a2l_definition.py:2388: AssertionError
 _ test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_6_a_quoted_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-938/test_r_a2l_def_151_6_a_quoted_0')
 
     def test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word(tmp_path):
         """R-A2L-DEF.151/6 (CR-5) - the kind word `MATRIX_DIM <2,000 Z>` is a file word: 256 characters and an ellipsis."""

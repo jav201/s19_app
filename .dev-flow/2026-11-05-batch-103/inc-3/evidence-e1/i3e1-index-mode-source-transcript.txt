@@ -1,6 +1,6 @@
-# i3e1-index-mode-source.py transcript 2026-11-06T16:37:57-06:00 host cachyos-rtx
+# i3e1-index-mode-source.py transcript 2026-11-06T16:37:57-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
-# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/local DISPLAY=unset
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/<local> DISPLAY=unset
 url: https://guide.intrepidcs.com/docs/asap2/main-toolbar/edit-tools/create-edit-record-layouts/
 bytes: 32348; text lines: 148
    79: Y1

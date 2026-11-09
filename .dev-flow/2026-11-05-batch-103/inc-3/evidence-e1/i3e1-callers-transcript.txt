@@ -1,4 +1,4 @@
-# i3e1-callers transcript 2026-11-06T16:33:34-06:00 host cachyos-rtx
+# i3e1-callers transcript 2026-11-06T16:33:34-06:00 host <runner>
 # base tree: git archive e07fb00 s19_app (throwaway copy /tmp/b103-e1-3/copy); code-wire v3.1.0 (e436a08) tools/codewire_extract.py copied; python Python 3.11.18
 files parsed: 86; parse failures: 0
 marks written: 1996

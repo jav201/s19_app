@@ -1,7 +1,7 @@
 # E5 gap pass 2 extractor transcript — Inc 2a (batch-103), the enum/tab forms and _table_value
 # code-wire: v3.1.0 e436a08; python: 3.12.7 (Windows host, this PC)
 # repo: b103-inc2a-code @ 1c90cf9b (worktree; read-only) — marks written only into a THROWAWAY copy under <scratch>
-# scratch: C:/Users/jjgh8/AppData/Local/Temp/b103-e5g-gap2 (copy of s19_app/ + marks + subset graph + extractor out)
+# scratch: C:/Users/<user>/AppData/Local/Temp/b103-e5g-gap2 (copy of s19_app/ + marks + subset graph + extractor out)
 # subset graph: graph-inc2.md filtered to the 3 nodes gap pass 2 touches (_read_method_record, _read_enum_table, _table_value)
 # command: python -I <scratch>/make_extract.py <scratch>  (runs codewire_extract.py --repo <copy> --graph graph-subset.md --path s19_app/tui/a2l_definition.py --out out)
 

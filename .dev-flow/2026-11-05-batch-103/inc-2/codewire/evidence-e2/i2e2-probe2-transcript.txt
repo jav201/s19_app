@@ -1,7 +1,7 @@
-# i2e2-probe2 transcript 2026-11-06T16:40:29-06:00 host cachyos-rtx
+# i2e2-probe2 transcript 2026-11-06T16:40:29-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
 # HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-2/home; no DISPLAY; no clipboard; stdin closed
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [P9 E1 case 28/3 input: COEFFS 0 1 0 0 1 0, stored 1] (None, 'error', 'RAT_FUNC has no solution for this value')
 [P9 corrected 28/3 input: COEFFS 0 1 1 0 1 1, stored 2 (raw = (P+1)/(P+1); root P = -1)] (None, 'error', 'RAT_FUNC root has a zero denominator')
 [P9 same method, stored 1 (every P but -1 solves it; the smaller-magnitude root rule)] (None, 'error', 'RAT_FUNC has no solution for this value')

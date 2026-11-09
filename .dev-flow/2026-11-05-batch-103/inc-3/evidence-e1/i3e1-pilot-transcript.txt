@@ -1,9 +1,9 @@
-# i3e1-pilot.py transcript 2026-11-06T16:37:45-06:00 host cachyos-rtx
+# i3e1-pilot.py transcript 2026-11-06T16:37:45-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
-# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/local DISPLAY=unset
-A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-make_release_case.__file__ = /home/javiergr/work/s19_app/tools/synth/make_release_case.py
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/<local> DISPLAY=unset
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+make_release_case.__file__ = /home/<user>/work/s19_app/tools/synth/make_release_case.py
 [P1 ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: matrix_dim/length/datatype] (3, None, None)
 [P1 ASAM.C.ARRAY.SWORD.MATRIX_DIM_6.ROW_DIR: matrix_dim/length/datatype] (6, None, None)
 [P1 ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL: matrix_dim/length/datatype] (8, 8, 'UBYTE')

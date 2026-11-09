@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 === SCENE s19-118
   apply_btn = {'region': 'Region(x=17, y=41, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Apply loaded changes'}
   validate_btn = {'region': 'Region(x=6, y=41, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Validate'}

@@ -1,4 +1,4 @@
-# host: cachyos-rtx | 2026-11-07T06:56:18-06:00 | load: 8.02 8.06 7.16
+# host: <runner> | 2026-11-07T06:56:18-06:00 | load: 8.02 8.06 7.16
 # a2l_definition.py md5: 7bd4064983dbcefac4523b1792f1838e  make_release_case.py md5: 82fba4c34fb9cad1888a30d06025a725
 # cmd: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition_perf.py -m serial_timing
 /tmp/b103-e5fix/green/s19_app/__init__.py

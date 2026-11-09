@@ -1,7 +1,7 @@
-# e3a2-named transcript 2026-11-07T00:27:14-06:00 host cachyos-rtx
+# e3a2-named transcript 2026-11-07T00:27:14-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 0.91 0.78 1.06
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/<user>; no DISPLAY; no clipboard; stdin closed; load: 0.91 0.78 1.06
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | python 3.11.18
 [corpus] files=158
 [tracked] files=35 tags=234654; six fields: e07fb00(raw) vs e07fb00(CANON1) differ 108; e07fb00(raw) vs e07fb00(CANON2) differ 108; CANON1 vs CANON2 differ 0
 corpus:CANON1:AXIS_PTS:begin:all = 1898

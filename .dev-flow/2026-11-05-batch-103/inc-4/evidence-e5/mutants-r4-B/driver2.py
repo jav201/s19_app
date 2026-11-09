@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""E5 mutant unit B (round 4) driver v2 — runs on cachyos-rtx only.
+"""E5 mutant unit B (round 4) driver v2 — runs on <runner> only.
 
 Same mutants as driver.py, but edits ONE working copy in place (on the root
 fs, which has room) instead of copytree-per-mutant (which filled the 16 GiB
@@ -12,10 +12,10 @@ import shutil
 import subprocess
 
 BASE = "/tmp/b103-e5-4-mutr4B/base"
-WORK = "/home/javiergr/mutr4B-work"
+WORK = "/home/<user>/mutr4B-work"
 OUT = "/tmp/b103-e5-4-mutr4B/out"
 PY = os.path.expanduser("~/miniconda3/envs/s19ci/bin/python")
-ISO = "/home/javiergr/mutr4B-iso"
+ISO = "/home/<user>/mutr4B-iso"
 LABEL = "s19_app/tui/services/label_match.py"
 BEH = "tests/test_b103_label_match.py"
 PERF = "tests/test_b103_label_match_perf.py"

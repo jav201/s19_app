@@ -2,7 +2,7 @@
 
 **Verdict: PASS-WITH-NOTES.** No MAJOR, HIGH or worse is open. All 138 cases are `covered` and `verified` on the final code. Code under test: `s19_app/tui/services/label_match.py`, sha256 `b97d19eb`. Written 2026-11-07.
 
-**Platform limit.** Every run below is on cachyos-rtx, Python 3.11.18, platform Linux. The perf bounds (R-A2L-MATCH.36, .40, .42, .37) are valid on that host only; Windows was not run.
+**Platform limit.** Every run below is on <runner>, Python 3.11.18, platform Linux. The perf bounds (R-A2L-MATCH.36, .40, .42, .37) are valid on that host only; Windows was not run.
 
 ## Runs (evidence under `evidence-e4/`, `evidence-e5/`)
 
@@ -48,13 +48,13 @@ E3 (design) closed earlier: architect and security both FAIL in round 1, PASS-WI
 
 ## Not run
 
-- **Windows:** no run; perf bounds are valid on cachyos-rtx only.
+- **Windows:** no run; perf bounds are valid on <runner> only.
 - **Full test suite:** batch end.
 - **UI route and acceptance through keys:** owed by Inc 7 (this module is I-3 surface only; AT-B103-I4-1/-2 run through I-3).
 
 ## Trace check
 
-`evidence-e5/trace-check-transcript.txt` (first run): 2 US, 43 active requirements, every requirement and case linked to a test (no TRACE/COVER gap); one EVID gap, because the checker links only cited paths that hold an "evidence/" folder segment and this increment's folders are `evidence-e1/` to `evidence-e5/`. Ruled by the orchestrator: the decisive transcripts are copied to the batch evidence folder and cited below by their path from this record, the skill unchanged. `evidence-e5/trace-check-transcript-3.txt` (final run, `--base e07fb00 --src s19_app`, on a committed scratch copy on cachyos-rtx): see the last line of the transcript.
+`evidence-e5/trace-check-transcript.txt` (first run): 2 US, 43 active requirements, every requirement and case linked to a test (no TRACE/COVER gap); one EVID gap, because the checker links only cited paths that hold an "evidence/" folder segment and this increment's folders are `evidence-e1/` to `evidence-e5/`. Ruled by the orchestrator: the decisive transcripts are copied to the batch evidence folder and cited below by their path from this record, the skill unchanged. `evidence-e5/trace-check-transcript-3.txt` (final run, `--base e07fb00 --src s19_app`, on a committed scratch copy on <runner>): see the last line of the transcript.
 
 ## Open LOW notes (backlog)
 

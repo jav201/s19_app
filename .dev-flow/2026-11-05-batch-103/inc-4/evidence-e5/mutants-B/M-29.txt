@@ -35,7 +35,7 @@ E
 E         Right contains one more item: (38, 44)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:494: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:494: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_rows_29_span_with_no_boundary_occurrence
 1 failed, 128 deselected in 4.87s

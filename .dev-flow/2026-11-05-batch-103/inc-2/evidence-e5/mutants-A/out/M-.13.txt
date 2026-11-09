@@ -34,7 +34,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 ______________ test_r_a2l_def_13_1_enum_with_no_table_is_refused _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-954/test_r_a2l_def_13_1_enum_with_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-954/test_r_a2l_def_13_1_enum_with_0')
 
     def test_r_a2l_def_13_1_enum_with_no_table_is_refused(tmp_path):
         """R-A2L-DEF.13/1 - TAB_VERB with no COMPU_TAB_REF."""
@@ -65,7 +65,7 @@ E         ...Full output truncated (7 lines hidden), use '-vv' to show
 ../base/tests/test_b103_a2l_definition.py:165: AssertionError
 ________________ test_r_a2l_def_13_2_dangling_table_is_refused _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-954/test_r_a2l_def_13_2_dangling_t0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-954/test_r_a2l_def_13_2_dangling_t0')
 
     def test_r_a2l_def_13_2_dangling_table_is_refused(tmp_path):
         """R-A2L-DEF.13/2 - COMPU_TAB_REF VT_GONE."""

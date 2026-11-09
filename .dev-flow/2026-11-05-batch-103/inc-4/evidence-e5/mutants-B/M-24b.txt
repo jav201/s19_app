@@ -49,7 +49,7 @@ E
 E         At index 0 diff: ('DiscouNTCount', 'substring', 0, ((8, 13),)) != ('DiscountCount', 'substring', 0, ((8, 13),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.24/4]
 1 failed, 3 passed, 125 deselected in 4.93s

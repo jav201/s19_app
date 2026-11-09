@@ -22,7 +22,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ________________ test_r_a2l_def_36_1_decimals_are_capped_at_17 _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-982/test_r_a2l_def_36_1_decimals_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-982/test_r_a2l_def_36_1_decimals_a0')
 
     def test_r_a2l_def_36_1_decimals_are_capped_at_17(tmp_path):
         """R-A2L-DEF.36/1 - %.40 on 0.1 -> 17 decimals."""

@@ -1,5 +1,5 @@
 rc=0
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 case08 462 names; case08_issues 470 (VALUE_0001 x2)
 [case08] query='\tVALUE_0001\n' limit=20
     'VALUE_0001'                                         exact       key=0 spans=[(0, 10)]

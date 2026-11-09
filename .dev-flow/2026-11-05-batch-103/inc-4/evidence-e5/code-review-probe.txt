@@ -1,11 +1,11 @@
 # E5 code review probe transcript (inc-4 label_match) - generated, not typed
-# runner: cachyos-rtx; tree: cp -a ~/work/b103-int4 /tmp/b103-e5-4-code/tree (read-only original untouched)
-# command: cd /tmp/b103-e5-4-code/tree && env PYTHONPATH=/tmp/b103-e5-4-code/tree HOME=/tmp/b103-e5-4-code/zq_iso_user XDG_{CONFIG,CACHE,DATA}_HOME=<under zq_iso_user> LOCALAPPDATA=<under zq_iso_user> PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 timeout 1500 ~/miniconda3/envs/s19ci/bin/python -u /tmp/b103-e5-4-code/e5_code_probe.py
+# runner: <runner>; tree: cp -a ~/work/b103-int4 /tmp/b103-e5-4-code/tree (read-only original untouched)
+# command: cd /tmp/b103-e5-4-code/tree && env PYTHONPATH=/tmp/b103-e5-4-code/tree HOME=/tmp/b103-e5-4-code/<user> XDG_{CONFIG,CACHE,DATA}_HOME=<under <user>> LOCALAPPDATA=<under <user>> PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 timeout 1500 ~/miniconda3/envs/s19ci/bin/python -u /tmp/b103-e5-4-code/e5_code_probe.py
 # script: evidence-e5/code-review-probe.py
 # sha256 on runner:
 1a70871d172ddb649281668e2d6a252f95394364515fc8ebdbb503eb494583e2  /tmp/b103-e5-4-code/e5_code_probe.py
 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b  /tmp/b103-e5-4-code/tree/s19_app/tui/services/label_match.py
-24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b  /home/javiergr/work/b103-int4/s19_app/tui/services/label_match.py
+24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b  /home/<user>/work/b103-int4/s19_app/tui/services/label_match.py
 # ===== probe.log =====
 s19_app.__file__ = /tmp/b103-e5-4-code/tree/s19_app/__init__.py
 label_match.__file__ = /tmp/b103-e5-4-code/tree/s19_app/tui/services/label_match.py
@@ -39,4 +39,4 @@ LONG Q64 before: load 0.70 0.37 0.39
 done
 # ===== end =====
 # sha256 local copy of script:
-1a70871d172ddb649281668e2d6a252f95394364515fc8ebdbb503eb494583e2 */c/Users/jjgh8/Github/s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/code-review-probe.py
+1a70871d172ddb649281668e2d6a252f95394364515fc8ebdbb503eb494583e2 */c/Users/<user>/Github/s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/code-review-probe.py

@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 verify N=20 totals=counter  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 8734112732843017983
-host = cachyos-rtx  load = (0.43, 2.22, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (0.43, 2.22, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 pilot with the cap N = 20 (a query of more than 20 distinct query tokens gets no fuzzy tier); median of 7 consecutive rankings, limit 20 (X40 also limit 40); every list's every query
 
 === REF: 50,000 names, 2,062,041 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.51, 2.18, 2.54)

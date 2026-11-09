@@ -25,7 +25,7 @@ E
 E         At index 0 diff: ((0, 3), (4, 7), (8, 12)) != ((0, 3), (4, 7), (8, 10))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:501: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:501: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_rows_30_token_spans - assert [((0...
 1 failed, 128 deselected in 4.86s

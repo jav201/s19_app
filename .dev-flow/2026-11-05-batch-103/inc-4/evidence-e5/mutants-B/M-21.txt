@@ -51,7 +51,7 @@ E
 E         At index 0 diff: ('Encounter', 'substring', 0, ((2, 9),)) != ('timeCounter', 'substring', 0, ((4, 11),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.21/1]
 1 failed, 2 passed, 126 deselected in 4.97s

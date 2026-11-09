@@ -2,7 +2,7 @@
 
 Role `mutB` (N=2). Rows from `inc-2/01-requirements.md` "Split (amendment A2)" 2a side, ids ≥ .59: **.59, .60, .61, .62, .63, .136, .137, .139, .149, .150, .151** (11 rows). Two rows have a second control named by `E5-rulings.md` / `E5-code-review.md` → both taken: **M-59b** (CR-6 `planned_text`) and **M-149b** (CR-7 `compare=True`). 13 mutants total.
 
-All runs on cachyos-rtx (`javiergr@192.168.1.67`), Python 3.11.18 (`~/miniconda3/envs/s19ci/bin/python`), base tree `/tmp/b103-e5-2-mutB/base` = read-only copy of `~/work/b103-int2a` (HEAD `26d3e309`), HOME/XDG_*/LOCALAPPDATA isolated to `zq_iso_user`, `PYTHONDONTWRITEBYTECODE=1`. Synth rows edit `tools/synth/make_release_case.py`; the rest edit `s19_app/tui/a2l_definition.py`. Evidence (unified diff + pytest tail) in `mutants-B/out/<id>.txt`.
+All runs on <runner> (`<user>@<runner-ip>`), Python 3.11.18 (`~/miniconda3/envs/s19ci/bin/python`), base tree `/tmp/b103-e5-2-mutB/base` = read-only copy of `~/work/b103-int2a` (HEAD `26d3e309`), HOME/XDG_*/LOCALAPPDATA isolated to `<user>`, `PYTHONDONTWRITEBYTECODE=1`. Synth rows edit `tools/synth/make_release_case.py`; the rest edit `s19_app/tui/a2l_definition.py`. Evidence (unified diff + pytest tail) in `mutants-B/out/<id>.txt`.
 
 | Id | Requirement row | Control as written | Edit made (one line) | Tests run | Result | Failing test id(s) |
 |---|---|---|---|---|---|---|

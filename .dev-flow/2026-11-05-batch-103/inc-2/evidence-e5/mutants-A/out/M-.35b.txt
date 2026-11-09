@@ -20,7 +20,7 @@ FFFF..                                                                   [100%]
 =================================== FAILURES ===================================
 _______________________ test_r_a2l_def_35_1_two_decimals _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-981/test_r_a2l_def_35_1_two_decima0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_1_two_decima0')
 
     def test_r_a2l_def_35_1_two_decimals(tmp_path):
         """R-A2L-DEF.35/1 - LINEAR 0.1, %4.2, stored 123 -> ``12.30``."""
@@ -34,7 +34,7 @@ E         + 12.3
 ../base/tests/test_b103_a2l_definition.py:1005: AssertionError
 ___________________ test_r_a2l_def_35_2_zero_decimals_a_tie ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-981/test_r_a2l_def_35_2_zero_decim0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_2_zero_decim0')
 
     def test_r_a2l_def_35_2_zero_decimals_a_tie(tmp_path):
         """R-A2L-DEF.35/2 - FLOAT64 2.5 with %.0 -> ``2``."""
@@ -47,7 +47,7 @@ E         + 2.5
 ../base/tests/test_b103_a2l_definition.py:1010: AssertionError
 ______________________ test_r_a2l_def_35_3_four_decimals _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-981/test_r_a2l_def_35_3_four_decim0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_3_four_decim0')
 
     def test_r_a2l_def_35_3_four_decimals(tmp_path):
         """R-A2L-DEF.35/3 - 3.14159 with %8.4 -> ``3.1416``."""
@@ -62,7 +62,7 @@ E         ?      ^^
 ../base/tests/test_b103_a2l_definition.py:1015: AssertionError
 _____________________ test_r_a2l_def_35_4_exact_binary_tie _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-981/test_r_a2l_def_35_4_exact_bina0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_4_exact_bina0')
 
     def test_r_a2l_def_35_4_exact_binary_tie(tmp_path):
         """R-A2L-DEF.35/4 - 0.125 with %.2 -> ``0.12``."""

@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18  PYTHONHASHSEED = None
-host = cachyos-rtx  load = (5.58642578125, 3.533203125, 2.02197265625)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3-4-security/pilot
+host = <runner>  load = (5.58642578125, 3.533203125, 2.02197265625)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3-4-security/pilot
   -- cap 64 characters
      'e ' repeated                                chars=64   tokens=32   median     37.4 ms [ok] results=20
      'a b c ... z ' repeated                      chars=64   tokens=32   median     38.3 ms [ok] results=0

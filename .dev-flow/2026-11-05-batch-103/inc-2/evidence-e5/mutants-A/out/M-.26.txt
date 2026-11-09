@@ -30,7 +30,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-968/test_r_a2l_def_26_1_a_missing_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-968/test_r_a2l_def_26_1_a_missing_0')
 
     def test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode(tmp_path):
         """R-A2L-DEF.26/1 - UWORD at 0x10, image holds 0x10 only."""

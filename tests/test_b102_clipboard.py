@@ -586,6 +586,7 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
 
     monkeypatch.setattr(mod.subprocess, "run", _fake_run)
     monkeypatch.setattr(mod.sys, "platform", "win32")
+    monkeypatch.setattr(mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     text = mod._read_via_powershell()
 
@@ -599,7 +600,7 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
         f"_POWERSHELL_TIMEOUT_S must be >= 2.0; got {mod._POWERSHELL_TIMEOUT_S!r}"
     )
     argv = captured["argv"]
-    assert argv[0] == "powershell", f"argv={argv!r}"
+    assert argv[0] == "C:\\PS\\powershell.exe", f"argv={argv!r}"
     assert any("Get-Clipboard" in str(part) for part in argv[1:]), (
         f"The read command must stay the static Get-Clipboard form; argv={argv!r}"
     )
@@ -636,6 +637,7 @@ def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_std
 
     monkeypatch.setattr(mod.subprocess, "run", _fake_run)
     monkeypatch.setattr(mod.sys, "platform", "win32")
+    monkeypatch.setattr(mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     written = _write_via_powershell("payload")
 
@@ -646,6 +648,7 @@ def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_std
         f"recorded timeout={timeout!r}"
     )
     argv = captured["argv"]
+    assert argv[0] == "C:\\PS\\powershell.exe", f"argv={argv!r}"
     assert any("Set-Clipboard" in str(part) for part in argv[1:]), (
         f"The write command must stay the static Set-Clipboard form; argv={argv!r}"
     )

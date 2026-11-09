@@ -25,7 +25,7 @@ E
 E         Right contains one more item: (0, 10)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:475: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:475: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_rows_26_exact_span - assert () ==...
 1 failed, 128 deselected in 4.75s

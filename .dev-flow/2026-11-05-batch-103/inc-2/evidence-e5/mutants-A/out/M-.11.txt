@@ -28,7 +28,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________ test_r_a2l_def_11_1_undeclared_method_is_refused _______________
 
-c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-951/b103_c080/firmware_issues.a2l', ...}, ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-951/b103_c080/firmware_issues.a2l', ...}, ...}
 
     def test_r_a2l_def_11_1_undeclared_method_is_refused(c08):
         """R-A2L-DEF.11/1 - MISSING_CM names CM_MISSING (base: identity)."""

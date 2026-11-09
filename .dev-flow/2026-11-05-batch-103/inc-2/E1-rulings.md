@@ -1,7 +1,7 @@
 # Inc 2 — E1 rulings: scope, canon changes, decisions
 
 Base: branch `batch-103` at `332f8ca` (product tree `e07fb00`). Rows: `01-requirements.md`. Cases: `02-test-cases.md`. Slice: `E1-slice.md`. Evidence (all tool output, `evidence-e1/`):
-- `i2e1-pilot.py` → `i2e1-pilot-transcript.txt` (B): the base tree's parse, decode and encode on real A2L shapes; LAN host cachyos-rtx, Python 3.11.18, the read-only clone at `e07fb00` (`s19_app.__file__` printed on line 5), HOME/XDG/LOCALAPPDATA under `/tmp/b103-e1-2/home`, no display, no clipboard.
+- `i2e1-pilot.py` → `i2e1-pilot-transcript.txt` (B): the base tree's parse, decode and encode on real A2L shapes; LAN host <runner>, Python 3.11.18, the read-only clone at `e07fb00` (`s19_app.__file__` printed on line 5), HOME/XDG/LOCALAPPDATA under `/tmp/b103-e1-2/home`, no display, no clipboard.
 - `i2e1-case08-hashes.py` → `i2e1-case08-hashes-transcript.txt` (C): 22 SHA-256 digests of case 08 (seed 20260001, 10 MiB and 1 MiB, two runs each, 0 mismatches), written under `/tmp/b103-e1-2/out` on the same host.
 - `i2e1-callers.py` → `i2e1-callers-transcript.txt` (C): the Code-Wire v3.1.0 extractor (`codewire_extract.py`, commit `e436a08`, tree-identical to the `ebc3bb7` PLAN pins) over a throwaway copy of `git archive e07fb00 s19_app` with one mark per def; real callers of every reused function, base line numbers.
 - `i2e1-a2l-shapes.txt` (C): keyword census of the 35 tracked `.a2l` files. `i2e1-id-census.txt` (C): `R-A2L-DEF` unused.

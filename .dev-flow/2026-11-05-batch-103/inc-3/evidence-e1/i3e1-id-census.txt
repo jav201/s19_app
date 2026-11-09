@@ -1,7 +1,7 @@
 # i3e1 id census — 2026-11-06T16:38:04-06:00; worktree HEAD 9ae92c35; pattern: R-A2L-DEF\.(6[4-9]|[7-9][0-9]|1[0-4][0-9])\b (R-A2L-DEF.64 … .149)
 ## REQUIREMENTS.md + docs/requirements/review/*.md
 (no file holds an id of the range)
-## C:/Users/jjgh8/Github/s19w/review/
+## C:/Users/<user>/Github/s19w/review/
 (none)
 ## every .dev-flow/*/ folder (this increment's folder excluded)
 .dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md:6:Row status: every row is **new** (ids `R-A2L-DEF.1` … `.63`, unused everywhere the brief names: `evidence-e1/i2e1-id-census.txt`). No existing canon row is changed (`E1-rulings.md` §2). Inc 3 continues at `R-A2L-DEF.64`; a row ruled out is marked `— Withdrawn` and keeps its id, so no gap opens.

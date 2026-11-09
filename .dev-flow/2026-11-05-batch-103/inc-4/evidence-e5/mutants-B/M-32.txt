@@ -37,7 +37,7 @@ E
 E         At index 0 diff: ('VAL_BLK_0001', 'fuzzy', 1, ((4, 8),)) != ('VAL_BLK_0001', 'fuzzy', 1, ((4, 7),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 ________________ test_rows_32_2_fuzzy_spans_of_two_query_tokens ________________
 
 prep = <function prep.<locals>.get at 0x7fe3899ecf40>
@@ -50,7 +50,7 @@ E
 E         At index 0 diff: (0, 4) != (0, 3)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:518: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:518: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.32/1]
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.32/3]

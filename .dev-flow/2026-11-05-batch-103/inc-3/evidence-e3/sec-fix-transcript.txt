@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/b103-int2a/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/b103-int2a/s19_app/__init__.py
 [F1] FIX axis max 65,536: describe 303.9 ms, peak 3.0 MiB, points built 65,536, refusal None
 [F1] FIX axis max 262,144: describe 1207.4 ms, peak 12.2 MiB, points built 262,144, refusal None
 [F1] FIX axis max 1,048,576: describe 4850.1 ms, peak 48.1 MiB, points built 1,048,576, refusal None

@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 build  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -4014505911269923152
-host = cachyos-rtx  load = (7.03, 3.99, 2.51)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (7.03, 3.99, 2.51)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 .35 / .37 scope today: 50,000 names that hold at most 2,062,041 characters in all (REF's total)
 S = shipped build_label_index; C = compact build (pilot); time = median of 3 builds; peak = one build under tracemalloc
 

@@ -1,10 +1,10 @@
 # E5 mutant table — unit A (R-A2L-DEF.1 … .58.x, Inc 2a)
 
-Base: HEAD `26d3e309`, read-only copy `/tmp/b103-e5-2-mutA/base` on cachyos-rtx. Each mutant is a
+Base: HEAD `26d3e309`, read-only copy `/tmp/b103-e5-2-mutA/base` on <runner>. Each mutant is a
 `cp -a` of the base with the smallest edit to `s19_app/tui/a2l_definition.py` that realises the
-row's Negative control. Tests run with `/home/javiergr/miniconda3/envs/s19ci/bin/python -I -m
+row's Negative control. Tests run with `/home/<user>/miniconda3/envs/s19ci/bin/python -I -m
 pytest -q -p no:cacheprovider tests/test_b103_a2l_definition.py -k "<ids>"` under an isolated
-HOME/XDG/LOCALAPPDATA (`zq_iso_user`) and `PYTHONDONTWRITEBYTECODE=1`. Evidence (diff + pytest tail)
+HOME/XDG/LOCALAPPDATA (`<user>`) and `PYTHONDONTWRITEBYTECODE=1`. Evidence (diff + pytest tail)
 in `evidence-e5/mutants-A/out/M-*.txt`.
 
 | Mutant | Row | Control (as written) | Edit made | Tests run | Result | Failing test(s) |

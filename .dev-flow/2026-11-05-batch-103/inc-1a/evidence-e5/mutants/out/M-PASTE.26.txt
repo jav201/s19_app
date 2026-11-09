@@ -1,0 +1,121 @@
+# M-PASTE.26
+# row: R-PASTE.26
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the toolkit press handler left to run on button 3 (prevent_default removed)
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..eab99cbd 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -321,7 +321,6 @@ class CappedTextArea(TextArea):
+         """
+         if event.button != 3:
+             return
+-        event.prevent_default()
+         event.stop()
+         if self.selected_text:
+             await self.action_copy()
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..c6315b9b 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -868,7 +868,6 @@ class OsClipboardInput(Input):
+         self._press_cursor = None
+         if event.button != 3:
+             return
+-        event.prevent_default()
+         event.stop()
+         if press is None and self.selected_text:
+             await self.action_copy()
+
+# --- pytest (rc=1) ---
+est-of-<user>/pytest-10034/test_r_paste_26_right_click_co0')
+box_kind = 'input'
+
+    @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
+    def test_r_paste_26_right_click_copy_leaves_text_and_selection(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.26/1-2 (LinuxH): the box's text and selection are unchanged."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app._clipboard = "BEFORE"
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                box.value = "AAAA-BBBB"
+                box.selection = (0, 4)
+                await pilot.pause()
+                await right_click_app_route(app, pilot, box)
+                await pilot.pause()
+                return box.value, box.selection
+    
+        value, selection = asyncio.run(_drive())
+        assert value == "AAAA-BBBB", value
+>       assert tuple(selection) == (0, 4), selection
+E       AssertionError: Selection(start=3, end=3)
+E       assert (3, 3) == (0, 4)
+E         
+E         At index 0 diff: 3 != 0
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:1134: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+______ test_r_paste_26_right_click_copy_leaves_text_and_selection[multi] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10034/test_r_paste_26_right_click_co1')
+box_kind = 'textarea'
+
+    @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
+    def test_r_paste_26_right_click_copy_leaves_text_and_selection(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.26/1-2 (LinuxH): the box's text and selection are unchanged."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app._clipboard = "BEFORE"
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                box.value = "AAAA-BBBB"
+                box.selection = (0, 4)
+                await pilot.pause()
+                await right_click_app_route(app, pilot, box)
+                await pilot.pause()
+                return box.value, box.selection
+    
+        value, selection = asyncio.run(_drive())
+        assert value == "AAAA-BBBB", value
+>       assert tuple(selection) == (0, 4), selection
+E       AssertionError: Selection(start=3, end=3)
+E       assert (3, 3) == (0, 4)
+E         
+E         At index 0 diff: 3 != 0
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:1134: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_26_right_click_copy_leaves_text_and_selection[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_26_right_click_copy_leaves_text_and_selection[multi]
+2 failed, 85 deselected in 5.54s
+
+===== stderr =====

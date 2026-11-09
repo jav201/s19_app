@@ -1,5 +1,5 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-python = 3.11.18  host = cachyos-rtx  cpus = 16
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>  cpus = 16
 load before = (6.193359375, 4.02197265625, 2.26953125)
 
 === REF (50000 names), limit 20, median of 7 per query; load (6.3916015625, 4.13671875, 2.326171875)

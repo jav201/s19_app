@@ -2,14 +2,14 @@
 read + conversion on the object's own definition). V171 ordinary scalar; read-only trees."""
 import pathlib, sys, time
 from dataclasses import dataclass, replace
-sys.path.insert(0, "/home/javiergr/work/b103-int2a")
+sys.path.insert(0, "/home/<user>/work/b103-int2a")
 import s19_app, s19_app.tui.a2l as a, s19_app.tui.a2l_definition as d2
 print("s19_app.__file__ =", s19_app.__file__)
 @dataclass(frozen=True)
 class Def3(d2.Definition):
     shape: tuple = (); element_count: int = 1; index_mode: object = None; values_offset: int = 0
     record_layout: object = None; axes: tuple = ()
-data = a.parse_a2l_file(pathlib.Path("/home/javiergr/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l"))
+data = a.parse_a2l_file(pathlib.Path("/home/<user>/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l"))
 base = d2.describe_definition("ASAM.C.SCALAR.SWORD.LINEAR_MUL_2", data)
 obj = Def3(**{f: getattr(base, f) for f in d2.Definition.__dataclass_fields__})
 n = 50_000; size = base.byte_length

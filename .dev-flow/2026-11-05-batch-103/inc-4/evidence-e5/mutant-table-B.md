@@ -1,6 +1,6 @@
 # E5 mutant table — unit B (rows R-A2L-MATCH.21 … .40)
 
-Run on cachyos-rtx (Python 3.11.18), base `~/work/b103-int4` copied read-only to
+Run on <runner> (Python 3.11.18), base `~/work/b103-int4` copied read-only to
 `/tmp/b103-e5-4-mutB/base`. Per mutant: smallest edit to
 `s19_app/tui/services/label_match.py`, then the row's tests. Evidence (unified
 diff + pytest tail) in `mutants-B/M-*.txt`. Result: **27 killed, 0 survived,
