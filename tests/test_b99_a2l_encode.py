@@ -60,7 +60,7 @@ from s19_app.tui.a2l import (
 )
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
-from tests.b97_probes import painted_rows, settle, settled
+from tests.b97_probes import settle, settled
 from tests.support.independent_reader import read_s19
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -511,6 +511,25 @@ def _status_text(app) -> str:
     return str(app.query_one("#log_line_4", Label).render())
 
 
+def _column_index(table: DataTable, label: str) -> int:
+    """A tag-table column's index, found by its label (Inc 12 re-orders the
+    columns to Address, Length, Tag, …; E2-6)."""
+    for index, column in enumerate(table.ordered_columns):
+        if str(column.label) == label:
+            return index
+    raise AssertionError(f"no {label!r} column in {[str(c.label) for c in table.ordered_columns]}")
+
+
+def _row_cells_by_name(app, table: DataTable, name: str):
+    """The cells of the first row whose Tag cell names ``name``."""
+    tag_column = _column_index(table, "Tag")
+    for index in range(table.row_count):
+        cells = table.get_row_at(index)
+        if name in str(getattr(cells[tag_column], "plain", cells[tag_column])):
+            return cells
+    return None
+
+
 async def _load_through_dialog(app, pilot, path: Path, description: str) -> None:
     """Load ``path`` through the shipped Load file dialog: ``l``, click the
     ``#load_path`` input and TYPE the path, click ``#load_ok`` — the same
@@ -554,22 +573,32 @@ async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> N
         )
 
         # The painted arms differ by width; the describe-modal arms (below)
-        # run at BOTH widths.
+        # run at BOTH widths. Inc 12 (E2-6): the values are read from the cells
+        # by label, not from the painted row (the padding + new order push the
+        # Physical column past the pane edge at 118×40).
         if size[0] >= 118:
             table = app.query_one("#a2l_tags_list", DataTable)
-            rows = painted_rows(app, table)
-            rat_row = next(r for r in rows if "RAT_FUNC_SYM" in r)
-            assert "30.0" in rat_row, f"RAT_FUNC_SYM row at {size}: {rat_row!r}"
-            msb_row = next(r for r in rows if "SYM_U16_MSB" in r)
-            # IDENTICAL passes the raw int through: "4113" paints in BOTH the
-            # Raw and the Physical cell
-            assert msb_row.count("4113") >= 2, f"SYM_U16_MSB row at {size}: {msb_row!r}"
-            sparse_row = next(r for r in rows if "TAB_INTP_SPARSE_SYM" in r)
-            assert "40.0" in sparse_row, f"TAB_INTP_SPARSE_SYM row at {size}: {sparse_row!r}"
-            noroot_row = next(r for r in rows if "NO_ROOT_SYM" in r)
-            assert "n/a" in noroot_row, f"NO_ROOT_SYM row at {size}: {noroot_row!r}"
-            outside_row = next(r for r in rows if "OUTSIDE_SYM" in r)
-            assert "n/a" not in outside_row, f"OUTSIDE_SYM row at {size}: {outside_row!r}"
+            raw_column = _column_index(table, "Raw")
+            phys_column = _column_index(table, "Physical")
+
+            def _phys(name: str) -> str:
+                cells = _row_cells_by_name(app, table, name)
+                assert cells is not None, f"{name} row not found"
+                return str(getattr(cells[phys_column], "plain", cells[phys_column]))
+
+            def _raw(name: str) -> str:
+                cells = _row_cells_by_name(app, table, name)
+                assert cells is not None, f"{name} row not found"
+                return str(getattr(cells[raw_column], "plain", cells[raw_column]))
+
+            assert _phys("RAT_FUNC_SYM") == "30.0", _phys("RAT_FUNC_SYM")
+            # IDENTICAL passes the raw int through: "4113" in BOTH the Raw and
+            # the Physical cell
+            assert _raw("SYM_U16_MSB") == "4113", _raw("SYM_U16_MSB")
+            assert _phys("SYM_U16_MSB") == "4113", _phys("SYM_U16_MSB")
+            assert _phys("TAB_INTP_SPARSE_SYM") == "40.0", _phys("TAB_INTP_SPARSE_SYM")
+            assert _phys("NO_ROOT_SYM") == "n/a", _phys("NO_ROOT_SYM")
+            assert _phys("OUTSIDE_SYM") == "", _phys("OUTSIDE_SYM")
 
         # UX-C8 (modal) at BOTH widths: the values paint through the describe
         # modal, never a stored table cell. Row order follows the corpus A2L

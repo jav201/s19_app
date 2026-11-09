@@ -132,9 +132,19 @@ def _strip_glyph(name_cell: str) -> str:
     return name_cell
 
 
+def _tag_column_index(table: DataTable) -> int:
+    """The Tag column's index in ``ordered_columns`` (Inc 12 re-orders the
+    columns to Address, Length, Tag, …; E2-6)."""
+    for index, column in enumerate(table.ordered_columns):
+        if str(column.label) == "Tag":
+            return index
+    raise AssertionError(f"no Tag column in {[str(c.label) for c in table.ordered_columns]}")
+
+
 def _row_names(app: S19TuiApp) -> list[str]:
     table = app.query_one("#a2l_tags_list", DataTable)
-    return [_strip_glyph(str(table.get_row_at(i)[0])) for i in range(table.row_count)]
+    tag_column = _tag_column_index(table)
+    return [_strip_glyph(str(table.get_row_at(i)[tag_column])) for i in range(table.row_count)]
 
 
 def _in_memory_cells(app: S19TuiApp) -> list[str]:

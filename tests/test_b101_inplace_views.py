@@ -499,14 +499,31 @@ def name_cell(cell) -> str:
     return text
 
 
+def tag_column(table) -> int:
+    """The Tag column's index, found by its label (Inc 12 re-orders the tag
+    table to Address, Length, Tag, …; E2-6 / E3A-14)."""
+    for index, column in enumerate(table.ordered_columns):
+        if str(column.label) == "Tag":
+            return index
+    raise AssertionError(
+        f"no Tag column in {[str(c.label) for c in table.ordered_columns]}"
+    )
+
+
 def row_name(app, index: int) -> str:
-    return name_cell(tag_table(app).get_row_at(index)[0])
+    table = tag_table(app)
+    return name_cell(table.get_row_at(index)[tag_column(table)])
 
 
 def find_row(app, name: str):
+    """The row index of the tag whose full name is ``name``, read from the row
+    key's tag (``_a2l_row_key_to_tag``) — never from the painted Tag cell, which
+    Inc 12 may shorten."""
     table = tag_table(app)
     for index in range(table.row_count):
-        if name_cell(table.get_row_at(index)[0]) == name:
+        key = table.coordinate_to_cell_key(Coordinate(index, 0)).row_key.value
+        tag = app._a2l_row_key_to_tag.get(key)
+        if tag is not None and str(tag.get("name")) == name:
             return index
     return None
 

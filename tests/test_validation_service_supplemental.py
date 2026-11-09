@@ -168,16 +168,26 @@ def _strip_glyph(name_cell: str) -> str:
     return name_cell
 
 
+def _tag_column_index(table: DataTable) -> int:
+    """The Tag column's index in ``ordered_columns`` (Inc 12 re-orders the
+    columns to Address, Length, Tag, …; E2-6)."""
+    for index, column in enumerate(table.ordered_columns):
+        if str(column.label) == "Tag":
+            return index
+    raise AssertionError(f"no Tag column in {[str(c.label) for c in table.ordered_columns]}")
+
+
 def _a2l_row_list(app: S19TuiApp) -> list[tuple[str, tuple]]:
     """Rendered ``#a2l_tags_list`` rows as ``(name_cell_text, cells)`` pairs
-    (cells are the styled ``rich.text.Text`` objects; name is column 0 per
-    ``_build_a2l_table_cells``, with the batch-47 in-image glyph prefix
+    (cells are the styled ``rich.text.Text`` objects; the name is the Tag
+    column, found by label, with the batch-47 in-image glyph prefix
     stripped)."""
     table = app.query_one("#a2l_tags_list", DataTable)
+    tag_column = _tag_column_index(table)
     rows: list[tuple[str, tuple]] = []
     for index in range(table.row_count):
         cells = table.get_row_at(index)
-        rows.append((_strip_glyph(str(cells[0])), tuple(cells)))
+        rows.append((_strip_glyph(str(cells[tag_column])), tuple(cells)))
     return rows
 
 
