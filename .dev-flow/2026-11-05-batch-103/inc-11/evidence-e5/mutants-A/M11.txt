@@ -1,0 +1,38 @@
+# M11  R-A2L-READ.5  verdict=KILLED
+mutation: UTF-8 BOM is kept (not dropped)
+applied: 1
+
+=== baseline pytest ===
+.                                                                        [100%]
+1 passed in 1.06s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_r_a2l_read_5_bom_before_project_dropped _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32659/test_r_a2l_read_5_bom_before_p0')
+
+    def test_r_a2l_read_5_bom_before_project_dropped(tmp_path: Path) -> None:
+        """R-A2L-READ.5/2: a BOM before /begin PROJECT is dropped (RP-A9)."""
+        text = _body(meas("X", " ECU_ADDRESS 0x1234")).split("\n", 1)[1]
+        data = _parse(tmp_path, "\ufeff" + text)
+>       assert data["errors"] == []
+E       AssertionError: assert ['Line 1: une...thout /begin'] == []
+E         
+E         Left contains 2 more items, first extra item: 'Line 1: unexpected character U+FEFF'
+E         Use -v to get more diff
+
+tests\test_b103_a2l_reader.py:350: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_5_bom_before_project_dropped
+1 failed in 1.11s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

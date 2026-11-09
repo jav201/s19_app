@@ -1,0 +1,36 @@
+# mutant M01 — header boundaries (keyword ends header)
+
+requirement: R-A2L-READ.27
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_27_keyword_ends_header']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________________ test_r_a2l_read_27_keyword_ends_header ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32602/test_r_a2l_read_27_keyword_end0')
+
+    def test_r_a2l_read_27_keyword_ends_header(tmp_path: Path) -> None:
+        """R-A2L-READ.27/2..5: a keyword in header position ends the header."""
+        text = _body(meas("SX", " ECU_ADDRESS 0x10", hdr=" UWORD CM_ID 0 0 0 BIT_MASK 0x0FF0"))
+        t = _tag(_parse(tmp_path, text), "SX")
+>       assert t["datatype"] == "UWORD" and t["bit_org"] == "0x0FF0" and t["upper_limit"] is None
+E       AssertionError: assert ('UWORD' == 'UWORD'
+E         
+E           UWORD and None == '0x0FF0')
+
+tests\test_b103_a2l_reader.py:1007: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_27_keyword_ends_header
+1 failed in 1.08s
+
+[exit=1 elapsed=2.0s tag=M01]
+
+VERDICT: KILLED (exit 1)

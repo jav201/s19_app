@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.17s",
+  "req": "R-A2L-READ.56",
+  "mutation": "error cap removed (append never caps)",
+  "anchor": "if len(self._texts) < self._cap:",
+  "replacement": "if True:",
+  "applied": 1,
+  "baseline": "1 passed in 1.00s",
+  "verdict": "KILLED"
+}

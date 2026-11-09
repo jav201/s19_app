@@ -1,0 +1,48 @@
+# M6  R-A2L-001.3.2  verdict=KILLED
+mutation: escaped quote closes the string (backslash parity ignored)
+applied: 1
+
+=== baseline pytest ===
+.                                                                        [100%]
+1 passed in 1.04s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________________ test_r_a2l_001_3_2_escapes __________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32649/test_r_a2l_001_3_2_escapes0')
+
+    def test_r_a2l_001_3_2_escapes(tmp_path: Path) -> None:
+        """R-A2L-001.3.2/1..3: \\\\, \\" and \\\\" behave as one escape pair."""
+        text = _body('/begin CHARACTERISTIC X "C:\\\\"\n VALUE 0x2000 RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC')
+        assert _tag(_parse(tmp_path, text), "X", "CHARACTERISTIC")["address"] == 0x2000
+        text2 = _body('/begin MEASUREMENT X "a\\"b"\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x10\n/end MEASUREMENT')
+>       assert _tag(_parse(tmp_path, text2), "X")["description"] == 'a\\"b'
+
+tests\test_b103_a2l_reader.py:626: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...Line 20: quoted string not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], ...}
+name = 'X', section = 'MEASUREMENT'
+
+    def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
+        for tag in data["tags"]:
+            if tag.get("name") == name and tag.get("section") == section:
+                return tag
+>       raise AssertionError(f"no {section} tag {name!r} in {[t['name'] for t in data['tags']]}")
+E       AssertionError: no MEASUREMENT tag 'X' in []
+
+tests\test_b103_a2l_reader.py:112: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_001_3_2_escapes - AssertionE...
+1 failed in 1.21s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

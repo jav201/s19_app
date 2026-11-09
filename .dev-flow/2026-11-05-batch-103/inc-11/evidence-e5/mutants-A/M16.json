@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.15s",
+  "req": "R-A2L-READ.22",
+  "mutation": "/include records no error",
+  "anchor": "if low == \"/include\":",
+  "replacement": "if low == \"/include\" and False:",
+  "applied": 1,
+  "baseline": "1 passed in 1.03s",
+  "verdict": "KILLED"
+}

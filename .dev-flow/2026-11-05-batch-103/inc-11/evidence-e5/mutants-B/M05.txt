@@ -1,0 +1,33 @@
+# mutant M05 — number/address bounds (0X refused)
+
+requirement: R-A2L-READ.34
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_34_hex_words']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________________ test_r_a2l_read_34_hex_words _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32606/test_r_a2l_read_34_hex_words0')
+
+    def test_r_a2l_read_34_hex_words(tmp_path: Path) -> None:
+        """R-A2L-READ.34/1: 0x, 0X and 16-digit hex."""
+        for w in ("0x1234", "0X1234", "0x0000000000001234"):
+>           assert _tag(_parse(tmp_path, _body(meas("X", f" ECU_ADDRESS {w}"))), "X")["address"] == 0x1234
+E           assert None == 4660
+
+tests\test_b103_a2l_reader.py:1293: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_34_hex_words - assert N...
+1 failed in 1.09s
+
+[exit=1 elapsed=2.0s tag=M05]
+
+VERDICT: KILLED (exit 1)

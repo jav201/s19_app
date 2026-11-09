@@ -1,0 +1,35 @@
+# mutant M02 — header arity (MEASUREMENT/CHARACTERISTIC swapped)
+
+requirement: R-A2L-READ.28
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_28_short_header_error']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_r_a2l_read_28_short_header_error ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32603/test_r_a2l_read_28_short_heade0')
+
+    def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
+        """R-A2L-READ.28/1, /2, /4 (/2 name = first word, R-A2L-READ.23): short header errors."""
+        text = _body(meas("SX", " ECU_ADDRESS 0x10", hdr=" UWORD CM_ID 0 0 0"))
+        data = _parse(tmp_path, text)
+>       assert any("MEASUREMENT SX has 5 of its 6 header words" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_28_short_header_error.<locals>.<genexpr> at 0x0000025ADDAE4040>)
+
+tests\test_b103_a2l_reader.py:1029: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_28_short_header_error
+1 failed in 1.09s
+
+[exit=1 elapsed=2.0s tag=M02]
+
+VERDICT: KILLED (exit 1)

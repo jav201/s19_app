@@ -1,0 +1,37 @@
+# mutant M06 — address bounds (2^64-1 refused)
+
+requirement: R-A2L-READ.69
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_69_address_above_64_bits']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_r_a2l_read_69_address_above_64_bits ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32607/test_r_a2l_read_69_address_abo0')
+
+    def test_r_a2l_read_69_address_above_64_bits(tmp_path: Path) -> None:
+        """R-A2L-READ.69/1, /2, /3: addresses above 2^64-1 give no address."""
+        for w in ("18446744073709551616", "99999999999999999999"):
+            data = _parse(tmp_path, _body(meas("X", f" ECU_ADDRESS {w}")))
+            assert _tag(data, "X")["address"] is None
+            assert not [e for e in data["errors"] if "is not a number" in e]
+        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 18446744073709551615")))
+>       assert _tag(data, "X")["address"] == 0xFFFFFFFFFFFFFFFF
+E       assert None == 18446744073709551615
+
+tests\test_b103_a2l_reader.py:1315: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_69_address_above_64_bits
+1 failed in 1.08s
+
+[exit=1 elapsed=2.0s tag=M06]
+
+VERDICT: KILLED (exit 1)

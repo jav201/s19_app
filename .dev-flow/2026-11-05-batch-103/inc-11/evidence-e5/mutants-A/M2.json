@@ -1,0 +1,10 @@
+{
+  "mutant": "3 failed in 1.30s",
+  "req": "R-A2L-READ.9",
+  "mutation": "line comment // opens a block comment (runs past the line end)",
+  "anchor": "if ch == \"/\" and i + 1 < n and body[i + 1] == \"/\":\n                i += 2\n                while i < n and body[i] != \"\\r\" and body[i] != \"\\n\":\n                    i += 1\n                continue",
+  "replacement": "if ch == \"/\" and i + 1 < n and body[i + 1] == \"/\":\n                in_comment = True\n                comment_line = line\n                i += 2\n                continue",
+  "applied": 1,
+  "baseline": "3 passed in 1.05s",
+  "verdict": "KILLED"
+}

@@ -1,0 +1,37 @@
+# M18  R-A2L-READ.19  verdict=KILLED
+mutation: /begin matches by prefix (glued /beginMEASUREMENT opens a section)
+applied: 1
+
+=== baseline pytest ===
+.                                                                        [100%]
+1 passed in 1.00s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_r_a2l_read_19_glued_begin_end ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32673/test_r_a2l_read_19_glued_begin0')
+
+    def test_r_a2l_read_19_glued_begin_end(tmp_path: Path) -> None:
+        """R-A2L-READ.19/1, /2: /beginMEASUREMENT and /endX are ordinary words."""
+        text = _body('/beginMEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x1234\n/end MEASUREMENT')
+        data = _parse(tmp_path, text)
+        assert _tags_named(data, "X") == []
+>       assert any("does not close /begin MODULE" in e for e in data["errors"])
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_19_glued_begin_end.<locals>.<genexpr> at 0x0000016D88894040>)
+
+tests\test_b103_a2l_reader.py:758: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_19_glued_begin_end - as...
+1 failed in 1.21s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

@@ -1,0 +1,36 @@
+# mutant M03 — keyword case / byte-order word case
+
+requirement: R-A2L-READ.68
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_words_no_error']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_r_a2l_read_68_byte_order_words_no_error _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32604/test_r_a2l_read_68_byte_order_0')
+
+    def test_r_a2l_read_68_byte_order_words_no_error(tmp_path: Path) -> None:
+        """R-A2L-READ.68/3: valid byte-order words give no error."""
+        for w in ("MSB_FIRST", "MSB_LAST", "BIG_ENDIAN", "LITTLE_ENDIAN", "msb_first", "msb_last", "big_endian", "little_endian"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" BYTE_ORDER {w}"))
+            data = _parse(tmp_path, text)
+>           assert not [e for e in data["errors"] if "not a byte order" in e], w
+E           AssertionError: msb_first
+E           assert not ['Line 23: BYTE_ORDER msb_first is not a byte order']
+
+tests\test_b103_a2l_reader.py:1273: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_words_no_error
+1 failed in 1.07s
+
+[exit=1 elapsed=2.0s tag=M03]
+
+VERDICT: KILLED (exit 1)

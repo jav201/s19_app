@@ -1,0 +1,37 @@
+# M20  R-A2L-001.4  verdict=KILLED
+mutation: stray /end records no error
+applied: 1
+
+=== baseline pytest ===
+.                                                                        [100%]
+1 passed in 1.05s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________________ test_r_a2l_001_4_stray_end __________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32677/test_r_a2l_001_4_stray_end0')
+
+    def test_r_a2l_001_4_stray_end(tmp_path: Path) -> None:
+        """R-A2L-001.4/1, /2: a stray /end at or after other words."""
+        for line in ("/end X", "junk /end X"):
+            text = _body("") + line + "\n"
+            data = _parse(tmp_path, text)
+>           assert any("/end without /begin" in e for e in data["errors"])
+E           assert False
+E            +  where False = any(<generator object test_r_a2l_001_4_stray_end.<locals>.<genexpr> at 0x000002A7CA340040>)
+
+tests\test_b103_a2l_reader.py:823: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_001_4_stray_end - assert False
+1 failed in 1.16s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

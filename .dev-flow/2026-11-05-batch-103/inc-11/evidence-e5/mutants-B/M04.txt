@@ -1,0 +1,61 @@
+# mutant M04 — number bounds (decimal parsed base-0)
+
+requirement: R-A2L-READ.35
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_35_decimal_words']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_r_a2l_read_35_decimal_words _______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32605/test_r_a2l_read_35_decimal_wor0')
+
+    def test_r_a2l_read_35_decimal_words(tmp_path: Path) -> None:
+        """R-A2L-READ.35/1, /2: decimal words with leading zero / plain."""
+>       assert _tag(_parse(tmp_path, _body(meas("X", " ECU_ADDRESS 010"))), "X")["address"] == 10
+
+tests\test_b103_a2l_reader.py:1298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader.py:105: in _parse
+    return parse_a2l_file(_file(text, tmp_path, name=name, raw=raw))
+s19_app\tui\a2l.py:3934: in parse_a2l_file
+    tags = extract_a2l_tags(
+s19_app\tui\a2l.py:3770: in extract_a2l_tags
+    walk(sections, None, (None, None, None))
+s19_app\tui\a2l.py:3768: in walk
+    walk(section["children"], current_module_byte_order, current_module_source)
+s19_app\tui\a2l.py:3768: in walk
+    walk(section["children"], current_module_byte_order, current_module_source)
+s19_app\tui\a2l.py:3766: in walk
+    _process_tag(section, current_module_byte_order, current_module_source)
+s19_app\tui\a2l.py:3526: in _process_tag
+    value = _number_word(args[0])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+word = '010'
+
+    def _number_word(word: str) -> Optional[int]:
+        """Parse a number word (``0x``/``0X`` + 1..16 hex digits, or 1..20 decimal
+        digits), else ``None`` (R-A2L-READ.34 � .36)."""
+        if not _NUMBER_WORD_RE.fullmatch(word):
+            return None
+        if word[:2] in ("0x", "0X"):
+            return int(word[2:], 16)
+>       return int(word, 0)
+E       ValueError: invalid literal for int() with base 0: '010'
+
+s19_app\tui\a2l.py:348: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_35_decimal_words - Valu...
+1 failed in 1.24s
+
+[exit=1 elapsed=2.1s tag=M04]
+
+VERDICT: KILLED (exit 1)

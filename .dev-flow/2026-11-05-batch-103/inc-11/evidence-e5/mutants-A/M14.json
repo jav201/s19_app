@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.14s",
+  "req": "R-A2L-001.1",
+  "mutation": "/begin and /end recognized only at the start of a line",
+  "anchor": "or \"/\" in text",
+  "replacement": "or text.startswith(\"/\")",
+  "applied": 1,
+  "baseline": "1 passed in 1.01s",
+  "verdict": "KILLED"
+}

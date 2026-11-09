@@ -1,0 +1,39 @@
+# M1  R-A2L-READ.7  verdict=KILLED
+mutation: comment no longer a word break (/* glues neighbours)
+applied: 1
+
+=== baseline pytest ===
+.                                                                        [100%]
+1 passed in 1.03s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+=== mutant pytest ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_a2l_read_7_comment_between_digits_splits _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32639/test_r_a2l_read_7_comment_betw0')
+
+    def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
+        """R-A2L-READ.7/1 (name = first word, R-A2L-READ.23): MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
+        text = _body(
+            '/begin CHARACTERISTIC Synthetic ""\n MAP 0x1C2D3E00/*c*/4026 RL_SYN_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC\n'
+            "/begin RECORD_LAYOUT RL_SYN_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        )
+        data = _parse(tmp_path, text)
+        tag = _tag(data, "Synthetic", "CHARACTERISTIC")
+>       assert tag["address"] == 0x1C2D3E00
+E       assert None == 472727040
+
+tests\test_b103_a2l_reader.py:523: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_7_comment_between_digits_splits
+1 failed in 1.15s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+

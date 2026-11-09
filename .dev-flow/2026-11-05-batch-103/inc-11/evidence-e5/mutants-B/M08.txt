@@ -1,0 +1,37 @@
+# mutant M08 — _describe_one not refilling a missing length
+
+requirement: R-A2L-READ.38 / R-A2L-READ.61
+file: s19_app/tui/a2l_definition.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_38_definition_stays_refused']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_r_a2l_read_38_definition_stays_refused _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32609/test_r_a2l_read_38_definition_0')
+
+    def test_r_a2l_read_38_definition_stays_refused(tmp_path: Path) -> None:
+        """R-A2L-READ.38/4 and .61/4: describe_definition keeps a refused length."""
+        for w in ("0", "99999999999"):
+            text = _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}"))
+            data = _parse(tmp_path, text)
+            definition = describe_definition("X", data)
+>           assert definition.byte_length is None
+E           AssertionError: assert 1 is None
+E            +  where 1 = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UWORD'...ompu_tab_ref=None, refusal=Refusal(code='A2L-DEF-LENGTH', message='X: its length 1 differs from the 2 bytes of UWORD')).byte_length
+
+tests\test_b103_a2l_reader.py:1448: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_38_definition_stays_refused
+1 failed in 1.10s
+
+[exit=1 elapsed=2.0s tag=M08]
+
+VERDICT: KILLED (exit 1)

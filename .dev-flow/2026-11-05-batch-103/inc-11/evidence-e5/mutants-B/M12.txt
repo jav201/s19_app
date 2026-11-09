@@ -1,0 +1,39 @@
+# mutant M12 — unresolvable deposits (guess a length)
+
+requirement: R-A2L-READ.43 / R-A2L-READ.45
+file: s19_app/tui/a2l.py
+applied_count(expected=1, actual=1)
+test nodes: ['tests/test_b103_a2l_reader.py::test_r_a2l_read_45_instance_unresolvable_value_deposit_ref']
+
+---- pytest transcript ----
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_r_a2l_read_45_instance_unresolvable_value_deposit_ref __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32613/test_r_a2l_read_45_instance_un0')
+ref = <function ref_read_a2l at 0x000001913DA005E0>
+
+    def test_r_a2l_read_45_instance_unresolvable_value_deposit_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.43/.45 (oracle): a VALUE typedef with an undeclared deposit gives no length."""
+        text = _body(
+            '/begin TYPEDEF_CHARACTERISTIC TVAL "" VALUE __ULong_Value 0 AccessType 0 4294967295\n/end TYPEDEF_CHARACTERISTIC\n'
+            '/begin INSTANCE I1 "" TVAL 0x10\n/end INSTANCE'
+        )
+        spans = _spans(_parse(tmp_path, text))
+>       assert any(s["name"] == "I1" and s["length"] is None for s in spans)
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_45_instance_unresolvable_value_deposit_ref.<locals>.<genexpr> at 0x000001913D96C040>)
+
+tests\test_b103_a2l_reader.py:1586: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_45_instance_unresolvable_value_deposit_ref
+1 failed in 1.17s
+
+[exit=1 elapsed=2.1s tag=M12]
+
+VERDICT: KILLED (exit 1)

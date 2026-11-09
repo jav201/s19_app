@@ -1,0 +1,10 @@
+{
+  "mutant": "2 failed in 1.58s",
+  "req": "R-A2L-READ.1",
+  "mutation": "CRLF inside a body counts as two line ends",
+  "anchor": "if ch == \"\\r\" and i + 1 < n and body[i + 1] == \"\\n\":",
+  "replacement": "if ch == \"\\r\" and i + 1 < n and body[i + 1] == \"\\n\" and False:",
+  "applied": 1,
+  "baseline": "2 failed in 1.52s",
+  "verdict": "N/A (baseline already red)"
+}

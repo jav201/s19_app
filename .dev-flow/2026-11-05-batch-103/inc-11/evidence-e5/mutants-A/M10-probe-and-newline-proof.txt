@@ -1,0 +1,11 @@
+=== M10 probe (direct lexer vs file path) ===
+count OLD: 1
+context around anchor:
+'if ch == "\\r":\n            count += 1\n            if i + 1 < n and text[i + 1] ='
+count OLD after replace: 0
+count NEW: 1
+M10 direct: [(1, 'A'), (4, 'B'), (6, 'C'), (7, 'D')]
+
+=== Windows Path.write_text newline-translation proof ===
+bytes: b'A\r\r\r\nB\r\nC\r'
+os.linesep: '\r\n'

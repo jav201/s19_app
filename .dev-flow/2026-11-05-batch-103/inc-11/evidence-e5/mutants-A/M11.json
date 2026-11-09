@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.11s",
+  "req": "R-A2L-READ.5",
+  "mutation": "UTF-8 BOM is kept (not dropped)",
+  "anchor": "utf8_bom = head[:3] == b\"\\xef\\xbb\\xbf\"",
+  "replacement": "utf8_bom = False",
+  "applied": 1,
+  "baseline": "1 passed in 1.06s",
+  "verdict": "KILLED"
+}

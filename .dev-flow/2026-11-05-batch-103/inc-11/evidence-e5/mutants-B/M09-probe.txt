@@ -1,0 +1,17 @@
+# M09 probe — synthetic MAP with LENGTH 0 + one inline STD_AXIS (fresh process per arm)
+
+== baseline (unmutated) ==
+length=None
+errors=['Line 8: CHARACTERISTIC C declares the sizes 0 and 13']
+
+== apply M09 ==
+anchor occurrences: 1
+M09 applied
+length=13
+errors=['Line 8: CHARACTERISTIC C declares the sizes 0 and 13']
+
+== restore ==
+length=None
+errors=['Line 8: CHARACTERISTIC C declares the sizes 0 and 13']
+
+== git diff --stat (must be empty) ==

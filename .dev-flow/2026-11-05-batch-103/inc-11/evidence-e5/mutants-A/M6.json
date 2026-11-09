@@ -1,0 +1,10 @@
+{
+  "mutant": "1 failed in 1.21s",
+  "req": "R-A2L-001.3.2",
+  "mutation": "escaped quote closes the string (backslash parity ignored)",
+  "anchor": "        if backslashes % 2 == 0:\n            return j",
+  "replacement": "        return j",
+  "applied": 1,
+  "baseline": "1 passed in 1.04s",
+  "verdict": "KILLED"
+}
