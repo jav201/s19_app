@@ -196,6 +196,7 @@ def main() -> int:
         return root / best_rel, best_count, per_file
 
     v171_path = root / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l"
+    image_path = root / "examples" / "case_00_public" / "prg.s19"
     curve_path: Path | None = None
     curve_counts: dict[str, int] = {}
     if args.scenario == "curve":
@@ -206,8 +207,6 @@ def main() -> int:
 
     report_lines: list[str] = [
         f"scenario={args.scenario}",
-        f"checkout={root}",
-        f"base={base}",
     ]
 
     class CaptureApp(S19TuiApp):
@@ -273,6 +272,11 @@ def main() -> int:
                     report_lines.append(f"synthetic_fixture={args.scenario}")
                 elif args.scenario == "curve":
                     assert curve_path is not None
+                    self.load_selected_file(image_path)
+                    await self._wait_for(
+                        lambda: self.current_file is not None
+                        and self.current_file.path.name == image_path.name
+                    )
                     self.load_a2l_from_path(curve_path)
                     report_lines.append(f"selected_file={curve_path.relative_to(root)}")
                     report_lines.append(f"curve_without_length_selected={_curve_count}")
@@ -280,6 +284,11 @@ def main() -> int:
                         "curve_without_length_per_file=" + json.dumps(curve_counts, sort_keys=True)
                     )
                 else:  # v171, v171-nameline
+                    self.load_selected_file(image_path)
+                    await self._wait_for(
+                        lambda: self.current_file is not None
+                        and self.current_file.path.name == image_path.name
+                    )
                     self.load_a2l_from_path(v171_path)
                     report_lines.append("tracked_file=examples/case_00_public/ASAP2_Demo_V171.a2l")
                 await self.workers.wait_for_complete()
