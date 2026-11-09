@@ -1543,6 +1543,11 @@ class A2LDetailCard(Static):
     }
     """
 
+    @property
+    def is_scrollable(self) -> bool:
+        """Return True because the bounded card scrolls its overflowing text."""
+        return True
+
     def show_tag(self, tag: Optional[dict]) -> None:
         """
         Summary:
