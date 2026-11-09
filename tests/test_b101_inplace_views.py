@@ -817,7 +817,8 @@ def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path
     (page 1; the Raw and Physical columns are 18 cells wide, the widest value
     they have painted); the cursor on ``VALUE_0007`` (row 14, Raw
     ``85.6589584350586``) and the table scrolled right so Raw is its first shown
-    column (the table is 50 cells wide); key ``6``, ``0x00040028`` = ``EA A3 64 C6`` applied;
+    column (at 160 columns the table is 73 cells wide, leaving room for Raw and
+    Physical below the two fixed columns); key ``6``, ``0x00040028`` = ``EA A3 64 C6`` applied;
     key ``2`` -> the row paints its Raw cell ``-9.876539885039906e+25`` whole
     (22 characters) and its Physical cell whole, both columns are at least 22
     cells wide, and the scroll and the cursor are unchanged.
@@ -892,7 +893,7 @@ def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path
         assert ((int(table.scroll_x), int(table.scroll_y)), table.cursor_row) == (first, cursor)
         assert row_name(app, 14) == "VALUE_0007"
 
-    drive(tmp_path, scenario)
+    drive(tmp_path, scenario, size=(160, 56))
 
 
 def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
