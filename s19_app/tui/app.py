@@ -1549,6 +1549,21 @@ class A2LDetailCard(RichLog):
         self.show_vertical_scrollbar = False
         self.show_tag(None)
 
+    def on_resize(self, event: events.Resize) -> None:
+        """Rewrap the current card text at its measured content width."""
+        super().on_resize(event)
+        if hasattr(self, "_card_text"):
+            self._rewrite_card_text()
+
+    def _rewrite_card_text(self) -> None:
+        """Write the current text with wrap and paint using one width."""
+        self.clear()
+        width = self.scrollable_content_region.width
+        if width:
+            self.write(self._card_text, width=width)
+        else:
+            self.write(self._card_text)
+
     def render(self) -> Text:
         """Return the card's current text for the existing Static-era callers."""
         return getattr(self, "_card_text", _a2l_detail_card_text(None))
@@ -1575,10 +1590,8 @@ class A2LDetailCard(RichLog):
             Used by:
                 - on_data_table_row_highlighted
         """
-        content = _a2l_detail_card_text(tag)
-        self._card_text = content
-        self.clear()
-        self.write(content)
+        self._card_text = _a2l_detail_card_text(tag)
+        self._rewrite_card_text()
 
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
