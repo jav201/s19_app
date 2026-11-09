@@ -206,7 +206,7 @@ from tools.id_registry import (
 # (tests/test_b103_a2l_definition_arrays_coverage.py); 292 -> 293.
 # batch-103 Inc 3a E5 FIX cap coverage: +1
 # (tests/test_b103_a2l_definition_arrays_fix_cap.py); 293 -> 294.
-EXPECTED_SCANNED_TEST_FILES = 294
+EXPECTED_SCANNED_TEST_FILES = 295
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

@@ -33,6 +33,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     ProgressBar,
+    RichLog,
     Select,
     Static,
     TextArea,
@@ -1507,7 +1508,7 @@ class A2LTagTable(DataTable):
         self.post_message(self.Measured())
 
 
-class A2LDetailCard(Static):
+class A2LDetailCard(RichLog):
     """
     Summary:
         A one-widget A2L detail card mounted at the top of ``#a2l_hex_pane``
@@ -1528,9 +1529,9 @@ class A2LDetailCard(Static):
         Used by:
             - _compose_screen_a2l (mount) ; on_data_table_row_highlighted (update)
 
-    Note (Textual internal-name shadowing): the only instance member added is
-    the public ``show_tag`` method — no ``_nodes``/``_context`` (or any other
-    ``Widget`` private) name is introduced, so mounting cannot silently deadlock.
+    Note (Textual internal-name shadowing): the subclass adds only ``on_mount``,
+    ``render``, ``show_tag`` and its current ``_card_text`` — no ``_nodes`` or
+    ``_context`` (or any other ``Widget`` private) name is introduced.
     """
 
     DEFAULT_CSS = """
@@ -1542,6 +1543,30 @@ class A2LDetailCard(Static):
         border-bottom: solid $panel;
     }
     """
+
+    def on_mount(self) -> None:
+        """Paint the placeholder and keep wrapped text clear of scrollbars."""
+        self.show_vertical_scrollbar = False
+        self.show_tag(None)
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Rewrap the current card text at its measured content width."""
+        super().on_resize(event)
+        if hasattr(self, "_card_text"):
+            self._rewrite_card_text()
+
+    def _rewrite_card_text(self) -> None:
+        """Write the current text with wrap and paint using one width."""
+        self.clear()
+        width = self.scrollable_content_region.width
+        if width:
+            self.write(self._card_text, width=width)
+        else:
+            self.write(self._card_text)
+
+    def render(self) -> Text:
+        """Return the card's current text for the existing Static-era callers."""
+        return getattr(self, "_card_text", _a2l_detail_card_text(None))
 
     def show_tag(self, tag: Optional[dict]) -> None:
         """
@@ -1556,8 +1581,8 @@ class A2LDetailCard(Static):
             None
 
         Data Flow:
-            - Delegates composition to :func:`_a2l_detail_card_text` and calls
-              ``Static.update`` with the resulting ``Text``.
+            - Delegates composition to :func:`_a2l_detail_card_text`, clears the
+              log and writes the resulting ``Text`` with markup disabled.
 
         Dependencies:
             Uses:
@@ -1565,7 +1590,8 @@ class A2LDetailCard(Static):
             Used by:
                 - on_data_table_row_highlighted
         """
-        self.update(_a2l_detail_card_text(tag))
+        self._card_text = _a2l_detail_card_text(tag)
+        self._rewrite_card_text()
 
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
@@ -8740,9 +8766,11 @@ class S19TuiApp(App):
         )
         _hex_pane = Container(
             A2LDetailCard(
-                _a2l_detail_card_text(None),
                 id="a2l_detail_card",
                 markup=False,
+                wrap=True,
+                min_width=1,
+                auto_scroll=False,
             ),
             Label("Hex Viewer", id="alt_hex_title"),
             Container(

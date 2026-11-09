@@ -24,6 +24,7 @@ the case's terminal width.
 """
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import time
@@ -33,6 +34,7 @@ from typing import Optional
 
 import pytest
 from rich.cells import cell_len
+from rich.text import Text
 from textual.coordinate import Coordinate
 from textual.widgets import Button, DataTable, Input
 
@@ -43,7 +45,7 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
-from tests.support.timing import wait_until
+from tests.support.timing import report_margin, wait_until
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +93,7 @@ def name_of(prefix: str, n: int) -> str:
 def map_block(name: str, display_identifier: Optional[str] = None) -> str:
     disp = f"  DISPLAY_IDENTIFIER {display_identifier}\n" if display_identifier else ""
     return f"""/begin CHARACTERISTIC {name} "synthetic map"
-{disp}  MAP 0x{ADDR:08X} RL_SYN_MAP 4095 CM_SYN 0 4095
+  MAP 0x{ADDR:08X} RL_SYN_MAP 4095 CM_SYN 0 4095
   /begin AXIS_DESCR
     FIX_AXIS NO_INPUT_QUANTITY CM_SYN {NX} 0 {NX - 1}
     FIX_AXIS_PAR 0 1 {NX}
@@ -100,14 +102,15 @@ def map_block(name: str, display_identifier: Optional[str] = None) -> str:
     FIX_AXIS NO_INPUT_QUANTITY CM_SYN {NY} 0 {NY - 1}
     FIX_AXIS_PAR 0 1 {NY}
   /end AXIS_DESCR
-/end CHARACTERISTIC
+{disp}/end CHARACTERISTIC
 """
 
 
-def meas(name: str, addr: int, dtype: str = "UWORD", length: Optional[int] = None) -> str:
+def meas(name: str, addr: int, dtype: Optional[str] = "UWORD", length: Optional[int] = None) -> str:
     hexdig = max(8, len(f"{addr:X}"))
+    dt = f"  {dtype} CM_SYN 0 0 0 65535\n" if dtype is not None else ""
     extra = f"  LENGTH {length}\n" if length is not None else ""
-    return (f'/begin MEASUREMENT {name} "synthetic"\n  {dtype} CM_SYN 0 0 0 65535\n'
+    return (f'/begin MEASUREMENT {name} "synthetic"\n{dt}'
             f"  ECU_ADDRESS 0x{addr:0{hexdig}X}\n{extra}/end MEASUREMENT\n")
 
 
@@ -125,7 +128,7 @@ def page64(n: int, wide16: bool = False) -> str:
     """PAGE64(n) — F's page: the MAP, a 64-bit MEASUREMENT, a 1 MiB-length
     MEASUREMENT; PAGE64W adds the 16-digit-address MEASUREMENT."""
     body = (map_block(name_of("SYN_MAP_", n)) + meas(name_of("SYN_V64_", n), ADDR64)
-            + meas(name_of("SYN_BIG_", n), 0x1000, "UBYTE", 1048576))
+            + meas(name_of("SYN_BIG_", n), 0x1000, None, 1048576))
     if wide16:
         body += meas(name_of("SYN_W16_", n), ADDR16)
     return HEAD + body + TAIL
@@ -269,7 +272,9 @@ def _explore(tmp_path: Path, a2l_text: str, size: tuple[int, int], scenario, *, 
         if scrolled:
             table.scroll_to(x=table.max_scroll_x, animate=False)
             await _settle(pilot, 10)
-        await scenario(app, pilot, table)
+        result = scenario(app, pilot, table)
+        if inspect.isawaitable(result):
+            await result
 
     projects.run_app(base, _run, size=size)
 
@@ -339,15 +344,16 @@ def _cell_span(geom, col_index: int) -> tuple[int, int]:
     return a, geom.xs[col_index] - geom.sx + geom.cols[col_index][1]
 
 
-def _painted_tag_cell(table, geom, row_index: int) -> tuple[str, int]:
+def _painted_tag_cell(table, geom, row_index: int) -> Optional[tuple[str, int]]:
     """The Tag cell as actually painted on ``row_index``: ``(text, end_x)`` —
     the visible painted text (padding stripped) and the x of its last painted
-    character, both read from the rendered line. This is R-TUI-042a.5's
-    painted-result oracle: stored cell length plus x is not a painted result."""
+    character, both read from the rendered line; ``None`` when the row is
+    vertically off-screen. This is R-TUI-042a.5's painted-result oracle:
+    stored cell length plus x is not a painted result."""
     lines = _painted_lines(table)
     y = 1 + row_index - geom.sy
     if y < 1 or y >= len(lines) - 1:
-        return "", -1
+        return None
     line = lines[y]
     a, b = _cell_span(geom, geom.idx["Tag"])
     a = max(0, a)
@@ -363,12 +369,14 @@ def _painted_tag_cell(table, geom, row_index: int) -> tuple[str, int]:
 
 
 def _assert_painted_tag_cell(table, geom, row_index: int, want: str) -> None:
-    """The painted Tag cell (when its row is on screen) reads exactly ``want``
-    — glyph, ``…`` and suffix included — and its last painted character lies
-    inside the visible width. Off-screen rows paint nothing and are skipped."""
-    painted, end = _painted_tag_cell(table, geom, row_index)
-    if painted == "" and end == -1:
-        return  # off-screen row: nothing painted to assert
+    """The painted Tag cell reads exactly ``want`` — glyph, ``…`` and suffix
+    included — and its last painted character lies inside the visible width.
+    Only a vertically off-screen row is skipped; an on-screen blank or fully
+    clipped Tag cell is a failure, not a skip."""
+    result = _painted_tag_cell(table, geom, row_index)
+    if result is None:
+        return  # vertically off-screen row: nothing paints to assert
+    painted, end = result
     assert painted == want, (row_index, painted, want)
     assert end != -1 and end + 1 <= geom.visible, (row_index, end, geom.visible)
 
@@ -419,9 +427,11 @@ _GLUED = ("0x1C2D3E002266", "SYN_MAP_W0x1C2D3E00", "17921792", "unknown0..")
 
 
 def _assert_adjacent_cell_gaps(table, geom, row_index: int) -> None:
-    """Every adjacent pair of columns both fully on screen paints its two cells
-    with at least one blank column between them (R-TUI-042a.2's gap, read from
-    the painted line — not from stored geometry alone)."""
+    """Every adjacent pair of columns both painting on screen has at least one
+    blank column between them (R-TUI-042a.2's gap, read from the painted line —
+    not from stored geometry alone). Each cell's span is clipped to the
+    viewport, so a partially visible right-hand cell (the 80-column Source
+    example) is checked on its visible part, not skipped."""
     lines = _painted_lines(table)
     y = 1 + row_index - geom.sy
     if y < 1 or y >= len(lines) - 1:
@@ -430,8 +440,12 @@ def _assert_adjacent_cell_gaps(table, geom, row_index: int) -> None:
     for i in range(len(geom.xs) - 1):
         a_i, b_i = _cell_span(geom, i)
         a_j, b_j = _cell_span(geom, i + 1)
-        if a_i < 0 or b_j > geom.visible:
-            continue  # not both fully on screen
+        a_i = max(0, a_i)
+        b_i = min(b_i, geom.visible)
+        a_j = max(0, a_j)
+        b_j = min(b_j, geom.visible)
+        if a_i >= b_i or a_j >= b_j:
+            continue  # one cell paints nothing here
         left = line[a_i:b_i].rstrip(" ")
         right = line[a_j:b_j].lstrip(" ")
         if not left or not right:
@@ -573,8 +587,9 @@ def test_r_tui_042a_4_3_widest_address_at_80(tmp_path: Path) -> None:
     unscrolled and scrolled fully right, every Length whole."""
     def _check(app, pilot, table):
         geom = _geom(table)
-        cells0 = table.get_row_at(0)
-        assert cells0[0].plain == ADDR16_STR, cells0[0].plain
+        assert table.row_count == 4, table.row_count
+        widest = table.get_row_at(3)
+        assert widest[0].plain == ADDR16_STR, widest[0].plain
         for r in range(table.row_count):
             cells = table.get_row_at(r)
             assert cells[0].plain in (ADDR_STR, ADDR64_STR, ADDR_0x1000_STR, ADDR16_STR)
@@ -705,7 +720,9 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "start fit", timeout=30)
         geom = _geom(table)
         assert geom.w == 84, geom.w
-        assert table.get_row_at(0)[geom.idx["Tag"]].plain == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+        cell = table.get_row_at(0)[geom.idx["Tag"]].plain
+        assert cell == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+        _assert_painted_tag_cell(table, geom, 0, cell)
         await pilot.resize_terminal(80, 54)
         await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "220→80 fit", timeout=30)
         geom = _geom(table)
@@ -717,7 +734,9 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "80→220 fit", timeout=30)
         geom = _geom(table)
         assert geom.w == 84, geom.w
-        assert table.get_row_at(0)[geom.idx["Tag"]].plain == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+        cell = table.get_row_at(0)[geom.idx["Tag"]].plain
+        assert cell == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+        _assert_painted_tag_cell(table, geom, 0, cell)
         assert table.cursor_row == 0
 
     _explore(tmp_path, page_long(48), (220, 60), _check)
@@ -935,21 +954,25 @@ def _build_cell(tmp_path: Path, name: str, width: int):
     return cells[2].plain, time.perf_counter() - start
 
 
+@pytest.mark.serial_timing
 def test_r_tui_042a_6_1_zero_width_tail(tmp_path: Path) -> None:
     """R-TUI-042a.6 case /1: a 47-char ASCII name + 4,000 then 16,000 × U+200B —
     one ``_build_a2l_table_cells(tag, 14)`` call each, under 1 s, 6 + ``…`` + 7 × U+FFFD."""
     for tail_len in (4_000, 16_000):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + "\u200b" * tail_len, 14)
         assert elapsed < 1.0, elapsed
+        report_margin("R-TUI-042a.6/1 cell build", elapsed, 1.0)
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
 
 
+@pytest.mark.serial_timing
 def test_r_tui_042a_6_2_combining_and_esc_tails(tmp_path: Path) -> None:
     """R-TUI-042a.6 case /2: the same name + 16,000 × U+0301, then + 16,000 × ESC —
     the /1 form, no U+0301 and no ESC in the cell."""
     for tail_char in ("\u0301", "\x1b"):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + tail_char * 16_000, 14)
         assert elapsed < 1.0, elapsed
+        report_margin("R-TUI-042a.6/2 cell build", elapsed, 1.0)
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
         assert "\u0301" not in plain and "\x1b" not in plain, repr(plain)
 
@@ -1071,14 +1094,25 @@ async def _assert_card_painted_then_safe(
     app, pilot, projected: str, *, scroll: bool = False
 ) -> None:
     """Positive-first (R-TUI-042a.7.1): prove ``projected`` — the value's
-    control-free projection — is actually painted in the card's visible lines
-    (scrolling to the end first when it lives below the 5 visible rows), then
-    every card text line holds no control character and the screen output
-    holds none of the four hostile introducers."""
+    control-free projection — is actually painted (scrolling to the end with an
+    asserted nonzero effective scroll first when it lives below the card's
+    visible rows), then every card text line holds no control character and the
+    screen output holds none of the four hostile introducers."""
     card = _card(app)
     if scroll:
-        card.scroll_end(animate=False)
+        full = card.render().plain
+        assert "byteorder " in full, full
+        assert "limits " in full, full
+        assert card.max_scroll_y > 0, card.max_scroll_y
+        card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
         await _settle(pilot, 6)
+        assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+        screen = _screen_output(app)
+        painted = Text.from_ansi(screen).plain
+        assert projected in painted, (projected, painted)
+        _assert_card_lines_clean(full)
+        _assert_no_introducers(screen)
+        return
     painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
     joined = "".join(painted)
     assert projected in joined, (projected, joined)
@@ -1182,7 +1216,7 @@ def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0].startswith("✓ SYN_DISP_C"), lines
-        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
         assert start is not None, lines
         assert scrubbed in "".join(lines[start:]), (scrubbed, lines[start:])
         _assert_card_lines_clean(card.render().plain)
@@ -1244,7 +1278,7 @@ def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> N
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
-        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
         assert start is not None, lines
         assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
 
