@@ -10,7 +10,7 @@ Base: `aa7f871c` (`batch-103`, Inc 11 integrated). Approved graph: `codewire/gra
 
 ## Environment and evidence
 
-- Runner: `<runner>@<runner-ip>` (cachyos-rtx), Python `/home/<runner>/miniconda3/envs/s19ci/bin/python` 3.11.18.
+- Runner: `<runner>@<runner-ip>` (<runner>), Python `/home/<runner>/miniconda3/envs/s19ci/bin/python` 3.11.18.
 - Implementer scratch: `/tmp/b103-e4-3a-impl/tree`.
 - Tester scratch: `/tmp/b103-e4-3a-tests/tree`.
 - Use `python -I -B` with explicit `sys.path.insert(0, scratch)`, isolated HOME/XDG/LOCALAPPDATA under `zq_iso_user`, closed stdin, `PYTHONDONTWRITEBYTECODE=1`. Print `s19_app.__file__` at the start of every transcript.

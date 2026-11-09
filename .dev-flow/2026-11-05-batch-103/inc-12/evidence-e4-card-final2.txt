@@ -1,0 +1,176 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F..FF                                                                    [100%]
+=================================== FAILURES ===================================
+_________________ test_r_tui_042a_3_4_card_keeps_the_full_name _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-222/test_r_tui_042a_3_4_card_keeps0')
+
+    def test_r_tui_042a_3_4_card_keeps_the_full_name(tmp_path: Path) -> None:
+        """R-TUI-042a.3 case /4: LONGMAP(48) at 118×54 — the card's painted lines
+        hold the 48-character name whole and one line holds the address whole."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert longname(48) in joined, (longname(48), joined)
+            assert any(ADDR_STR in ln for ln in lines), lines
+    
+>       _explore(tmp_path, page_long(48), (118, 54), _check)
+
+tests/test_b103_inc12_tag_table.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:279: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:277: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert longname(48) in joined, (longname(48), joined)
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', '✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map')
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in '✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+
+tests/test_b103_inc12_tag_table.py:542: AssertionError
+___________ test_r_tui_042a_8_1_name_line_with_a_display_identifier ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-222/test_r_tui_042a_8_1_name_line_0')
+
+    def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.8 case /1: LONGMAP(48) with ``DISPLAY_IDENTIFIER SYN_DISP_W`` —
+        first line ``✓ SYN_DISP_W  0x1C2D3E00``; the painted Name line and its
+        painted continuations hold the full 48-character name (never read from
+        ``card.render().plain``)."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
+            start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
+            assert start is not None, lines
+            assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
+    
+>       _explore(tmp_path, HEAD + map_block(longname(48), display_identifier="SYN_DISP_W") + TAIL,
+                 (118, 54), _check)
+
+tests/test_b103_inc12_tag_table.py:1281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:279: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:277: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
+        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
+        assert start is not None, lines
+>       assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', ['name', 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL', 'LL_END'])
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'nameSYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+E        +  and   'nameSYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = <built-in method join of str object at 0x55a05d3d4d20>(['name', 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL', 'LL_END'])
+E        +    where <built-in method join of str object at 0x55a05d3d4d20> = ''.join
+
+tests/test_b103_inc12_tag_table.py:1279: AssertionError
+________ test_r_tui_042a_8_2_no_name_line_without_a_display_identifier _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-222/test_r_tui_042a_8_2_no_name_li0')
+
+    def test_r_tui_042a_8_2_no_name_line_without_a_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.8 case /2: LONGMAP(48) with no display identifier — the header
+        holds the name across the wrap, and no line starts with ``name``."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert longname(48) in joined, (longname(48), joined)
+            plain = card.render().plain
+            assert not any(ln.startswith("name ") for ln in plain.split("\n")), plain
+    
+>       _explore(tmp_path, page_long(48), (118, 54), _check)
+
+tests/test_b103_inc12_tag_table.py:1296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:279: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:277: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert longname(48) in joined, (longname(48), joined)
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', '✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map')
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in '✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+
+tests/test_b103_inc12_tag_table.py:1292: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_2_no_name_line_without_a_display_identifier
+3 failed, 2 passed in 34.34s
