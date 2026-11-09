@@ -1,0 +1,51 @@
+Done. Executed the brief exactly; here is the evidence-backed result.
+
+## What I changed (all six named targets)
+
+| File | Change |
+|---|---|
+| `tests/support/b103_a2l_ref.py` | inline axis-count/span now uses the full `_KIND_FAMILY` (CURVE, MAP, CUBOID, CUBE_4, CUBE_5), not just `("CURVE", "MAP")` |
+| `tests/fixtures/b103_i11/e07fb00_tags.jsonl` | only `ASAM.C.CUBOID.ROW_DIR` → `class="D8"`, `length=36`; address 8455472 and all other tags untouched |
+| `tests/test_b103_a2l_reader.py` | READ.49/1 → 234,426 / 228; READ.49/2 → 8/8 with a hand-written D8 CUBOID reduction (span 36) |
+| `tests/test_id_registry.py` | `EXPECTED_SCANNED_TEST_FILES = 276` + comment (Inc 11 E5 added `test_b103_a2l_reader_e5.py`) |
+| `inc-11/01-requirements.md` | READ.49 threshold, D8 class text, CUBOID defect-table row, count paragraph → 228 / 234,426 |
+| `inc-11/02-test-cases.md` | READ.49/1 and /2 rows updated for D8, 228 / 234,426, 8/8 |
+
+`py_compile` passed on all three changed Python files on this PC.
+
+## Test run (cachyos-rtx, s19ci Python, isolated env, closed stdin)
+
+```
+1 failed, 3 passed in 40.30s
+PYTEST_EXIT_CODE=1
+```
+
+- `test_r_a2l_read_48_tracked_files_equal_ref` — ✅ pass
+- `test_r_a2l_read_49_2_defect_classes_hand_written` — ✅ pass (D8 reduction gives length 36)
+- `test_tc607_scanned_corpus_matches_the_declared_bound` — ✅ pass (276)
+- `test_r_a2l_read_49_no_regression` — ❌ **fail**
+
+Transcript saved to `inc-11/evidence-e5/test-consistency-green.txt` (exit code 1, not green).
+
+## Remaining CUBOID difference (reported, not edited — per the brief)
+
+The product (P13, full family) produces length **36** for a *second* tag the brief did not list:
+
+```
+ASAP2_Demo_V171.a2l  ASAM.C.CUBOID.COLUMN_DIR  actual_len=36  golden_len=None  rl=RL.CUBOID.COLUMN_DIR
+```
+
+I verified the full CUBOID/CUBE set on the runner with the tree's own `s19_app`:
+
+| Tag | product | golden | status |
+|---|---|---|---|
+| CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS | None | None | ✅ (external axis, unresolvable) |
+| **CUBOID.ROW_DIR** | 36 | 36 | ✅ (D8, updated) |
+| **CUBOID.COLUMN_DIR** | 36 | **None** | ❌ **remaining diff** |
+| CUBE_4.ROW_DIR / COLUMN_DIR | None | None | ✅ (`NO_AXIS_PTS_4`/`AXIS_PTS_4` unmodeled → span None) |
+
+**Reading:** `CUBOID.COLUMN_DIR` uses the identical 3-axis layout shape as `ROW_DIR` (RL.CUBOID.COLUMN_DIR: 3×NO_AXIS_PTS + 9 SBYTE axis points + 24 SBYTE FNC_VALUES), so P13 legitimately changes it too. The brief's ruling and count only accounted for `ROW_DIR`.
+
+**Measurable implication:** the true numbers are **229 defect tags / 234,425 identical**, not 228 / 234,426 — unless `COLUMN_DIR` is deliberately excluded (there is no code basis to exclude it; it is a CUBOID in `_CURVE_MAP_FAMILY`).
+
+Per your final instruction I did **not** edit the `COLUMN_DIR` golden expectation, did not touch product code, and did not commit. If you want the four nodes green, the minimal delta is: also mark `ASAM.C.CUBOID.COLUMN_DIR` as `class="D8"`, `length=36` in the fixture and bump the READ.49 numbers to 229 / 234,425 — but that's a scope decision for you, not something I applied unilaterally.

@@ -1,0 +1,26 @@
+s19_app.__file__ = /tmp/b103-e5-11-int7/tree/s19_app/__init__.py
+commit = 21a0c56bb166fc8a6676f0ad8792bff5a645ce3a
+run_start = 2026-11-08T19:50:43-06:00
+command = tests/test_a2l_multiline_headers.py tests/test_b101_a2l_blocks_and_segments.py tests/test_tui_a2l_issue_recolor.py tests/test_b100_a2l_progress.py tests/test_tui_directionb.py tests/test_tui_issues_triage_b94.py -n 8
+================================================================
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/b103-e5-11-int7/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 8/8 workers
+8 workers [390 items]
+
+........................................................................ [ 18%]
+........................................................................ [ 36%]
+........................................................................ [ 55%]
+........................................................................ [ 73%]
+........................................................................ [ 92%]
+..................s...........                                           [100%]
+============================= QC-TM timing margins =============================
+99.8%  0.011 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+QC-TM: 1 bounds, 0 under 20 % margin
+================== 389 passed, 1 skipped in 111.30s (0:01:51) ==================
+PYTEST_EXIT_CODE = 0
+================================================================
+run_end = 2026-11-08T19:52:35-06:00

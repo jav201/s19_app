@@ -189,7 +189,9 @@ from tools.id_registry import (
 # batch-103 Inc 11 E4 (tester): +3 (tests/test_b103_a2l_reader.py,
 # tests/test_b103_a2l_reader_perf.py, tests/support/b103_a2l_ref.py); 272 -> 275,
 # to be re-measured by the guard on the LAN Linux host.
-EXPECTED_SCANNED_TEST_FILES = 275
+# batch-103 Inc 11 E5 (tester): +1 (tests/test_b103_a2l_reader_e5.py); 275 -> 276,
+# measured with ``scanned_test_files()``.
+EXPECTED_SCANNED_TEST_FILES = 276
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

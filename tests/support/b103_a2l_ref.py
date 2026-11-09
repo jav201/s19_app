@@ -1179,9 +1179,10 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
     else:
         element_size = _characteristic_element_size(kind, deposit, layouts)
 
-    # Inline axis counts for a CURVE/MAP (the span and the length both need it).
+    # Inline axis counts for the full _KIND_FAMILY (CURVE, MAP, CUBOID,
+    # CUBE_4 and CUBE_5) — the span and the length both need it (P13).
     axis_counts = None
-    if kind in ("CURVE", "MAP"):
+    if kind in _KIND_FAMILY:
         axis_counts = _axis_counts(section)
 
     span = None

@@ -1714,7 +1714,7 @@ def _load_fixture() -> List[dict]:
 
 
 def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
-    """R-A2L-READ.49/1: 234,427 tags identical; 227 defect tags take their values."""
+    """R-A2L-READ.49/1: 234,425 tags identical; 229 defect tags take their values."""
     if not FIXTURE_PATH.exists():
         pytest.skip("e07fb00 fixture not yet generated on the runner")
     fixture = _load_fixture()
@@ -1738,7 +1738,7 @@ def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
 
 def test_r_a2l_read_49_2_defect_classes_hand_written(tmp_path: Path) -> None:
     """R-A2L-READ.49/2: each defect class on a synthetic reduction with
-    hand-written values (independent of REF), 7/7 classes."""
+    hand-written values (independent of REF), 8/8 classes."""
     # D1 (RP-B15): a MEASUREMENT header over commented lines.
     d1 = _parse(
         tmp_path,
@@ -1792,6 +1792,32 @@ def test_r_a2l_read_49_2_defect_classes_hand_written(tmp_path: Path) -> None:
     # D7 (.57/2): MEASUREMENT sized by ARRAY_SIZE.
     d7 = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10", " ARRAY_SIZE 4")))
     assert _tag(d7, "X")["length"] == 8
+
+    # D8 (P13): CUBOID sized by its full record-layout span (36 bytes).
+    d8 = _parse(
+        tmp_path,
+        _body(
+            "/begin RECORD_LAYOUT RL_CUBOID\n"
+            "NO_AXIS_PTS_X 1 UBYTE\n"
+            "NO_AXIS_PTS_Y 2 UBYTE\n"
+            "NO_AXIS_PTS_Z 3 UBYTE\n"
+            "AXIS_PTS_X 4 SBYTE INDEX_INCR DIRECT\n"
+            "AXIS_PTS_Y 5 SBYTE INDEX_INCR DIRECT\n"
+            "AXIS_PTS_Z 6 SBYTE INDEX_INCR DIRECT\n"
+            "FNC_VALUES 7 SBYTE ROW_DIR DIRECT\n"
+            "/end RECORD_LAYOUT\n"
+            + char(
+                "CUB8",
+                "CUBOID",
+                "0x3000",
+                "RL_CUBOID",
+                " /begin AXIS_DESCR\n  STD_AXIS\n  AX\n  CM_ID\n  2\n  -128 127\n /end AXIS_DESCR",
+                " /begin AXIS_DESCR\n  STD_AXIS\n  AX\n  CM_ID\n  3\n  -128 127\n /end AXIS_DESCR",
+                " /begin AXIS_DESCR\n  STD_AXIS\n  AX\n  CM_ID\n  4\n  -128 127\n /end AXIS_DESCR",
+            )
+        ),
+    )
+    assert _tag(d8, "CUB8", "CHARACTERISTIC")["length"] == 36
 
 
 # ===========================================================================

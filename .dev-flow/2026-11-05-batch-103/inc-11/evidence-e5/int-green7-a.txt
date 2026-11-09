@@ -1,0 +1,93 @@
+s19_app.__file__ = /tmp/b103-e5-11-int7/tree/s19_app/__init__.py
+commit = 21a0c56bb166fc8a6676f0ad8792bff5a645ce3a
+run_start = 2026-11-08T19:49:40-06:00
+command = tests/test_b103_a2l_reader.py tests/test_b103_a2l_reader_e5.py -n 8
+================================================================
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/b103-e5-11-int7/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 8/8 workers
+8 workers [206 items]
+
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+..........FF..................................................           [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_read_48_tracked_files_equal_ref __________________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+ref = <function ref_read_a2l at 0x7f8abcb0c220>
+
+    def test_r_a2l_read_48_tracked_files_equal_ref(ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.48/1: the 35 tracked files equal the reference reading."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            data = parse_a2l_file(path)
+            reading = ref(text)
+            _assert_sections_equal(data["sections"], reading["sections"])
+>           _assert_tags_equal(data["tags"], reading["tags"])
+
+tests/test_b103_a2l_reader.py:1641: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_tags = [{'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_m...'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, ...]
+ref_tags = [{'address': 80384, 'axis_counts': None, 'bit_mask': None, 'byte_order': 'little', ...}, {'address': 80384, 'axis_coun...te_order': 'little', ...}, {'address': 80384, 'axis_counts': None, 'bit_mask': None, 'byte_order': 'little', ...}, ...]
+
+    def _assert_tags_equal(reader_tags: list, ref_tags: list) -> None:
+        def key(t: dict) -> tuple:
+            return (t.get("section"), t.get("name"))
+    
+        reader = {key(t): t for t in reader_tags}
+        ref = {key(t): t for t in ref_tags}
+        assert set(reader) == set(ref)
+        for k in reader:
+>           assert _reader_to_ref(reader[k]) == _ref_native(ref[k]), (k, _reader_to_ref(reader[k]), _ref_native(ref[k]))
+E           AssertionError: (('CHARACTERISTIC', 'ASAM.C.CUBOID.ROW_DIR'), {'address': 8455472, 'bit_mask': None, 'byte_order': 'little', 'conversi...CM.IDENTICAL', ...}, {'address': 8455472, 'bit_mask': None, 'byte_order': 'little', 'conversion': 'CM.IDENTICAL', ...})
+E           assert {'address': 8...ENTICAL', ...} == {'address': 8...ENTICAL', ...}
+E             
+E             Omitting 11 identical items, use -vv to show
+E             Differing items:
+E             {'length': 36} != {'length': None}
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:1680: AssertionError
+_______________________ test_r_a2l_read_49_no_regression _______________________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-48/popen-gw3/test_r_a2l_read_49_no_regressi0')
+
+    def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
+        """R-A2L-READ.49/1: 234,427 tags identical; 227 defect tags take their values."""
+        if not FIXTURE_PATH.exists():
+            pytest.skip("e07fb00 fixture not yet generated on the runner")
+        fixture = _load_fixture()
+        total_tags = 0
+        for entry in fixture:
+            path = REPO_ROOT / entry["file"]
+            data = parse_a2l_file(path)
+            assert len(data["tags"]) == entry["tag_count"], entry["file"]
+            expected = {(t["section"], t["name"]): t for t in entry["tags"]}
+            for tag in data["tags"]:
+                key = (tag["section"], tag["name"])
+                assert key in expected, (entry["file"], key)
+                want = expected[key]
+>               assert _six_fields(tag) == (
+                    want["name"], want["address"], want["length"], want["datatype"],
+                    want["byte_order"], want["bit_mask"],
+                ), (entry["file"], key)
+E               AssertionError: ('examples/case_00_public/ASAP2_Demo_V171.a2l', ('CHARACTERISTIC', 'ASAM.C.CUBOID.ROW_DIR'))
+E               assert ('ASAM.C.CUBO...little', None) == ('ASAM.C.CUBO...little', None)
+E                 
+E                 At index 2 diff: 36 != None
+E                 Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:1731: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_49_no_regression - Asse...
+======================== 2 failed, 204 passed in 53.84s ========================
+PYTEST_EXIT_CODE = 1
+================================================================
+run_end = 2026-11-08T19:50:35-06:00

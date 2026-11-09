@@ -1,0 +1,20 @@
+s19_app.__file__ = /tmp/b103-e5-11-int7/tree/s19_app/__init__.py
+commit = 21a0c56bb166fc8a6676f0ad8792bff5a645ce3a
+run_start = 2026-11-08T19:50:35-06:00
+command = tests/test_b103_a2l_definition.py tests/test_b103_synth_definitions.py -n 8
+================================================================
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/b103-e5-11-int7/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 8/8 workers
+8 workers [200 items]
+
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+........................................................                 [100%]
+============================= 200 passed in 7.95s ==============================
+PYTEST_EXIT_CODE = 0
+================================================================
+run_end = 2026-11-08T19:50:43-06:00

@@ -22,6 +22,10 @@ Each item must first produce a behavioral RED on `f1397097` through the relevant
 - **P14 — unclosed declared sections (design addendum required).** Before code, add an explicit requirement/case: an unclosed BLOB/INSTANCE exports no usable address or length, and an unclosed typedef cannot size an INSTANCE. Assign R-A2L-READ.70 and update the graph and test-case ledger. This is a security/consumer-contract correction; do not silently change only code.
 - **P15 — final tag-length refusal cannot be re-derived inline.** Mutant B M09 proves that removing the refused-length guard lets a MAP with `LENGTH 0` and an inline STD_AXIS recover length 13. Add the direct synthetic case and keep the inline-span pass subordinate to R-A2L-READ.61's final refusal.
 
+## P13 test-oracle and golden consistency
+
+Run 7 proves the intended CUBOID behavior: both `ASAM.C.CUBOID.ROW_DIR` and `ASAM.C.CUBOID.COLUMN_DIR` now have a complete record-layout span of 36 bytes (24 FNC_VALUES bytes plus axis components). Reverting P13 would violate the approved size rule. Add defect class **D8** for both tags: `length=None` at e07fb00 becomes 36. This makes **229 defect tags**, with **234,425 identical tags**. The reference oracle computes inline axis counts for the full `_CURVE_MAP_FAMILY`, and both golden entries take `class="D8"`, `length=36`. READ.49/2 adds a hand-written CUBOID reduction. `EXPECTED_SCANNED_TEST_FILES` becomes **276** after the new E5 test module. These are intentional test/record updates, not a product rollback.
+
 ## Coverage findings accepted
 
 - Correct the two AT matrix node ids to the real functions; their `full/covered/verified` status stands.
