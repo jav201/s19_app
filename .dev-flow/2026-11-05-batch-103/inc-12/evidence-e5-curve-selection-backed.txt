@@ -1,0 +1,8 @@
+A2L section tree has structural errors: path=/tmp/b103-e4-12-27fb/e07/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+/tmp/b103-e4-12-27fb/e07/s19_app/__init__.py
+backed=0 population=3 file=examples/case_00_public/ASAP2_Demo_V161.a2l
+backed=0 population=5 file=examples/case_00_public/ASAP2_Demo_V171.a2l
+backed=0 population=151 file=examples/case_00_public/software_a.a2l
+backed=0 population=2 file=examples/case_00_public/update_test1.a2l
+backed=0 population=1 file=examples/case_00_public/update_test2.a2l
+selected=none
