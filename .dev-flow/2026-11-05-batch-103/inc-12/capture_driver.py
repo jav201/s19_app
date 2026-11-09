@@ -198,11 +198,12 @@ def main() -> int:
     def name_of(prefix: str, n: int) -> str:
         return (prefix + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" * 4)[:n]
 
-    def meas(name: str, addr: int, dtype: str = "UWORD", length: int | None = None) -> str:
+    def meas(name: str, addr: int, dtype: str | None = "UWORD", length: int | None = None) -> str:
         hexdig = max(8, len(f"{addr:X}"))
         extra = f"  LENGTH {length}\n" if length is not None else ""
+        header = f"  {dtype} CM_SYN 0 0 0 65535\n" if dtype is not None else ""
         return (
-            f'/begin MEASUREMENT {name} "synthetic"\n  {dtype} CM_SYN 0 0 0 65535\n'
+            f'/begin MEASUREMENT {name} "synthetic"\n{header}'
             f"  ECU_ADDRESS 0x{addr:0{hexdig}X}\n{extra}/end MEASUREMENT\n"
         )
 
@@ -213,7 +214,7 @@ def main() -> int:
         body = (
             map_block(name_of("SYN_MAP_", n))
             + meas(name_of("SYN_V64_", n), ADDR64)
-            + meas(name_of("SYN_BIG_", n), 0x1000, "UBYTE", 1048576)
+            + meas(name_of("SYN_BIG_", n), 0x1000, None, 1048576)
         )
         return HEAD + body + TAIL
 
@@ -393,7 +394,7 @@ def main() -> int:
                             f"mid-scroll surface has no horizontal scroll "
                             f"(max_scroll_x={max_scroll_x})"
                         )
-                    target = max_scroll_x // 2
+                    target = min(25, max_scroll_x)
                     if target <= 0:
                         raise AssertionError(
                             f"mid-scroll target is not positive (target={target})"
