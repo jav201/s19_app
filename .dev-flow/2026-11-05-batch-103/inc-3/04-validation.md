@@ -49,6 +49,8 @@ Final command on committed Linux clone `1452c838afe6`: `trace_check.py --req .de
 
 **Result: 1 US, 85 active requirements, 12 gaps.** All 12 are TEST gaps on the Inc 3b rows R-A2L-DEF.122 … .132 and .140. **0 EVID gaps and 0 gaps on any Inc 3a row.** Transcript: `../evidence/inc-3/evidence-e5-trace-check-final.txt`. The earlier path-convention failure is retained as history in `../evidence/inc-3/evidence-e5-trace-check.txt`.
 
+The integrated `batch-103` merge `3feed9cc9a66` independently repeats **471 passed, 35 deselected** (`../evidence/inc-3/evidence-e5-merge-functional-green.txt`) and the same 12 Inc 3b-only TEST gaps (`../evidence/inc-3/evidence-e5-merge-trace.txt`).
+
 ## Models
 
 Kimi conducted integration, corrections, records and rulings. DeepSeek v4 Pro implemented mechanical product/test/coverage passes, reviews, timing and mutant drivers. Independent functional RED/GREEN, code, security and coverage reviews were used. No source mutation was made in the real worktree and no threshold or assertion was weakened to obtain a pass.
