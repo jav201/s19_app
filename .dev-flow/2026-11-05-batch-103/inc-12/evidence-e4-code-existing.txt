@@ -1,0 +1,2151 @@
+/tmp/b103-e4-12-27fb/code/s19_app/__init__.py
+F.FFF.FFF...........FF.....FFFF..FFF......FFFFFFFFFF............QC-TM-10b-1 case_06: 220040 tags, 1.366 s
+F        [100%]
+=================================== FAILURES ===================================
+__________________________ test_at068_glyph_branches ___________________________
+
+    def test_at068_glyph_branches() -> None:
+        for size in _SIZES:
+    
+            async def _observe(app: S19TuiApp, pilot: object) -> None:
+                names = _name_cells(app)
+                assert any(n.startswith("✓ ") and "RPM" in n for n in names), (
+                    f"expected an in-image ✓ row (RPM); got {names!r}"
+                )
+                assert any(n.startswith("· ") and "COOLANT" in n for n in names), (
+                    f"expected a not-in-image · row (COOLANT); got {names!r}"
+                )
+    
+>           _drive_mixed(size, _observe)
+
+tests/test_tui_a2l_detail.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_tui_a2l_detail.py:179: in _drive_mixed
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_a2l_detail.py:177: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        names = _name_cells(app)
+>       assert any(n.startswith("✓ ") and "RPM" in n for n in names), (
+            f"expected an in-image ✓ row (RPM); got {names!r}"
+        )
+E       AssertionError: expected an in-image ✓ row (RPM); got ['0x00001000', '0x00009000']
+E       assert False
+E        +  where False = any(<generator object test_at068_glyph_branches.<locals>._observe.<locals>.<genexpr> at 0x7f618da6eb20>)
+
+tests/test_tui_a2l_detail.py:220: AssertionError
+_____________________________ test_at069b_c17_card _____________________________
+
+    def test_at069b_c17_card() -> None:
+        for size in _SIZES:
+    
+            async def _observe(app: S19TuiApp, pilot: object) -> None:
+                tag = _hostile_tag("description", _HOSTILE)
+                tag["unit"] = _HOSTILE
+                app._a2l_row_key_to_tag = {"a2l:0": tag}
+                app.on_data_table_row_highlighted(_Evt("a2l_tags_list", "a2l:0"))
+                await pilot.pause()
+                card = app.query_one("#a2l_detail_card", A2LDetailCard)
+                rendered = card.render()
+                plain = rendered.plain
+                for payload in _PAYLOADS:
+                    assert payload in plain, (
+                        f"payload {payload!r} not verbatim in card; got {plain!r}"
+                    )
+                # no style span originates from the payload (the developer styles are
+                # LABEL/VALUE/etc.; a from_markup regression would inject 'red'/'link')
+                styles = " ".join(str(span.style) for span in rendered.spans)
+                assert "link" not in styles and "red" not in styles, (
+                    f"payload-derived style leaked into card spans: {styles!r}"
+                )
+    
+            # a MarkupError inside compose/update would surface as run_test exception
+>           _drive_bare(size, _observe)
+
+tests/test_tui_a2l_detail.py:295: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_tui_a2l_detail.py:201: in _drive_bare
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_a2l_detail.py:199: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        tag = _hostile_tag("description", _HOSTILE)
+        tag["unit"] = _HOSTILE
+        app._a2l_row_key_to_tag = {"a2l:0": tag}
+        app.on_data_table_row_highlighted(_Evt("a2l_tags_list", "a2l:0"))
+        await pilot.pause()
+        card = app.query_one("#a2l_detail_card", A2LDetailCard)
+        rendered = card.render()
+        plain = rendered.plain
+        for payload in _PAYLOADS:
+>           assert payload in plain, (
+                f"payload {payload!r} not verbatim in card; got {plain!r}"
+            )
+E           AssertionError: payload '\x1b[31mX\x1b[0m' not verbatim in card; got '✓ SAFE_NAME  0x00001000\ndesc [red]PWNED[/red][link=http://x]u[/link][31mX[0msensor[unclosed\nunit [red]PWNED[/red][link=http://x]u[/link][31mX[0msensor[unclosed\nbyteorder little\nlimits 0..10'
+E           assert '\x1b[31mX\x1b[0m' in '✓ SAFE_NAME  0x00001000\ndesc [red]PWNED[/red][link=http://x]u[/link][31mX[0msensor[unclosed\nunit [red]PWNED[/red][link=http://x]u[/link][31mX[0msensor[unclosed\nbyteorder little\nlimits 0..10'
+
+tests/test_tui_a2l_detail.py:284: AssertionError
+__________________________ test_at069c_c17_table_name __________________________
+
+    def test_at069c_c17_table_name() -> None:
+        """AT-069c — the hostile NAME renders literally in the table cell.
+    
+        **PORTED, batch-77 Inc-2 (LLR-116.7).** Each payload was asserted present
+        *verbatim*, ANSI included. The C0/C1 class is now removed at ``safe_text``,
+        so the subject is each payload's non-control projection — unchanged for the
+        three markup payloads, and ``'[31mX[0m'`` for ``_P_ANSI``. Both original
+        observables survive: every payload is still asserted present in the cell,
+        and the no-span claim is unchanged. The added absence clause is paired with
+        that presence loop, never asserted alone.
+        """
+        for size in _SIZES:
+    
+            async def _observe(app: S19TuiApp, pilot: object) -> None:
+                tag = _hostile_tag("name", _HOSTILE)
+                app.update_a2l_tags_view([tag])
+                await pilot.pause()
+                table = app.query_one("#a2l_tags_list", DataTable)
+                assert table.row_count == 1, "expected the single hostile row rendered"
+                name_cell = table.get_row_at(0)[0]
+                assert isinstance(name_cell, Text), "table cell must be a Rich Text"
+                plain = name_cell.plain
+                for payload in _PAYLOADS:
+                    assert _scrub(payload) in plain, (
+                        f"payload {payload!r} not verbatim (non-control) in cell; "
+                        f"got {plain!r}"
+                    )
+                # safe_text builds a base-styled Text with NO spans → no payload span
+                assert not name_cell.spans, (
+                    f"hostile name cell grew spans (markup leak): {name_cell.spans!r}"
+                )
+                # LLR-116.7, co-asserted with the presence loop above.
+                assert not any(ord(ch) in _CONTROL for ch in plain), (
+                    f"a control byte reached the table cell: {plain!r}"
+                )
+    
+>           _drive_bare(size, _observe)
+
+tests/test_tui_a2l_detail.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_tui_a2l_detail.py:201: in _drive_bare
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_a2l_detail.py:199: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        tag = _hostile_tag("name", _HOSTILE)
+        app.update_a2l_tags_view([tag])
+        await pilot.pause()
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert table.row_count == 1, "expected the single hostile row rendered"
+        name_cell = table.get_row_at(0)[0]
+        assert isinstance(name_cell, Text), "table cell must be a Rich Text"
+        plain = name_cell.plain
+        for payload in _PAYLOADS:
+>           assert _scrub(payload) in plain, (
+                f"payload {payload!r} not verbatim (non-control) in cell; "
+                f"got {plain!r}"
+            )
+E           AssertionError: payload '[red]PWNED[/red]' not verbatim (non-control) in cell; got '0x00001000'
+E           assert '[red]PWNED[/red]' in '0x00001000'
+E            +  where '[red]PWNED[/red]' = _scrub('[red]PWNED[/red]')
+
+tests/test_tui_a2l_detail.py:328: AssertionError
+________________________ test_cells_are_text_and_glyph _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_cells_are_text_and_glyph0')
+
+    def test_cells_are_text_and_glyph(tmp_path: Path) -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        in_tag = _hostile_tag("name", "IN_TAG")
+        in_tag["in_memory"] = True
+        out_tag = _hostile_tag("name", "OUT_TAG")
+        out_tag["in_memory"] = False
+    
+        in_cells = app._build_a2l_table_cells(in_tag)
+        out_cells = app._build_a2l_table_cells(out_tag)
+    
+        assert len(in_cells) == 16, "the DataTable expects a 16-cell row"
+        assert all(isinstance(cell, Text) for cell in in_cells), "every cell must be Text"
+        assert all(isinstance(cell, Text) for cell in out_cells)
+>       assert in_cells[0].plain.startswith("✓ "), in_cells[0].plain
+E       AssertionError: 0x00001000
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x7f618e584af0>('✓ ')
+E        +    where <built-in method startswith of str object at 0x7f618e584af0> = '0x00001000'.startswith
+E        +      where '0x00001000' = <text '0x00001000' [] '#7dd3fc'>.plain
+
+tests/test_tui_a2l_detail.py:363: AssertionError
+_________ test_at_036a_missing_schema_red_row_has_matching_error_issue _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_036a_missing_schema_re0')
+
+    def test_at_036a_missing_schema_red_row_has_matching_error_issue(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _RECONCILE_A2L)
+    
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            rows = dict(_a2l_row_list(app))
+            assert {"RPM", "BROKEN_CHAR", "NOLEN_CHAR", "VIRT_CHAR"} <= set(rows), (
+                f"A2L table missing expected tag rows; rendered names: {sorted(rows)}"
+            )
+            # Observable 1 — a missing *address* (non-virtual) is the only schema_ok=False
+            # arm: BROKEN_CHAR renders red (_tag_schema_and_applicability address branch).
+            assert all(cell.style == error_style for cell in rows["BROKEN_CHAR"]), (
+                "BROKEN_CHAR (missing address, non-virtual) row is not ERROR-styled"
+            )
+            # Boundary — a valid address with an underivable *length* is spec-valid
+            # (ASAM size is derived), so NOLEN_CHAR must NOT render red — it is
+            # "valid, not memory-checked" (a2l-missing-length-fix batch).
+            assert all(cell.style != error_style for cell in rows["NOLEN_CHAR"]), (
+                "NOLEN_CHAR (missing length, valid address) must NOT render red — "
+                "an underivable length is valid, not a schema failure"
+            )
+            # Boundary — virtual/no-address tag is exempt by construction (virtual branch).
+            assert all(cell.style != error_style for cell in rows["VIRT_CHAR"]), (
+                "VIRT_CHAR (virtual, no address) must NOT render red"
+            )
+            # Observable 2 — Issues surface (rail screen 5) carries the matching ERRORs.
+            app.action_show_screen("issues")
+            await pilot.pause()
+            # C-14 count-guard: whole filtered list fits under the row cap, so the
+            # capped IssueRow read equals the whole list (existence + absence claims
+            # below are then faithful).
+            _assert_within_cap(app)
+            issue_rows = _issue_rows(app)
+            supplemental = [row for row in issue_rows if row[_CODE] == SUPPLEMENTAL_CODE]
+            broken = [row for row in supplemental if row[_SYMBOL] == "BROKEN_CHAR"]
+            nolen = [row for row in supplemental if row[_SYMBOL] == "NOLEN_CHAR"]
+            assert broken, (
+                f"Issues surface has no {SUPPLEMENTAL_CODE} row naming BROKEN_CHAR "
+                f"(red row without an issue — the HLR-036 divergence). "
+                f"Rendered issue rows: {issue_rows!r}"
+            )
+            assert broken[0][_SEV] == ValidationSeverity.ERROR
+            assert "missing address/length" in broken[0][_MESSAGE]
+            assert not nolen, (
+                f"missing-length tag (valid address) must NOT gain a "
+                f"{SUPPLEMENTAL_CODE} issue — its length is derivable-in-spec, not a "
+                f"schema failure; rendered issue rows: {issue_rows!r}"
+            )
+            assert not any(row[_SYMBOL] == "VIRT_CHAR" for row in supplemental), (
+                "virtual-exempt tag must not gain a supplemental issue"
+            )
+    
+>       _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+tests/test_validation_service_supplemental.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_validation_service_supplemental.py:159: in _drive_load
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_validation_service_supplemental.py:157: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        error_style = _severity_style(ValidationSeverity.ERROR)
+        rows = dict(_a2l_row_list(app))
+>       assert {"RPM", "BROKEN_CHAR", "NOLEN_CHAR", "VIRT_CHAR"} <= set(rows), (
+            f"A2L table missing expected tag rows; rendered names: {sorted(rows)}"
+        )
+E       AssertionError: A2L table missing expected tag rows; rendered names: ['0x00001000', '0x00001008', 'n/a']
+E       assert {'BROKEN_CHAR..., 'VIRT_CHAR'} <= {'0x00001000'...01008', 'n/a'}
+E         
+E         Extra items in the left set:
+E         'BROKEN_CHAR'
+E         'NOLEN_CHAR'
+E         'RPM'
+E         'VIRT_CHAR'
+
+tests/test_validation_service_supplemental.py:234: AssertionError
+__________ test_at_036b_already_covered_symbol_gains_no_second_error ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_036b_already_covered_s0')
+
+    def test_at_036b_already_covered_symbol_gains_no_second_error(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _DUP_A2L)
+    
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            dup_rows = [cells for name, cells in _a2l_row_list(app) if name == "DUP_RPM"]
+            assert len(dup_rows) == 2, "expected both DUP_RPM rows rendered"
+            for cells in dup_rows:
+                assert all(cell.style == error_style for cell in cells), (
+                    "schema-bad DUP_RPM row must render red"
+                )
+            app.action_show_screen("issues")
+            await pilot.pause()
+            # C-14 count-guard: whole filtered list fits under the row cap, so the
+            # "exactly one ERROR" and dedup-absence claims below are faithful.
+            _assert_within_cap(app)
+            issue_rows = _issue_rows(app)
+            dup_errors = [
+                row
+                for row in issue_rows
+                if row[_SYMBOL].casefold() == "dup_rpm"
+                and row[_SEV] == ValidationSeverity.ERROR
+            ]
+            assert len(dup_errors) == 1, (
+                f"expected exactly ONE ERROR for DUP_RPM (dedup, LLR-036.2); "
+                f"got {dup_errors!r} out of {issue_rows!r}"
+            )
+            assert dup_errors[0][_CODE] == "A2L_DUPLICATE_SYMBOL"
+            assert not any(
+                row[_CODE] == SUPPLEMENTAL_CODE and row[_SYMBOL].casefold() == "dup_rpm"
+                for row in issue_rows
+            ), "supplemental issue must be suppressed for an already-covered symbol"
+    
+>       _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+tests/test_validation_service_supplemental.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_validation_service_supplemental.py:159: in _drive_load
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_validation_service_supplemental.py:157: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        error_style = _severity_style(ValidationSeverity.ERROR)
+        dup_rows = [cells for name, cells in _a2l_row_list(app) if name == "DUP_RPM"]
+>       assert len(dup_rows) == 2, "expected both DUP_RPM rows rendered"
+E       AssertionError: expected both DUP_RPM rows rendered
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/test_validation_service_supplemental.py:296: AssertionError
+____________ test_at_036c_clean_a2l_yields_zero_supplemental_issues ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_036c_clean_a2l_yields_0')
+
+    def test_at_036c_clean_a2l_yields_zero_supplemental_issues(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _CLEAN_A2L)
+    
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            rows = dict(_a2l_row_list(app))
+            assert {"RPM", "TORQUE"} <= set(rows)
+            for name in ("RPM", "TORQUE"):
+                assert all(cell.style != error_style for cell in rows[name]), (
+                    f"clean tag {name} must not render red"
+                )
+            app.action_show_screen("issues")
+            await pilot.pause()
+            # C-14 count-guard: whole filtered list fits under the row cap, so the
+            # absence claim below is faithful (not vacuous under the row cap).
+            _assert_within_cap(app)
+            issue_rows = _issue_rows(app)
+            assert not any(row[_CODE] == SUPPLEMENTAL_CODE for row in issue_rows), (
+                f"clean A2L produced supplemental issues: {issue_rows!r}"
+            )
+    
+>       _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+tests/test_validation_service_supplemental.py:354: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_validation_service_supplemental.py:159: in _drive_load
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_validation_service_supplemental.py:157: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        error_style = _severity_style(ValidationSeverity.ERROR)
+        rows = dict(_a2l_row_list(app))
+>       assert {"RPM", "TORQUE"} <= set(rows)
+E       AssertionError: assert {'RPM', 'TORQUE'} <= {'0x00001000', 'n/a'}
+E         
+E         Extra items in the left set:
+E         'TORQUE'
+E         'RPM'
+
+tests/test_validation_service_supplemental.py:339: AssertionError
+___________ test_at_037a_duplicate_symbol_error_issue_reds_both_rows ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_037a_duplicate_symbol_0')
+
+    def test_at_037a_duplicate_symbol_error_issue_reds_both_rows(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _DUP_CASE_A2L)
+    
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            rows = _a2l_row_list(app)
+            dup_rows = [cells for name, cells in rows if name.casefold() == "rpm"]
+            assert len(dup_rows) == 2, (
+                f"expected both case-variant duplicate rows rendered; "
+                f"got names: {[name for name, _ in rows]}"
+            )
+            # Observable 1 — BOTH duplicate rows ERROR-styled (case-folded match,
+            # mirroring the engine's name.lower() duplicate grouping).
+            for cells in dup_rows:
+                assert all(cell.style == error_style for cell in cells), (
+                    "duplicate-symbol row is not ERROR-styled "
+                    "(ERROR issue does not recolour its rows — the HLR-037 divergence)"
+                )
+            # Observable 2 — healthy control row unaffected (per-symbol targeting).
+            torque_rows = [cells for name, cells in rows if name == "TORQUE"]
+            assert torque_rows, "control tag TORQUE missing from the rendered table"
+            assert all(cell.style != error_style for cell in torque_rows[0]), (
+                "control tag TORQUE must not be recoloured"
+            )
+            # Observable 3 — issue list content unchanged (US-033 is render-side
+            # only): exactly one A2L_DUPLICATE_SYMBOL ERROR, no supplemental code.
+            app.action_show_screen("issues")
+            await pilot.pause()
+            # C-14 count-guard: the whole filtered list fits under the row cap, so
+            # the capped IssueRow read below equals the whole list (both the
+            # "exactly one" and the "not any" claims are then faithful).
+            _assert_within_cap(app)
+            issue_rows = _issue_rows(app)
+            dup_issues = [row for row in issue_rows if row[_CODE] == DUPLICATE_CODE]
+            assert len(dup_issues) == 1, (
+                f"expected exactly ONE {DUPLICATE_CODE} issue; rows: {issue_rows!r}"
+            )
+            assert dup_issues[0][_SEV] == ValidationSeverity.ERROR
+            assert dup_issues[0][_SYMBOL].casefold() == "rpm"
+            assert not any(row[_CODE] == SUPPLEMENTAL_CODE for row in issue_rows), (
+                "schema-complete duplicate tags must gain no supplemental issue"
+            )
+    
+>       _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+tests/test_tui_a2l_issue_recolor.py:278: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_tui_a2l_issue_recolor.py:166: in _drive_load
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_a2l_issue_recolor.py:164: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        error_style = _severity_style(ValidationSeverity.ERROR)
+        rows = _a2l_row_list(app)
+        dup_rows = [cells for name, cells in rows if name.casefold() == "rpm"]
+>       assert len(dup_rows) == 2, (
+            f"expected both case-variant duplicate rows rendered; "
+            f"got names: {[name for name, _ in rows]}"
+        )
+E       AssertionError: expected both case-variant duplicate rows rendered; got names: ['0x00001000', '0x00001002', '0x00001004']
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/test_tui_a2l_issue_recolor.py:242: AssertionError
+_____________ test_at_037b_absent_from_table_issue_symbol_is_inert _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_037b_absent_from_table0')
+
+    def test_at_037b_absent_from_table_issue_symbol_is_inert(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _BROKEN_REF_A2L)
+    
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            rows = dict(_a2l_row_list(app))
+            assert "RPM" in rows, f"expected RPM rendered; got {sorted(rows)}"
+            assert "GHOST_TAG" not in rows, "referenced-only symbol must not render as a tag row"
+            # No row change: the healthy tag keeps its non-ERROR style.
+            assert all(cell.style != error_style for cell in rows["RPM"]), (
+                "absent-from-table issue symbol must not recolour other rows"
+            )
+            # Load-bearing positive assert: the shipped chain really produced the
+            # absent-symbol issue (otherwise this boundary passes vacuously).
+            app.action_show_screen("issues")
+            await pilot.pause()
+            # C-14 count-guard: whole filtered list fits under the row cap, so the
+            # ghost issue (if produced) is guaranteed present in the capped read.
+            _assert_within_cap(app)
+            issue_rows = _issue_rows(app)
+            ghost = [
+                row
+                for row in issue_rows
+                if row[_CODE] == BROKEN_REF_CODE and row[_SYMBOL] == "GHOST_TAG"
+            ]
+            assert ghost, (
+                f"fixture failed to produce the natural {BROKEN_REF_CODE} issue "
+                f"for GHOST_TAG; rows: {issue_rows!r}"
+            )
+    
+>       _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+tests/test_tui_a2l_issue_recolor.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_tui_a2l_issue_recolor.py:166: in _drive_load
+    asyncio.run(_run())
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_a2l_issue_recolor.py:164: in _run
+    await observe(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        error_style = _severity_style(ValidationSeverity.ERROR)
+        rows = dict(_a2l_row_list(app))
+>       assert "RPM" in rows, f"expected RPM rendered; got {sorted(rows)}"
+E       AssertionError: expected RPM rendered; got ['0x00001000']
+E       assert 'RPM' in {'0x00001000': (<text '0x00001000' [] 'green'>, <text '2' [] 'green'>, <text '✓ RPM' [] 'green'>, <text 'assigned' [] 'green'>, <text '' [] 'green'>, <text '' [] 'green'>, ...)}
+
+tests/test_tui_a2l_issue_recolor.py:295: AssertionError
+______________ test_tc_037_3_sync_fallback_first_render_is_fresh _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_037_3_sync_fallback_fi0')
+
+    def test_tc_037_3_sync_fallback_first_render_is_fresh(tmp_path: Path) -> None:
+        s19_path = _write_s19(tmp_path)
+        a2l_path = _write_a2l(tmp_path, _DUP_CASE_A2L)
+    
+        async def _run() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            app.current_a2l_path = a2l_path
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                loaded = app._parse_loaded_file(s19_path)
+                assert loaded is not None
+                app._apply_loaded_file(loaded, s19_path, 0.0)
+                for _ in range(8):
+                    await pilot.pause()
+                error_style = _severity_style(ValidationSeverity.ERROR)
+                dup_rows = [
+                    cells for name, cells in _a2l_row_list(app) if name.casefold() == "rpm"
+                ]
+                assert len(dup_rows) == 2
+                for cells in dup_rows:
+                    assert all(cell.style == error_style for cell in cells), (
+                        "stale first render on the sync-fallback path: issues were "
+                        "installed AFTER the tag rows rendered (LLR-037.3 reorder)"
+                    )
+    
+>       asyncio.run(_run())
+
+tests/test_tui_a2l_issue_recolor.py:710: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _run() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        app.current_a2l_path = a2l_path
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            loaded = app._parse_loaded_file(s19_path)
+            assert loaded is not None
+            app._apply_loaded_file(loaded, s19_path, 0.0)
+            for _ in range(8):
+                await pilot.pause()
+            error_style = _severity_style(ValidationSeverity.ERROR)
+            dup_rows = [
+                cells for name, cells in _a2l_row_list(app) if name.casefold() == "rpm"
+            ]
+>           assert len(dup_rows) == 2
+E           assert 0 == 2
+E            +  where 0 = len([])
+
+tests/test_tui_a2l_issue_recolor.py:703: AssertionError
+______________ test_tc_b102_a2l_01_direct_attach_refreshes_viewer ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_01_direct_att0')
+
+    def test_tc_b102_a2l_01_direct_attach_refreshes_viewer(
+        tmp_path: Path,
+    ) -> None:
+        img = _write_s19(tmp_path, "img.s19", 0x1000)
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            await projects.load_image(pilot, app, img)
+            await _settle(pilot)
+    
+            # Route 1/3 — attach inicial through the shipped entry point
+            # (``load_a2l_from_path`` -> worker -> ``_install_attached_a2l``).
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+            # The tag rows are already painted at the outcome boundary: no manual
+            # refresh action runs between the install and this read-back.
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert " / 2 " in _summary_text(app)
+            assert set(app._a2l_row_key_to_tag) == {"a2l:0", "a2l:1"}
+            assert "A2L loaded" in log.messages[-1]
+            assert "fixture_a.a2l" in log.messages[-1]
+    
+            # Route 2/3 — attach distinto replaces the rows before its own outcome.
+            app.load_a2l_from_path(b_a2l)
+            await _drain(app, pilot)
+            assert _row_names(app) == ["Alpha", "Gamma"]
+            assert "A2L loaded" in log.messages[-1]
+    
+            # Route 3/3 — clear/unload, then re-attach of the SAME file refreshes
+            # again (no reliance on payload identity having changed).
+            app._apply_unload("a2l")
+            await _settle(pilot)
+            assert _row_count(app) == 0
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert " / 2 " in _summary_text(app)
+            assert "A2L loaded" in log.messages[-1]
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618c788a90>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        await projects.load_image(pilot, app, img)
+        await _settle(pilot)
+    
+        # Route 1/3 — attach inicial through the shipped entry point
+        # (``load_a2l_from_path`` -> worker -> ``_install_attached_a2l``).
+        app.load_a2l_from_path(a_a2l)
+        await _drain(app, pilot)
+        # The tag rows are already painted at the outcome boundary: no manual
+        # refresh action runs between the install and this read-back.
+>       assert _row_names(app) == ["Alpha", "Beta"]
+E       AssertionError: assert ['0x00001000', '0x00001002'] == ['Alpha', 'Beta']
+E         
+E         At index 0 diff: '0x00001000' != 'Alpha'
+E         Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:226: AssertionError
+_____________ test_tc_b102_a2l_02_same_size_reload_refreshes_rows ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_02_same_size_0')
+
+    def test_tc_b102_a2l_02_same_size_reload_refreshes_rows(tmp_path: Path) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        img1 = _write_s19(tmp_path, "img1.s19", 0x1000)
+        # Image 2: same address count (16), different mapped addresses AND content.
+        img2 = _write_hex(tmp_path, "img2.hex", 0x2000, fill=0xFF)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+    
+            # Image 1 (S19) covers both tag addresses -> rows paint in-image "yes".
+            await projects.load_image(pilot, app, img1)
+            await _settle(pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["yes", "yes"]
+    
+            # Reload through the file-load path: same-size HEX over the same A2L.
+            await projects.load_image(pilot, app, img2)
+            await _settle(pilot)
+            # The final painted rows must reflect image-2 membership: neither tag
+            # address (0x1000/0x1002) is mapped by the image at 0x2000.
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["no", "no"], (
+                "painted A2L rows still describe the previous image's membership — "
+                "the enrichment cache was not invalidated by the equal-size reload"
+            )
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618ccf4150>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(a_a2l)
+        await _drain(app, pilot)
+    
+        # Image 1 (S19) covers both tag addresses -> rows paint in-image "yes".
+        await projects.load_image(pilot, app, img1)
+        await _settle(pilot)
+>       assert _row_names(app) == ["Alpha", "Beta"]
+E       AssertionError: assert ['0x00001000', '0x00001002'] == ['Alpha', 'Beta']
+E         
+E         At index 0 diff: '0x00001000' != 'Alpha'
+E         Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:276: AssertionError
+___________ test_tc_b102_a2l_03_active_filter_applied_to_new_attach ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_03_active_fil0')
+
+    def test_tc_b102_a2l_03_active_filter_applied_to_new_attach(tmp_path: Path) -> None:
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            _set_filter(app, "Alpha")
+            await _settle(pilot)
+            _attach(app, b_a2l)
+            await _settle(pilot)
+            assert _row_names(app) == ["Alpha"]
+            assert " / 1 " in _summary_text(app), _summary_text(app)
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618eba5290>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        _set_filter(app, "Alpha")
+        await _settle(pilot)
+        _attach(app, b_a2l)
+        await _settle(pilot)
+>       assert _row_names(app) == ["Alpha"]
+E       AssertionError: assert ['0x00001000'] == ['Alpha']
+E         
+E         At index 0 diff: '0x00001000' != 'Alpha'
+E         Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:308: AssertionError
+______________ test_tc_b102_a2l_05_forced_id_collision_recomputes ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_05_forced_id_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f618d73ce50>
+
+    def test_tc_b102_a2l_05_forced_id_collision_recomputes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+        colliding_id = 0xC0111DE
+        real_id = builtins.id
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            entry_a = parse_a2l_cached(a_a2l, None)
+            entry_b = parse_a2l_cached(b_a2l, None)
+            payload_a, payload_b = entry_a[1], entry_b[1]
+    
+            def _forced_id(obj: object) -> int:
+                if obj is payload_a or obj is payload_b:
+                    return colliding_id
+                return real_id(obj)
+    
+            monkeypatch.setattr(builtins, "id", _forced_id)
+            try:
+                # Attach A at the forced identity: base stores the enrichment key
+                # ``(colliding_id, mem_size)``.
+                app._install_attached_a2l(
+                    A2LAttachResult(
+                        A2LAttachRequest(
+                            source=a_a2l, copy=False,
+                            temp_dir=app.workarea / WORKAREA_TEMP,
+                            workarea=app.workarea, record_recent=False,
+                            a2l_cache=None, gen=0,
+                        ),
+                        a_a2l, entry_a, 0.0,
+                    )
+                )
+                await _settle(pilot)
+                assert _row_names(app) == ["Alpha", "Beta"]
+    
+                # Attach B: a DIFFERENT payload at the SAME forced object address
+                # and the same memory-map size. Fresh tags must be computed.
+                app._install_attached_a2l(
+                    A2LAttachResult(
+                        A2LAttachRequest(
+                            source=b_a2l, copy=False,
+                            temp_dir=app.workarea / WORKAREA_TEMP,
+                            workarea=app.workarea, record_recent=False,
+                            a2l_cache=None, gen=0,
+                        ),
+                        b_a2l, entry_b, 0.0,
+                    )
+                )
+                await _settle(pilot)
+            finally:
+                monkeypatch.undo()
+            assert _row_names(app) == ["Alpha", "Gamma"], (
+                "stale enrichment rendered: the identity-colliding attach returned "
+                "the previous payload's tag list (Beta must be gone, Gamma present)"
+            )
+            assert " / 2 " in _summary_text(app)
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:419: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618b7ef710>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        entry_a = parse_a2l_cached(a_a2l, None)
+        entry_b = parse_a2l_cached(b_a2l, None)
+        payload_a, payload_b = entry_a[1], entry_b[1]
+    
+        def _forced_id(obj: object) -> int:
+            if obj is payload_a or obj is payload_b:
+                return colliding_id
+            return real_id(obj)
+    
+        monkeypatch.setattr(builtins, "id", _forced_id)
+        try:
+            # Attach A at the forced identity: base stores the enrichment key
+            # ``(colliding_id, mem_size)``.
+            app._install_attached_a2l(
+                A2LAttachResult(
+                    A2LAttachRequest(
+                        source=a_a2l, copy=False,
+                        temp_dir=app.workarea / WORKAREA_TEMP,
+                        workarea=app.workarea, record_recent=False,
+                        a2l_cache=None, gen=0,
+                    ),
+                    a_a2l, entry_a, 0.0,
+                )
+            )
+            await _settle(pilot)
+>           assert _row_names(app) == ["Alpha", "Beta"]
+E           AssertionError: assert ['0x00001000', '0x00001002'] == ['Alpha', 'Beta']
+E             
+E             At index 0 diff: '0x00001000' != 'Alpha'
+E             Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:395: AssertionError
+_____________ test_tc_b102_a2l_06_clear_unload_renders_empty_state _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_06_clear_unlo0')
+
+    def test_tc_b102_a2l_06_clear_unload_renders_empty_state(tmp_path: Path) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            _attach(app, a_a2l)
+            await _settle(pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+    
+            app._apply_unload("a2l")
+            await _settle(pilot)
+            assert _a2l_view_text(app) == "No A2L loaded."
+            assert _row_count(app) == 0
+            assert app._a2l_row_key_to_tag == {}
+            assert app.current_a2l_data is None
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618b7d8c50>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        _attach(app, a_a2l)
+        await _settle(pilot)
+>       assert _row_names(app) == ["Alpha", "Beta"]
+E       AssertionError: assert ['0x00001000', '0x00001002'] == ['Alpha', 'Beta']
+E         
+E         At index 0 diff: '0x00001000' != 'Alpha'
+E         Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:434: AssertionError
+______________ test_tc_b102_a2l_07_stale_prepared_load_discarded _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_tc_b102_a2l_07_stale_prep0')
+
+    def test_tc_b102_a2l_07_stale_prepared_load_discarded(tmp_path: Path) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        img1 = _write_s19(tmp_path, "img1.s19", 0x1000)
+        img2 = _write_hex(tmp_path, "img2.hex", 0x2000, fill=0xFF)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+    
+            # Arm 1/2 — valid snapshot: the shipped worker path precomputes
+            # against image 1 and the apply installs it (rows in-image "yes").
+            app.load_from_path(img1)
+            await _drain(app, pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["yes", "yes"]
+    
+            # Arm 2/2 — stale snapshot: capture image-1 enrichment (generation N)
+            # and hand-apply a PreparedLoad for image 2 (generation N+1) carrying
+            # that stale cache with the pre-fix key shape.
+            stale_tags = list(app._a2l_enriched_tags)
+            assert stale_tags and all(t.get("in_memory") for t in stale_tags), (
+                "arm-1 setup: the worker precompute must have produced in-image "
+                "enrichment for image 1, otherwise the stale arm is vacuous"
+            )
+            loaded2 = app._parse_loaded_file(img2)
+            assert loaded2 is not None
+            assert loaded2.a2l_data is not None
+            stale_prepared = PreparedLoad(
+                loaded=loaded2,
+                precomputed=True,
+                a2l_enriched_tags=stale_tags,
+                a2l_enriched_key=(id(loaded2.a2l_data), len(loaded2.mem_map)),
+                a2l_summary_lines=["stale snapshot"],
+            )
+            app._apply_prepared_load(stale_prepared, img2, 0.0)
+            await _settle(pilot)
+            assert app._a2l_enriched_tags is not stale_tags, (
+                "the stale worker precompute was installed verbatim — apply-time "
+                "generation verification is missing"
+            )
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["no", "no"], (
+                "painted A2L rows came from the stale worker snapshot instead of "
+                "a UI-thread recompute against the applied image"
+            )
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests/test_b102_a2l_refresh.py:514: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618e532d10>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(a_a2l)
+        await _drain(app, pilot)
+    
+        # Arm 1/2 — valid snapshot: the shipped worker path precomputes
+        # against image 1 and the apply installs it (rows in-image "yes").
+        app.load_from_path(img1)
+        await _drain(app, pilot)
+>       assert _row_names(app) == ["Alpha", "Beta"]
+E       AssertionError: assert ['0x00001000', '0x00001002'] == ['Alpha', 'Beta']
+E         
+E         At index 0 diff: '0x00001000' != 'Alpha'
+E         Use -v to get more diff
+
+tests/test_b102_a2l_refresh.py:481: AssertionError
+__________________ test_at_b99_09_a2l_window_physical_column ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_b99_09_a2l_window_phys0')
+
+    def test_at_b99_09_a2l_window_physical_column(tmp_path: Path) -> None:
+        """AT-B99-09 (US-147): through the shipped Load dialog, the A2L window
+        paints 30.0 for RAT_FUNC_SYM and 4113 for SYM_U16_MSB, ``40.0`` for the
+        sparse-table symbol and ``n/a`` for the undecodable symbol — distinct from
+        the blank cell of the no-bytes symbol — and the describe modal reads
+        ``Scalar value: n/a (rat_func_no_real_root)``: at 118x40 AND 80x24, all
+        from painted screen text (no clipping at either width)."""
+        s19_path, a2l_path = _undecodable_pair(tmp_path)
+        for size in _SIZES:
+>           asyncio.run(_run_at_09(s19_path, a2l_path, size))
+
+tests/test_b99_a2l_encode.py:623: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s19_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_b99_09_a2l_window_phys0/case.s19')
+a2l_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_at_b99_09_a2l_window_phys0/case.a2l')
+size = (118, 40)
+
+    async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:
+        app = S19TuiApp(base_dir=s19_path.parent)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await _load_through_dialog(
+                app, pilot, s19_path, "the S19 image loaded (log names case.s19)"
+            )
+            await _load_through_dialog(
+                app, pilot, a2l_path, "the A2L loaded (log names case.a2l)"
+            )
+            await pilot.press("escape")
+            await pilot.pause()
+            await pilot.press("2")
+            await settled(
+                pilot,
+                lambda: "A2L Explorer" in _screen_text(app),
+                "the A2L screen paints",
+            )
+    
+            # The painted arms differ by width; the describe-modal arms (below)
+            # run at BOTH widths.
+            if size[0] >= 118:
+                table = app.query_one("#a2l_tags_list", DataTable)
+                rows = painted_rows(app, table)
+                rat_row = next(r for r in rows if "RAT_FUNC_SYM" in r)
+>               assert "30.0" in rat_row, f"RAT_FUNC_SYM row at {size}: {rat_row!r}"
+E               AssertionError: RAT_FUNC_SYM row at (118, 40): ' 0x00002002  2       ✓ RAT_FUNC_SYM         formula  300   3'
+E               assert '30.0' in ' 0x00002002  2       ✓ RAT_FUNC_SYM         formula  300   3'
+
+tests/test_b99_a2l_encode.py:562: AssertionError
+________________ test_r_a2l_048_1_apply_shows_in_the_tag_table _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_048_1_apply_shows_i0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_048_1_apply_shows_in_the_tag_table(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /1: case 08 and its A2L, key ``2`` (``VALUE_0001`` Raw
+        ``108``); key ``6``, a document ``0x0`` = ``93`` loaded and applied; key
+        ``2`` -> the ``VALUE_0001`` row reads Raw ``147``, Physical ``147``.
+    
+        Why: the cell was cached across the write and read the old byte (base:
+        ``108`` / ``108``, cache key unchanged, uncached value ``147``). Negative
+        control: the enrichment cache kept across the write -> ``108`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            assert raw_phys(app, "VALUE_0001") == ("108", "108"), raw_phys(app, "VALUE_0001")
+            assert mem_at(app, 0x0) == 0x6C
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
+            assert mem_at(app, 0x0) == 0x93, "the apply did not write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VALUE_0001") == ("147", "147"),
+                lambda: f"VALUE_0001 paints {raw_phys(app, 'VALUE_0001')!r}, expected ('147', '147')",
+                timeout=FIX_WAIT,
+            )
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:715: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618d5e4150>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+>       assert raw_phys(app, "VALUE_0001") == ("108", "108"), raw_phys(app, "VALUE_0001")
+E       AssertionError: None
+E       assert None == ('108', '108')
+E        +  where None = raw_phys(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), 'VALUE_0001')
+
+tests/test_b101_inplace_views.py:703: AssertionError
+_________ test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_048_2_save_project_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-A2L-048 case /2: as /1 after the apply, the entry edited to ``55``
+        without a new apply, key ``2`` (the A2L Explorer displayed); ``ctrl+s``,
+        Save project confirmed -> Raw ``85``, Physical ``85``.
+    
+        Why: a Save project commit re-derives the image in place, so the value
+        painted from the apply (``147``) is stale. Negative control: the commit's
+        write not reaching the table -> ``147`` (or ``108``) -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
+            await edit_entry(pilot, app, log, "0x0", "55")
+            assert mem_at(app, 0x0) == 0x93, "the edit must not write (no new apply)"
+            await show_a2l(pilot, app)
+            await save_project(pilot, app, log)
+            assert mem_at(app, 0x0) == 0x55, "the commit did not write"
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VALUE_0001") == ("85", "85"),
+                lambda: f"VALUE_0001 paints {raw_phys(app, 'VALUE_0001')!r}, expected ('85', '85')",
+                timeout=FIX_WAIT,
+            )
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:744: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_inplace_views.py:737: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table.<locals>.scenario.<locals>.<lambda> at 0x7f618d0fc860>
+failure = <function test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table.<locals>.scenario.<locals>.<lambda> at 0x7f618b7799e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: VALUE_0001 paints None, expected ('85', '85')
+
+tests/support/timing.py:66: AssertionError
+______________ test_r_a2l_048_3_save_back_shows_in_the_tag_table _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_048_3_save_back_sho0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_048_3_save_back_shows_in_the_tag_table(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /3: as /2 before ``ctrl+s``; *Save patched image as*
+        confirmed (Write file); key ``2`` -> Raw ``85``, Physical ``85``.
+    
+        Why: a save-back re-derives the image in place. Negative control: the
+        save-back's call to the in-place-write hook removed -> the table keeps the
+        value of the apply -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
+            await edit_entry(pilot, app, log, "0x0", "55")
+            assert mem_at(app, 0x0) == 0x93, "the edit must not write (no new apply)"
+            await write_file(pilot, app, log)
+            assert mem_at(app, 0x0) == 0x55, "the save-back did not write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VALUE_0001") == ("85", "85"),
+                lambda: f"VALUE_0001 paints {raw_phys(app, 'VALUE_0001')!r}, expected ('85', '85')",
+                timeout=FIX_WAIT,
+            )
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:770: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_inplace_views.py:763: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_a2l_048_3_save_back_shows_in_the_tag_table.<locals>.scenario.<locals>.<lambda> at 0x7f618ac51da0>
+failure = <function test_r_a2l_048_3_save_back_shows_in_the_tag_table.<locals>.scenario.<locals>.<lambda> at 0x7f618bdc2020>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: VALUE_0001 paints None, expected ('85', '85')
+
+tests/support/timing.py:66: AssertionError
+_______________ test_r_a2l_048_4_a_wider_value_is_painted_whole ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_048_4_a_wider_value0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /4 (robustness, E5 QA-2): case 08 and its A2L, key ``2``
+        (page 1; the Raw and Physical columns are 18 cells wide, the widest value
+        they have painted); the cursor on ``VALUE_0007`` (row 14, Raw
+        ``85.6589584350586``) and the table scrolled right so Raw is its first shown
+        column (the table is 50 cells wide); key ``6``, ``0x00040028`` = ``EA A3 64 C6`` applied;
+        key ``2`` -> the row paints its Raw cell ``-9.876539885039906e+25`` whole
+        (22 characters) and its Physical cell whole, both columns are at least 22
+        cells wide, and the scroll and the cursor are unchanged.
+    
+        The table's columns only widen (Textual keeps their widths across the
+        page refill), so the case needs a written value wider than any value the
+        column has painted, not only wider than the cells on screen.
+    
+        Why: a written value wider than its column is painted at the old width
+        unless the cell write widens the column (R2-7), so the screen would show
+        a cut number while the stored cell holds the written one. Base: Raw
+        ``85.6589584350586`` -> RED at the value wait. Negative control: the cells
+        written with ``update_width=False`` (the call's default) -> the painted
+        cells are cut at 18 -> RED."""
+        import struct
+    
+        expected_raw = str(struct.unpack(">f", WIDE_FLOAT)[0])
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            table = tag_table(app)
+            raw_column, phys_column = table.ordered_columns[4], table.ordered_columns[5]
+            assert (str(raw_column.label), str(phys_column.label)) == ("Raw", "Physical")
+            assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
+            assert raw_phys(app, "VALUE_0007") == ("85.6589584350586", "185.6589584350586")
+            # the table is narrower than its columns: scroll it so Raw is its first shown column
+            raw_x = sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+            table.scroll_to(x=raw_x, animate=False)
+            await wait_until(pilot, lambda: table.scroll_x == raw_x, lambda: f"scroll_x {table.scroll_x}")
+            assert painted_cell(app, 14, 4) == "85.6589584350586", painted_cell(app, 14, 4)
+            assert max(raw_column.content_width, phys_column.content_width) < len(expected_raw), (
+                f"the columns are already {raw_column.content_width} / "
+                f"{phys_column.content_width} cells wide"
+            )
+            table.move_cursor(row=14, animate=False)
+            await wait_until(
+                pilot, lambda: table.cursor_row == 14, lambda: f"cursor row {table.cursor_row}"
+            )
+            first, cursor = (int(table.scroll_x), int(table.scroll_y)), table.cursor_row
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x40028, WIDE_FLOAT)])
+            assert bytes(mem_at(app, 0x40028 + i) for i in range(4)) == WIDE_FLOAT, "no write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: (raw_phys(app, "VALUE_0007") or ("",))[0] == expected_raw,
+                lambda: f"VALUE_0007 holds {raw_phys(app, 'VALUE_0007')!r}, expected Raw "
+                f"{expected_raw!r}",
+                timeout=FIX_WAIT,
+            )
+            stored_phys = raw_phys(app, "VALUE_0007")[1]
+            assert len(stored_phys) >= len(expected_raw), stored_phys
+            await wait_until(
+                pilot,
+                lambda: (painted_cell(app, 14, 4), painted_cell(app, 14, 5))
+                == (expected_raw, stored_phys),
+                lambda: f"the row paints Raw {painted_cell(app, 14, 4)!r}, Physical "
+                f"{painted_cell(app, 14, 5)!r}; columns {raw_column.content_width} / "
+                f"{phys_column.content_width} cells",
+                timeout=FIX_WAIT,
+            )
+            assert raw_column.content_width >= len(expected_raw), raw_column.content_width
+            assert phys_column.content_width >= len(stored_phys), phys_column.content_width
+            assert ((int(table.scroll_x), int(table.scroll_y)), table.cursor_row) == (first, cursor)
+            assert row_name(app, 14) == "VALUE_0007"
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:860: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618e587710>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        table = tag_table(app)
+        raw_column, phys_column = table.ordered_columns[4], table.ordered_columns[5]
+        assert (str(raw_column.label), str(phys_column.label)) == ("Raw", "Physical")
+>       assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
+E       AssertionError: 0x00040028
+E       assert '0x00040028' == 'VALUE_0007'
+E         
+E         - VALUE_0007
+E         + 0x00040028
+
+tests/test_b101_inplace_views.py:818: AssertionError
+___________ test_r_a2l_048_5_a_write_on_the_second_page_shows_there ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_048_5_a_write_on_th0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
+        ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 45
+        (``VAL_BLK_0002``: a 2-byte little-endian tag at ``0x00800108``, bytes
+        ``0D BA``, Raw ``47629``); key ``6``, ``0x00800109`` = ``45`` (the tag's
+        second byte) applied; key ``2`` -> the row reads Raw ``17677``, Physical
+        ``17677``; the summary still reads ``tags 201-400 / 462``; the page's row
+        names are unchanged and the cursor stays on row 45.
+    
+        Why: the repaint writes page row ``i`` from the listed tag ``start + i``;
+        one that reads tag ``i`` paints page 1's tags over page 2 (every other A2L
+        node stays on page 1), and a changed-byte test that reads only a tag's
+        first byte misses a write into its second (E5 R-1). Base: Raw ``47629`` ->
+        RED. Negative controls: ``tags[i]`` -> ``VAL_BLK_0002`` is no longer painted
+        and the row names change -> RED; the first byte only -> Raw ``47629`` ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            await pilot.press("plus")
+            await wait_until(
+                pilot,
+                lambda: summary_span(app) == "tags 201-400 / 462",
+                lambda: f"+ did not page: the summary reads {summary_span(app)!r}",
+            )
+            await settle(pilot)
+            table = tag_table(app)
+            assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
+            assert raw_phys(app, "VAL_BLK_0002") == ("47629", "47629"), raw_phys(app, "VAL_BLK_0002")
+            assert (mem_at(app, 0x800108), mem_at(app, 0x800109)) == (0x0D, 0xBA)
+            table.move_cursor(row=45, animate=False)
+            await wait_until(
+                pilot, lambda: table.cursor_row == 45, lambda: f"cursor row {table.cursor_row}"
+            )
+            names = [row_name(app, i) for i in range(table.row_count)]
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x800109, b"\x45")])
+            assert mem_at(app, 0x800109) == 0x45, "the apply did not write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"),
+                lambda: f"VAL_BLK_0002 paints {raw_phys(app, 'VAL_BLK_0002')!r}, expected 17677",
+                timeout=FIX_WAIT,
+            )
+            assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
+            assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
+            assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
+            # E5 RR-4: the row key of page row 45 (``a2l:245``) maps to the new dict;
+            # the card for that row is the one the highlight resolves through it.
+            row_key = table.coordinate_to_cell_key(Coordinate(45, 0)).row_key.value
+            assert row_key == "a2l:245", row_key
+            assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "17677", (
+                app._a2l_row_key_to_tag[row_key]["raw_value"]
+            )
+            table.move_cursor(row=44, animate=False)
+            await wait_until(
+                pilot, lambda: "VAL_BLK_0001" in card_text(app), lambda: card_text(app)
+            )
+            table.move_cursor(row=45, animate=False)
+            await wait_until(
+                pilot,
+                lambda: "VAL_BLK_0002" in card_text(app),
+                lambda: f"the card for row 45 reads {card_text(app)!r}",
+            )
+            # E5 RR-1: the recomputed list is the one installed - a filter on the new
+            # Raw value lists the written tag, built from ``_a2l_enriched_tags``.
+            await filter_raw(pilot, app, "17677")
+            assert raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"), raw_phys(app, "VAL_BLK_0002")
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618bf44a10>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        await pilot.press("plus")
+        await wait_until(
+            pilot,
+            lambda: summary_span(app) == "tags 201-400 / 462",
+            lambda: f"+ did not page: the summary reads {summary_span(app)!r}",
+        )
+        await settle(pilot)
+        table = tag_table(app)
+>       assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
+E       AssertionError: 0x00800108
+E       assert '0x00800108' == 'VAL_BLK_0002'
+E         
+E         - VAL_BLK_0002
+E         + 0x00800108
+
+tests/test_b101_inplace_views.py:891: AssertionError
+___________________ test_r_a2l_049_1_first_shown_row_is_kept ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_049_1_first_shown_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_049_1_first_shown_row_is_kept(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-049 case /1: the table scrolled so the page's row 30 is the first
+        shown row; the apply of R-A2L-048/1 -> the first shown row is the same tag.
+    
+        Why: a clear-and-refill repaint sends the table back to row 0 (E3
+        architect P4: ``scroll_y`` 30 -> 0). The node first waits for the repaint
+        itself (``VALUE_0001`` Raw ``147``): base paints nothing, so it is RED
+        there at that wait. Negative control: the repaint clears the table ->
+        ``scroll_y`` 0 -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await first_shown_scenario(pilot, app, log, case08, tmp_path, "")
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:991: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_inplace_views.py:989: in scenario
+    await first_shown_scenario(pilot, app, log, case08, tmp_path, "")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+log = <tests.support.b100_projects.StatusLog object at 0x7f6181b52490>
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_049_1_first_shown_r0')
+raw_filter = ''
+
+    async def first_shown_scenario(pilot, app, log, case08: Path, tmp_path: Path, raw_filter: str) -> None:
+        """The shared drive of R-A2L-049 /1 (``raw_filter`` empty) and /2."""
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        if raw_filter:
+            await filter_raw(pilot, app, raw_filter)
+        table = tag_table(app)
+        assert table.row_count > 41, f"only {table.row_count} rows listed"
+>       assert find_row(app, "VALUE_0001") is not None, "VALUE_0001 is not listed"
+E       AssertionError: VALUE_0001 is not listed
+E       assert None is not None
+E        +  where None = find_row(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), 'VALUE_0001')
+
+tests/test_b101_inplace_views.py:949: AssertionError
+_________ test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_049_2_first_shown_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-A2L-049 case /2: as /1 with the filter on Raw, text ``1``; the table
+        scrolled so the page's row 30 is the first shown row -> the same tag
+        stays first shown after the apply.
+    
+        Why: the same, with a Raw filter on. Negative control: the filter re-run
+        at the write or a clear and refill -> the first shown row changes -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await first_shown_scenario(pilot, app, log, case08, tmp_path, "1")
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:1007: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_inplace_views.py:1005: in scenario
+    await first_shown_scenario(pilot, app, log, case08, tmp_path, "1")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+log = <tests.support.b100_projects.StatusLog object at 0x7f618b1c4f50>
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_049_2_first_shown_r0')
+raw_filter = '1'
+
+    async def first_shown_scenario(pilot, app, log, case08: Path, tmp_path: Path, raw_filter: str) -> None:
+        """The shared drive of R-A2L-049 /1 (``raw_filter`` empty) and /2."""
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        if raw_filter:
+            await filter_raw(pilot, app, raw_filter)
+        table = tag_table(app)
+        assert table.row_count > 41, f"only {table.row_count} rows listed"
+>       assert find_row(app, "VALUE_0001") is not None, "VALUE_0001 is not listed"
+E       AssertionError: VALUE_0001 is not listed
+E       assert None is not None
+E        +  where None = find_row(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), 'VALUE_0001')
+
+tests/test_b101_inplace_views.py:949: AssertionError
+___________________ test_r_a2l_105_1_highlighted_row_is_kept ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_105_1_highlighted_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_105_1_highlighted_row_is_kept(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-105 case /1: the cursor on the page's row 40; the apply of
+        R-A2L-048/1 -> cursor row 40, the same tag, and the detail card names that
+        tag.
+    
+        Why: a clear-and-refill repaint puts the cursor on row 0 (P4: 40 -> 0) and
+        the card on another tag. The node waits for the repaint first (base paints
+        nothing: RED at that wait). Negative control: the repaint clears the table
+        -> cursor 0 -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            table = tag_table(app)
+            assert table.row_count > 41, f"only {table.row_count} rows listed"
+            table.move_cursor(row=40, animate=False)
+            await wait_until(
+                pilot, lambda: table.cursor_row == 40, lambda: f"cursor row {table.cursor_row}"
+            )
+            tag = row_name(app, 40)
+            await wait_until(
+                pilot,
+                lambda: tag in card_text(app),
+                lambda: f"the detail card does not name {tag!r}: {card_text(app)!r}",
+            )
+            card_before = card_text(app)
+            # control: a round trip through the Patch Editor with no write keeps both
+            await open_patch(pilot, app)
+            await show_a2l(pilot, app)
+            assert table.cursor_row == 40 and card_text(app) == card_before, (
+                f"the round trip alone moved the cursor to {table.cursor_row}"
+            )
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VALUE_0001") == ("147", "147"),
+                lambda: f"the repaint did not happen: VALUE_0001 paints {raw_phys(app, 'VALUE_0001')!r}",
+                timeout=FIX_WAIT,
+            )
+            assert table.cursor_row == 40, f"the cursor moved to row {table.cursor_row}"
+            assert row_name(app, table.cursor_row) == tag
+            assert tag in card_text(app), f"the detail card lost {tag!r}: {card_text(app)!r}"
+            assert card_text(app) == card_before
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_inplace_views.py:1044: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_a2l_105_1_highlighted_row_is_kept.<locals>.scenario.<locals>.<lambda> at 0x7f6181d95da0>
+failure = <function test_r_a2l_105_1_highlighted_row_is_kept.<locals>.scenario.<locals>.<lambda> at 0x7f6181d96b60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the repaint did not happen: VALUE_0001 paints None
+
+tests/support/timing.py:66: AssertionError
+________________ test_r_a2l_106_1_value_filter_rows_stay_listed ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_r_a2l_106_1_value_filter_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-204/b101_i10bw_case080')
+
+    def test_r_a2l_106_1_value_filter_rows_stay_listed(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-106 case /1: case 08 and its A2L, key ``2``, the filter on Raw
+        with the text ``108`` (``VALUE_0001`` listed); key ``6``, ``0x0`` = ``93``
+        applied; key ``2`` -> ``VALUE_0001`` is still listed with Raw ``147`` and
+        the summary's ``tags <a>-<b> / <T>`` equals the one before.
+    
+        Why: re-running the filter at the write would drop the row whose value no
+        longer matches. Negative control: the filter re-run at the write ->
+        ``VALUE_0001`` no longer listed -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            await filter_raw(pilot, app, "108")
+            assert raw_phys(app, "VALUE_0001") == ("108", "108"), "VALUE_0001 is not listed"
+            span_before = summary_span(app)
+            count_before = tag_table(app).row_count
+            assert span_before, "the table summary paints no tags a-b / T"
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VALUE_0001") == ("147", "147"),
+                lambda: f"VALUE_0001 paints {raw_phys(app, 'VALUE_0001')!r}, expected ('147', '147')",
+                timeout=FIX_WAIT,
+            )
+            assert tag_table(app).row_count == count_before, "the listed row count changed"
+            assert summary_span(app) == span_before, (summary_span(app), span_before)
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:1087: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618a9c7710>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        await filter_raw(pilot, app, "108")
+>       assert raw_phys(app, "VALUE_0001") == ("108", "108"), "VALUE_0001 is not listed"
+E       AssertionError: VALUE_0001 is not listed
+E       assert None == ('108', '108')
+E        +  where None = raw_phys(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), 'VALUE_0001')
+
+tests/test_b101_inplace_views.py:1072: AssertionError
+_____________ test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-204/test_qc_tm_10b_1_a2l_refresh_c0')
+
+    @pytest.mark.serial_timing
+    def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None:
+        """QC-TM-10b-1: the UI-thread time of one in-place write's A2L refresh
+        (``_refresh_a2l_values_after_write``) on the largest A2L the repo ships
+        (case_06, re-pointed at E5 R-1) stays under ``timing_bound(1.0)``; the tag
+        count is in the QC-TM label.
+    
+        The refresh is timed where the write notice calls it (the method wrapped on
+        the app instance, one real apply of the complement of the byte at
+        ``0x80100005`` through the Patch Editor). After the bound, the enriched
+        tags must equal a full recompute over the written image (the partial
+        recompute of R-1 must describe the same bytes). Negative controls: the full refresh at
+        every write -> above the bound -> RED; a changed-byte test that reads only
+        a tag's first byte -> the tags covering ``0x80100005`` keep their old
+        values -> RED."""
+        from s19_app.tui.services.a2l_service import enrich_tags_and_render
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+            await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+            await wait_until(
+                pilot,
+                lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+                "the case_06 tags were never enriched",
+                timeout=240.0,
+            )
+            assert hasattr(app, "_refresh_a2l_values_after_write"), (
+                "the write notice has no A2L refresh to time"
+            )
+            real = app._refresh_a2l_values_after_write
+            spans: list = []
+    
+            def timed(*args, **kwargs):
+                start = time.perf_counter()
+                try:
+                    return real(*args, **kwargs)
+                finally:
+                    spans.append(time.perf_counter() - start)
+    
+            app._refresh_a2l_values_after_write = timed
+            tags = len(app._a2l_enriched_tags)
+            old = mem_at(app, CASE06_WRITE)
+            assert old is not None, "0x80100005 is not in the case_06 image"
+            await patch_apply(
+                pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+            )
+            assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+            await wait_until(
+                pilot,
+                lambda: bool(spans),
+                "the write notice never ran the A2L refresh",
+                timeout=240.0,
+            )
+            elapsed = spans[0]
+            print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+            assert elapsed < report_margin(
+                f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+            ), f"{tags} tags: {elapsed:.3f} s"
+            full, _lines = enrich_tags_and_render(
+                app.current_a2l_data, app.current_file.mem_map, max_tag_lines=500
+            )
+            differ = [
+                i for i, (got, want) in enumerate(zip(app._a2l_enriched_tags, full)) if got != want
+            ]
+            assert len(app._a2l_enriched_tags) == len(full) and not differ, (
+                f"{len(differ)} enriched tags differ from a full recompute "
+                f"(first {differ[:3]}; {len(app._a2l_enriched_tags)} vs {len(full)} tags)"
+            )
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:1628: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f618d8f0190>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+        await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+        await wait_until(
+            pilot,
+            lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+            "the case_06 tags were never enriched",
+            timeout=240.0,
+        )
+        assert hasattr(app, "_refresh_a2l_values_after_write"), (
+            "the write notice has no A2L refresh to time"
+        )
+        real = app._refresh_a2l_values_after_write
+        spans: list = []
+    
+        def timed(*args, **kwargs):
+            start = time.perf_counter()
+            try:
+                return real(*args, **kwargs)
+            finally:
+                spans.append(time.perf_counter() - start)
+    
+        app._refresh_a2l_values_after_write = timed
+        tags = len(app._a2l_enriched_tags)
+        old = mem_at(app, CASE06_WRITE)
+        assert old is not None, "0x80100005 is not in the case_06 image"
+        await patch_apply(
+            pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+        )
+        assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+        await wait_until(
+            pilot,
+            lambda: bool(spans),
+            "the write notice never ran the A2L refresh",
+            timeout=240.0,
+        )
+        elapsed = spans[0]
+        print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+>       assert elapsed < report_margin(
+            f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+        ), f"{tags} tags: {elapsed:.3f} s"
+E       AssertionError: 220040 tags: 1.366 s
+E       assert 1.366315053001017 < 1.0
+E        +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 1.366315053001017, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b101_inplace_views.py:1614: AssertionError
+============================= QC-TM timing margins =============================
+LOW -36.6%  1.366 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_tui_a2l_detail.py::test_at068_glyph_branches - AssertionErr...
+FAILED tests/test_tui_a2l_detail.py::test_at069b_c17_card - AssertionError: p...
+FAILED tests/test_tui_a2l_detail.py::test_at069c_c17_table_name - AssertionEr...
+FAILED tests/test_tui_a2l_detail.py::test_cells_are_text_and_glyph - Assertio...
+FAILED tests/test_validation_service_supplemental.py::test_at_036a_missing_schema_red_row_has_matching_error_issue
+FAILED tests/test_validation_service_supplemental.py::test_at_036b_already_covered_symbol_gains_no_second_error
+FAILED tests/test_validation_service_supplemental.py::test_at_036c_clean_a2l_yields_zero_supplemental_issues
+FAILED tests/test_tui_a2l_issue_recolor.py::test_at_037a_duplicate_symbol_error_issue_reds_both_rows
+FAILED tests/test_tui_a2l_issue_recolor.py::test_at_037b_absent_from_table_issue_symbol_is_inert
+FAILED tests/test_tui_a2l_issue_recolor.py::test_tc_037_3_sync_fallback_first_render_is_fresh
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_01_direct_attach_refreshes_viewer
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_02_same_size_reload_refreshes_rows
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_03_active_filter_applied_to_new_attach
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_05_forced_id_collision_recomputes
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_06_clear_unload_renders_empty_state
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_07_stale_prepared_load_discarded
+FAILED tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_1_apply_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_4_a_wider_value_is_painted_whole
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_5_a_write_on_the_second_page_shows_there
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_1_first_shown_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_105_1_highlighted_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_106_1_value_filter_rows_stay_listed
+FAILED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+27 failed, 38 passed in 492.46s (0:08:12)
