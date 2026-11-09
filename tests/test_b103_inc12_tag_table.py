@@ -34,6 +34,7 @@ from typing import Optional
 
 import pytest
 from rich.cells import cell_len
+from rich.text import Text
 from textual.coordinate import Coordinate
 from textual.widgets import Button, DataTable, Input
 
@@ -1102,10 +1103,9 @@ async def _assert_card_painted_then_safe(
         card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
         await _settle(pilot, 6)
         assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
-        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
-        joined = "".join(painted)
-        assert projected in joined, (projected, joined)
         screen = _screen_output(app)
+        painted = Text.from_ansi(screen).plain
+        assert projected in painted, (projected, painted)
         _assert_card_lines_clean(full)
         _assert_no_introducers(screen)
         return
