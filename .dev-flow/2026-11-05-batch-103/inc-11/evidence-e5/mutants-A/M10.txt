@@ -7,7 +7,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 _________________ test_r_a2l_read_1_cr_cr_lf_counts_two_ends __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32656/test_r_a2l_read_1_cr_cr_lf_cou0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32656/test_r_a2l_read_1_cr_cr_lf_cou0')
 
     def test_r_a2l_read_1_cr_cr_lf_counts_two_ends(tmp_path: Path) -> None:
         """R-A2L-READ.1/4: CR CR LF counts two line ends (RP-A4)."""
@@ -22,7 +22,7 @@ E       assert 4 == 3
 tests\test_b103_a2l_reader.py:214: AssertionError
 _________________ test_r_a2l_read_1_crlf_cr_mixed_read_as_lf __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32656/test_r_a2l_read_1_crlf_cr_mixe0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32656/test_r_a2l_read_1_crlf_cr_mixe0')
 
     def test_r_a2l_read_1_crlf_cr_mixed_read_as_lf(tmp_path: Path) -> None:
         """R-A2L-READ.1/1..3: CRLF, lone CR and mixed ends each read as LF (35/35)."""
@@ -45,7 +45,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
                 for t in data["tags"]:
                     assert _six_fields(t) == base_tags[t["name"]], (path, t["name"])
 >               assert data["errors"] == base["errors"], path
-E               AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b103-e5-11-mutA/examples/case_00_public/merge_inc_test.a2l')
+E               AssertionError: WindowsPath('C:/Users/<user>/AppData/Local/Temp/b103-e5-11-mutA/examples/case_00_public/merge_inc_test.a2l')
 E               assert ['Line 9: /in... is not read'] == ['Line 5: /in... is not read']
 E                 
 E                 At index 0 diff: 'Line 9: /include included.a2l is not read' != 'Line 5: /include included.a2l is not read'
@@ -56,7 +56,7 @@ tests\test_b103_a2l_reader.py:204: AssertionError
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf
 2 failed in 1.52s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -66,7 +66,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 _________________ test_r_a2l_read_1_cr_cr_lf_counts_two_ends __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32657/test_r_a2l_read_1_cr_cr_lf_cou0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32657/test_r_a2l_read_1_cr_cr_lf_cou0')
 
     def test_r_a2l_read_1_cr_cr_lf_counts_two_ends(tmp_path: Path) -> None:
         """R-A2L-READ.1/4: CR CR LF counts two line ends (RP-A4)."""
@@ -81,7 +81,7 @@ E       assert 4 == 3
 tests\test_b103_a2l_reader.py:214: AssertionError
 _________________ test_r_a2l_read_1_crlf_cr_mixed_read_as_lf __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32657/test_r_a2l_read_1_crlf_cr_mixe0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32657/test_r_a2l_read_1_crlf_cr_mixe0')
 
     def test_r_a2l_read_1_crlf_cr_mixed_read_as_lf(tmp_path: Path) -> None:
         """R-A2L-READ.1/1..3: CRLF, lone CR and mixed ends each read as LF (35/35)."""
@@ -104,7 +104,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
                 for t in data["tags"]:
                     assert _six_fields(t) == base_tags[t["name"]], (path, t["name"])
 >               assert data["errors"] == base["errors"], path
-E               AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b103-e5-11-mutA/examples/case_00_public/merge_inc_test.a2l')
+E               AssertionError: WindowsPath('C:/Users/<user>/AppData/Local/Temp/b103-e5-11-mutA/examples/case_00_public/merge_inc_test.a2l')
 E               assert ['Line 9: /in... is not read'] == ['Line 5: /in... is not read']
 E                 
 E                 At index 0 diff: 'Line 9: /include included.a2l is not read' != 'Line 5: /include included.a2l is not read'
@@ -115,7 +115,7 @@ tests\test_b103_a2l_reader.py:204: AssertionError
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf
 2 failed in 1.58s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

@@ -1,6 +1,6 @@
 # Inc 11 E4: correct the CURVE INSTANCE reference-reading fault (DeepSeek)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`, base HEAD `1075fe48`.
+Worktree: `C:\Users\<user>\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`, base HEAD `1075fe48`.
 
 ## Finding
 
@@ -32,7 +32,7 @@ Do not edit product code, requirements, graphs, records, evidence, or any other 
 
 On this PC run only `python -m py_compile` on the changed test files. Do not run pytest or any other Python here.
 
-A fresh full Git clone of `1075fe48` exists on the runner at `/tmp/b103-e4-11-oracle-kimi/tree`. Copy only your changed test files there and run the targeted test with `/home/javiergr/miniconda3/envs/s19ci/bin/python`, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e4-11-oracle-kimi/zq_iso_user`. Start the transcript by printing `s19_app.__file__`.
+A fresh full Git clone of `1075fe48` exists on the runner at `/tmp/b103-e4-11-oracle-kimi/tree`. Copy only your changed test files there and run the targeted test with `/home/<user>/miniconda3/envs/s19ci/bin/python`, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e4-11-oracle-kimi/<user>`. Start the transcript by printing `s19_app.__file__`.
 
 Run:
 

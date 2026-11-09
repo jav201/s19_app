@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_read_28_short_header_error _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-39/test_r_a2l_read_28_short_heade0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-39/test_r_a2l_read_28_short_heade0')
 
     def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
         """R-A2L-READ.28/1, /2, /4 (/2 name = first word, R-A2L-READ.23): short header errors."""

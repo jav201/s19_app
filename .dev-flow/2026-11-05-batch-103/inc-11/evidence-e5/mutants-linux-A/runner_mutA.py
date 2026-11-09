@@ -24,7 +24,7 @@ PRISTINE = OUT / ".pristine-a2l.py"
 TRANSCRIPTS = OUT / "mutants-A"
 
 PY = "/data/miniconda3/envs/s19ci/bin/python"
-ISO = Path("/tmp/b103-e5-11-mutA-laptop/zq_iso_user")
+ISO = Path("/tmp/b103-e5-11-mutA-laptop/<user>")
 
 DRIVER = OUT / "driver.py"
 

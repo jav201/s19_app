@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ________________________ test_r_a2l_read_11_stray_close ________________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-26/test_r_a2l_read_11_stray_close0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_11_stray_close0')
 
     def test_r_a2l_read_11_stray_close(tmp_path: Path) -> None:
         """R-A2L-READ.11/1: a stray */ alone."""

@@ -5,7 +5,7 @@ applied: 1
 === baseline pytest ===
 ...                                                                      [100%]
 3 passed in 1.05s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -15,7 +15,7 @@ FFF                                                                      [100%]
 ================================== FAILURES ===================================
 _____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\n] _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32641/test_r_a2l_read_9_line_comment0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment0')
 nl = '\n'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -41,7 +41,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in []
 tests\test_b103_a2l_reader.py:112: AssertionError
 ____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n] ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32641/test_r_a2l_read_9_line_comment1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment1')
 nl = '\r\n'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -67,7 +67,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in []
 tests\test_b103_a2l_reader.py:112: AssertionError
 _____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r] _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32641/test_r_a2l_read_9_line_comment2')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32641/test_r_a2l_read_9_line_comment2')
 nl = '\r'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -96,7 +96,7 @@ FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_lin
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n]
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r]
 3 failed in 1.30s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

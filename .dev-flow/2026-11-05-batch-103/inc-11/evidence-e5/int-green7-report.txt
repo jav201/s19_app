@@ -2,7 +2,7 @@ Run 7 executed end-to-end. **Result: NOT green — 3 failures** (no timing run, 
 
 ## What ran
 
-Fresh full clone of branch `b103-inc11-code` @ `21a0c56b` under `/tmp/b103-e5-11-int7/tree` on `cachyos-rtx`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, closed stdin, `HOME`/`XDG_*`/`LOCALAPPDATA` isolated under `/tmp/b103-e5-11-int7/zq_iso_user` (HOME basename `zqisolated7`, never `home`). Every transcript opens with `s19_app.__file__` → the fresh tree and carries the pytest exit code. Did not touch `~/work/b103-int11`.
+Fresh full clone of branch `b103-inc11-code` @ `21a0c56b` under `/tmp/b103-e5-11-int7/tree` on `<runner>`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, closed stdin, `HOME`/`XDG_*`/`LOCALAPPDATA` isolated under `/tmp/b103-e5-11-int7/<user>` (HOME basename `zqisolated7`, never `home`). Every transcript opens with `s19_app.__file__` → the fresh tree and carries the pytest exit code. Did not touch `~/work/b103-int11`.
 
 | Group | Files | Result | Exit |
 |---|---|---|---|

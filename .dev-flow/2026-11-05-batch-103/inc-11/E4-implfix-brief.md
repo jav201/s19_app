@@ -1,6 +1,6 @@
 # Inc 11 E4: implementation fix pass (DeepSeek v4 Pro, implementer role)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`. Integration run 2 is **not GREEN**. Read the report `inc-11/evidence-e4/int-run2-report.txt` and every transcript in `inc-11/evidence-e4/int-green2-*.txt`. Your rules are those of `inc-11/E4-handoff-impl-11.md`: the same 3 source files, and the design pinned by `codewire/graph-inc11.md` and `E3-rulings.md`.
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`. Integration run 2 is **not GREEN**. Read the report `inc-11/evidence-e4/int-run2-report.txt` and every transcript in `inc-11/evidence-e4/int-green2-*.txt`. Your rules are those of `inc-11/E4-handoff-impl-11.md`: the same 3 source files, and the design pinned by `codewire/graph-inc11.md` and `E3-rulings.md`.
 
 Fix every failure the report classes as **implementation**:
 1. The **hang**: `_split_line_respecting_quotes` loops forever (`a2l.py:1093/1106`), because `\n` is not in `_BLANKS`.
@@ -10,7 +10,7 @@ Fix every failure the report classes as **implementation**:
 5. The MEMORY_SEGMENT regression in `test_b101_a2l_blocks_and_segments.py:371`.
 6. The 24 failures in Inc 2a's tests (`a2l_definition.py` changed). Each of them must pass again unless one of Inc 11's rows changes it on purpose; in that case, name the row.
 
-On this PC run only `py_compile` and the code-wire extractor; run no other Python. To verify, update `/home/javiergr/work/b103-int11` on cachyos-rtx with a bundle of your **committed** branch. Commit as `batch-103 Inc 11 E4: implementation fixes after integration (DeepSeek)` with `Co-Authored-By: DeepSeek V4 Pro`. Then re-run (a), (b) and (c) of `E4-integration-brief.md` the Run-2 way (nohup and polling, `-n 8`), and after them (d). Save the results as `int-green3-*.txt` and commit them.
+On this PC run only `py_compile` and the code-wire extractor; run no other Python. To verify, update `/home/<user>/work/b103-int11` on <runner> with a bundle of your **committed** branch. Commit as `batch-103 Inc 11 E4: implementation fixes after integration (DeepSeek)` with `Co-Authored-By: DeepSeek V4 Pro`. Then re-run (a), (b) and (c) of `E4-integration-brief.md` the Run-2 way (nohup and polling, `-n 8`), and after them (d). Save the results as `int-green3-*.txt` and commit them.
 
 Do not edit any test file. Write a list of the test faults in `inc-11/evidence-e4/test-faults.md` for the tester pass.
 

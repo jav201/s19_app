@@ -3,7 +3,7 @@
 =================================== FAILURES ===================================
 ___________ test_e5_p9_invalid_byte_order_keeps_address_disagreement ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p9_invalid_byte_order_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p9_invalid_byte_order_0')
 
     def test_e5_p9_invalid_byte_order_keeps_address_disagreement(tmp_path: Path) -> None:
         """R-A2L-READ.59: differing addresses are still diagnosed alongside an
@@ -18,7 +18,7 @@ E        +  where False = any(<generator object test_e5_p9_invalid_byte_order_ke
 tests/test_b103_a2l_reader_e5.py:256: AssertionError
 _________________ test_e5_p9_no_number_keeps_size_disagreement _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p9_no_number_keeps_siz0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p9_no_number_keeps_siz0')
 
     def test_e5_p9_no_number_keeps_size_disagreement(tmp_path: Path) -> None:
         """R-A2L-READ.59: disagreeing sizes are still diagnosed alongside a size
@@ -33,7 +33,7 @@ E        +  where False = any(<generator object test_e5_p9_no_number_keeps_size_
 tests/test_b103_a2l_reader_e5.py:265: AssertionError
 ___________ test_e5_p10_every_invalid_byte_order_argument_diagnosed ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p10_every_invalid_byte0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p10_every_invalid_byte0')
 
     def test_e5_p10_every_invalid_byte_order_argument_diagnosed(tmp_path: Path) -> None:
         """R-A2L-READ.68: one .68 error per invalid BYTE_ORDER word, duplicates
@@ -47,7 +47,7 @@ E        +  where 1 = len(['Line 23: BYTE_ORDER MSB_FRIST is not a byte order'])
 tests/test_b103_a2l_reader_e5.py:278: AssertionError
 ______________ test_e5_p11_typedef_refused_length_not_reappearing ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p11_typedef_refused_le0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p11_typedef_refused_le0')
 
     def test_e5_p11_typedef_refused_length_not_reappearing(tmp_path: Path) -> None:
         """R-A2L-READ.43/.61: a refused typedef length stays refused for the INSTANCE."""
@@ -64,7 +64,7 @@ E        +  where False = any(<generator object test_e5_p11_typedef_refused_leng
 tests/test_b103_a2l_reader_e5.py:299: AssertionError
 ________________ test_e5_p12_declared_fnc_values_datatype_wins _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p12_declared_fnc_value0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p12_declared_fnc_value0')
 
     def test_e5_p12_declared_fnc_values_datatype_wins(tmp_path: Path) -> None:
         """R-A2L-015: a layout named ``__UBYTE_Z`` whose FNC_VALUES is ULONG sizes 4,
@@ -87,7 +87,7 @@ E       assert 1 == 4
 tests/test_b103_a2l_reader_e5.py:331: AssertionError
 __________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBOID] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p13_cuboid_cube_span_d0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p13_cuboid_cube_span_d0')
 kind = 'CUBOID'
 
     @pytest.mark.parametrize("kind", ["CUBOID", "CUBE_4", "CUBE_5"])
@@ -116,7 +116,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader_e5.py:360: AssertionError
 __________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_4] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p13_cuboid_cube_span_d1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p13_cuboid_cube_span_d1')
 kind = 'CUBE_4'
 
     @pytest.mark.parametrize("kind", ["CUBOID", "CUBE_4", "CUBE_5"])
@@ -145,7 +145,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader_e5.py:360: AssertionError
 __________ test_e5_p13_cuboid_cube_span_disagreement_refused[CUBE_5] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p13_cuboid_cube_span_d2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p13_cuboid_cube_span_d2')
 kind = 'CUBE_5'
 
     @pytest.mark.parametrize("kind", ["CUBOID", "CUBE_4", "CUBE_5"])
@@ -174,7 +174,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader_e5.py:360: AssertionError
 ________________ test_e5_p14_unclosed_declared_sections_no_span ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p14_unclosed_declared_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p14_unclosed_declared_0')
 
     def test_e5_p14_unclosed_declared_sections_no_span(tmp_path: Path) -> None:
         """R-A2L-READ.70: an unclosed BLOB/INSTANCE and an INSTANCE whose typedef is

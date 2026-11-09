@@ -4,7 +4,7 @@ F...........FFFFFFFF........FFF..FF...F.F.F.F..................FF....... [ 64%]
 =================================== FAILURES ===================================
 __________________ test_cov_read_1_line_end_variants_equal_lf __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_1_line_end_varia0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_1_line_end_varia0')
 
     def test_cov_read_1_line_end_variants_equal_lf(tmp_path: Path) -> None:
         """R-A2L-READ.1/1..3: tags, sections (line numbers included) and errors
@@ -62,7 +62,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:1669: AssertionError
 _________ test_cov_read_4_after_address_length_matrix_exact[\xa0-00A0] _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_0')
 ch = '\xa0', code = '00A0'
 
     @pytest.mark.parametrize(
@@ -91,7 +91,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+00A0'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 _________ test_cov_read_4_after_address_length_matrix_exact[\x85-0085] _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_1')
 ch = '\x85', code = '0085'
 
     @pytest.mark.parametrize(
@@ -120,7 +120,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+0085'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 ________ test_cov_read_4_after_address_length_matrix_exact[\u2028-2028] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_2')
 ch = '\u2028', code = '2028'
 
     @pytest.mark.parametrize(
@@ -149,7 +149,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+2028'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 ________ test_cov_read_4_after_address_length_matrix_exact[\u2029-2029] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_3')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_3')
 ch = '\u2029', code = '2029'
 
     @pytest.mark.parametrize(
@@ -178,7 +178,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+2029'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 _________ test_cov_read_4_after_address_length_matrix_exact[\x1c-001C] _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_4')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_4')
 ch = '\x1c', code = '001C'
 
     @pytest.mark.parametrize(
@@ -207,7 +207,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+001C'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 _________ test_cov_read_4_after_address_length_matrix_exact[\x1e-001E] _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_5')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_5')
 ch = '\x1e', code = '001E'
 
     @pytest.mark.parametrize(
@@ -236,7 +236,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+001E'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 ________ test_cov_read_4_after_address_length_matrix_exact[\ufeff-FEFF] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_6')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_6')
 ch = '\ufeff', code = 'FEFF'
 
     @pytest.mark.parametrize(
@@ -265,7 +265,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+FEFF'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 ________ test_cov_read_4_after_address_length_matrix_exact[\u200b-200B] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_4_after_address_7')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_4_after_address_7')
 ch = '\u200b', code = '200B'
 
     @pytest.mark.parametrize(
@@ -294,7 +294,7 @@ E        +  where 1 = len(['Line 20: unexpected character U+200B'])
 tests/test_b103_a2l_reader_coverage.py:201: AssertionError
 ______________ test_cov_read_7_keyword_glued_comment_upper_limit _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_7_keyword_glued_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_7_keyword_glued_0')
 
     def test_cov_read_7_keyword_glued_comment_upper_limit(tmp_path: Path) -> None:
         """R-A2L-READ.7/6: a header word glued to a comment and a keyword splits —
@@ -307,7 +307,7 @@ E       AssertionError: assert '65535' == 65535
 tests/test_b103_a2l_reader_coverage.py:288: AssertionError
 _________________ test_cov_read_8_comments_do_not_nest_word_c __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_8_comments_do_no0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_8_comments_do_no0')
 
     def test_cov_read_8_comments_do_not_nest_word_c(tmp_path: Path) -> None:
         """R-A2L-READ.8/2 (RP-B40): ``c`` is an own word of X and the stray ``*/``
@@ -323,7 +323,7 @@ E       IndexError: list index out of range
 tests/test_b103_a2l_reader_coverage.py:299: IndexError
 _________________ test_cov_read_10_comment_not_closed_line_20 __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_10_comment_not_c0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_10_comment_not_c0')
 
     def test_cov_read_10_comment_not_closed_line_20(tmp_path: Path) -> None:
         """R-A2L-READ.10/1: ``Line 20: comment not closed`` and no tag X."""
@@ -335,7 +335,7 @@ E       AssertionError: assert 'Line 20: comment not closed' in ['Line 19: comme
 tests/test_b103_a2l_reader_coverage.py:314: AssertionError
 ___________________ test_cov_001_3_2_escape_long_identifier ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_001_3_2_escape_long_i0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_001_3_2_escape_long_i0')
 
     def test_cov_001_3_2_escape_long_identifier(tmp_path: Path) -> None:
         """R-A2L-001.3.2/1: ``C:\\`` ends the string; long identifier ``C:\\`` and
@@ -353,7 +353,7 @@ E         ?    +
 tests/test_b103_a2l_reader_coverage.py:342: AssertionError
 __________________ test_cov_001_3_2_backslash_line_end_exact ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_001_3_2_backslash_lin0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_001_3_2_backslash_lin0')
 
     def test_cov_001_3_2_backslash_line_end_exact(tmp_path: Path) -> None:
         """R-A2L-001.3.2/4: the string closes on line 2; ``Line 3: /end without /begin``."""
@@ -365,7 +365,7 @@ E       AssertionError: assert 'Line 3: /end without /begin' in ['Line 25: /end 
 tests/test_b103_a2l_reader_coverage.py:349: AssertionError
 ______________ test_cov_read_14_words_after_close_carry_end_line _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_14_words_after_c0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_14_words_after_c0')
 
     def test_cov_read_14_words_after_close_carry_end_line(tmp_path: Path) -> None:
         """R-A2L-READ.14/2: X's end_line is 5; the U+00E9 error names Line 5."""
@@ -378,7 +378,7 @@ E       IndexError: list index out of range
 tests/test_b103_a2l_reader_coverage.py:406: IndexError
 _______________________ test_cov_001_1_if_data_parentage _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_001_1_if_data_parenta0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_001_1_if_data_parenta0')
 
     def test_cov_001_1_if_data_parentage(tmp_path: Path) -> None:
         """R-A2L-001.1/1: IF_DATA is a child of SX and SX's BIT_MASK 0x0FF0."""
@@ -395,7 +395,7 @@ E       IndexError: list index out of range
 tests/test_b103_a2l_reader_coverage.py:431: IndexError
 ____________________ test_cov_001_1_two_one_line_instances _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_001_1_two_one_line_in0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_001_1_two_one_line_in0')
 
     def test_cov_001_1_two_one_line_instances(tmp_path: Path) -> None:
         """R-A2L-001.1/4 ([K7b]): two INSTANCE sections, each start_line = end_line,
@@ -419,7 +419,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader_coverage.py:458: AssertionError
 ___________________ test_cov_read_19_endx_closes_at_own_end ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_19_endx_closes_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_19_endx_closes_a0')
 
     def test_cov_read_19_endx_closes_at_own_end(tmp_path: Path) -> None:
         """R-A2L-READ.19/2: /endX is a word of X; X closes at its own /end."""
@@ -433,7 +433,7 @@ E       IndexError: list index out of range
 tests/test_b103_a2l_reader_coverage.py:474: IndexError
 _________________ test_cov_read_58_argument_count_exact_lines __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_58_argument_coun0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_58_argument_coun0')
 
     def test_cov_read_58_argument_count_exact_lines(tmp_path: Path) -> None:
         """R-A2L-READ.58/1..3, /5: the argument-count errors name the keyword's line."""
@@ -455,7 +455,7 @@ E       AssertionError: assert 'ECU_ADDRESS has 0 of its 1 arguments' in ['Line 
 tests/test_b103_a2l_reader_coverage.py:697: AssertionError
 ___________________ test_cov_read_58_hex_like_surplus_exact ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_58_hex_like_surp0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_58_hex_like_surp0')
 
     def test_cov_read_58_hex_like_surplus_exact(tmp_path: Path) -> None:
         """R-A2L-READ.58/5 round 3: the five ECU_ADDRESS hex-like surplus shapes,
@@ -476,7 +476,7 @@ E           assert 'ECU_ADDRESS has 2 of its 1 arguments' in ['Line 22: ECU_ADDR
 tests/test_b103_a2l_reader_coverage.py:713: AssertionError
 __________________ test_cov_read_63_header_address_not_number __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_63_header_addres0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_63_header_addres0')
 
     def test_cov_read_63_header_address_not_number(tmp_path: Path) -> None:
         """R-A2L-READ.63/2 (H2e): ``Line 21: address 0x1C2D3E00_4026 is not a number``."""
@@ -499,7 +499,7 @@ E       AssertionError: assert 'Line 21: address 0x1C2D3E00_4026 is not a number
 tests/test_b103_a2l_reader_coverage.py:947: AssertionError
 ____________________ test_cov_read_63_exact_words_and_lines ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_63_exact_words_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_63_exact_words_a0')
 
     def test_cov_read_63_exact_words_and_lines(tmp_path: Path) -> None:
         """R-A2L-READ.63/1, /3, /4: the not-a-number errors echo the exact word and
@@ -513,7 +513,7 @@ E           assert 'ECU_ADDRESS 0x12_34 is not a number' in ['Line 22: ECU_ADDRE
 tests/test_b103_a2l_reader_coverage.py:955: AssertionError
 __________________ test_cov_read_48_hostile_corpus_equal_ref ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_48_hostile_corpu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_48_hostile_corpu0')
 
     def test_cov_read_48_hostile_corpus_equal_ref(tmp_path: Path) -> None:
         """R-A2L-READ.48/2: the hostile corpus equals the reference reading."""
@@ -562,7 +562,7 @@ E             Use -v to get more diff
 tests/test_b103_a2l_reader.py:1680: AssertionError
 __________________ test_cov_read_54_record_layout_named_later __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_54_record_layout0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_54_record_layout0')
 
     def test_cov_read_54_record_layout_named_later(tmp_path: Path) -> None:
         """R-A2L-READ.54/3: a later-named RECORD_LAYOUT's FNC_VALUES UWORD sizes 2."""
@@ -583,7 +583,7 @@ E       KeyError: 'decode_type'
 tests/test_b103_a2l_reader_coverage.py:1748: KeyError
 ____________________ test_cov_read_21_innermost_close_line _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-60/test_cov_read_21_innermost_clo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-60/test_cov_read_21_innermost_clo0')
 
     def test_cov_read_21_innermost_close_line(tmp_path: Path) -> None:
         """R-A2L-READ.21/1: an /end closes the innermost section; X is closed at

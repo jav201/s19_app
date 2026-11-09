@@ -1,31 +1,31 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 .......F.F.............F..FFFF....F..................................... [ 36%]
 ......................F.FFF................F..............FF..F......... [ 72%]
 .............................F.........FFFFFFF..........                 [100%]
 =================================== FAILURES ===================================
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:302: AssertionError: assert ('' == 'text'
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:324: AssertionError: assert None == 256
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: None
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='Z0: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZN: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZH: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='NA2: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='LX: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:1123: KeyError: 'UNKNOWN'
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:1243: AssertionError: assert ('' == 'enum'
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:1251: assert []
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='N1: no tag of that name in the A2L')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:1588: AssertionError: ('UNKNOWN', Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HL: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HD: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HN: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2312: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='MD: the object has no address or no length')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2351: AssertionError: assert Definition(na... in the A2L')) == Definition(na... refusal=None)
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2372: AssertionError: assert Refusal(code=...or no length') == Refusal(code=...EMENT object')
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_definition.py:2388: AssertionError: assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:302: AssertionError: assert ('' == 'text'
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:324: AssertionError: assert None == 256
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: None
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='Z0: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZN: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZH: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='NA2: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='LX: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:1123: KeyError: 'UNKNOWN'
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:1243: AssertionError: assert ('' == 'enum'
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:1251: assert []
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='N1: no tag of that name in the A2L')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:1588: AssertionError: ('UNKNOWN', Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HL: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HD: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2284: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HN: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2312: AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='MD: the object has no address or no length')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2351: AssertionError: assert Definition(na... in the A2L')) == Definition(na... refusal=None)
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2372: AssertionError: assert Refusal(code=...or no length') == Refusal(code=...EMENT object')
+/home/<user>/work/b103-int11/tests/test_b103_a2l_definition.py:2388: AssertionError: assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
 24 failed, 176 passed in 14.98s
 B_EXIT=1

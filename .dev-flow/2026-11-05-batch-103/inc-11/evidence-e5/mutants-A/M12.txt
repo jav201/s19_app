@@ -5,7 +5,7 @@ applied: 1
 === baseline pytest ===
 ..                                                                       [100%]
 2 passed in 1.08s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -15,7 +15,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 __________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32661/test_r_a2l_read_6_utf16_refusa0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32661/test_r_a2l_read_6_utf16_refusa0')
 bom = b'\xff\xfe'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -34,7 +34,7 @@ E         Use -v to get more diff
 tests\test_b103_a2l_reader.py:361: AssertionError
 __________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32661/test_r_a2l_read_6_utf16_refusa1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32661/test_r_a2l_read_6_utf16_refusa1')
 bom = b'\xfe\xff'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -55,7 +55,7 @@ tests\test_b103_a2l_reader.py:361: AssertionError
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xff\xfe]
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_6_utf16_refusal[\xfe\xff]
 2 failed in 1.22s
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

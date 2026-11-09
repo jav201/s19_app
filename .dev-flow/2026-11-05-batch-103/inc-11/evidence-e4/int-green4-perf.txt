@@ -1,7 +1,7 @@
 === (d) timed tests, one at a time (-m serial_timing) ===
 --- uptime BEFORE ---
  13:32:37 up 7 min,  2 users,  load average: 1.50, 1.30, 0.67
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 === tester perf arms: test_b103_a2l_reader_perf.py ===
 FFF....                                                                  [100%]
 =================================== FAILURES ===================================

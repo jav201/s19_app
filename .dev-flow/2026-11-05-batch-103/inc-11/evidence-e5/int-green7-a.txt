@@ -16,7 +16,7 @@ created: 8/8 workers
 ..........FF..................................................           [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_48_tracked_files_equal_ref __________________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 ref = <function ref_read_a2l at 0x7f8abcb0c220>
 
@@ -54,9 +54,9 @@ E             Use -v to get more diff
 
 tests/test_b103_a2l_reader.py:1680: AssertionError
 _______________________ test_r_a2l_read_49_no_regression _______________________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-48/popen-gw3/test_r_a2l_read_49_no_regressi0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-48/popen-gw3/test_r_a2l_read_49_no_regressi0')
 
     def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
         """R-A2L-READ.49/1: 234,427 tags identical; 227 defect tags take their values."""

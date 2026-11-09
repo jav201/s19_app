@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_61_no_length_when_disagree __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-44/test_r_a2l_read_61_no_length_w0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-44/test_r_a2l_read_61_no_length_w0')
 
     def test_r_a2l_read_61_no_length_when_disagree(tmp_path: Path) -> None:
         """R-A2L-READ.61/1..7: no length when sizes disagree."""

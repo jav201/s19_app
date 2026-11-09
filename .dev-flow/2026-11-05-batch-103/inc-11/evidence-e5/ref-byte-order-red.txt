@@ -3,7 +3,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________________ test_cov_read_68_byte_order_error_exact ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javierg/pytest-567/test_cov_read_68_byte_order_er0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-567/test_cov_read_68_byte_order_er0')
 
     def test_cov_read_68_byte_order_error_exact(tmp_path: Path) -> None:
         """R-A2L-READ.68/1: exactly one not-a-byte-order error each, on line 23."""

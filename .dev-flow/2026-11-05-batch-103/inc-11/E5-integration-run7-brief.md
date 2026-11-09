@@ -2,7 +2,7 @@
 
 Baseline `21a0c56b`, which includes P1–P15 and 23 green E5 nodes. Do not edit any product or test file and do not commit.
 
-Create a fresh full Git clone of the supplied branch under `/tmp/b103-e5-11-int7/tree`. Use the Linux runner only, absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-int7/zq_iso_user` (never a final component named `home`). Print `s19_app.__file__` at the start of every transcript. Do not use the stale `~/work/b103-int11`.
+Create a fresh full Git clone of the supplied branch under `/tmp/b103-e5-11-int7/tree`. Use the Linux runner only, absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-int7/<user>` (never a final component named `home`). Print `s19_app.__file__` at the start of every transcript. Do not use the stale `~/work/b103-int11`.
 
 Run these groups without `serial_timing`, using `-n 8`:
 

@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_read_10_comment_not_closed _____________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-25/test_r_a2l_read_10_comment_not0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-25/test_r_a2l_read_10_comment_not0')
 
     def test_r_a2l_read_10_comment_not_closed(tmp_path: Path) -> None:
         """R-A2L-READ.10/1: an unclosed comment ends the reading."""

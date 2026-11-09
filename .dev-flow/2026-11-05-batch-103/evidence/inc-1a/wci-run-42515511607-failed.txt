@@ -134,7 +134,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2524751Z ================================== FAILURES ===================================
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2525657Z _______________ test_r_tui_043_12_2_held_clipboard_logs_warning _______________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2526247Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2527065Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_12_2_held_clipb0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2527065Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_tui_043_12_2_held_clipb0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528013Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528207Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528618Z     def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
@@ -170,13 +170,13 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2543361Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2543644Z tests\test_b103_clipboard_windows.py:639: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2544483Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2546793Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_2_held_clipb0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_2_held_clipb0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2546793Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_tui_043_12_2_held_clipb0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_tui_043_12_2_held_clipb0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2550422Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2551389Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2552584Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2553668Z ____________ test_r_paste_9_2_held_clipboard_write_warning[single] ____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2554276Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2555444Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_9_2_held_clipboar0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2555444Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_9_2_held_clipboar0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2556649Z os_clipboard_ready = None, box_kind = 'a'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2557019Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2557467Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
@@ -211,7 +211,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2574020Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2574337Z tests\test_b103_clipboard_windows.py:972: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2575639Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2578374Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2578374Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_9_2_held_clipboar0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_9_2_held_clipboar0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2580671Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2581696Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2582917Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
@@ -242,7 +242,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2614962Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9570EB340> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2616106Z ____________ test_r_paste_9_2_held_clipboard_write_warning[multi] _____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2616599Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2617244Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_9_2_held_clipboar1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2617244Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_9_2_held_clipboar1')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618270Z os_clipboard_ready = None, box_kind = 'm'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618562Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618902Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
@@ -277,7 +277,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2632836Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2633098Z tests\test_b103_clipboard_windows.py:972: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2634062Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2636046Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2636046Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_9_2_held_clipboar1 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_9_2_held_clipboar1\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2637888Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2638642Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2639504Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
@@ -307,7 +307,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2657562Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D957F82480> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2658685Z _______ test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single] _______
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2659115Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2659744Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_13_1_2_held_clipb0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2659744Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_13_1_2_held_clipb0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2660827Z os_clipboard_ready = None, box_kind = 'a'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2661135Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2661271Z     @pytest.mark.serial_timing
@@ -351,7 +351,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2678861Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2679073Z tests\test_b103_clipboard_windows.py:1059: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2679715Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2681703Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2681703Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_13_1_2_held_clipb0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_13_1_2_held_clipb0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2683477Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2684229Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2685148Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
@@ -382,7 +382,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2704353Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D958635D80> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2705439Z _______ test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi] ________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2705906Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2706528Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_13_1_2_held_clipb1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2706528Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_13_1_2_held_clipb1')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707447Z os_clipboard_ready = None, box_kind = 'm'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707720Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707887Z     @pytest.mark.serial_timing
@@ -426,7 +426,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2744418Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2744672Z tests\test_b103_clipboard_windows.py:1059: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2745412Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2747587Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2747587Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_13_1_2_held_clipb1 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_13_1_2_held_clipb1\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2749811Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2751389Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2752407Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
@@ -456,7 +456,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2774243Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D95A749D40> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2776447Z ____________ test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive _____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2777026Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2777787Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_9_1_held_read_c0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2777787Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_tui_043_9_1_held_read_c0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802203Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802526Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802685Z     @pytest.mark.serial_timing
@@ -490,7 +490,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2817829Z tests\test_b103_clipboard_windows.py:1143: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2818608Z ____________ test_r_paste_14_1_held_write_ctrl_c_stays_responsive _____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2819123Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2819834Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_14_1_held_write_c0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2819834Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_14_1_held_write_c0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821116Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821394Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821557Z     @pytest.mark.serial_timing
@@ -523,7 +523,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2836341Z tests\test_b103_clipboard_windows.py:1143: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2837121Z __________ test_r_paste_14_2_held_write_right_click_stays_responsive __________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2837665Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2838374Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_14_2_held_write_r0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2838374Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_14_2_held_write_r0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839458Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839683Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839866Z     @pytest.mark.serial_timing
@@ -556,7 +556,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2870104Z tests\test_b103_clipboard_windows.py:1143: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2870932Z __________ test_r_tui_043_9_2_held_read_right_click_stays_responsive __________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2871663Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2872417Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_9_2_held_read_r0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2872417Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_tui_043_9_2_held_read_r0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2873706Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2873970Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2874170Z     @pytest.mark.serial_timing
@@ -590,7 +590,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2889049Z tests\test_b103_clipboard_windows.py:1143: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2889826Z ______ test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single] ______
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2890375Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2891109Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_28_1_2_held_right0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2891109Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_28_1_2_held_right0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2892470Z os_clipboard_ready = None, box_kind = 'a'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2892839Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2893002Z     @pytest.mark.serial_timing
@@ -634,7 +634,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915094Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915300Z tests\test_b103_clipboard_windows.py:1353: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915872Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2917614Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2917614Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_28_1_2_held_right0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_28_1_2_held_right0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2919295Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2919968Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2920816Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
@@ -665,7 +665,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2937739Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9575A0C80> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2938785Z ______ test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi] _______
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2939204Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2939774Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_28_1_2_held_right1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2939774Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_28_1_2_held_right1')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940615Z os_clipboard_ready = None, box_kind = 'm'
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940872Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940997Z     @pytest.mark.serial_timing
@@ -709,7 +709,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2977962Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2978220Z tests\test_b103_clipboard_windows.py:1353: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2978841Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7638722Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7638722Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_28_1_2_held_right1 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_28_1_2_held_right1\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7640932Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7641711Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7642536Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
@@ -739,7 +739,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7659830Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9568D9DC0> was created in a different Context
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7660854Z ____________ test_r_tui_043_12_3_win_right_click_held_logs_warning ____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7661664Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7662271Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_12_3_win_right_0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7662271Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_tui_043_12_3_win_right_0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663123Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663325Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663749Z     def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
@@ -775,13 +775,13 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677060Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677265Z tests\test_b103_clipboard_windows.py:1558: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677822Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7679640Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_3_win_right_0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_3_win_right_0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7679640Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_tui_043_12_3_win_right_0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_tui_043_12_3_win_right_0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7681318Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7681987Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7682819Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7683555Z _____________ test_r_paste_10_2_win_right_click_copy_logs_warning _____________
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7683962Z 
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7684539Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_10_2_win_right_cl0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7684539Z tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-0/test_r_paste_10_2_win_right_cl0')
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685375Z os_clipboard_ready = None
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685561Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685958Z     def test_r_paste_10_2_win_right_click_copy_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
@@ -813,7 +813,7 @@ clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696103Z 
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696297Z tests\test_b103_clipboard_windows.py:1650: AssertionError
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696835Z ------------------------------ Captured log call ------------------------------
-clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7698557Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_10_2_win_right_cl0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_10_2_win_right_cl0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7698557Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_10_2_win_right_cl0 workarea=C:\Users\<user>\AppData\Local\Temp\pytest-of-<user>\pytest-0\test_r_paste_10_2_win_right_cl0\.s19tool\workarea
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7700208Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7700845Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
 clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7701678Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001

@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________________ test_r_a2l_read_34_hex_words _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-37/test_r_a2l_read_34_hex_words0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-37/test_r_a2l_read_34_hex_words0')
 
     def test_r_a2l_read_34_hex_words(tmp_path: Path) -> None:
         """R-A2L-READ.34/1: 0x, 0X and 16-digit hex."""

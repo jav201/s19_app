@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________________________ test_r_a2l_001_3_2_escapes __________________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-28/test_r_a2l_001_3_2_escapes0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-28/test_r_a2l_001_3_2_escapes0')
 
     def test_r_a2l_001_3_2_escapes(tmp_path: Path) -> None:
         """R-A2L-001.3.2/1..3: \\\\, \\" and \\\\" behave as one escape pair."""
@@ -23,7 +23,7 @@ tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javi
 tests/test_b103_a2l_reader.py:628: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-28/test_r_a2l_001_3_2_escapes0/x.a2l', ...ted string not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
+data = {'path': '/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-28/test_r_a2l_001_3_2_escapes0/x.a2l', ...ted string not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:

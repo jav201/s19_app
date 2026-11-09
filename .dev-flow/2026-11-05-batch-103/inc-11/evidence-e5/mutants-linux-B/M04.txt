@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________________ test_r_a2l_read_35_decimal_words _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-41/test_r_a2l_read_35_decimal_wor0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-41/test_r_a2l_read_35_decimal_wor0')
 
     def test_r_a2l_read_35_decimal_words(tmp_path: Path) -> None:
         """R-A2L-READ.35/1, /2: decimal words with leading zero / plain."""

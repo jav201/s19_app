@@ -1,11 +1,11 @@
 # Inc 11 E5 — mutants A: lexer and section tree (Linux canonical)
 
 Baseline `14fdc3b9`, isolated copy `/tmp/b103-e5-11-mutA-laptop/tree`
-(the real worktree was never mutated or committed). Host: `lnx1` (the
+(the real worktree was never mutated or committed). Host: `<runner>` (the
 operator-provided alternative CachyOS laptop), Python `/data/miniconda3/envs/s19ci/bin/python`, textual
 8.x, pytest. Every arm ran in a fresh process with `PYTHONDONTWRITEBYTECODE=1`,
 closed stdin, isolated `HOME`/`XDG_*`/`LOCALAPPDATA`/`TMPDIR` under
-`zq_iso_user`, `python -I -B`, explicit `sys.path.insert(0, tree)`, and
+`<user>`, `python -I -B`, explicit `sys.path.insert(0, tree)`, and
 `s19_app.__file__` printed first. A verdict is read from the pytest summary
 **and** the assertion text in the per-arm transcript, never from the process
 exit code alone. Scope: the graph nodes `_lex_a2l_lines`, `_line_words`/

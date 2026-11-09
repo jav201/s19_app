@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 bringing up nodes...
 bringing up nodes...
 
@@ -10,9 +10,9 @@ bringing up nodes...
 .............                                                            [100%]
 =================================== FAILURES ===================================
 ___________________ test_r_a2l_036_2_open_quote_ends_at_line ___________________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10081/popen-gw3/test_r_a2l_036_2_open_quote_en0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10081/popen-gw3/test_r_a2l_036_2_open_quote_en0')
 
     def test_r_a2l_036_2_open_quote_ends_at_line(tmp_path: Path) -> None:
         """Why: an unterminated quote ends at its line; it must not swallow the next line's

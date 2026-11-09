@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_5_bom_before_project_dropped _________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-33/test_r_a2l_read_5_bom_before_p0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-33/test_r_a2l_read_5_bom_before_p0')
 
     def test_r_a2l_read_5_bom_before_project_dropped(tmp_path: Path) -> None:
         """R-A2L-READ.5/2: a BOM before /begin PROJECT is dropped (RP-A9)."""

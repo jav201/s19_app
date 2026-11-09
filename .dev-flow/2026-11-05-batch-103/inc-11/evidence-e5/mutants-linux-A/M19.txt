@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________________ test_r_a2l_001_5_end_name_mismatch ______________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-41/test_r_a2l_001_5_end_name_mism0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-41/test_r_a2l_001_5_end_name_mism0')
 
     def test_r_a2l_001_5_end_name_mismatch(tmp_path: Path) -> None:
         """R-A2L-001.5/1, /2 and R-A2L-READ.21/1: /end name mismatch and innermost close."""

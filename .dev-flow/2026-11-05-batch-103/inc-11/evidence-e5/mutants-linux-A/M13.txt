@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_55_nul_after_address_refused _________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-35/test_r_a2l_read_55_nul_after_a0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-35/test_r_a2l_read_55_nul_after_a0')
 
     def test_r_a2l_read_55_nul_after_address_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/3: a NUL after an address word refuses the file."""

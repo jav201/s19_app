@@ -3,7 +3,7 @@ F
 =================================== FAILURES ===================================
 ________________________ test_r_a2l_read_52_case06_time ________________________
 
-big_files = {'case06': PosixPath('/tmp/b103-e5-11-mutB-rtx/tree/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': Po...eader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-30/b103_a2l_reader_perf0/words.a2l'), ...}
+big_files = {'case06': PosixPath('/tmp/b103-e5-11-mutB-rtx/tree/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': Po...eader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-<user>/pytest-30/b103_a2l_reader_perf0/words.a2l'), ...}
 
     @pytest.mark.serial_timing
     def test_r_a2l_read_52_case06_time(big_files: dict) -> None:

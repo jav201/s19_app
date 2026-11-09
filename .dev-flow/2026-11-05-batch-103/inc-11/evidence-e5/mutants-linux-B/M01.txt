@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_read_27_keyword_ends_header ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-38/test_r_a2l_read_27_keyword_end0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-38/test_r_a2l_read_27_keyword_end0')
 
     def test_r_a2l_read_27_keyword_ends_header(tmp_path: Path) -> None:
         """R-A2L-READ.27/2..5: a keyword in header position ends the header."""

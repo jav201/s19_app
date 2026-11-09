@@ -70,19 +70,19 @@ No other case was changed.
 - Local syntax check: `python -m py_compile tests/test_b103_a2l_reader.py`
   → `PY_COMPILE_OK` (Windows, local repo checkout).
 - Linux pytest: **NOT RUN — SSH unavailable.** The runner
-  `javiergr@192.168.1.67` (cachyos-rtx) is unreachable from this machine:
-  `ssh: connect to host 192.168.1.67 port 22: Connection timed out` and
-  `ping` reports `Destination host unreachable` from 192.168.1.66.
+  `<user>@<runner-ip>` (<runner>) is unreachable from this machine:
+  `ssh: connect to host <runner-ip> port 22: Connection timed out` and
+  `ping` reports `Destination host unreachable` from <runner-ip>.
   Per the lane instructions, the change is implemented and py_compiled, and the
   Linux run is left as **pending evidence**.
 
 Intended Linux command (pending runner availability):
 
 ```
-/home/javiergr/miniconda3/envs/s19ci/bin/python
+/home/<user>/miniconda3/envs/s19ci/bin/python
 ```
 
-with an isolated `/tmp/b103-e5-11-deep-b/zq_iso_user` user, closed stdin,
+with an isolated `/tmp/b103-e5-11-deep-b/<user>` user, closed stdin,
 `PYTHONDONTWRITEBYTECODE=1`, and the package path printed first.
 
 ## Scope guard

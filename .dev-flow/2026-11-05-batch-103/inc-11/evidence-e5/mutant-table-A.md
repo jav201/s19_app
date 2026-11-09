@@ -1,6 +1,6 @@
 # Inc 11 E5 — mutants A: lexer and section tree (DeepSeek v4 Pro)
 
-Baseline `f1397097`, isolated copy `C:\Users\jjgh8\AppData\Local\Temp\b103-e5-11-mutA`
+Baseline `f1397097`, isolated copy `C:\Users\<user>\AppData\Local\Temp\b103-e5-11-mutA`
 (a `git worktree add --detach` of `f1397097`; the real worktree was never mutated or
 committed). Host: Windows, Python 3.12.7, textual 8.2.8, pytest 8.3.4. Every arm ran
 with `PYTHONDONTWRITEBYTECODE=1`, closed stdin, and a fresh process per discriminating
@@ -93,7 +93,7 @@ which on Windows translates `\n` → `\r\n` (proven: `write_text("A\r\r\nB\nC\r"
 `b'A\r\r\r\nB\r\nC\r'`, `os.linesep == '\r\n'`), corrupting the hand-built CR/CRLF
 variants and shifting line numbers (`Line 9: /include …` vs `Line 5`). The product
 code is unaffected: the full reader suite is 181 passed / 2 failed on Windows and
-**183 passed / 0 failed** on the canonical Linux CI host (cachyos-rtx; see
+**183 passed / 0 failed** on the canonical Linux CI host (<runner>; see
 `steps.log`, "E4 integration run 6 … full reader 183 passed"). M10's verdict is
 SURVIVED on both hosts: on Linux the two CR tests are green and still pass after M10,
 because universal newlines removes the `\r` the mutation targets.

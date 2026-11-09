@@ -1,9 +1,9 @@
 host:
-cachyos-rtx
+<runner>
 Sat Nov  7 11:27:44 AM CST 2026
 0.92 3.88 5.50 1/585 503251
 s19_app __file__:
-/home/javiergr/work/b103-inc11-base/s19_app/__init__.py
+/home/<user>/work/b103-inc11-base/s19_app/__init__.py
 
 == RED pins (behavioural) on base ==
 FFFF                                                                     [100%]
@@ -19,7 +19,7 @@ E       assert None is not None
 tests/test_b103_a2l_reader.py:1533: AssertionError
 _______________ test_r_a2l_read_7_comment_between_digits_splits ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1012/test_r_a2l_read_7_comment_betw0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_7_comment_betw0')
 
     def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
         """R-A2L-READ.7/1: MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
@@ -34,7 +34,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1012/test_r_a2l_read_7_comm
 tests/test_b103_a2l_reader.py:521: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1012/test_r_a2l_read_7_comment_betw0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_7_comment_betw0/x.a2l', ...}
 name = 'Synthetic map', section = 'CHARACTERISTIC'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -47,7 +47,7 @@ E       AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
 tests/test_b103_a2l_reader.py:112: AssertionError
 ________________________ test_r_a2l_read_17_v171_clean _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1012/test_r_a2l_read_17_v171_clean0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1012/test_r_a2l_read_17_v171_clean0')
 
     def test_r_a2l_read_17_v171_clean(tmp_path: Path) -> None:
         """R-A2L-READ.17/1: V171 has 0 parse errors and depth-3 MEASUREMENTs."""

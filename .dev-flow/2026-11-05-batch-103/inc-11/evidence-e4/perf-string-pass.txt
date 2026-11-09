@@ -1,4 +1,4 @@
-# Inc 11 E4 — R-A2L-READ.52/2 string-path perf fix (cachyos-rtx)
+# Inc 11 E4 — R-A2L-READ.52/2 string-path perf fix (<runner>)
 
 Bound: <= 1.5 x e07fb00 (BASE_STRING_S = 0.075 s) -> 0.1125 s.
 Before (integration run 4, int-green4-perf.txt): 0.1797 s = 2.40 x  -> FAIL.

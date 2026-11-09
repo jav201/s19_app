@@ -1,6 +1,6 @@
 # Inc 11 E5: complete AT-B103-I11-2 and AT-B103-I11-3 through the real app (DeepSeek)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`, base commit `c351ed7b`. You are an independent acceptance tester. Do not commit.
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`, base commit `c351ed7b`. You are an independent acceptance tester. Do not commit.
 
 ## Scope
 
@@ -42,7 +42,7 @@ Use product observables and the repository's settled/wait helpers, not arbitrary
 
 ## RED and GREEN evidence
 
-On this PC run only `python -m py_compile tests/test_b103_a2l_reader.py`. All pytest runs happen on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e5-11-at/zq_iso_user` (never a path whose final component is `home`). Start every transcript with `s19_app.__file__` and include the pytest exit code.
+On this PC run only `python -m py_compile tests/test_b103_a2l_reader.py`. All pytest runs happen on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e5-11-at/<user>` (never a path whose final component is `home`). Start every transcript with `s19_app.__file__` and include the pytest exit code.
 
 Create fresh full Git clones/worktrees as needed under `/tmp/b103-e5-11-at`; never use the stale `~/work/b103-int11`.
 

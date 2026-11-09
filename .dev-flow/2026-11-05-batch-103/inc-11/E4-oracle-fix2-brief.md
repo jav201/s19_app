@@ -25,7 +25,7 @@ Add focused synthetic differential coverage for each corrected class where it is
 
 ## Execution
 
-On this PC run only `python -m py_compile` on the changed test files. Use the existing fresh clone at `/tmp/b103-e4-11-oracle-kimi/tree`; copy only your changed test files there. Use the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin, and the existing isolated `zq_iso_user` environment.
+On this PC run only `python -m py_compile` on the changed test files. Use the existing fresh clone at `/tmp/b103-e4-11-oracle-kimi/tree`; copy only your changed test files there. Use the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin, and the existing isolated `<user>` environment.
 
 Run the focused cases, then `test_r_a2l_read_48_tracked_files_equal_ref`, then the whole `tests/test_b103_a2l_reader.py` with `-m "not serial_timing"`. Save the complete final reader transcript as `/tmp/b103-e4-11-oracle-kimi/followup-reader.log`, including the exit code, and copy it to `inc-11/evidence-e4/int-oracle-followup-reader.txt` in the local worktree. If other differences surface, report them; do not broaden into product changes.
 

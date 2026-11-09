@@ -1,7 +1,7 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 ============================= test session starts ==============================
-platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/javiergr/miniconda3/envs/s19ci/bin/python
-rootdir: /home/javiergr/work/b103-int11
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/<user>/miniconda3/envs/s19ci/bin/python
+rootdir: /home/<user>/work/b103-int11
 configfile: pyproject.toml
 plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
 collecting ... collected 178 items / 16 deselected / 162 selected
@@ -170,20 +170,20 @@ tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_not
 tests/test_b103_a2l_reader.py::test_at_b103_i11_3_v171_loads_clean PASSED [100%]
 
 =================================== FAILURES ===================================
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:214: assert ((3 * 2) - 1) == 49
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:460: assert 0 == 2
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:490: AssertionError: LENGTH
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:505: AssertionError: assert 'little' == 'big'
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:112: AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:602: AssertionError: assert [{'access': N...': None, ...}] == []
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:673: assert False
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:804: assert []
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1010: assert False
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:112: AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1213: assert False
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1334: AssertionError: 1048576
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1341: AssertionError: 0
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1418: AttributeError: 'Definition' object has no attribute 'refusals'
-/home/javiergr/work/b103-int11/tests/test_b103_a2l_reader.py:1490: assert False
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:214: assert ((3 * 2) - 1) == 49
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:460: assert 0 == 2
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:490: AssertionError: LENGTH
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:505: AssertionError: assert 'little' == 'big'
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:112: AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:602: AssertionError: assert [{'access': N...': None, ...}] == []
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:673: assert False
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:804: assert []
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1010: assert False
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:112: AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1213: assert False
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1334: AssertionError: 1048576
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1341: AssertionError: 0
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1418: AttributeError: 'Definition' object has no attribute 'refusals'
+/home/<user>/work/b103-int11/tests/test_b103_a2l_reader.py:1490: assert False
 ================ 15 failed, 147 passed, 16 deselected in 4.47s =================
 SERIAL_EXIT=1

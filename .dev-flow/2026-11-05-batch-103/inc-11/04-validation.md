@@ -2,7 +2,7 @@
 
 **Verdict: PASS-WITH-NOTES.** No MAJOR, HIGH or worse is open. The increment has **81 active requirements** (two tag-table rows withdrawn here and moved to Inc 12), **271 cases + 2 acceptance cases**, all `covered` and `verified`. Code-Wire has **39/40 nodes**. Written 2026-11-09.
 
-**Platforms.** Final integration, READ.52 and mutant B ran on `cachyos-rtx`, Python 3.11.18. Mutant A ran on the operator-provided CachyOS laptop `lnx1`, Python 3.11.18. Earlier laptop-only results are retained as history, not as the final RTX verdict. Windows mutant output is noncanonical supporting material only and is excluded from this verdict.
+**Platforms.** Final integration, READ.52 and mutant B ran on `<runner>`, Python 3.11.18. Mutant A ran on the operator-provided CachyOS laptop `<runner>`, Python 3.11.18. Earlier laptop-only results are retained as history, not as the final RTX verdict. Windows mutant output is noncanonical supporting material only and is excluded from this verdict.
 
 ## Final runs
 

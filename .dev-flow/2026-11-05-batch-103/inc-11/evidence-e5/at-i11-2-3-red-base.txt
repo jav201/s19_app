@@ -3,7 +3,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 ____________ test_at_b103_i11_2_commented_old_copy_changes_nothing _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_2_commented_o0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-39/test_at_b103_i11_2_commented_o0')
 
     def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
         """AT-B103-I11-2 (RP-B28) through the app: exactly one A2L Explorer row X
@@ -104,13 +104,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/support/b100_projects.py:615: in run_app
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests/support/b100_projects.py:613: in _drive
@@ -160,7 +160,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:1911: AssertionError
 _____________________ test_at_b103_i11_3_v171_loads_clean ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_3_v171_loads_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-39/test_at_b103_i11_3_v171_loads_0')
 
     def test_at_b103_i11_3_v171_loads_clean(tmp_path: Path) -> None:
         """AT-B103-I11-3 through the app: the real A2L attach action loads
@@ -211,13 +211,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/support/b100_projects.py:615: in run_app
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests/support/b100_projects.py:613: in _drive
@@ -257,7 +257,7 @@ E       assert 'A2L Sections:' in 'A2L summary lines 1-2 / 2\n------------------
 
 tests/test_b103_a2l_reader.py:1978: AssertionError
 ------------------------------ Captured log call -------------------------------
-WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_3_v171_loads_0/app/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/pytest-of-<user>/pytest-39/test_at_b103_i11_3_v171_loads_0/app/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_nothing
 FAILED tests/test_b103_a2l_reader.py::test_at_b103_i11_3_v171_loads_clean - A...

@@ -6,11 +6,11 @@ Canonical re-run on commit `14fdc3b9`
 non-canonical reference; every anchor and verdict below is rebuilt from the
 current tree.
 
-Host: `cachyos-rtx`, Linux 7.3.3-1-cachyos x86_64. Python 3.11.18
-(`/home/javiergr/miniconda3/envs/s19ci/bin/python -I -B`), pytest 8.4.2.
+Host: `<runner>`, Linux 7.3.3-1-cachyos x86_64. Python 3.11.18
+(`/home/<user>/miniconda3/envs/s19ci/bin/python -I -B`), pytest 8.4.2.
 Every arm ran with `PYTHONDONTWRITEBYTECODE=1`, closed stdin, an isolated
 `HOME` / `XDG_CACHE_HOME` / `XDG_CONFIG_HOME` / `XDG_DATA_HOME` /
-`LOCALAPPDATA` under `/tmp/b103-e5-11-mutB-rtx/zq_iso_user`, and
+`LOCALAPPDATA` under `/tmp/b103-e5-11-mutB-rtx/<user>`, and
 `s19_app.__file__` printed first in every transcript. One mutation at a time;
 bytes restored and the SHA-256 verified against the pre-mutation hash after
 every arm (no git checkout/stash/commit).

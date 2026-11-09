@@ -5,7 +5,7 @@ Ejecución completada. Resumen de lo hecho y del resultado.
 - **`tests/test_b103_a2l_reader_e5.py`** — 23 nodos de test (P1–P15), cada uno con el id de requisito en el docstring, reutilizando helpers de `tests/test_b103_a2l_reader.py` (nada copiado, texto A2L sintético, solo rutas públicas).
 - **`inc-11/evidence-e5/product-findings-red.txt`** — transcripta completa (abre con `s19_app.__file__` → clon fresco, termina con `PYTEST_EXIT=1`), checksum verificado idéntico runner↔local (`3c45b3eb…`).
 
-Entorno: clon Git completo de `f4206433` (via `git bundle` del árbol local, HEAD verificado `f42064330c…`, branch `b103-inc11-code`), Python `s19ci` 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados bajo `/tmp/b103-e5-11-product-red/zq_iso_user/` (basename único `zqisolated5`, nunca `home`). Runner scratch ya eliminado.
+Entorno: clon Git completo de `f4206433` (via `git bundle` del árbol local, HEAD verificado `f42064330c…`, branch `b103-inc11-code`), Python `s19ci` 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados bajo `/tmp/b103-e5-11-product-red/<user>/` (basename único `zqisolated5`, nunca `home`). Runner scratch ya eliminado.
 
 ## Resultado: 22 RED, 1 GREEN (exit 1)
 

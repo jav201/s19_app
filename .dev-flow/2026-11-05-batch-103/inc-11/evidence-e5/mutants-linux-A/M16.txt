@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________________ test_r_a2l_read_22_include_error _______________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-38/test_r_a2l_read_22_include_err0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-38/test_r_a2l_read_22_include_err0')
 
     def test_r_a2l_read_22_include_error(tmp_path: Path) -> None:
         """R-A2L-READ.22/1, /2: /include gives one error; in a comment, none."""

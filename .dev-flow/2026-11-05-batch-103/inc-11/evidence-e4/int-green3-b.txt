@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 bringing up nodes...
 bringing up nodes...
 
@@ -7,9 +7,9 @@ bringing up nodes...
 ..F.................FFFFF.FF............................                 [100%]
 =================================== FAILURES ===================================
 ____________ test_r_a2l_def_9_1_length_not_the_datatypes_is_refused ____________
-[gw5] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw5] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw5/test_r_a2l_def_9_1_length_not_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw5/test_r_a2l_def_9_1_length_not_0')
 
     def test_r_a2l_def_9_1_length_not_the_datatypes_is_refused(tmp_path):
         """R-A2L-DEF.9/1 - UWORD with LENGTH 4."""
@@ -39,9 +39,9 @@ E         ...Full output truncated (6 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 _________________ test_r_a2l_def_7_2_1_length_zero_is_refused __________________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_1_length_ze0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw4/test_r_a2l_def_7_2_1_length_ze0')
 
     def test_r_a2l_def_7_2_1_length_zero_is_refused(tmp_path):
         """R-A2L-DEF.7.2/1 - NUMBER 0."""
@@ -71,9 +71,9 @@ E           + Z0: the object has no address or no length
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 _______________ test_r_a2l_def_7_2_2_negative_length_is_refused ________________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_2_negative_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw4/test_r_a2l_def_7_2_2_negative_0')
 
     def test_r_a2l_def_7_2_2_negative_length_is_refused(tmp_path):
         """R-A2L-DEF.7.2/2 - NUMBER -5."""
@@ -103,7 +103,7 @@ E           + ZN: the object has no address or no length
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 ______________ test_r_a2l_def_3_1_ascii_characteristic_is_a_text _______________
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -117,9 +117,9 @@ E         - text)
 
 tests/test_b103_a2l_definition.py:302: AssertionError
 _____________ test_r_a2l_def_7_2_3_length_above_one_mib_is_refused _____________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_3_length_ab0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw4/test_r_a2l_def_7_2_3_length_ab0')
 
     def test_r_a2l_def_7_2_3_length_above_one_mib_is_refused(tmp_path):
         """R-A2L-DEF.7.2/3 - NUMBER 1048577 (one past the bound)."""
@@ -149,9 +149,9 @@ E           + ZH: the object has no address or no length
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 _______________ test_r_a2l_def_7_2_4_negative_address_is_refused _______________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_4_negative_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw4/test_r_a2l_def_7_2_4_negative_0')
 
     def test_r_a2l_def_7_2_4_negative_address_is_refused(tmp_path):
         """R-A2L-DEF.7.2/4 - address -0x10 (a UWORD object)."""
@@ -181,7 +181,7 @@ E           + NA2: the object has no address or no length
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 ___________________ test_r_a2l_def_33_1_text_ended_by_a_nul ____________________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -207,9 +207,9 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNO
 
 tests/test_b103_a2l_definition.py:170: AssertionError
 __ test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration __
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw3/test_r_a2l_def_139_3_commented0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw3/test_r_a2l_def_139_3_commented0')
 
     def test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration(tmp_path):
         """R-A2L-DEF.139/3 - the builder opens the commented-out copy: two tags."""
@@ -233,7 +233,7 @@ E        +  and   Refusal(code='A2L-DEF-NAME', message='X: the A2L declares that
 
 tests/test_b103_a2l_definition.py:165: AssertionError
 _____________ test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd ______________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -260,7 +260,7 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNO
 
 tests/test_b103_a2l_definition.py:170: AssertionError
 ____________ test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged ____________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -281,7 +281,7 @@ E           KeyError: 'UNKNOWN'
 
 tests/test_b103_a2l_definition.py:1123: KeyError
 ____________________ test_r_a2l_def_4_1_val_blk_is_refused _____________________
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
 
@@ -295,9 +295,9 @@ E        +  where None = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC
 
 tests/test_b103_a2l_definition.py:324: AssertionError
 ___________________ test_r_a2l_def_137_1_nul_in_an_enum_text ___________________
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw3/test_r_a2l_def_137_1_nul_in_an0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw3/test_r_a2l_def_137_1_nul_in_an0')
 
     def test_r_a2l_def_137_1_nul_in_an_enum_text(tmp_path):
         """R-A2L-DEF.137/1 - NUL in the entry text shows as U+FFFD."""
@@ -324,9 +324,9 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='N1: n
 
 tests/test_b103_a2l_definition.py:170: AssertionError
 ______ test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text ______
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_14_esc_and0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw1/test_r_a2l_def_58_2_14_esc_and0')
 
     def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text(tmp_path):
         """R-A2L-DEF.58.2/14 - ESC shows as U+FFFD; no exception on an unterminated quote."""
@@ -340,7 +340,7 @@ E         - enum)
 
 tests/test_b103_a2l_definition.py:1243: AssertionError
 __________________ test_r_a2l_def_58_2_15_v171_unclosed_begin __________________
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -351,7 +351,7 @@ E       assert []
 
 tests/test_b103_a2l_definition.py:1251: AssertionError
 _____________________ test_r_a2l_def_33_3_text_with_no_nul _____________________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -377,7 +377,7 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNO
 
 tests/test_b103_a2l_definition.py:170: AssertionError
 _______________ test_r_a2l_def_34_1_control_byte_shows_as_u_fffd _______________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -404,7 +404,7 @@ E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNO
 
 tests/test_b103_a2l_definition.py:170: AssertionError
 __ test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives ___
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
@@ -440,9 +440,9 @@ E            +  where Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of t
 
 tests/test_b103_a2l_definition.py:1588: AssertionError
 _ test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception _
-[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw7] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
 
     def test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
         """R-A2L-DEF.58.2/20 (E5S-01, CR-2) - LENGTH 0x + 5,000 F on a UWORD VALUE."""
@@ -452,7 +452,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_
 tests/test_b103_a2l_definition.py:2291: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
 name = 'HL'
 block = '/begin CHARACTERISTIC HL ""\n  VALUE 0x10 RL_U16 0 NO_COMPU_METHOD 0 65535\n  LENGTH 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end CHARACTERISTIC'
 
@@ -476,9 +476,9 @@ E         ...Full output truncated (2 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2284: AssertionError
 _ test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception _
-[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw7] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
 
     def test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
         """R-A2L-DEF.58.2/21 (E5S-01) - DATA_SIZE 0x + 5,000 F on a UBYTE MEASUREMENT."""
@@ -488,7 +488,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_
 tests/test_b103_a2l_definition.py:2297: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
 name = 'HD'
 block = '/begin MEASUREMENT HD ""\n  UBYTE NO_COMPU_METHOD 0 0 0 255\n  ECU_ADDRESS 0x10\n  DATA_SIZE 0xFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end MEASUREMENT'
 
@@ -512,9 +512,9 @@ E         ...Full output truncated (2 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2284: AssertionError
 _ test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception _
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
 
     def test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
         """R-A2L-DEF.58.2/22 (E5S-01) - NUMBER 0x + 5,000 F on an ASCII CHARACTERISTIC."""
@@ -523,7 +523,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_
 tests/test_b103_a2l_definition.py:2303: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
 name = 'HN'
 block = '/begin CHARACTERISTIC HN ""\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end CHARACTERISTIC'
 
@@ -547,9 +547,9 @@ E         ...Full output truncated (2 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2284: AssertionError
 _ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_23_a_matri0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw1/test_r_a2l_def_58_2_23_a_matri0')
 
     def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
         """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
@@ -572,9 +572,9 @@ E         ...Full output truncated (6 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2312: AssertionError
 _ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
-[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_151_5_the_numbe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw1/test_r_a2l_def_151_5_the_numbe0')
 
     def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
         """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
@@ -600,9 +600,9 @@ E         ...Full output truncated (2 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2388: AssertionError
 _ test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order _
-[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw7] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_24_deep_ne0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_58_2_24_deep_ne0')
 
     def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order(tmp_path):
         """R-A2L-DEF.58.2/24 (E5S-04) - (N) 980 nested sections: 0 exceptions, same definition, same decode;
@@ -629,9 +629,9 @@ E         ...Full output truncated (57 lines hidden), use '-vv' to show
 
 tests/test_b103_a2l_definition.py:2351: AssertionError
 ____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
-[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw7] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_151_4_a_matrix_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10082/popen-gw7/test_r_a2l_def_151_4_a_matrix_0')
 
     def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
         """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""

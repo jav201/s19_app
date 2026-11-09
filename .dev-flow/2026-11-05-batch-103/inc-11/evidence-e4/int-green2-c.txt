@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 bringing up nodes...
 bringing up nodes...
 
@@ -7,7 +7,7 @@ bringing up nodes...
 ...........................................................F............ [ 98%]
 ...                                                                      [100%]
 =================================== FAILURES ===================================
-/home/javiergr/work/b103-int11/tests/test_suite_hygiene.py:403: AssertionError: serial_timing on a test that is not a timing arm: tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_no_exception_and_one_error
+/home/<user>/work/b103-int11/tests/test_suite_hygiene.py:403: AssertionError: serial_timing on a test that is not a timing arm: tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_no_exception_and_one_error
 ============================= QC-TM timing margins =============================
 49.7%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
 66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock

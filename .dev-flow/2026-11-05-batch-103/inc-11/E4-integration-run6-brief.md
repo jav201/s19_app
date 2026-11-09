@@ -1,10 +1,10 @@
 # Inc 11 E4: integration run 6 after the CURVE oracle correction (DeepSeek)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`. The orchestrator will supply the final commit containing `1075fe48` plus the test-only CURVE reference correction. Do not edit any product or test file.
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`. The orchestrator will supply the final commit containing `1075fe48` plus the test-only CURVE reference correction. Do not edit any product or test file.
 
 ## Runner and isolation
 
-Use the Linux runner only. Create a fresh full Git clone of the supplied commit under `/tmp/b103-e4-11-int6/tree`; do not use the stale, dirty `~/work/b103-int11`. Use `/home/javiergr/miniconda3/envs/s19ci/bin/python`, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME, XDG_CONFIG_HOME, XDG_CACHE_HOME, XDG_DATA_HOME and LOCALAPPDATA isolated under `/tmp/b103-e4-11-int6/zq_iso_user`.
+Use the Linux runner only. Create a fresh full Git clone of the supplied commit under `/tmp/b103-e4-11-int6/tree`; do not use the stale, dirty `~/work/b103-int11`. Use `/home/<user>/miniconda3/envs/s19ci/bin/python`, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME, XDG_CONFIG_HOME, XDG_CACHE_HOME, XDG_DATA_HOME and LOCALAPPDATA isolated under `/tmp/b103-e4-11-int6/<user>`.
 
 Start every transcript with `s19_app.__file__`. Use `nohup` for long runs, poll by short SSH calls, and kill only by a verified PID if necessary. Do not modify source or tests while a run is active. Record `uptime` before and after timing runs. Do not write the OS clipboard or use proprietary A2L material.
 

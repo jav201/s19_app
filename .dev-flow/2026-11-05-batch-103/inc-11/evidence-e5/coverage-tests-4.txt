@@ -4,7 +4,7 @@
 =================================== FAILURES ===================================
 __________________ test_cov_read_48_hostile_corpus_equal_ref ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-65/test_cov_read_48_hostile_corpu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-65/test_cov_read_48_hostile_corpu0')
 
     def test_cov_read_48_hostile_corpus_equal_ref(tmp_path: Path) -> None:
         """R-A2L-READ.48/2: the hostile corpus equals the reference reading."""

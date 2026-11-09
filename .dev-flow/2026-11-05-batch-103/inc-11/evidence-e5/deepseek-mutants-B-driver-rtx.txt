@@ -1,4 +1,4 @@
-Done. Canonical Linux mutant unit B re-run complete on `cachyos-rtx` against the frozen tree `/tmp/b103-e5-11-mutB-rtx/tree`.
+Done. Canonical Linux mutant unit B re-run complete on `<runner>` against the frozen tree `/tmp/b103-e5-11-mutB-rtx/tree`.
 
 ## Results
 

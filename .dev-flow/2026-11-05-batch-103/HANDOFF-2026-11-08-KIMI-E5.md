@@ -4,7 +4,7 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 
 ## Start here
 
-- Worktree: `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`.
+- Worktree: `C:\Users\<user>\Github\s19_app-b103-inc11-code`, branch `b103-inc11-code`.
 - Last product commit: **`a0cff5a4`** (`batch-103 Inc 11 E5: align CUBOID oracle and golden`).
 - Authoritative current review/ruling: `.dev-flow/2026-11-05-batch-103/inc-11/E5-rulings.md`.
 - Earlier handoff (updated through coverage launch): `.dev-flow/2026-11-05-batch-103/HANDOFF-2026-11-07.md`.
@@ -79,7 +79,7 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 ## Hard operating rules
 
 - On this PC run only `py_compile` and `codewire_extract.py`; every pytest/probe runs on the Linux runner with the absolute s19ci Python.
-- Isolate HOME/XDG/LOCALAPPDATA under a directory named `zq_iso_user`, never a final component called `home`. Closed stdin and `PYTHONDONTWRITEBYTECODE=1`. Print `s19_app.__file__` at the start of every transcript.
+- Isolate HOME/XDG/LOCALAPPDATA under a directory named `<user>`, never a final component called `home`. Closed stdin and `PYTHONDONTWRITEBYTECODE=1`. Print `s19_app.__file__` at the start of every transcript.
 - No OS clipboard writes, no proprietary A2L fragment, no public-corpus text in records, no operator name in new records.
 - Kill only by a verified PID, never `pkill -f`. Delete only the scratch paths you created.
 - No source or scope changes during a long run. No stale writers in one worktree. One owner for `batch-103` merges.
@@ -100,7 +100,7 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 
 ## Recovery checkpoint — 2026-11-09 06:28 (Kimi, laptop)
 
-- The alternative runner is `javierg@192.168.50.235` (`lnx1`), Python `/data/miniconda3/envs/s19ci/bin/python` 3.11.18. The scratch is `/tmp/b103-e5-11-p18-laptop/tree`; it was built from `a0cff5a4` plus the current product/tests and indexed with Git because tracked-file tests require `git ls-files`.
+- The alternative runner is `<user>@<runner-ip>` (`<runner>`), Python `/data/miniconda3/envs/s19ci/bin/python` 3.11.18. The scratch is `/tmp/b103-e5-11-p18-laptop/tree`; it was built from `a0cff5a4` plus the current product/tests and indexed with Git because tracked-file tests require `git ls-files`.
 - P18 RED is `p18-red.txt`: the unresolved DATA_SIZE case failed `None == 4`; the external-span case already passed and is only a regression guard. Product and REF now accept DATA_SIZE/LENGTH consistently. Focused GREEN is 2 passed (`p18-green.txt`).
 - Complete E5+coverage is **148 passed**, including the 160,000-mutant node (`p18-e5-coverage-green-2.txt`). The first run had two failures: missing Git metadata in the archive and an overly broad UI-cell oracle. The scratch now has a Git index; READ.61/9 compares the required width token only, leaving the unconstrained unit suffix out of the oracle. Both focused reruns passed.
 - A DeepSeek read-only reconciliation is identifying which of the 37 supplemental IDs this run verifies. Do not mark the legacy-reader pair or READ.52 verified from the 148-node transcript. Integration, READ.52, independent P18 review and Linux mutants remain pending. No merge or push has been made.
@@ -139,7 +139,7 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 
 ## Recovery checkpoint — 2026-11-09 08:07 (Kimi)
 
-- `cachyos-rtx` is online again. Mutant **A runs on the laptop**, resumed from its complete green baseline (**331 passed**), and mutant **B runs on RTX** in a fresh current-tree scratch.
+- `<runner>` is online again. Mutant **A runs on the laptop**, resumed from its complete green baseline (**331 passed**), and mutant **B runs on RTX** in a fresh current-tree scratch.
 - During the split the orchestrator initially stopped A by a PID-mapping error. No mutant arms had run and no product/test file was damaged. The baseline was recovered and the actual B process was identified by cwd and stopped before relaunch. The incident and recovery are logged in `steps.log`.
 - Current driver outputs are `deepseek-mutants-A-driver-2.txt` and `deepseek-mutants-B-driver-rtx.txt`. Wait for process completion before recovering remote `out/` tables.
 

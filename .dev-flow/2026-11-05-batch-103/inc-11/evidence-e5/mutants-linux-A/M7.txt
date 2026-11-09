@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_15_quoted_string_not_closed __________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-29/test_r_a2l_read_15_quoted_stri0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-29/test_r_a2l_read_15_quoted_stri0')
 
     def test_r_a2l_read_15_quoted_string_not_closed(tmp_path: Path) -> None:
         """R-A2L-READ.15/1: an unclosed quote ends the reading."""

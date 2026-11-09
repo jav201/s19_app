@@ -10,7 +10,7 @@ Hecho. La corrección de consistencia CUBOID está aplicada y verificada en verd
 ## Verificación
 
 - **Esta PC:** `python -m py_compile tests/test_b103_a2l_reader.py` → OK; fixture JSON válida.
-- **Linux runner (cachyos-rtx):** copié los 2 archivos de prueba al clon `/tmp/b103-e5-11-consistency/tree` (HEAD `21a0c56b`, mismas modificaciones previas) y corrí el nodo pedido con el entorno aislado (`s19ci` Python absoluto, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados).
+- **Linux runner (<runner>):** copié los 2 archivos de prueba al clon `/tmp/b103-e5-11-consistency/tree` (HEAD `21a0c56b`, mismas modificaciones previas) y corrí el nodo pedido con el entorno aislado (`s19ci` Python absoluto, `PYTHONDONTWRITEBYTECODE=1`, stdin cerrado, HOME/XDG/LOCALAPPDATA aislados).
 
 Transcripción completa guardada en `inc-11/evidence-e5/test-consistency2-green.txt`:
 

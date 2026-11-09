@@ -6,7 +6,7 @@ import sys
 
 TREE = Path("/tmp/b103-e5-11-mutB-rtx/tree")
 TARGET = TREE / "s19_app/tui/a2l_definition.py"
-PYTHON = "/home/javiergr/miniconda3/envs/s19ci/bin/python"
+PYTHON = "/home/<user>/miniconda3/envs/s19ci/bin/python"
 NODE = "tests/test_b103_a2l_reader_coverage.py::test_cov_read_54_tab_verb_near_keyword_is_not_enum"
 ANCHOR = 'conversion_type == "TAB_VERB"'
 REPLACEMENT = 'conversion_type.startswith("TAB_VERB")'
@@ -32,11 +32,11 @@ def run(label):
     )
     env = os.environ.copy()
     env.update(
-        HOME="/tmp/b103-e5-11-mutB-rtx/zq_iso_user",
-        XDG_CONFIG_HOME="/tmp/b103-e5-11-mutB-rtx/zq_iso_user/config",
-        XDG_CACHE_HOME="/tmp/b103-e5-11-mutB-rtx/zq_iso_user/cache",
-        XDG_DATA_HOME="/tmp/b103-e5-11-mutB-rtx/zq_iso_user/data",
-        LOCALAPPDATA="/tmp/b103-e5-11-mutB-rtx/zq_iso_user/local",
+        HOME="/tmp/b103-e5-11-mutB-rtx/<user>",
+        XDG_CONFIG_HOME="/tmp/b103-e5-11-mutB-rtx/<user>/config",
+        XDG_CACHE_HOME="/tmp/b103-e5-11-mutB-rtx/<user>/cache",
+        XDG_DATA_HOME="/tmp/b103-e5-11-mutB-rtx/<user>/data",
+        LOCALAPPDATA="/tmp/b103-e5-11-mutB-rtx/<user>/local",
         PYTHONDONTWRITEBYTECODE="1",
         PYTHONIOENCODING="utf-8",
     )

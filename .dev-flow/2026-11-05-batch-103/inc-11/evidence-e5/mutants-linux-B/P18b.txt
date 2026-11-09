@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ________ test_e5_p18_external_full_span_agrees_with_standing_data_size _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-58/test_e5_p18_external_full_span0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-58/test_e5_p18_external_full_span0')
 
     def test_e5_p18_external_full_span_agrees_with_standing_data_size(tmp_path: Path) -> None:
         """A later-resolved full span 4 agrees with standing DATA_SIZE 4 and is

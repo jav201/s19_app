@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_def_17_1_count_zero_is_refused ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-56/test_r_a2l_def_17_1_count_zero0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-56/test_r_a2l_def_17_1_count_zero0')
 
     def test_r_a2l_def_17_1_count_zero_is_refused(tmp_path):
         """R-A2L-DEF.17/1 - ``TAB_VERB 0``."""

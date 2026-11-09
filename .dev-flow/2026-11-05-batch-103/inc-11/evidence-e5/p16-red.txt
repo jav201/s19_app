@@ -3,7 +3,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________ test_e5_p16_curve_declared_uword_two_axis_points_full_span __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-57/test_e5_p16_curve_declared_uwo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-57/test_e5_p16_curve_declared_uwo0')
 
     def test_e5_p16_curve_declared_uword_two_axis_points_full_span(tmp_path: Path) -> None:
         """R-A2L-018: a CURVE with a declared UWORD record layout and two inline

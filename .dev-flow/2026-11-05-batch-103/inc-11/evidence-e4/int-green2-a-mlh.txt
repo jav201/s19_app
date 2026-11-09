@@ -1,6 +1,6 @@
 ============================= test session starts ==============================
-platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/javiergr/miniconda3/envs/s19ci/bin/python
-rootdir: /home/javiergr/work/b103-int11
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/<user>/miniconda3/envs/s19ci/bin/python
+rootdir: /home/<user>/work/b103-int11
 configfile: pyproject.toml
 plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
 collecting ... collected 30 items / 1 deselected / 29 selected

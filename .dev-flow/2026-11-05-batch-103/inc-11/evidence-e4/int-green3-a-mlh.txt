@@ -1,13 +1,13 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 bringing up nodes...
 bringing up nodes...
 
 ......................F..F..F.                                           [100%]
 =================================== FAILURES ===================================
 _____ test_at101_hostile_comment_corpus[unterminated_block_eats_mandatory] _____
-[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw3] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10080/popen-gw3/test_at101_hostile_comment_cor0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw3/test_at101_hostile_comment_cor0')
 case_id = 'unterminated_block_eats_mandatory'
 body = '      VALUE /* runaway to EOF with no close', expected = None
 
@@ -28,9 +28,9 @@ E       assert None is not None
 
 tests/test_a2l_multiline_headers.py:277: AssertionError
 ____________ test_at101_hostile_comment_corpus[unterminated_quote] _____________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10080/popen-gw4/test_at101_hostile_comment_cor1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw4/test_at101_hostile_comment_cor1')
 case_id = 'unterminated_quote', body = '      VALUE 0x810000 RL "never closes'
 expected = None
 
@@ -51,9 +51,9 @@ E       assert None is not None
 
 tests/test_a2l_multiline_headers.py:277: AssertionError
 _______________ test_at101_megabyte_unterminated_block_is_linear _______________
-[gw6] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw6] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10080/popen-gw6/test_at101_megabyte_unterminat0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10080/popen-gw6/test_at101_megabyte_unterminat0')
 
     @pytest.mark.slow
     @pytest.mark.serial_timing

@@ -1,14 +1,14 @@
 # Inc 11 E5: mutant table B — tags, lengths and declared spans
 
 Baseline `f1397097`. Work done only in an isolated git clone at
-`C:\Users\jjgh8\AppData\Local\Temp\b103-e5-11-mutB` (MSYS `/tmp/b103-e5-11-mutB`);
+`C:\Users\<user>\AppData\Local\Temp\b103-e5-11-mutB` (MSYS `/tmp/b103-e5-11-mutB`);
 the real worktree was never mutated and nothing was committed. The clone was a
 `git clone --local --single-branch --branch b103-inc11-code` of the main repo, so
 `git ls-files` (used by `_tracked_a2l()`) resolves inside the copy.
 
 Host: Windows, Python 3.12.7 (anaconda), pytest 8.3.4. Every arm ran with
 `PYTHONDONTWRITEBYTECODE=1`, closed stdin and an isolated `HOME` / `XDG_*` /
-`LOCALAPPDATA` under `…/b103-e5-11-mutB-evidence/zq_iso_user`.
+`LOCALAPPDATA` under `…/b103-e5-11-mutB-evidence/<user>`.
 
 Verdicts: **KILLED** = the discriminating test node failed on an assertion;
 **SURVIVED** = it still passed; **CRASH** = collection/import error; **BAD** = the

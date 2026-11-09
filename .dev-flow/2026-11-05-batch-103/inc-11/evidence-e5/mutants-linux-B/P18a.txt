@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ________ test_e5_p18_data_size_only_unresolved_span_uses_standing_size _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-57/test_e5_p18_data_size_only_unr0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-57/test_e5_p18_data_size_only_unr0')
 
     def test_e5_p18_data_size_only_unresolved_span_uses_standing_size(tmp_path: Path) -> None:
         """A CURVE with DATA_SIZE 4 and no resolvable span keeps 4, never the

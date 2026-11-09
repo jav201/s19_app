@@ -17,16 +17,16 @@ The A2L reader now handles comments, quoted strings, mixed line endings, one-lin
 
 ### 3. How to test
 
-On `cachyos-rtx`, with the final tree and `B103_BASE_ROOT` pointing to an `e07fb00` checkout:
+On `<runner>`, with the final tree and `B103_BASE_ROOT` pointing to an `e07fb00` checkout:
 
 ```bash
 cd /tmp/b103-e5-11-mutB-rtx/tree
-/home/javiergr/miniconda3/envs/s19ci/bin/python -I -B runner.py -q -n 8 \
+/home/<user>/miniconda3/envs/s19ci/bin/python -I -B runner.py -q -n 8 \
   tests/test_b103_a2l_reader.py tests/test_b103_a2l_reader_e5.py \
   tests/test_b103_a2l_reader_coverage.py
-/home/javiergr/miniconda3/envs/s19ci/bin/python -I -B runner.py -q -s -m serial_timing \
+/home/<user>/miniconda3/envs/s19ci/bin/python -I -B runner.py -q -s -m serial_timing \
   tests/test_b103_a2l_reader_perf.py
-/home/javiergr/miniconda3/envs/s19ci/bin/python -I -B runner.py -q \
+/home/<user>/miniconda3/envs/s19ci/bin/python -I -B runner.py -q \
   tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_no_exception_and_one_error
 ```
 
@@ -34,7 +34,7 @@ Trace check on the committed clone:
 
 ```bash
 cd /tmp/b103-e5-11-trace-14fdc3b9
-/home/javiergr/miniconda3/envs/s19ci/bin/python -I -B trace_check.py \
+/home/<user>/miniconda3/envs/s19ci/bin/python -I -B trace_check.py \
   --req .dev-flow/2026-11-05-batch-103/inc-11/01-requirements.md \
   --base e07fb00 --src s19_app/tui/a2l.py s19_app/tui/a2l_extract.py \
   s19_app/tui/a2l_definition.py

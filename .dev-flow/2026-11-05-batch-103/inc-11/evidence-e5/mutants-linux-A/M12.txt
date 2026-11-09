@@ -10,7 +10,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] ___________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-34/test_r_a2l_read_6_utf16_refusa0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-34/test_r_a2l_read_6_utf16_refusa0')
 bom = b'\xff\xfe'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -29,7 +29,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:363: AssertionError
 __________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] ___________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-34/test_r_a2l_read_6_utf16_refusa1')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-34/test_r_a2l_read_6_utf16_refusa1')
 bom = b'\xfe\xff'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])

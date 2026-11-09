@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_68_byte_order_words_no_error _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-40/test_r_a2l_read_68_byte_order_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-40/test_r_a2l_read_68_byte_order_0')
 
     def test_r_a2l_read_68_byte_order_words_no_error(tmp_path: Path) -> None:
         """R-A2L-READ.68/3: valid byte-order words give no error."""

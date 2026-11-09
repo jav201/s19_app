@@ -29,7 +29,7 @@ The pre-existing CURVE/VALUE correction (`_read_span` `if tkind2 in ("VALUE","VA
 - `test_r_a2l_read_42_instance_forward_typedef_ref` — INSTANCE declared before its typedef is sized.
 - `test_r_a2l_read_45_instance_unresolvable_value_deposit_ref` — VALUE typedef with an undeclared deposit → no length.
 
-### Test counts and exit codes (runner, fresh clone `/tmp/b103-e4-11-oracle-kimi/tree`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, isolated `zq_iso_user`, closed stdin)
+### Test counts and exit codes (runner, fresh clone `/tmp/b103-e4-11-oracle-kimi/tree`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, isolated `<user>`, closed stdin)
 ```
 s19_app.__file__ = /tmp/b103-e4-11-oracle-kimi/tree/s19_app/__init__.py   exit=0
 TEST 1  focused synthetic differential cases (5)        5 passed in 0.63s   exit=0

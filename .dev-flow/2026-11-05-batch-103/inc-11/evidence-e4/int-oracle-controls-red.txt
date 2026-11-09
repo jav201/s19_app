@@ -20,7 +20,7 @@ E        +  where False = any(<generator object test_r_a2l_read_22_include_error
 tests/test_b103_a2l_reader.py:850: AssertionError
 ___________________ test_r_a2l_read_29_unit_body_keyword_ref ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_29_unit_body_k0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_29_unit_body_k0')
 ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
 
     def test_r_a2l_read_29_unit_body_keyword_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
@@ -50,7 +50,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:1698: AssertionError
 ________________ test_r_a2l_read_45_instance_curve_typedef_ref _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_45_instance_cu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_45_instance_cu0')
 ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
 
     def test_r_a2l_read_45_instance_curve_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
@@ -91,7 +91,7 @@ E            +    where <built-in method get of dict object at 0x7f2a4e9f3400> =
 tests/test_b103_a2l_reader.py:1691: AssertionError
 _______________ test_r_a2l_read_42_instance_forward_typedef_ref ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_42_instance_fo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_42_instance_fo0')
 ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
 
     def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
@@ -129,7 +129,7 @@ E            +    where <built-in method get of dict object at 0x7f2a4e75c4c0> =
 tests/test_b103_a2l_reader.py:1691: AssertionError
 __________ test_r_a2l_read_45_instance_unresolvable_value_deposit_ref __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_45_instance_un0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-26/test_r_a2l_read_45_instance_un0')
 ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
 
     def test_r_a2l_read_45_instance_unresolvable_value_deposit_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:

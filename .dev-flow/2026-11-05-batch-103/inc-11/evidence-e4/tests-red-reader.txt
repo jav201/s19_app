@@ -1,9 +1,9 @@
 host:
-cachyos-rtx
+<runner>
 Sat Nov  7 11:30:07 AM CST 2026
 0.35 2.61 4.80 1/583 503987
 s19_app __file__:
-/home/javiergr/work/b103-inc11-base/s19_app/__init__.py
+/home/<user>/work/b103-inc11-base/s19_app/__init__.py
 
 == RED: tests/test_b103_a2l_reader.py (base batch-103) ==
 .FFF....FFFFFF..FFFFFFFFFFFFFFFFF..FFFFFFFFFF.FFFFFFFF.FFFFFFFFFFFFF...F [ 40%]
@@ -12,7 +12,7 @@ FFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                       [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_1_cr_cr_lf_counts_two_ends __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_1_cr_cr_lf_cou0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_1_cr_cr_lf_cou0')
 
     def test_r_a2l_read_1_cr_cr_lf_counts_two_ends(tmp_path: Path) -> None:
         """R-A2L-READ.1/4: CR CR LF counts two line ends (RP-A4)."""
@@ -28,7 +28,7 @@ E       assert ((3 * 2) - 1) == 49
 tests/test_b103_a2l_reader.py:214: AssertionError
 __________________ test_r_a2l_read_2_lf_cr_space_end_word[\n] __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_2_lf_cr_space_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_2_lf_cr_space_0')
 sep = '\n'
 
     @pytest.mark.parametrize("sep", ["\n", "\r", " "])
@@ -42,7 +42,7 @@ E       assert None == 4660
 tests/test_b103_a2l_reader.py:222: AssertionError
 __________________ test_r_a2l_read_2_lf_cr_space_end_word[\r] __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_2_lf_cr_space_1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_2_lf_cr_space_1')
 sep = '\r'
 
     @pytest.mark.parametrize("sep", ["\n", "\r", " "])
@@ -56,7 +56,7 @@ E       assert None == 4660
 tests/test_b103_a2l_reader.py:222: AssertionError
 ________________ test_r_a2l_read_3_nonblank_stays_in_word[\xa0] ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta0')
 ch = '\xa0'
 
     @pytest.mark.parametrize(
@@ -73,7 +73,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 ________________ test_r_a2l_read_3_nonblank_stays_in_word[\x85] ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta1')
 ch = '\x85'
 
     @pytest.mark.parametrize(
@@ -90,7 +90,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 _______________ test_r_a2l_read_3_nonblank_stays_in_word[\u2028] _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta2')
 ch = '\u2028'
 
     @pytest.mark.parametrize(
@@ -107,7 +107,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 _______________ test_r_a2l_read_3_nonblank_stays_in_word[\u2029] _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta3')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta3')
 ch = '\u2029'
 
     @pytest.mark.parametrize(
@@ -124,7 +124,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 ________________ test_r_a2l_read_3_nonblank_stays_in_word[\x1c] ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta4')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta4')
 ch = '\x1c'
 
     @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 ________________ test_r_a2l_read_3_nonblank_stays_in_word[\x1e] ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nonblank_sta5')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nonblank_sta5')
 ch = '\x1e'
 
     @pytest.mark.parametrize(
@@ -158,7 +158,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:240: AssertionError
 ________________ test_r_a2l_read_3_nbsp_joins_keyword_and_word _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_nbsp_joins_k0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_nbsp_joins_k0')
 
     def test_r_a2l_read_3_nbsp_joins_keyword_and_word(tmp_path: Path) -> None:
         """R-A2L-READ.3/2: NBSP between the keyword and its word joins them."""
@@ -169,7 +169,7 @@ E       assert 4660 is None
 tests/test_b103_a2l_reader.py:246: AssertionError
 ________ test_r_a2l_read_3_after_header_address_length_matrix_dim[\xa0] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header0')
 ch = '\xa0'
 
     @pytest.mark.parametrize(
@@ -188,7 +188,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 ________ test_r_a2l_read_3_after_header_address_length_matrix_dim[\x85] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header1')
 ch = '\x85'
 
     @pytest.mark.parametrize(
@@ -207,7 +207,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 _______ test_r_a2l_read_3_after_header_address_length_matrix_dim[\u2028] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header2')
 ch = '\u2028'
 
     @pytest.mark.parametrize(
@@ -226,7 +226,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 _______ test_r_a2l_read_3_after_header_address_length_matrix_dim[\u2029] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header3')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header3')
 ch = '\u2029'
 
     @pytest.mark.parametrize(
@@ -245,7 +245,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 ________ test_r_a2l_read_3_after_header_address_length_matrix_dim[\x1c] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header4')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header4')
 ch = '\x1c'
 
     @pytest.mark.parametrize(
@@ -264,7 +264,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 ________ test_r_a2l_read_3_after_header_address_length_matrix_dim[\x1e] ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header5')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header5')
 ch = '\x1e'
 
     @pytest.mark.parametrize(
@@ -283,7 +283,7 @@ E       assert 4 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 _______ test_r_a2l_read_3_after_header_address_length_matrix_dim[\ufeff] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header6')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header6')
 ch = '\ufeff'
 
     @pytest.mark.parametrize(
@@ -302,7 +302,7 @@ E       assert 2 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 _______ test_r_a2l_read_3_after_header_address_length_matrix_dim[\u200b] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_3_after_header7')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_3_after_header7')
 ch = '\u200b'
 
     @pytest.mark.parametrize(
@@ -321,7 +321,7 @@ E       assert 2 is None
 tests/test_b103_a2l_reader.py:259: AssertionError
 ___________ test_r_a2l_read_4_unexpected_character_error[\xa0-00A0] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c0')
 ch = '\xa0', code = '00A0'
 
     @pytest.mark.parametrize(
@@ -348,7 +348,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 ___________ test_r_a2l_read_4_unexpected_character_error[\x85-0085] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c1')
 ch = '\x85', code = '0085'
 
     @pytest.mark.parametrize(
@@ -375,7 +375,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 __________ test_r_a2l_read_4_unexpected_character_error[\u2028-2028] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c2')
 ch = '\u2028', code = '2028'
 
     @pytest.mark.parametrize(
@@ -402,7 +402,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 __________ test_r_a2l_read_4_unexpected_character_error[\u2029-2029] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c3')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c3')
 ch = '\u2029', code = '2029'
 
     @pytest.mark.parametrize(
@@ -429,7 +429,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 ___________ test_r_a2l_read_4_unexpected_character_error[\x1c-001C] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c4')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c4')
 ch = '\x1c', code = '001C'
 
     @pytest.mark.parametrize(
@@ -456,7 +456,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 ___________ test_r_a2l_read_4_unexpected_character_error[\x1e-001E] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c5')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c5')
 ch = '\x1e', code = '001E'
 
     @pytest.mark.parametrize(
@@ -483,7 +483,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 __________ test_r_a2l_read_4_unexpected_character_error[\ufeff-FEFF] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c6')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c6')
 ch = '\ufeff', code = 'FEFF'
 
     @pytest.mark.parametrize(
@@ -510,7 +510,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 __________ test_r_a2l_read_4_unexpected_character_error[\u200b-200B] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_unexpected_c7')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_unexpected_c7')
 ch = '\u200b', code = '200B'
 
     @pytest.mark.parametrize(
@@ -537,7 +537,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:282: AssertionError
 ______________________ test_r_a2l_read_4_latin1_byte_fffd ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_latin1_byte_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_latin1_byte_0')
 
     def test_r_a2l_read_4_latin1_byte_fffd(tmp_path: Path) -> None:
         """R-A2L-READ.4/4: a Latin-1 0xB0 read as U+FFFD; error in a word only."""
@@ -550,7 +550,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:303: AssertionError
 ___________ test_r_a2l_read_4_after_address_length_matrix[\xa0-00A0] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres0')
 ch = '\xa0', code = '00A0'
 
     @pytest.mark.parametrize(
@@ -583,7 +583,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 ___________ test_r_a2l_read_4_after_address_length_matrix[\x85-0085] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres1')
 ch = '\x85', code = '0085'
 
     @pytest.mark.parametrize(
@@ -616,7 +616,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 __________ test_r_a2l_read_4_after_address_length_matrix[\u2028-2028] __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres2')
 ch = '\u2028', code = '2028'
 
     @pytest.mark.parametrize(
@@ -649,7 +649,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 __________ test_r_a2l_read_4_after_address_length_matrix[\u2029-2029] __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres3')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres3')
 ch = '\u2029', code = '2029'
 
     @pytest.mark.parametrize(
@@ -682,7 +682,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 ___________ test_r_a2l_read_4_after_address_length_matrix[\x1c-001C] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres4')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres4')
 ch = '\x1c', code = '001C'
 
     @pytest.mark.parametrize(
@@ -715,7 +715,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 ___________ test_r_a2l_read_4_after_address_length_matrix[\x1e-001E] ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres5')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres5')
 ch = '\x1e', code = '001E'
 
     @pytest.mark.parametrize(
@@ -748,7 +748,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 __________ test_r_a2l_read_4_after_address_length_matrix[\ufeff-FEFF] __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres6')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres6')
 ch = '\ufeff', code = 'FEFF'
 
     @pytest.mark.parametrize(
@@ -781,7 +781,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 __________ test_r_a2l_read_4_after_address_length_matrix[\u200b-200B] __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_after_addres7')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_after_addres7')
 ch = '\u200b', code = '200B'
 
     @pytest.mark.parametrize(
@@ -814,7 +814,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:329: AssertionError
 ______________________ test_r_a2l_read_4_quoted_name_esc _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_4_quoted_name_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_4_quoted_name_0')
 
     def test_r_a2l_read_4_quoted_name_esc(tmp_path: Path) -> None:
         """R-A2L-READ.4/6: ESC in a quoted tag name gives exactly one error."""
@@ -826,7 +826,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:336: AssertionError
 _________________ test_r_a2l_read_5_bom_before_project_dropped _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_5_bom_before_p0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_5_bom_before_p0')
 
     def test_r_a2l_read_5_bom_before_project_dropped(tmp_path: Path) -> None:
         """R-A2L-READ.5/2: a BOM before /begin PROJECT is dropped (RP-A9)."""
@@ -842,7 +842,7 @@ tests/test_b103_a2l_reader.py:349: AssertionError
 ------------------------------ Captured log call -------------------------------
 __________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_6_utf16_refusa0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_6_utf16_refusa0')
 bom = b'\xff\xfe'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -861,7 +861,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:360: AssertionError
 __________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_6_utf16_refusa1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_6_utf16_refusa1')
 bom = b'\xfe\xff'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -880,7 +880,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:360: AssertionError
 ___________________ test_r_a2l_read_55_utf16_no_bom_refused ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_55_utf16_no_bo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_55_utf16_no_bo0')
 
     def test_r_a2l_read_55_utf16_no_bom_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/1: UTF-16 LE with no BOM refuses."""
@@ -896,7 +896,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:369: AssertionError
 ______________________ test_r_a2l_read_55_binary_refused _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_55_binary_refu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_55_binary_refu0')
 
     def test_r_a2l_read_55_binary_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/2: 5 MiB of seeded random bytes holding NUL refuse."""
@@ -915,7 +915,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:381: AssertionError
 _________________ test_r_a2l_read_55_nul_after_address_refused _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_55_nul_after_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_55_nul_after_a0')
 
     def test_r_a2l_read_55_nul_after_address_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/3: a NUL after an address word refuses the file."""
@@ -930,7 +930,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:388: AssertionError
 __________________ test_r_a2l_read_55_nul_in_comment_refused ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_55_nul_in_comm0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_55_nul_in_comm0')
 
     def test_r_a2l_read_55_nul_in_comment_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/4: a NUL inside a comment refuses the file."""
@@ -944,7 +944,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:394: AssertionError
 ________________ test_r_a2l_read_55_utf16_with_bom_gives_6_only ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_55_utf16_with_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_55_utf16_with_0')
 
     def test_r_a2l_read_55_utf16_with_bom_gives_6_only(tmp_path: Path) -> None:
         """R-A2L-READ.55/5: a UTF-16 file with its BOM gives .6's error only."""
@@ -960,7 +960,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:402: AssertionError
 ________________________ test_r_a2l_read_56_cap_at_edge ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_56_cap_at_edge0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_56_cap_at_edge0')
 
     def test_r_a2l_read_56_cap_at_edge(tmp_path: Path) -> None:
         """R-A2L-READ.56/1: 100 errors and no marker; then 101."""
@@ -980,7 +980,7 @@ tests/test_b103_a2l_reader.py:419: AssertionError
 ------------------------------ Captured log call -------------------------------
 _____________________ test_r_a2l_read_56_word_error_flood ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_56_word_error_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_56_word_error_0')
 
     def test_r_a2l_read_56_word_error_flood(tmp_path: Path) -> None:
         """R-A2L-READ.56/2: 400,000 \u00e9 words -> 101 entries, last the marker."""
@@ -993,7 +993,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:426: AssertionError
 ______________ test_r_a2l_read_56_cap_through_build_section_tree _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_56_cap_through0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_56_cap_through0')
 
     def test_r_a2l_read_56_cap_through_build_section_tree(tmp_path: Path) -> None:
         """R-A2L-READ.56/4: build_section_tree returns a plain list of 101."""
@@ -1008,7 +1008,7 @@ tests/test_b103_a2l_reader.py:435: AssertionError
 ------------------------------ Captured log call -------------------------------
 _________________________ test_r_a2l_read_66_echo_cap __________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_66_echo_cap0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_66_echo_cap0')
 
     def test_r_a2l_read_66_echo_cap(tmp_path: Path) -> None:
         """R-A2L-READ.66/1: a huge /include word is echoed at most 312 chars, no LF/ESC."""
@@ -1023,7 +1023,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:445: AssertionError
 _______________________ test_r_a2l_read_66_name_cut_256 ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_66_name_cut_250')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_66_name_cut_250')
 
     def test_r_a2l_read_66_name_cut_256(tmp_path: Path) -> None:
         """R-A2L-READ.66/2: a 256-char name whole; a 257-char name cut + ellipsis."""
@@ -1042,7 +1042,7 @@ E        +  where 0 = len([])
 tests/test_b103_a2l_reader.py:460: AssertionError
 ____________________ test_r_a2l_read_66_esc_in_echoed_word _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_66_esc_in_echo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_66_esc_in_echo0')
 
     def test_r_a2l_read_66_esc_in_echoed_word(tmp_path: Path) -> None:
         """R-A2L-READ.66/3: /end <ESC>X -> /end <U+FFFD>X."""
@@ -1056,7 +1056,7 @@ tests/test_b103_a2l_reader.py:469: AssertionError
 ------------------------------ Captured log call -------------------------------
 ______________________ test_r_a2l_001_2_comment_not_read _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_2_comment_not_r0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_2_comment_not_r0')
 
     def test_r_a2l_001_2_comment_not_read(tmp_path: Path) -> None:
         """R-A2L-001.2/1..7: an old keyword in a comment is not read."""
@@ -1078,7 +1078,7 @@ E           assert 39321 == 4660
 tests/test_b103_a2l_reader.py:490: AssertionError
 _________________ test_r_a2l_001_2_mod_common_comment_not_read _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_2_mod_common_co0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_2_mod_common_co0')
 
     def test_r_a2l_001_2_mod_common_comment_not_read(tmp_path: Path) -> None:
         """R-A2L-001.2/8: a commented MOD_COMMON BYTE_ORDER is not read."""
@@ -1102,7 +1102,7 @@ tests/test_b103_a2l_reader.py:505: AssertionError
 ------------------------------ Captured log call -------------------------------
 _________________ test_r_a2l_001_2_comment_before_live_address _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_2_comment_befor0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_2_comment_befor0')
 
     def test_r_a2l_001_2_comment_before_live_address(tmp_path: Path) -> None:
         """R-A2L-001.2/9 ([K5b]): a comment before the live ECU_ADDRESS on its line."""
@@ -1113,7 +1113,7 @@ E       assert None == 4660
 tests/test_b103_a2l_reader.py:511: AssertionError
 _______________ test_r_a2l_read_7_comment_between_digits_splits ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_7_comment_betw0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_7_comment_betw0')
 
     def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
         """R-A2L-READ.7/1: MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
@@ -1128,7 +1128,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_7_comm
 tests/test_b103_a2l_reader.py:521: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_7_comment_betw0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_7_comment_betw0/x.a2l', ...}
 name = 'Synthetic map', section = 'CHARACTERISTIC'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -1141,7 +1141,7 @@ E       AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
 tests/test_b103_a2l_reader.py:112: AssertionError
 ____________________ test_r_a2l_read_7_comment_glued_splits ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_7_comment_glue0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_7_comment_glue0')
 
     def test_r_a2l_read_7_comment_glued_splits(tmp_path: Path) -> None:
         """R-A2L-READ.7/3..6: comments glued around keywords/words split them."""
@@ -1159,7 +1159,7 @@ E           assert None == 4660
 tests/test_b103_a2l_reader.py:535: AssertionError
 _____________ test_r_a2l_read_8_block_comment_ends_at_first_close ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_8_block_commen0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_8_block_commen0')
 
     def test_r_a2l_read_8_block_comment_ends_at_first_close(tmp_path: Path) -> None:
         """R-A2L-READ.8/1: /* a /* b */ ECU_ADDRESS reads the address."""
@@ -1170,7 +1170,7 @@ E       assert None == 4660
 tests/test_b103_a2l_reader.py:541: AssertionError
 ____________________ test_r_a2l_read_8_comments_do_not_nest ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_8_comments_do_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_8_comments_do_0')
 
     def test_r_a2l_read_8_comments_do_not_nest(tmp_path: Path) -> None:
         """R-A2L-READ.8/2 (RP-B40): c is a word; the stray */ gives .11's error."""
@@ -1184,7 +1184,7 @@ E        +  where False = any(<generator object test_r_a2l_read_8_comments_do_no
 tests/test_b103_a2l_reader.py:549: AssertionError
 ____________________ test_r_a2l_read_10_comment_not_closed _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_10_comment_not0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_10_comment_not0')
 
     def test_r_a2l_read_10_comment_not_closed(tmp_path: Path) -> None:
         """R-A2L-READ.10/1: an unclosed comment ends the reading."""
@@ -1197,7 +1197,7 @@ E        +  where False = any(<generator object test_r_a2l_read_10_comment_not_c
 tests/test_b103_a2l_reader.py:564: AssertionError
 ________________________ test_r_a2l_read_11_stray_close ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_11_stray_close0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_11_stray_close0')
 
     def test_r_a2l_read_11_stray_close(tmp_path: Path) -> None:
         """R-A2L-READ.11/1: a stray */ alone."""
@@ -1210,7 +1210,7 @@ E        +  where False = any(<generator object test_r_a2l_read_11_stray_close.<
 tests/test_b103_a2l_reader.py:572: AssertionError
 _________________ test_r_a2l_read_12_commented_old_copy_no_tag _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_12_commented_o0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_12_commented_o0')
 
     def test_r_a2l_read_12_commented_old_copy_no_tag(tmp_path: Path) -> None:
         """R-A2L-READ.12/1 (RP-B28): exactly 1 tag X at 0x1234."""
@@ -1224,7 +1224,7 @@ E        +  where 2 = len([{'access': None, 'address': 39321, 'axis_meta': [], '
 tests/test_b103_a2l_reader.py:587: AssertionError
 _______________ test_r_a2l_read_12_commented_object_alone_no_tag _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_12_commented_o1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_12_commented_o1')
 
     def test_r_a2l_read_12_commented_object_alone_no_tag(tmp_path: Path) -> None:
         """R-A2L-READ.12/2, /3 (RP-B29, RP-B30): 0 tags."""
@@ -1238,7 +1238,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:593: AssertionError
 ____________________ test_r_a2l_read_12_cut_section_no_tag _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_12_cut_section0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_12_cut_section0')
 
     def test_r_a2l_read_12_cut_section_no_tag(tmp_path: Path) -> None:
         """R-A2L-READ.12/4 ([B13]): a file cut inside a MEASUREMENT gives 0 tags."""
@@ -1254,7 +1254,7 @@ tests/test_b103_a2l_reader.py:602: AssertionError
 ------------------------------ Captured log call -------------------------------
 ___________ test_r_a2l_read_14_words_after_close_carry_closing_line ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_14_words_after0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_14_words_after0')
 
     def test_r_a2l_read_14_words_after_close_carry_closing_line(tmp_path: Path) -> None:
         """R-A2L-READ.14/2: words after a closing quote carry the closing line."""
@@ -1267,7 +1267,7 @@ E        +  where False = any(<generator object test_r_a2l_read_14_words_after_c
 tests/test_b103_a2l_reader.py:673: AssertionError
 _________________ test_r_a2l_read_15_quoted_string_not_closed __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_15_quoted_stri0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_15_quoted_stri0')
 
     def test_r_a2l_read_15_quoted_string_not_closed(tmp_path: Path) -> None:
         """R-A2L-READ.15/1: an unclosed quote ends the reading."""
@@ -1280,7 +1280,7 @@ E        +  where False = any(<generator object test_r_a2l_read_15_quoted_string
 tests/test_b103_a2l_reader.py:680: AssertionError
 ______________________ test_r_a2l_read_16_quote_ends_word ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_16_quote_ends_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_16_quote_ends_0')
 
     def test_r_a2l_read_16_quote_ends_word(tmp_path: Path) -> None:
         """R-A2L-READ.16/1..3: a double quote ends a word."""
@@ -1291,7 +1291,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_16_quo
 tests/test_b103_a2l_reader.py:686: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_16_quote_ends_0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_16_quote_ends_0/x.a2l', ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -1304,7 +1304,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in ['X"long"']
 tests/test_b103_a2l_reader.py:112: AssertionError
 _______________________ test_r_a2l_001_1_begin_end_words _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_1_begin_end_wor0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_1_begin_end_wor0')
 
     def test_r_a2l_001_1_begin_end_words(tmp_path: Path) -> None:
         """R-A2L-001.1/1..3: /begin and /end are words wherever they stand."""
@@ -1322,7 +1322,7 @@ tests/test_b103_a2l_reader.py:708: AssertionError
 ------------------------------ Captured log call -------------------------------
 ___________________ test_r_a2l_001_1_two_one_line_instances ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_1_two_one_line_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_1_two_one_line_0')
 
     def test_r_a2l_001_1_two_one_line_instances(tmp_path: Path) -> None:
         """R-A2L-001.1/4 ([K7b]): two one-line INSTANCEs on one line."""
@@ -1342,7 +1342,7 @@ tests/test_b103_a2l_reader.py:723: AssertionError
 ------------------------------ Captured log call -------------------------------
 ________________________ test_r_a2l_read_17_v171_clean _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_17_v171_clean0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_17_v171_clean0')
 
     def test_r_a2l_read_17_v171_clean(tmp_path: Path) -> None:
         """R-A2L-READ.17/1: V171 has 0 parse errors and depth-3 MEASUREMENTs."""
@@ -1357,7 +1357,7 @@ tests/test_b103_a2l_reader.py:729: AssertionError
 ------------------------------ Captured log call -------------------------------
 ______________ test_r_a2l_read_17_one_line_if_data_before_address ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_17_one_line_if0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_17_one_line_if0')
 
     def test_r_a2l_read_17_one_line_if_data_before_address(tmp_path: Path) -> None:
         """R-A2L-READ.17/2 (RP-B13): one-line IF_DATA before ECU_ADDRESS."""
@@ -1369,7 +1369,7 @@ tests/test_b103_a2l_reader.py:735: AssertionError
 ------------------------------ Captured log call -------------------------------
 ____________ test_r_a2l_read_17_one_line_if_data_before_byte_order _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_17_one_line_if1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_17_one_line_if1')
 
     def test_r_a2l_read_17_one_line_if_data_before_byte_order(tmp_path: Path) -> None:
         """R-A2L-READ.17/3 (Inc 2 C1): one-line IF_DATA before BYTE_ORDER."""
@@ -1384,7 +1384,7 @@ tests/test_b103_a2l_reader.py:741: AssertionError
 ------------------------------ Captured log call -------------------------------
 ______________________ test_r_a2l_read_19_glued_begin_end ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_19_glued_begin0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_19_glued_begin0')
 
     def test_r_a2l_read_19_glued_begin_end(tmp_path: Path) -> None:
         """R-A2L-READ.19/1, /2: /beginMEASUREMENT and /endX are ordinary words."""
@@ -1398,7 +1398,7 @@ E        +  where False = any(<generator object test_r_a2l_read_19_glued_begin_e
 tests/test_b103_a2l_reader.py:757: AssertionError
 ____________________ test_r_a2l_read_20_keyword_after_begin ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_20_keyword_aft0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_20_keyword_aft0')
 
     def test_r_a2l_read_20_keyword_after_begin(tmp_path: Path) -> None:
         """R-A2L-READ.20/1, /2: the keyword after /begin wherever it stands."""
@@ -1409,7 +1409,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_20_key
 tests/test_b103_a2l_reader.py:765: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_20_keyword_aft0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_20_keyword_aft0/x.a2l', ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -1422,7 +1422,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in []
 tests/test_b103_a2l_reader.py:112: AssertionError
 _________________ test_r_a2l_read_54_compu_method_named_later __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_54_compu_metho0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_54_compu_metho0')
 
     def test_r_a2l_read_54_compu_method_named_later(tmp_path: Path) -> None:
         """R-A2L-READ.54/1, /2: a COMPU_METHOD named on a later line converts."""
@@ -1443,7 +1443,7 @@ tests/test_b103_a2l_reader.py:782: AssertionError
 ------------------------------ Captured log call -------------------------------
 _________________ test_r_a2l_read_54_record_layout_named_later _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_54_record_layo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_54_record_layo0')
 
     def test_r_a2l_read_54_record_layout_named_later(tmp_path: Path) -> None:
         """R-A2L-READ.54/3: a RECORD_LAYOUT named on a later line sizes a VALUE."""
@@ -1461,7 +1461,7 @@ tests/test_b103_a2l_reader.py:796: AssertionError
 ------------------------------ Captured log call -------------------------------
 ___________________ test_r_a2l_read_54_axis_pts_named_later ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_54_axis_pts_na0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_54_axis_pts_na0')
 
     def test_r_a2l_read_54_axis_pts_named_later(tmp_path: Path) -> None:
         """R-A2L-READ.54/5: an AXIS_PTS named on a later line parses its name."""
@@ -1474,7 +1474,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:804: AssertionError
 __________________________ test_r_a2l_001_4_stray_end __________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_4_stray_end0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_4_stray_end0')
 
     def test_r_a2l_001_4_stray_end(tmp_path: Path) -> None:
         """R-A2L-001.4/1, /2: a stray /end at or after other words."""
@@ -1489,7 +1489,7 @@ tests/test_b103_a2l_reader.py:813: AssertionError
 ------------------------------ Captured log call -------------------------------
 ______________________ test_r_a2l_001_5_end_name_mismatch ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_001_5_end_name_mism0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_001_5_end_name_mism0')
 
     def test_r_a2l_001_5_end_name_mismatch(tmp_path: Path) -> None:
         """R-A2L-001.5/1, /2 and R-A2L-READ.21/1: /end name mismatch and innermost close."""
@@ -1503,7 +1503,7 @@ tests/test_b103_a2l_reader.py:820: AssertionError
 ------------------------------ Captured log call -------------------------------
 _______________________ test_r_a2l_read_22_include_error _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_22_include_err0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_22_include_err0')
 
     def test_r_a2l_read_22_include_error(tmp_path: Path) -> None:
         """R-A2L-READ.22/1, /2: /include gives one error; in a comment, none."""
@@ -1514,7 +1514,7 @@ E       assert []
 tests/test_b103_a2l_reader.py:829: AssertionError
 ________________________ test_r_a2l_read_64_nesting_cap ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_64_nesting_cap0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_64_nesting_cap0')
 
     def test_r_a2l_read_64_nesting_cap(tmp_path: Path) -> None:
         """R-A2L-READ.64/1..3: 33 levels error, 32 levels read."""
@@ -1533,7 +1533,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:842: AssertionError
 ___________________ test_r_a2l_read_65_no_exception_nesting ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_65_no_exceptio0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_65_no_exceptio0')
 
     def test_r_a2l_read_65_no_exception_nesting(tmp_path: Path) -> None:
         """R-A2L-READ.65/1, /2: 5,000 levels and 50,000 unclosed /begin raise nothing."""
@@ -3480,7 +3480,7 @@ s19_app/tui/a2l.py:705: RecursionError
 ------------------------------ Captured log call -------------------------------
 _______________ test_r_a2l_read_65_no_exception_stray_end_flood ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_65_no_exceptio1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_65_no_exceptio1')
 
     def test_r_a2l_read_65_no_exception_stray_end_flood(tmp_path: Path) -> None:
         """R-A2L-READ.65/3: 200,000 stray /end raise nothing."""
@@ -3493,7 +3493,7 @@ tests/test_b103_a2l_reader.py:869: AssertionError
 ------------------------------ Captured log call -------------------------------
 ____________________ test_r_a2l_read_23_name_on_later_line _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_name_on_lat0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_name_on_lat0')
 
     def test_r_a2l_read_23_name_on_later_line(tmp_path: Path) -> None:
         """R-A2L-READ.23/1..3: the name after a comment / on a later line."""
@@ -3509,7 +3509,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_nam
 tests/test_b103_a2l_reader.py:892: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_name_on_lat0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_name_on_lat0/x.a2l', ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -3522,7 +3522,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in ['UNKNOWN']
 tests/test_b103_a2l_reader.py:112: AssertionError
 __________________ test_r_a2l_read_23_v161_v171_unknown_named __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_v161_v171_u0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_v161_v171_u0')
 
     def test_r_a2l_read_23_v161_v171_unknown_named(tmp_path: Path) -> None:
         """R-A2L-READ.23/4: V161 and V171 name the ASCII CHARACTERISTIC."""
@@ -3534,7 +3534,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_v16
 tests/test_b103_a2l_reader.py:899: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers....}, ...}, 'errors': [], 'path': '/home/javiergr/work/b103-inc11-base/examples/case_00_public/ASAP2_Demo_V161.a2l', ...}
+data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers....}, ...}, 'errors': [], 'path': '/home/<user>/work/b103-inc11-base/examples/case_00_public/ASAP2_Demo_V161.a2l', ...}
 name = 'ASAM.C.ASCII.UBYTE.NUMBER_42', section = 'CHARACTERISTIC'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -3547,7 +3547,7 @@ E       AssertionError: no CHARACTERISTIC tag 'ASAM.C.ASCII.UBYTE.NUMBER_42' in 
 tests/test_b103_a2l_reader.py:112: AssertionError
 ____________ test_r_a2l_read_23_two_measurements_one_word_per_line _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_two_measure0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_two_measure0')
 
     def test_r_a2l_read_23_two_measurements_one_word_per_line(tmp_path: Path) -> None:
         """R-A2L-READ.23/5 ([K1]): two MEASUREMENTs written one word per line."""
@@ -3563,7 +3563,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_two
 tests/test_b103_a2l_reader.py:912: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_two_measure0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_two_measure0/x.a2l', ...}
 name = 'XK1', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -3576,7 +3576,7 @@ E       AssertionError: no MEASUREMENT tag 'XK1' in ['UNKNOWN', 'UNKNOWN']
 tests/test_b103_a2l_reader.py:112: AssertionError
 _____________ test_r_a2l_read_23_characteristic_one_word_per_line ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_characteris0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_characteris0')
 
     def test_r_a2l_read_23_characteristic_one_word_per_line(tmp_path: Path) -> None:
         """R-A2L-READ.23/6 ([K1c]): a CHARACTERISTIC written one word per line."""
@@ -3588,7 +3588,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_cha
 tests/test_b103_a2l_reader.py:921: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_23_characteris0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_23_characteris0/x.a2l', ...}
 name = 'CK1', section = 'CHARACTERISTIC'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -3601,7 +3601,7 @@ E       AssertionError: no CHARACTERISTIC tag 'CK1' in ['UNKNOWN']
 tests/test_b103_a2l_reader.py:112: AssertionError
 ___________________ test_r_a2l_read_25_balance_tube_headers ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_25_balance_tub0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_25_balance_tub0')
 
     def test_r_a2l_read_25_balance_tube_headers(tmp_path: Path) -> None:
         """R-A2L-READ.25/1: BalanceTube's 104 MEASUREMENTs get datatype and length."""
@@ -3615,7 +3615,7 @@ E        +  where False = all(<generator object test_r_a2l_read_25_balance_tube_
 tests/test_b103_a2l_reader.py:937: AssertionError
 ____________________ test_r_a2l_read_25_virtual_measurement ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_25_virtual_mea0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_25_virtual_mea0')
 
     def test_r_a2l_read_25_virtual_measurement(tmp_path: Path) -> None:
         """R-A2L-READ.25/2: the virtual MEASUREMENT of V161/V171."""
@@ -3631,7 +3631,7 @@ E             + CM.VIRTUAL.EXTERNAL_VALUE)
 tests/test_b103_a2l_reader.py:945: AssertionError
 ___________________ test_r_a2l_read_25_header_on_begin_line ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_25_header_on_b0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_25_header_on_b0')
 
     def test_r_a2l_read_25_header_on_begin_line(tmp_path: Path) -> None:
         """R-A2L-READ.25/3, /4, /5, /6: headers on the /begin line / over lines."""
@@ -3643,7 +3643,7 @@ E       AssertionError: assert (None == 'UWORD')
 tests/test_b103_a2l_reader.py:953: AssertionError
 ___________________ test_r_a2l_read_26_characteristic_header ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_26_characteris0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_26_characteris0')
 
     def test_r_a2l_read_26_characteristic_header(tmp_path: Path) -> None:
         """R-A2L-READ.26/1..5: CHARACTERISTIC headers."""
@@ -3655,7 +3655,7 @@ E       assert (None == 8192)
 tests/test_b103_a2l_reader.py:969: AssertionError
 ____________________ test_r_a2l_read_27_keyword_ends_header ____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_27_keyword_end0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_27_keyword_end0')
 
     def test_r_a2l_read_27_keyword_ends_header(tmp_path: Path) -> None:
         """R-A2L-READ.27/2..5: a keyword in header position ends the header."""
@@ -3669,7 +3669,7 @@ E           UWORD and None == '0x0FF0')
 tests/test_b103_a2l_reader.py:985: AssertionError
 ____________________ test_r_a2l_read_28_short_header_error _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_28_short_heade0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_28_short_heade0')
 
     def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
         """R-A2L-READ.28/1, /2, /4: short header errors."""
@@ -3682,7 +3682,7 @@ E        +  where False = any(<generator object test_r_a2l_read_28_short_header_
 tests/test_b103_a2l_reader.py:1007: AssertionError
 __________________ test_r_a2l_read_29_keyword_argument_words ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_29_keyword_arg0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_29_keyword_arg0')
 
     def test_r_a2l_read_29_keyword_argument_words(tmp_path: Path) -> None:
         """R-A2L-READ.29/1..4: arguments on later lines / up to the next keyword."""
@@ -3700,7 +3700,7 @@ E           assert None == 4660
 tests/test_b103_a2l_reader.py:1035: AssertionError
 __________________ test_r_a2l_read_29_keyword_never_argument ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_29_keyword_nev0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_29_keyword_nev0')
 
     def test_r_a2l_read_29_keyword_never_argument(tmp_path: Path) -> None:
         """R-A2L-READ.29/5, /6: a keyword is never an argument."""
@@ -3715,7 +3715,7 @@ E        +  where False = any(<generator object test_r_a2l_read_29_keyword_never
 tests/test_b103_a2l_reader.py:1044: AssertionError
 _____________________ test_r_a2l_read_30_keyword_wherever ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_30_keyword_whe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_30_keyword_whe0')
 
     def test_r_a2l_read_30_keyword_wherever(tmp_path: Path) -> None:
         """R-A2L-READ.30/1..3: a keyword wherever it stands on its line."""
@@ -3729,7 +3729,7 @@ E         + big
 tests/test_b103_a2l_reader.py:1054: AssertionError
 _____________________ test_r_a2l_read_32_duplicate_keyword _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_32_duplicate_k0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_32_duplicate_k0')
 
     def test_r_a2l_read_32_duplicate_keyword(tmp_path: Path) -> None:
         """R-A2L-READ.32/1..3: a keyword twice records the error."""
@@ -3742,7 +3742,7 @@ E        +  where False = any(<generator object test_r_a2l_read_32_duplicate_key
 tests/test_b103_a2l_reader.py:1073: AssertionError
 ___________________ test_r_a2l_read_58_argument_count_errors ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_58_argument_co0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_58_argument_co0')
 
     def test_r_a2l_read_58_argument_count_errors(tmp_path: Path) -> None:
         """R-A2L-READ.58/1..5: argument-count errors."""
@@ -3755,7 +3755,7 @@ E        +  where False = any(<generator object test_r_a2l_read_58_argument_coun
 tests/test_b103_a2l_reader.py:1096: AssertionError
 _____________________ test_r_a2l_read_58_hex_like_surplus ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_58_hex_like_su0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_58_hex_like_su0')
 
     def test_r_a2l_read_58_hex_like_surplus(tmp_path: Path) -> None:
         """R-A2L-READ.58/5 round 3: hex-like surplus words."""
@@ -3775,7 +3775,7 @@ E            +  where False = any(<generator object test_r_a2l_read_58_hex_like_
 tests/test_b103_a2l_reader.py:1120: AssertionError
 _________________ test_r_a2l_read_59_declares_sizes_addresses __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_59_declares_si0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_59_declares_si0')
 
     def test_r_a2l_read_59_declares_sizes_addresses(tmp_path: Path) -> None:
         """R-A2L-READ.59/1, /2: disagreeing addresses and sizes."""
@@ -3788,7 +3788,7 @@ E        +  where False = any(<generator object test_r_a2l_read_59_declares_size
 tests/test_b103_a2l_reader.py:1131: AssertionError
 _________________ test_r_a2l_read_60_no_address_when_disagree __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_60_no_address_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_60_no_address_0')
 
     def test_r_a2l_read_60_no_address_when_disagree(tmp_path: Path) -> None:
         """R-A2L-READ.60/1..4: no address when address words disagree."""
@@ -3799,7 +3799,7 @@ E       assert 32 is None
 tests/test_b103_a2l_reader.py:1150: AssertionError
 ____________ test_r_a2l_read_60_no_address_when_missing_or_invalid _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_60_no_address_1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_60_no_address_1')
 
     def test_r_a2l_read_60_no_address_when_missing_or_invalid(tmp_path: Path) -> None:
         """R-A2L-READ.60/2, /6: no address for a missing argument or surplus."""
@@ -3812,7 +3812,7 @@ E       assert 16 is None
 tests/test_b103_a2l_reader.py:1164: AssertionError
 _______________ test_r_a2l_read_60_no_address_header_not_number ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_60_no_address_2')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_60_no_address_2')
 
     def test_r_a2l_read_60_no_address_header_not_number(tmp_path: Path) -> None:
         """R-A2L-READ.60/7: no address when the header address is no number word."""
@@ -3824,7 +3824,7 @@ E       assert 12288 is None
 tests/test_b103_a2l_reader.py:1173: AssertionError
 _______________ test_r_a2l_read_62_short_characteristic_no_field _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_62_short_chara0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_62_short_chara0')
 
     def test_r_a2l_read_62_short_characteristic_no_field(tmp_path: Path) -> None:
         """R-A2L-READ.62/1, /2: a short CHARACTERISTIC header gives no field."""
@@ -3835,7 +3835,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_62_sho
 tests/test_b103_a2l_reader.py:1180: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_62_short_chara0/x.a2l', ...}
+data = {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_62_short_chara0/x.a2l', ...}
 name = 'Synthetic map', section = 'CHARACTERISTIC'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -3848,7 +3848,7 @@ E       AssertionError: no CHARACTERISTIC tag 'Synthetic map' in ['Synthetic']
 tests/test_b103_a2l_reader.py:112: AssertionError
 _______________________ test_r_a2l_read_63_not_a_number ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_63_not_a_numbe0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_63_not_a_numbe0')
 
     def test_r_a2l_read_63_not_a_number(tmp_path: Path) -> None:
         """R-A2L-READ.63/1, /3, /4: not-a-number errors."""
@@ -3863,7 +3863,7 @@ E            +  where False = any(<generator object test_r_a2l_read_63_not_a_num
 tests/test_b103_a2l_reader.py:1192: AssertionError
 ________________________ test_r_a2l_read_67_not_closed _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_67_not_closed0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_67_not_closed0')
 
     def test_r_a2l_read_67_not_closed(tmp_path: Path) -> None:
         """R-A2L-READ.67/1, /2: the not-closed error."""
@@ -3877,7 +3877,7 @@ tests/test_b103_a2l_reader.py:1213: AssertionError
 ------------------------------ Captured log call -------------------------------
 _____________________ test_r_a2l_read_68_byte_order_error ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_68_byte_order_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_68_byte_order_0')
 
     def test_r_a2l_read_68_byte_order_error(tmp_path: Path) -> None:
         """R-A2L-READ.68/1: BYTE_ORDER not-a-byte-order errors."""
@@ -3892,7 +3892,7 @@ E            +  where False = any(<generator object test_r_a2l_read_68_byte_orde
 tests/test_b103_a2l_reader.py:1233: AssertionError
 ____________________ test_r_a2l_read_33_display_identifier _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_33_display_ide0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_33_display_ide0')
 
     def test_r_a2l_read_33_display_identifier(tmp_path: Path) -> None:
         """R-A2L-READ.33/1, /2: display identifier without its comment."""
@@ -3906,7 +3906,7 @@ E         + XM_disp /* shown name */
 tests/test_b103_a2l_reader.py:1256: AssertionError
 _______________________ test_r_a2l_read_35_decimal_words _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_35_decimal_wor0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_35_decimal_wor0')
 
     def test_r_a2l_read_35_decimal_words(tmp_path: Path) -> None:
         """R-A2L-READ.35/1, /2: decimal words with leading zero / plain."""
@@ -3916,7 +3916,7 @@ E       assert None == 10
 tests/test_b103_a2l_reader.py:1267: AssertionError
 _____________________ test_r_a2l_read_36_not_number_words ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_36_not_number_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_36_not_number_0')
 
     def test_r_a2l_read_36_not_number_words(tmp_path: Path) -> None:
         """R-A2L-READ.36/1..3: non-number words give no number."""
@@ -3927,7 +3927,7 @@ E           assert 4660 is None
 tests/test_b103_a2l_reader.py:1274: AssertionError
 ___________________ test_r_a2l_read_69_address_above_64_bits ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_69_address_abo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_69_address_abo0')
 
     def test_r_a2l_read_69_address_above_64_bits(tmp_path: Path) -> None:
         """R-A2L-READ.69/1, /2, /3: addresses above 2^64-1 give no address."""
@@ -3939,7 +3939,7 @@ E           assert 18446744073709551616 is None
 tests/test_b103_a2l_reader.py:1281: AssertionError
 ____________________ test_r_a2l_read_37_matrix_dim_product _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_37_matrix_dim_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_37_matrix_dim_0')
 
     def test_r_a2l_read_37_matrix_dim_product(tmp_path: Path) -> None:
         """R-A2L-READ.37/2 (RP-B26): MATRIX_DIM 2 2 -> length 8."""
@@ -3976,7 +3976,7 @@ E               assert 8 == 16
 tests/test_b103_a2l_reader.py:1320: AssertionError
 _______________________ test_r_a2l_read_38_length_bounds _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_38_length_boun0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_38_length_boun0')
 
     def test_r_a2l_read_38_length_bounds(tmp_path: Path) -> None:
         """R-A2L-READ.38/1..3: lengths below 1 or above 1 MiB give no length."""
@@ -3989,7 +3989,7 @@ E           assert 0 == None
 tests/test_b103_a2l_reader.py:1334: AssertionError
 _______________________ test_r_a2l_read_39_length_error ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_39_length_erro0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_39_length_erro0')
 
     def test_r_a2l_read_39_length_error(tmp_path: Path) -> None:
         """R-A2L-READ.39/1: the length-out-of-bounds error."""
@@ -4003,7 +4003,7 @@ E            +  where False = any(<generator object test_r_a2l_read_39_length_er
 tests/test_b103_a2l_reader.py:1341: AssertionError
 _____________________ test_r_a2l_014_datatype_times_matrix _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_014_datatype_times_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_014_datatype_times_0')
 
     def test_r_a2l_014_datatype_times_matrix(tmp_path: Path) -> None:
         """R-A2L-014/1, /2: datatype size x MATRIX_DIM."""
@@ -4014,7 +4014,7 @@ E       assert 4 == 8
 tests/test_b103_a2l_reader.py:1353: AssertionError
 ________________________ test_r_a2l_read_57_array_size _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_57_array_size0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_57_array_size0')
 
     def test_r_a2l_read_57_array_size(tmp_path: Path) -> None:
         """R-A2L-READ.57/1, /2: ARRAY_SIZE sizes a MEASUREMENT."""
@@ -4025,7 +4025,7 @@ E       assert 1 == 16
 tests/test_b103_a2l_reader.py:1360: AssertionError
 ________________________ test_r_a2l_016_val_blk_matrix _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_016_val_blk_matrix0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_016_val_blk_matrix0')
 
     def test_r_a2l_016_val_blk_matrix(tmp_path: Path) -> None:
         """R-A2L-016/1: a VAL_BLK sized by its layout datatype x MATRIX_DIM."""
@@ -4036,7 +4036,7 @@ E       assert None == 8
 tests/test_b103_a2l_reader.py:1368: AssertionError
 ______________________ test_r_a2l_read_53_val_blk_number _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_53_val_blk_num0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_53_val_blk_num0')
 
     def test_r_a2l_read_53_val_blk_number(tmp_path: Path) -> None:
         """R-A2L-READ.53/1: a VAL_BLK sized by NUMBER."""
@@ -4047,7 +4047,7 @@ E       assert None == 8
 tests/test_b103_a2l_reader.py:1374: AssertionError
 _________________________ test_r_a2l_017_ascii_length __________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_017_ascii_length0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_017_ascii_length0')
 
     def test_r_a2l_017_ascii_length(tmp_path: Path) -> None:
         """R-A2L-017/1, /2: an ASCII sized by MATRIX_DIM or NUMBER."""
@@ -4058,7 +4058,7 @@ E       assert None == 8
 tests/test_b103_a2l_reader.py:1380: AssertionError
 __________________ test_r_a2l_read_61_no_length_when_disagree __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_61_no_length_w0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_61_no_length_w0')
 
     def test_r_a2l_read_61_no_length_when_disagree(tmp_path: Path) -> None:
         """R-A2L-READ.61/1..7: no length when sizes disagree."""
@@ -4079,7 +4079,7 @@ E           assert 8 is None
 tests/test_b103_a2l_reader.py:1398: AssertionError
 ________________ test_r_a2l_read_61_agreeing_sizes_keep_length _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_61_agreeing_si0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_61_agreeing_si0')
 
     def test_r_a2l_read_61_agreeing_sizes_keep_length(tmp_path: Path) -> None:
         """R-A2L-READ.61/3: agreeing sizes keep their length."""
@@ -4092,7 +4092,7 @@ E       assert None == 8
 tests/test_b103_a2l_reader.py:1406: AssertionError
 _________________ test_r_a2l_read_38_definition_stays_refused __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_38_definition_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_38_definition_0')
 
     def test_r_a2l_read_38_definition_stays_refused(tmp_path: Path) -> None:
         """R-A2L-READ.38/4 and .61/4: describe_definition keeps a refused length."""
@@ -4107,7 +4107,7 @@ E            +  where 0 = Definition(name='X', section='MEASUREMENT', char_type=
 tests/test_b103_a2l_reader.py:1417: AssertionError
 ___________________ test_r_a2l_read_61_no_enriched_byte_size ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_61_no_enriched0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_61_no_enriched0')
 
     def test_r_a2l_read_61_no_enriched_byte_size(tmp_path: Path) -> None:
         """R-A2L-READ.61/9: no enriched byte size for a tag with no length."""
@@ -4123,7 +4123,7 @@ E        +    where <built-in method get of dict object at 0x7f669cb44600> = {'a
 tests/test_b103_a2l_reader.py:1427: AssertionError
 _________________________ test_r_a2l_read_40_blob_span _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_40_blob_span0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_40_blob_span0')
 
     def test_r_a2l_read_40_blob_span(tmp_path: Path) -> None:
         """R-A2L-READ.40/1, /3 (RP-D1, RP-D4): a BLOB span; a commented-out one none."""
@@ -4161,20 +4161,20 @@ tests/test_b103_a2l_reader.py:1465: AssertionError
 ------------------------------ Captured log call -------------------------------
 _______________ test_r_a2l_read_42_instance_typedef_measurement ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_42_instance_ty0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_42_instance_ty0')
 
     def test_r_a2l_read_42_instance_typedef_measurement(tmp_path: Path) -> None:
         """R-A2L-READ.42/1, /2 (RP-D2, RP-D3): INSTANCE of a TYPEDEF_MEASUREMENT."""
         text = _body('/begin INSTANCE I1 "" T_U16 0x10\n/end INSTANCE')
 >       assert {"name": "I1", "kind": "INSTANCE", "address": 0x10, "length": 2} in _spans(_parse(tmp_path, text))
 E       assert {'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'I1'} in []
-E        +  where [] = _spans({'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_42_instance_ty0/x.a2l', ...})
-E        +    where {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_42_instance_ty0/x.a2l', ...} = _parse(PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_42_instance_ty0'), 'ASAP2_VERSION 1 71\n/begin PROJECT P ""\n/begin MODULE M ""\n/begin MOD_COMMON ""\nBYTE_ORDER MSB_FIRST\n/end MOD_COM...ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT\n/begin INSTANCE I1 "" T_U16 0x10\n/end INSTANCE\n/end MODULE\n/end PROJECT\n')
+E        +  where [] = _spans({'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_42_instance_ty0/x.a2l', ...})
+E        +    where {'compu_methods_by_name': {'CM_ID': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': ...s_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_42_instance_ty0/x.a2l', ...} = _parse(PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_42_instance_ty0'), 'ASAP2_VERSION 1 71\n/begin PROJECT P ""\n/begin MODULE M ""\n/begin MOD_COMMON ""\nBYTE_ORDER MSB_FIRST\n/end MOD_COM...ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT\n/begin INSTANCE I1 "" T_U16 0x10\n/end INSTANCE\n/end MODULE\n/end PROJECT\n')
 
 tests/test_b103_a2l_reader.py:1471: AssertionError
 __________________ test_r_a2l_read_43_instance_value_typedef ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_43_instance_va0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_43_instance_va0')
 
     def test_r_a2l_read_43_instance_value_typedef(tmp_path: Path) -> None:
         """R-A2L-READ.43/1: V171's INSTANCE of a VALUE typedef."""
@@ -4187,7 +4187,7 @@ tests/test_b103_a2l_reader.py:1479: IndexError
 ------------------------------ Captured log call -------------------------------
 _________________ test_r_a2l_read_43_instance_val_blk_typedef __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_43_instance_va1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_43_instance_va1')
 
     def test_r_a2l_read_43_instance_val_blk_typedef(tmp_path: Path) -> None:
         """R-A2L-READ.43/2: a VAL_BLK typedef on RL_U16 with MATRIX_DIM 3, INSTANCE 2."""
@@ -4203,7 +4203,7 @@ E        +  where False = any(<generator object test_r_a2l_read_43_instance_val_
 tests/test_b103_a2l_reader.py:1490: AssertionError
 __________________ test_r_a2l_read_43_instance_ascii_typedef ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_43_instance_as0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_43_instance_as0')
 
     def test_r_a2l_read_43_instance_ascii_typedef(tmp_path: Path) -> None:
         """R-A2L-READ.43/3: an ASCII typedef with NUMBER 8."""
@@ -4219,7 +4219,7 @@ E        +  where False = any(<generator object test_r_a2l_read_43_instance_asci
 tests/test_b103_a2l_reader.py:1500: AssertionError
 ______________ test_r_a2l_read_44_instance_blob_structure_typedef ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_44_instance_bl0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_44_instance_bl0')
 
     def test_r_a2l_read_44_instance_blob_structure_typedef(tmp_path: Path) -> None:
         """R-A2L-READ.44/1, /2: TYPEDEF_BLOB and TYPEDEF_STRUCTURE."""
@@ -4231,7 +4231,7 @@ E        +  where False = any(<generator object test_r_a2l_read_44_instance_blob
 tests/test_b103_a2l_reader.py:1506: AssertionError
 _________________ test_r_a2l_read_45_instance_unknown_typedef __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_45_instance_un0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_45_instance_un0')
 
     def test_r_a2l_read_45_instance_unknown_typedef(tmp_path: Path) -> None:
         """R-A2L-READ.45/1..3: an unsizeable INSTANCE has no length."""
@@ -4249,7 +4249,7 @@ E            +  where False = any(<generator object test_r_a2l_read_45_instance_
 tests/test_b103_a2l_reader.py:1519: AssertionError
 ____________________ test_r_a2l_read_46_span_length_bounds _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_46_span_length0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_46_span_length0')
 
     def test_r_a2l_read_46_span_length_bounds(tmp_path: Path) -> None:
         """R-A2L-READ.46/1, /2: BLOB sizes 0/1048577 and a huge MATRIX_DIM."""
@@ -4320,7 +4320,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:1601: AssertionError
 _______________________ test_r_a2l_read_49_no_regression _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_49_no_regressi0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_49_no_regressi0')
 
     def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
         """R-A2L-READ.49/1: 234,427 tags identical; 227 defect tags take their values."""
@@ -4350,7 +4350,7 @@ E                 Use -v to get more diff
 tests/test_b103_a2l_reader.py:1663: AssertionError
 _______________ test_r_a2l_read_49_2_defect_classes_hand_written _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_49_2_defect_cl0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_49_2_defect_cl0')
 
     def test_r_a2l_read_49_2_defect_classes_hand_written(tmp_path: Path) -> None:
         """R-A2L-READ.49/2: each defect class on a synthetic reduction with
@@ -4370,7 +4370,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:1680: AssertionError
 ______________ test_r_a2l_read_50_summary_header_without_comment _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_50_summary_hea0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_50_summary_hea0')
 
     def test_r_a2l_read_50_summary_header_without_comment(tmp_path: Path) -> None:
         """R-A2L-READ.50/1..3: the summary begin words without the comment."""
@@ -4390,7 +4390,7 @@ E           - CHARACTERISTIC XH: n/a len=n/a mem=unknown
 tests/test_b103_a2l_reader.py:1739: AssertionError
 _____________________ test_r_a2l_076_errors_then_sections ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_076_errors_then_sec0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_076_errors_then_sec0')
 
     def test_r_a2l_076_errors_then_sections(tmp_path: Path) -> None:
         """R-A2L-076/1, /2: a file with errors lists its sections."""
@@ -4402,7 +4402,7 @@ E       assert ('A2L parse errors:' in 'A2L Sections:\n- PROJECT merge_includes_
 tests/test_b103_a2l_reader.py:1747: AssertionError
 _______________________ test_r_a2l_077_errors_then_tags ________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_077_errors_then_tag0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_077_errors_then_tag0')
 
     def test_r_a2l_077_errors_then_tags(tmp_path: Path) -> None:
         """R-A2L-077/1: a file with errors lists its tags."""
@@ -4416,7 +4416,7 @@ tests/test_b103_a2l_reader.py:1759: AssertionError
 ------------------------------ Captured log call -------------------------------
 ___________________ test_r_a2l_read_51_control_chars_as_fffd ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_r_a2l_read_51_control_cha0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_r_a2l_read_51_control_cha0')
 
     def test_r_a2l_read_51_control_chars_as_fffd(tmp_path: Path) -> None:
         """R-A2L-READ.51/1: control characters show as U+FFFD in the summary."""
@@ -4430,7 +4430,7 @@ E           assert '�' in 'A2L Sections:\n- PROJECT P "" (lines 2-25)\n  - MOD
 tests/test_b103_a2l_reader.py:1769: AssertionError
 ____________ test_at_b103_i11_2_commented_old_copy_changes_nothing _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_at_b103_i11_2_commented_o0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_at_b103_i11_2_commented_o0')
 
     def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
         """AT-B103-I11-2 (RP-B28): 1 row X at 0x1234; no duplicate issue."""
@@ -4446,7 +4446,7 @@ E        +  where 2 = len([{'access': None, 'address': 39321, 'axis_meta': [], '
 tests/test_b103_a2l_reader.py:1784: AssertionError
 _____________________ test_at_b103_i11_3_v171_loads_clean ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-1015/test_at_b103_i11_3_v171_loads_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1015/test_at_b103_i11_3_v171_loads_0')
 
     def test_at_b103_i11_3_v171_loads_clean(tmp_path: Path) -> None:
         """AT-B103-I11-3: V171 loads clean and the summary shows sections and tags."""

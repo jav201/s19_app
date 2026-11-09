@@ -5,7 +5,7 @@
 =================================== FAILURES ===================================
 _______________________ test_r_a2l_read_49_no_regression _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-53/test_r_a2l_read_49_no_regressi0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-53/test_r_a2l_read_49_no_regressi0')
 
     def test_r_a2l_read_49_no_regression(tmp_path: Path) -> None:
         """R-A2L-READ.49/1: 234,426 tags identical; 228 defect tags take their values."""

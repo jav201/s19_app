@@ -26,7 +26,7 @@ Use the public parser and, where the case concerns the real write/definition pat
 
 ## Execution
 
-On this PC run only `python -m py_compile tests/test_b103_a2l_reader_e5.py`. Run pytest only on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-product-red/zq_iso_user` (never a final component named `home`). Use a fresh full Git clone of `f4206433` and print `s19_app.__file__` first.
+On this PC run only `python -m py_compile tests/test_b103_a2l_reader_e5.py`. Run pytest only on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-product-red/<user>` (never a final component named `home`). Use a fresh full Git clone of `f4206433` and print `s19_app.__file__` first.
 
 Run the new file on the unmodified baseline and save the complete transcript plus exit code to `inc-11/evidence-e5/product-findings-red.txt`. Each P finding must be classified: reproduced for the stated behavioral reason, already correct, or wrong test premise. Do not modify the product to make the reds pass and do not run the full integration or timing suite in this task.
 

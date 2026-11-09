@@ -1,4 +1,4 @@
-# Inc 11 E4 perf pass — cProfile (top 25 by cumulative time), cachyos-rtx
+# Inc 11 E4 perf pass — cProfile (top 25 by cumulative time), <runner>
 # R-A2L-READ.52 time (least of 15, GC off, fresh measure):
 #   case_06  8.466 s vs base 5.898 s = 1.435x (bound <= 1.5x)
 #   software_a 0.843 s vs base 0.653 s = 1.291x (bound <= 1.5x)

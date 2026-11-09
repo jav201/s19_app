@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________ test_r_a2l_read_7_comment_between_digits_splits ________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-23/test_r_a2l_read_7_comment_betw0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-23/test_r_a2l_read_7_comment_betw0')
 
     def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
         """R-A2L-READ.7/1 (name = first word, R-A2L-READ.23): MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""

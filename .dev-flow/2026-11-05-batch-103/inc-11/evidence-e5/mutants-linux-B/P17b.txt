@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________ test_r_a2l_def_13_1_enum_with_no_table_is_refused _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-54/test_r_a2l_def_13_1_enum_with_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-54/test_r_a2l_def_13_1_enum_with_0')
 
     def test_r_a2l_def_13_1_enum_with_no_table_is_refused(tmp_path):
         """R-A2L-DEF.13/1 - TAB_VERB with no COMPU_TAB_REF."""

@@ -2,7 +2,7 @@
 /tmp/b103-e5-11-product-red/tree/s19_app/__init__.py
 ===== pytest tests/test_b103_a2l_reader_e5.py =====
 ============================= test session starts ==============================
-platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/javiergr/miniconda3/envs/s19ci/bin/python
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /home/<user>/miniconda3/envs/s19ci/bin/python
 rootdir: /tmp/b103-e5-11-product-red/tree
 configfile: pyproject.toml
 plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0

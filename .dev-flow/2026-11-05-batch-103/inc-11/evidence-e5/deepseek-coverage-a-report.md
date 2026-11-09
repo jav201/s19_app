@@ -4,8 +4,8 @@
   `tests/test_b103_a2l_reader_perf.py` only).
 - **Date:** 2026-11-08 (batch-103 Inc 11, E5 gate).
 - **Status:** **PENDING Linux verification.** Code implemented and
-  `py_compile` green on the Windows PC; the cachyos-rtx runner is unreachable
-  (SSH `192.168.1.67:22` connection timed out), so no pytest/probe was run.
+  `py_compile` green on the Windows PC; the <runner> runner is unreachable
+  (SSH `<runner-ip>:22` connection timed out), so no pytest/probe was run.
 
 ## Scope
 
@@ -66,25 +66,25 @@ $ python -m py_compile tests/test_b103_a2l_reader_coverage.py tests/test_b103_a2
 PY_COMPILE_OK
 
 $ timeout 15 ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new \
-    javiergr@192.168.1.67 "echo SSH_OK && hostname"
-ssh: connect to host 192.168.1.67 port 22: Connection timed out
+    <user>@<runner-ip> "echo SSH_OK && hostname"
+ssh: connect to host <runner-ip> port 22: Connection timed out
 ```
 
-No pytest/probe was run on the Windows PC (batch rule). The cachyos-rtx runner
+No pytest/probe was run on the Windows PC (batch rule). The <runner> runner
 is unreachable, so per instructions I did not retry.
 
 ## Pending (blocking `verified`)
 
 1. **Linux run of the two owned modules** with the mandated runner:
-   absolute `/home/javiergr/miniconda3/envs/s19ci/bin/python`, isolated
-   `/tmp/b103-e5-11-deep-a/zq_iso_user`, closed stdin,
+   absolute `/home/<user>/miniconda3/envs/s19ci/bin/python`, isolated
+   `/tmp/b103-e5-11-deep-a/<user>`, closed stdin,
    `PYTHONDONTWRITEBYTECODE=1`, package path printed first.
    Suggested commands (to be run only once the runner is reachable):
 
    ```bash
-   /home/javiergr/miniconda3/envs/s19ci/bin/python -c "import sys; sys.path.insert(0, '/home/javiergr/Github/s19_app-b103-inc11-code'); print(sys.path)"
-   cd /home/javiergr/Github/s19_app-b103-inc11-code && \
-     PYTHONDONTWRITEBYTECODE=1 /home/javiergr/miniconda3/envs/s19ci/bin/python -m pytest \
+   /home/<user>/miniconda3/envs/s19ci/bin/python -c "import sys; sys.path.insert(0, '/home/<user>/Github/s19_app-b103-inc11-code'); print(sys.path)"
+   cd /home/<user>/Github/s19_app-b103-inc11-code && \
+     PYTHONDONTWRITEBYTECODE=1 /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest \
      tests/test_b103_a2l_reader_coverage.py tests/test_b103_a2l_reader_perf.py \
      -m "not slow and not serial_timing" -q --tb=short
    ```

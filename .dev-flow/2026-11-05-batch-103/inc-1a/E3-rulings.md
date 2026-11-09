@@ -10,7 +10,7 @@ Round 1: `E3-architect.md` **FAIL** (3 MAJOR, 5 MEDIUM, 3 MINOR, 1 LOW, 2 INFO);
 | E3A-05 (`screen.focused`, not `has_focus`) | accept. |
 | E3S-01 MAJOR (pasted escape sequences) | accept: one strip step with the repo's `_CONTROL_SCRUB` set at the four paste entry points of the two slice files; boxes with their own `restrict` filter keep it (R-LOADDLG.20 holds). New rows **R-PASTE.34** and **R-PASTE.35** as the fix column words them. |
 | E3S-02 MAJOR (guard covers only the new tests) | accept: a suite-wide guard in `tests/conftest.py` (beside the `LOCALAPPDATA` one): no test writes the OS clipboard unless the isolation term holds; R-PASTE.21 says "every test". |
-| E3S-03 MEDIUM | accept: the isolation term also requires the logged-on account `runneradmin` (read with `GetUserNameW`), so an environment variable alone never isolates a developer PC. |
+| E3S-03 MEDIUM | accept: the isolation term also requires the logged-on account `<user>` (read with `GetUserNameW`), so an environment variable alone never isolates a developer PC. |
 | E3S-04 MEDIUM | accept: the Win32 read is bounded by `GlobalSize`. |
 | E3S-05 MEDIUM (records the push would publish) | accept, batch-wide: before any push the orchestrator redacts the batch-103 records (the LAN host login and address, the Windows user-profile path, the runner home path) by a scripted replace, recorded with its command; this increment's tests extend the redaction gate (`tests/test_suite_hygiene.py` ~:2017) to the batch-103 folder. Host details move to a local, git-excluded note that briefs reference. |
 | E2-1 | `focus_on_click()` confirmed (with E3A-05). |

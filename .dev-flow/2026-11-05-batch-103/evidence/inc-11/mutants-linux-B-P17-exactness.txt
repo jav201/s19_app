@@ -4,7 +4,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________ test_cov_read_54_tab_verb_near_keyword_is_not_enum ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-25/test_cov_read_54_tab_verb_near0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-25/test_cov_read_54_tab_verb_near0')
 
     def test_cov_read_54_tab_verb_near_keyword_is_not_enum(tmp_path: Path) -> None:
         """R-A2L-READ.54/4 negative exactness: a near TAB_VERB name is not an enum."""

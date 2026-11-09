@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________ test_e5_p15_length_zero_inline_axis_refusal_final _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p15_length_zero_inline0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-46/test_e5_p15_length_zero_inline0')
 
     def test_e5_p15_length_zero_inline_axis_refusal_final(tmp_path: Path) -> None:
         """R-A2L-READ.61 (E3S-23): a MAP with ``LENGTH 0`` and an inline STD_AXIS keeps

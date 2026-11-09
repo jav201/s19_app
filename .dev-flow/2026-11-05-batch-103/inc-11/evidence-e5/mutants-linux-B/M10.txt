@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________________ test_r_a2l_read_68_byte_order_error ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-47/test_r_a2l_read_68_byte_order_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-47/test_r_a2l_read_68_byte_order_0')
 
     def test_r_a2l_read_68_byte_order_error(tmp_path: Path) -> None:
         """R-A2L-READ.68/1: BYTE_ORDER not-a-byte-order errors."""

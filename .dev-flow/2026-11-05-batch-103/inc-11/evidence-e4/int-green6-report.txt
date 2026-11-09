@@ -2,7 +2,7 @@ Integration run 6 executed end-to-end. Full report below.
 
 ## Result: GREEN (all five groups passed)
 
-Ran on the Linux runner (`cachyos-rtx`) from a fresh full clone of `3926b710` under `/tmp/b103-e4-11-int6/tree`, with the `s19ci` env, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e4-11-int6/zq_iso_user`. Every transcript opens with `s19_app.__file__` → the fresh tree, and carries the pytest exit code.
+Ran on the Linux runner (`<runner>`) from a fresh full clone of `3926b710` under `/tmp/b103-e4-11-int6/tree`, with the `s19ci` env, `PYTHONDONTWRITEBYTECODE=1`, stdin `/dev/null`, and HOME/XDG/LOCALAPPDATA isolated under `/tmp/b103-e4-11-int6/<user>`. Every transcript opens with `s19_app.__file__` → the fresh tree, and carries the pytest exit code.
 
 | Group | Files | Result |
 |---|---|---|
@@ -18,7 +18,7 @@ Totals: **1017 passed, 4 skipped, 0 failed, 1 deselected**. No failures.
 
 ## One environment note (not a test failure)
 
-The laws group D initially ran red (2 failures) purely because I set the isolated `HOME` to `…/zq_iso_user/home`, making `Path.home().name == "home"`; the redaction laws then matched the literal word "home" across committed inc-6/7/8 evidence. I corrected `HOME` to a unique basename (`zq_iso_user/zqisolated6`, verified absent from the repo) and re-ran A–D uniformly. No product, test, or reference file was touched.
+The laws group D initially ran red (2 failures) purely because I set the isolated `HOME` to `…/<user>/home`, making `Path.home().name == "home"`; the redaction laws then matched the literal word "home" across committed inc-6/7/8 evidence. I corrected `HOME` to a unique basename (`<user>/zqisolated6`, verified absent from the repo) and re-ran A–D uniformly. No product, test, or reference file was touched.
 
 ## Deliverables
 

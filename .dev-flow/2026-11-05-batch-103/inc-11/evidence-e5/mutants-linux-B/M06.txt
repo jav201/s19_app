@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________________ test_r_a2l_read_69_address_above_64_bits ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-43/test_r_a2l_read_69_address_abo0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-43/test_r_a2l_read_69_address_abo0')
 
     def test_r_a2l_read_69_address_above_64_bits(tmp_path: Path) -> None:
         """R-A2L-READ.69/1, /2, /3: addresses above 2^64-1 give no address."""

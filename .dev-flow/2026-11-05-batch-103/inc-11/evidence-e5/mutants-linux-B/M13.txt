@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_read_46_span_length_bounds _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-50/test_r_a2l_read_46_span_length0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-50/test_r_a2l_read_46_span_length0')
 
     def test_r_a2l_read_46_span_length_bounds(tmp_path: Path) -> None:
         """R-A2L-READ.46/1, /2: BLOB sizes 0/1048577 and a huge MATRIX_DIM."""

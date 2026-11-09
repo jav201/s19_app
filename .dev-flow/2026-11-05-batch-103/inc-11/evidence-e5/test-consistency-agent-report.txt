@@ -13,7 +13,7 @@ Done. Executed the brief exactly; here is the evidence-backed result.
 
 `py_compile` passed on all three changed Python files on this PC.
 
-## Test run (cachyos-rtx, s19ci Python, isolated env, closed stdin)
+## Test run (<runner>, s19ci Python, isolated env, closed stdin)
 
 ```
 1 failed, 3 passed in 40.30s

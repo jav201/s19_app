@@ -17,7 +17,7 @@ READ.52 must compare base and current in the same session, in fresh processes, u
 
 ## Evidence
 
-On this PC run only `python -m py_compile` on the changed test files. All pytest runs happen on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-coverage/zq_iso_user` (never a final component named `home`). Print `s19_app.__file__` first.
+On this PC run only `python -m py_compile` on the changed test files. All pytest runs happen on the Linux runner with the absolute s19ci Python, `PYTHONDONTWRITEBYTECODE=1`, closed stdin and HOME/XDG/LOCALAPPDATA under `/tmp/b103-e5-11-coverage/<user>` (never a final component named `home`). Print `s19_app.__file__` first.
 
 Run the new/changed tests, the whole reader, the modified legacy tests and the perf arms. Save complete transcripts and exit codes under `inc-11/evidence-e5/coverage-*.txt`. Produce `inc-11/evidence-e5/coverage-completion-report.md` listing each of the 136 case ids, the test node that discharges it, and any residual gap or false audit premise. Do not type a green result without its transcript.
 

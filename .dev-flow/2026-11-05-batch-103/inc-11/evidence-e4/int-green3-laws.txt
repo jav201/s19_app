@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int11/s19_app/__init__.py
+/home/<user>/work/b103-int11/s19_app/__init__.py
 bringing up nodes...
 bringing up nodes...
 
@@ -8,7 +8,7 @@ bringing up nodes...
 ...                                                                      [100%]
 =================================== FAILURES ===================================
 ____________ test_r_tst_002_every_timing_arm_carries_serial_timing _____________
-[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+[gw4] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
 
     def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
         from tests.support import suite_census

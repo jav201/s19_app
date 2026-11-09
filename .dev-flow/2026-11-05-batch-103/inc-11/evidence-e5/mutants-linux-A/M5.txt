@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________________ test_r_a2l_read_8_comments_do_not_nest ____________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-27/test_r_a2l_read_8_comments_do_0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-27/test_r_a2l_read_8_comments_do_0')
 
     def test_r_a2l_read_8_comments_do_not_nest(tmp_path: Path) -> None:
         """R-A2L-READ.8/2 (RP-B40): c is a word; the stray */ gives .11's error."""

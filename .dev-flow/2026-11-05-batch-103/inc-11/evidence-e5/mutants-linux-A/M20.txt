@@ -10,7 +10,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 __________________________ test_r_a2l_001_4_stray_end __________________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-42/test_r_a2l_001_4_stray_end0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/<user>/tmp/pytest-of-<user>/pytest-42/test_r_a2l_001_4_stray_end0')
 
     def test_r_a2l_001_4_stray_end(tmp_path: Path) -> None:
         """R-A2L-001.4/1, /2: a stray /end at or after other words."""
