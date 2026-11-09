@@ -1545,7 +1545,8 @@ class A2LDetailCard(RichLog):
     """
 
     def on_mount(self) -> None:
-        """Paint the placeholder before the first highlighted row."""
+        """Paint the placeholder and keep wrapped text clear of scrollbars."""
+        self.show_vertical_scrollbar = False
         self.show_tag(None)
 
     def render(self) -> Text:
