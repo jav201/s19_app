@@ -229,7 +229,7 @@ def main() -> int:
 
         def __init__(self) -> None:
             super().__init__(base_dir=base)
-            self._ready = asyncio.Event()
+            self._capture_ready = asyncio.Event()
 
         def on_mount(self) -> None:
             super().on_mount()
@@ -420,7 +420,7 @@ def main() -> int:
                         args.report.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
                     except OSError:
                         pass
-                self._ready.set()
+                self._capture_ready.set()
 
     app = CaptureApp()
     app.run()
