@@ -582,12 +582,14 @@ def _tag_sizes(
 def _characteristic_element_size(
     deposit: str, record_layouts_by_name: Optional[dict[str, dict]]
 ) -> Optional[int]:
-    """The datatype (CHARACTERISTIC) size for a deposit name (CG-2)."""
-    el = sizeof_from_deposit(deposit)
-    if el is None and record_layouts_by_name:
+    """The datatype (CHARACTERISTIC) size, resolving its layout before a name hint (CG-2)."""
+    el: Optional[int] = None
+    if record_layouts_by_name:
         meta = _resolve_record_layout(deposit, record_layouts_by_name)
         if meta and meta.get("decode_type"):
             el = DATATYPE_SIZES.get(meta["decode_type"])
+    if el is None:
+        el = sizeof_from_deposit(deposit)
     return el
 
 
@@ -965,12 +967,16 @@ def _build_section_tree_into(
             if pending_end_line is not None:
                 if stack:
                     top = stack[-1]
-                    if top["name"] != word:
+                    matched = top["name"] == word
+                    if not matched:
                         errors.append(
                             f"Line {pending_end_line}: /end {_echo_word(word)} does not close "
                             f"/begin {_echo_word(top['name'])}"
                         )
-                    top["end_line"] = pending_end_line
+                    if matched or not (
+                        top["name"] in ("BLOB", "INSTANCE") or top["name"].startswith("TYPEDEF_")
+                    ):
+                        top["end_line"] = pending_end_line
                     stack.pop()
                 else:
                     errors.append(f"Line {pending_end_line}: /end without /begin")
@@ -2006,11 +2012,10 @@ def _infer_length_characteristic(
     h = header or {}
     deposit = str(h.get("deposit") or "")
     char_type = h.get("char_type")
-    el = sizeof_from_deposit(deposit)
-    if el is None and char_type in ("VALUE", "VAL_BLK") and record_layouts_by_name:
-        meta = _resolve_record_layout(deposit, record_layouts_by_name)
-        if meta and meta.get("decode_type"):
-            el = DATATYPE_SIZES.get(meta["decode_type"])
+    if char_type in ("VALUE", "VAL_BLK"):
+        el = _characteristic_element_size(deposit, record_layouts_by_name)
+    else:
+        el = sizeof_from_deposit(deposit)
     if char_type == "ASCII":
         if number is not None:
             return number
@@ -3617,7 +3622,6 @@ def extract_a2l_tags(
 
         # BYTE_ORDER value and source (E3S-27).
         own_bo_word: Optional[str] = None
-        own_bo_line: Optional[int] = None
         own_bo_order: Optional[str] = None
         bo_values = {w for w, _ in byte_order_words}
         if byte_order_missing:
@@ -3626,7 +3630,6 @@ def extract_a2l_tags(
             address_invalid = True
         elif len(byte_order_words) >= 1:
             own_bo_word = byte_order_words[0][0]
-            own_bo_line = byte_order_words[0][1]
             own_bo_order = _normalize_byte_order(own_bo_word)
             tag["endian"] = own_bo_word
 
@@ -3645,8 +3648,10 @@ def extract_a2l_tags(
             str(tag.get("record_layout_name") or ""), (None, None, None)
         )
         module_order, module_word, module_line = module_source
+        for bo_word, bo_line in byte_order_words:
+            if _normalize_byte_order(bo_word) is None:
+                _errors.append(f"Line {bo_line}: BYTE_ORDER {_echo_word(bo_word)} is not a byte order")
         if own_bo_word is not None and own_bo_order is None:
-            _errors.append(f"Line {own_bo_line}: BYTE_ORDER {_echo_word(own_bo_word)} is not a byte order")
             address_invalid = True
         elif own_bo_word is None:
             if layout_word is not None and layout_order is None:
@@ -3664,14 +3669,14 @@ def extract_a2l_tags(
         tag["effective_byte_order"] = effective
 
         # Address (D-6 revised).
-        if address_invalid:
-            tag["address"] = None
-        elif len(set(v for v, _ in address_words)) > 1:
+        if len(set(v for v, _ in address_words)) > 1:
             vals = sorted(set(v for v, _ in address_words))
             _errors.append(
                 f"Line {start_line}: {section_name} {_echo_word(name)} declares the "
                 f"addresses 0x{vals[0]:08X} and 0x{vals[-1]:08X}"
             )
+            tag["address"] = None
+        elif address_invalid:
             tag["address"] = None
         elif address_words:
             tag["address"] = address_words[0][0]
@@ -3701,7 +3706,7 @@ def extract_a2l_tags(
                 str(tag.get("deposit") or ""), record_layouts_by_name
             )
         span: Optional[int] = None
-        if section_name == "CHARACTERISTIC" and kind in ("CURVE", "MAP"):
+        if section_name == "CHARACTERISTIC" and kind in _CURVE_MAP_FAMILY:
             axis_counts = _inline_axis_counts(tag.get("axis_meta") or [])
             if axis_counts is not None:
                 layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
@@ -3709,14 +3714,12 @@ def extract_a2l_tags(
                     span = _record_layout_full_span(layout, axis_counts)
 
         agree, smallest, largest, no_number = _tag_sizes(keyword_lines, element_size, kind, span)
-        if no_number:
-            refused_length_ids.add(id(tag))
-            tag["length"] = None
-        elif not agree:
+        if not agree:
             _errors.append(
                 f"Line {start_line}: {section_name} {_echo_word(name)} declares the "
                 f"sizes {smallest} and {largest}"
             )
+        if no_number or not agree:
             refused_length_ids.add(id(tag))
             tag["length"] = None
         else:
@@ -3739,7 +3742,7 @@ def extract_a2l_tags(
         # Inline-axis span (base behavior; a refusal is final).
         if (
             section_name == "CHARACTERISTIC"
-            and kind in ("CURVE", "MAP")
+            and kind in _CURVE_MAP_FAMILY
             and tag.get("length") is None
             and id(tag) not in refused_length_ids
             and span is not None
@@ -3749,7 +3752,7 @@ def extract_a2l_tags(
         # Remember a standing DATA_SIZE/LENGTH whose span is external (E3S-29).
         if (
             section_name == "CHARACTERISTIC"
-            and kind in ("CURVE", "MAP")
+            and kind in _CURVE_MAP_FAMILY
             and has_standing_size
             and span is None
             and id(tag) not in refused_length_ids
@@ -3797,7 +3800,9 @@ def extract_a2l_tags(
         tid = id(tag)
         if tid in refused_length_ids:
             continue
-        if not (tag.get("section") == "CHARACTERISTIC" and tag.get("char_type") in ("CURVE", "MAP")):
+        if not (
+            tag.get("section") == "CHARACTERISTIC" and tag.get("char_type") in _CURVE_MAP_FAMILY
+        ):
             continue
         counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags, tags_by_name)
         if counts is None:
@@ -3837,22 +3842,31 @@ def extract_declared_spans(
                 head = list(itertools.islice(stream, 10))
                 tname, _tlongid, theader, trest = _tag_header(name, head)
                 keyword_lines = _tag_keyword_lines(itertools.chain(head[trest:], stream))
-                typedefs[tname] = {"kind": name, "header": theader, "keyword_lines": keyword_lines}
+                typedefs[tname] = {
+                    "kind": name,
+                    "header": theader,
+                    "keyword_lines": keyword_lines,
+                    "closed": node.get("end_line") is not None,
+                }
             _collect_typedefs(node.get("children") or [])
 
     _collect_typedefs(sections)
 
     def _instance_length(typedef: Optional[dict], matrix_product: Optional[int]) -> Optional[int]:
-        if typedef is None or matrix_product is None:
+        if typedef is None or not typedef["closed"] or matrix_product is None:
             return None
         kind = typedef["kind"]
         header = typedef["header"]
         kw_lines = typedef["keyword_lines"]
         if kind == "TYPEDEF_MEASUREMENT":
             datatype = _unquote(header[0]) if header else None
+            element_size = DATATYPE_SIZES.get(datatype)
+            agree, _smallest, _largest, no_number = _tag_sizes(kw_lines, element_size)
+            if no_number or not agree:
+                return None
             tmatrix = _matrix_dim_product(kw_lines)
-            if datatype in DATATYPE_SIZES and tmatrix is not None:
-                return _bounded_length(DATATYPE_SIZES[datatype] * tmatrix * matrix_product)
+            if element_size is not None and tmatrix is not None:
+                return _bounded_length(element_size * tmatrix * matrix_product)
             return None
         if kind == "TYPEDEF_CHARACTERISTIC":
             char_type = _unquote(header[0]) if header else None
@@ -3866,6 +3880,10 @@ def extract_declared_spans(
                 deposit = header[2] if len(header) > 2 else None
             deposit = _unquote(deposit) if deposit is not None else None
             if char_type in ("VALUE", "VAL_BLK", "ASCII"):
+                element_size = _characteristic_element_size(str(deposit or ""), record_layouts_by_name)
+                agree, _smallest, _largest, no_number = _tag_sizes(kw_lines, element_size, char_type)
+                if no_number or not agree:
+                    return None
                 hdr = {"char_type": char_type, "deposit": deposit}
                 kw_texts = [text for text, _line, _args in kw_lines]
                 base = _infer_length_characteristic(kw_texts, hdr, record_layouts_by_name)
@@ -3887,8 +3905,9 @@ def extract_declared_spans(
             if name == "BLOB":
                 head = list(itertools.islice(_section_words(node), 4))
                 bname, _longid, bheader, _rest = _tag_header("BLOB", head)
-                address = _number_word(bheader[0]) if len(bheader) >= 1 else None
-                length = _number_word(bheader[1]) if len(bheader) >= 2 else None
+                closed = node.get("end_line") is not None
+                address = _number_word(bheader[0]) if closed and len(bheader) >= 1 else None
+                length = _number_word(bheader[1]) if closed and len(bheader) >= 2 else None
                 spans.append(
                     {"name": bname, "kind": "BLOB", "address": address, "length": _bounded_length(length)}
                 )
@@ -3897,7 +3916,14 @@ def extract_declared_spans(
                 head = list(itertools.islice(stream, 4))
                 iname, _longid, iheader, irest = _tag_header("INSTANCE", head)
                 typedef_name = _unquote(iheader[0]) if len(iheader) >= 1 else None
-                address = _number_word(iheader[1]) if len(iheader) >= 2 else None
+                typedef = typedefs.get(typedef_name)
+                closed = node.get("end_line") is not None
+                typedef_closed = typedef is None or typedef["closed"]
+                address = (
+                    _number_word(iheader[1])
+                    if closed and typedef_closed and len(iheader) >= 2
+                    else None
+                )
                 keyword_lines = _tag_keyword_lines(itertools.chain(head[irest:], stream))
                 matrix_product = _matrix_dim_product(keyword_lines)
                 spans.append(
@@ -3905,7 +3931,11 @@ def extract_declared_spans(
                         "name": iname,
                         "kind": "INSTANCE",
                         "address": address,
-                        "length": _instance_length(typedefs.get(typedef_name), matrix_product),
+                        "length": (
+                            _instance_length(typedef, matrix_product)
+                            if closed and typedef_closed
+                            else None
+                        ),
                     }
                 )
             walk(node.get("children") or [])

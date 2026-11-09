@@ -1,0 +1,21 @@
+Implemented P9–P14 with targeted edits only to `s19_app/tui/a2l.py`; pass A and P15’s final-refusal guards are preserved.
+
+Changed helpers:
+
+- `s19_app/tui/a2l.py:3419` — `_process_tag`: P9 independent address/size diagnostics; P10 one diagnostic per invalid `BYTE_ORDER`; P13 inline and standing-size handling through `_CURVE_MAP_FAMILY`.
+- `s19_app/tui/a2l.py:3377` — `extract_a2l_tags`: P13 external-axis post-pass now covers the full family.
+- `s19_app/tui/a2l.py:582` — `_characteristic_element_size`: P12 resolves declared layout datatype before deposit-name hints.
+- `s19_app/tui/a2l.py:1979` — `_infer_length_characteristic`: P12 applies the same layout-first precedence during inference.
+- `s19_app/tui/a2l.py:3855` — `_instance_length`: P11 applies `_tag_sizes` refusal before inference or INSTANCE multiplication; P14 rejects unclosed typedefs.
+- `s19_app/tui/a2l.py:930` — `_process_text`: P14 leaves declared sections unclosed after a mismatched `/end`, without adding public section fields.
+- `s19_app/tui/a2l.py:3837` — `_collect_typedefs`: P14 records typedef closure internally.
+- `s19_app/tui/a2l.py:3902` — declared-span `walk`: P14 gives unclosed BLOB/INSTANCE declarations no address or length; an unclosed typedef also invalidates its INSTANCE span.
+
+Verification:
+
+- `python -m py_compile s19_app/tui/a2l.py` — passed.
+- `git diff --check` — passed.
+- No pytest or other Python commands run, as instructed.
+- No incomplete items.
+
+The orchestrator’s `steps.log` start entry and pre-existing untracked evidence files remain untouched. No commit created.
