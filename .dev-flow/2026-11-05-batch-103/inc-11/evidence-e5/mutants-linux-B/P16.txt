@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '                if span is not None:\r\n                    tag["length"] = span'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  f2328ef9b5a39d94f6befe36f983f97350ebb9681e456d2206a8df0e36ee88ca
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  7a91b7a8c49b6317f3df0ea7e35c21ec70b1f1f34d76e6733e6288f00d68c3c6
 == P16 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 __________ test_e5_p16_curve_declared_uword_two_axis_points_full_span __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-21/test_e5_p16_curve_declared_uwo0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-52/test_e5_p16_curve_declared_uwo0')
 
     def test_e5_p16_curve_declared_uword_two_axis_points_full_span(tmp_path: Path) -> None:
         """R-A2L-018: a CURVE with a declared UWORD record layout and two inline
@@ -39,4 +39,4 @@ FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p16_curve_declared_uword_two_ax
 == P16 pytest exit code: 1 ==
 == P16 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

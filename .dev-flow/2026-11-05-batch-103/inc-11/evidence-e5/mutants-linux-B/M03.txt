@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '    raw = (token or "").strip().upper()'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  28e1fc1ffa585045cffea29183246a9c5c95596bce3641c796c223b726e91c5d
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  74c9f4c67fbaf0fd4d650be79e5a94258f10688020cc479bed5c5a60133635c5
 == M03 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_68_byte_order_words_no_error _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-4/test_r_a2l_read_68_byte_order_0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-40/test_r_a2l_read_68_byte_order_0')
 
     def test_r_a2l_read_68_byte_order_words_no_error(tmp_path: Path) -> None:
         """R-A2L-READ.68/3: valid byte-order words give no error."""
@@ -28,4 +28,4 @@ FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_68_byte_order_words_no_err
 == M03 pytest exit code: 1 ==
 == M03 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

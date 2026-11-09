@@ -3,15 +3,15 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '                if base is None:\r\n                    return None'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  61095fa012c6180484dd0f3f8366665d9d2a72e2a56034e37fea4d4d02726690
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  9fef8a69cb3d002e410ebb0d6a1032f92ec57e97f78c5e75a40f2c171c7ee8ea
 == M12 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 __________ test_r_a2l_read_45_instance_unresolvable_value_deposit_ref __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-20/test_r_a2l_read_45_instance_un0')
-ref = <function ref_read_a2l at 0x7f686625d3a0>
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-49/test_r_a2l_read_45_instance_un0')
+ref = <function ref_read_a2l at 0x7fb90ac954e0>
 
     def test_r_a2l_read_45_instance_unresolvable_value_deposit_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
         """R-A2L-READ.43/.45 (oracle): a VALUE typedef with an undeclared deposit gives no length."""
@@ -22,7 +22,7 @@ ref = <function ref_read_a2l at 0x7f686625d3a0>
         spans = _spans(_parse(tmp_path, text))
 >       assert any(s["name"] == "I1" and s["length"] is None for s in spans)
 E       assert False
-E        +  where False = any(<generator object test_r_a2l_read_45_instance_unresolvable_value_deposit_ref.<locals>.<genexpr> at 0x7f68661f5220>)
+E        +  where False = any(<generator object test_r_a2l_read_45_instance_unresolvable_value_deposit_ref.<locals>.<genexpr> at 0x7fb90a9713c0>)
 
 tests/test_b103_a2l_reader.py:1588: AssertionError
 =========================== short test summary info ============================
@@ -31,4 +31,4 @@ FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_45_instance_unresolvable_v
 == M12 pytest exit code: 1 ==
 == M12 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

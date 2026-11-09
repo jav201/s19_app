@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '    if kind in _CURVE_MAP_FAMILY:\r\n        values = list(byte_sizes)\r\n        if span is not None:\r\n            values.append(span)'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  9b419613e511d39cb304b48b44b39305e09556fb52c0427b42ade4ac1ccb35b5
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  e557f76edd3d754f64133e41a04a8629166c5c2d64bdd6511178c7002d6a79c4
 == M09 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________ test_e5_p15_length_zero_inline_axis_refusal_final _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-18/test_e5_p15_length_zero_inline0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-46/test_e5_p15_length_zero_inline0')
 
     def test_e5_p15_length_zero_inline_axis_refusal_final(tmp_path: Path) -> None:
         """R-A2L-READ.61 (E3S-23): a MAP with ``LENGTH 0`` and an inline STD_AXIS keeps
@@ -42,4 +42,4 @@ FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p15_length_zero_inline_axis_ref
 == M09 pytest exit code: 1 ==
 == M09 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

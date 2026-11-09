@@ -3,15 +3,15 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '    _collect_typedefs(sections)'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  ea388d77b18c88c427d9fd58ab21dff24d57fdb7c669973b25a692a8ac399b72
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  a57310223c16560afae3ba85cf9186024c8f904f9ac4867ac52389461299c5d3
 == M11 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________ test_r_a2l_read_42_instance_forward_typedef_ref ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10/test_r_a2l_read_42_instance_fo0')
-ref = <function ref_read_a2l at 0x7f8ceb0693a0>
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-48/test_r_a2l_read_42_instance_fo0')
+ref = <function ref_read_a2l at 0x7efea2db94e0>
 
     def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
         """R-A2L-READ.42 (oracle): an INSTANCE declared before its typedef is sized."""
@@ -22,7 +22,7 @@ ref = <function ref_read_a2l at 0x7f8ceb0693a0>
         spans = _spans(_parse(tmp_path, text))
 >       assert any(s["name"] == "I1" and s["length"] == 2 for s in spans)
 E       assert False
-E        +  where False = any(<generator object test_r_a2l_read_42_instance_forward_typedef_ref.<locals>.<genexpr> at 0x7f8ceb072400>)
+E        +  where False = any(<generator object test_r_a2l_read_42_instance_forward_typedef_ref.<locals>.<genexpr> at 0x7efea2d753c0>)
 
 tests/test_b103_a2l_reader.py:1577: AssertionError
 =========================== short test summary info ============================
@@ -31,4 +31,4 @@ FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_42_instance_forward_typede
 == M11 pytest exit code: 1 ==
 == M11 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

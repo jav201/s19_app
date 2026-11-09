@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '            if not agree:'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  02f02a3651edc9a148332f40d529bc894f6fb06cdf81aabb309a4dbc3ffb4222
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  ca349ece95066be3e6be5e6378874ea1267e767e15b222f5829abf80185bf704
 == P18b test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 ________ test_e5_p18_external_full_span_agrees_with_standing_data_size _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-17/test_e5_p18_external_full_span0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-58/test_e5_p18_external_full_span0')
 
     def test_e5_p18_external_full_span_agrees_with_standing_data_size(tmp_path: Path) -> None:
         """A later-resolved full span 4 agrees with standing DATA_SIZE 4 and is
@@ -48,4 +48,4 @@ FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p18_external_full_span_agrees_w
 == P18b pytest exit code: 1 ==
 == P18b restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

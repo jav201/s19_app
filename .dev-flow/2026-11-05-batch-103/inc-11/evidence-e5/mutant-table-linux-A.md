@@ -1,6 +1,6 @@
 # Inc 11 E5 — mutants A: lexer and section tree (Linux canonical)
 
-Baseline `99bdbbe8`, isolated copy `/tmp/b103-e5-11-mutA-laptop/tree`
+Baseline `14fdc3b9`, isolated copy `/tmp/b103-e5-11-mutA-laptop/tree`
 (the real worktree was never mutated or committed). Host: `lnx1` (the
 operator-provided alternative CachyOS laptop), Python `/data/miniconda3/envs/s19ci/bin/python`, textual
 8.x, pytest. Every arm ran in a fresh process with `PYTHONDONTWRITEBYTECODE=1`,
@@ -112,8 +112,8 @@ owns any source change.
   error). No verdict rests on the process exit code alone.
 - **Restoration proof:** after each arm the runner rewrote `a2l.py` from the
   pristine copy and verified the sha256 (every transcript records
-  `restored hash: 9aaf7037…f96ad131`, the pristine hash). After all arms the
-  full reader baseline reproduced exactly: `331 passed` (see
+  `restored hash: 39752794…6c82da5c`, the pristine hash). After all arms the
+  full reader baseline reproduced exactly: `332 passed` (see
   `mutants-A/final-baseline-green.txt`).
 
 ## Coverage of the required categories

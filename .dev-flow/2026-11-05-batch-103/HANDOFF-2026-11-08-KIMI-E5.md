@@ -155,3 +155,16 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 - READ.52 is finally GREEN on the original RTX host: **7 passed, 1 deselected**, case_06 **8.411 / 8.843 s (4.9 % margin)**, software_a 11.6 %, all memory arms green (`coverage-perf-rtx-final.txt`). The earlier 0.2 % laptop margin is historical, not the final reference-host result.
 - The last optimization avoids no-op copies and caches immutable layout metadata; each tag copies a default-field template and receives a fresh `axis_meta`. The graph is now **39/40 nodes** with `_record_layout_decode_metadata`.
 - Integration run 13 and bounded final code/security reviews are running. Final mutants must rerun on this exact tree; earlier mutant results are rehearsals, not the final verdict.
+
+## Recovery checkpoint — 2026-11-09 09:26 (Kimi)
+
+- Second checkpoint commit: **`14fdc3b9`**.
+- Final reviews: **code PASS** (`E5-code-final-review-3.md`) and **security PASS-WITH-NOTES**. The earlier code FAIL was reproduced as stale REF scratch, not a committed defect; `ref-byte-order-{red,green}.txt` and group A prove the actual correction.
+- Final mutant B has all 22 main arms at rc=1 and is running its restored baseline. Final mutant A is progressing through M10 onward with pristine updated. Do not use the earlier rehearsal tables as the final verdict until these finish.
+
+## Inc 11 E5 closed — 2026-11-09 09:39 (Kimi)
+
+- Final mutant A: **19 KILLED + M10 NOT_REALISABLE**, restored baseline **332 passed**. Final mutant B: **23 KILLED, 0 SURVIVED, 0 CRASH, 0 BAD**, restored baseline **522 passed + 1 deselected**.
+- `inc-11/04-validation.md` is written: **PASS-WITH-NOTES**, with all LOW items declared. `inc-11/REVIEW-PACKET.md` contains the mandatory seven sections.
+- Final `trace_check`: **3 US, 81 active requirements, 2 withdrawn, 0 gaps** (`evidence/inc-11/trace-check-transcript.txt`).
+- Remaining work is integration, not more Inc 11 product changes: merge current `origin/main` and `batch-103` into this branch, re-measure the scanned test count, rerun combined-tree gates, integrate into `batch-103`, then start Inc 3a.

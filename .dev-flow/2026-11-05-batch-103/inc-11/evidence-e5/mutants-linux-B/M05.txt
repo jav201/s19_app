@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '_NUMBER_WORD_RE = re.compile(r"0[xX][0-9A-Fa-f]{1,16}|[0-9]{1,20}")'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  bbeb757b8495a74c8a311894226caaab02bf649c45d5d88baca6536a30255c04
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  0bd03b98b0ddb71eafe47df9d47e15e5376593a291b8b1aaa0a62216291cd023
 == M05 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________________ test_r_a2l_read_34_hex_words _________________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-6/test_r_a2l_read_34_hex_words0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-42/test_r_a2l_read_34_hex_words0')
 
     def test_r_a2l_read_34_hex_words(tmp_path: Path) -> None:
         """R-A2L-READ.34/1: 0x, 0X and 16-digit hex."""
@@ -25,4 +25,4 @@ FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_34_hex_words - assert N...
 == M05 pytest exit code: 1 ==
 == M05 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

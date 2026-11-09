@@ -8,6 +8,6 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 ........................................................................ [ 96%]
 ..................                                                       [100%]
 ============================= QC-TM timing margins =============================
-70.6%  35.281 s / 120.000 s  R-A2L-READ.48/1 tracked files  tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
+71.8%  33.867 s / 120.000 s  R-A2L-READ.48/1 tracked files  tests/test_b103_a2l_reader.py::test_r_a2l_read_48_tracked_files_equal_ref
 QC-TM: 1 bounds, 0 under 20 % margin
-522 passed in 341.68s (0:05:41)
+522 passed, 1 deselected in 274.97s (0:04:34)

@@ -2,15 +2,15 @@
 anchor: '            if ch == "/" and i + 1 < n and body[i + 1] == "/":\n                i += 2\n                while i < n and body[i] != "\\r" and body[i] != "\\n":\n                    i += 1\n                continue'
 mutation: '            if ch == "/" and i + 1 < n and body[i + 1] == "/":\n                in_comment = True\n                comment_line = line\n                i += 2\n                continue'
 applied count: 1
-mutated hash: 32f4720143226b3aca566b08765160256df65130aebca9f68b3650671e17e969
-restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+mutated hash: a882ff0659df36adf2733c937f8b2195df990762dcec8a3a933f4047e669473a
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
 
 s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
 FFF                                                                      [100%]
 =================================== FAILURES ===================================
 _____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\n] ______________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment0')
 nl = '\n'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -24,7 +24,7 @@ nl = '\n'
 tests/test_b103_a2l_reader.py:560: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment0/x.a2l...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
+data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment0/x.a2...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -37,7 +37,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in []
 tests/test_b103_a2l_reader.py:114: AssertionError
 ____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n] _____________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment1')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment1')
 nl = '\r\n'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -51,7 +51,7 @@ nl = '\r\n'
 tests/test_b103_a2l_reader.py:560: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment1/x.a2l...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
+data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment1/x.a2...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -64,7 +64,7 @@ E       AssertionError: no MEASUREMENT tag 'X' in []
 tests/test_b103_a2l_reader.py:114: AssertionError
 _____________ test_r_a2l_read_9_line_comment_ends_at_line_end[\r] ______________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment2')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment2')
 nl = '\r'
 
     @pytest.mark.parametrize("nl", ["\n", "\r\n", "\r"])
@@ -78,7 +78,7 @@ nl = '\r'
 tests/test_b103_a2l_reader.py:560: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-2/test_r_a2l_read_9_line_comment2/x.a2l...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
+data = {'path': '/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-24/test_r_a2l_read_9_line_comment2/x.a2...2: comment not closed', 'Unclosed /begin sections detected.', 'Line 20: MEASUREMENT X is not closed'], 'tags': [], ...}
 name = 'X', section = 'MEASUREMENT'
 
     def _tag(data: dict, name: str, section: str = "MEASUREMENT") -> dict:
@@ -93,4 +93,4 @@ tests/test_b103_a2l_reader.py:114: AssertionError
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\n]
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r\n]
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_9_line_comment_ends_at_line_end[\r]
-3 failed in 0.92s
+3 failed in 0.93s

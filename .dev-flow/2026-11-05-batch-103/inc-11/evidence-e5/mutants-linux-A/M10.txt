@@ -2,9 +2,9 @@
 anchor: '                if ch == "\\r" and i + 1 < n and body[i + 1] == "\\n":'
 mutation: '                if ch == "\\r" and False:'
 applied count: 1
-mutated hash: 347bc6d0179de3de960b2e7fabd147e62033b2aa8e4856ae588f16cc2893d963
-restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+mutated hash: db9e67d8558bf9744c2b0c7b567b20503974a602cc92c7e825a99ab59971da48
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
 
 s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
 ..                                                                       [100%]
-2 passed in 46.07s
+2 passed in 43.46s

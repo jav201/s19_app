@@ -2,15 +2,15 @@
 anchor: '    if head[:2] in (b"\\xff\\xfe", b"\\xfe\\xff"):'
 mutation: '    if False:'
 applied count: 1
-mutated hash: 3e8cf85aaf7369e9d759bfb17df1c4a7b46d3d3442211d70d34bc2c3c2ebbe2c
-restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+mutated hash: 540864ffd44c4e415cb415b45e9d1a8059182b18333e8d2f59b394705b441a5a
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
 
 s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
 FF                                                                       [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_6_utf16_refusal[\xff\xfe] ___________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-12/test_r_a2l_read_6_utf16_refusa0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-34/test_r_a2l_read_6_utf16_refusa0')
 bom = b'\xff\xfe'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])
@@ -29,7 +29,7 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:363: AssertionError
 __________________ test_r_a2l_read_6_utf16_refusal[\xfe\xff] ___________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-12/test_r_a2l_read_6_utf16_refusa1')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-34/test_r_a2l_read_6_utf16_refusa1')
 bom = b'\xfe\xff'
 
     @pytest.mark.parametrize("bom", [b"\xff\xfe", b"\xfe\xff"])

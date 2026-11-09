@@ -2,15 +2,15 @@
 anchor: '    utf8_bom = head[:3] == b"\\xef\\xbb\\xbf"'
 mutation: '    utf8_bom = False'
 applied count: 1
-mutated hash: ab2fbabd05d32ca13013e678f6dda03d9958a0d6f995d716a9155d447853e36a
-restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+mutated hash: a8705c13e7b72046066862c12cc93c6c9c4c06f14fe3656b9d8a3a7f3877d89f
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
 
 s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_5_bom_before_project_dropped _________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-11/test_r_a2l_read_5_bom_before_p0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-33/test_r_a2l_read_5_bom_before_p0')
 
     def test_r_a2l_read_5_bom_before_project_dropped(tmp_path: Path) -> None:
         """R-A2L-READ.5/2: a BOM before /begin PROJECT is dropped (RP-A9)."""
@@ -25,4 +25,4 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:352: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_5_bom_before_project_dropped
-1 failed in 0.84s
+1 failed in 0.85s

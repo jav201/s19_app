@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '    return int(word, 10)'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  a36a2b3943d9bd56c5d64528fb6e4bff632370e7cdc96de16a6112927645006e
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  8241d10a331686f5e6c65435a992439de44b0593d5594148459bcc270e8bd69a
 == M04 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________________ test_r_a2l_read_35_decimal_words _______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-5/test_r_a2l_read_35_decimal_wor0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-41/test_r_a2l_read_35_decimal_wor0')
 
     def test_r_a2l_read_35_decimal_words(tmp_path: Path) -> None:
         """R-A2L-READ.35/1, /2: decimal words with leading zero / plain."""
@@ -22,17 +22,17 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_b103_a2l_reader.py:107: in _parse
     return parse_a2l_file(_file(text, tmp_path, name=name, raw=raw))
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-s19_app/tui/a2l.py:4043: in parse_a2l_file
+s19_app/tui/a2l.py:4050: in parse_a2l_file
     tags = extract_a2l_tags(
-s19_app/tui/a2l.py:3847: in extract_a2l_tags
+s19_app/tui/a2l.py:3854: in extract_a2l_tags
     walk(sections, None, (None, None, None))
-s19_app/tui/a2l.py:3845: in walk
+s19_app/tui/a2l.py:3852: in walk
     walk(section["children"], current_module_byte_order, current_module_source)
-s19_app/tui/a2l.py:3845: in walk
+s19_app/tui/a2l.py:3852: in walk
     walk(section["children"], current_module_byte_order, current_module_source)
-s19_app/tui/a2l.py:3843: in walk
+s19_app/tui/a2l.py:3850: in walk
     _process_tag(section, current_module_byte_order, current_module_source)
-s19_app/tui/a2l.py:3594: in _process_tag
+s19_app/tui/a2l.py:3601: in _process_tag
     value = _number_word(args[0])
             ^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
@@ -54,8 +54,8 @@ E       ValueError: invalid literal for int() with base 0: '010'
 s19_app/tui/a2l.py:351: ValueError
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_35_decimal_words - Valu...
-1 failed in 0.83s
+1 failed in 0.84s
 == M04 pytest exit code: 1 ==
 == M04 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

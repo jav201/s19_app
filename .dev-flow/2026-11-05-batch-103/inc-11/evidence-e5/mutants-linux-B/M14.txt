@@ -19,7 +19,7 @@ E       assert None is not None
 tests/test_b103_a2l_reader.py:1603: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_extract_declared_spans_is_public
-1 failed in 0.62s
+1 failed in 0.63s
 == M14 pytest exit code: 1 ==
 == M14 restore ==
 restore_hash_ok: True

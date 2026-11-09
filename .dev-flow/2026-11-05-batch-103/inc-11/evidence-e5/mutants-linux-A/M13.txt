@@ -2,15 +2,15 @@
 anchor: '        if "\\x00" in body:'
 mutation: '        if False:'
 applied count: 1
-mutated hash: 1056bfa4656720290edb5596cb09f6b53881dd18d2f93d9b08a71017fc17f04f
-restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+mutated hash: 52ecc83fb3441ffb17fa9397a85d0eb07398617930aacb0f051d078b931243b7
+restored hash: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
 
 s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
 F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_r_a2l_read_55_nul_after_address_refused _________________
 
-tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-13/test_r_a2l_read_55_nul_after_a0')
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-35/test_r_a2l_read_55_nul_after_a0')
 
     def test_r_a2l_read_55_nul_after_address_refused(tmp_path: Path) -> None:
         """R-A2L-READ.55/3: a NUL after an address word refuses the file."""
@@ -26,4 +26,4 @@ E         Use -v to get more diff
 tests/test_b103_a2l_reader.py:391: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_55_nul_after_address_refused
-1 failed in 0.83s
+1 failed in 0.84s

@@ -3,14 +3,14 @@ s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
 file: s19_app/tui/a2l.py
 anchor: '    return smallest == largest, smallest, largest, no_number'
 applied_count: 1 (expected 1 )
-sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
-sha256_after:  104c09c795552bcd9483512b712b34c939059c24f921de4231469161775a85ba
+sha256_before: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c
+sha256_after:  de67c22debeba13c20147963bb8803e2f9feb4710c1cca7037a2eb58a3b69873
 == M07 test ==
 F                                                                        [100%]
 =================================== FAILURES ===================================
 __________________ test_r_a2l_read_61_no_length_when_disagree __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-8/test_r_a2l_read_61_no_length_w0')
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-44/test_r_a2l_read_61_no_length_w0')
 
     def test_r_a2l_read_61_no_length_when_disagree(tmp_path: Path) -> None:
         """R-A2L-READ.61/1..7: no length when sizes disagree."""
@@ -31,8 +31,8 @@ E           assert 8 is None
 tests/test_b103_a2l_reader.py:1431: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_61_no_length_when_disagree
-1 failed in 0.62s
+1 failed in 0.63s
 == M07 pytest exit code: 1 ==
 == M07 restore ==
 restore_hash_ok: True
-sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_restored: 397527940a3252c8c33e29b163993475eb9986f766fd354878f52d3b6c82da5c

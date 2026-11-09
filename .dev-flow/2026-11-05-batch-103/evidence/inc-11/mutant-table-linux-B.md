@@ -1,6 +1,6 @@
 # Inc 11 E5: mutant table B — tags, lengths and declared spans (Linux re-run)
 
-Canonical re-run on the current frozen tree `P19 + corrected REF`
+Canonical re-run on commit `14fdc3b9`
 (`/tmp/b103-e5-11-mutB-rtx/tree`). The Windows table
 `/tmp/b103-e5-11-mutB-rtx/mutant-table-B.windows.md` was read only as
 non-canonical reference; every anchor and verdict below is rebuilt from the
@@ -26,10 +26,10 @@ every arm.
 
 `tests/test_b103_a2l_reader.py` + `tests/test_b103_a2l_reader_e5.py` +
 `tests/test_b103_a2l_reader_coverage.py` +
-`tests/test_b103_a2l_definition.py`: **522 passed in 341.68s** (Linux, exit 0).
+`tests/test_b103_a2l_definition.py`: **522 passed, 1 deselected in 274.97s** (Linux, exit 0).
 The two Windows-only CR/CRLF fixture failures from the Windows reference do not
-occur on Linux. After all mutants were restored, `git diff --stat` was empty and
-the slice re-ran to the same 522/0 (final green, `out/final-green.txt`).
+occur on Linux. After all mutants were restored, the slice re-ran to the same
+522/1 deselected (final green, `out/final-green.txt`).
 
 ## Table
 
