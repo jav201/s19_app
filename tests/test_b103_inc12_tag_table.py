@@ -43,7 +43,7 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
-from tests.support.timing import timing_bound, wait_until
+from tests.support.timing import wait_until
 
 
 # ---------------------------------------------------------------------------
@@ -331,9 +331,46 @@ def _cell_whole_in_painted(table, geom, row_index: int, col_index: int) -> bool:
     return line[a:min(b, geom.visible)].strip() == want
 
 
-def _tag_ends_inside(geom, tag_text: str) -> bool:
-    tag_x = geom.xs[geom.idx["Tag"]] - geom.sx
-    return tag_x + 1 + cell_len(tag_text) <= geom.visible
+def _cell_span(geom, col_index: int) -> tuple[int, int]:
+    """The column's painted span ``(start, end)`` in painted-line x cells."""
+    if col_index < geom.fixed:
+        return geom.xs[col_index], geom.xs[col_index] + geom.cols[col_index][1]
+    a = max(geom.fixed_w, geom.xs[col_index] - geom.sx)
+    return a, geom.xs[col_index] - geom.sx + geom.cols[col_index][1]
+
+
+def _painted_tag_cell(table, geom, row_index: int) -> tuple[str, int]:
+    """The Tag cell as actually painted on ``row_index``: ``(text, end_x)`` —
+    the visible painted text (padding stripped) and the x of its last painted
+    character, both read from the rendered line. This is R-TUI-042a.5's
+    painted-result oracle: stored cell length plus x is not a painted result."""
+    lines = _painted_lines(table)
+    y = 1 + row_index - geom.sy
+    if y < 1 or y >= len(lines) - 1:
+        return "", -1
+    line = lines[y]
+    a, b = _cell_span(geom, geom.idx["Tag"])
+    a = max(0, a)
+    b = min(b, geom.visible)
+    if a >= b:
+        return "", -1
+    seg = line[a:b]
+    stripped = seg.strip(" ")
+    if not stripped:
+        return "", -1
+    end = a + len(seg.rstrip(" ")) - 1
+    return stripped, end
+
+
+def _assert_painted_tag_cell(table, geom, row_index: int, want: str) -> None:
+    """The painted Tag cell (when its row is on screen) reads exactly ``want``
+    — glyph, ``…`` and suffix included — and its last painted character lies
+    inside the visible width. Off-screen rows paint nothing and are skipped."""
+    painted, end = _painted_tag_cell(table, geom, row_index)
+    if painted == "" and end == -1:
+        return  # off-screen row: nothing painted to assert
+    assert painted == want, (row_index, painted, want)
+    assert end != -1 and end + 1 <= geom.visible, (row_index, end, geom.visible)
 
 
 def _tags_of(app, table) -> list:
@@ -366,8 +403,7 @@ def _all_rows_in_measured_form(app, table) -> bool:
 def _assert_all_rows_form_and_inside(app, table, geom, w: Optional[int]) -> None:
     assert _rows_match_form(app, table, geom, w), "a Tag cell is not in the expected form"
     for r in range(table.row_count):
-        tag_text = table.get_row_at(r)[geom.idx["Tag"]].plain
-        assert _tag_ends_inside(geom, tag_text), (r, tag_text, geom.visible)
+        _assert_painted_tag_cell(table, geom, r, table.get_row_at(r)[geom.idx["Tag"]].plain)
 
 
 def _hex_runs(text: str) -> list[str]:
@@ -382,9 +418,35 @@ def _hex_runs(text: str) -> list[str]:
 _GLUED = ("0x1C2D3E002266", "SYN_MAP_W0x1C2D3E00", "17921792", "unknown0..")
 
 
+def _assert_adjacent_cell_gaps(table, geom, row_index: int) -> None:
+    """Every adjacent pair of columns both fully on screen paints its two cells
+    with at least one blank column between them (R-TUI-042a.2's gap, read from
+    the painted line — not from stored geometry alone)."""
+    lines = _painted_lines(table)
+    y = 1 + row_index - geom.sy
+    if y < 1 or y >= len(lines) - 1:
+        return  # off-screen: nothing paints, nothing to check
+    line = lines[y]
+    for i in range(len(geom.xs) - 1):
+        a_i, b_i = _cell_span(geom, i)
+        a_j, b_j = _cell_span(geom, i + 1)
+        if a_i < 0 or b_j > geom.visible:
+            continue  # not both fully on screen
+        left = line[a_i:b_i].rstrip(" ")
+        right = line[a_j:b_j].lstrip(" ")
+        if not left or not right:
+            continue  # an empty cell paints nothing to glue
+        left_end = a_i + len(left) - 1
+        right_start = a_j + (len(line[a_j:b_j]) - len(right))
+        assert right_start - left_end - 1 >= 1, (i, i + 1, left, right, line)
+
+
 def _assert_synmap_gap(app, table, width: int) -> None:
     geom = _geom(table)
     tag_idx = geom.idx["Tag"]
+    # Every adjacent pair of cells paints with ≥ 1 blank between (the general
+    # gap, not only Address/Length).
+    _assert_adjacent_cell_gaps(table, geom, 0)
     # Address and Length are separate cells with ≥ 1 blank between them.
     assert _cell_whole_in_painted(table, geom, 0, 0), "Address not whole"
     assert _cell_whole_in_painted(table, geom, 0, 1), "Length not whole"
@@ -558,7 +620,7 @@ def test_r_tui_042a_5_1_width_left_on_a_32_bit_page(tmp_path: Path) -> None:
             assert geom.w == w, (geom.w, w)
             cell = table.get_row_at(0)[geom.idx["Tag"]].plain
             assert cell == want, (cell, want)
-            assert _tag_ends_inside(geom, cell)
+            _assert_painted_tag_cell(table, geom, 0, cell)
 
         _explore(tmp_path, page_long(48), (width, 54), _check)
 
@@ -571,7 +633,7 @@ def test_r_tui_042a_5_2_short_name_cut_too_at_80(tmp_path: Path) -> None:
         cell = table.get_row_at(0)[geom.idx["Tag"]].plain
         assert cell == "✓ " + _shorten(longname(20), 14), cell
         assert cell == "✓ SYN_MA…LLL_END", cell
-        assert _tag_ends_inside(geom, cell)
+        _assert_painted_tag_cell(table, geom, 0, cell)
 
     _explore(tmp_path, page_long(20), (80, 54), _check)
 
@@ -592,7 +654,7 @@ def test_r_tui_042a_5_3_64_bit_page(tmp_path: Path) -> None:
                 assert cell == f"{glyph} " + _shorten(name, w), (r, cell)
                 assert cell == f"{glyph} " + name[:head] + "…" + name[len(name) - (w - 1 - head):], (r, cell)
                 assert cell.endswith(name[len(name) - (w - 1 - head):]), (r, cell)
-                assert _tag_ends_inside(geom, cell)
+                _assert_painted_tag_cell(table, geom, r, cell)
 
         _explore(tmp_path, page64(48), (width, 54), _check)
 
@@ -604,7 +666,8 @@ def test_r_tui_042a_5_4_fixed_cap_at_220(tmp_path: Path) -> None:
         assert geom.w == 84, geom.w
         cell = table.get_row_at(0)[geom.idx["Tag"]].plain
         assert cell == "✓ " + _shorten(longname(48), 34), cell
-        assert cell_len(cell) == 36 and _tag_ends_inside(geom, cell)
+        assert cell_len(cell) == 36
+        _assert_painted_tag_cell(table, geom, 0, cell)
 
     async def _p64(app, pilot, table):
         geom = _geom(table)
@@ -614,7 +677,8 @@ def test_r_tui_042a_5_4_fixed_cap_at_220(tmp_path: Path) -> None:
             glyph = "✓" if tag.get("in_memory") else "·"
             cell = table.get_row_at(r)[geom.idx["Tag"]].plain
             assert cell == f"{glyph} " + _shorten(str(tag["name"]), 34), (r, cell)
-            assert cell_len(cell) == 36 and _tag_ends_inside(geom, cell)
+            assert cell_len(cell) == 36
+            _assert_painted_tag_cell(table, geom, r, cell)
 
     _explore(tmp_path, page_long(48), (220, 60), _long)
     _explore(tmp_path, page64(48), (220, 60), _p64)
@@ -630,7 +694,7 @@ def test_r_tui_042a_5_5_narrowest_width(tmp_path: Path) -> None:
             glyph = "✓" if tag.get("in_memory") else "·"
             cell = table.get_row_at(r)[geom.idx["Tag"]].plain
             assert cell == f"{glyph} " + _shorten(str(tag["name"]), 5), (r, cell)
-            assert _tag_ends_inside(geom, cell)
+            _assert_painted_tag_cell(table, geom, r, cell)
 
     _explore(tmp_path, page64(48, wide16=True), (80, 54), _check)
 
@@ -648,7 +712,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         assert geom.w == 14, geom.w
         cell = table.get_row_at(0)[geom.idx["Tag"]].plain
         assert cell == "✓ SYN_MA…LLL_END", cell
-        assert _tag_ends_inside(geom, cell)
+        _assert_painted_tag_cell(table, geom, 0, cell)
         await pilot.resize_terminal(220, 60)
         await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "80→220 fit", timeout=30)
         geom = _geom(table)
@@ -789,7 +853,7 @@ def test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form(tmp_path: Path) -> 
             timeout=15,
         )
         geom = _geom(table)
-        assert _tag_ends_inside(geom, table.get_row_at(0)[tag_idx].plain)
+        _assert_painted_tag_cell(table, geom, 0, table.get_row_at(0)[tag_idx].plain)
 
     base = tmp_path / "app"
     base.mkdir(parents=True, exist_ok=True)
@@ -876,7 +940,7 @@ def test_r_tui_042a_6_1_zero_width_tail(tmp_path: Path) -> None:
     one ``_build_a2l_table_cells(tag, 14)`` call each, under 1 s, 6 + ``…`` + 7 × U+FFFD."""
     for tail_len in (4_000, 16_000):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + "\u200b" * tail_len, 14)
-        assert elapsed < timing_bound(1.0), elapsed
+        assert elapsed < 1.0, elapsed
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
 
 
@@ -885,7 +949,7 @@ def test_r_tui_042a_6_2_combining_and_esc_tails(tmp_path: Path) -> None:
     the /1 form, no U+0301 and no ESC in the cell."""
     for tail_char in ("\u0301", "\x1b"):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + tail_char * 16_000, 14)
-        assert elapsed < timing_bound(1.0), elapsed
+        assert elapsed < 1.0, elapsed
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
         assert "\u0301" not in plain and "\x1b" not in plain, repr(plain)
 
@@ -908,37 +972,67 @@ def test_r_tui_042a_6_3_plain_ascii_unchanged(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-class _Evt:
-    """Duck-typed ``DataTable.RowHighlighted`` stand-in (idiom:
-    ``tests/test_tui_a2l_detail.py``)."""
+#: A minimal self-contained A2L wrapper for the hostile-card fixtures.
+_CARD_HEAD = (
+    "ASAP2_VERSION 1 71\n"
+    "/begin PROJECT PCARD \"\"\n"
+    "/begin MODULE MCARD \"\"\n"
+    "/begin MOD_COMMON \"\"\n"
+    "BYTE_ORDER MSB_LAST\n"
+    "/end MOD_COMMON\n"
+)
+_CARD_TAIL = "/end MODULE\n/end PROJECT\n"
 
-    def __init__(self, table_id: str, key: str) -> None:
-        class _T:
-            id = table_id
+#: The CHARACTERISTIC variant also declares a COMPU_METHOD and a RECORD_LAYOUT
+#: so the limits case stacks header, desc, unit·conv, layout and byteorder
+#: above its limits line.
+_CARD_HEAD_CHAR = (
+    _CARD_HEAD
+    + '/begin COMPU_METHOD CM_SYN "" IDENTICAL "%.0" ""\n'
+    + "/end COMPU_METHOD\n"
+    + "/begin RECORD_LAYOUT RL_SYN\n"
+    + "FNC_VALUES 1 UWORD COLUMN_DIR DIRECT\n"
+    + "/end RECORD_LAYOUT\n"
+)
 
-        class _K:
-            value = key
 
-        self.data_table = _T()
-        self.row_key = _K()
+def _card_measurement(
+    name: str = "SYN_NAME",
+    desc: Optional[str] = None,
+    *,
+    display_identifier: Optional[str] = None,
+    unit: Optional[str] = None,
+    conversion: Optional[str] = None,
+) -> str:
+    """A one-MEASUREMENT synthetic A2L (``ECU_ADDRESS 0x1000``, 2 bytes) whose
+    detail card shows the given file-derived values — each value travels the
+    real A2L reader, enrichment and card renderer."""
+    lines = [f'/begin MEASUREMENT {name} "{desc or ""}"']
+    lines.append("  ECU_ADDRESS 0x1000")
+    lines.append("  DATA_SIZE 2")
+    if display_identifier is not None:
+        lines.append(f"  DISPLAY_IDENTIFIER {display_identifier}")
+    if unit is not None:
+        lines.append(f'  UNIT "{unit}"')
+    if conversion is not None:
+        lines.append(f"  COMPU_METHOD {conversion}")
+    lines.append("/end MEASUREMENT")
+    return _CARD_HEAD + "\n".join(lines) + "\n" + _CARD_TAIL
 
 
-def _card_tag(**overrides) -> dict:
-    tag = {
-        "in_memory": True,
-        "name": "SYN_NAME",
-        "display_identifier": None,
-        "address": ADDR,
-        "description": None,
-        "unit": None,
-        "conversion": None,
-        "record_layout_name": None,
-        "effective_byte_order": None,
-        "lower_limit": None,
-        "upper_limit": None,
-    }
-    tag.update(overrides)
-    return tag
+def _card_characteristic_limits(
+    lower_limit: str, upper_limit: str, *, unit: str = "u"
+) -> str:
+    """A one-VALUE CHARACTERISTIC whose card stacks header, desc, unit·conv,
+    layout and byteorder above the limits line — so the limits sit below the
+    card's 5 visible rows and must be scrolled into view (R-TUI-042a.7.1/6)."""
+    lines = [
+        '/begin CHARACTERISTIC SYN_NAME "d"',
+        f"  VALUE 0x1000 RL_SYN 0 CM_SYN {lower_limit} {upper_limit}",
+        f'  UNIT "{unit}"',
+        "/end CHARACTERISTIC",
+    ]
+    return _CARD_HEAD_CHAR + "\n".join(lines) + "\n" + _CARD_TAIL
 
 
 def _screen_output(app) -> str:
@@ -947,19 +1041,23 @@ def _screen_output(app) -> str:
     return app.screen._compositor.render_full_update().render_segments(app.console)
 
 
-def _drive_card(tmp_path: Path, size: tuple[int, int], tag: dict, observe) -> None:
+def _explore_card(tmp_path: Path, a2l_text: str, size: tuple[int, int], scenario) -> None:
+    """Boot the app, load a 2-byte 0x1000 image + the hostile A2L through the
+    real loader, show the Explorer with the cursor on row 0, then run
+    ``scenario(app, pilot, table)``."""
     base = tmp_path / "app"
     base.mkdir(parents=True, exist_ok=True)
+    img = base / "syn_img.s19"
+    img.write_text(
+        emit_s19_from_mem_map({0x1000: 0x00, 0x1001: 0x00}, [(0x1000, 0x1002)]),
+        encoding="ascii",
+    )
+    a2l = _write_a2l(base, a2l_text)
 
     async def _run(app, pilot, log):
-        await pilot.pause()
-        app.action_show_screen("a2l")
-        for _ in range(4):
-            await pilot.pause()
-        app._a2l_row_key_to_tag = {"a2l:0": tag}
-        app.on_data_table_row_highlighted(_Evt("a2l_tags_list", "a2l:0"))
-        await pilot.pause()
-        await observe(app, pilot)
+        await _load(app, pilot, base, a2l)
+        table = await _show_a2l(app, pilot)
+        await scenario(app, pilot, table)
 
     projects.run_app(base, _run, size=size)
 
@@ -969,171 +1067,186 @@ def _assert_card_lines_clean(plain: str) -> None:
         assert not any(ord(ch) in _CONTROL for ch in line), repr(line)
 
 
+async def _assert_card_painted_then_safe(
+    app, pilot, projected: str, *, scroll: bool = False
+) -> None:
+    """Positive-first (R-TUI-042a.7.1): prove ``projected`` — the value's
+    control-free projection — is actually painted in the card's visible lines
+    (scrolling to the end first when it lives below the 5 visible rows), then
+    every card text line holds no control character and the screen output
+    holds none of the four hostile introducers."""
+    card = _card(app)
+    if scroll:
+        card.scroll_end(animate=False)
+        await _settle(pilot, 6)
+    painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+    joined = "".join(painted)
+    assert projected in joined, (projected, joined)
+    _assert_card_lines_clean(card.render().plain)
+    _assert_no_introducers(_screen_output(app))
+
+
 def _assert_no_introducers(seq: str) -> None:
     for intro in _INTRODUCER_SEQS:
         assert intro not in seq, intro
 
 
 def test_r_tui_042a_7_1_1_name_without_display_identifier(tmp_path: Path) -> None:
-    """R-TUI-042a.7.1 case /1: a hostile name, no DISPLAY_IDENTIFIER."""
+    """R-TUI-042a.7.1 case /1: a hostile name, no DISPLAY_IDENTIFIER, loaded
+    from a real A2L file — the projected name is painted in the card header
+    before the hostile introducers are asserted absent from the screen output."""
     name, scrubbed = _hostile("SYN", "_END")
-    tag = _card_tag(name=name, display_identifier=None)
+    a2l = _card_measurement(name=name)
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        _assert_card_lines_clean(plain)
-        assert scrubbed in plain, (scrubbed, plain)
-        _assert_no_introducers(_screen_output(app))
+    async def _observe(app, pilot, table):
+        await _assert_card_painted_then_safe(app, pilot, scrubbed)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_2_display_identifier(tmp_path: Path) -> None:
-    """R-TUI-042a.7.1 case /2: a hostile DISPLAY_IDENTIFIER word."""
+    """R-TUI-042a.7.1 case /2: a hostile DISPLAY_IDENTIFIER word, from a real
+    A2L file."""
     disp, scrubbed = _hostile("SYN", "_DISP")
-    tag = _card_tag(name="SYN_NAME", display_identifier=disp)
+    a2l = _card_measurement(name="SYN_NAME", display_identifier=disp)
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        _assert_card_lines_clean(plain)
-        assert scrubbed in plain, (scrubbed, plain)
-        _assert_no_introducers(_screen_output(app))
+    async def _observe(app, pilot, table):
+        await _assert_card_painted_then_safe(app, pilot, scrubbed)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_3_description(tmp_path: Path) -> None:
-    """R-TUI-042a.7.1 case /3: a hostile description (the card's ``desc`` field)."""
+    """R-TUI-042a.7.1 case /3: a hostile description (the long identifier),
+    from a real A2L file."""
     desc, scrubbed = _hostile("DESC_", "_END")
-    tag = _card_tag(description=desc)
+    a2l = _card_measurement(name="SYN_NAME", desc=desc)
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        _assert_card_lines_clean(plain)
-        assert scrubbed in plain, (scrubbed, plain)
-        _assert_no_introducers(_screen_output(app))
+    async def _observe(app, pilot, table):
+        await _assert_card_painted_then_safe(app, pilot, scrubbed)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_4_unit(tmp_path: Path) -> None:
-    """R-TUI-042a.7.1 case /4: a hostile unit."""
+    """R-TUI-042a.7.1 case /4: a hostile unit (a quoted string), from a real
+    A2L file."""
     unit, scrubbed = _hostile("m", "_u")
-    tag = _card_tag(unit=unit)
+    a2l = _card_measurement(name="SYN_NAME", unit=unit)
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        _assert_card_lines_clean(plain)
-        assert scrubbed in plain, (scrubbed, plain)
-        _assert_no_introducers(_screen_output(app))
+    async def _observe(app, pilot, table):
+        await _assert_card_painted_then_safe(app, pilot, scrubbed)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_5_conversion(tmp_path: Path) -> None:
-    """R-TUI-042a.7.1 case /5: a hostile header conversion word."""
+    """R-TUI-042a.7.1 case /5: a hostile conversion word (``COMPU_METHOD``),
+    from a real A2L file."""
     conv, scrubbed = _hostile("CV_", "_END")
-    tag = _card_tag(conversion=conv)
+    a2l = _card_measurement(name="SYN_NAME", conversion=conv)
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        _assert_card_lines_clean(plain)
-        assert scrubbed in plain, (scrubbed, plain)
-        _assert_no_introducers(_screen_output(app))
+    async def _observe(app, pilot, table):
+        await _assert_card_painted_then_safe(app, pilot, scrubbed)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
     """R-TUI-042a.7.1 case /6: a hostile lower-limit word, then a hostile
-    upper-limit word — the card's full text (limits below the visible rows)
-    holds no control character; the screen output holds none with the card
-    scrolled to its end."""
+    upper-limit word — each loaded from a real A2L file; the limits line sits
+    below the card's 5 visible rows and is scrolled into view, proven painted,
+    before the hostile introducers are asserted absent."""
     for field in ("lower_limit", "upper_limit"):
         hostile, scrubbed = _hostile("LIM", "_END")
-        # enough fields that the limits line sits below the card's visible rows
-        # (max-height: 5): header, desc, unit·conv, layout, byteorder, limits.
-        tag = _card_tag(
-            description="d", unit="u", conversion="c",
-            record_layout_name="rl", effective_byte_order="msb",
-        )
         if field == "lower_limit":
-            tag["lower_limit"], tag["upper_limit"] = hostile, 100
+            a2l = _card_characteristic_limits(lower_limit=hostile, upper_limit="100")
         else:
-            tag["lower_limit"], tag["upper_limit"] = 0, hostile
+            a2l = _card_characteristic_limits(lower_limit="0", upper_limit=hostile)
 
-        async def _observe(app, pilot, scrubbed=scrubbed):
-            plain = _card(app).render().plain
-            _assert_card_lines_clean(plain)
-            assert scrubbed in plain, (scrubbed, plain)
-            card = _card(app)
-            card.scroll_end(animate=False)
-            await _settle(pilot, 6)
-            _assert_no_introducers(_screen_output(app))
+        async def _observe(app, pilot, table, scrubbed=scrubbed):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
 
-        _drive_card(tmp_path, (118, 54), tag, _observe)
+        _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
     """R-TUI-042a.7.1 case /7: a clean display identifier, a hostile name — the
-    first line shows ``SYN_DISP_C`` and the Name line holds no control character."""
+    first line shows ``SYN_DISP_C``, the painted Name line and its continuations
+    hold the projected name, and the screen output holds none of the four
+    hostile introducers."""
     name, scrubbed = _hostile("SYN", "_END")
-    tag = _card_tag(name=name, display_identifier="SYN_DISP_C")
+    a2l = _card_measurement(name=name, display_identifier="SYN_DISP_C")
 
-    async def _observe(app, pilot):
+    async def _observe(app, pilot, table):
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0].startswith("✓ SYN_DISP_C"), lines
-        plain = card.render().plain
-        _assert_card_lines_clean(plain)
-        # the line that starts with the label ``name`` holds the projected name
-        name_lines = [ln for ln in plain.split("\n") if ln.startswith("name ")]
-        assert name_lines, plain
-        assert scrubbed in name_lines[0], (scrubbed, name_lines[0])
+        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        assert start is not None, lines
+        assert scrubbed in "".join(lines[start:]), (scrubbed, lines[start:])
+        _assert_card_lines_clean(card.render().plain)
         _assert_no_introducers(_screen_output(app))
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_2_1_description_break_run(tmp_path: Path) -> None:
-    """R-TUI-042a.7.2 case /1: ``SYN  desc`` + line end + TAB + ``part two`` →
-    ``desc SYN  desc part two``."""
-    tag = _card_tag(description="SYN  desc\n\tpart two")
+    """R-TUI-042a.7.2 case /1: a long identifier written over two lines, the
+    second starting with a TAB — the painted desc line reads
+    ``desc SYN  desc part two`` and no TAB/LF/CR from the value is painted or
+    sent to the terminal."""
+    a2l = (
+        _CARD_HEAD
+        + '/begin MEASUREMENT SYN_NAME "SYN  desc\n\tpart two"\n'
+        + "  ECU_ADDRESS 0x1000\n"
+        + "  DATA_SIZE 2\n"
+        + "/end MEASUREMENT\n"
+        + _CARD_TAIL
+    )
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        assert "desc SYN  desc part two" in plain, plain
+    async def _observe(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+        assert "desc SYN  desc part two" in joined, joined
+        plain = card.render().plain
         assert "\t" not in plain and "\r" not in plain, repr(plain)
         _assert_no_introducers(_screen_output(app))
         assert "\t" not in _screen_output(app)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_7_2_2_unit_break_run(tmp_path: Path) -> None:
-    """R-TUI-042a.7.2 case /2: ``m`` + TAB + TAB + ``s`` → ``unit m s``."""
-    tag = _card_tag(unit="m\t\ts")
+    """R-TUI-042a.7.2 case /2: a unit ``m`` + TAB + TAB + ``s`` — the painted
+    unit line starts ``unit m s`` and no TAB from the value is painted or sent
+    to the terminal."""
+    a2l = _card_measurement(name="SYN_NAME", unit="m\t\ts")
 
-    async def _observe(app, pilot):
-        plain = _card(app).render().plain
-        assert "unit m s" in plain, plain
-        assert "\t" not in plain, repr(plain)
+    async def _observe(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+        assert "unit m s" in joined, joined
+        assert "\t" not in card.render().plain, repr(card.render().plain)
         assert "\t" not in _screen_output(app)
 
-    _drive_card(tmp_path, (118, 54), tag, _observe)
+    _explore_card(tmp_path, a2l, (118, 54), _observe)
 
 
 def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> None:
     """R-TUI-042a.8 case /1: LONGMAP(48) with ``DISPLAY_IDENTIFIER SYN_DISP_W`` —
-    first line ``✓ SYN_DISP_W  0x1C2D3E00``, then a ``name`` line holding the name."""
+    first line ``✓ SYN_DISP_W  0x1C2D3E00``; the painted Name line and its
+    painted continuations hold the full 48-character name (never read from
+    ``card.render().plain``)."""
     async def _check(app, pilot, table):
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
-        plain = card.render().plain
-        name_lines = [ln for ln in plain.split("\n") if ln.startswith("name ")]
-        assert name_lines, plain
-        assert longname(48) in name_lines[0], (longname(48), name_lines[0])
+        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        assert start is not None, lines
+        assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
 
     _explore(tmp_path, HEAD + map_block(longname(48), display_identifier="SYN_DISP_W") + TAIL,
              (118, 54), _check)
@@ -1173,7 +1286,7 @@ def _assert_at_invariants(app, table, declared_addrs: set, declared_lengths: set
         assert cells[1].plain in declared_lengths, (r, cells[1].plain)
         assert _cell_whole_in_painted(table, geom, r, 0), r
         assert _cell_whole_in_painted(table, geom, r, 1), r
-        assert _tag_ends_inside(geom, cells[tag_idx].plain), (r, cells[tag_idx].plain)
+        _assert_painted_tag_cell(table, geom, r, cells[tag_idx].plain)
 
 
 def test_at_b103_i12_1_no_glued_or_cut_values(tmp_path: Path) -> None:
