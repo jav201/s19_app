@@ -44,14 +44,14 @@ Print `s19_app.__file__` before each transcript and isolate HOME/XDG/LOCALAPPDAT
 
 ### 4. Test results
 
-- Functional: **471 passed, 35 deselected** (`evidence-e5-green-final.txt`).
-- Final RED on base: **269 failed, 6 passed, 34 deselected**, no fixture errors (`evidence-e5-red-final.txt`).
-- Array timing: **33 passed, 1 deselected; 96 bounds, 0 under 20 % margin** (`evidence-e5-timing-final.txt`).
-- FIX cap: **0.090 / 1.000 s, 1.2 MiB** and **0.514 / 5.000 s, 63.5 MiB** (`evidence-e5-fix-cap5-green.txt`, `evidence-e5-fix-cap6-green-fixed.txt`).
-- Scalar performance: **22 passed; 52 bounds, 0 under 20 % margin** (`evidence-e5-scalar-perf.txt`).
-- Synth: **3 passed** including slow/determinism; full file **9 passed** (`evidence-e5-synth-cited.txt`, `evidence-e5-synth-final.txt`).
-- Law guards: **375 passed, 1 skipped**, then TC-027 **1 passed**; final ID/engine selection **13 passed** (`evidence-e5-lawguards-laptop-final.txt`, `evidence-e5-tc027-laptop.txt`, `evidence-e5-id-registry-final.txt`).
-- Mutants: **103 KILLED, 0 open survivors** across A, B and supplemental runs (`evidence-e5-mutants-A-final.txt`, `evidence-e5-mutants-A-M141.txt`, `evidence-e5-mutants-B-run.txt`, `evidence-e5-mutants-extra-run.txt`, `evidence-e5-mutant-M148-reduce.txt`).
+- Functional: **471 passed, 35 deselected** (`../evidence/inc-3/evidence-e5-green-final.txt`).
+- Final RED on base: **269 failed, 6 passed, 34 deselected**, no fixture errors (`../evidence/inc-3/evidence-e5-red-final.txt`).
+- Array timing: **33 passed, 1 deselected; 96 bounds, 0 under 20 % margin** (`../evidence/inc-3/evidence-e5-timing-final.txt`).
+- FIX cap: **0.090 / 1.000 s, 1.2 MiB** and **0.514 / 5.000 s, 63.5 MiB** (`../evidence/inc-3/evidence-e5-fix-cap5-green.txt`, `../evidence/inc-3/evidence-e5-fix-cap6-green-fixed.txt`).
+- Scalar performance: **22 passed; 52 bounds, 0 under 20 % margin** (`../evidence/inc-3/evidence-e5-scalar-perf.txt`).
+- Synth: **3 passed** including slow/determinism; full file **9 passed** (`../evidence/inc-3/evidence-e5-synth-cited.txt`, `../evidence/inc-3/evidence-e5-synth-final.txt`).
+- Law guards: **375 passed, 1 skipped**, then TC-027 **1 passed**; final ID/engine selection **13 passed** (`../evidence/inc-3/evidence-e5-lawguards-laptop-final.txt`, `../evidence/inc-3/evidence-e5-tc027-laptop.txt`, `../evidence/inc-3/evidence-e5-id-registry-final.txt`).
+- Mutants: **103 KILLED, 0 open survivors** across A, B and supplemental runs (`../evidence/inc-3/evidence-e5-mutants-A-final.txt`, `../evidence/inc-3/evidence-e5-mutants-A-M141.txt`, `../evidence/inc-3/evidence-e5-mutants-B-run.txt`, `../evidence/inc-3/evidence-e5-mutants-extra-run.txt`, `../evidence/inc-3/evidence-e5-mutant-M148-reduce.txt`).
 - Reviews: code/security/final re-review **PASS-WITH-NOTES**; final coverage has 275 full + 5 partial and no unrun 3a arm.
 
 ### 5. Risks
