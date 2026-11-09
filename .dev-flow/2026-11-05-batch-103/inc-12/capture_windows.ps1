@@ -1,11 +1,19 @@
 # capture_windows.ps1 - batch-103 Inc 12 E5: one real-Windows-Terminal capture.
-# Opens a NEW Windows Terminal window (truecolor, NO_COLOR unset) running
+# Opens a NEW Windows Terminal window (truecolor, NO_COLOR removed) running
 # .dev-flow/2026-11-05-batch-103/inc-12/capture_driver.py against the tree in
 # -Root under ``python -I -B``, saves that exact window as a PNG, then closes
 # the window it opened and deletes only its own scratch. It never touches a
-# window it did not open (-w new plus a unique title), and the operator's real
-# HOME / XDG_* / LOCALAPPDATA (and with it the real recent-files store) are
-# isolated below a scratch ``zq_iso_user`` for the launched process.
+# window it did not open (-w new plus a unique title). The isolated HOME /
+# XDG_* / LOCALAPPDATA (and with it the real recent-files store) and the
+# color/PYTHON* variables are set INSIDE the launched command by a scratch
+# launcher (a tiny PowerShell script wt runs), never via wt.exe's environment
+# inheritance (wt may connect to an already-running Windows Terminal whose
+# process environment is not this script's). Instead of a fixed settle it
+# polls the driver's sidecar for surface=ready/error and captures the moment
+# the surface is ready; on surface=error it captures for diagnosis, prints the
+# failure and exits non-zero (never reports success). The finally block
+# verifies the opened window actually closed and the scratch is gone, and
+# fails loudly if either could not be cleaned up.
 #
 #   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario synmap -OutPng out/synmap.80x50.png -Cols 80 -Rows 50
 #   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario curve -Cols 118 -Rows 54 -OutPng out/curve.118x54.png
@@ -42,20 +50,19 @@ New-Item -ItemType Directory -Force -Path (
   (Join-Path $iso "localappdata")
 ) | Out-Null
 
-# truecolor, NO_COLOR unset (as E13); PYTHONDONTWRITEBYTECODE=1 (no .pyc).
-foreach ($k in "NO_COLOR", "TERM", "CLICOLOR", "CLICOLOR_FORCE", "FORCE_COLOR") {
-  [Environment]::SetEnvironmentVariable($k, $null, "Process")
-  Remove-Item "Env:$k" -ErrorAction SilentlyContinue
-}
-$env:COLORTERM = "truecolor"
-$env:PYTHONUTF8 = "1"
-$env:PYTHONDONTWRITEBYTECODE = "1"
-$env:HOME = Join-Path $iso "home"
-$env:XDG_CONFIG_HOME = Join-Path $iso "xdg_config"
-$env:XDG_CACHE_HOME = Join-Path $iso "xdg_cache"
-$env:XDG_DATA_HOME = Join-Path $iso "xdg_data"
-$env:XDG_STATE_HOME = Join-Path $iso "xdg_state"
-$env:LOCALAPPDATA = Join-Path $iso "localappdata"
+# The isolated environment is applied INSIDE the launched command (the
+# scratch launcher built just before Start-Process), not here: wt.exe can
+# attach to a running Windows Terminal whose process environment is unrelated
+# to this script's, so only a command-level set/remove is reliable. HOME /
+# XDG_* / LOCALAPPDATA point below ``zq_iso_user``; NO_COLOR is REMOVED (an
+# empty NO_COLOR still trips Textual's ``pop('NO_COLOR') is not None``) and
+# COLORTERM=truecolor; PYTHON* is pinned/cleared so ``python -I`` starts clean.
+$isoHome = Join-Path $iso "home"
+$isoConfig = Join-Path $iso "xdg_config"
+$isoCache = Join-Path $iso "xdg_cache"
+$isoData = Join-Path $iso "xdg_data"
+$isoState = Join-Path $iso "xdg_state"
+$isoLocal = Join-Path $iso "localappdata"
 
 Add-Type -AssemblyName System.Drawing
 Add-Type @"
@@ -128,15 +135,71 @@ $outPath = [IO.Path]::GetFullPath($OutPng)
 $report = $outPath + ".txt"
 New-Item -ItemType Directory -Force (Split-Path -Parent $outPath) | Out-Null
 
+# Scratch launcher: the launched command removes/sets the isolated environment
+# itself, then runs the driver under ``python -I -B`` (isolated, no .pyc); the
+# driver inserts -Root at sys.path[0] itself. NO_COLOR is removed (not emptied)
+# so Textual sees it as absent. Placeholders are replaced with the real paths.
+$launcherPs1 = Join-Path $scratch "zq_launch.ps1"
+$launcherTemplate = @'
+$ErrorActionPreference = 'Stop'
+foreach ($k in 'NO_COLOR','TERM','CLICOLOR','CLICOLOR_FORCE','FORCE_COLOR') {
+  Remove-Item "Env:$k" -ErrorAction SilentlyContinue
+}
+Remove-Item Env:PYTHONPATH, Env:PYTHONHOME, Env:PYTHONSTARTUP -ErrorAction SilentlyContinue
+$env:COLORTERM = 'truecolor'
+$env:PYTHONDONTWRITEBYTECODE = '1'
+$env:PYTHONUTF8 = '1'
+$env:HOME = '__ISO_HOME__'
+$env:XDG_CONFIG_HOME = '__ISO_CONFIG__'
+$env:XDG_CACHE_HOME = '__ISO_CACHE__'
+$env:XDG_DATA_HOME = '__ISO_DATA__'
+$env:XDG_STATE_HOME = '__ISO_STATE__'
+$env:LOCALAPPDATA = '__ISO_LOCAL__'
+& '__PYTHON__' -I -B '__DRIVER__' --root '__ROOT__' --scenario __SCENARIO__ --base '__BASE__' --report '__REPORT__'
+exit $LASTEXITCODE
+'@
+$launcherText = $launcherTemplate
+$launcherText = $launcherText.Replace('__ISO_HOME__', $isoHome)
+$launcherText = $launcherText.Replace('__ISO_CONFIG__', $isoConfig)
+$launcherText = $launcherText.Replace('__ISO_CACHE__', $isoCache)
+$launcherText = $launcherText.Replace('__ISO_DATA__', $isoData)
+$launcherText = $launcherText.Replace('__ISO_STATE__', $isoState)
+$launcherText = $launcherText.Replace('__ISO_LOCAL__', $isoLocal)
+$launcherText = $launcherText.Replace('__PYTHON__', $Python)
+$launcherText = $launcherText.Replace('__DRIVER__', $driver)
+$launcherText = $launcherText.Replace('__ROOT__', $Root)
+$launcherText = $launcherText.Replace('__SCENARIO__', $Scenario)
+$launcherText = $launcherText.Replace('__BASE__', $base)
+$launcherText = $launcherText.Replace('__REPORT__', $report)
+Set-Content -LiteralPath $launcherPs1 -Value $launcherText -Encoding ASCII
+
 # -w new opens a NEW window; the unique title is how we find (and later close)
 # only our own window. --suppressApplicationTitle keeps that title even if the
-# app changes it. The driver runs under ``python -I -B`` (isolated, no .pyc);
-# it inserts -Root at sys.path[0] itself.
-$argLine = '-w new --size {0},{1} --title "{2}" --suppressApplicationTitle "{3}" -I -B "{4}" --root "{5}" --scenario {6} --base "{7}" --report "{8}"' -f `
-  $Cols, $Rows, $title, $Python, $driver, $Root, $Scenario, $base, $report
+# app changes it.
+$argLine = '-w new --size {0},{1} --title "{2}" --suppressApplicationTitle powershell -NoProfile -ExecutionPolicy Bypass -File "{3}"' -f `
+  $Cols, $Rows, $title, $launcherPs1
 Start-Process "wt.exe" -ArgumentList $argLine | Out-Null
 
+function Close-CaptureWindow([string]$Title, [IntPtr]$KnownHwnd) {
+  # Close the unique-title window we opened. When discovery failed earlier
+  # ($KnownHwnd -eq [IntPtr]::Zero), re-find it once so a late-appearing
+  # window is still closed. Returns $null on success, else an error string.
+  $h = $KnownHwnd
+  if ($h -eq [IntPtr]::Zero) { $h = Find-ByTitle $Title }
+  if ($h -eq [IntPtr]::Zero) { return $null }
+  for ($i = 0; $i -lt 20; $i++) {
+    [void][ZqU32]::PostMessage($h, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)
+    Start-Sleep -Milliseconds 300
+    $still = Find-ByTitle $Title
+    if ($still -eq [IntPtr]::Zero) { return $null }
+    $h = $still
+  }
+  return "window '$Title' did not close after best-effort WM_CLOSE"
+}
+
 $hwnd = [IntPtr]::Zero
+$primaryError = $null
+$cleanupError = $null
 try {
   for ($i = 0; $i -lt 80 -and $hwnd -eq [IntPtr]::Zero; $i++) {
     Start-Sleep -Milliseconds 250
@@ -145,7 +208,32 @@ try {
   if ($hwnd -eq [IntPtr]::Zero) { throw "window '$title' did not appear" }
   [void][ZqU32]::ShowWindow($hwnd, 9)
   [void][ZqU32]::SetForegroundWindow($hwnd)
-  Start-Sleep -Seconds $SettleSeconds
+  # Poll the driver's sidecar instead of a fixed settle: capture as soon as
+  # the surface is ready, and stop as soon as the driver reports an error.
+  $surface = $null
+  $deadline = (Get-Date).AddSeconds($SettleSeconds)
+  while ((Get-Date) -lt $deadline) {
+    if (Test-Path -LiteralPath $report) {
+      $surfaceLine = $null
+      try {
+        $surfaceLine = Get-Content -LiteralPath $report -ErrorAction Stop |
+          Where-Object { $_ -match '^surface=' } | Select-Object -Last 1
+      } catch { }
+      if ($surfaceLine) {
+        if ($surfaceLine -match '^surface=ready') { $surface = "ready"; break }
+        if ($surfaceLine -match '^surface=error') { $surface = "error"; break }
+      }
+    }
+    Start-Sleep -Milliseconds 200
+  }
+
+  if ($null -eq $surface) {
+    $still = Find-ByTitle $title
+    if ($still -eq [IntPtr]::Zero) {
+      throw "window '$title' vanished before the driver reported a surface"
+    }
+    throw "driver for '$title' did not report surface=ready/error within $SettleSeconds s"
+  }
 
   $rect = New-Object ZqU32+RECT
   $valid = $false
@@ -159,16 +247,38 @@ try {
     }
   }
   if (-not $valid) { throw "invalid rect for '$title'" }
+
+  if ($surface -eq "error") {
+    # Capture for diagnosis only; print the failure and never claim success.
+    $diagMethod = "not-captured"
+    try { $diagMethod = Save-WindowPng $hwnd $rect $outPath } catch { }
+    if (Test-Path -LiteralPath $report) {
+      foreach ($line in Get-Content -LiteralPath $report) { Write-Output ("REPORT " + $line) }
+    }
+    throw "driver reported surface=error for '$title' (diagnosis capture: $diagMethod)"
+  }
   $method = Save-WindowPng $hwnd $rect $outPath
   Write-Output ("CAPTURED {0}  {1}x{2}px  grid={3}x{4}  method={5}  bytes={6}" -f `
     $outPath, ($rect.Right - $rect.Left), ($rect.Bottom - $rect.Top), $Cols, $Rows, $method, (Get-Item $outPath).Length)
   if (Test-Path -LiteralPath $report) {
     foreach ($line in Get-Content -LiteralPath $report) { Write-Output ("REPORT " + $line) }
   }
+} catch {
+  $primaryError = $_
 } finally {
-  if ($hwnd -ne [IntPtr]::Zero) {
-    [void][ZqU32]::PostMessage($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)
+  $cleanupError = Close-CaptureWindow -Title $title -KnownHwnd $hwnd
+  if (Test-Path -LiteralPath $scratch) {
+    Remove-Item -LiteralPath $scratch -Recurse -Force -ErrorAction SilentlyContinue
   }
-  Start-Sleep -Milliseconds 1500
-  if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force -ErrorAction SilentlyContinue }
+  if (Test-Path -LiteralPath $scratch) {
+    if ($cleanupError) { $cleanupError += "; " }
+    $cleanupError += "scratch zq_cap_$stamp was not removed"
+  }
+}
+if ($primaryError) {
+  if ($cleanupError) { Write-Output ("CLEANUP-ALSO-FAILED: " + $cleanupError) }
+  throw $primaryError
+}
+if ($cleanupError) {
+  throw "capture cleanup failed: $cleanupError"
 }

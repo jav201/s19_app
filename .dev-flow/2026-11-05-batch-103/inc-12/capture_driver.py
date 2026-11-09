@@ -22,9 +22,10 @@ Scenarios (see ``02-test-cases.md`` AT-B103-I12-2):
                    unscrolled (its ASAM.M.SCALAR rows lead the page).
   v171-nameline    V171 with the cursor on the first row whose card shows a
                    DISPLAY_IDENTIFIER (the Name-line capture, R-TUI-042a.8).
-  curve            A tracked file holding a CURVE with no length, selected at
-                   capture time with the ``corr2-e3c2-bytesize.py`` criterion
-                   (Inc 11 E3S-18: the tags whose Raw/Physical cells go blank).
+  curve            The tracked ``examples/case_00_public/software_a.a2l``
+                   (pinned), whose 151 CURVE-without-length tags (the executed
+                   e07 selection evidence) lead the page to a blank
+                   Raw/Physical cell.
 
 Synthetic text only is written for the SYNMAP / PAGE64 fixtures. Tracked files
 are read from the checkout and their names/counts go into the sidecar report;
@@ -40,11 +41,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import os
-import subprocess
+import re
 import sys
 import time
+import traceback
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -59,6 +60,62 @@ _SCENARIOS = (
     "v171-nameline",
     "curve",
 )
+
+# The CURVE scenario is pinned to this tracked file (repo-relative, so the
+# same path resolves under both -Root and -BeforeRoot). The executed e07
+# selection evidence counts exactly 151 CURVE tags with no length in it.
+_CURVE_FILE_REL = ("examples", "case_00_public", "software_a.a2l")
+_REQUIRED_CURVE_COUNT = 151
+
+# A safety-net matcher for any absolute path a redacted message may still hold
+# (Windows drive letter or a leading slash). Anchors are replaced exactly first.
+_ABS_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/][^\s'\"]*|/(?:[^\s'\"]*[/\\])?[^\s'\"]*)")
+
+
+def _redact_frame_path(path: Path, root: Path, base: Path) -> str:
+    """Reduce a frame filename to a repo-relative or basename label."""
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(root).as_posix()
+    except ValueError:
+        pass
+    try:
+        return resolved.relative_to(base).as_posix()
+    except ValueError:
+        pass
+    return path.name
+
+
+def _redacted_traceback(root: Path, base: Path) -> list[str]:
+    """Frame locations only (file, line, function) - never source text or
+    absolute paths. Returns empty when there is no active exception."""
+    tb = sys.exc_info()[2]
+    if tb is None:
+        return []
+    lines: list[str] = []
+    for frame in traceback.extract_tb(tb):
+        label = _redact_frame_path(Path(frame.filename), root, base)
+        lines.append(f'  File "{label}", line {frame.lineno}, in {frame.name}')
+    return lines
+
+
+def _redact_message(msg: str, root: Path, base: Path) -> str:
+    """Replace every absolute path an exception message may echo with a
+    repo-relative or basename label, so no personal path reaches the
+    sidecar or console."""
+    text = msg
+    for anchor in (root, base, base.parent):
+        text = text.replace(str(anchor), _anchor_label(anchor, root, base))
+    text = _ABS_PATH_RE.sub(lambda m: Path(m.group(0)).name, text)
+    return text
+
+
+def _anchor_label(anchor: Path, root: Path, base: Path) -> str:
+    if anchor == root:
+        return "<checkout>"
+    if anchor == base:
+        return "<scratch>"
+    return anchor.name
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -79,7 +136,6 @@ def main() -> int:
     # syntax-only ``python -m py_compile`` never needs the checkout present).
     from textual.widgets import DataTable
 
-    from s19_app.tui.a2l import enrich_a2l_tags_with_values, parse_a2l_file
     from s19_app.tui.app import S19TuiApp
     from s19_app.tui.changes.io import emit_s19_from_mem_map
 
@@ -152,55 +208,12 @@ def main() -> int:
         mem_map = {ADDR + i: (i * 7) & 0xFF for i in range(MAP_LEN)}
         return emit_s19_from_mem_map(mem_map, [(ADDR, ADDR + MAP_LEN)])
 
-    # -----------------------------------------------------------------------
-    # Tracked-file selection for the CURVE-without-length scenario: the
-    # ``corr2-e3c2-bytesize.py`` criterion is "a tag with no length whose
-    # enriched size Inc 11's E3S-18 removes". After Inc 11 the enriched
-    # ``byte_size`` of a length-less tag is None, so the surviving, version-
-    # independent form is "CURVE with no length" (char_type == "CURVE" and
-    # ``length is None``). The file with the most such CURVEs is chosen and
-    # its name + counts are written to the sidecar report.
-    # -----------------------------------------------------------------------
-    def select_curve_file() -> tuple[Path, int, dict[str, int]]:
-        probe = subprocess.run(
-            ["git", "-C", str(root), "grep", "-l", "CURVE", "--", "*.a2l"],
-            capture_output=True,
-            text=True,
-        )
-        rel_files = [ln for ln in probe.stdout.splitlines() if ln.strip()]
-        if probe.returncode not in (0, 1) or not rel_files:
-            # Fallback: every tracked A2L, filtered by a cheap literal scan.
-            listed = subprocess.run(
-                ["git", "-C", str(root), "ls-files", "*.a2l"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.split()
-            rel_files = [
-                rel for rel in listed if "CURVE" in (root / rel).read_text(encoding="utf-8", errors="replace")
-            ]
-        per_file: dict[str, int] = {}
-        best_rel, best_count = "", 0
-        for rel in rel_files:
-            data = parse_a2l_file(root / rel)
-            count = 0
-            for tag in enrich_a2l_tags_with_values(data, {}):
-                if tag.get("char_type") == "CURVE" and tag.get("length") is None:
-                    count += 1
-            if count:
-                per_file[rel] = count
-            if count > best_count:
-                best_rel, best_count = rel, count
-        if not best_rel:
-            raise SystemExit("no tracked A2L file holds a CURVE with no length")
-        return root / best_rel, best_count, per_file
-
     v171_path = root / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l"
     image_path = root / "examples" / "case_00_public" / "prg.s19"
-    curve_path: Path | None = None
-    curve_counts: dict[str, int] = {}
-    if args.scenario == "curve":
-        curve_path, _curve_count, curve_counts = select_curve_file()
+    # Pinned (no dynamic selection): the same repo-relative file under both
+    # -Root and -BeforeRoot, whose 151 CURVE-without-length tags the executed
+    # e07 selection evidence requires.
+    curve_path = root.joinpath(*_CURVE_FILE_REL)
 
     fixture_a2l = base / "fixture.a2l"
     fixture_s19 = base / "fixture.s19"
@@ -233,6 +246,21 @@ def main() -> int:
                 await asyncio.sleep(0.05)
             return False
 
+        def _image_loaded(self, name: str) -> bool:
+            """True once the just-launched image load installed ``current_file``."""
+            return (
+                self.current_file is not None
+                and self.current_file.path.name == name
+            )
+
+        def _a2l_ready(self) -> bool:
+            """True once the A2L attach installed data and computed the enriched tags."""
+            return (
+                self.current_a2l_data is not None
+                and self._a2l_enriched_key is not None
+                and bool(self._a2l_enriched_tags)
+            )
+
         async def _show_explorer(self) -> DataTable:
             self.action_show_screen("a2l")
             await self._settle(0.6)
@@ -247,7 +275,15 @@ def main() -> int:
             for index, tag in enumerate(self._a2l_filtered_tags):
                 if tag.get("display_identifier"):
                     return index
-            return 0
+            return -1
+
+        def _curve_without_length_count(self) -> int:
+            """Count the CURVE tags with no length in the enriched tag list."""
+            return sum(
+                1
+                for tag in self._a2l_enriched_tags
+                if tag.get("char_type") == "CURVE" and tag.get("length") is None
+            )
 
         def _first_curve_without_length(self) -> int:
             for index, tag in enumerate(self._a2l_filtered_tags):
@@ -256,7 +292,6 @@ def main() -> int:
             return -1
 
         async def _drive(self) -> None:
-            error: str | None = None
             try:
                 await self._settle(0.3)
                 if args.scenario in ("synmap", "page64", "synmap-midscroll"):
@@ -264,70 +299,121 @@ def main() -> int:
                     fixture_a2l.write_text(a2l_text, encoding="utf-8")
                     fixture_s19.write_text(synthetic_image(), encoding="ascii")
                     self.load_selected_file(fixture_s19)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == fixture_s19.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(fixture_s19.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    # ``load_selected_file`` applies synchronously but defers the
+                    # sections -> hex -> a2l refresh chain on ``call_later``; let
+                    # that chain drain so the A2L attach never races it.
+                    await self._settle(0.4)
                     self.load_a2l_from_path(fixture_a2l)
                     report_lines.append(f"synthetic_fixture={args.scenario}")
                 elif args.scenario == "curve":
-                    assert curve_path is not None
                     self.load_selected_file(image_path)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == image_path.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(image_path.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    await self._settle(0.4)
                     self.load_a2l_from_path(curve_path)
-                    report_lines.append(f"selected_file={curve_path.relative_to(root)}")
-                    report_lines.append(f"curve_without_length_selected={_curve_count}")
-                    report_lines.append(
-                        "curve_without_length_per_file=" + json.dumps(curve_counts, sort_keys=True)
-                    )
+                    report_lines.append("selected_file=" + "/".join(_CURVE_FILE_REL))
                 else:  # v171, v171-nameline
                     self.load_selected_file(image_path)
-                    await self._wait_for(
-                        lambda: self.current_file is not None
-                        and self.current_file.path.name == image_path.name
-                    )
+                    if not await self._wait_for(
+                        lambda: self._image_loaded(image_path.name)
+                    ):
+                        raise TimeoutError("image load did not finish before A2L attach")
+                    await self._settle(0.4)
                     self.load_a2l_from_path(v171_path)
                     report_lines.append("tracked_file=examples/case_00_public/ASAP2_Demo_V171.a2l")
-                await self.workers.wait_for_complete()
+                # A2L attach runs on its own worker; wait on the installed
+                # state (data + enriched tags/key), never on the global worker
+                # manager, whose ``wait_for_complete`` raises ``WorkerCancelled``
+                # if any unrelated worker was cancelled.
+                if not await self._wait_for(self._a2l_ready):
+                    raise TimeoutError(
+                        "A2L load did not finish: "
+                        f"current_a2l_data={'set' if self.current_a2l_data else 'unset'} "
+                        f"enriched_key={'set' if self._a2l_enriched_key else 'unset'} "
+                        f"tags={len(self._a2l_enriched_tags)}"
+                    )
+                if args.scenario == "curve":
+                    curve_count = self._curve_without_length_count()
+                    report_lines.append(f"curve_without_length_selected={curve_count}")
+                    if curve_count != _REQUIRED_CURVE_COUNT:
+                        raise AssertionError(
+                            f"software_a.a2l has {curve_count} CURVE tags with no "
+                            f"length, expected {_REQUIRED_CURVE_COUNT}"
+                        )
                 await self._settle(0.6)
                 table = await self._show_explorer()
                 report_lines.append(f"tags={len(self._a2l_filtered_tags)}")
                 report_lines.append(f"table_rows={table.row_count}")
                 if args.scenario == "synmap-midscroll":
-                    target = max(0, int(table.max_scroll_x) // 2)
+                    max_scroll_x = int(table.max_scroll_x)
+                    if max_scroll_x <= 0:
+                        raise AssertionError(
+                            f"mid-scroll surface has no horizontal scroll "
+                            f"(max_scroll_x={max_scroll_x})"
+                        )
+                    target = max_scroll_x // 2
+                    if target <= 0:
+                        raise AssertionError(
+                            f"mid-scroll target is not positive (target={target})"
+                        )
                     table.scroll_to(x=target, animate=False)
-                    report_lines.append(f"scroll_x={target}/{int(table.max_scroll_x)}")
+                    report_lines.append(f"scroll_x={target}/{max_scroll_x}")
                     await self._settle(0.4)
                 elif args.scenario == "v171-nameline":
                     row = self._first_display_id_row()
+                    if row < 0 or row >= len(self._a2l_filtered_tags):
+                        raise AssertionError(
+                            "Name-line: no A2L tag holds a display_identifier"
+                        )
+                    if not self._a2l_filtered_tags[row].get("display_identifier"):
+                        raise AssertionError(
+                            f"Name-line row {row} has no display_identifier"
+                        )
                     if table.row_count:
                         table.move_cursor(row=row)
                     report_lines.append(f"cursor_row={row}")
                     await self._settle(0.4)
                 elif args.scenario == "curve":
                     idx = self._first_curve_without_length()
-                    if idx >= 0:
-                        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
-                        start = (idx // page_size) * page_size
-                        self._a2l_window_start = start
-                        self.update_a2l_tags_view(self._a2l_filtered_tags)
-                        await self._settle(0.5)
-                        table = self.query_one("#a2l_tags_list", DataTable)
-                        if table.row_count:
-                            table.move_cursor(row=idx - start)
-                        report_lines.append(
-                            f"curve_without_length_row={idx} "
-                            f"(page {idx // page_size + 1}, in-page row {idx - start})"
+                    if idx < 0:
+                        raise AssertionError(
+                            "no CURVE tag with no length found in software_a.a2l"
                         )
+                    page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+                    start = (idx // page_size) * page_size
+                    self._a2l_window_start = start
+                    self.update_a2l_tags_view(self._a2l_filtered_tags)
+                    await self._settle(0.5)
+                    table = self.query_one("#a2l_tags_list", DataTable)
+                    in_page = idx - start
+                    if in_page >= table.row_count:
+                        raise AssertionError(
+                            f"CURVE row {idx} not placed in-page "
+                            f"(in-page row {in_page} of {table.row_count} rows)"
+                        )
+                    if table.row_count:
+                        table.move_cursor(row=in_page)
+                    report_lines.append(
+                        f"curve_without_length_row={idx} "
+                        f"(page {idx // page_size + 1}, in-page row {in_page})"
+                    )
                     await self._settle(0.4)
                 report_lines.append("surface=ready")
             except BaseException as exc:  # noqa: BLE001 - keep the app alive, report it
-                error = f"{type(exc).__name__}: {exc}"
+                error = _redact_message(f"{type(exc).__name__}: {exc}", root, base)
+                frames = _redacted_traceback(root, base)
                 report_lines.append(f"surface=error {error}")
+                for frame_line in frames:
+                    report_lines.append(f"traceback: {frame_line}")
                 sys.stderr.write(f"capture drive failed: {error}\n")
+                for frame_line in frames:
+                    sys.stderr.write(frame_line + "\n")
             finally:
                 if args.report is not None:
                     try:
