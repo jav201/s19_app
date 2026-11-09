@@ -20,6 +20,7 @@ Each item must first produce a behavioral RED on `f1397097` through the relevant
 - **P12 — declared layout datatype precedence.** Resolve FNC_VALUES/declared layout datatype first and use the deposit-name hint only when that yields none, consistently in inference and agreement checks.
 - **P13 — CUBOID/CUBE_4/CUBE_5.** Use `_CURVE_MAP_FAMILY` consistently for span resolution, standing-size checks and external-axis refusal, not only CURVE/MAP.
 - **P14 — unclosed declared sections (design addendum required).** Before code, add an explicit requirement/case: an unclosed BLOB/INSTANCE exports no usable address or length, and an unclosed typedef cannot size an INSTANCE. Assign R-A2L-READ.70 and update the graph and test-case ledger. This is a security/consumer-contract correction; do not silently change only code.
+- **P15 — final tag-length refusal cannot be re-derived inline.** Mutant B M09 proves that removing the refused-length guard lets a MAP with `LENGTH 0` and an inline STD_AXIS recover length 13. Add the direct synthetic case and keep the inline-span pass subordinate to R-A2L-READ.61's final refusal.
 
 ## Coverage findings accepted
 
