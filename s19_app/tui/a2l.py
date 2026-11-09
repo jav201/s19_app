@@ -374,7 +374,7 @@ def _unquote(word: str) -> str:
 
 #: Canonical-text word split: a quoted word keeps quotes and escape pairs; an
 #: unquoted word is a run of non-space characters.
-_WORD_SPLIT_RE = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"|[^ ]+')
+_WORD_SPLIT_RE = re.compile(r'"[^"\\]*(?:\\[\s\S][^"\\]*)*"|[^ ]+')
 
 #: A compiled ASCII-blank run split for the no-quote fast path of
 #: ``_split_line_respecting_quotes`` (space, HT, VT, FF and line ends).
@@ -421,7 +421,7 @@ def _tag_header(
     section_name: str, words: list[tuple[str, int]]
 ) -> tuple[str, Optional[str], list[str], int]:
     """Split a tag/spans section's leading words into name, long identifier,
-    header words and the index of the first word after the header."""
+    raw header words and the index of the first word after the header."""
     name = "UNKNOWN"
     long_identifier: Optional[str] = None
     i = 0
@@ -442,7 +442,7 @@ def _tag_header(
         quoted = word.startswith('"')
         if not quoted and word in _TAG_KEYWORD_ARITY:
             break
-        header.append(_unquote(word) if quoted else word)
+        header.append(word)
         i += 1
     return name, long_identifier, header, i
 
@@ -455,10 +455,10 @@ _SURPLUS_KEYWORDS = frozenset(
 
 def _tag_keyword_lines(
     words: Iterable[tuple[str, int]], start: int = 0, errors: Optional[Any] = None
-) -> list[tuple[str, int]]:
-    """Group a tag's own words into one canonical ``"<KEYWORD> <arg> …"`` text
-    per keyword, appending the .58 argument-count errors."""
-    items: list[tuple[str, int]] = []
+) -> list[tuple[str, int, list[tuple[str, int]]]]:
+    """Group a tag's own words into canonical text and raw ``(word, line)``
+    arguments per keyword, appending the .58 argument-count errors."""
+    items: list[tuple[str, int, list[tuple[str, int]]]] = []
     _errors = errors if errors is not None else []
     it = iter(itertools.islice(words, start, None))
     pushback: Optional[tuple[str, int]] = None
@@ -475,9 +475,9 @@ def _tag_keyword_lines(
             continue
         kw = word
         arity = _TAG_KEYWORD_ARITY[kw]
-        args: list[str] = []
+        args: list[tuple[str, int]] = []
         surplus_count = 0
-        first_surplus: Optional[str] = None
+        first_surplus: Optional[tuple[str, int]] = None
         while True:
             try:
                 w, l = next(it)
@@ -487,12 +487,12 @@ def _tag_keyword_lines(
                 pushback = (w, l)
                 break
             if kw == "MATRIX_DIM":
-                args.append(w)
+                args.append((w, l))
             elif len(args) < arity:
-                args.append(w)
+                args.append((w, l))
             elif kw in _SURPLUS_KEYWORDS and _is_hex_like(w):
                 if surplus_count == 0:
-                    first_surplus = w
+                    first_surplus = (w, l)
                 surplus_count += 1
             # any other surplus word is dropped silently
         if kw == "MATRIX_DIM":
@@ -508,15 +508,16 @@ def _tag_keyword_lines(
         elif surplus_count:
             total = len(args) + surplus_count
             _errors.append(f"Line {line}: {kw} has {total} of its {arity} arguments")
-            item_words = args + [first_surplus if first_surplus is not None else ""]
+            item_words = args + [first_surplus if first_surplus is not None else ("", line)]
         else:
             item_words = list(args)
-        items.append((" ".join([kw] + item_words), line))
+        text = " ".join([kw] + [word for word, _line in item_words])
+        items.append((text, line, item_words))
     return items
 
 
 def _tag_sizes(
-    keyword_lines: list[tuple[str, int]],
+    keyword_lines: list[tuple[str, int, list[tuple[str, int]]]],
     element_size: Optional[int] = None,
     kind: Optional[str] = None,
     span: Optional[int] = None,
@@ -528,10 +529,9 @@ def _tag_sizes(
     no_number = False
     has_data_or_length = False
     has_count = False
-    for text, _line in keyword_lines:
-        parts = text.split(" ")
-        kw = parts[0]
-        args = parts[1:]
+    for text, _line, arg_words in keyword_lines:
+        kw = text.partition(" ")[0]
+        args = [word for word, _arg_line in arg_words]
         if kw in ("DATA_SIZE", "LENGTH"):
             has_data_or_length = True
             if len(args) == 1 and _number_word(args[0]) is not None:
@@ -591,17 +591,18 @@ def _characteristic_element_size(
     return el
 
 
-def _matrix_dim_product(keyword_lines: list[tuple[str, int]]) -> Optional[int]:
+def _matrix_dim_product(
+    keyword_lines: list[tuple[str, int, list[tuple[str, int]]]]
+) -> Optional[int]:
     """The MATRIX_DIM product (1 when no MATRIX_DIM keyword), ``None`` when a
     MATRIX_DIM keyword gives no number."""
     product = 1
     seen = False
-    for text, _line in keyword_lines:
-        parts = text.split(" ")
-        if parts[0] != "MATRIX_DIM":
+    for text, _line, arg_words in keyword_lines:
+        if text.partition(" ")[0] != "MATRIX_DIM":
             continue
         seen = True
-        args = parts[1:]
+        args = [word for word, _arg_line in arg_words]
         if not (_MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX):
             return None
         prod = 1
@@ -761,10 +762,20 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
             if in_comment:
                 j = body.find("*/", i)
                 if j < 0:
-                    line += _count_line_ends(body[i:])
+                    ends = _count_line_ends(body[i:])
+                    if ends and pending:
+                        yield pending_line, " ".join(pending)
+                        pending = []
+                        pending_line = None
+                    line += ends
                     i = n
                     break
-                line += _count_line_ends(body[i:j])
+                ends = _count_line_ends(body[i:j])
+                if ends and pending:
+                    yield pending_line, " ".join(pending)
+                    pending = []
+                    pending_line = None
+                line += ends
                 in_comment = False
                 i = j + 2
                 continue
@@ -797,11 +808,11 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
                 if ch == "\r" and i + 1 < n and body[i + 1] == "\n":
                     i += 1
                 i += 1
-                line += 1
                 if pending:
                     yield pending_line, " ".join(pending)
                     pending = []
                     pending_line = None
+                line += 1
                 continue
             if ch == "/" and i + 1 < n and body[i + 1] == "*":
                 in_comment = True
@@ -831,6 +842,10 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
 
         # element boundary (a line end)
         if in_comment:
+            if pending:
+                yield pending_line, " ".join(pending)
+                pending = []
+                pending_line = None
             line += 1
         elif in_string:
             string_buf.append("\n")
@@ -926,7 +941,7 @@ def _build_section_tree_into(
         for word in _line_words(text):
             if pending_begin_line is not None:
                 if len(stack) >= _MAX_NESTING:
-                    errors.reset(f"Line {lnum}: sections nested deeper than 32")
+                    errors.reset(f"Line {pending_begin_line}: sections nested deeper than 32")
                     return False
                 entry = {
                     "name": word,
@@ -952,13 +967,13 @@ def _build_section_tree_into(
                     top = stack[-1]
                     if top["name"] != word:
                         errors.append(
-                            f"Line {lnum}: /end {_echo_word(word)} does not close "
+                            f"Line {pending_end_line}: /end {_echo_word(word)} does not close "
                             f"/begin {_echo_word(top['name'])}"
                         )
-                    top["end_line"] = lnum
+                    top["end_line"] = pending_end_line
                     stack.pop()
                 else:
-                    errors.append(f"Line {lnum}: /end without /begin")
+                    errors.append(f"Line {pending_end_line}: /end without /begin")
                 pending_end_line = None
                 continue
             if pending_include_line is not None:
@@ -1390,7 +1405,7 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
     """
     anchor: Optional[int] = None
     for idx, token in enumerate(tokens):
-        if token in CHARACTERISTIC_KINDS:
+        if _unquote(token) in CHARACTERISTIC_KINDS:
             anchor = idx
             break
     if anchor is None:
@@ -1406,13 +1421,13 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
         return None
     address_inline: Optional[int] = _number_word(params[1])
     return {
-        "char_type": params[0],
+        "char_type": _unquote(params[0]),
         "address_inline": address_inline,
-        "deposit": params[2],
-        "max_diff": params[3],
-        "conversion": params[4],
-        "lower_limit": params[5],
-        "upper_limit": params[6],
+        "deposit": _unquote(params[2]),
+        "max_diff": _unquote(params[3]),
+        "conversion": _unquote(params[4]),
+        "lower_limit": _unquote(params[5]),
+        "upper_limit": _unquote(params[6]),
         "datatype": None,
     }
 
@@ -1924,7 +1939,7 @@ def _infer_length_measurement(lines: list[str], header: Optional[dict]) -> Optio
     array_size: Optional[int] = None
     matrix = 1
     for text in lines:
-        parts = text.split(" ")
+        parts = _line_words(text)
         if parts[0] in ("DATA_SIZE", "LENGTH") and len(parts) == 2:
             value = _number_word(parts[1])
             if value is not None:
@@ -1965,7 +1980,7 @@ def _infer_length_characteristic(
     matrix: Optional[int] = None
     number: Optional[int] = None
     for text in lines:
-        parts = text.split(" ")
+        parts = _line_words(text)
         if parts[0] == "LENGTH" and len(parts) == 2:
             value = _number_word(parts[1])
             if value is not None:
@@ -3486,7 +3501,7 @@ def extract_a2l_tags(
             _apply_conversion_source(tag, tag.get("conversion"))
 
         keyword_lines = _tag_keyword_lines(itertools.chain(head[rest:], stream), errors=_errors)
-        keyword_texts = [text for text, _line in keyword_lines]
+        keyword_texts = [text for text, _line, _args in keyword_lines]
 
         address_words: list[tuple[int, int]] = []
         address_invalid = False
@@ -3510,10 +3525,9 @@ def extract_a2l_tags(
             else:
                 address_words.append((value, header_address_line))
 
-        for text, line in keyword_lines:
-            parts = text.split(" ")
-            kw = parts[0]
-            args = parts[1:]
+        for text, line, arg_words in keyword_lines:
+            kw = text.partition(" ")[0]
+            args = [word for word, _arg_line in arg_words]
             if kw in seen:
                 _errors.append(
                     f"Line {line}: {_echo_word(kw)} is declared twice in "
@@ -3522,66 +3536,71 @@ def extract_a2l_tags(
             seen.add(kw)
 
             if kw == "ECU_ADDRESS":
-                if len(parts) == 2:
+                if len(args) == 1:
                     value = _number_word(args[0])
                     if value is None:
-                        _errors.append(f"Line {line}: ECU_ADDRESS {_echo_word(args[0])} is not a number")
+                        _errors.append(
+                            f"Line {arg_words[0][1]}: ECU_ADDRESS {_echo_word(args[0])} is not a number"
+                        )
                         address_invalid = True
                     elif value > _MAX_ADDRESS:
                         address_invalid = True
                     else:
-                        address_words.append((value, line))
+                        address_words.append((value, arg_words[0][1]))
                 else:
                     address_invalid = True
             elif kw in ("DATA_SIZE", "LENGTH", "NUMBER", "ARRAY_SIZE"):
                 if kw in ("DATA_SIZE", "LENGTH"):
                     has_standing_size = True
-                if len(parts) == 2 and _number_word(args[0]) is None:
-                    _errors.append(f"Line {line}: {kw} {_echo_word(args[0])} is not a number")
+                if len(args) == 1 and _number_word(args[0]) is None:
+                    _errors.append(
+                        f"Line {arg_words[0][1]}: {kw} {_echo_word(args[0])} is not a number"
+                    )
             elif kw == "MATRIX_DIM":
                 prod = 1
                 ok = _MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX
                 if ok:
-                    for arg in args:
+                    for arg, arg_line in arg_words:
                         value = _number_word(arg)
                         if value is None:
-                            _errors.append(f"Line {line}: MATRIX_DIM {_echo_word(arg)} is not a number")
+                            _errors.append(f"Line {arg_line}: MATRIX_DIM {_echo_word(arg)} is not a number")
                             ok = False
                             break
                         prod *= value
                 tag["matrix_dim"] = prod if (ok and args) else None
             elif kw == "LOWER_LIMIT":
-                if len(parts) == 2:
-                    tag["lower_limit"] = args[0]
+                if len(args) == 1:
+                    tag["lower_limit"] = _unquote(args[0])
             elif kw == "UPPER_LIMIT":
-                if len(parts) == 2:
-                    tag["upper_limit"] = args[0]
+                if len(args) == 1:
+                    tag["upper_limit"] = _unquote(args[0])
             elif kw == "UNIT":
-                if len(parts) == 2:
-                    tag["unit"] = args[0]
+                if len(args) == 1:
+                    tag["unit"] = _unquote(args[0])
             elif kw == "BYTE_ORDER":
-                if len(parts) == 2:
-                    byte_order_words.append((args[0], line))
+                if len(args) == 1:
+                    byte_order_words.append((args[0], arg_words[0][1]))
                 else:
                     byte_order_missing = True
             elif kw == "BIT_MASK":
-                if len(parts) == 2:
-                    bit_mask_words.append((args[0], line))
+                if len(args) == 1:
+                    bit_mask_words.append((args[0], arg_words[0][1]))
                 else:
                     bit_mask_missing = True
             elif kw == "DATA_TYPE":
-                if len(parts) == 2:
-                    tag["datatype"] = args[0]
+                if len(args) == 1:
+                    tag["datatype"] = _unquote(args[0])
             elif kw == "FUNCTION":
-                if len(parts) == 2:
-                    tag["function_group"] = args[0]
+                if len(args) == 1:
+                    tag["function_group"] = _unquote(args[0])
             elif kw == "VIRTUAL":
                 tag["virtual"] = True
             elif kw == "COMPU_METHOD":
-                if len(parts) == 2:
-                    tag["conversion"] = args[0]
-                    tag["compu_method_name"] = args[0]
-                    if args[0] != "NO_COMPU_METHOD":
+                if len(args) == 1:
+                    conversion = _unquote(args[0])
+                    tag["conversion"] = conversion
+                    tag["compu_method_name"] = conversion
+                    if conversion != "NO_COMPU_METHOD":
                         tag["source"] = "formula"
             elif kw == "FORMULA":
                 tag["source"] = "formula"
@@ -3590,11 +3609,11 @@ def extract_a2l_tags(
             elif kw == "CALIBRATABLE":
                 tag["access"] = "calibratable"
             elif kw == "DISPLAY_IDENTIFIER":
-                if len(parts) >= 2:
-                    tag["display_identifier"] = args[0]
+                if len(args) == 1:
+                    tag["display_identifier"] = _unquote(args[0])
             elif kw == "SYMBOL_LINK":
-                if len(parts) >= 2:
-                    tag["symbol_link"] = args[0]
+                if len(args) == 2:
+                    tag["symbol_link"] = _unquote(args[0])
 
         # BYTE_ORDER value and source (E3S-27).
         own_bo_word: Optional[str] = None
@@ -3736,7 +3755,7 @@ def extract_a2l_tags(
             and id(tag) not in refused_length_ids
         ):
             standing_size_ids.add(id(tag))
-            post_info[id(tag)] = (keyword_lines, element_size, kind)
+            post_info[id(tag)] = (keyword_lines, element_size, kind, start_line)
 
         if not tag.get("compu_method_name"):
             token = tag.get("conversion")
@@ -3755,8 +3774,9 @@ def extract_a2l_tags(
                 order, word, line = _module_byte_order_source(section)
                 if word is not None and order is None:
                     _errors.append(f"Line {line}: BYTE_ORDER {_echo_word(word)} is not a byte order")
-                current_module_byte_order = order if order is not None else enclosing_byte_order
-                current_module_source = (order, word, line)
+                if word is not None:
+                    current_module_byte_order = order
+                    current_module_source = (order, word, line)
             elif name == "RECORD_LAYOUT":
                 layout_name = parse_begin_meta(section.get("meta", "") or "")[0]
                 order, word, line = layout_sources.get(layout_name, (None, None, None))
@@ -3789,11 +3809,11 @@ def extract_a2l_tags(
         if tag.get("length") is None:
             tag["length"] = span
         elif tid in standing_size_ids:
-            keyword_lines, element_size, kind = post_info[tid]
+            keyword_lines, element_size, kind, start_line = post_info[tid]
             agree, smallest, largest, _no_number = _tag_sizes(keyword_lines, element_size, kind, span)
             if not agree:
                 _errors.append(
-                    f"Line {tag.get('start_line')}: CHARACTERISTIC {_echo_word(tag.get('name'))} "
+                    f"Line {start_line}: CHARACTERISTIC {_echo_word(tag.get('name'))} "
                     f"declares the sizes {smallest} and {largest}"
                 )
                 tag["length"] = None
@@ -3829,13 +3849,13 @@ def extract_declared_spans(
         header = typedef["header"]
         kw_lines = typedef["keyword_lines"]
         if kind == "TYPEDEF_MEASUREMENT":
-            datatype = header[0] if header else None
+            datatype = _unquote(header[0]) if header else None
             tmatrix = _matrix_dim_product(kw_lines)
             if datatype in DATATYPE_SIZES and tmatrix is not None:
                 return _bounded_length(DATATYPE_SIZES[datatype] * tmatrix * matrix_product)
             return None
         if kind == "TYPEDEF_CHARACTERISTIC":
-            char_type = header[0] if header else None
+            char_type = _unquote(header[0]) if header else None
             # ASAP2 1.7.1 has no MemoryAddress in a TYPEDEF_CHARACTERISTIC
             # (Type, Deposit, MaxDiff, Conversion, LowerLimit, UpperLimit);
             # ASAP2 1.6 keeps one (Type, Address, Deposit, …). Read the deposit
@@ -3844,9 +3864,10 @@ def extract_declared_spans(
             deposit = header[1] if len(header) > 1 else None
             if deposit is not None and _number_word(deposit) is not None:
                 deposit = header[2] if len(header) > 2 else None
+            deposit = _unquote(deposit) if deposit is not None else None
             if char_type in ("VALUE", "VAL_BLK", "ASCII"):
                 hdr = {"char_type": char_type, "deposit": deposit}
-                kw_texts = [text for text, _line in kw_lines]
+                kw_texts = [text for text, _line, _args in kw_lines]
                 base = _infer_length_characteristic(kw_texts, hdr, record_layouts_by_name)
                 if base is None:
                     return None
@@ -3875,7 +3896,7 @@ def extract_declared_spans(
                 stream = _section_words(node)
                 head = list(itertools.islice(stream, 4))
                 iname, _longid, iheader, irest = _tag_header("INSTANCE", head)
-                typedef_name = iheader[0] if len(iheader) >= 1 else None
+                typedef_name = _unquote(iheader[0]) if len(iheader) >= 1 else None
                 address = _number_word(iheader[1]) if len(iheader) >= 2 else None
                 keyword_lines = _tag_keyword_lines(itertools.chain(head[irest:], stream))
                 matrix_product = _matrix_dim_product(keyword_lines)
