@@ -1,0 +1,6 @@
+........................................................................ [ 88%]
+.........                                                                [100%]
+============================= QC-TM timing margins =============================
+88.1%  0.060 s / 0.500 s  R-A2L-DEF.131/2  tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell
+QC-TM: 1 bounds, 0 under 20 % margin
+81 passed in 42.49s

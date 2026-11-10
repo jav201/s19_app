@@ -126,6 +126,7 @@ class _TabForm:
     inverse_match_ys: tuple[float, ...] = field(init=False, compare=False, repr=False)
     inverse_rmq: tuple[tuple[int, int], ...] = field(init=False, compare=False, repr=False)
     inverse_rmq_size: int = field(init=False, compare=False, repr=False)
+    inverse_y_nan: bool = field(init=False, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         numeric: list[tuple[float, float]] = []
@@ -147,7 +148,7 @@ class _TabForm:
         size = 1
         while size < len(match):
             size *= 2
-        tree = [(len(match), len(match))] * (2 * size)
+        tree = [(len(numeric), len(numeric))] * (2 * size)
         for pos, item in enumerate(match):
             tree[size + pos] = (item[2], pos)
         for pos in range(size - 1, 0, -1):
@@ -157,6 +158,11 @@ class _TabForm:
         object.__setattr__(self, "inverse_match_ys", tuple(item[1] for item in match))
         object.__setattr__(self, "inverse_rmq", tuple(tree))
         object.__setattr__(self, "inverse_rmq_size", size)
+        object.__setattr__(
+            self,
+            "inverse_y_nan",
+            any(math.isnan(y) for _, y in numeric),
+        )
 
 
 @dataclass(frozen=True)
@@ -3526,7 +3532,7 @@ def _table_match(
         return None
     if interpolate:
         return entries[lo]
-    best = (len(entries), len(entries))
+    best = (len(form.inverse_file), len(entries))
     left = lo + form.inverse_rmq_size
     right = hi + form.inverse_rmq_size
     while left < right:
@@ -3566,7 +3572,7 @@ def _reverse_table_form(
         ), None
 
     ordered = form.inverse_match
-    if not ordered or math.isnan(physical):
+    if form.inverse_y_nan or not ordered or math.isnan(physical):
         return None, f"the value {physical} is not invertible in this table", None
     y_min = ordered[0][1]
     y_max = ordered[-1][1]

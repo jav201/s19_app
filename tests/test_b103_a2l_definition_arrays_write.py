@@ -1001,6 +1001,16 @@ def test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising(tmp_pat
     res = a2ldef._encode_number(d, a2l_data, 0.0)
     _refusal(res, "A2L-DEF-ENCODE", "VINF[0]: the value 0.0 is not invertible in this table")
 
+    nan_data = inline(
+        tmp_path,
+        cm("CM_NANY", "TAB_INTP", fmt='"%.3"', ref="CT_NANY"),
+        ctab("CT_NANY", "TAB_INTP", "0 0", "1 nan", "2 1"),
+        valblk("VNANY", "0x20", "RL_U16", "CM_NANY", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+    )
+    d = a2ldef._element_definition(a2ldef.describe_definition("VNANY", nan_data), (0,))
+    res = a2ldef._encode_number(d, nan_data, 0.5)
+    _refusal(res, "A2L-DEF-ENCODE", "VNANY[0]: the value 0.5 is not invertible in this table")
+
 
 def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monkeypatch):
     a2l_data = inline(
@@ -1044,7 +1054,7 @@ def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monke
     monkeypatch.setattr(a2ldef.math, "isclose", counted_isclose)
     for name, entries, physical, expected_raw in (
         ("DUP", tuple(f"{i} 1" for i in range(20_000)), 1.0 + 5e-10, 0),
-        ("NAN", ("0 nan",) + tuple(f"{i} {i}" for i in range(1, 20_000)), 19_999.0 + 5e-10, 19_999),
+        ("NAN", ("0 nan", "0 nan") + tuple(f"{i} {i}" for i in range(1, 20_000)), 19_999.0 + 5e-10, 19_999),
     ):
         scaled = inline(
             tmp_path,
