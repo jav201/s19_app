@@ -1,0 +1,22 @@
+I've completed the implementation. Here's the report.
+
+## Implementation report — Inc 2b (`s19_app/tui/a2l_definition.py`)
+
+**Nodes implemented (all 2b):**
+- `Encoded` frozen dataclass; `Definition.shared_with` inserted after `compu_tab_ref`, before `refusal`, no default, at all 5 `Definition(...)` sites.
+- `encode_definition` (full encode order: refusal → parse errors → text/number/enum → limits → encode direction → image span → mask merge → precision → written-value limits → overlap → `Encoded`).
+- `_parse_number_text`, `_check_limits`, `_encode_number` (via frozen `encode_physical_to_raw_bytes`), `_merge_bit_mask`, `_encode_enum`, `_encode_ascii`, `_agrees_at_display_precision`, `_selected_bits`, `_shared_with`.
+- `describe_definitions`: cross-kind span index (tags + `declared_spans` BLOB/INSTANCE, 256-byte pages, fail-closed point for unreadable length), CLEAN `mask_of` (on-demand, cached by name), `shared_with` fill.
+- `_read_object_lines`: added `bit_mask_count` / `byte_order_count`; `_describe_one`: duplicate-BIT_MASK and ambiguous-byte-order residual guards. Helper `_operator_echo`. Module docstring updated (read-side wording removed).
+
+**Commands and exit codes:**
+- `python -m py_compile s19_app/tui/a2l_definition.py` → **exit 0** (only command run, per Windows constraint — no import/pytest/probes).
+
+**Deviations:**
+- Added a defensive `A2L-DEF-ELEMENTS` refusal at the top of `encode_definition` for array/curve/map kinds (mirrors `decode_definition`), so the enum branch cannot misfire on non-scalar kinds.
+- `_exact_decimal` normalizes trailing/leading-dot number texts (`1.`, `.5`) that `Decimal` rejects, for the E3S-09 exact-integer check.
+
+**Open questions:**
+- Step-8 decode-refusal (rare, unreachable for encode-produced bytes in practice) reports `(none)` as `<stored>` — no test case pins this.
+
+Not committed, as instructed.
