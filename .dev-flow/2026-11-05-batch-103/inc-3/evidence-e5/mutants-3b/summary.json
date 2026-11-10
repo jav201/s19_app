@@ -1,0 +1,238 @@
+[
+  {
+    "id": "M-120",
+    "selection": "a2l_def_120",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_120_2_single_text_encode_refuses_array"
+    ]
+  },
+  {
+    "id": "M-121",
+    "selection": "a2l_def_121",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_121_1_element_name_in_encode_refusal"
+    ]
+  },
+  {
+    "id": "M-122",
+    "selection": "a2l_def_122",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_1_converted_element_edit",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_4_converted_axis_point_edit",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_5_float64_element_uses_precision_rule",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_7_written_element_against_extended_limits"
+    ]
+  },
+  {
+    "id": "M-123",
+    "selection": "a2l_def_123",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes"
+    ]
+  },
+  {
+    "id": "M-124",
+    "selection": "a2l_def_124",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_1_edit_with_axis_object_missing",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_2_edit_on_partial_record"
+    ]
+  },
+  {
+    "id": "M-125",
+    "selection": "a2l_def_125",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_1_index_past_shape",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_2_index_of_wrong_length"
+    ]
+  },
+  {
+    "id": "M-125b",
+    "selection": "a2l_def_125_5",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_5_public_element_name_is_total_and_bounded"
+    ]
+  },
+  {
+    "id": "M-126",
+    "selection": "a2l_def_126",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_1_fixed_curve_axis",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_2_fixed_map_axis"
+    ]
+  },
+  {
+    "id": "M-127",
+    "selection": "a2l_def_127",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_1_common_axis_point",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_2_definitions_case_shared_axis"
+    ]
+  },
+  {
+    "id": "M-128",
+    "selection": "a2l_def_128",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_128_1_axis_with_no_points"
+    ]
+  },
+  {
+    "id": "M-129",
+    "selection": "a2l_def_129",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_1_strict_increase",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_2_strict_decrease",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_4_mon_increase",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_5_mon_decrease",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_6_default_rule",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_7_monotonous",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_9_unedited_point_can_break_order"
+    ]
+  },
+  {
+    "id": "M-130",
+    "selection": "a2l_def_130_4 or a2l_def_130_5",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_4_parse_before_missing_bytes",
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_5_parse_before_invalid_position"
+    ]
+  },
+  {
+    "id": "M-131",
+    "selection": "a2l_def_122_5 or a2l_def_131_1",
+    "result": "killed",
+    "failures": []
+  },
+  {
+    "id": "M-131b",
+    "selection": "a2l_def_131_5",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale"
+    ]
+  },
+  {
+    "id": "M-131c",
+    "selection": "a2l_def_131_4",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising"
+    ]
+  },
+  {
+    "id": "M-131d",
+    "selection": "a2l_def_131_6",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes"
+    ]
+  },
+  {
+    "id": "M-132",
+    "selection": "a2l_def_132",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes"
+    ]
+  },
+  {
+    "id": "M-140",
+    "selection": "a2l_def_140_1",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused"
+    ]
+  },
+  {
+    "id": "M-140b",
+    "selection": "a2l_def_140_10",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks"
+    ]
+  },
+  {
+    "id": "M-140c",
+    "selection": "a2l_def_140_11",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point"
+    ]
+  },
+  {
+    "id": "M-153",
+    "selection": "a2l_def_153",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_153_1_scalar_values_through_encode_values"
+    ]
+  },
+  {
+    "id": "M-154",
+    "selection": "a2l_def_154",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_154_1_unknown_monotony_rule_refuses"
+    ]
+  },
+  {
+    "id": "M-155",
+    "selection": "a2l_def_155_2",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded"
+    ]
+  },
+  {
+    "id": "M-58.1a",
+    "selection": "58_1_arr_1_edit_arm",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged"
+    ]
+  },
+  {
+    "id": "M-58.1b",
+    "selection": "58_1_arr_2_edit_arm",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged"
+    ]
+  },
+  {
+    "id": "M-AT1",
+    "selection": "at_b103_i3_1_edit_arm",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes"
+    ]
+  },
+  {
+    "id": "M-AT2",
+    "selection": "at_b103_i3_2_edit_arm",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_2_edit_arm_definitions_case"
+    ]
+  },
+  {
+    "id": "M-AT3",
+    "selection": "at_b103_i3_3_edit_arm or a2l_def_123_2",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes"
+    ]
+  }
+]

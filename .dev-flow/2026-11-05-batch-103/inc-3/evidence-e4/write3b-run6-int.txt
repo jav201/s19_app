@@ -1,0 +1,36 @@
+...............................................................F........ [ 88%]
+.........                                                                [100%]
+=================================== FAILURES ===================================
+________ test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-514/test_r_a2l_def_140_11_refused_0')
+
+    def test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            meas("M", "UBYTE", addr="0x10", extras=("MATRIX_DIM x 2",)),
+            characteristic("V", "VALUE", "0x12", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("VMD", "VALUE", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535", extras=("MATRIX_DIM 2 2",)),
+            characteristic("V2", "VALUE", "0x21", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        next(tag for tag in a2l_data["tags"] if tag.get("name") == "M")["length"] = 4
+        malformed = a2ldef.describe_definition("M", a2l_data)
+        value_matrix = a2ldef.describe_definition("VMD", a2l_data)
+        assert malformed.byte_length is None and malformed.shared_with is None
+        assert malformed.refusal.code == "A2L-DEF-MATRIX"
+        assert value_matrix.byte_length is None and value_matrix.shared_with is None
+        assert value_matrix.refusal.code == "A2L-DEF-MATRIX"
+        for name, address in (("V", 0x12), ("V2", 0x21)):
+            d = a2ldef.describe_definition(name, a2l_data)
+            assert d.shared_with is None
+>           assert a2ldef.encode_definition(d, a2l_data, "7", {address: 0}) == a2ldef.Encoded(address, b"\x07", ())
+E           AssertionError: assert Refusal(code='A2L-DEF-PARSE', message='V: the A2L cannot be edited while it has parse errors — the first is Line 46: MATRIX_DIM x is not a number') == Encoded(address=18, data=b'\x07', notices=())
+E            +  where Refusal(code='A2L-DEF-PARSE', message='V: the A2L cannot be edited while it has parse errors — the first is Line 46: MATRIX_DIM x is not a number') = <function encode_definition at 0x7f7594d509a0>(Definition(name='V', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=18, byte_length=1, datatype='...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type...ICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 46: MATRIX_DIM x is not a number'], ...}, '7', {18: 0})
+E            +    where <function encode_definition at 0x7f7594d509a0> = a2ldef.encode_definition
+E            +  and   Encoded(address=18, data=b'\x07', notices=()) = <class 's19_app.tui.a2l_definition.Encoded'>(18, b'\x07', ())
+E            +    where <class 's19_app.tui.a2l_definition.Encoded'> = a2ldef.Encoded
+
+tests/test_b103_a2l_definition_arrays_write.py:1110: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point
+1 failed, 80 passed in 42.18s

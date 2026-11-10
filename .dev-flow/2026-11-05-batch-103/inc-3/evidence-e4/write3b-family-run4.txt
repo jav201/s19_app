@@ -1,0 +1,1103 @@
+..F.............FFFF.F....F.................F..F......F...............FF [ 10%]
+...................................................F.......F.FFF........ [ 21%]
+...........................F....F.........F............................. [ 32%]
+...............................................................F........ [ 43%]
+............F...F.....................F................................. [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+..........................................FF.F.......................... [ 87%]
+........................................................................ [ 97%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_1_3_no_compu_method_gives_a_number _______________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def test_r_a2l_def_1_3_no_compu_method_gives_a_number(softa):
+        """R-A2L-DEF.1/3 - NO_COMPU_METHOD gives a number (software_a)."""
+        name = next(t["name"] for t in softa["tags"]
+                    if t["section"] == "MEASUREMENT" and t.get("conversion") == "NO_COMPU_METHOD")
+>       d = describe_definition(name, softa)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'AAB_CHYEAQ1_DXZTD_NLPMJIM_2_IGTLL_AWV_CHZTO.SwaxfqdawbZkcwtx'
+a2l_data = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'AAB_CHYEAQ1_DXZTD_NLPMJIM_2_IGTLL_AWV_CHZTO.SwaxfqdawbZkcwtx'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+__________________ test_r_a2l_def_6_1_unknown_name_is_refused __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_6_1_unknown_name_is_refused(v171):
+        """R-A2L-DEF.6/1 - NO_SUCH_TAG."""
+>       d = describe_definition("NO_SUCH_TAG", v171)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:385: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'NO_SUCH_TAG'
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'NO_SUCH_TAG'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_______________ test_r_a2l_def_6_2_name_is_matched_with_its_case _______________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_6_2_name_is_matched_with_its_case(c08):
+        """R-A2L-DEF.6/2 - value_0001 is not VALUE_0001."""
+>       d = describe_definition("value_0001", c08["a2l"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'value_0001'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'value_0001'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_____________ test_r_a2l_def_139_1_name_declared_twice_is_refused ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_139_1_name_decl0')
+
+    def test_r_a2l_def_139_1_name_declared_twice_is_refused(tmp_path):
+        """R-A2L-DEF.139/1 - two VALUEs named DUP."""
+        a2l = _inline(tmp_path, _val("DUP", "0x10", "RL_U16"), _val("DUP", "0x20", "RL_U16"))
+>       _is_refused(describe_definition("DUP", a2l), "A2L-DEF-NAME", "DUP: the A2L declares that name more than once")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:399: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'DUP'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'DUP'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_________________ test_r_a2l_def_139_2_case08_issues_duplicate _________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_139_2_case08_issues_duplicate(c08):
+        """R-A2L-DEF.139/2 - firmware_issues.a2l declares VALUE_0001 twice."""
+>       d = describe_definition("VALUE_0001", c08["issues"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:404: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'VALUE_0001'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'VALUE_0001'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+__________________ test_r_a2l_def_7_1_1_no_address_is_refused __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_7_1_1_no_addres0')
+
+    def test_r_a2l_def_7_1_1_no_address_is_refused(tmp_path):
+        """R-A2L-DEF.7.1/1 - MEASUREMENT with no ECU_ADDRESS."""
+        a2l = _inline(tmp_path, _meas("NA", "UBYTE"))
+>       _is_refused(describe_definition("NA", a2l), "A2L-DEF-ADDRESS", "NA: the object has no address or no length")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:425: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'NA'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'NA'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_______________ test_r_a2l_def_7_2_4_negative_address_is_refused _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_7_2_4_negative_0')
+
+    def test_r_a2l_def_7_2_4_negative_address_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/4 - address -0x10 (a UWORD object)."""
+        a2l = _inline(tmp_path, _meas("NA2", "UWORD", addr="-0x10"))
+>       _is_refused(describe_definition("NA2", a2l), "A2L-DEF-ADDRESS", "NA2: the object has no address or no length")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:459: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'NA2'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 33: ECU_ADDRESS -0x10 is not a number'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'NA2'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+____________________ test_r_a2l_def_14_2_negative_raw_first ____________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def test_r_a2l_def_14_2_negative_raw_first(softa):
+        """R-A2L-DEF.14/2 - an a2ltool COMPU_VTAB whose first pair is -1."""
+>       d = describe_definition("QUUU_Ywjznkkjwj.AuooouPgqj", softa)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:601: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'QUUU_Ywjznkkjwj.AuooouPgqj'
+a2l_data = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'QUUU_Ywjznkkjwj.AuooouPgqj'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+___________________ test_r_a2l_def_15_2_a2ltool_range_table ____________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+softa_defs = {'AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y': Definition(name='AAD_UTRQ.HWV_VIUF_C_PposBXIIFf...r_Eud_Y', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}
+
+    def test_r_a2l_def_15_2_a2ltool_range_table(softa, softa_defs):
+        """R-A2L-DEF.15/2 - the first COMPU_VTAB_RANGE of software_a: 5 entries, first (0, 0, text)."""
+        # Integration fix (orchestrator, 2026-11-07; diagnosis evidence-e4/diag-2a-transcript.txt):
+        # the side table holds only COMPU_VTAB sections, so the first COMPU_VTAB_RANGE is found
+        # by a pre-order walk of the section tree, its name read as the reader reads it.
+        from s19_app.tui.a2l import parse_begin_meta
+    
+        def _first_range(nodes):
+            for node in nodes:
+                if node.get("name") == "COMPU_VTAB_RANGE":
+                    return parse_begin_meta(node.get("meta", "") or "")[0]
+                found = _first_range(node.get("children") or [])
+                if found is not None:
+                    return found
+            return None
+    
+        table = _first_range(softa["sections"])
+        assert table is not None
+>       d = next(x for x in softa_defs.values() if x.enum_table == table)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/test_b103_a2l_definition.py:640: StopIteration
+_________________ test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong _________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_18_3_a_24_bit_m0')
+
+    def test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong(softa, tmp_path):
+        """R-A2L-DEF.18/3 - software_a (no address -> ADDRESS, not MASK) and INLINE ULONG."""
+>       d = describe_definition("Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj", softa)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:689: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj'
+a2l_data = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+________________ test_r_a2l_def_24_1_kind_comes_before_address _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_24_1_kind_comes0')
+
+    def test_r_a2l_def_24_1_kind_comes_before_address(tmp_path):
+        """R-A2L-DEF.24/1 (changed, D-14) - a CUBOID whose address word is 0xZZ.
+    
+        Inc 2's input, MEASUREMENT ``MA`` with ``MATRIX_DIM 4`` and no ECU_ADDRESS,
+        is an array now and gives ``A2L-DEF-ADDRESS`` (R-A2L-DEF.7.1/arr-2).
+        """
+        a2l = _inline(tmp_path, _char("CB", "CUBOID", "0xZZ", "RL_U16"))
+>       d = describe_definition("CB", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:806: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'CB'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 32: address 0xZZ is not a number'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'CB'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_______________ test_r_a2l_def_24_2_address_comes_before_method ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_24_2_address_co0')
+
+    def test_r_a2l_def_24_2_address_comes_before_method(tmp_path):
+        """R-A2L-DEF.24/2 - no address and an undeclared method: ADDRESS."""
+        a2l = _inline(tmp_path, _meas("AM", "UBYTE", "CM_GONE", "0", "255"))
+>       assert describe_definition("AM", a2l).refusal.code == "A2L-DEF-ADDRESS"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:814: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'AM'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'AM'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_________________ test_r_a2l_def_58_2_10_negative_ecu_address __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_58_2_10_negativ0')
+
+    def test_r_a2l_def_58_2_10_negative_ecu_address(tmp_path):
+        """R-A2L-DEF.58.2/10."""
+        a2l = _inline(tmp_path, _meas("T10", "UWORD", addr="-0x10"))
+>       d = describe_definition("T10", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'T10'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 33: ECU_ADDRESS -0x10 is not a number'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'T10'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+__________ test_r_a2l_def_137_1_nul_in_an_entry_text_refuses_the_file __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_137_1_nul_in_an0')
+
+    def test_r_a2l_def_137_1_nul_in_an_entry_text_refuses_the_file(tmp_path):
+        """R-A2L-DEF.137/1 - a NUL byte in the entry text refuses the file (R-A2L-READ.55): 0 tags."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_C", "VT_C1", "1", '0 "A\x00B"'), _val("N1", "0x10", "RL_U8", "CM_C"))
+        assert a2l["tags"] == []
+        assert any("File is not UTF-8 text" in e for e in a2l["errors"])
+>       _is_refused(describe_definition("N1", a2l), "A2L-DEF-NAME", "N1: no tag of that name in the A2L")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'N1'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['File is not UTF-8 text; save it as UTF-8 and load it again.'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'N1'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+______________________ test_r_a2l_def_137_3_nul_in_a_name ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_137_3_nul_in_a_name(v171):
+        """R-A2L-DEF.137/3 - the message echoes the name with U+FFFD."""
+>       d = describe_definition("AB\x00C", v171)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1295: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'AB\x00C'
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'AB\x00C'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+______________________ test_r_a2l_def_137_4_esc_in_a_name ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_137_4_esc_in_a_name(v171):
+        """R-A2L-DEF.137/4."""
+>       d = describe_definition("AB\x1bC", v171)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'AB\x1bC'
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'AB\x1bC'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_________ test_r_a2l_def_136_1_batch_describe_equals_per_name_describe _________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_136_1_batch_describe_equals_per_name_describe(v171, c08):
+        """R-A2L-DEF.136/1 (identity half) - one walk gives what the per-name call gives, on V171 and case 08."""
+        for a2l in (v171, c08["a2l"]):
+            names = [t["name"] for t in a2l["tags"]]
+            batch = describe_definitions(names, a2l)
+            assert set(batch) == set(names)
+            for n in names[:60]:
+                assert batch[n] == describe_definition(n, a2l)
+        assert describe_definitions([V171_SWORD], v171)[V171_SWORD].kind == "number"
+>       assert describe_definitions(["NO_SUCH_TAG"], v171)["NO_SUCH_TAG"].refusal.code == "A2L-DEF-NAME"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'NO_SUCH_TAG'
+
+tests/test_b103_a2l_definition.py:1319: KeyError
+__________ test_at_b103_i2_3_case08_builds_and_decodes_with_the_model __________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
+        """AT-B103-I2-3 - case 08 clean and issues, built and decoded; the 11 files of the 1 MiB case equal the pin.
+    
+        The 10 MiB half of the 22-file pin is R-A2L-DEF.59/2 (slow).
+        """
+        names = _defined_names(c08)
+        assert len(names) == 322
+        a2l, mem = c08["a2l"], c08["mem"]
+        for name in names:
+            o = c08["by_name"][name]
+            d = describe_definition(name, a2l)
+            assert d.refusal is None, (name, d.refusal)
+            res = _decoded(d, a2l, mem)
+            if o["kind"] == "ASCII":
+                assert res.text == o["raw_bytes"].split(b"\x00")[0].decode("ascii"), name
+            else:
+                _planned_close(res, o["physical"])
+    
+        issues = c08["issues"]
+        refused = []
+        # VAL_BLK / CURVE / MAP are defined objects now (Inc 3's kinds); AT-B103-I2-3
+        # is scoped to the scalar kinds, so the issues arm scans only those.  The
+        # arrays, curves and maps of both A2Ls give A2L-DEF-ELEMENTS on a single
+        # decode and are AT-B103-I3-3's (tests/test_b103_a2l_definition_arrays_decode.py).
+        undefined_kinds = ("VAL_BLK", "CURVE", "MAP")        # scalar scope only, per D-14
+        for n in sorted({t["name"] for t in issues["tags"] if t.get("char_type") not in undefined_kinds}):
+>           d = describe_definition(n, issues)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1623: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'VALUE_0001'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'VALUE_0001'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_ test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode _
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_151_2_a_word_of0')
+
+    def test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode(tmp_path):
+        """R-A2L-DEF.151/2 - the first 256 characters and an ellipsis; describe and decode messages alike; each message <= 1,024."""
+        n = 257
+        N, K, M, Z, G, E, F = ("N" * n, "K" * n, "M" * n, "Z" * n, "G" * n, "E" * n, "F" * n)
+        # the 257-character forms of KX2 ... BM2, and the two decode objects
+        a2l = _inline(
+            tmp_path,
+            _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+            _char("KX2", K, "0x11", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _val("MX2", "0x12", LAYOUT["UBYTE"], M, "0", "255"),
+            _cm("CM_T2", Z),
+            _val("CT2", "0x13", LAYOUT["UBYTE"], "CM_T2", "0", "255"),
+            _cm("CM_R2", "TAB_VERB", fmt='"%.0"', ref=G),
+            _val("TR2", "0x14", LAYOUT["UBYTE"], "CM_R2", "0", "255"),
+            _cm("CM_E2", "TAB_VERB", fmt='"%.0"', ref=E),
+            f'/begin COMPU_VTAB {E} "" TAB_VERB 0\n/end COMPU_VTAB',
+            _val("TE2", "0x15", LAYOUT["UBYTE"], "CM_E2", "0", "255"),
+            _val("BM2", "0x16", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+            _val("D" * n, "0x20", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _cm("CM_XN2", "TAB_NOINTP", fmt='"%.0"', ref="V" * n),
+            f'/begin COMPU_VTAB {"V" * n} "" TAB_VERB 1\n  1 "ON"\n/end COMPU_VTAB',
+            _val("X" * n, "0x21", LAYOUT["UBYTE"], "CM_XN2", "0", "255"),
+        )
+        e = lambda w: w[:256] + ELLIPSIS                                      # noqa: E731
+        got = describe_definitions([N, "KX2", "MX2", "CT2", "TR2", "TE2", "BM2", "D" * n, "X" * n, "Q" * n], a2l)
+        want = {
+            N: Refusal("A2L-DEF-METHOD", f"{e(N)}: the conversion method CM_GONE is not declared in the A2L"),
+            "KX2": Refusal("A2L-DEF-KIND", f"KX2: the system has no definition for a {e(K)} object"),
+            "MX2": Refusal("A2L-DEF-METHOD", f"MX2: the conversion method {e(M)} is not declared in the A2L"),
+            "CT2": Refusal("A2L-DEF-CONVERSION", f"CT2: the conversion type {e(Z)} of CM_T2 is not supported"),
+            "TR2": Refusal("A2L-DEF-TABLE", f"TR2: the table {e(G)} of CM_R2 is not declared in the A2L"),
+            "TE2": Refusal("A2L-DEF-TABLE-EMPTY", f"TE2: the table {e(E)} has no entries"),
+            "BM2": Refusal("A2L-DEF-MASK", f"BM2: the bit mask {e(F)} cannot be applied to UWORD"),
+            "Q" * n: Refusal("A2L-DEF-NAME", f"{e('Q' * n)}: no tag of that name in the A2L"),
+        }
+        for key, refusal in want.items():
+>           assert got[key].refusal == refusal, (key[:8], got[key].refusal)
+                   ^^^^^^^^
+E           KeyError: 'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ'
+
+tests/test_b103_a2l_definition.py:1968: KeyError
+_ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_151_5_the_numbe0')
+
+    def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
+        """R-A2L-DEF.151/5 - oversized address/length words give no address/length (R-A2L-READ.34/.38/.63)."""
+        a2l = _inline(
+            tmp_path,
+            _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
+            _val("CH", "0x" + "F" * 1500, LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _ascii("B1", "0x10", "18446744073709551615"),
+            _ascii("B2", "0x20", "18446744073709551616"),
+        )
+        got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
+        for name in ("AH", "CH", "B1", "B2"):
+>           assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), (name, got[name].refusal)
+                   ^^^^^^^^^
+E           KeyError: 'AH'
+
+tests/test_b103_a2l_definition.py:2394: KeyError
+__ test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_138_18_object_w0')
+
+    def test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index(tmp_path):
+        a2l = _inline(tmp_path,
+                      _meas("MX", "UWORD", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("Z0", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+>       mx = describe_definition("MX", a2l)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:3331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'MX'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'MX'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+______________ test_r_a2l_def_58_2_10_negative_ecu_address_encode ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_58_2_10_negativ1')
+
+    def test_r_a2l_def_58_2_10_negative_ecu_address_encode(tmp_path):
+        a2l = _inline(tmp_path, _meas("T10", "UWORD", addr="-0x10"))
+>       d = describe_definition("T10", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:3572: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'T10'
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 33: ECU_ADDRESS -0x10 is not a number'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'T10'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+___________ test_r_a2l_def_58_2_14_esc_and_unterminated_quote_encode ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_58_2_14_esc_and0')
+
+    def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_encode(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_E", "TAB_VERB", fmt='"%.0"', ref="VT_E"),
+                      _vtab("VT_E", "1", '0 "A\x1bB'), _val("EV", "0x10", "RL_U8", "CM_E", "0", "255"))
+>       d = describe_definition("EV", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:3600: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'EV'
+a2l_data = {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_E', 'conversion_type':.....}}, 'declared_spans': [], 'errors': ['Line 38: quoted string not closed', 'Unclosed /begin sections detected.'], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EV'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_____________________ test_r_a2l_def_67_5_two_trailing_1s ______________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def test_r_a2l_def_67_5_two_trailing_1s(softa):
+        name = next(t["name"] for t in softa["tags"]
+                    if t.get("section") == "MEASUREMENT" and t.get("matrix_dim") == 8)
+>       assert _describe(name, softa).shape == (8,)
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:237: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays.py:68: in _describe
+    return a2ldef.describe_definition(name, a2l)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'AIP_EGZ.URB_EHC_EdGiiqKprxgmn_CGN.SWN_QDB_SPO_Bf_UuiBrt16_Wyyhvo'
+a2l_data = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...5 "YY AJMNQLL"', ...], 'name': 'DVPJexr.CDAT_UDW_SW_rHjjVfzjGyvl', ...}, ...}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'AIP_EGZ.URB_EHC_EdGiiqKprxgmn_CGN.SWN_QDB_SPO_Bf_UuiBrt16_Wyyhvo'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+_________________ test_r_a2l_def_139_arr_1_name_declared_twice _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_139_arr_1_name_0')
+
+    def test_r_a2l_def_139_arr_1_name_declared_twice(tmp_path):
+        a2l = inline(tmp_path,
+                     valblk("DUPA", "0x10", "RL_U16", extras=("MATRIX_DIM 2",)),
+                     valblk("DUPA", "0x20", "RL_U16", extras=("MATRIX_DIM 2",)))
+>       d = a2ldef.describe_definition("DUPA", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_decode.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'DUPA'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'DUPA'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+__________________ test_r_a2l_def_6_arr_1_name_case_for_curve __________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...ian': False, 'conversion': 'CM_IDENT', 'datatype': 'UBYTE', ...}, ...}, 'mem': {0: 108, 1: 49, 2: 57, 3: 84, ...}, ...}
+
+    def test_r_a2l_def_6_arr_1_name_case_for_curve(c08):
+>       d = a2ldef.describe_definition("curve_0001", c08["a2l"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_decode.py:555: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'curve_0001'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'curve_0001'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+________________ test_r_a2l_def_7_1_arr_2_array_with_no_address ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-511/test_r_a2l_def_7_1_arr_2_array0')
+
+    def test_r_a2l_def_7_1_arr_2_array_with_no_address(tmp_path):
+        a2l = inline(tmp_path, meas("MA0", "UBYTE", extras=("MATRIX_DIM 4",)))
+>       d = a2ldef.describe_definition("MA0", a2l)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_decode.py:566: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'MA0'
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+
+    def describe_definition(name: str, a2l_data: dict) -> Definition:
+        """Build the definition of one name; ``describe_definitions([name],
+        a2l_data)[name]`` — one code path, every rule lives in
+        :func:`describe_definitions`.
+    
+        Args:
+            name (str): The A2L object name, case included.
+            a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
+                ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+                Read, never written.  ``compu_methods_by_name`` is built from
+                ``sections``, not read.
+    
+        Returns:
+            Definition: The definition of the name (a refusal carries every field
+                the system could read).
+    
+        Raises:
+            None: file and image content never raise.
+        """
+>       return describe_definitions([name], a2l_data)[name]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'MA0'
+
+s19_app/tui/a2l_definition.py:590: KeyError
+============================= QC-TM timing margins =============================
+89.2%  0.539 s / 5.000 s  R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+89.8%  0.102 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+100.0%  0.000 s / 1.000 s  R-A2L-DEF.147/9 describe FE huge shift  tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_9_huge_shift_computes_no_power
+QC-TM: 3 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_3_no_compu_method_gives_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_6_1_unknown_name_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_6_2_name_is_matched_with_its_case
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_1_name_declared_twice_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_2_case08_issues_duplicate
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_1_1_no_address_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_4_negative_address_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_14_2_negative_raw_first
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_2_a2ltool_range_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_1_kind_comes_before_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_2_address_comes_before_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_1_nul_in_an_entry_text_refuses_the_file
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_3_nul_in_a_name
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_4_esc_in_a_name
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_136_1_batch_describe_equals_per_name_describe
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_3_case08_builds_and_decodes_with_the_model
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_14_esc_and_unterminated_quote_encode
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_67_5_two_trailing_1s
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_139_arr_1_name_declared_twice
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_6_arr_1_name_case_for_curve
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_1_arr_2_array_with_no_address
+27 failed, 635 passed in 80.00s (0:01:19)

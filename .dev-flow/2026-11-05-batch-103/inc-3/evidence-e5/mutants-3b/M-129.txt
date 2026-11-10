@@ -1,0 +1,210 @@
+M-129
+pytest -k a2l_def_129
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..2a525dfc 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4213,6 +4213,7 @@ def _breaking_point(
+ ) -> Optional[int]:
+     """The first point index whose prefix violates the axis's stored monotony."""
+     rule = axis.monotony
++    return None
+     if rule == "NOT_MON" or len(stored_points) < 2:
+         return None
+     if rule not in _SUPPORTED_MONOTONY:
+
+FF.FFFF.F                                                                [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_129_1_strict_increase _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_1_strict_in0')
+
+    def test_r_a2l_def_129_1_strict_increase(tmp_path):
+>       _monotony_refusal(tmp_path, "STRICT_INCREASE", [10, 20, 30, 40], 2, "20", "CM1.X[2]: 20 breaks the STRICT_INCREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'\n\x14\x14(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[2]: 20 breaks the STRICT_INCREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'
+E         \x14\x14(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'\n\x14\x14(\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+_____________________ test_r_a2l_def_129_2_strict_decrease _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_2_strict_de0')
+
+    def test_r_a2l_def_129_2_strict_decrease(tmp_path):
+>       _monotony_refusal(tmp_path, "STRICT_DECREASE", [40, 30, 20, 10], 1, "45", "CM1.X[1]: 45 breaks the STRICT_DECREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'(-\x14\n\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[1]: 45 breaks the STRICT_DECREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'(-\x14
+E         \x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'(-\x14\n\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+______________________ test_r_a2l_def_129_4_mon_increase _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_4_mon_incre0')
+
+    def test_r_a2l_def_129_4_mon_increase(tmp_path):
+>       _monotony_refusal(tmp_path, "MON_INCREASE", [10, 20, 30, 40], 2, "15", "CM1.X[2]: 15 breaks the MON_INCREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:481: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'\n\x14\x0f(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[2]: 15 breaks the MON_INCREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'
+E         \x14\x0f(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'\n\x14\x0f(\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+______________________ test_r_a2l_def_129_5_mon_decrease _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_5_mon_decre0')
+
+    def test_r_a2l_def_129_5_mon_decrease(tmp_path):
+>       _monotony_refusal(tmp_path, "MON_DECREASE", [40, 30, 20, 10], 2, "35", "CM1.X[2]: 35 breaks the MON_DECREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:485: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'(\x1e#\n\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[2]: 35 breaks the MON_DECREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'(\x1e#
+E         \x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'(\x1e#\n\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+______________________ test_r_a2l_def_129_6_default_rule _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_6_default_r0')
+
+    def test_r_a2l_def_129_6_default_rule(tmp_path):
+>       _monotony_refusal(tmp_path, None, [10, 20, 30, 40], 3, "30", "CM1.X[3]: 30 breaks the STRICT_MON order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:489: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'\n\x14\x1e\x1e\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[3]: 30 breaks the STRICT_MON order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'
+E         \x14\x1e\x1e\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'\n\x14\x1e\x1e\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+_______________________ test_r_a2l_def_129_7_monotonous ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_7_monotonou0')
+
+    def test_r_a2l_def_129_7_monotonous(tmp_path):
+>       _monotony_refusal(tmp_path, "MONOTONOUS", [10, 20, 30, 40], 1, "5", "CM1.X[2]: 30 breaks the MONOTONOUS order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:493: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'\n\x05\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[2]: 30 breaks the MONOTONOUS order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'
+E         \x05\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'\n\x05\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+_____________ test_r_a2l_def_129_9_unedited_point_can_break_order ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-544/test_r_a2l_def_129_9_unedited_0')
+
+    def test_r_a2l_def_129_9_unedited_point_can_break_order(tmp_path):
+>       _monotony_refusal(tmp_path, "STRICT_INCREASE", [10, 20, 30, 40], 1, "35", "CM1.X[2]: 30 breaks the STRICT_INCREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:457: in _monotony_refusal
+    _refusal(res, "A2L-DEF-MONOTONY", expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=256, data=b'\n#\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+code = 'A2L-DEF-MONOTONY'
+message = 'CM1.X[2]: 30 breaks the STRICT_INCREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=256, data=b'
+E         #\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=256, data=b'\n#\x1e(\x00\x00\x00\x01\x00\x02\x00\x03', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_1_strict_increase
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_2_strict_decrease
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_4_mon_increase
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_5_mon_decrease
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_6_default_rule
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_7_monotonous
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_9_unedited_point_can_break_order
+7 failed, 2 passed, 72 deselected in 1.03s

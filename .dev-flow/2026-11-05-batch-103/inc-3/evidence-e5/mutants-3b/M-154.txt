@@ -1,0 +1,50 @@
+M-154
+pytest -k a2l_def_154
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..7d0b5474 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4356,7 +4356,7 @@ def encode_values(
+                     "A2L-DEF-AXIS-NONE",
+                     f"{point_label}: the record layout {layout} holds no points for this axis",
+                 )
+-            if axis.monotony not in _SUPPORTED_MONOTONY:
++            if False and axis.monotony not in _SUPPORTED_MONOTONY:
+                 rule = _echo(axis.monotony)
+                 return Refusal(
+                     "A2L-DEF-MONOTONY",
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_154_1_unknown_monotony_rule_refuses ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-555/test_r_a2l_def_154_1_unknown_m0')
+
+    def test_r_a2l_def_154_1_unknown_monotony_rule_refuses(tmp_path):
+        a2l_data = inline(tmp_path, *_std_blocks("C", "UNKNOWN_RULE"))
+        d = a2ldef.describe_definition("C", a2l_data)
+        res = _encode(d, a2l_data, {("X", 0): "5"}, _std_image(bytes([10, 20, 30, 40])))
+>       _refusal(res, "A2L-DEF-MONOTONY", "C.X[0]: the monotony rule UNKNOWN_RULE is not supported")
+
+tests/test_b103_a2l_definition_arrays_write.py:951: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-MONOTONY', message='C.X[1]: 20 breaks the UNKNOWN_RULE order of the axis')
+code = 'A2L-DEF-MONOTONY'
+message = 'C.X[0]: the monotony rule UNKNOWN_RULE is not supported'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-MONOTONY', message='C.X[1]: 20 breaks the UNKNOWN_RULE order of the axis')
+E       assert ('A2L-DEF-MON... of the axis') == ('A2L-DEF-MON...ot supported')
+E         
+E         At index 1 diff: 'C.X[1]: 20 breaks the UNKNOWN_RULE order of the axis' != 'C.X[0]: the monotony rule UNKNOWN_RULE is not supported'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_154_1_unknown_monotony_rule_refuses
+1 failed, 80 deselected in 0.82s

@@ -1,0 +1,39 @@
+M-AT3
+pytest -k at_b103_i3_3_edit_arm or a2l_def_123_2
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..fac37cf3 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -2930,7 +2930,7 @@ def _element_offset(definition: Definition, index: tuple[int, ...]) -> int:
+             linear = index[0]
+         else:
+             i, j = index[0], index[1]
+-            linear = j + definition.shape[1] * i
++            linear = i + definition.shape[0] * j
+     else:
+         linear = 0
+         stride = 1
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_123_2_column_dir_whole_record_bytes ______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_123_2_column_dir_whole_record_bytes(v171):
+        d = a2ldef.describe_definition(COL_ARRAY, v171)
+        image = _array_image(0x810120)
+        before = bytes(image[0x810120 + i] for i in range(24))
+        res = _encoded(d, v171, {(1, 0): "-7"}, image)
+>       assert res.data[8:10] == b"\xf9\xff"
+E       AssertionError: assert b'\x05\x00' == b'\xf9\xff'
+E         
+E         At index 0 diff: b'\x05' != b'\xf9'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:333: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes
+1 failed, 1 passed, 79 deselected in 24.38s

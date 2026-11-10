@@ -1,0 +1,164 @@
+M-122
+pytest -k a2l_def_122
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..65ebd36f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -3624,7 +3624,7 @@ def _encode_number(
+     method_name = (
+         "NO_COMPU_METHOD" if definition.kind == "enum" else definition.method_name
+     )
+-    conversion_type = definition.conversion_type
++    conversion_type = "IDENTICAL"
+     table_form = definition._table_form
+     if conversion_type in ("TAB_INTP", "TAB_NOINTP") and isinstance(
+         table_form, _TabForm
+
+F..FF.F                                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_def_122_1_converted_element_edit __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-536/test_r_a2l_def_122_1_converted0')
+
+    def test_r_a2l_def_122_1_converted_element_edit(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_HALF", "LINEAR", "0.5", "0", fmt='"%.1"'),
+            valblk("VN", "0x10", "RL_U16", "CM_HALF", "0", "65535", extras=("MATRIX_DIM 2",)),
+        )
+        d = a2ldef.describe_definition("VN", a2l_data)
+        image = img(0x10, bytes.fromhex("00030004"))
+>       res = _encoded(d, a2l_data, {(0,): "2.5"}, image)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_write.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VN', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=16, byte_length=4, datatype...one, refusal=None, shape=(2,), element_count=2, index_mode='ROW_DIR', values_offset=0, record_layout='RL_U16', axes=())
+a2l_data = {'compu_methods_by_name': {'CM_HALF': {'coeffs': None, 'coeffs_linear': [0.5, 0.0], 'compu_tab_ref': None, 'conversion...b_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+edit = {(0,): '2.5'}, image = {16: 0, 17: 3, 18: 0, 19: 4}
+
+    def _encoded(d, a2l_data, edit, image):
+        res = _encode(d, a2l_data, edit, image)
+>       assert isinstance(res, a2ldef.Encoded), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='VN[0]: the converted raw value 2.5 is not integral')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-ENCODE', message='VN[0]: the converted raw value 2.5 is not integral'), <class 's19_app.tui.a2l_definition.Encoded'>)
+E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = a2ldef.Encoded
+
+tests/test_b103_a2l_definition_arrays_write.py:80: AssertionError
+________________ test_r_a2l_def_122_4_converted_axis_point_edit ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-536/test_r_a2l_def_122_4_converted0')
+
+    def test_r_a2l_def_122_4_converted_axis_point_edit(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_TWO", "LINEAR", "2", "0"),
+            rl("RL_C", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT", "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),
+            curve("C", "0x100", "RL_C", axis("STD_AXIS", "CM_TWO", "4", "0", "500")),
+        )
+        d = a2ldef.describe_definition("C", a2l_data)
+        image = _std_image(_uwords(1, 2, 3, 4))
+>       res = _encoded(d, a2l_data, {("X", 3): "10"}, image)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_write.py:265: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=256, byte_length=16, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),))
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type..._tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+edit = {('X', 3): '10'}, image = {256: 0, 257: 1, 258: 0, 259: 2, ...}
+
+    def _encoded(d, a2l_data, edit, image):
+        res = _encode(d, a2l_data, edit, image)
+>       assert isinstance(res, a2ldef.Encoded), res
+E       AssertionError: Refusal(code='A2L-DEF-PRECISION', message='C.X[3]: 10 cannot be stored at the display precision — the nearest stored value is 20.000')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-PRECISION', message='C.X[3]: 10 cannot be stored at the display precision — the nearest stored value is 20.000'), <class 's19_app.tui.a2l_definition.Encoded'>)
+E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = a2ldef.Encoded
+
+tests/test_b103_a2l_definition_arrays_write.py:80: AssertionError
+___________ test_r_a2l_def_122_5_float64_element_uses_precision_rule ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-536/test_r_a2l_def_122_5_float64_e0')
+
+    def test_r_a2l_def_122_5_float64_element_uses_precision_rule(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_P", "LINEAR", "1", "1e10", fmt='"%"'),
+            valblk("VP", "0x10", "RL_F64", "CM_P", "-10", "10", extras=("MATRIX_DIM 2",)),
+        )
+        d = a2ldef.describe_definition("VP", a2l_data)
+        res = _encode(d, a2l_data, {(1,): "1.0000001"}, img(0x10, bytes(16)))
+>       _refusal(
+            res,
+            "A2L-DEF-PRECISION",
+            "VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:278: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-PRECISION', message='VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 10000000001')
+code = 'A2L-DEF-PRECISION'
+message = 'VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-PRECISION', message='VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 10000000001')
+E       assert ('A2L-DEF-PRE... 10000000001') == ('A2L-DEF-PRE...d value is 1')
+E         
+E         At index 1 diff: 'VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 10000000001' != 'VP[1]: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+_________ test_r_a2l_def_122_7_written_element_against_extended_limits _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-536/test_r_a2l_def_122_7_written_e0')
+
+    def test_r_a2l_def_122_7_written_element_against_extended_limits(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_T", "TAB_INTP", fmt='"%.1"', ref="CT_T"),
+            ctab("CT_T", "TAB_INTP", "0 0.0", "10 1.0"),
+            valblk(
+                "VL4",
+                "0x10",
+                "RL_U16",
+                "CM_T",
+                "0",
+                "0.55",
+                extras=("MATRIX_DIM 2", "EXTENDED_LIMITS 0 0.55"),
+            ),
+        )
+        d = a2ldef.describe_definition("VL4", a2l_data)
+        res = _encode(d, a2l_data, {(1,): "0.55"}, img(0x10, bytes(4)))
+>       _refusal(res, "A2L-DEF-EXTENDED", "VL4[1]: 0.6 is outside the extended limits 0..0.55")
+
+tests/test_b103_a2l_definition_arrays_write.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENCODE', message='VL4[1]: the converted raw value 0.55 is not integral')
+code = 'A2L-DEF-EXTENDED'
+message = 'VL4[1]: 0.6 is outside the extended limits 0..0.55'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='VL4[1]: the converted raw value 0.55 is not integral')
+E       assert ('A2L-DEF-ENC...not integral') == ('A2L-DEF-EXT...mits 0..0.55')
+E         
+E         At index 0 diff: 'A2L-DEF-ENCODE' != 'A2L-DEF-EXTENDED'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_1_converted_element_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_4_converted_axis_point_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_5_float64_element_uses_precision_rule
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_7_written_element_against_extended_limits
+4 failed, 3 passed, 74 deselected in 0.90s

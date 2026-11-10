@@ -1,0 +1,58 @@
+M-155
+pytest -k a2l_def_155_2
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..755e6b36 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4203,7 +4203,7 @@ def _monotony_refusal(
+     label = f"{_name_echo_of(axis.points)}[{k}]"
+     return Refusal(
+         "A2L-DEF-MONOTONY",
+-        f"{label}: {_operator_echo(point.text)} breaks the "
++        f"{label}: {point.text} breaks the "
+         f"{axis.monotony} order of the axis",
+     )
+ 
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-556/test_r_a2l_def_155_2_breaking_0')
+
+    def test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded(tmp_path):
+        long_text = "L" * 300
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_E", "TAB_VERB", fmt='"%.0"', ref="VT_E"),
+            vtab("VT_E", "4", '0 "zero"', '1 "one"', f'2 "{long_text}"', '3 "three"'),
+            rl("RL_C", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT", "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),
+            curve("C", "0x100", "RL_C", axis("STD_AXIS", "CM_E", "4", "0", "3", "MONOTONY STRICT_INCREASE")),
+        )
+        d = a2ldef.describe_definition("C", a2l_data)
+        res = _encode(d, a2l_data, {("X", 1): long_text}, _std_image(bytes([3, 1, 2, 3])))
+>       _refusal(res, "A2L-DEF-MONOTONY", f"C.X[1]: {'L' * 256}… breaks the STRICT_INCREASE order of the axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:977: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-MONOTONY', message='C.X[1]: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL breaks the STRICT_INCREASE order of the axis')
+code = 'A2L-DEF-MONOTONY'
+message = 'C.X[1]: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL… breaks the STRICT_INCREASE order of the axis'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-MONOTONY', message='C.X[1]: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL breaks the STRICT_INCREASE order of the axis')
+E       assert ('A2L-DEF-MON... of the axis') == ('A2L-DEF-MON... of the axis')
+E         
+E         At index 1 diff: 'C.X[1]: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL breaks the STRICT_INCREASE order of the axis' != 'C.X[1]: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded
+1 failed, 80 deselected in 0.84s

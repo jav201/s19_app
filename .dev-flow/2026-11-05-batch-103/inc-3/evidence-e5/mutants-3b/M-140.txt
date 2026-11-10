@@ -1,0 +1,35 @@
+M-140
+pytest -k a2l_def_140_1
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..60106c15 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -699,7 +699,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+                                 "little",
+                             )
+                         )
+-            elif node_name == "AXIS_PTS":
++            elif False and node_name == "AXIS_PTS":
+                 tokens = _flatten_body_tokens(
+                     [node.get("meta", "") or ""] + (node.get("lines") or [])
+                 )
+
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-550/test_r_a2l_def_140_1_encode_ov0')
+
+    def test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused(tmp_path):
+        a2l_data = inline(tmp_path, *_axis_span_blocks())
+        d = a2ldef.describe_definition("VS", a2l_data)
+>       assert d.shared_with == "AXS"
+E       AssertionError: assert None == 'AXS'
+E        +  where None = Definition(name='VS', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=20, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition_arrays_write.py:793: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused
+1 failed, 2 passed, 78 deselected in 0.80s

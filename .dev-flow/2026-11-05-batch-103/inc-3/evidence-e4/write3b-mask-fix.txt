@@ -1,0 +1,109 @@
+F.F...                                                                   [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_def_136_1_batch_describe_equals_per_name_describe _________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_136_1_batch_describe_equals_per_name_describe(v171, c08):
+        """R-A2L-DEF.136/1 (identity half) - one walk gives what the per-name call gives, on V171 and case 08."""
+        for a2l in (v171, c08["a2l"]):
+            names = [t["name"] for t in a2l["tags"]]
+            batch = describe_definitions(names, a2l)
+            assert set(batch) == set(names)
+            for n in names[:60]:
+>               assert batch[n] == describe_definition(n, a2l)
+E               AssertionError: assert Definition(na...None, axes=()) == Definition(na...None, axes=())
+E                 
+E                 Omitting 30 identical items, use -vv to show
+E                 Differing attributes:
+E                 ['shared_with']
+E                 
+E                 Drill down into differing attribute shared_with:
+E                   shared_with: None != 'ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING'
+
+tests/test_b103_a2l_definition.py:1317: AssertionError
+_________ test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-510/test_r_a2l_def_136_arr_4_k1_k30')
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh(tmp_path, v171):
+        # K1: a VALUE and a VAL_BLK on one SWORD layout.
+        k1 = _rl("RL_N", "FNC_VALUES 1 SWORD ROW_DIR DIRECT") + \
+             _value("SA", "0x10", "RL_N", "NO_COMPU_METHOD", "0", "65535") + \
+             _valblk("VA", "0x20", "RL_N", "NO_COMPU_METHOD", "0", "65535", "MATRIX_DIM 2")
+        # K2: the same on a layout whose first line holds no datatype word.
+        k2 = _rl("RL_N", "FNC_VALUES 1") + \
+             _value("SA", "0x10", "RL_N", "NO_COMPU_METHOD", "0", "65535") + \
+             _valblk("VA", "0x20", "RL_N", "NO_COMPU_METHOD", "0", "65535", "MATRIX_DIM 2")
+        # K3: a VALUE and a CURVE on one layout.
+        k3 = _rl("RL_N", "FNC_VALUES 1 SWORD ROW_DIR DIRECT") + \
+             _value("SA", "0x10", "RL_N", "NO_COMPU_METHOD", "0", "65535") + \
+             _curve("CA", "0x20", "RL_N", _axis("STD_AXIS", "NO_COMPU_METHOD", "2", "0", "255"))
+        for body in (k1, k2, k3):
+            _one_walk_equals_fresh(_parse(tmp_path, body))
+    
+        # P1: two VAL_BLKs sharing a refused layout (RESERVED part).
+        p1 = _rl("RL_BAD", "FNC_VALUES 1 UBYTE ROW_DIR DIRECT", "RESERVED 2 BYTE") + \
+             _valblk("VA", "0x100", "RL_BAD", "NO_COMPU_METHOD", "0", "255", "NUMBER 4") + \
+             _valblk("VB", "0x200", "RL_BAD", "NO_COMPU_METHOD", "0", "255", "NUMBER 4")
+        _one_walk_equals_fresh(_parse(tmp_path, p1, mod_common=("ALIGNMENT_WORD 2",)))
+    
+        # P2: two curves (max 8) sharing RL_C under MOD_COMMON ALIGNMENT_WORD 2.
+        p2 = _rl("RL_C", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 SBYTE INDEX_INCR DIRECT",
+                 "FNC_VALUES 3 SWORD ROW_DIR DIRECT") + \
+             _curve("CA", "0x100", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "8", "0", "255")) + \
+             _curve("CB", "0x200", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "8", "0", "255"))
+        _one_walk_equals_fresh(_parse(tmp_path, p2, mod_common=("ALIGNMENT_WORD 2",)))
+    
+        # P4: curves of max 8 and 7 share RL_C under ALIGNMENT_WORD 2 (one moved, one not).
+        p4 = _rl("RL_C", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 SBYTE INDEX_INCR DIRECT",
+                 "FNC_VALUES 3 SWORD ROW_DIR DIRECT") + \
+             _curve("CA", "0x100", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "8", "0", "255")) + \
+             _curve("CC", "0x200", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "7", "0", "255"))
+        _one_walk_equals_fresh(_parse(tmp_path, p4, mod_common=("ALIGNMENT_WORD 2",)))
+    
+        # P5: two COM curves sharing AXO under MOD_COMMON ALIGNMENT_WORD 2.
+        p5 = _rl("RL_AXO", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UWORD INDEX_INCR DIRECT") + \
+             _axis_pts("AXO", "0x100", "RL_AXO", "4") + \
+             _curve("CR1", "0x200", "RL_U8", _axis("COM_AXIS", "NO_COMPU_METHOD", "4", "0", "255", "AXIS_PTS_REF AXO")) + \
+             _curve("CR2", "0x300", "RL_U8", _axis("COM_AXIS", "NO_COMPU_METHOD", "4", "0", "255", "AXIS_PTS_REF AXO"))
+        _one_walk_equals_fresh(_parse(tmp_path, p5, mod_common=("ALIGNMENT_WORD 2",)))
+    
+        # P3: CA in M1 (ALIGNMENT_WORD 2) and CB in M2 (none) share RL_C across modules.
+        p3 = _parse(tmp_path, _rl("RL_C", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 SBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 SWORD ROW_DIR DIRECT") +
+                    _curve("CA", "0x100", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "8", "0", "255")) +
+                    _curve("CB", "0x200", "RL_C", _axis("STD_AXIS", "NO_COMPU_METHOD", "8", "0", "255")),
+                    mod_common=("ALIGNMENT_WORD 2",))
+        _one_walk_equals_fresh(p3)
+    
+        # V171: one walk == fresh, in both orders, for every name.
+>       _one_walk_equals_fresh(v171)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def _one_walk_equals_fresh(a2l_data: dict) -> None:
+        names = [t["name"] for t in a2l_data["tags"]]
+        one = a2ldef.describe_definitions(names, a2l_data)
+        one_rev = a2ldef.describe_definitions(list(reversed(names)), a2l_data)
+        fresh = {n: a2ldef.describe_definition(n, a2l_data) for n in names}
+>       assert one == fresh and one_rev == fresh
+E       AssertionError: assert ({'ASAM.C.ARRA...axes=()), ...} == {'ASAM.C.ARRA...axes=()), ...}
+E         
+E         Omitting 63 identical items, use -vv to show
+E         Differing items:
+E         {'ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4': Definition(name='ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4', section='MEASUREMENT', char...X_PLUS_4 is not supported'), shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())} != {'ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4': Definition(name='ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4', section='MEASUREMENT', char...X_PLUS_4 is not supported'), shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+E         {'ASAM.C.SCALAR.FLOAT64_IEEE.IDE...
+E         
+E         ...Full output truncated (55 lines hidden), use '-vv' to show)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:350: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_136_1_batch_describe_equals_per_name_describe
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh
+2 failed, 4 passed in 2.12s

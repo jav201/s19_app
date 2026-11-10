@@ -1,0 +1,50 @@
+M-58.1a
+pytest -k 58_1_arr_1_edit_arm
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..47851ea5 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4277,6 +4277,7 @@ def encode_values(
+             f"— the first is {errors[0]}",
+         )
+ 
++    image[definition.address] = 0
+     ordered = _ordered_edits(definition, edit)
+     scalar = definition.kind in ("number", "enum", "text")
+     if scalar and len(ordered) == 1 and _scalar_position(ordered[0][0]):
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged ________
+
+arrays_v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged(arrays_v171):
+        m = _model()
+        defs = _v171_write_definitions(m, arrays_v171)
+        assert len(defs) == 20, len(defs)
+        image = _v171_write_image(defs)
+        a2l_before = _copy3b.deepcopy(arrays_v171)
+        image_before = dict(image)
+        for d in defs.values():
+            decoded = _decode3b(m, d, arrays_v171, image)
+            position = (0,) * len(d.shape)
+            _value_edit3b(m, d, arrays_v171, image, position, decoded.values[0].text)
+>       assert arrays_v171 == a2l_before and image == image_before
+E       AssertionError: assert ({'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E         
+E         Omitting 8 identical items, use -vv to show
+E         Use -v to get more diff and {80432: 0, 80...80435: 3, ...} == {80432: 0, 80...80435: 3, ...}
+E         
+E         Omitting 455 identical items, use -vv to show
+E         Differing items:
+E         {8454400: 0} != {8454400: 1}
+E         {8454432: 0} != {8454432: 1}
+E         Use -v to get more diff)
+
+tests/test_b103_synth_definitions.py:487: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged
+1 failed, 80 deselected in 1.04s

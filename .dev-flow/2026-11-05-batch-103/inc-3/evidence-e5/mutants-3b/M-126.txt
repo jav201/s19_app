@@ -1,0 +1,77 @@
+M-126
+pytest -k a2l_def_126
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..600dd11a 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4334,7 +4334,7 @@ def encode_values(
+             letter, k = position
+             edited_axes.add(axis.letter)
+             point_label = f"{_name_echo_of(axis.points)}[{k}]"
+-            if axis.axis_kind == "FIX_AXIS":
++            if False and axis.axis_kind == "FIX_AXIS":
+                 return Refusal(
+                     "A2L-DEF-AXIS-FIXED",
+                     f"{point_label}: the points of a fixed axis are not stored in the image",
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_126_1_fixed_curve_axis _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_126_1_fixed_curve_axis(v171):
+        name = "ASAM.C.CURVE.FIX_AXIS.PAR_DIST"
+        d = a2ldef.describe_definition(name, v171)
+        res = _encode(d, v171, {("X", 0): "0"}, img(0x810350, _swords(*range(6))))
+>       _refusal(res, "A2L-DEF-AXIS-FIXED", f"{name}.X[0]: the points of a fixed axis are not stored in the image")
+
+tests/test_b103_a2l_definition_arrays_write.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENCODE', message='ASAM.C.CURVE.FIX_AXIS.PAR_DIST.X[0]: the tag declares no datatype')
+code = 'A2L-DEF-AXIS-FIXED'
+message = 'ASAM.C.CURVE.FIX_AXIS.PAR_DIST.X[0]: the points of a fixed axis are not stored in the image'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='ASAM.C.CURVE.FIX_AXIS.PAR_DIST.X[0]: the tag declares no datatype')
+E       assert ('A2L-DEF-ENC... no datatype') == ('A2L-DEF-AXI...in the image')
+E         
+E         At index 0 diff: 'A2L-DEF-ENCODE' != 'A2L-DEF-AXIS-FIXED'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+_____________________ test_r_a2l_def_126_2_fixed_map_axis ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_126_2_fixed_map_axis(v171):
+        d = a2ldef.describe_definition(COM_MAP, v171)
+        res = _encode(d, v171, {("Y", 2): "4"}, _map_image())
+>       _refusal(res, "A2L-DEF-AXIS-FIXED", f"{COM_MAP}.Y[2]: the points of a fixed axis are not stored in the image")
+
+tests/test_b103_a2l_definition_arrays_write.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENCODE', message='ASAM.C.MAP.COM_AXIS.FIX_AXIS.Y[2]: the tag declares no datatype')
+code = 'A2L-DEF-AXIS-FIXED'
+message = 'ASAM.C.MAP.COM_AXIS.FIX_AXIS.Y[2]: the points of a fixed axis are not stored in the image'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='ASAM.C.MAP.COM_AXIS.FIX_AXIS.Y[2]: the tag declares no datatype')
+E       assert ('A2L-DEF-ENC... no datatype') == ('A2L-DEF-AXI...in the image')
+E         
+E         At index 0 diff: 'A2L-DEF-ENCODE' != 'A2L-DEF-AXIS-FIXED'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_1_fixed_curve_axis
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_2_fixed_map_axis
+2 failed, 79 deselected in 0.89s

@@ -1,4 +1,4 @@
-"""The A2L definition model (Incs 2a, 2b and 3a).
+"""The A2L definition model (Incs 2a, 2b, 3a and 3b).
 
 This module builds *definitions* of scalar objects, VAL_BLK and MATRIX_DIM
 arrays, curves and maps from the parse payload of
@@ -20,7 +20,7 @@ import heapq
 import math
 import re
 import struct
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from types import MappingProxyType
@@ -84,8 +84,8 @@ class EnumEntry:
 @dataclass(frozen=True)
 class _EnumForm:
     """The enum table's reduced form (R-A2L-DEF.150): the public entries, the
-    once-cleaned display texts and the private one-lookup index, built once per
-    walk and shared by reference.  COMPU_VTAB holds ``first_of``; a
+    once-cleaned display texts and the private one-lookup indexes, built once
+    per walk and shared by reference.  COMPU_VTAB holds ``first_of``; a
     COMPU_VTAB_RANGE holds ``ends`` / ``at_end`` / ``between``."""
 
     section_kind: str
@@ -97,18 +97,72 @@ class _EnumForm:
     ends: tuple[float, ...]
     at_end: tuple[Optional[int], ...]
     between: tuple[Optional[int], ...]
+    by_text: Mapping = field(init=False, compare=False, repr=False)
+
+    def __post_init__(self) -> None:
+        by_text: dict[str, float] = {}
+        for entry in self.entries:
+            if entry.text not in by_text:
+                by_text[entry.text] = entry.raw
+        object.__setattr__(self, "by_text", MappingProxyType(by_text))
 
 
 @dataclass(frozen=True)
 class _TabForm:
     """A COMPU_TAB's reduced form for a TAB_INTP / TAB_NOINTP method
-    (R-A2L-DEF.150): the frozen parse's sorted x / y, a NaN-x verdict and the
-    echoed COMPU_TAB_REF word.  Read by :func:`_table_value`."""
+    (R-A2L-DEF.150): the frozen parse's sorted x / y, a NaN-x verdict, the
+    echoed COMPU_TAB_REF word and the shared physical-to-raw indexes."""
 
     xs: tuple[float, ...]
     ys: tuple[object, ...]
     x_nan: bool
     ref_echo: str
+    inverse_file: tuple[tuple[float, float], ...] = field(
+        init=False, compare=False, repr=False
+    )
+    inverse_match: tuple[tuple[float, float, int], ...] = field(
+        init=False, compare=False, repr=False
+    )
+    inverse_match_ys: tuple[float, ...] = field(init=False, compare=False, repr=False)
+    inverse_rmq: tuple[tuple[int, int], ...] = field(init=False, compare=False, repr=False)
+    inverse_rmq_size: int = field(init=False, compare=False, repr=False)
+    inverse_y_nan: bool = field(init=False, compare=False, repr=False)
+
+    def __post_init__(self) -> None:
+        numeric: list[tuple[float, float]] = []
+        for raw_x, raw_y in zip(self.xs, self.ys):
+            y = _to_float(raw_y)
+            if y is not None:
+                numeric.append((float(raw_x), y))
+        match = tuple(
+            (raw_x, y, pos)
+            for pos, (raw_x, y) in sorted(
+                (
+                    item
+                    for item in enumerate(numeric)
+                    if not math.isnan(item[1][1])
+                ),
+                key=lambda item: item[1][1],
+            )
+        )
+        size = 1
+        while size < len(match):
+            size *= 2
+        tree = [(len(numeric), len(numeric))] * (2 * size)
+        for pos, item in enumerate(match):
+            tree[size + pos] = (item[2], pos)
+        for pos in range(size - 1, 0, -1):
+            tree[pos] = min(tree[2 * pos], tree[2 * pos + 1])
+        object.__setattr__(self, "inverse_file", tuple(numeric))
+        object.__setattr__(self, "inverse_match", match)
+        object.__setattr__(self, "inverse_match_ys", tuple(item[1] for item in match))
+        object.__setattr__(self, "inverse_rmq", tuple(tree))
+        object.__setattr__(self, "inverse_rmq_size", size)
+        object.__setattr__(
+            self,
+            "inverse_y_nan",
+            any(math.isnan(y) for _, y in numeric),
+        )
 
 
 @dataclass(frozen=True)
@@ -526,8 +580,8 @@ def _read_limits(lower_word: object, upper_word: object) -> Limits:
     return Limits(
         lower,
         upper,
-        str(lower_word) if lower is not None else "",
-        str(upper_word) if upper is not None else "",
+        _echo(lower_word) if lower is not None else "",
+        _echo(upper_word) if upper is not None else "",
     )
 
 
@@ -556,21 +610,10 @@ def describe_definition(name: str, a2l_data: dict) -> Definition:
 def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Definition]:
     """Build the definitions of ``names`` in one walk of ``a2l_data``.
 
-    Builds the name maps once — the MEASUREMENT / CHARACTERISTIC sections of
-    each name in file order, the first COMPU_METHOD of each name and the first
-    COMPU_VTAB / COMPU_VTAB_RANGE of each name — then one pass over
-    ``a2l_data["tags"]`` maps the tags of each name.  For each name (order
-    kept, a repeated name maps once) it reads every field it can and applies
-    the refusal order (name, kind, address and length, datatype, length against
-    datatype, conversion method, conversion type, enum table, entries, bit
-    mask).  A ``reads`` map (one per call) holds each shared section's read
-    form once, so a name's time does not grow with the size of a section it
-    shares (R-A2L-DEF.148): Inc 2a's forms under the bare ``id()`` of the
-    section (the method record, enum table, table form and resolved layout
-    datatype) and Inc 3a's under a ``(kind, id(section))`` tuple key
-    (``("layout", id(entry))``, ``("mod_common", id(section))``,
-    ``("axis_byte_order", id(section))``); the map is dropped when the call
-    returns.
+    Shared sections are reduced once in ``reads``.  Declared spans are then
+    materialised at most once on demand, reusing requested definitions.
+    AXIS_PTS records join the same cross-kind candidates; an unreadable final
+    length remains a fail-closed point at the declared address (R-A2L-DEF.140).
 
     Args:
         names (Iterable[str]): The names to describe.
@@ -666,24 +709,28 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
                 layout_section = record_layouts.get(layout_name) if layout_name else None
                 if ref is not None:
                     axis_pts_by_name.setdefault(ref, (node, header, layout_section))
+                    address = _read_address_word(
+                        header[2] if len(header) > 2 else None
+                    )
+                    if address is not None:
+                        span_entries.append(
+                            (
+                                position,
+                                ref,
+                                "AXIS_PTS",
+                                address,
+                                None,
+                                "little",
+                                node,
+                                header,
+                                layout_section,
+                            )
+                        )
                 mod_common_of[id(node)] = mod_common
             walk(node.get("children") or [], mod_common)
 
     walk(a2l_data.get("sections") or [], None)
 
-    span_index: dict[int, list[tuple]] = {}
-    for entry in span_entries:
-        _position, _name, _kind, address, byte_length, _byte_order = entry
-        if byte_length is not None and byte_length >= 1:
-            first_page = address >> 4
-            last_page = (address + byte_length - 1) >> 4
-            pages = range(first_page, last_page + 1)
-        else:
-            pages = (address >> 4,)
-        for page in pages:
-            span_index.setdefault(page, []).append(entry)
-
-    result: dict[str, Definition] = {}
     reads: dict[object, object] = {}
     maps = {
         "axis_pts_by_name": axis_pts_by_name,
@@ -692,49 +739,143 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
         "compu_methods_by_name": compu_methods_by_name,
         "compu_tables_by_name": compu_tables_by_name,
     }
-    mask_cache: dict[str, Optional[int]] = {}
+    definitions: dict[str, Definition] = {}
+    axis_records: dict[int, tuple[Optional[int], str]] = {}
+
+    def describe_name(name: str) -> Definition:
+        if name not in definitions:
+            definition = _describe_one(
+                name,
+                tags_by_name,
+                object_sections_by_name,
+                compu_methods_by_name,
+                compu_tables_by_name,
+                a2l_data,
+                maps,
+            )
+            definitions[name] = definition
+            for axis in definition.axes:
+                record = axis.axis_object_record
+                if record is None:
+                    continue
+                found = axis_pts_by_name.get(record.name)
+                if found is not None:
+                    axis_records[id(found[0])] = (
+                        record.byte_length,
+                        record.byte_order,
+                    )
+        return definitions[name]
+
+    requested: list[str] = []
+    requested_set: set[str] = set()
+    for name in names:
+        if name not in definitions:
+            describe_name(name)
+        if name not in requested_set:
+            requested.append(name)
+            requested_set.add(name)
+
+    def axis_span(entry: tuple) -> tuple[Optional[int], str]:
+        node, header, layout_section = entry[6:9]
+        key = id(node)
+        if key in axis_records:
+            return axis_records[key]
+        byte_order = _axis_byte_order(node, layout_section, maps)
+        byte_length: Optional[int] = None
+        layout_name = header[4] if len(header) > 4 else None
+        layout = _read_record_layout(
+            layout_name,
+            a2l_data,
+            _echo(entry[1]),
+            maps,
+            layout_section,
+        )
+        point_count = _read_count(header[7] if len(header) > 7 else None)
+        if (
+            layout is not None
+            and not isinstance(layout, Refusal)
+            and _find_component(layout, "AXIS_PTS_X") is not None
+            and point_count is not None
+            and 1 <= point_count <= _MAX_AXIS_POINTS
+        ):
+            fixed_count = layout["fixed"].get("X")
+            if fixed_count is None or fixed_count == point_count:
+                placed = _place_components(layout, (point_count,))
+                if placed is not None:
+                    end = placed[1]
+                    address = entry[3]
+                    if address >= 0 and address + end - 1 <= 0xFFFFFFFF:
+                        byte_length = end
+        axis_records[key] = (byte_length, byte_order)
+        return axis_records[key]
+
+    def is_array_entry(entry: tuple) -> bool:
+        tags = tags_by_name.get(entry[1]) or []
+        sections = object_sections_by_name.get(entry[1]) or []
+        if len(tags) != 1 or len(sections) != 1:
+            return True
+        tag = tags[0]
+        if tag.get("section") == "CHARACTERISTIC":
+            if tag.get("char_type") == "VALUE":
+                matrix = _read_matrix_dim(sections[0])
+                return matrix is not None and _is_multi_value_matrix(matrix[0])
+            return tag.get("char_type") in ("VAL_BLK", "CURVE", "MAP")
+        if tag.get("section") == "MEASUREMENT":
+            matrix = _read_matrix_dim(sections[0])
+            return matrix is not None and (
+                matrix[1] is None or _is_multi_value_matrix(matrix[0])
+            )
+        return False
+
+    entry_cache: dict[int, tuple] = {}
+
+    def materialize(entry: tuple) -> tuple:
+        key = entry[0]
+        if key in entry_cache:
+            return entry_cache[key]
+        kind = entry[2]
+        if kind in ("MEASUREMENT", "CHARACTERISTIC") and is_array_entry(entry):
+            other = describe_name(entry[1])
+            byte_length = other.byte_length
+            byte_order = other.byte_order
+        elif kind in ("MEASUREMENT", "CHARACTERISTIC"):
+            byte_length = entry[4]
+            byte_order = entry[5]
+        elif kind == "AXIS_PTS":
+            byte_length, byte_order = axis_span(entry)
+        else:
+            byte_length = entry[4]
+            byte_order = entry[5]
+        entry_cache[key] = entry[:4] + (byte_length, byte_order)
+        return entry_cache[key]
 
     def mask_of(other_name: str) -> Optional[int]:
-        if other_name in mask_cache:
-            return mask_cache[other_name]
-        other = _describe_one(
-            other_name,
-            tags_by_name,
-            object_sections_by_name,
-            compu_methods_by_name,
-            compu_tables_by_name,
-            a2l_data,
-            maps,
-        )
-        value = (
-            other.bit_mask
-            if (other.refusal is None and other.byte_length is not None)
-            else None
-        )
-        mask_cache[other_name] = value
-        return value
+        other = describe_name(other_name)
+        if (
+            other is None
+            or other.section not in ("MEASUREMENT", "CHARACTERISTIC")
+            or other.kind not in ("number", "enum")
+            or other.refusal is not None
+            or other.byte_length is None
+            or other.byte_length < 1
+        ):
+            return None
+        return other.bit_mask
 
-    for name in names:
-        if name in result:
+    span_index: dict[int, list[tuple]] = {}
+    result: dict[str, Definition] = {}
+    for name in requested:
+        definition = definitions[name]
+        address = definition.address
+        if address is None:
+            result[name] = definition
             continue
-        definition = _describe_one(
-            name,
-            tags_by_name,
-            object_sections_by_name,
-            compu_methods_by_name,
-            compu_tables_by_name,
-            a2l_data,
-            maps,
-        )
-        mask_cache[name] = (
-            definition.bit_mask
-            if (definition.refusal is None and definition.byte_length is not None)
-            else None
-        )
+        span_index[None] = span_entries
         result[name] = replace(
             definition,
-            shared_with=_shared_with(definition, span_index, mask_of),
+            shared_with=_shared_with(definition, span_index, mask_of, materialize),
         )
+
     return result
 
 
@@ -2590,10 +2731,9 @@ def _read_object_lines(section: Optional[dict]) -> dict:
             result["format"] = body[i + 1]
             i += 1
         elif word == "EXTENDED_LIMITS" and result["extended_limits"] is None and i + 2 < n:
-            lo = _finite_number(body[i + 1])
-            hi = _finite_number(body[i + 2])
-            if lo is not None and hi is not None:
-                result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 2])
+            limits = _read_limits(body[i + 1], body[i + 2])
+            if limits.lower is not None and limits.upper is not None:
+                result["extended_limits"] = limits
                 i += 2
             # A line that does not hold two numbers consumes only its keyword, so the
             # next keyword (e.g. FORMAT) is still read (R-A2L-DEF.21/1, .22).
@@ -2764,12 +2904,8 @@ def _decode_stored(
 
 
 def element_name(definition: Definition, position: tuple) -> str:
-    """An element index → ``<name>[<i>]`` / ``<name>[<i>,<j>]`` / …; an axis
-    point ``(letter, k)`` → ``<name>.<letter>[<k>]`` (I-2; zero-based)."""
-    if isinstance(position, tuple) and position and isinstance(position[0], str):
-        letter, k = position
-        return f"{definition.name}.{letter}[{k}]"
-    return f"{definition.name}[{','.join(str(i) for i in position)}]"
+    """An element or axis point name, or a bounded malformed-position repr."""
+    return _position_label(definition, position)
 
 
 def _element_indexes(shape: tuple[int, ...]):
@@ -2848,7 +2984,8 @@ def _element_definition(
     definition: Definition, position: tuple, named: bool = True
 ) -> Definition:
     """The element definition of one element or axis point (a
-    ``dataclasses.replace``; R-A2L-DEF.105, .121, .122)."""
+    ``dataclasses.replace``; R-A2L-DEF.105, .121, .122, .140).  Named encode
+    definitions carry the bounded composed name and the parent's shared span."""
     if isinstance(position, tuple) and position and isinstance(position[0], str):
         letter, k = position
         axis = _axis_for(definition, letter)
@@ -2862,9 +2999,27 @@ def _element_definition(
                 else axis.axis_object_address
             )
             address = base_address + _point_offset(axis, k)
-        name = element_name(definition, position) if named else points.name
-        return replace(points, name=name, address=address, refusal=None)
-    name = element_name(definition, position) if named else definition.name
+        if named:
+            name_echo = f"{_name_echo_of(points)}[{k}]"
+            name = name_echo
+        else:
+            name_echo = points._name_echo
+            name = points.name
+        return replace(
+            points,
+            name=name,
+            address=address,
+            shared_with=definition.shared_with,
+            refusal=None,
+            _name_echo=name_echo,
+        )
+    if named:
+        suffix = f"[{','.join(str(i) for i in position)}]"
+        name_echo = _name_echo_of(definition) + suffix
+        name = name_echo
+    else:
+        name_echo = definition._name_echo
+        name = definition.name
     kind = "enum" if definition.conversion_type == "TAB_VERB" else "number"
     address = definition.address + _element_offset(definition, position)
     byte_length = DATATYPE_SIZES.get(definition.datatype) if definition.datatype else None
@@ -2874,6 +3029,7 @@ def _element_definition(
         kind=kind,
         address=address,
         byte_length=byte_length,
+        shared_with=definition.shared_with,
         refusal=None,
         shape=(),
         element_count=1,
@@ -2881,6 +3037,7 @@ def _element_definition(
         values_offset=0,
         record_layout=None,
         axes=(),
+        _name_echo=name_echo,
     )
 
 
@@ -3297,6 +3454,10 @@ def _name_echo_of(definition: Definition) -> str:
     )
 
 
+def _bounded_message(message: str) -> str:
+    return message if len(message) <= 1_024 else message[:1_023] + "…"
+
+
 def _check_limits(
     definition: Definition, limit_value: float, text: str
 ) -> Refusal | str | None:
@@ -3320,8 +3481,10 @@ def _check_limits(
     if definition.extended_limits is None:
         return Refusal(
             "A2L-DEF-LIMITS",
-            f"{name_echo}: {text} is outside the limits "
-            f"{limits.lower_text}..{limits.upper_text}",
+            _bounded_message(
+                f"{name_echo}: {text} is outside the limits "
+                f"{limits.lower_text}..{limits.upper_text}"
+            ),
         )
     extended = definition.extended_limits
     ebelow = extended.lower is not None and _limit_less(
@@ -3333,31 +3496,151 @@ def _check_limits(
     if ebelow or eabove:
         return Refusal(
             "A2L-DEF-EXTENDED",
-            f"{name_echo}: {text} is outside the extended limits "
-            f"{extended.lower_text}..{extended.upper_text}",
+            _bounded_message(
+                f"{name_echo}: {text} is outside the extended limits "
+                f"{extended.lower_text}..{extended.upper_text}"
+            ),
         )
-    return (
+    return _bounded_message(
         f"{name_echo}: {text} is outside the limits {limits.lower_text}.."
         f"{limits.upper_text} and inside the extended limits "
         f"{extended.lower_text}..{extended.upper_text}"
     )
 
 
+def _nearest_table_entries(
+    form: _TabForm, physical: float
+) -> list[tuple[float, float, int]]:
+    """The first two entries by distance, with stable file-order tie breaks."""
+    entries = (
+        (raw_x, y, pos) for pos, (raw_x, y) in enumerate(form.inverse_file)
+    )
+    return sorted(entries, key=lambda item: abs(item[1] - physical))[:2]
+
+
+def _table_match(
+    form: _TabForm, physical: float, interpolate: bool
+) -> Optional[tuple[float, float, int]]:
+    """The frozen tolerance match, using the shared range-minimum index."""
+    if math.isnan(physical):
+        return None
+    entries = form.inverse_match
+    ys = form.inverse_match_ys
+    lo = bisect_left(ys, physical - 1e-9)
+    hi = bisect_right(ys, physical + 1e-9)
+    if lo == hi:
+        return None
+    if interpolate:
+        return entries[lo]
+    best = (len(form.inverse_file), len(entries))
+    left = lo + form.inverse_rmq_size
+    right = hi + form.inverse_rmq_size
+    while left < right:
+        if left & 1:
+            best = min(best, form.inverse_rmq[left])
+            left += 1
+        if right & 1:
+            right -= 1
+            best = min(best, form.inverse_rmq[right])
+        left //= 2
+        right //= 2
+    return entries[best[1]] if best[1] < len(entries) else None
+
+
+def _reverse_table_form(
+    form: _TabForm, physical: float, interpolate: bool
+) -> tuple[Optional[float], str, Optional[str]]:
+    """The frozen ``_reverse_table_lookup`` result on the shared inverse form."""
+    if not form.xs:
+        return None, "lookup table missing or empty", None
+    if not form.inverse_file:
+        return None, "lookup table has no numeric entries", None
+    if not interpolate:
+        match = _table_match(form, physical, False)
+        if match is not None:
+            return match[0], "", None
+        nearest = _nearest_table_entries(form, physical)
+        named = sorted({item[1] for item in nearest})
+        nearest_text = (
+            str(named[0])
+            if len(named) == 1
+            else f"{named[0]} and {named[1]}"
+        )
+        return None, (
+            f"the value {physical} is not a table value - "
+            f"the nearest table values are {nearest_text}"
+        ), None
+
+    ordered = form.inverse_match
+    if form.inverse_y_nan or not ordered or math.isnan(physical):
+        return None, f"the value {physical} is not invertible in this table", None
+    y_min = ordered[0][1]
+    y_max = ordered[-1][1]
+    if physical < y_min or physical > y_max:
+        return None, (
+            f"the value {physical} is outside the table range "
+            f"[{y_min}, {y_max}]"
+        ), None
+    match = _table_match(form, physical, True)
+    if match is not None:
+        return match[0], "", None
+
+    raw_fraction: Optional[float] = None
+    ys = form.inverse_match_ys
+    pos = bisect_right(ys, physical) - 1
+    pairs = ((ordered[i], ordered[i + 1]) for i in range(pos, len(ordered) - 1))
+    for left, right in pairs:
+        left_raw, left_y = left[:2]
+        right_raw, right_y = right[:2]
+        if left_y <= physical <= right_y and not math.isclose(
+            right_y, left_y, rel_tol=0.0, abs_tol=1e-12
+        ):
+            raw_fraction = left_raw + (physical - left_y) * (
+                right_raw - left_raw
+            ) / (right_y - left_y)
+            break
+    if raw_fraction is None or not math.isfinite(raw_fraction):
+        return None, f"the value {physical} is not invertible in this table", None
+
+    raw_x = round(raw_fraction)
+    written, _error = _table_value(form, float(raw_x), True)
+    written_f = _to_float(written)
+    if written_f is None:
+        return None, "lookup table has no numeric entries", None
+    if math.isclose(written_f, physical, rel_tol=0.0, abs_tol=1e-9):
+        return float(raw_x), "", None
+    return float(raw_x), "", (
+        f"the value {physical} is not a table value - "
+        f"the write proceeds as {written_f}"
+    )
+
+
 def _encode_number(
     definition: Definition, a2l_data: dict, value: float
 ) -> bytes | Refusal:
-    """The encode direction (R-A2L-DEF.41, .42) through the frozen
-    ``encode_physical_to_raw_bytes`` on a mask-free tag view, or
-    ``A2L-DEF-ENCODE`` ``<name>: <reason>``."""
+    """The encode direction (R-A2L-DEF.41, .42, .131) through the shared
+    inverse table when present, then the frozen scalar byte packing."""
     name_echo = _name_echo_of(definition)
     method_name = (
         "NO_COMPU_METHOD" if definition.kind == "enum" else definition.method_name
     )
+    conversion_type = definition.conversion_type
+    table_form = definition._table_form
+    if conversion_type in ("TAB_INTP", "TAB_NOINTP") and isinstance(
+        table_form, _TabForm
+    ):
+        raw_value, reason, _flag = _reverse_table_form(
+            table_form, value, conversion_type == "TAB_INTP"
+        )
+        if raw_value is None:
+            return Refusal("A2L-DEF-ENCODE", f"{name_echo}: {reason}")
+        value = raw_value
+        conversion_type = "IDENTICAL"
     method_table: dict = {}
     if method_name is not None and method_name != "NO_COMPU_METHOD":
         method_table = {
             method_name: {
-                "conversion_type": definition.conversion_type,
+                "conversion_type": conversion_type,
                 "coeffs_linear": definition.coeffs_linear,
                 "coeffs": definition.coeffs,
                 "compu_tab_ref": definition.compu_tab_ref,
@@ -3423,9 +3706,14 @@ def _encode_enum(definition: Definition, text: str) -> float | Refusal:
     """The raw of the first entry whose text equals ``text`` (case included),
     else ``A2L-DEF-ENUM`` (R-A2L-DEF.48, .49)."""
     name_echo = _name_echo_of(definition)
-    for entry in definition.enum_entries:
-        if entry.text == text:
-            return entry.raw
+    form = definition._table_form
+    if isinstance(form, _EnumForm):
+        if text in form.by_text:
+            return form.by_text[text]
+    else:
+        for entry in definition.enum_entries:
+            if entry.text == text:
+                return entry.raw
     table_echo = (
         _echo(definition.enum_table)
         if definition.enum_table is not None
@@ -3498,17 +3786,21 @@ def _selected_bits(
 def _pair_exempt(
     definition: Definition, entry: tuple, mask_of: Callable[[str], Optional[int]]
 ) -> bool:
-    """Whether the pair ``definition`` / ``entry`` is left out of the overlap
-    guard: both masks read (the definition's own, and the neighbour's via
-    ``mask_of``) and no common selected bit (R-A2L-DEF.138)."""
-    if definition.refusal is not None:
-        return False
-    if definition.byte_length is None or definition.byte_length < 1:
+    """Whether two clean scalar number/enum tags select no common bit.
+    Arrays, curves, maps, AXIS_PTS, BLOB and INSTANCE never receive the CLEAN
+    exemption (R-A2L-DEF.138, .140)."""
+    if (
+        definition.section not in ("MEASUREMENT", "CHARACTERISTIC")
+        or definition.kind not in ("number", "enum")
+        or definition.refusal is not None
+        or definition.byte_length is None
+        or definition.byte_length < 1
+    ):
         return False
     my_mask = definition.bit_mask
     if my_mask is None:
         return False
-    if entry[2] in ("BLOB", "INSTANCE"):
+    if entry[2] not in ("MEASUREMENT", "CHARACTERISTIC"):
         return False
     other_mask = mask_of(entry[1])
     if other_mask is None:
@@ -3546,6 +3838,7 @@ def _shared_with(
     definition: Definition,
     span_index: Mapping[int, tuple],
     mask_of: Callable[[str], Optional[int]],
+    materialize: Optional[Callable[[tuple], tuple]] = None,
 ) -> Optional[str]:
     """The name of the first other entry, in cross-kind file order, whose span
     overlaps the definition's span (or whose declared address lies inside it
@@ -3560,21 +3853,26 @@ def _shared_with(
         )
     else:
         pages = (address >> 4,)
-    seen: set[int] = set()
-    multi_page = len(pages) > 1
-    candidates: list[tuple] = []
-    for page in pages:
-        for entry in span_index.get(page, ()):
-            if multi_page:
-                key = entry[0]
-                if key in seen:
-                    continue
-                seen.add(key)
-            candidates.append(entry)
-    if multi_page:
-        candidates.sort(key=lambda entry: entry[0])
+    if materialize is not None and None in span_index:
+        candidates = span_index[None]
+    else:
+        seen: set[int] = set()
+        multi_page = len(pages) > 1
+        candidates: list[tuple] = []
+        for page in pages:
+            for entry in span_index.get(page, ()):
+                if multi_page:
+                    key = entry[0]
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                candidates.append(entry)
+        if multi_page:
+            candidates.sort(key=lambda entry: entry[0])
     own_entry = True
     for entry in candidates:
+        if materialize is not None:
+            entry = materialize(entry)
         if own_entry and (
             entry[1] == definition.name
             and entry[2] == definition.section
@@ -3806,3 +4104,297 @@ def encode_definition(
             f"are shared with {_echo(definition.shared_with)}",
         )
     return Encoded(definition.address, data, notices)
+
+
+_SUPPORTED_MONOTONY = frozenset(
+    {
+        "STRICT_INCREASE",
+        "STRICT_DECREASE",
+        "MON_INCREASE",
+        "MON_DECREASE",
+        "STRICT_MON",
+        "MONOTONOUS",
+        "NOT_MON",
+    }
+)
+
+
+def _position_repr(position: object) -> str:
+    """A total, bounded rendering of a malformed edit position."""
+    try:
+        rendered = repr(position)
+    except Exception:
+        rendered = "<unrepresentable>"
+    return _operator_echo(rendered)
+
+
+def _axis_position(position: object) -> bool:
+    return (
+        type(position) is tuple
+        and len(position) == 2
+        and type(position[0]) is str
+        and position[0] in ("X", "Y")
+        and type(position[1]) is int
+        and position[1] >= 0
+    )
+
+
+def _element_position(position: object) -> bool:
+    return type(position) is tuple and all(
+        type(index) is int and index >= 0 for index in position
+    )
+
+
+def _scalar_position(position: object) -> bool:
+    return (
+        type(position) is tuple
+        and len(position) == 1
+        and type(position[0]) is int
+        and position[0] == 0
+    )
+
+
+def _index_text(index: int) -> str:
+    try:
+        return str(index)
+    except Exception:
+        return "<unrepresentable>"
+
+
+def _ordered_edits(
+    definition: Definition, edit: Mapping
+) -> list[tuple[object, object]]:
+    """The I-2 edit order, with malformed positions last in insertion order."""
+    def order(item: tuple[int, tuple[object, object]]) -> tuple:
+        serial, (position, _text) = item
+        if _axis_position(position):
+            return (0 if position[0] == "X" else 1, position[1])
+        if _element_position(position):
+            return (2, tuple(reversed(position)))
+        return (3, serial)
+
+    return [pair for _serial, pair in sorted(enumerate(edit.items()), key=order)]
+
+
+def _position_label(definition: Definition, position: object) -> str:
+    """The composed name of a structurally valid position, or bounded repr."""
+    name_echo = _name_echo_of(definition)
+    if _axis_position(position):
+        return f"{name_echo}.{position[0]}[{_index_text(position[1])}]"
+    if _element_position(position):
+        return f"{name_echo}[{','.join(_index_text(i) for i in position)}]"
+    return _position_repr(position)
+
+
+def _index_refusal(definition: Definition, position: object) -> Refusal:
+    return Refusal(
+        "A2L-DEF-INDEX",
+        f"{_name_echo_of(definition)}: {_position_label(definition, position)} "
+        "is not a value or axis point of it",
+    )
+
+
+def _monotony_refusal(
+    definition: Definition,
+    axis: AxisDefinition,
+    k: int,
+    point: Decoded,
+) -> Refusal:
+    label = f"{_name_echo_of(axis.points)}[{k}]"
+    return Refusal(
+        "A2L-DEF-MONOTONY",
+        f"{label}: {_operator_echo(point.text)} breaks the "
+        f"{axis.monotony} order of the axis",
+    )
+
+
+def _breaking_point(
+    axis: AxisDefinition, stored_points: tuple[int | float, ...]
+) -> Optional[int]:
+    """The first point index whose prefix violates the axis's stored monotony."""
+    rule = axis.monotony
+    if rule == "NOT_MON" or len(stored_points) < 2:
+        return None
+    if rule not in _SUPPORTED_MONOTONY:
+        return 1
+
+    direction = 0
+    for k in range(1, len(stored_points)):
+        previous = stored_points[k - 1]
+        current = stored_points[k]
+        if rule == "STRICT_INCREASE":
+            valid = previous < current
+        elif rule == "STRICT_DECREASE":
+            valid = previous > current
+        elif rule == "MON_INCREASE":
+            valid = previous <= current
+        elif rule == "MON_DECREASE":
+            valid = previous >= current
+        elif rule == "STRICT_MON":
+            if k == 1:
+                direction = 1 if previous < current else (-1 if previous > current else 0)
+                valid = direction != 0
+            elif direction == 1:
+                valid = previous < current
+            else:
+                valid = previous > current
+        else:
+            if direction == 0:
+                if previous < current:
+                    direction = 1
+                elif previous > current:
+                    direction = -1
+                valid = previous == current or direction != 0
+            elif direction == 1:
+                valid = previous <= current
+            else:
+                valid = previous >= current
+        if not valid:
+            return k
+    return None
+
+
+def encode_values(
+    definition: Definition,
+    a2l_data: dict,
+    edit: Mapping,
+    image: Mapping[int, int],
+) -> Encoded | Refusal:
+    """Encode edited elements and axis points into the object's whole record.
+
+    The order is definition refusal, PARSE, decode, positions, edits and
+    monotony, with the scalar ``(0,)`` case delegated to
+    :func:`encode_definition` (R-A2L-DEF.122 … .132, .153 … .155).
+    """
+    if definition.refusal is not None:
+        return definition.refusal
+    name_echo = _name_echo_of(definition)
+    errors = a2l_data.get("errors") or []
+    if errors:
+        return Refusal(
+            "A2L-DEF-PARSE",
+            f"{name_echo}: the A2L cannot be edited while it has parse errors "
+            f"— the first is {errors[0]}",
+        )
+
+    ordered = _ordered_edits(definition, edit)
+    scalar = definition.kind in ("number", "enum", "text")
+    if scalar and len(ordered) == 1 and _scalar_position(ordered[0][0]):
+        return encode_definition(definition, a2l_data, ordered[0][1], image)
+
+    decoded = decode_values(definition, a2l_data, image)
+    if isinstance(decoded, Refusal):
+        return decoded
+
+    validated: list[tuple[object, object, Optional[AxisDefinition]]] = []
+    for position, text in ordered:
+        if scalar:
+            if not _scalar_position(position):
+                return _index_refusal(definition, position)
+            validated.append((position, text, None))
+            continue
+        if _axis_position(position):
+            letter, k = position
+            axis = next(
+                (candidate for candidate in definition.axes if candidate.letter == letter),
+                None,
+            )
+            if (
+                axis is None
+                or axis.point_count is None
+                or k >= axis.point_count
+            ):
+                return _index_refusal(definition, position)
+            validated.append((position, text, axis))
+            continue
+        if _element_position(position):
+            if len(position) != len(definition.shape) or any(
+                index >= definition.shape[dim] for dim, index in enumerate(position)
+            ):
+                return _index_refusal(definition, position)
+            validated.append((position, text, None))
+            continue
+        return _index_refusal(definition, position)
+
+    byte_refusal = _image_span_refusal(definition, image, name_echo)
+    if byte_refusal is not None:
+        return byte_refusal
+    address = definition.address
+    record = bytearray(
+        image[address + offset] & 0xFF for offset in range(definition.byte_length)
+    )
+    working_image = {address + offset: byte for offset, byte in enumerate(record)}
+    notices: list[str] = []
+    edited_axes: set[str] = set()
+
+    for position, text, axis in validated:
+        if scalar:
+            continue
+        if axis is not None:
+            letter, k = position
+            edited_axes.add(axis.letter)
+            point_label = f"{_name_echo_of(axis.points)}[{k}]"
+            if axis.axis_kind == "FIX_AXIS":
+                return Refusal(
+                    "A2L-DEF-AXIS-FIXED",
+                    f"{point_label}: the points of a fixed axis are not stored in the image",
+                )
+            if axis.axis_kind == "COM_AXIS":
+                ref = _echo(axis.axis_object) if axis.axis_object else "(none)"
+                return Refusal(
+                    "A2L-DEF-AXIS-SHARED",
+                    f"{point_label}: the points of the common axis {ref} are not "
+                    f"edited through {name_echo}",
+                )
+            if not axis.has_points:
+                layout = (
+                    _echo(definition.record_layout)
+                    if definition.record_layout is not None
+                    else "(none)"
+                )
+                return Refusal(
+                    "A2L-DEF-AXIS-NONE",
+                    f"{point_label}: the record layout {layout} holds no points for this axis",
+                )
+            if axis.monotony not in _SUPPORTED_MONOTONY:
+                rule = _echo(axis.monotony)
+                return Refusal(
+                    "A2L-DEF-MONOTONY",
+                    f"{point_label}: the monotony rule {rule} is not supported",
+                )
+
+        element = _element_definition(definition, position)
+        encoded = encode_definition(element, a2l_data, text, working_image)
+        if isinstance(encoded, Refusal):
+            return encoded
+        offset = encoded.address - address
+        record[offset : offset + len(encoded.data)] = encoded.data
+        for index, byte in enumerate(encoded.data):
+            working_image[encoded.address + index] = byte
+        notices.extend(encoded.notices)
+
+    if not scalar:
+        for axis in definition.axes:
+            if axis.letter not in edited_axes or axis.monotony == "NOT_MON":
+                continue
+            decoded_axis = _decode_axis(
+                definition, axis, a2l_data, working_image, bytes(record)
+            )
+            if isinstance(decoded_axis, Refusal):
+                return decoded_axis
+            points = decoded_axis.points or ()
+            stored_points: list[int | float] = []
+            for point in points:
+                if isinstance(point, Refusal):
+                    breaking = _breaking_point(axis, tuple(stored_points))
+                    if breaking is not None:
+                        return _monotony_refusal(
+                            definition, axis, breaking, points[breaking]
+                        )
+                    return point
+                stored_points.append(point.stored)
+            breaking = _breaking_point(axis, tuple(stored_points))
+            if breaking is not None:
+                return _monotony_refusal(definition, axis, breaking, points[breaking])
+
+    return Encoded(address, bytes(record), tuple(notices))

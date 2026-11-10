@@ -1,0 +1,59 @@
+M-131d
+pytest -k a2l_def_131_6
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..ea68f9d6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -3455,7 +3455,7 @@ def _name_echo_of(definition: Definition) -> str:
+ 
+ 
+ def _bounded_message(message: str) -> str:
+-    return message if len(message) <= 1_024 else message[:1_023] + "…"
++    return message
+ 
+ 
+ def _check_limits(
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-548/test_r_a2l_def_131_6_long_and_0')
+
+    def test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes(tmp_path):
+        long_lower = "0" * 2_000 + "1"
+        long_upper = "0" * 2_000 + "2"
+        long_zero = "0" * 2_000
+        long_extended = "0" * 2_000 + "3"
+        a2l_data = inline(
+            tmp_path,
+            valblk(
+                "VLIM",
+                "0x10",
+                "RL_U16",
+                "NO_COMPU_METHOD",
+                long_lower,
+                long_upper,
+                extras=("MATRIX_DIM 2", f"EXTENDED_LIMITS {long_zero} {long_extended}"),
+            ),
+        )
+        d = a2ldef.describe_definition("VLIM", a2l_data)
+        image = img(0x10, bytes(4))
+        res = _encoded(d, a2l_data, {(0,): "0"}, image)
+        echo = "0" * 256 + "…"
+        assert len(res.notices) == 1
+        notice = res.notices[0]
+        assert notice.startswith(
+            f"VLIM[0]: 0 is outside the limits {echo}..{echo} "
+            "and inside the extended limits "
+        )
+>       assert len(notice) == 1_024 and notice.endswith("…")
+E       AssertionError: assert (1097 == 1024)
+E        +  where 1097 = len('VLIM[0]: 0 is outside the limits 000000000000000000000000000000000000000000000000000000000000000000000000000000000000...000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000…')
+
+tests/test_b103_a2l_definition_arrays_write.py:1100: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes
+1 failed, 80 deselected in 0.80s

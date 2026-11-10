@@ -1,0 +1,81 @@
+M-124
+pytest -k a2l_def_124
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..477106cb 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4283,7 +4283,7 @@ def encode_values(
+         return encode_definition(definition, a2l_data, ordered[0][1], image)
+ 
+     decoded = decode_values(definition, a2l_data, image)
+-    if isinstance(decoded, Refusal):
++    if False and isinstance(decoded, Refusal):
+         return decoded
+ 
+     validated: list[tuple[object, object, Optional[AxisDefinition]]] = []
+
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_124_1_edit_with_axis_object_missing ______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_124_1_edit_with_axis_object_missing(v171):
+        d = a2ldef.describe_definition(COM_CURVE, v171)
+        image = img(0x810320, _swords(*range(8)))
+        res = _encode(d, v171, {(0,): "1"}, image)
+>       _refusal(
+            res,
+            "A2L-DEF-AXIS-BYTES",
+            f"{COM_CURVE}.X: 9 of the 9 bytes of the axis object ASAM.C.AXIS_PTS.UBYTE_8 are not in the image",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:360: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=())
+code = 'A2L-DEF-AXIS-BYTES'
+message = 'ASAM.C.CURVE.COM_AXIS.X: 9 of the 9 bytes of the axis object ASAM.C.AXIS_PTS.UBYTE_8 are not in the image'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+_________________ test_r_a2l_def_124_2_edit_on_partial_record __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_124_2_edit_on_partial_record(v171):
+        d = a2ldef.describe_definition(COM_CURVE, v171)
+        res = _encode(d, v171, {(0,): "1"}, _com_image(5))
+>       _refusal(
+            res,
+            "A2L-DEF-AXIS-PARTIAL",
+            f"{COM_CURVE}.X: the record holds 5 of its 8 points — a record with fewer points than its maximum is not supported",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=())
+code = 'A2L-DEF-AXIS-PARTIAL'
+message = 'ASAM.C.CURVE.COM_AXIS.X: the record holds 5 of its 8 points — a record with fewer points than its maximum is not supported'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=8454944, data=b'\x01\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_1_edit_with_axis_object_missing
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_2_edit_on_partial_record
+2 failed, 1 passed, 78 deselected in 0.89s

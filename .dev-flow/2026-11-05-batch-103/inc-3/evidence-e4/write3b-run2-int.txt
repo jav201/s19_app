@@ -1,0 +1,176 @@
+.........................................F.FF........F.................. [ 96%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_131_1_edit_round_trip _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-499/test_r_a2l_def_131_1_edit_roun0')
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_a2l_def_131_1_edit_round_trip(tmp_path, v171, defc):
+        plan = _round_trip_plan(tmp_path, v171, defc)
+        for d, a2l_data, image, edit in plan:
+>           _round_trip_edit(d, a2l_data, image, edit)
+
+tests/test_b103_a2l_definition_arrays_write.py:664: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', section='CHARACTERISTIC', char_type='VAL_BLK', kind='arra..., shape=(3, 4), element_count=12, index_mode='ROW_DIR', values_offset=0, record_layout='RL.FNC.SWORD.ROW_DIR', axes=())
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454400: 1, 8454401: 0, 8454402: 2, 8454403: 0, ...}
+edit = {(1, 0): '3'}
+
+    def _round_trip_edit(d, a2l_data, image, edit) -> None:
+        before = _decoded(d, a2l_data, image)
+        before_record = bytes(image[d.address + i] for i in range(d.byte_length))
+        res = _encoded(d, a2l_data, edit, image)
+        after_image = _apply(image, res)
+        after = _decoded(d, a2l_data, after_image)
+        edited_spans = set()
+        for position, text in edit.items():
+            if isinstance(position[0], str):
+                after_point = after.axes[0 if position[0] == "X" else 1].points[position[1]]
+                element_d = d.axes[0 if position[0] == "X" else 1].points
+            else:
+                after_point = _value_at(after, d.shape, position)
+                element_d = d
+            assert isinstance(after_point, a2ldef.Decoded), (d.name, position, after_point)
+            _assert_display_agrees(element_d, float(text), after_point.value)
+            offset, size = _point_span(d, position)
+            edited_spans.update(range(offset, offset + size))
+        for position in _positions(d.shape):
+            if position not in edit:
+                assert _value_at(after, d.shape, position).stored == _value_at(before, d.shape, position).stored, (d.name, position)
+        for axis_index, axis_decoded in enumerate(before.axes):
+            if axis_decoded.points is None:
+                continue
+            letter = "X" if axis_index == 0 else "Y"
+            for k, old_point in enumerate(axis_decoded.points):
+                if (letter, k) not in edit:
+                    assert after.axes[axis_index].points[k].stored == old_point.stored, (d.name, letter, k)
+        for offset, old_byte in enumerate(before_record):
+            if offset not in edited_spans:
+>               assert res.data[offset] == old_byte, (d.name, offset)
+E               AssertionError: ('ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', 2)
+E               assert 3 == 2
+
+tests/test_b103_a2l_definition_arrays_write.py:599: AssertionError
+______________ test_r_a2l_def_131_3_exact_inverse_table_semantics ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-499/test_r_a2l_def_131_3_exact_inv0')
+
+    def test_r_a2l_def_131_3_exact_inverse_table_semantics(tmp_path):
+        table_lines = ("0 0", "1 10", "2 10", '3 "not-a-number"', "4 40")
+        physical_values = (10.0, 10.0 + 5e-10, 15.0, -1.0, 41.0, float("nan"))
+        for kind in ("TAB_INTP", "TAB_NOINTP"):
+            a2l_data = inline(
+                tmp_path,
+                cm("CM_I", kind, fmt='"%.3"', ref="CT_I"),
+                ctab("CT_I", kind, *table_lines),
+                valblk("VI", "0x10", "RL_U16", "CM_I", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+            )
+            parent = a2ldef.describe_definition("VI", a2l_data)
+            d = a2ldef._element_definition(parent, (0,))
+            table = a2l_data["compu_tabs_by_name"]["CT_I"]
+            for physical in physical_values:
+>               _check_inverse(d, a2l_data, physical, table, kind == "TAB_INTP")
+
+tests/test_b103_a2l_definition_arrays_write.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:709: in _check_inverse
+    _refusal(res, "A2L-DEF-ENCODE", f"{d.name}: {expected_reason}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENCODE', message='VI[0]: the value 41.0 is not a table value - the nearest table values are 40.0')
+code = 'A2L-DEF-ENCODE'
+message = 'VI[0]: the value 41.0 is not a table value - the nearest table values are 10.0 and 40.0'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='VI[0]: the value 41.0 is not a table value - the nearest table values are 40.0')
+E       assert ('A2L-DEF-ENC...ues are 40.0') == ('A2L-DEF-ENC...0.0 and 40.0')
+E         
+E         At index 1 diff: 'VI[0]: the value 41.0 is not a table value - the nearest table values are 40.0' != 'VI[0]: the value 41.0 is not a table value - the nearest table values are 10.0 and 40.0'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:75: AssertionError
+__________ test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-499/test_r_a2l_def_132_1_unedited_0')
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes(tmp_path, v171, defc):
+        plan = _round_trip_plan(tmp_path, v171, defc)
+        for d, a2l_data, image, edit in plan:
+>           _round_trip_edit(d, a2l_data, image, edit)
+
+tests/test_b103_a2l_definition_arrays_write.py:762: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', section='CHARACTERISTIC', char_type='VAL_BLK', kind='arra..., shape=(3, 4), element_count=12, index_mode='ROW_DIR', values_offset=0, record_layout='RL.FNC.SWORD.ROW_DIR', axes=())
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454400: 1, 8454401: 0, 8454402: 2, 8454403: 0, ...}
+edit = {(1, 0): '3'}
+
+    def _round_trip_edit(d, a2l_data, image, edit) -> None:
+        before = _decoded(d, a2l_data, image)
+        before_record = bytes(image[d.address + i] for i in range(d.byte_length))
+        res = _encoded(d, a2l_data, edit, image)
+        after_image = _apply(image, res)
+        after = _decoded(d, a2l_data, after_image)
+        edited_spans = set()
+        for position, text in edit.items():
+            if isinstance(position[0], str):
+                after_point = after.axes[0 if position[0] == "X" else 1].points[position[1]]
+                element_d = d.axes[0 if position[0] == "X" else 1].points
+            else:
+                after_point = _value_at(after, d.shape, position)
+                element_d = d
+            assert isinstance(after_point, a2ldef.Decoded), (d.name, position, after_point)
+            _assert_display_agrees(element_d, float(text), after_point.value)
+            offset, size = _point_span(d, position)
+            edited_spans.update(range(offset, offset + size))
+        for position in _positions(d.shape):
+            if position not in edit:
+                assert _value_at(after, d.shape, position).stored == _value_at(before, d.shape, position).stored, (d.name, position)
+        for axis_index, axis_decoded in enumerate(before.axes):
+            if axis_decoded.points is None:
+                continue
+            letter = "X" if axis_index == 0 else "Y"
+            for k, old_point in enumerate(axis_decoded.points):
+                if (letter, k) not in edit:
+                    assert after.axes[axis_index].points[k].stored == old_point.stored, (d.name, letter, k)
+        for offset, old_byte in enumerate(before_record):
+            if offset not in edited_spans:
+>               assert res.data[offset] == old_byte, (d.name, offset)
+E               AssertionError: ('ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', 2)
+E               assert 3 == 2
+
+tests/test_b103_a2l_definition_arrays_write.py:599: AssertionError
+____ test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-499/test_r_a2l_def_140_9_cross_pag0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd7dcee8f10>
+
+    def test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization(tmp_path, monkeypatch):
+        a2l_data = inline(
+            tmp_path,
+            rl("RL_CX", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT", "FNC_VALUES 2 UWORD ROW_DIR DIRECT", "RESERVED 12 UBYTE 52"),
+            curve("CX", "0x20", "RL_CX", axis("STD_AXIS", "CM_IDENT", "4", "0", "255")),
+            characteristic("V", "VALUE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+>       assert a2ldef.describe_definition("CX", a2l_data).byte_length == 64
+E       AssertionError: assert None == 64
+E        +  where None = Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=None, datatyp...e system cannot read'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout='RL_CX', axes=()).byte_length
+E        +    where Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=None, datatyp...e system cannot read'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout='RL_CX', axes=()) = <function describe_definition at 0x7fd7dd905800>('CX', {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...})
+E        +      where <function describe_definition at 0x7fd7dd905800> = a2ldef.describe_definition
+
+tests/test_b103_a2l_definition_arrays_write.py:894: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_1_edit_round_trip
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_3_exact_inverse_table_semantics
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization
+4 failed, 71 passed in 47.75s

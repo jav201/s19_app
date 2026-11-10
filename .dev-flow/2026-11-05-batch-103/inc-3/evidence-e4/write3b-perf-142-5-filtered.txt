@@ -1,0 +1,44 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-506/test_r_a2l_def_142_5_describin0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point(tmp_path):
+        """R-A2L-DEF.142/5 - 50 FIX curves at the cap + 50 two-axis FIX maps: median of 3 <= 1.0 s (tracemalloc on), peak < 50 MiB, exact counts/refusals, no point built."""
+        a2l, names = _cap_fixture(tmp_path)
+        times: list[float] = []
+        result: dict = {}
+        peak = 0
+        gc.collect()
+        tracemalloc.start()
+        try:
+            for _ in range(3):
+                gc.collect()
+                started = time.perf_counter()
+                result = describe_definitions(names, a2l)
+                times.append(time.perf_counter() - started)
+                _current, run_peak = tracemalloc.get_traced_memory()
+                peak = max(peak, run_peak)
+        finally:
+            tracemalloc.stop()
+        median = statistics.median(times)
+        print(f"R-A2L-DEF.142/5 median {median:.3f} s, peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+>       assert median <= report_margin(
+            "R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps",
+            median, timing_bound(BOUND_142_5_S)), times
+E       AssertionError: [12.36184066500573, 12.243807531005586, 12.329928687991924]
+E       assert 12.329928687991924 <= 1.0
+E        +  where 1.0 = report_margin('R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps', 12.329928687991924, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b103_a2l_definition_arrays_fix_cap.py:126: AssertionError
+----------------------------- Captured stdout call -----------------------------
+R-A2L-DEF.142/5 median 12.330 s, peak 342381427 bytes (326.5 MiB)
+============================= QC-TM timing margins =============================
+LOW -1133.0%  12.330 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+1 failed in 37.14s

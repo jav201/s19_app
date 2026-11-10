@@ -1,0 +1,4 @@
+s19_app.__file__=/tmp/b103-e4-3b-tests-c089df37/s19_app/__init__.py
+.........                                                                [100%]
+9 passed, 58 deselected in 45.92s
+PYTEST_EXIT=0

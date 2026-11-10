@@ -1,0 +1,56 @@
+M-58.1b
+pytest -k 58_1_arr_2_edit_arm
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..47851ea5 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4277,6 +4277,7 @@ def encode_values(
+             f"— the first is {errors[0]}",
+         )
+ 
++    image[definition.address] = 0
+     ordered = _ordered_edits(definition, edit)
+     scalar = definition.kind in ("number", "enum", "text")
+     if scalar and len(ordered) == 1 and _scalar_position(ordered[0][0]):
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged _______
+
+arrays_c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...ENT', 'datatype': 'UBYTE', ...}, ...}, 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-558/b103_i3b_c08_write0'), ...}
+
+    def test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged(arrays_c08):
+        m = _model()
+        a2l_data = arrays_c08["a2l"]
+        a2l_before = _copy3b.deepcopy(a2l_data)
+        image = arrays_c08["mem"]
+        image_before = dict(image)
+        edited = 0
+        for kind, count in (("VAL_BLK", 60), ("CURVE", 60), ("MAP", 20)):
+            for i in range(1, count + 1):
+                d = m.describe_definition(f"{kind}_{i:04d}", a2l_data)
+                decoded = _decode3b(m, d, a2l_data, image)
+                _value_edit3b(m, d, a2l_data, image, (0,) * len(d.shape), decoded.values[0].text)
+                edited += 1
+        assert edited == 140
+>       assert a2l_data == a2l_before and image == image_before
+E       AssertionError: assert ({'compu_metho...6', ...], ...} == {'compu_metho...6', ...], ...}
+E         
+E         Omitting 8 identical items, use -vv to show
+E         Use -v to get more diff and {0: 108, 1: 4...7, 3: 84, ...} == {0: 108, 1: 4...7, 3: 84, ...}
+E         
+E         Omitting 424597 identical items, use -vv to show
+E         Differing items:
+E         {8388608: 0} != {8388608: 152}
+E         {8407040: 0} != {8407040: 215}
+E         {8406536: 0} != {8406536: 255}
+E         {8406032: 0} != {8406032: 111}...
+E         
+E         ...Full output truncated (136 lines hidden), use '-vv' to show)
+
+tests/test_b103_synth_definitions.py:504: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged
+1 failed, 80 deselected in 12.72s

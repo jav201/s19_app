@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 import random
+from dataclasses import replace
 import re
 import subprocess
 import sys
@@ -42,6 +43,7 @@ import make_release_case as gen  # noqa: E402
 
 from s19_app.core import S19File  # noqa: E402
 from s19_app.tui.a2l_parse import parse_a2l_file  # noqa: E402
+from tests.test_b103_a2l_definition import _clear_parse_errors  # noqa: E402
 
 CASE08_FILES = [
     "firmware.s19",
@@ -369,3 +371,192 @@ def test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value(defc):
     for addr, b in base_image.items():
         if addr not in written:
             assert image[addr] == b, hex(addr)
+
+
+# --------------------------------------------------------------------------
+# Inc 3b: only the waiting edit arms of the five mixed Inc 3 cases.
+# --------------------------------------------------------------------------
+
+import copy as _copy3b
+
+from tests.support.b103_a2l_arrays import img as _img3b
+from tests.test_b103_a2l_definition import _assert_display_agrees as _display_agrees3b
+from tests.test_b103_a2l_definition_arrays_decode import v171 as arrays_v171  # noqa: F401
+
+
+@pytest.fixture(scope="module")
+def arrays_c08(tmp_path_factory: pytest.TempPathFactory) -> dict:
+    folder = tmp_path_factory.mktemp("b103_i3b_c08_write")
+    gen.generate(folder, SEED, 1.0)
+    regions = gen.compute_region_sizes(1.0)
+    objects = gen.build_objects(regions, random.Random(SEED))
+    return {
+        "dir": folder,
+        "a2l": parse_a2l_file(folder / "firmware.a2l"),
+        "a2l_issues": parse_a2l_file(folder / "firmware_issues.a2l"),
+        "mem": S19File(str(folder / "firmware.s19")).get_memory_map(),
+        "by_name": {o["name"]: o for o in objects},
+    }
+
+
+def _encode3b(m, d, a2l_data, edit, image):
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+    res = m.encode_values(d, a2l_data, edit, image)
+    assert isinstance(res, m.Encoded), (d.name, res)
+    return res
+
+
+def _decode3b(m, d, a2l_data, image):
+    res = m.decode_values(d, a2l_data, image)
+    assert isinstance(res, m.DecodedValues), (d.name, res)
+    return res
+
+
+def _positions3b(shape):
+    from itertools import product
+
+    return [tuple(reversed(position)) for position in product(*(range(n) for n in reversed(shape)))]
+
+
+def _apply3b(image, res):
+    after = dict(image)
+    after.update(_img3b(res.address, res.data))
+    return after
+
+
+def _value_edit3b(m, d, a2l_data, image, position, text):
+    d = replace(d, shared_with=None)
+    a2l_data = _clear_parse_errors(a2l_data)
+    before = _decode3b(m, d, a2l_data, image)
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+    after_image = _apply3b(image, res)
+    after = _decode3b(m, d, a2l_data, after_image)
+    index = _positions3b(d.shape).index(position)
+    _display_agrees3b(d, float(text), after.values[index].value)
+    for other in _positions3b(d.shape):
+        if other != position:
+            j = _positions3b(d.shape).index(other)
+            assert after.values[j].stored == before.values[j].stored, (d.name, other)
+    size = {"UBYTE": 1, "SBYTE": 1, "UWORD": 2, "SWORD": 2, "FLOAT32_IEEE": 4}[d.datatype]
+    edited = set(range(d.values_offset, d.values_offset + size))
+    for i in range(d.byte_length):
+        old = image[d.address + i]
+        if i not in edited:
+            assert res.data[i] == old, (d.name, i)
+    for address, old in image.items():
+        if not d.address <= address < d.address + d.byte_length:
+            assert after_image[address] == old, (d.name, hex(address))
+    return res, after_image
+
+
+def _v171_write_definitions(m, v171):
+    names = [t["name"] for t in v171["tags"]]
+    defs = m.describe_definitions(names, v171)
+    return {
+        name: d
+        for name, d in defs.items()
+        if d.kind in ("array", "curve", "map") and d.refusal is None
+    }
+
+
+def _v171_write_image(defs):
+    image = {}
+    for d in defs.values():
+        image.update(_img3b(d.address, bytes(d.byte_length)))
+    swords = lambda values: b"".join(int(v).to_bytes(2, "little", signed=True) for v in values)
+    image.update(_img3b(0x810100, swords(range(1, 13))))
+    image.update(_img3b(0x810120, swords(range(1, 13))))
+    image.update(_img3b(0x13A30, bytes(range(64))))
+    for address, count in ((0x810320, 8), (0x810330, 8), (0x810350, 6), (0x810360, 6), (0x810370, 6), (0x810440, 24)):
+        image.update(_img3b(address, swords(range(count))))
+    image.update(_img3b(0x810340, bytes([8, 0x46, 0x3C, 0x32, 0x28, 0x1E, 0x14, 0x0A, 0x00])))
+    return image
+
+
+def test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged(arrays_v171):
+    m = _model()
+    defs = _v171_write_definitions(m, arrays_v171)
+    assert len(defs) == 20, len(defs)
+    image = _v171_write_image(defs)
+    a2l_before = _copy3b.deepcopy(arrays_v171)
+    image_before = dict(image)
+    for d in defs.values():
+        decoded = _decode3b(m, d, arrays_v171, image)
+        position = (0,) * len(d.shape)
+        _value_edit3b(m, d, arrays_v171, image, position, decoded.values[0].text)
+    assert arrays_v171 == a2l_before and image == image_before
+
+
+def test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged(arrays_c08):
+    m = _model()
+    a2l_data = arrays_c08["a2l"]
+    a2l_before = _copy3b.deepcopy(a2l_data)
+    image = arrays_c08["mem"]
+    image_before = dict(image)
+    edited = 0
+    for kind, count in (("VAL_BLK", 60), ("CURVE", 60), ("MAP", 20)):
+        for i in range(1, count + 1):
+            d = m.describe_definition(f"{kind}_{i:04d}", a2l_data)
+            decoded = _decode3b(m, d, a2l_data, image)
+            _value_edit3b(m, d, a2l_data, image, (0,) * len(d.shape), decoded.values[0].text)
+            edited += 1
+    assert edited == 140
+    assert a2l_data == a2l_before and image == image_before
+
+
+def test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes(arrays_v171):
+    m = _model()
+    defs = _v171_write_definitions(m, arrays_v171)
+    assert len(defs) == 20
+    image = _v171_write_image(defs)
+    for d in defs.values():
+        decoded = _decode3b(m, d, arrays_v171, image)
+        old = decoded.values[0].value
+        _value_edit3b(m, d, arrays_v171, image, (0,) * len(d.shape), format(float(old) + 1, ".17g"))
+    for name, offset in (("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR", 2), ("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR", 8)):
+        d = m.describe_definition(name, arrays_v171)
+        res = _encode3b(m, d, arrays_v171, {(1, 0): "-7"}, image)
+        assert res.data[offset:offset + 2] == b"\xf9\xff"
+
+
+def test_at_b103_i3_2_edit_arm_definitions_case(defc):
+    m = _model()
+    image = dict(defc["mem"])
+    for name in ("CURVE_DEF_0001", "CURVE_DEF_0002", "MAP_DEF_0001", "VAL_BLK_DEF_0001"):
+        d = m.describe_definition(name, defc["a2l"])
+        obj = defc["objs"][name]
+        position = (0,) * len(d.shape)
+        _res, image = _value_edit3b(m, d, defc["a2l"], image, position, obj["planned_text"][1])
+
+    d = m.describe_definition("MAP_DEF_0001", defc["a2l"])
+    res = _encode3b(m, d, defc["a2l"], {("X", 1): "600"}, image)
+    assert res.data[2:4] == b"\x02\x58"
+    image = _apply3b(image, res)
+    decoded = _decode3b(m, d, defc["a2l"], image)
+    assert [p.stored for p in decoded.axes[0].points] == [224, 600, 648, 909]
+
+    curve_d = m.describe_definition("CURVE_DEF_0001", defc["a2l"])
+    common = m.encode_values(curve_d, defc["a2l"], {("X", 0): "242.500"}, defc["mem"])
+    assert common == m.Refusal(
+        "A2L-DEF-AXIS-SHARED",
+        "CURVE_DEF_0001.X[0]: the points of the common axis AXIS_DEF_0001 are not edited through CURVE_DEF_0001",
+    )
+    refusal = m.encode_values(d, defc["a2l"], {("X", 2): "100"}, image)
+    assert refusal == m.Refusal("A2L-DEF-MONOTONY", "MAP_DEF_0001.X[2]: 100 breaks the STRICT_INCREASE order of the axis")
+
+
+def test_at_b103_i3_3_edit_arm_case08_arrays(arrays_c08):
+    m = _model()
+    edited = 0
+    for original in (arrays_c08["a2l"], arrays_c08["a2l_issues"]):
+        a2l_data = _copy3b.deepcopy(original)
+        a2l_data["errors"] = []
+        for kind, count in (("VAL_BLK", 60), ("CURVE", 60), ("MAP", 20)):
+            for i in range(1, count + 1):
+                d = m.describe_definition(f"{kind}_{i:04d}", a2l_data)
+                decoded = _decode3b(m, d, a2l_data, arrays_c08["mem"])
+                text = decoded.values[1].text
+                _value_edit3b(m, d, a2l_data, arrays_c08["mem"], (0,) * len(d.shape), text)
+                edited += 1
+    assert edited == 280
+    assert case08_file_digests(arrays_c08["dir"]) == CASE08_PIN_1MIB

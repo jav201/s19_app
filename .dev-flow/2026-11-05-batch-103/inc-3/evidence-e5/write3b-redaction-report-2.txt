@@ -1,0 +1,6 @@
+evidence-e4/write3b-law-suite-hygiene-final.txt 228 [('pytest-of-<account>', 228)]
+evidence-e4/write3b-laws-core-clean-env.txt 57 [('pytest-of-<account>', 57)]
+evidence-e4/write3b-laws-core-e9abae6e.txt 57 [('pytest-of-<account>', 57)]
+evidence-e4/write3b-redaction-base-head.txt 57 [('pytest-of-<account>', 57)]
+evidence-e5/write3b-redaction-scan.txt 20 [('pytest-of-<account>', 20)]
+files_changed=5 replacements=419

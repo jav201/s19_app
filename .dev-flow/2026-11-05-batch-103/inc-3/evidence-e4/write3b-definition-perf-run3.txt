@@ -1,0 +1,58 @@
+commit=98904e820485a3ec15064f95a2b3d1300d42214d run=3
+command=pytest-definition-perf
+......................                                                   [100%]
+============================= QC-TM timing margins =============================
+30.3%  1.045 s / 1.500 s  R-A2L-DEF.150/1 COMPU_VTAB decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+32.4%  1.013 s / 1.500 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+32.5%  1.012 s / 1.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+32.6%  1.011 s / 1.500 s  R-A2L-DEF.149/9 CUBOID layout per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+32.7%  1.009 s / 1.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+32.9%  1.006 s / 1.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+32.9%  1.007 s / 1.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+33.0%  1.005 s / 1.500 s  R-A2L-DEF.150/5 matched range text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+33.2%  1.001 s / 1.500 s  R-A2L-DEF.149/7 conversion type word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/2 matched entry text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/3 default text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+33.4%  0.998 s / 1.500 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+33.4%  0.999 s / 1.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+33.4%  0.999 s / 1.500 s  R-A2L-DEF.149/6 FORMAT word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+33.4%  1.000 s / 1.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+33.5%  0.997 s / 1.500 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+33.9%  0.992 s / 1.500 s  R-A2L-DEF.149/10 empty table name per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+44.2%  1.116 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+48.8%  1.025 s / 2.000 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+48.9%  1.021 s / 2.000 s  R-A2L-DEF.149/9 CUBOID layout per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+49.0%  1.020 s / 2.000 s  R-A2L-DEF.150/1 COMPU_VTAB decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+49.1%  1.018 s / 2.000 s  R-A2L-DEF.149/8 COMPU_TAB_REF word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+49.4%  1.013 s / 2.000 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+49.5%  1.010 s / 2.000 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+49.7%  1.006 s / 2.000 s  R-A2L-DEF.149/6 FORMAT word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+49.7%  1.005 s / 2.000 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+49.8%  1.005 s / 2.000 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/2 matched entry text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/3 default text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+50.1%  0.998 s / 2.000 s  R-A2L-DEF.149/7 conversion type word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+50.2%  0.997 s / 2.000 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+50.4%  0.992 s / 2.000 s  R-A2L-DEF.149/10 empty table name per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+50.6%  0.988 s / 2.000 s  R-A2L-DEF.150/5 matched range text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+67.1%  0.165 s / 0.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+69.1%  0.155 s / 0.500 s  R-A2L-DEF.149 /2 COMPU_VTAB 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+81.5%  0.092 s / 0.500 s  R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+83.8%  0.081 s / 0.500 s  R-A2L-DEF.149 /1 COMPU_METHOD 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+84.5%  0.078 s / 0.500 s  R-A2L-DEF.149/6 FORMAT word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+84.8%  0.076 s / 0.500 s  R-A2L-DEF.149/7 conversion type word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+86.2%  0.069 s / 0.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+86.8%  0.066 s / 0.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+89.6%  0.052 s / 0.500 s  R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+99.7%  0.001 s / 0.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/7 TAB_INTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/1 COMPU_VTAB decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/2 matched entry text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/3 default text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/5 matched range text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+QC-TM: 52 bounds, 0 under 20 % margin
+22 passed in 245.85s (0:04:05)

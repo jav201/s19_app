@@ -1,0 +1,46 @@
+M-AT1
+pytest -k at_b103_i3_1_edit_arm
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..fac37cf3 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -2930,7 +2930,7 @@ def _element_offset(definition: Definition, index: tuple[int, ...]) -> int:
+             linear = index[0]
+         else:
+             i, j = index[0], index[1]
+-            linear = j + definition.shape[1] * i
++            linear = i + definition.shape[0] * j
+     else:
+         linear = 0
+         stride = 1
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes _____________
+
+arrays_v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes(arrays_v171):
+        m = _model()
+        defs = _v171_write_definitions(m, arrays_v171)
+        assert len(defs) == 20
+        image = _v171_write_image(defs)
+        for d in defs.values():
+            decoded = _decode3b(m, d, arrays_v171, image)
+            old = decoded.values[0].value
+            _value_edit3b(m, d, arrays_v171, image, (0,) * len(d.shape), format(float(old) + 1, ".17g"))
+        for name, offset in (("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR", 2), ("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR", 8)):
+            d = m.describe_definition(name, arrays_v171)
+            res = _encode3b(m, d, arrays_v171, {(1, 0): "-7"}, image)
+>           assert res.data[offset:offset + 2] == b"\xf9\xff"
+E           AssertionError: assert b'\x05\x00' == b'\xf9\xff'
+E             
+E             At index 0 diff: b'\x05' != b'\xf9'
+E             Use -v to get more diff
+
+tests/test_b103_synth_definitions.py:519: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes
+1 failed, 80 deselected in 1.04s

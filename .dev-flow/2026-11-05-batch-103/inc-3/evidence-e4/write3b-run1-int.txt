@@ -1,0 +1,320 @@
+/tmp/b103-e4-3b-int/s19_app/__init__.py
+.............F............F..............F.FF........FF...............FF [ 96%]
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_123_3_index_decr_point_edit __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_123_3_index_dec0')
+
+    def test_r_a2l_def_123_3_index_decr_point_edit(tmp_path):
+        a2l_data = inline(tmp_path, *_std_blocks("CD", point_order="INDEX_DECR"))
+        d = a2ldef.describe_definition("CD", a2l_data)
+        image = _std_image(bytes([40, 30, 20, 10]))
+        before = bytes(image[0x100 + i] for i in range(12))
+        res = _encoded(d, a2l_data, {("X", 0): "5"}, image)
+>       assert res.data[4] == 5
+E       assert 0 == 5
+
+tests/test_b103_a2l_definition_arrays_write.py:330: AssertionError
+___________________ test_r_a2l_def_128_1_axis_with_no_points ___________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...ian': False, 'conversion': 'CM_IDENT', 'datatype': 'UBYTE', ...}, ...}, 'mem': {0: 108, 1: 49, 2: 57, 3: 84, ...}, ...}
+
+    def test_r_a2l_def_128_1_axis_with_no_points(c08):
+        d = a2ldef.describe_definition("CURVE_0001", c08["a2l"])
+        res = _encode(d, c08["a2l"], {("X", 0): "1"}, c08["mem"])
+>       _refusal(res, "A2L-DEF-AXIS-NONE", "CURVE_0001.X[0]: the record layout RL_U16 holds no points for this axis")
+
+tests/test_b103_a2l_definition_arrays_write.py:436: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-PARSE', message='CURVE_0001: the A2L cannot be edited while it has parse errors — the first is Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256')
+code = 'A2L-DEF-AXIS-NONE'
+message = 'CURVE_0001.X[0]: the record layout RL_U16 holds no points for this axis'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-PARSE', message='CURVE_0001: the A2L cannot be edited while it has parse errors — the first is Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256')
+E       assert ('A2L-DEF-PAR...es 2 and 256') == ('A2L-DEF-AXI...or this axis')
+E         
+E         At index 0 diff: 'A2L-DEF-PARSE' != 'A2L-DEF-AXIS-NONE'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:74: AssertionError
+_____________________ test_r_a2l_def_131_1_edit_round_trip _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_131_1_edit_roun0')
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_a2l_def_131_1_edit_round_trip(tmp_path, v171, defc):
+        plan = _round_trip_plan(tmp_path, v171, defc)
+        for d, a2l_data, image, edit in plan:
+>           _round_trip_edit(d, a2l_data, image, edit)
+
+tests/test_b103_a2l_definition_arrays_write.py:662: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:582: in _round_trip_edit
+    _assert_display_agrees(element_d, float(text), after_point.value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', section='CHARACTERISTIC', char_type='VAL_BLK', kind='arra..., shape=(3, 4), element_count=12, index_mode='ROW_DIR', values_offset=0, record_layout='RL.FNC.SWORD.ROW_DIR', axes=())
+expected = 3.0, actual = 2
+
+    def _assert_display_agrees(d: Definition, expected: float, actual: float) -> None:
+        if actual == expected:
+            return
+        if d.decimals is not None:
+>           assert actual == pytest.approx(expected, rel=0.0, abs=0.5 * 10.0 ** -d.decimals)
+E           assert 2 == 3.0 ± 5.0e-05
+E             
+E             comparison failed
+E             Obtained: 2
+E             Expected: 3.0 ± 5.0e-05
+
+tests/test_b103_a2l_definition.py:2987: AssertionError
+______________ test_r_a2l_def_131_3_exact_inverse_table_semantics ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_131_3_exact_inv0')
+
+    def test_r_a2l_def_131_3_exact_inverse_table_semantics(tmp_path):
+        table_lines = ("0 0", "1 10", "2 10", '3 "not-a-number"', "4 40")
+        physical_values = (10.0, 10.0 + 5e-10, 15.0, -1.0, 41.0, float("nan"))
+        for kind in ("TAB_INTP", "TAB_NOINTP"):
+            a2l_data = inline(
+                tmp_path,
+                cm("CM_I", kind, fmt='"%.3"', ref="CT_I"),
+                ctab("CT_I", kind, *table_lines),
+                valblk("VI", "0x10", "RL_U16", "CM_I", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+            )
+            parent = a2ldef.describe_definition("VI", a2l_data)
+            d = a2ldef._element_definition(parent, (0,))
+            table = a2l_data["compu_tabs_by_name"]["CT_I"]
+            for physical in physical_values:
+>               _check_inverse(d, a2l_data, physical, table, kind == "TAB_INTP")
+
+tests/test_b103_a2l_definition_arrays_write.py:733: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:707: in _check_inverse
+    _refusal(res, "A2L-DEF-ENCODE", f"{d.name}: {expected_reason}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENCODE', message='VI[0]: the value -1.0 is not a table value - the nearest table values are 0.0')
+code = 'A2L-DEF-ENCODE'
+message = 'VI[0]: the value -1.0 is not a table value - the nearest table values are 0.0 and 10.0'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENCODE', message='VI[0]: the value -1.0 is not a table value - the nearest table values are 0.0')
+E       assert ('A2L-DEF-ENC...lues are 0.0') == ('A2L-DEF-ENC...0.0 and 10.0')
+E         
+E         At index 1 diff: 'VI[0]: the value -1.0 is not a table value - the nearest table values are 0.0' != 'VI[0]: the value -1.0 is not a table value - the nearest table values are 0.0 and 10.0'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:74: AssertionError
+__________ test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_132_1_unedited_0')
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes(tmp_path, v171, defc):
+        plan = _round_trip_plan(tmp_path, v171, defc)
+        for d, a2l_data, image, edit in plan:
+>           _round_trip_edit(d, a2l_data, image, edit)
+
+tests/test_b103_a2l_definition_arrays_write.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:582: in _round_trip_edit
+    _assert_display_agrees(element_d, float(text), after_point.value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', section='CHARACTERISTIC', char_type='VAL_BLK', kind='arra..., shape=(3, 4), element_count=12, index_mode='ROW_DIR', values_offset=0, record_layout='RL.FNC.SWORD.ROW_DIR', axes=())
+expected = 3.0, actual = 2
+
+    def _assert_display_agrees(d: Definition, expected: float, actual: float) -> None:
+        if actual == expected:
+            return
+        if d.decimals is not None:
+>           assert actual == pytest.approx(expected, rel=0.0, abs=0.5 * 10.0 ** -d.decimals)
+E           assert 2 == 3.0 ± 5.0e-05
+E             
+E             comparison failed
+E             Obtained: 2
+E             Expected: 3.0 ± 5.0e-05
+
+tests/test_b103_a2l_definition.py:2987: AssertionError
+____ test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_140_9_cross_pag0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f95eda131d0>
+
+    def test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization(tmp_path, monkeypatch):
+        a2l_data = inline(
+            tmp_path,
+            rl("RL_CX", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT", "ALIGNMENT_BYTE 56", "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),
+            curve("CX", "0x20", "RL_CX", axis("STD_AXIS", "CM_IDENT", "4", "0", "255")),
+            characteristic("V", "VALUE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+>       assert a2ldef.describe_definition("CX", a2l_data).byte_length == 64
+E       AssertionError: assert 12 == 64
+E        +  where 12 = Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=12, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)).byte_length
+E        +    where Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=12, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)) = <function describe_definition at 0x7f95edb0d8a0>('CX', {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...})
+E        +      where <function describe_definition at 0x7f95edb0d8a0> = a2ldef.describe_definition
+
+tests/test_b103_a2l_definition_arrays_write.py:892: AssertionError
+___________ test_r_a2l_def_153_1_scalar_values_through_encode_values ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-498/test_r_a2l_def_153_1_scalar_va0')
+
+    def test_r_a2l_def_153_1_scalar_values_through_encode_values(tmp_path):
+        a2l_data = inline2(
+            tmp_path,
+            _val("N", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            *_enum_blocks("CM_E", "VT_E", "2", '0 "OFF"', '1 "ON"'),
+            _val("E", "0x11", "RL_U8", "CM_E", "0", "1"),
+            _ascii("T", "0x20", "2"),
+        )
+        for name, text, expected in (("N", "7", b"\x07"), ("E", "ON", b"\x01"), ("T", "A", b"A\x00")):
+            d = a2ldef.describe_definition(name, a2l_data)
+            image = img(d.address, bytes(d.byte_length))
+            scalar = a2ldef.encode_definition(d, a2l_data, text, image)
+            assert scalar == a2ldef.Encoded(d.address, expected, ())
+            assert _encode(d, a2l_data, {(0,): text}, image) == scalar
+            res = _encode(d, a2l_data, {(1,): text}, image)
+            assert isinstance(res, a2ldef.Refusal) and res.code == "A2L-DEF-INDEX"
+>           assert res.message.startswith(f"{name}: ") and "(1,)" in res.message
+E           AssertionError: assert (True and '(1,)' in 'N: N[1] is not a value or axis point of it')
+E            +  where True = <built-in method startswith of str object at 0x7f95ed79db90>('N: ')
+E            +    where <built-in method startswith of str object at 0x7f95ed79db90> = 'N: N[1] is not a value or axis point of it'.startswith
+E            +      where 'N: N[1] is not a value or axis point of it' = Refusal(code='A2L-DEF-INDEX', message='N: N[1] is not a value or axis point of it').message
+E            +  and   'N: N[1] is not a value or axis point of it' = Refusal(code='A2L-DEF-INDEX', message='N: N[1] is not a value or axis point of it').message
+
+tests/test_b103_a2l_definition_arrays_write.py:926: AssertionError
+_______ test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged ________
+
+arrays_v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged(arrays_v171):
+        m = _model()
+        defs = _v171_write_definitions(m, arrays_v171)
+        assert len(defs) == 20, len(defs)
+        image = _v171_write_image(defs)
+        a2l_before = _copy3b.deepcopy(arrays_v171)
+        image_before = dict(image)
+        for d in defs.values():
+            decoded = _decode3b(m, d, arrays_v171, image)
+            position = (0,) * len(d.shape)
+>           _value_edit3b(m, d, arrays_v171, image, position, decoded.values[0].text)
+
+tests/test_b103_synth_definitions.py:482: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>
+d = Definition(name='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', section='MEASUREMENT', char_type=None, kind='array', address...ICAL', refusal=None, shape=(16,), element_count=16, index_mode='ROW_DIR', values_offset=0, record_layout=None, axes=())
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+edit = {(0,): '0'}, image = {80432: 0, 80433: 1, 80434: 2, 80435: 3, ...}
+
+    def _encode3b(m, d, a2l_data, edit, image):
+        assert hasattr(m, "encode_values"), "encode_values not implemented"
+        res = m.encode_values(d, a2l_data, edit, image)
+>       assert isinstance(res, m.Encoded), (d.name, res)
+E       AssertionError: ('ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', Refusal(code='A2L-DEF-OVERLAP', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL[0]: its bytes at 0x13A30 are shared with ASAM.M.MATRIX_DIM_16.UBYTE.IDENTICAL'))
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-OVERLAP', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL[0]: its bytes at 0x13A30 are shared with ASAM.M.MATRIX_DIM_16.UBYTE.IDENTICAL'), <class 's19_app.tui.a2l_definition.Encoded'>)
+E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>.Encoded
+
+tests/test_b103_synth_definitions.py:403: AssertionError
+______ test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged _______
+
+arrays_c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...ENT', 'datatype': 'UBYTE', ...}, ...}, 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-498/b103_i3b_c08_write0'), ...}
+
+    def test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged(arrays_c08):
+        m = _model()
+        a2l_data = arrays_c08["a2l"]
+        a2l_before = _copy3b.deepcopy(a2l_data)
+        image = arrays_c08["mem"]
+        image_before = dict(image)
+        edited = 0
+        for kind, count in (("VAL_BLK", 60), ("CURVE", 60), ("MAP", 20)):
+            for i in range(1, count + 1):
+                d = m.describe_definition(f"{kind}_{i:04d}", a2l_data)
+                decoded = _decode3b(m, d, a2l_data, image)
+>               _value_edit3b(m, d, a2l_data, image, (0,) * len(d.shape), decoded.values[0].text)
+
+tests/test_b103_synth_definitions.py:497: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>
+d = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=8388608, byte_len...fusal=None, shape=(128,), element_count=128, index_mode='COLUMN_DIR', values_offset=0, record_layout='RL_U16', axes=())
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}
+edit = {(0,): '39054'}, image = {0: 108, 1: 49, 2: 57, 3: 84, ...}
+
+    def _encode3b(m, d, a2l_data, edit, image):
+        assert hasattr(m, "encode_values"), "encode_values not implemented"
+        res = m.encode_values(d, a2l_data, edit, image)
+>       assert isinstance(res, m.Encoded), (d.name, res)
+E       AssertionError: ('VAL_BLK_0001', Refusal(code='A2L-DEF-PARSE', message='VAL_BLK_0001: the A2L cannot be edited while it has parse errors — the first is Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'))
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-PARSE', message='VAL_BLK_0001: the A2L cannot be edited while it has parse errors — the first is Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'), <class 's19_app.tui.a2l_definition.Encoded'>)
+E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>.Encoded
+
+tests/test_b103_synth_definitions.py:403: AssertionError
+_____________ test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes _____________
+
+arrays_v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes(arrays_v171):
+        m = _model()
+        defs = _v171_write_definitions(m, arrays_v171)
+        assert len(defs) == 20
+        image = _v171_write_image(defs)
+        for d in defs.values():
+            decoded = _decode3b(m, d, arrays_v171, image)
+            old = decoded.values[0].value
+>           _value_edit3b(m, d, arrays_v171, image, (0,) * len(d.shape), format(float(old) + 1, ".17g"))
+
+tests/test_b103_synth_definitions.py:511: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>
+d = Definition(name='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', section='MEASUREMENT', char_type=None, kind='array', address...ICAL', refusal=None, shape=(16,), element_count=16, index_mode='ROW_DIR', values_offset=0, record_layout=None, axes=())
+a2l_data = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+edit = {(0,): '1'}, image = {80432: 0, 80433: 1, 80434: 2, 80435: 3, ...}
+
+    def _encode3b(m, d, a2l_data, edit, image):
+        assert hasattr(m, "encode_values"), "encode_values not implemented"
+        res = m.encode_values(d, a2l_data, edit, image)
+>       assert isinstance(res, m.Encoded), (d.name, res)
+E       AssertionError: ('ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', Refusal(code='A2L-DEF-OVERLAP', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL[0]: its bytes at 0x13A30 are shared with ASAM.M.MATRIX_DIM_16.UBYTE.IDENTICAL'))
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-OVERLAP', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL[0]: its bytes at 0x13A30 are shared with ASAM.M.MATRIX_DIM_16.UBYTE.IDENTICAL'), <class 's19_app.tui.a2l_definition.Encoded'>)
+E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = <module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py'>.Encoded
+
+tests/test_b103_synth_definitions.py:403: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_3_index_decr_point_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_128_1_axis_with_no_points
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_1_edit_round_trip
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_3_exact_inverse_table_semantics
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_153_1_scalar_values_through_encode_values
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes
+10 failed, 65 passed in 33.68s
