@@ -239,3 +239,75 @@ Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b1
   - Fix, choose one: time the 399 names inside one fresh walk through the module's per-name step (the steady form), or raise the object count until the per-object part dominates (e.g. 4,000 names).
   - Until then the timed cases are decided on a quiet host: load < 2 at start, nothing else on the runner. That is how the batch-end battery runs them.
 - **The integrated tree** `~/work/b103-int2a` on <runner> is rebuilt at `e9bad3ca`, as a `--shared` clone of `~/work/s19_app` on branch `b103-inc2a-code`. It is read-only for E5 agents.
+
+
+## Inc 2b re-review against the fixed reader (2026-11-09, orchestrator Kimi)
+
+Reviews: `E3-architect-2b.md` and `E3-security-2b.md`, both DeepSeek v4 Pro after Anthropic OAuth failed with `invalid_grant`; both returned FAIL. Executed premise: `evidence-e3/e3-2b-reader-premise-transcript.txt`, PASS on <runner>, Python 3.11.18, over the integrated tree. It proves the V171 INSTANCE spans, C1/C2/C3 byte orders, `/include` and structural parse errors, the capped-error marker, H1–H4, the commented mask word, the non-duplicate commented object and an unsized INSTANCE. The transcript's expected-failure selftest proves the instrument can report failure.
+
+### Rulings on the inherited findings
+
+| Finding | Ruling |
+|---|---|
+| E3S-36 | **Closed by Inc 11 for C1/C2/C3.** Keep one residual guard: a masked definition whose own object, record layout or MOD_COMMON holds more than one live BYTE_ORDER keyword gets `A2L-DEF-MASK` with `<name>: its byte order cannot be read`. Own-tag duplicates already fail at ADDRESS. This refuses the still-possible duplicate in a layout or module instead of trusting first-wins. Case `.19/7`. |
+| E3S-37 | **Accept option (a) for BLOB and INSTANCE.** Index `a2l_data["declared_spans"]`. An address-bearing entry whose length cannot be read covers its declared address for overlap purposes; it is never exempt. `/include` is covered by the new file-level parse-error row R-A2L-DEF.152 below, not by parsing the text of an error. AXIS_PTS remains R-A2L-DEF.140 in Inc 3b, which lands before Inc 8/9 exposes a write path. V171's SBYTE and UBYTE edits now refuse against `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`; AT-B103-I2-1 applies only the ASCII edit. The ULONG and REF_1 overlaps also join the cases. |
+| E3S-38 | **Closed by Inc 11.** No C-rule cross-check. |
+| E3S-39 | **Closed by Inc 11 for bounded lengths.** The index files only bounded spans as intervals. It does not discard an address-bearing object whose length is unreadable: that object contributes its declared address as a fail-closed point. Cases `.138/4` (unsized INSTANCE) and `.138/9` (hostile tag length). |
+| E3S-40 | **Closed by Inc 11.** MATRIX_DIM is a bounded product. |
+| E3S-41 | **Accept CLEAN, not the reviewer's whole-file second pass.** `mask_of(other)` is `other.bit_mask` only when the other's definition has no refusal; otherwise None. Build candidate definitions on demand and cache them by name; a duplicate name yields its NAME refusal and therefore no mask. Object identity stays in the span entry. Do not describe every object when only one name was requested: that would re-open .136's performance defect. Cases `.138/10` (length-refused neighbour) and `.138/11` (duplicate-named neighbour). |
+| E3S-42 | **Accept.** Text kind runs the overlap step before `Encoded`; add `.138/20`. |
+| E3S-43 | **Closed by Inc 11.** The model reads `0x000F`; the surplus word invalidates the tag, and the new file-level parse refusal blocks the write. The executed premise records this. No old glued-token guard is restored. |
+| E3S-44 | **Accept.** The scan stops at the first overlapping entry not left out. |
+| Security F1 | **Accept: remove the obsolete text-of-object clauses.** Delete the BIT_MASK-letters, open-comment/quote and `/begin` clauses and their graph pass. Keep the 2a record-word checks. Add only the two live residuals: more than one BIT_MASK keyword (`.19/6`) and an unreadable byte-order source (`.19/7`). Withdraw old cases `.19/8` and `.19/10` through `.19/23`; do not implement mutants against clauses that no longer exist. Re-anchor `.138/1` through `/13` as specified below. |
+| Security F4 | **Accept a 256-character cap for operator text too.** R-A2L-DEF.151 now covers operator text as well as file words; `.40`, `.49` and every other encode message uses the same echo. Add `.151/7`. This also keeps every encode message bounded. |
+| Architect B-2 implementation | **Modified as above.** No whole-file describe. The requested definitions and the on-demand neighbours carry their actual refusals, so CLEAN falls out without a second full walk. |
+| Architect F-1 | **Accepted as record sync.** Update I-2's field list and all five current `Definition(...)` construction sites at E4, not four. No default for `shared_with`; it sits after `compu_tab_ref`, before `refusal`. |
+| Architect F-8 | **Accepted.** Re-derive the V171 overlap names at E4 against the current reader; the old e07fb00 census count is history, not a threshold. |
+
+### Requirement and case changes
+
+- **R-A2L-DEF.19:** 8/8 active cases: `/1` through `/7` and `/9`. `/6` is two live BIT_MASK lines with the same value → `A2L-DEF-MASK`; `/7` is two live BYTE_ORDER keywords in MOD_COMMON beside masked objects → `<name>: its byte order cannot be read`. Old `/8` and `/10` through `/23` are withdrawn from the active table, with their ids retained here as history. Threshold and negative controls are rewritten to the current reader.
+- **R-A2L-DEF.138:** 20/20. `/1` keeps the synthetic lost-mask negative control (a direct definition state, no longer claimed as reader-produced). `/2` BLOB overlap; `/3` sized INSTANCE overlap; `/4` unsized INSTANCE address; `/5` and `/6` V171 UBYTE and SBYTE against the single VALUE INSTANCE; `/7` V171 ULONG against the array INSTANCE; `/8` V171 REF_1 against ASAM_S_EXAMPLE; `/9` hostile unknown-length tag address; `/10` CLEAN length-refused neighbour; `/11` CLEAN duplicate-named neighbour; `/12` byte-order-refused neighbour still names the overlap; `/13` two same-valued BIT_MASK lines on the neighbour still name the overlap. `/14` through `/19` keep their existing meanings; `/20` is ASCII beside UBYTE. The row names MEASUREMENT, CHARACTERISTIC, BLOB and INSTANCE, and the declared-address point when no length can be read. Disjoint clean masks remain the only exemption.
+- **R-A2L-DEF.152 (new, 2b):** `If the A2L payload holds one or more parse errors, then the system shall refuse the encode with refusal A2L-DEF-PARSE and the message <name>: the A2L cannot be edited while it has parse errors — the first is <error>.` Five cases: `/include`, stray `*/`, unclosed comment, unclosed quoted string and the capped `… <k> more parse errors` marker. `<error>` is the payload's first error. Describe and decode are unchanged. The check follows the definition's own refusal and precedes all operator-value checks.
+- **R-A2L-DEF.151:** operator text receives the same 256-character echo as a file word. Add `/7`: 257-character operator text → the first 256 and `…`, with control characters replaced, message at most 1,024 characters.
+- **R-A2L-DEF.57:** add `/5`: invalid number text in a payload with a parse error → `A2L-DEF-PARSE`, proving the new order.
+- **R-A2L-DEF.139/3 and its case:** the commented-out old copy is not a second declaration; the live X at 0x20 is accepted. The shipped test already has this expectation; the requirement and case table were stale.
+- **AT-B103-I2-1:** nine objects refuse overlap, and only UNKNOWN is applied and decoded again. The V171 limit cases `.43`, `.44` and `.45` first assert that overlap, then clear `shared_with` solely as a test device to exercise their own requirement. The I-2 consumer note repeats that consumers never clear it and must re-describe after an A2L change.
+
+Resulting active counts for the correction to recompute mechanically: 73 requirements (20 in 2b), 318 cases (216 in 2a, 102 in 2b). The graph keeps its existing node count: the new parse refusal is part of `encode_definition`; the index consumes `declared_spans` without a new public interface. E4 owns the source docstring cleanup that currently says the module is read-only.
+
+### Re-review scope
+
+After one targeted correction of requirements, cases and graph, both reviewers re-check only the blockers and the changed rows/cases/nodes. E4 does not start until both return PASS or PASS-WITH-NOTES with no MAJOR/HIGH open.
+
+
+## Inc 2b correction completion addendum (2026-11-09, orchestrator Kimi)
+
+The DeepSeek correction agent timed out after 20 minutes with no final output. Its partial requirements/cases edits were reviewed and completed by the orchestrator; no writer remains active.
+
+Final clarifications now present in the requirements, cases and graph:
+- Operator text does **not** use `_echo`: `_operator_echo` preserves spaces and non-control Unicode, replaces controls, caps at 256 and adds `…`. `.151/7` uses 252 `x`, ` é `, ESC and `y`, so both preservation and the cut are discriminating.
+- The index preserves cross-kind file order from the section walk; BLOB/INSTANCE entries align with `declared_spans` in that order and are not appended after the tags.
+- `.138` is one EARS sentence and covers the declared address when length is unreadable. `.138/13` checks the original duplicate-mask payload gives PARSE and isolates OVERLAP with a copy whose error list is cleared.
+- Every new case has concrete names, addresses, inputs and expected messages. R-A2L-DEF.152's object is closed before each structural defect so its own NAME/ADDRESS refusal cannot mask the PARSE refusal being tested.
+- I-2 carries the actual Inc 3a fields in their real order and all five construction sites are owed at E4. The iterative-walk contract of `.58.2/24` remains in the graph.
+- R-A2L-DEF.152's Base notes that e07fb00 already returned errors but had no write consumer; Inc 11 added the capped marker.
+
+Active totals remain **73 requirements / 318 cases: 216 in 2a and 102 in 2b**. The final re-review must check these completed artifacts, not the correction agent's partial output.
+
+
+## Inc 2b E3 close (2026-11-09T22:54:27-06:00, orchestrator Kimi)
+
+**Verdict: PASS-WITH-NOTES for both reviewers.** `E3-architect-2b-r2.md` and `E3-security-2b-r2.md` agree that no MAJOR/HIGH remains and E4 is unblocked.
+
+All round-2 findings were discharged before close:
+- Coverage table refreshed, including R-A2L-DEF.152 and the active case ranges.
+- Literal and narrative I-2 blocks carry the actual Inc 3a fields in the correct order.
+- CTX *encode order* includes the payload parse step.
+- AT-B103-I2-1's row list drops `.44` and `.55`; `.44` remains covered by its own cases and `.55` by its property case.
+- The shared_with and refusal-code lists include BLOB/INSTANCE, declared-address points and PARSE.
+
+E4 addenda, not open design findings:
+- Pin the exact first-error text `Line 20: /end without /begin` on the real reader for `.152/5`.
+- Assert hostile ASCII H1 keeps `address == 0x10` before using its declared-address point in `.138/9`.
+- The byte-order residual has representative MOD_COMMON coverage; object and record-layout sources use the same counted mechanism.

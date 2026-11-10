@@ -1,0 +1,24 @@
+FAIL SELFTEST expected failure 
+PASS SELFTEST red-proof
+PACKAGE /tmp/b103-e3-2b-kimi/tree/s19_app/__init__.py
+PLATFORM Linux-7.3.3-1-cachyos-x86_64-with-glibc2.44 3.11.18
+PASS V171 span ASAM_I_SCALAR_VALUE_UWORD_SINGLE (8454144, 2)
+PASS V171 span ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5 (8454146, 10)
+PASS V171 structure address 
+PASS C1 one-line IF_DATA ('little', 16)
+PASS C2 commented BYTE_ORDER ('little', 16)
+PASS C3 commented module BYTE_ORDER ('big', 16)
+PASS parse error include ['Line 20: /include x.a2l is not read']
+PASS parse error stray comment close ['Line 20: */ without /*']
+PASS parse error unclosed comment ['Line 20: comment not closed', 'Unclosed /begin sections detected.']
+PASS parse error unclosed quote ['Line 22: quoted string not closed', 'Unclosed /begin sections detected.', 'Line 20: CHARACTERISTIC Q is not closed']
+PASS parse error cap ['… 3 more parse errors']
+PASS hostile length H1 NUMBER (None, Refusal(code='A2L-DEF-ADDRESS', message='H1: the object has no address or no length'))
+PASS hostile length H2 MATRIX_DIM (None, Refusal(code='A2L-DEF-MATRIX', message='H2: MATRIX_DIM 4294967296 is not 1 to 3 whole numbers of at least 1'))
+PASS hostile length H3 LENGTH (None, Refusal(code='A2L-DEF-ADDRESS', message='H3: the object has no address or no length'))
+PASS hostile length H4 DATA_SIZE (None, Refusal(code='A2L-DEF-ADDRESS', message='H4: the object has no address or no length'))
+PASS hostile length describe time 0.0016
+PASS commented mask word is read but the tag fails closed (None, 15, Refusal(code='A2L-DEF-ADDRESS', message='M: the object has no address or no length'))
+PASS commented object is not duplicate (1, 32, None)
+PASS unsized INSTANCE keeps declared address {'name': 'IU', 'kind': 'INSTANCE', 'address': 16, 'length': None}
+RESULT PASS

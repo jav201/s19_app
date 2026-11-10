@@ -1,0 +1,11 @@
+FAIL SELFTEST expected failure 
+PASS SELFTEST red-proof
+PACKAGE /tmp/b103-e3-2b-kimi/tree/s19_app/__init__.py
+PLATFORM Linux-7.3.3-1-cachyos-x86_64-with-glibc2.44 3.11.18
+PASS same BIT_MASK twice reports an error ['Line 20: BIT_MASK is declared twice in CHARACTERISTIC M']
+PASS same BIT_MASK twice needs the new definition guard (None, 15)
+PASS duplicate MOD_COMMON BYTE_ORDER is currently last-wins ('little', None, [])
+PASS duplicate neighbour has no clean mask (2, Refusal(code='A2L-DEF-NAME', message='N: the A2L declares that name more than once'))
+PASS declared_spans keeps section order [{'name': 'B1', 'kind': 'BLOB', 'address': 32, 'length': 2}, {'name': 'I1', 'kind': 'INSTANCE', 'address': 48, 'length': 2}]
+PASS section walk supplies cross-kind file order ['CHARACTERISTIC', 'BLOB', 'INSTANCE']
+RESULT PASS

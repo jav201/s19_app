@@ -1,0 +1,21 @@
+Re-review complete. Report written to `.dev-flow/2026-11-05-batch-103/inc-2/E3-architect-2b-r2.md`.
+
+## Verdict: PASS-WITH-NOTES
+
+**Read** (no execution — Windows, read-only, no probes/pytest/git): `E3-rulings.md` (2b re-review + correction addendum), `01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc2.md` (full), `E1-rulings.md` §4, `E1-slice.md` §7, and both premise transcripts (`e3-2b-reader-premise-transcript.txt`, `e3-2b-residual-premise-transcript.txt` — both PASS).
+
+### Former blockers — closed
+- **B-1** (`/include` had no signal) → CLOSED via R-A2L-DEF.152 keyed on `a2l_data["errors"]`, not the frozen message text.
+- **B-2** (CLEAN `mask_of` unpinned) → CLOSED: `mask_of(other)` = `bit_mask` only when no refusal + readable length, built on-demand/cached by name — explicitly no whole-file second describe.
+
+### E3S-36…E3S-44 dispositions — all confirmed against the corrected artifacts
+Byte-order residual (`.19/7`) and duplicate-BIT_MASK (`.19/6`) are the two live guards, both reachable and discriminating per the residual premise ("duplicate MOD_COMMON BYTE_ORDER is currently last-wins"). BLOB/INSTANCE + unknown-length index, cross-kind file order, CLEAN, text-kind overlap (`.138/20`), the 256-char operator echo (`.151/7`, `é`-preserving so it discriminates against `_echo`), Inc 3a fields, and the counts (73 rows = 53+20; 318 cases = 216+102) all reconcile.
+
+### Findings — all LOW, none blocking E4
+1. **Graph coverage table stale** — `.19/1…/23` (should be active 8), `.57/1…/4` (→`/5`), `.138/1…/19` (→`/20`), `.151` omits `/7`, and **R-A2L-DEF.152 has no coverage row** (`graph-inc2.md:147,164,165,173`).
+2. **CTX `encode order` term omits the parse step** that `encode_definition` step (1a) adds.
+3. **Graph P-2 note field-order** says Inc 3a fields come *after* `_name_echo`/`_table_form`; E1-rulings §4 (synced authority) puts them *before* — cosmetic (all defaulted).
+4. **AT-B103-I2-1 rows list still names `.44`/`.55`**, no longer reached since the AT encodes only `UNKNOWN`.
+5. **`.152/5` first-error text** ("/end without /begin") not evidenced in the premise (only the cap marker is); pinned at E4.
+
+No vacuous new cases; PARSE/definition-refusal/OVERLAP order is strict and conflict-free.

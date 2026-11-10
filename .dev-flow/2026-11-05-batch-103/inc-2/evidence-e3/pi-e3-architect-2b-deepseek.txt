@@ -1,0 +1,22 @@
+Architect review complete. Report written to `.dev-flow/2026-11-05-batch-103/inc-2/E3-architect-2b.md`.
+
+## Verdict: FAIL
+
+Two blockers remain (the reader premise itself is sound):
+
+**B-1 — E3S-37 residual (HIGH).** BLOB/INSTANCE is closed by Inc 11 (`parse_a2l_file` now returns `declared_spans`), but the `/include` arm has **no machine-checkable signal** — the frozen reader only emits a human error string (`a2l.py:1000-1004`) and `a2l.py` is engine-frozen. Also, the graph's span-index node (`graph-inc2.md:253`) is stale: it mentions only MEASUREMENT/CHARACTERISTIC tags, not `declared_spans` or the unsized-INSTANCE fail-closed arm.
+
+**B-2 — E3S-41 CLEAN `mask_of` not pinned (HIGH).** The graph still defines `mask_of` as "when the rules of R-A2L-DEF.19 give it no refusal" — narrower than CLEAN. Current `_describe_one` sets `bit_mask` even on a refused definition (`a2l_definition.py:818`), so a length-mismatched neighbour can still falsely exempt a write. Correction: `mask_of(other) = other.bit_mask when other.refusal is None`, best implemented as a second pass over built definitions.
+
+## Dispositions
+
+- **Closed by Inc 11 (verified in code):** E3S-36, E3S-38, E3S-39, E3S-40, E3S-43.
+- **Accept-fix, not applied:** E3S-41 (blocker), E3S-42 (case `.138/20` + step-2 wording missing), E3S-44 (scan-sentence overlap test).
+- **Partially closed:** E3S-37 (BLOB/INSTANCE done; `/include` + AXIS_PTS open).
+
+## Key case-coverage findings
+
+- **Stale under option (a):** `.44/1, .44/2, .45/1, .45/2` and AT-B103-I2-1's SBYTE/UBYTE arms use objects E3S-37 shows overlap V171's INSTANCE — the rebrief's "V171 cases expect the refusal" note omitted `.43/.44/.45`.
+- **Missing discriminating cases:** no C1/C2/C3 byte-order-exemption case (F-3), no H1–H4 hostile-length case (F-4), no commented-mask-word case (F-6), no `.138/20` (F-5).
+
+Executed: read-only inspection of current `a2l_definition.py` and `a2l.py` (Definition, describe, decode, `_read_object_lines`, `extract_a2l_tags`, `extract_declared_spans`, `parse_a2l_file`, `_section_words`/`_number_word`/`_bounded_length`) plus greps confirming `shared_with`/`_shared_with`/`_selected_bits`/span index are absent from today's code. No pytest, no probes, no git mutations.

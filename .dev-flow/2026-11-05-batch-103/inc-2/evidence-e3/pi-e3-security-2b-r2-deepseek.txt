@@ -1,0 +1,24 @@
+## Verdict: **PASS-WITH-NOTES**
+
+No MAJOR or HIGH open — E4 is not blocked. Both former MAJOR blockers are closed:
+- **E3S-37 / F2** (span-index scope) — BLOB/INSTANCE and the unknown-length declared-address point now join the index from `declared_spans`; `/include` → R-A2L-DEF.152; AXIS_PTS stays Inc 3b.
+- **F1** (stale `.19`/`.138` mask cases) — obsolete text-of-object clauses removed; only two live residuals remain.
+
+## Findings
+
+**MINOR (2, both record-sync, non-blocking):**
+1. **MINOR-1** — the graph's "Coverage" table is stale for the 2b re-review: no R-A2L-DEF.152 row, and `.57`/`.138`/`.151`/`.19` case ranges omit the new `/5`, `/20`, `/7` and still list withdrawn `.19/10–/23`. Node-level trace (`encode_definition` `req:` + examples) is complete — only the summary table lags.
+2. **MINOR-2** — graph's I-2 `Definition(...)` block (`graph-inc2.md:30-45`) elides the Inc 3a fields that `E1-rulings.md` §4 lists in real order after `refusal`; the "How Inc 3 extends I-2" prose names them `elements`/`shape` vs §4's `element_count`/`shape`.
+
+**INFO (3, E4 pin-verifications):**
+- `.152/5`'s exact first-error text `/end without /begin` isn't in the premise transcripts (the four other error texts match verbatim).
+- `.138/9` assumes hostile-length ASCII `H1` keeps declared address 0x10; premise proves length=None + refusal but checks `t["length"]`, not `t["address"]`.
+- `.19/7` cases only MOD_COMMON; object-record and record-layout BYTE_ORDER sources are representative-only.
+
+## Key confirmations
+- **Counts reconcile:** 73 requirements (53+20); 318 cases (216+102 = 4+3+95).
+- **Residual guards are non-vacuous:** premise shows the reader alone returns `(refusal None, bit_mask 0x000F)` for duplicate BIT_MASK and `('little', None, [])` for duplicate BYTE_ORDER.
+- **No PARSE ↔ definition ↔ OVERLAP conflict:** `.138/13` isolates PARSE (original payload) from OVERLAP (error-list-cleared copy); encode order keeps definition-refusal → parse → … → overlap, so `.57/5` and `.138/13` are coherent.
+- **AT-B103-I2-1** applies only `UNKNOWN`; nine overlaps asserted.
+
+**What was read vs executed:** read all cited artifacts and the two premise scripts+transcripts; executed nothing (read-only, per the brief). The premise transcripts are prior execution evidence I read, not re-ran.

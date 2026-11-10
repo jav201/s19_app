@@ -1,0 +1,21 @@
+Report written to `.dev-flow/2026-11-05-batch-103/inc-2/E3-security-2b.md`.
+
+## Verdict: FAIL
+
+Two MAJOR design-gaps block E4. Read-only review — **nothing executed** (no pytest/probes/git, per brief); every premise was checked by reading the current `a2l.py` (Inc 11 reader) and `a2l_definition.py` (Inc 2a+3a), not by citing documents.
+
+### Dispositions E3S-36…44
+- **E3S-36 → closed-by-Inc-11** (own/comment-stripped byte order), one LOW residual: a *live* duplicate BYTE_ORDER inside MOD_COMMON/RECORD_LAYOUT is still silently first-wins.
+- **E3S-37 → still open, MAJOR** — reader exposes `a2l_data["declared_spans"]` (BLOB+INSTANCE) but the 2b span index/CTX ignore it; `/include` has no fail-closed refusal; AXIS_PTS dependency (Inc 3b, R-A2L-DEF.140) unwritten.
+- **E3S-38 → closed-by-Inc-11** (comment word-breaks, duplicate-keyword detection, differing-address→None).
+- **E3S-39 → closed-by-Inc-11** (`_bounded_length`, digit caps) + MINOR residual (span-index sentence must state "only tags with length not None").
+- **E3S-40 → closed-by-Inc-11** (MATRIX_DIM product + bound).
+- **E3S-41 → accept-fix, partially** (CLEAN condition present; stale `mask_of(position)` keying).
+- **E3S-42 → accept-fix, partially** (step-9 note present; step-2 wording and **case `.138/20` missing**).
+- **E3S-43 → closed-by-Inc-11** (comment word-break makes the mask word read correctly).
+- **E3S-44 → accept-fix, NOT applied** (scan sentence still lacks "whose span overlaps").
+
+### Key new finding (F1, MAJOR)
+The 2b `.19` text-of-object clauses (`ends_open`, `begin_inside`, letters clauses) and the lost-mask case chain (`.19/6–8, /10–23` and `.138/1–13`) are **stale after Inc 11**: the fixed reader eliminates the lost-mask/misread-mask conditions they guard, so the expected refusals won't fire (e.g. `.19/14` now yields `A2L-DEF-ADDRESS`; `.138/1`'s `shared_with = MN` becomes `None` since L2C's mask is now read correctly). Negative controls become non-discriminating. Security is *better*, but the cases can't pass as written.
+
+Also flagged: F2 (span index scope, =E3S-37), F3 (one-line edits for E3S-41/42/44), F4 (LOW — operator `<text>` in `.40`/`.49` messages unbounded by `.151`), plus the E3S-45(iii) consumer note that `shared_with` must never be cleared/reused without re-describe.

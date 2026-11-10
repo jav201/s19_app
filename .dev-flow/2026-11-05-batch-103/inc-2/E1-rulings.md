@@ -107,17 +107,30 @@ Refusal(code: str, message: str)                                    frozen datac
 Limits(lower: float | None, upper: float | None,
        lower_text: str, upper_text: str)                            the text as the file writes it
 EnumEntry(raw: float, raw_max: float | None, text: str)            raw_max None for a COMPU_VTAB pair
-Definition(                                                         frozen dataclass
+Definition(                                                         frozen dataclass, fields in this order
     name: str, section: str, char_type: str | None,
     kind: str,                         "number" | "enum" | "text"   (Inc 3 adds its kinds)
     address: int | None, byte_length: int | None,
     datatype: str | None, byte_order: str,                          "big" | "little"
-    bit_mask: int | None, conversion_type: str | None, method_name: str | None,
+    bit_mask: int | None, bit_mask_text: str | None,
+    conversion_type: str | None, method_name: str | None,
     display_format: str | None, decimals: int | None, unit: str,
     limits: Limits, extended_limits: Limits | None,
     enum_table: str | None, enum_entries: tuple[EnumEntry, ...], default_text: str | None,
-    refusal: Refusal | None)           set when the object cannot be edited; every field
+    coeffs_linear: tuple[float | None, float | None] | None,        the method record's coefficients
+    coeffs: tuple[float | None, ...] | None,                        and table reference (E3A-03, E3A-22)
+    compu_tab_ref: str | None,
+    shared_with: str | None,            R-A2L-DEF.138; no default, after compu_tab_ref, before refusal
+    refusal: Refusal | None,           set when the object cannot be edited; every field
                                        it could read is still filled
+    shape: tuple[int, ...] = (),
+    element_count: int | None = 1,
+    index_mode: str | None = None,
+    values_offset: int = 0,
+    record_layout: str | None = None,
+    axes: tuple[AxisDefinition, ...] = (),                         Inc 3a fields, after refusal
+    _name_echo: str | None = None,     private (P-2; compare=False, repr=False)
+    _table_form: _EnumForm | _TabForm | None = None)   private (P-2; compare=False, repr=False)
 Decoded(stored: int | float | None, value: int | float | str | None, text: str)
 Encoded(address: int, data: bytes, notices: tuple[str, ...])
 
