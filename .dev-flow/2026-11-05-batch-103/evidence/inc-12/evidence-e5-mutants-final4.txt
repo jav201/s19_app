@@ -1,0 +1,54 @@
+tree copy method: git-clone
+tree: /tmp/b103-e5-12-mut4/tree
+source commit: 25dd5661084c4250a049e0053675de63b6296f9f
+clone commit:  25dd5661084c4250a049e0053675de63b6296f9f
+== baseline ==
+baseline rc=0 (SURVIVED) nodes=27
+== control ==
+CONTROL-KILL: applied=1 rc=1 KILLED
+== arms ==
+M1: applied=1 rc=1 KILLED
+M2: applied=1 rc=0 SURVIVED
+M3: applied=1 rc=1 KILLED
+M4: applied=1 rc=1 KILLED
+M5: applied=1 rc=1 KILLED
+M6: applied=1 rc=1 KILLED
+M7: applied=1 rc=1 KILLED
+M8: applied=1 rc=1 KILLED
+M9: applied=1 rc=1 KILLED
+M10: applied=1 rc=1 KILLED
+M11: applied=1 rc=1 KILLED
+M12: applied=1 rc=1 KILLED
+M13: applied=1 rc=1 KILLED
+M14: applied=1 rc=1 KILLED
+M15: applied=1 rc=1 KILLED
+M16: applied=1 rc=1 KILLED
+M17: applied=1 rc=1 KILLED
+M18: applied=1 rc=1 KILLED
+M19: applied=1 rc=1 KILLED
+M20: applied=1 rc=1 KILLED
+== summary ==
+M1: applied=1 rc=1 KILLED
+M2: applied=1 rc=0 SURVIVED
+M3: applied=1 rc=1 KILLED
+M4: applied=1 rc=1 KILLED
+M5: applied=1 rc=1 KILLED
+M6: applied=1 rc=1 KILLED
+M7: applied=1 rc=1 KILLED
+M8: applied=1 rc=1 KILLED
+M9: applied=1 rc=1 KILLED
+M10: applied=1 rc=1 KILLED
+M11: applied=1 rc=1 KILLED
+M12: applied=1 rc=1 KILLED
+M13: applied=1 rc=1 KILLED
+M14: applied=1 rc=1 KILLED
+M15: applied=1 rc=1 KILLED
+M16: applied=1 rc=1 KILLED
+M17: applied=1 rc=1 KILLED
+M18: applied=1 rc=1 KILLED
+M19: applied=1 rc=1 KILLED
+M20: applied=1 rc=1 KILLED
+baseline rc=0
+counts: {'KILLED': 19, 'SURVIVED': 1}
+summary.json written to /tmp/b103-e5-12-mut4/summary.json
+DONE
