@@ -1017,6 +1017,21 @@ def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monke
         "the nearest table values are -1e-09 and 0.5",
     )
 
+    for kind in ("TAB_INTP", "TAB_NOINTP"):
+        for entries, physical in (
+            (("0 1.0", "1 1.0000000005"), 1.0000000005),
+            (("0 1e-10", "1 0"), 5e-10),
+        ):
+            tolerant = inline(
+                tmp_path,
+                cm("CM_TOL", kind, fmt='"%.15"', ref="CT_TOL"),
+                ctab("CT_TOL", kind, *entries),
+                valblk("VTOL", "0x10", "RL_U16", "CM_TOL", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+            )
+            parent = a2ldef.describe_definition("VTOL", tolerant)
+            element = a2ldef._element_definition(parent, (0,))
+            _check_inverse(element, tolerant, physical, tolerant["compu_tabs_by_name"]["CT_TOL"], kind == "TAB_INTP")
+
     real_isclose = a2ldef.math.isclose
     match_calls = Counter()
 
@@ -1027,8 +1042,8 @@ def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monke
 
     monkeypatch.setattr(a2ldef.math, "isclose", counted_isclose)
     for name, entries, physical, expected_raw in (
-        ("DUP", tuple(f"{i} 1" for i in range(20_000)), 1.0, 0),
-        ("NAN", ("0 nan",) + tuple(f"{i} {i}" for i in range(1, 20_000)), 19_999.0, 19_999),
+        ("DUP", tuple(f"{i} 1" for i in range(20_000)), 1.0 + 5e-10, 0),
+        ("NAN", ("0 nan",) + tuple(f"{i} {i}" for i in range(1, 20_000)), 19_999.0 + 5e-10, 19_999),
     ):
         scaled = inline(
             tmp_path,
@@ -1046,7 +1061,9 @@ def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monke
 
 def test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes(tmp_path):
     long_lower = "0" * 2_000 + "1"
+    long_upper = "0" * 2_000 + "2"
     long_zero = "0" * 2_000
+    long_extended = "0" * 2_000 + "3"
     a2l_data = inline(
         tmp_path,
         valblk(
@@ -1055,19 +1072,21 @@ def test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes(tmp_path):
             "RL_U16",
             "NO_COMPU_METHOD",
             long_lower,
-            "10",
-            extras=("MATRIX_DIM 2", f"EXTENDED_LIMITS {long_zero} 20"),
+            long_upper,
+            extras=("MATRIX_DIM 2", f"EXTENDED_LIMITS {long_zero} {long_extended}"),
         ),
     )
     d = a2ldef.describe_definition("VLIM", a2l_data)
     image = img(0x10, bytes(4))
     res = _encoded(d, a2l_data, {(0,): "0"}, image)
     echo = "0" * 256 + "…"
-    assert res.notices == (
-        f"VLIM[0]: 0 is outside the limits {echo}..10 "
-        f"and inside the extended limits {echo}..20",
+    assert len(res.notices) == 1
+    notice = res.notices[0]
+    assert notice.startswith(
+        f"VLIM[0]: 0 is outside the limits {echo}..{echo} "
+        "and inside the extended limits "
     )
-    assert all(len(notice) <= 1_024 for notice in res.notices)
+    assert len(notice) == 1_024 and notice.endswith("…")
     controlled = a2ldef._read_limits("\n1", "\t2")
     assert controlled.lower_text == "\ufffd1"
     assert controlled.upper_text == "\ufffd2"

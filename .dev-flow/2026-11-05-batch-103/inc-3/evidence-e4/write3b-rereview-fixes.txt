@@ -1,0 +1,63 @@
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-518/test_r_a2l_def_131_5_nointp_ne0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f28e6f62e90>
+
+    def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monkeypatch):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_NEAR", "TAB_NOINTP", fmt='"%.3"', ref="CT_NEAR"),
+            ctab("CT_NEAR", "TAB_NOINTP", "2 -1e-9", "5 0.5", "7 2.0"),
+            valblk("VNEAR", "0x10", "RL_U16", "CM_NEAR", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+        )
+        d = a2ldef._element_definition(a2ldef.describe_definition("VNEAR", a2l_data), (0,))
+        res = a2ldef._encode_number(d, a2l_data, 1e308)
+        _refusal(
+            res,
+            "A2L-DEF-ENCODE",
+            "VNEAR[0]: the value 1e+308 is not a table value - "
+            "the nearest table values are -1e-09 and 0.5",
+        )
+    
+        for kind in ("TAB_INTP", "TAB_NOINTP"):
+            for entries, physical in (
+                (("0 1.0", "1 1.0000000005"), 1.0000000005),
+                (("0 1e-10", "1 0"), 5e-10),
+            ):
+                tolerant = inline(
+                    tmp_path,
+                    cm("CM_TOL", kind, fmt='"%.15"', ref="CT_TOL"),
+                    ctab("CT_TOL", kind, *entries),
+                    valblk("VTOL", "0x10", "RL_U16", "CM_TOL", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+                )
+                parent = a2ldef.describe_definition("VTOL", tolerant)
+                element = a2ldef._element_definition(parent, (0,))
+>               _check_inverse(element, tolerant, physical, tolerant["compu_tabs_by_name"]["CT_TOL"], kind == "TAB_INTP")
+
+tests/test_b103_a2l_definition_arrays_write.py:1033: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VTOL[0]', section='CHARACTERISTIC', char_type='VAL_BLK', kind='number', address=16, byte_length=2, da...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())
+a2l_data = {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type...1.0, 0.0)], 'kind': '0', 'lines': ['0 1e-10', '1 0'], 'name': 'CT_TOL', ...}}, 'declared_spans': [], 'errors': [], ...}
+physical = 5e-10
+table = {'entries': [(0.0, 1e-10), (1.0, 0.0)], 'kind': '0', 'lines': ['0 1e-10', '1 0'], 'name': 'CT_TOL', ...}
+interpolate = False
+
+    def _check_inverse(d, a2l_data, physical: float, table: dict, interpolate: bool) -> None:
+        expected_raw, expected_reason, expected_flag = a2l._reverse_table_lookup(physical, table, interpolate)
+        res = a2ldef._encode_number(d, a2l_data, physical)
+        if expected_raw is None:
+            _refusal(res, "A2L-DEF-ENCODE", f"{d.name}: {expected_reason}")
+            return
+        assert isinstance(res, bytes), (d.name, physical, res, expected_raw, expected_reason)
+        stored = int.from_bytes(res, "big" if d.byte_order == "big" else "little")
+>       assert stored == expected_raw, (d.name, physical, stored, expected_raw)
+E       AssertionError: ('VTOL[0]', 5e-10, 1, 0.0)
+E       assert 1 == 0.0
+
+tests/test_b103_a2l_definition_arrays_write.py:724: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale
+1 failed, 4 passed, 59 deselected in 1.18s

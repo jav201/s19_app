@@ -120,37 +120,43 @@ class _TabForm:
     inverse_file: tuple[tuple[float, float], ...] = field(
         init=False, compare=False, repr=False
     )
-    inverse_sorted: tuple[tuple[float, float, int], ...] = field(
+    inverse_match: tuple[tuple[float, float, int], ...] = field(
         init=False, compare=False, repr=False
     )
-    inverse_ys: tuple[float, ...] = field(init=False, compare=False, repr=False)
-    inverse_y_nan: bool = field(init=False, compare=False, repr=False)
-    inverse_by_y: Mapping = field(init=False, compare=False, repr=False)
+    inverse_match_ys: tuple[float, ...] = field(init=False, compare=False, repr=False)
+    inverse_rmq: tuple[tuple[int, int], ...] = field(init=False, compare=False, repr=False)
+    inverse_rmq_size: int = field(init=False, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         numeric: list[tuple[float, float]] = []
-        by_y: dict[float, tuple[float, float, int]] = {}
-        for pos, (raw_x, raw_y) in enumerate(zip(self.xs, self.ys)):
+        for raw_x, raw_y in zip(self.xs, self.ys):
             y = _to_float(raw_y)
             if y is not None:
                 numeric.append((float(raw_x), y))
-                if y not in by_y:
-                    by_y[y] = (float(raw_x), y, pos)
-        ordered = tuple(
+        match = tuple(
             (raw_x, y, pos)
             for pos, (raw_x, y) in sorted(
-                enumerate(numeric), key=lambda item: item[1][1]
+                (
+                    item
+                    for item in enumerate(numeric)
+                    if not math.isnan(item[1][1])
+                ),
+                key=lambda item: item[1][1],
             )
         )
+        size = 1
+        while size < len(match):
+            size *= 2
+        tree = [(len(match), len(match))] * (2 * size)
+        for pos, item in enumerate(match):
+            tree[size + pos] = (item[2], pos)
+        for pos in range(size - 1, 0, -1):
+            tree[pos] = min(tree[2 * pos], tree[2 * pos + 1])
         object.__setattr__(self, "inverse_file", tuple(numeric))
-        object.__setattr__(self, "inverse_sorted", ordered)
-        object.__setattr__(self, "inverse_ys", tuple(item[1] for item in ordered))
-        object.__setattr__(
-            self,
-            "inverse_y_nan",
-            any(isinstance(y, float) and math.isnan(y) for _, y in numeric),
-        )
-        object.__setattr__(self, "inverse_by_y", MappingProxyType(by_y))
+        object.__setattr__(self, "inverse_match", match)
+        object.__setattr__(self, "inverse_match_ys", tuple(item[1] for item in match))
+        object.__setattr__(self, "inverse_rmq", tuple(tree))
+        object.__setattr__(self, "inverse_rmq_size", size)
 
 
 @dataclass(frozen=True)
@@ -3442,6 +3448,10 @@ def _name_echo_of(definition: Definition) -> str:
     )
 
 
+def _bounded_message(message: str) -> str:
+    return message if len(message) <= 1_024 else message[:1_023] + "…"
+
+
 def _check_limits(
     definition: Definition, limit_value: float, text: str
 ) -> Refusal | str | None:
@@ -3465,8 +3475,10 @@ def _check_limits(
     if definition.extended_limits is None:
         return Refusal(
             "A2L-DEF-LIMITS",
-            f"{name_echo}: {text} is outside the limits "
-            f"{limits.lower_text}..{limits.upper_text}",
+            _bounded_message(
+                f"{name_echo}: {text} is outside the limits "
+                f"{limits.lower_text}..{limits.upper_text}"
+            ),
         )
     extended = definition.extended_limits
     ebelow = extended.lower is not None and _limit_less(
@@ -3478,10 +3490,12 @@ def _check_limits(
     if ebelow or eabove:
         return Refusal(
             "A2L-DEF-EXTENDED",
-            f"{name_echo}: {text} is outside the extended limits "
-            f"{extended.lower_text}..{extended.upper_text}",
+            _bounded_message(
+                f"{name_echo}: {text} is outside the extended limits "
+                f"{extended.lower_text}..{extended.upper_text}"
+            ),
         )
-    return (
+    return _bounded_message(
         f"{name_echo}: {text} is outside the limits {limits.lower_text}.."
         f"{limits.upper_text} and inside the extended limits "
         f"{extended.lower_text}..{extended.upper_text}"
@@ -3501,34 +3515,30 @@ def _nearest_table_entries(
 def _table_match(
     form: _TabForm, physical: float, interpolate: bool
 ) -> Optional[tuple[float, float, int]]:
-    """The frozen tolerance match, using the shared physical-value index."""
+    """The frozen tolerance match, using the shared range-minimum index."""
     if math.isnan(physical):
         return None
-    exact = form.inverse_by_y.get(physical)
-    if exact is not None:
-        return exact
-    if form.inverse_y_nan:
-        entries = form.inverse_file if not interpolate else form.inverse_sorted
-        for item in entries:
-            raw_x, y = item[:2]
-            if math.isclose(y, physical, rel_tol=0.0, abs_tol=1e-9):
-                if interpolate:
-                    return item
-                return (raw_x, y, 0)
-        return None
-    ys = form.inverse_ys
+    entries = form.inverse_match
+    ys = form.inverse_match_ys
     lo = bisect_left(ys, physical - 1e-9)
     hi = bisect_right(ys, physical + 1e-9)
-    best: Optional[tuple[float, float, int]] = None
-    for pos in range(lo, hi):
-        item = form.inverse_sorted[pos]
-        if not math.isclose(item[1], physical, rel_tol=0.0, abs_tol=1e-9):
-            continue
-        if interpolate:
-            return item
-        if best is None or item[2] < best[2]:
-            best = item
-    return best
+    if lo == hi:
+        return None
+    if interpolate:
+        return entries[lo]
+    best = (len(entries), len(entries))
+    left = lo + form.inverse_rmq_size
+    right = hi + form.inverse_rmq_size
+    while left < right:
+        if left & 1:
+            best = min(best, form.inverse_rmq[left])
+            left += 1
+        if right & 1:
+            right -= 1
+            best = min(best, form.inverse_rmq[right])
+        left //= 2
+        right //= 2
+    return entries[best[1]] if best[1] < len(entries) else None
 
 
 def _reverse_table_form(
@@ -3555,7 +3565,9 @@ def _reverse_table_form(
             f"the nearest table values are {nearest_text}"
         ), None
 
-    ordered = form.inverse_sorted
+    ordered = form.inverse_match
+    if not ordered or math.isnan(physical):
+        return None, f"the value {physical} is not invertible in this table", None
     y_min = ordered[0][1]
     y_max = ordered[-1][1]
     if physical < y_min or physical > y_max:
@@ -3568,12 +3580,9 @@ def _reverse_table_form(
         return match[0], "", None
 
     raw_fraction: Optional[float] = None
-    if not math.isnan(physical) and not form.inverse_y_nan:
-        ys = form.inverse_ys
-        pos = bisect_right(ys, physical) - 1
-        pairs = ((ordered[i], ordered[i + 1]) for i in range(pos, len(ordered) - 1))
-    else:
-        pairs = zip(ordered, ordered[1:])
+    ys = form.inverse_match_ys
+    pos = bisect_right(ys, physical) - 1
+    pairs = ((ordered[i], ordered[i + 1]) for i in range(pos, len(ordered) - 1))
     for left, right in pairs:
         left_raw, left_y = left[:2]
         right_raw, right_y = right[:2]
