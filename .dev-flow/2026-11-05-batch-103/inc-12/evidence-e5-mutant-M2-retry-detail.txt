@@ -1,0 +1,2375 @@
+=== M2 (R-TUI-042a.4/2 — Address and Length stay whole under horizontal scroll) ===
+file: s19_app/tui/app.py
+anchor: '                fixed_columns=2,'
+mutation: '                fixed_columns=0,'
+applied count: 1 (expected 1)
+mutated hash: d8e441c004631ee94ad1bb1ae1d66f0fe11192f2ff7b882c8f3cce3ad9fb518b
+restored hash: ea4f86feb74c8190d14cb88663e84163dd73d9f3f5c77a6a7804c1233ab21ec8
+verdict: KILLED (rc=1)
+
+s19_app.__file__ = /tmp/b103-e5-12-m2/tree/s19_app/__init__.py
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                 [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-80] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le0')
+width = 80, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=38, sx=110, sy=0, padding=1, w=9), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-85] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le1')
+width = 85, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=41, sx=107, sy=0, padding=1, w=12), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-90] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le2')
+width = 90, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=44, sx=104, sy=0, padding=1, w=15), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-95] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le3')
+width = 95, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=46, sx=102, sy=0, padding=1, w=17), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-100] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le4')
+width = 100, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=49, sx=99, sy=0, padding=1, w=20), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-118] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le5')
+width = 118, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=60, sx=88, sy=0, padding=1, w=31), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-160] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le6')
+width = 160, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=73, sx=75, sy=0, padding=1, w=44), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[20-220] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le7')
+width = 220, n = 20
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 24), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 59, 65, 75, 82, 91, 101, 107, 113, 121, 127, 133, 141], fixed=0, fixed_w=0, visible=108, sx=40, sy=0, padding=1, w=79), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-80] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le8')
+width = 80, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=38, sx=118, sy=0, padding=1, w=9), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-85] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le9')
+width = 85, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=41, sx=115, sy=0, padding=1, w=12), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-90] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le10')
+width = 90, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=44, sx=112, sy=0, padding=1, w=15), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-95] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le11')
+width = 95, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=46, sx=110, sy=0, padding=1, w=17), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-100] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le12')
+width = 100, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=49, sx=107, sy=0, padding=1, w=20), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-118] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le13')
+width = 118, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=60, sx=96, sy=0, padding=1, w=31), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-160] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le14')
+width = 160, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7..., 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=73, sx=83, sy=0, padding=1, w=44), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[28-220] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le15')
+width = 220, n = 28
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 32), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 67, 73, 83, 90, 99, 109, 115, 121, 129, 135, 141, 149], fixed=0, fixed_w=0, visible=108, sx=48, sy=0, padding=1, w=79), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-80] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le16')
+width = 80, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=38, sx=124, sy=0, padding=1, w=9), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-85] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le17')
+width = 85, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=41, sx=121, sy=0, padding=1, w=12), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-90] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le18')
+width = 90, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=44, sx=118, sy=0, padding=1, w=15), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-95] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le19')
+width = 95, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=46, sx=116, sy=0, padding=1, w=17), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-100] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le20')
+width = 100, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=49, sx=113, sy=0, padding=1, w=20), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-118] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le21')
+width = 118, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=60, sx=102, sy=0, padding=1, w=31), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-160] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le22')
+width = 160, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=73, sx=89, sy=0, padding=1, w=44), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[34-220] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le23')
+width = 220, n = 34
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=108, sx=54, sy=0, padding=1, w=79), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-80] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le24')
+width = 80, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=38, sx=124, sy=0, padding=1, w=9), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-85] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le25')
+width = 85, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=41, sx=121, sy=0, padding=1, w=12), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-90] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le26')
+width = 90, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=44, sx=118, sy=0, padding=1, w=15), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+___________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-95] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le27')
+width = 95, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=46, sx=116, sy=0, padding=1, w=17), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-100] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le28')
+width = 100, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=49, sx=113, sy=0, padding=1, w=20), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-118] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le29')
+width = 118, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=60, sx=102, sy=0, padding=1, w=31), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-160] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le30')
+width = 160, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=73, sx=89, sy=0, padding=1, w=44), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[48-220] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le31')
+width = 220, n = 48
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=108, sx=54, sy=0, padding=1, w=79), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-80] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le32')
+width = 80, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=38, sx=124, sy=0, padding=1, w=9), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-85] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le33')
+width = 85, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=41, sx=121, sy=0, padding=1, w=12), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-90] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le34')
+width = 90, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=44, sx=118, sy=0, padding=1, w=15), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-95] ___________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le35')
+width = 95, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=46, sx=116, sy=0, padding=1, w=17), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-100] __________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le36')
+width = 100, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=49, sx=113, sy=0, padding=1, w=20), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-118] __________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le37')
+width = 118, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=60, sx=102, sy=0, padding=1, w=31), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-160] __________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le38')
+width = 160, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7... 73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=73, sx=89, sy=0, padding=1, w=44), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+__________ test_r_tui_042a_4_2_address_length_whole_scrolled[100-220] __________
+
+tmp_path = PosixPath('/tmp/b103-e5-12-m2/zq_iso_user/tmp/pytest-of-javiergr/pytest-2/test_r_tui_042a_4_2_address_le39')
+width = 220, n = 100
+
+    @pytest.mark.parametrize("width", _P64_WIDTHS)
+    @pytest.mark.parametrize("n", _P64_NAMES)
+    def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int, n: int) -> None:
+        """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
+        Length still whole (fixed columns), 40/40."""
+>       _explore(tmp_path, page64(n), (width, 54),
+                 lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                 scrolled=True)
+
+tests/test_b103_inc12_tag_table.py:592: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    result = scenario(app, pilot, table)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:593: in <lambda>
+    lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+table = A2LTagTable(id='a2l_tags_list')
+
+    def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
+        geom = _geom(table)
+        for r in range(table.row_count):
+            cells = table.get_row_at(r)
+            assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
+            assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
+>           assert _cell_whole_in_painted(
+                table, geom, r, 0, require_visible=require_visible
+            ), (r, "Address")
+E           AssertionError: (0, 'Address')
+E           assert False
+E            +  where False = _cell_whole_in_painted(A2LTagTable(id='a2l_tags_list'), namespace(cols=[('Address', 16), ('Length', 9), ('Tag', 38), ('Source', 10), ('Raw', 6), ('Physical', 10), ('InMem', 7...73, 79, 89, 96, 105, 115, 121, 127, 135, 141, 147, 155], fixed=0, fixed_w=0, visible=108, sx=54, sy=0, padding=1, w=79), 0, 0, require_visible=True)
+
+tests/test_b103_inc12_tag_table.py:571: AssertionError
+------------- generated xml file: /tmp/b103-e5-12-m2/junit/M2.xml --------------
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-80]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-85]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-90]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-95]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-100]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-118]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-160]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[20-220]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-80]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-85]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-90]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-95]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-100]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-118]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-160]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[28-220]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-80]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-85]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-90]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-95]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-100]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-118]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-160]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[34-220]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-80]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-85]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-90]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-95]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-100]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-118]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-160]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[48-220]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-80]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-85]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-90]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-95]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-100]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-118]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-160]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled[100-220]
+40 failed in 275.71s (0:04:35)

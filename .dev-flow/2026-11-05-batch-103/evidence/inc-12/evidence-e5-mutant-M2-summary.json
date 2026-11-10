@@ -1,0 +1,53 @@
+{
+  "arms": [
+    {
+      "applied": 1,
+      "evidence": "M2.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M2",
+      "rc": 1,
+      "req": "R-TUI-042a.4/2 \u2014 Address and Length stay whole under horizontal scroll",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled"
+      ],
+      "verdict": "KILLED"
+    }
+  ],
+  "baseline": {
+    "evidence": "baseline.txt",
+    "nodes": 2,
+    "rc": 0,
+    "verdict": "GREEN"
+  },
+  "checkout": "<CHECKOUT>",
+  "clone_commit": "0691983f2e44b2ec845c177ffa9cf6aa1b424582",
+  "control": {
+    "applied": 1,
+    "evidence": "CONTROL-KILL.txt",
+    "file": "s19_app/tui/app.py",
+    "id": "CONTROL-KILL",
+    "rc": 1,
+    "req": "CONTROL \u2014 address must render (known-bad; must be KILLED)",
+    "tests": [
+      "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_1_address_length_whole_unscrolled"
+    ],
+    "verdict": "KILLED"
+  },
+  "copy_method": "git-clone",
+  "counts": {
+    "KILLED": 1
+  },
+  "evidence_base": "transcripts",
+  "expected_product_arms": 20,
+  "pristine_sha256": {
+    "s19_app/tui/app.py": "ea4f86feb74c8190d14cb88663e84163dd73d9f3f5c77a6a7804c1233ab21ec8",
+    "s19_app/utils.py": "82dc0d42a58c768270ca6f0fb6603905def0a737894273b123250f42328cf858"
+  },
+  "python": "<PYTHON>",
+  "source_commit": "0691983f2e44b2ec845c177ffa9cf6aa1b424582",
+  "test_sha256": {
+    "tests/test_b103_inc12_tag_table.py": "76deeb2c976844ba25edb1d782290a30f2d0cacb964d4b13250d056273f60cc6",
+    "tests/test_tui_a2l_detail.py": "d2760521a2782385605c6c2681c2d2d03dafb6762b9888a86fe0caba702ecf59"
+  },
+  "tree": "<TREE>"
+}

@@ -1,0 +1,16 @@
+tree copy method: git-clone
+tree: /tmp/b103-e5-12-m2/tree
+source commit: 0691983f2e44b2ec845c177ffa9cf6aa1b424582
+clone commit:  0691983f2e44b2ec845c177ffa9cf6aa1b424582
+== baseline ==
+baseline rc=0 (SURVIVED) nodes=2
+== control ==
+CONTROL-KILL: applied=1 rc=1 KILLED
+== arms ==
+M2: applied=1 rc=1 KILLED
+== summary ==
+M2: applied=1 rc=1 KILLED
+baseline rc=0
+counts: {'KILLED': 1}
+summary.json written to /tmp/b103-e5-12-m2/summary.json
+DONE
