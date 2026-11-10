@@ -190,7 +190,7 @@ S19TuiApp.on_data_table_row_highlighted
 req: R-TUI-042a.5
 in: DataTable.RowHighlighted event
 out: None
-func: unchanged. Shows the highlighted row's tag in the detail card (`app.py:16315-16360`); the fit's in-place repaint does not move the cursor, so the card shows the same tag (E3A-06 [O inplace]: 0 RowHighlighted; at E2 the rebuild moved the cursor back to the kept row).
+func: unchanged. Shows the highlighted row's tag in the detail card (`app.py:16315-16360`); the resize rebuild restores the cursor row, so the card shows the same tag (E3A-06's in-place experiment is superseded by E4-resize-ruling).
 module: s19_app/tui/app.py
 examples: (R-TUI-042a.5/6, P design resize) PAGE64(48) with the cursor on row `2` → after the resize rebuild the cursor row `2`
 
