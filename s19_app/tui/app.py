@@ -21239,9 +21239,9 @@ class S19TuiApp(App):
     def _fit_a2l_tag_cells(self) -> None:
         """
         Summary:
-            Repaint the shown A2L tag-table page's Tag cells in place when the
-            measured name width *w* no longer matches what is painted, keeping
-            the cursor, scroll and detail card (R-TUI-042a.3, .5).
+            Rebuild the shown A2L tag-table page when the measured name width
+            *w* no longer matches what is painted, restoring the cursor, scroll
+            and detail card (R-TUI-042a.3, .5).
 
         Args:
             None
@@ -21256,8 +21256,9 @@ class S19TuiApp(App):
             - Compare each painted Tag cell (``get_row_at(i)[2].plain``)
               against ``_build_a2l_table_cells(tag, w)[2].plain`` for the
               row's tag.
-            - Only when one differs, call ``_repaint_a2l_tag_cells()`` once:
-              an in-place rewrite, so the cursor and scroll stay (E3A-06).
+            - Only when one differs, rebuild through ``update_a2l_tags_view``
+              and restore the cursor and scroll. DataTable's cached composed
+              line otherwise intermittently keeps the old narrow render.
 
         Dependencies:
             Uses:
@@ -21279,7 +21280,16 @@ class S19TuiApp(App):
             painted = a2l_table.get_row_at(i)[2].plain
             wanted = self._build_a2l_table_cells(tag, name_width)[2].plain
             if painted != wanted:
-                self._repaint_a2l_tag_cells()
+                cursor_row = a2l_table.cursor_row
+                scroll_x, scroll_y = a2l_table.scroll_x, a2l_table.scroll_y
+                self.update_a2l_tags_view(self._a2l_filtered_tags)
+                if a2l_table.row_count:
+                    a2l_table.move_cursor(
+                        row=min(cursor_row, a2l_table.row_count - 1), scroll=False
+                    )
+                a2l_table.call_after_refresh(
+                    a2l_table.scroll_to, x=scroll_x, y=scroll_y, animate=False
+                )
                 return
 
     def on_a2l_tag_table_measured(self, event: A2LTagTable.Measured) -> None:
