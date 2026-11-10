@@ -1,6 +1,6 @@
 # Inc 3b — A2L definition writes: validation record (E5)
 
-**Verdict: PENDING two law chunks.** Product, functional, scale, performance, mutation, review and trace gates are complete. No HIGH/MAJOR is open. **86 requirements / 344 cases = 280 3a + 64 3b; all 344 full, covered and verified.** Product tree `98904e82`; evidence/record commit `43276135`.
+**Verdict: PASS-WITH-NOTES.** No HIGH/MAJOR is open. **86 requirements / 344 cases = 280 3a + 64 3b; all 344 full, covered and verified.** Product tree `98904e82`; functional/scale/performance evidence `43276135`; sanitized records `cd5757b6`. The open note is an inherited redaction-law failure outside Inc 3, proved on base; it is not called GREEN.
 
 **Platform.** Linux `<runner>`, Python 3.11.18, real Git checkout, isolated neutral HOME/XDG/LOCALAPPDATA, stdin closed and bytecode disabled. Windows was limited to `py_compile` and static reviews.
 
@@ -17,9 +17,12 @@
 | Trace | **1 US, 88 active requirements, 0 gaps** | `evidence-e5/write3b-trace-final.txt` |
 | Canon/ID/docs laws | **254 passed, 1 skipped** | `evidence-e4/write3b-law-canon-id-docs-final.txt` |
 | Suite hygiene | **64 passed, 2 skipped, 1 failed** — only redaction | `evidence-e4/write3b-law-suite-hygiene-final.txt` |
-| Direction-B laws | **running; not yet accepted** | `evidence-e4/write3b-law-directionb-final.txt` |
+| Direction-B laws | **184 passed** | `evidence-e4/write3b-law-directionb-final.txt` |
+| **Law total** | **502 passed, 3 skipped, 1 inherited redaction failure** | the three chunks above |
 
-The two earlier combined law attempts were not accepted: the archive lacked `.git`; the 600-second combined run had no summary. The corrected real-checkout chunks above supersede them. Inc 3's evidence was sanitized reproducibly and the official scan reports **inc3_redaction_hits=0** (`evidence-e5/write3b-redaction-scan-2.txt`). The full redaction law still fails only on inherited Inc 12 evidence and `inc-2/steps.log`, reproduced on base `8cb8f479` (`evidence-e4/write3b-law-redaction-after-inc3.txt`); those files were left intact as instructed. No redaction GREEN is claimed.
+The two earlier combined law attempts were not accepted: the archive lacked `.git`; the 600-second combined run had no summary. The corrected real-checkout chunks above supersede them.
+
+Inc 3's evidence was sanitized reproducibly and the official scan reports **inc3_redaction_hits=0** (`evidence-e5/write3b-redaction-scan-2.txt`). The full redaction law still fails only on inherited Inc 12 evidence and `inc-2/steps.log` (`evidence-e4/write3b-law-redaction-after-inc3.txt`). The base reproduction is `8cb8f479`, in `evidence-e4/write3b-redaction-base-head.txt`; those files were left intact as instructed.
 
 ## Reviews
 
@@ -27,6 +30,7 @@ The two earlier combined law attempts were not accepted: the archive lacked `.gi
 - **Security:** `E5-security-3b-rereview.md` — **PASS**, 0 MAJOR remaining.
 - **Coverage:** `E5-coverage-audit-3b.md` — **PASS**, 344 cases and 64 write tests one-to-one.
 - **Mutation-driver audit:** three non-discriminating controls were fixed before execution; all 28 final mutants were killed.
+- **Packet audit:** suite status, inherited cause and base citation corrected before closure.
 
 ## Contract amendments
 
@@ -34,4 +38,4 @@ Nonfinite TAB_INTP fractions and any NaN-y TAB_INTP are not invertible and refus
 
 ## Not run here
 
-The complete repository suite and canon fold belong to batch end. No UI changed, so no new UI capture is owed. Integration into `batch-103` waits for the two remaining law results and the completed review packet.
+The complete repository suite and canon fold belong to batch end. No UI changed, so no new UI capture is owed. Integration into `batch-103` is next, followed by merge-clone functional and trace checks.

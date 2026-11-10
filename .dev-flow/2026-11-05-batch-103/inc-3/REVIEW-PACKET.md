@@ -30,7 +30,7 @@ python -I -B -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition_arr
 python -I -B -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition_perf.py
 ```
 
-Run performance serially three times. `evidence-e5/run_3b_mutants.py` applies each of 28 mutants only to an isolated copy and records diff plus pytest output. Trace command and law chunks are indexed in `04-validation.md`.
+Run performance serially three times. `evidence-e5/run_3b_mutants.py` applies each of 28 mutants only to an isolated copy; set `S19CI_PYTHON` to the runner interpreter. Trace and law commands are indexed in `04-validation.md`.
 
 ### 4. Test results
 
@@ -40,19 +40,19 @@ Run performance serially three times. `evidence-e5/run_3b_mutants.py` applies ea
 - Performance: **3 × 22 passed**, 52 bounds each, 0 under 20 %.
 - Mutants: **28 killed / 0 survived** (`evidence-e5/mutant-table-3b.md`).
 - Reviews: code/security/coverage **PASS**; trace **88 active requirements, 0 gaps**.
-- Canon/ID/docs laws: **254 passed, 1 skipped**. Suite hygiene and Direction-B results remain pending at this draft; no all-law GREEN is claimed.
+- Laws: **502 passed, 3 skipped, 1 inherited redaction failure**: canon/ID/docs **254+1 skip**, suite hygiene **64+2 skip+1 fail**, Direction-B **184 passed**.
+- Inc 3's official redaction scan: **0 hits**; the full-law residual is outside Inc 3.
 
 ### 5. Risks
 
-- The redaction law already fails on base `8cb8f479` because of Inc 12 evidence. It was reproduced, not introduced by 3b; those transcripts remain unchanged by instruction and are not hidden from the report.
+- The redaction law already fails on base `8cb8f479` because of Inc 12 evidence and `inc-2/steps.log`. It was reproduced, not introduced by 3b; those files remain unchanged by instruction and the failure is not hidden or called GREEN.
 - NaN-y TAB_INTP is deliberately not invertible, an explicit oracle amendment; NaN-y is not a supported interpolation domain.
 - Timing/memory results apply to Linux `<runner>` / Python 3.11.18, not Windows.
 - The full repository suite and canon fold remain batch-end gates.
 
 ### 6. Pending items
 
-- Complete suite-hygiene and Direction-B law chunks and record their actual summaries.
-- Integrate Inc 3b into `batch-103`, then run the merge-clone functional and trace checks.
+- Integrate Inc 3b into `batch-103`, then run merge-clone functional and trace checks.
 - Continue the approved sequence with Inc 5; no push of additional branches is authorized.
 
 ### 7. Suggested next task
