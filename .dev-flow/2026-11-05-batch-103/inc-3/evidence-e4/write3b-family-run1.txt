@@ -1,0 +1,55 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........................................................................ [ 87%]
+.........F.............................................................. [ 97%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-502/test_r_a2l_def_142_5_describin0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point(tmp_path):
+        """R-A2L-DEF.142/5 - 50 FIX curves at the cap + 50 two-axis FIX maps: median of 3 <= 1.0 s (tracemalloc on), peak < 50 MiB, exact counts/refusals, no point built."""
+        a2l, names = _cap_fixture(tmp_path)
+        times: list[float] = []
+        result: dict = {}
+        peak = 0
+        gc.collect()
+        tracemalloc.start()
+        try:
+            for _ in range(3):
+                gc.collect()
+                started = time.perf_counter()
+                result = describe_definitions(names, a2l)
+                times.append(time.perf_counter() - started)
+                _current, run_peak = tracemalloc.get_traced_memory()
+                peak = max(peak, run_peak)
+        finally:
+            tracemalloc.stop()
+        median = statistics.median(times)
+        print(f"R-A2L-DEF.142/5 median {median:.3f} s, peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+>       assert median <= report_margin(
+            "R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps",
+            median, timing_bound(BOUND_142_5_S)), times
+E       AssertionError: [27.32851437399222, 27.01765617899946, 27.15651531300682]
+E       assert 27.15651531300682 <= 1.0
+E        +  where 1.0 = report_margin('R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps', 27.15651531300682, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b103_a2l_definition_arrays_fix_cap.py:126: AssertionError
+----------------------------- Captured stdout call -----------------------------
+R-A2L-DEF.142/5 median 27.157 s, peak 588443627 bytes (561.2 MiB)
+============================= QC-TM timing margins =============================
+LOW -2615.7%  27.157 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+89.0%  0.550 s / 5.000 s  R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+100.0%  0.000 s / 1.000 s  R-A2L-DEF.147/9 describe FE huge shift  tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_9_huge_shift_computes_no_power
+QC-TM: 3 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+1 failed, 661 passed in 214.85s (0:03:34)

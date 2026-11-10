@@ -235,3 +235,20 @@ Both round-3 reports are **PASS-WITH-NOTES**, with no HIGH/MAJOR. Their notes ar
 - CTX distinguishes valid position names from malformed positions' bounded `repr`.
 
 **Inc 3b E3 is CLOSED: PASS-WITH-NOTES.** E4 may implement the corrected graph. The cost and duplicate-describe controls are mandatory evidence, not optional optimizations.
+
+## Inc 3b E4 implementation note — lazy candidate materialization (2026-11-10)
+
+E4 evidence required an implementation-level refinement of correction 2. Eagerly describing every candidate made `.142/5` take 27 s and 561 MiB. The implementation instead evaluates candidates in global file order and materialises each at most once, on demand, cached by section position. Requested definitions are reused; unrequested candidates are described once with the same `reads`. Its original 1 MiB lower window was proved incomplete by E5 and is superseded by the ruling below: every declared span remains a candidate, including over-cap and earlier-page records.
+
+This changes no refusal, exemption, span or ordering rule. The graph states the refined mechanism. After the refinement, `.142/5` passes at 0.103 s with its memory bound, and the complete functional family passes 662 tests. E5 must check the lazy implementation and its duplicate-describe oracle explicitly.
+
+
+## Inc 3b E5 corrective ruling (2026-11-10, orchestrator Kimi)
+
+E5-3B-01 … -04 and E5S-3B-01 … -08 are accepted and corrected together. No new requirement row is needed: the six added cases belong to existing .125, .131 and .140. Final counts are **86 rows, 344 cases = 280 3a + 64 3b; S2.7g 46, S2.7h 58**.
+
+- Every declared span stays a lazy candidate. The former 1 MiB lower bound is withdrawn because length-refused spans deliberately retain their over-cap final length. MEASUREMENT with malformed multi-value MATRIX_DIM and VALUE refused by .145 use full description, never provisional tag lengths.
+- `_TabForm` gains an immutable physical-value → first-file-entry index used before tolerance bisection. NaN remains only a fallback; a TAB_NOINTP rejection selects its nearest two over all entries with stable file-order ties.
+- **Frozen-oracle amendment:** a nonfinite interpolated raw fraction is not invertible and returns A2L-DEF-ENCODE, never `round(nan)` / `round(inf)`. The frozen helper shares the legacy defect and is intentionally not used as the oracle for `.131/4`.
+- Public `element_name` delegates to the existing total `_position_label`. Ordinary and extended limits both use `_echo`; their numeric comparisons are unchanged.
+- `.142/5` remains within 1.0 s after these changes (0.109 s in `write3b-family-run6.txt`); the 81-case integration and 668-case functional family are GREEN. Re-review, scale/performance repetitions, law guards and mutants remain E5 gates.

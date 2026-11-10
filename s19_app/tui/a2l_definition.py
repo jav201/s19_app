@@ -125,13 +125,17 @@ class _TabForm:
     )
     inverse_ys: tuple[float, ...] = field(init=False, compare=False, repr=False)
     inverse_y_nan: bool = field(init=False, compare=False, repr=False)
+    inverse_by_y: Mapping = field(init=False, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         numeric: list[tuple[float, float]] = []
-        for raw_x, raw_y in zip(self.xs, self.ys):
+        by_y: dict[float, tuple[float, float, int]] = {}
+        for pos, (raw_x, raw_y) in enumerate(zip(self.xs, self.ys)):
             y = _to_float(raw_y)
             if y is not None:
                 numeric.append((float(raw_x), y))
+                if y not in by_y:
+                    by_y[y] = (float(raw_x), y, pos)
         ordered = tuple(
             (raw_x, y, pos)
             for pos, (raw_x, y) in sorted(
@@ -146,6 +150,7 @@ class _TabForm:
             "inverse_y_nan",
             any(isinstance(y, float) and math.isnan(y) for _, y in numeric),
         )
+        object.__setattr__(self, "inverse_by_y", MappingProxyType(by_y))
 
 
 @dataclass(frozen=True)
@@ -563,8 +568,8 @@ def _read_limits(lower_word: object, upper_word: object) -> Limits:
     return Limits(
         lower,
         upper,
-        str(lower_word) if lower is not None else "",
-        str(upper_word) if upper is not None else "",
+        _echo(lower_word) if lower is not None else "",
+        _echo(upper_word) if upper is not None else "",
     )
 
 
@@ -593,11 +598,10 @@ def describe_definition(name: str, a2l_data: dict) -> Definition:
 def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Definition]:
     """Build the definitions of ``names`` in one walk of ``a2l_data``.
 
-    Shared sections are reduced once in ``reads``.  Every declared span
-    candidate is then materialised once, reusing requested definitions, and
-    the final ``Definition.byte_length`` is indexed on every page it touches.
-    AXIS_PTS records join the same cross-kind index; an unreadable final length
-    remains a fail-closed point at the declared address (R-A2L-DEF.140).
+    Shared sections are reduced once in ``reads``.  Declared spans are then
+    materialised at most once on demand, reusing requested definitions.
+    AXIS_PTS records join the same cross-kind candidates; an unreadable final
+    length remains a fail-closed point at the declared address (R-A2L-DEF.140).
 
     Args:
         names (Iterable[str]): The names to describe.
@@ -793,34 +797,48 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
         axis_records[key] = (byte_length, byte_order)
         return axis_records[key]
 
-    final_entries: list[tuple] = []
-    for entry in span_entries:
+    def is_array_entry(entry: tuple) -> bool:
+        tags = tags_by_name.get(entry[1]) or []
+        sections = object_sections_by_name.get(entry[1]) or []
+        if len(tags) != 1 or len(sections) != 1:
+            return True
+        tag = tags[0]
+        if tag.get("section") == "CHARACTERISTIC":
+            if tag.get("char_type") == "VALUE":
+                matrix = _read_matrix_dim(sections[0])
+                return matrix is not None and _is_multi_value_matrix(matrix[0])
+            return tag.get("char_type") in ("VAL_BLK", "CURVE", "MAP")
+        if tag.get("section") == "MEASUREMENT":
+            matrix = _read_matrix_dim(sections[0])
+            return matrix is not None and (
+                matrix[1] is None or _is_multi_value_matrix(matrix[0])
+            )
+        return False
+
+    entry_cache: dict[int, tuple] = {}
+
+    def materialize(entry: tuple) -> tuple:
+        key = entry[0]
+        if key in entry_cache:
+            return entry_cache[key]
         kind = entry[2]
-        if kind in ("MEASUREMENT", "CHARACTERISTIC"):
+        if kind in ("MEASUREMENT", "CHARACTERISTIC") and is_array_entry(entry):
             other = describe_name(entry[1])
             byte_length = other.byte_length
             byte_order = other.byte_order
+        elif kind in ("MEASUREMENT", "CHARACTERISTIC"):
+            byte_length = entry[4]
+            byte_order = entry[5]
         elif kind == "AXIS_PTS":
             byte_length, byte_order = axis_span(entry)
         else:
             byte_length = entry[4]
             byte_order = entry[5]
-        final_entries.append(entry[:4] + (byte_length, byte_order))
-
-    span_index: dict[int, list[tuple]] = {}
-    for entry in final_entries:
-        _position, _name, _kind, address, byte_length, _byte_order = entry
-        if byte_length is not None and byte_length >= 1:
-            first_page = address >> 4
-            last_page = (address + byte_length - 1) >> 4
-            pages = range(first_page, last_page + 1)
-        else:
-            pages = (address >> 4,)
-        for page in pages:
-            span_index.setdefault(page, []).append(entry)
+        entry_cache[key] = entry[:4] + (byte_length, byte_order)
+        return entry_cache[key]
 
     def mask_of(other_name: str) -> Optional[int]:
-        other = definitions.get(other_name)
+        other = describe_name(other_name)
         if (
             other is None
             or other.section not in ("MEASUREMENT", "CHARACTERISTIC")
@@ -832,13 +850,20 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             return None
         return other.bit_mask
 
+    span_index: dict[int, list[tuple]] = {}
     result: dict[str, Definition] = {}
     for name in requested:
         definition = definitions[name]
+        address = definition.address
+        if address is None:
+            result[name] = definition
+            continue
+        span_index[None] = span_entries
         result[name] = replace(
             definition,
-            shared_with=_shared_with(definition, span_index, mask_of),
+            shared_with=_shared_with(definition, span_index, mask_of, materialize),
         )
+
     return result
 
 
@@ -2694,10 +2719,9 @@ def _read_object_lines(section: Optional[dict]) -> dict:
             result["format"] = body[i + 1]
             i += 1
         elif word == "EXTENDED_LIMITS" and result["extended_limits"] is None and i + 2 < n:
-            lo = _finite_number(body[i + 1])
-            hi = _finite_number(body[i + 2])
-            if lo is not None and hi is not None:
-                result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 2])
+            limits = _read_limits(body[i + 1], body[i + 2])
+            if limits.lower is not None and limits.upper is not None:
+                result["extended_limits"] = limits
                 i += 2
             # A line that does not hold two numbers consumes only its keyword, so the
             # next keyword (e.g. FORMAT) is still read (R-A2L-DEF.21/1, .22).
@@ -2868,12 +2892,8 @@ def _decode_stored(
 
 
 def element_name(definition: Definition, position: tuple) -> str:
-    """An element index → ``<name>[<i>]`` / ``<name>[<i>,<j>]`` / …; an axis
-    point ``(letter, k)`` → ``<name>.<letter>[<k>]`` (I-2; zero-based)."""
-    if isinstance(position, tuple) and position and isinstance(position[0], str):
-        letter, k = position
-        return f"{definition.name}.{letter}[{k}]"
-    return f"{definition.name}[{','.join(str(i) for i in position)}]"
+    """An element or axis point name, or a bounded malformed-position repr."""
+    return _position_label(definition, position)
 
 
 def _element_indexes(shape: tuple[int, ...]):
@@ -3471,52 +3491,11 @@ def _check_limits(
 def _nearest_table_entries(
     form: _TabForm, physical: float
 ) -> list[tuple[float, float, int]]:
-    """The first two entries by rounded distance, file order breaking ties."""
-    if math.isnan(physical) or form.inverse_y_nan:
-        candidates = (
-            (raw_x, y, pos)
-            for pos, (raw_x, y) in enumerate(form.inverse_file)
-        )
-        ordered = form.inverse_sorted
-        ys = form.inverse_ys
-        left = right = None
-    else:
-        ordered = form.inverse_sorted
-        ys = form.inverse_ys
-        at = bisect_left(ys, physical)
-        left = (max(bisect_left(ys, ys[at - 1]) - 1, 0), at) if at else None
-        right = (
-            (at, min(bisect_right(ys, ys[at]) + 1, len(ys)))
-            if at < len(ys)
-            else None
-        )
-        candidates = ()
-
-    best: list[tuple[float, float, int]] = []
-
-    def offer(item: tuple[float, float, int]) -> None:
-        distance = abs(item[1] - physical)
-        for pos, old in enumerate(best):
-            old_distance = abs(old[1] - physical)
-            if distance < old_distance or (
-                distance == old_distance and item[2] < old[2]
-            ):
-                best.insert(pos, item)
-                break
-        else:
-            best.append(item)
-        del best[2:]
-
-    if math.isnan(physical) or form.inverse_y_nan:
-        for item in candidates:
-            offer(item)
-    else:
-        for bounds in (left, right):
-            if bounds is None:
-                continue
-            for pos in range(bounds[0], bounds[1]):
-                offer(ordered[pos])
-    return best
+    """The first two entries by distance, with stable file-order tie breaks."""
+    entries = (
+        (raw_x, y, pos) for pos, (raw_x, y) in enumerate(form.inverse_file)
+    )
+    return sorted(entries, key=lambda item: abs(item[1] - physical))[:2]
 
 
 def _table_match(
@@ -3525,6 +3504,9 @@ def _table_match(
     """The frozen tolerance match, using the shared physical-value index."""
     if math.isnan(physical):
         return None
+    exact = form.inverse_by_y.get(physical)
+    if exact is not None:
+        return exact
     if form.inverse_y_nan:
         entries = form.inverse_file if not interpolate else form.inverse_sorted
         for item in entries:
@@ -3602,7 +3584,7 @@ def _reverse_table_form(
                 right_raw - left_raw
             ) / (right_y - left_y)
             break
-    if raw_fraction is None:
+    if raw_fraction is None or not math.isfinite(raw_fraction):
         return None, f"the value {physical} is not invertible in this table", None
 
     raw_x = round(raw_fraction)
@@ -3841,6 +3823,7 @@ def _shared_with(
     definition: Definition,
     span_index: Mapping[int, tuple],
     mask_of: Callable[[str], Optional[int]],
+    materialize: Optional[Callable[[tuple], tuple]] = None,
 ) -> Optional[str]:
     """The name of the first other entry, in cross-kind file order, whose span
     overlaps the definition's span (or whose declared address lies inside it
@@ -3855,21 +3838,26 @@ def _shared_with(
         )
     else:
         pages = (address >> 4,)
-    seen: set[int] = set()
-    multi_page = len(pages) > 1
-    candidates: list[tuple] = []
-    for page in pages:
-        for entry in span_index.get(page, ()):
-            if multi_page:
-                key = entry[0]
-                if key in seen:
-                    continue
-                seen.add(key)
-            candidates.append(entry)
-    if multi_page:
-        candidates.sort(key=lambda entry: entry[0])
+    if materialize is not None and None in span_index:
+        candidates = span_index[None]
+    else:
+        seen: set[int] = set()
+        multi_page = len(pages) > 1
+        candidates: list[tuple] = []
+        for page in pages:
+            for entry in span_index.get(page, ()):
+                if multi_page:
+                    key = entry[0]
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                candidates.append(entry)
+        if multi_page:
+            candidates.sort(key=lambda entry: entry[0])
     own_entry = True
     for entry in candidates:
+        if materialize is not None:
+            entry = materialize(entry)
         if own_entry and (
             entry[1] == definition.name
             and entry[2] == definition.section

@@ -5,6 +5,7 @@ from __future__ import annotations
 import struct
 import time
 from collections import Counter
+from dataclasses import replace
 from typing import Mapping
 
 import pytest
@@ -19,6 +20,7 @@ from tests.support.b103_a2l_arrays import (
     curve,
     img,
     inline,
+    meas,
     rl,
     valblk,
     vtab,
@@ -973,3 +975,137 @@ def test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded(tmp_path):
     res = _encode(d, a2l_data, {("X", 1): long_text}, _std_image(bytes([3, 1, 2, 3])))
     _refusal(res, "A2L-DEF-MONOTONY", f"C.X[1]: {'L' * 256}… breaks the STRICT_INCREASE order of the axis")
     assert len(res.message) < 400
+
+
+
+def test_r_a2l_def_125_5_public_element_name_is_total_and_bounded(v171):
+    d = a2ldef.describe_definition(ROW_ARRAY, v171)
+    name = "\x1b" + "N" * 300
+    hostile = replace(d, name=name, _name_echo=None)
+    echo = "\ufffd" + "N" * 255 + "…"
+    assert a2ldef.element_name(hostile, (1, 2)) == f"{echo}[1,2]"
+    assert a2ldef.element_name(hostile, ("X", 1)) == f"{echo}.X[1]"
+    for position in (("X",), ("X", 0, 1), (0.5,), None, 0, (-1,), ("Z", 0)):
+        assert a2ldef.element_name(hostile, position) == repr(position)
+
+
+def test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising(tmp_path):
+    a2l_data = inline(
+        tmp_path,
+        cm("CM_INF", "TAB_INTP", fmt='"%.3"', ref="CT_INF"),
+        ctab("CT_INF", "TAB_INTP", "0 -inf", "1 inf"),
+        valblk("VINF", "0x10", "RL_U16", "CM_INF", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+    )
+    d = a2ldef._element_definition(a2ldef.describe_definition("VINF", a2l_data), (0,))
+    res = a2ldef._encode_number(d, a2l_data, 0.0)
+    _refusal(res, "A2L-DEF-ENCODE", "VINF[0]: the value 0.0 is not invertible in this table")
+
+
+def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monkeypatch):
+    a2l_data = inline(
+        tmp_path,
+        cm("CM_NEAR", "TAB_NOINTP", fmt='"%.3"', ref="CT_NEAR"),
+        ctab("CT_NEAR", "TAB_NOINTP", "2 -1e-9", "5 0.5", "7 2.0"),
+        valblk("VNEAR", "0x10", "RL_U16", "CM_NEAR", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+    )
+    d = a2ldef._element_definition(a2ldef.describe_definition("VNEAR", a2l_data), (0,))
+    res = a2ldef._encode_number(d, a2l_data, 1e308)
+    _refusal(
+        res,
+        "A2L-DEF-ENCODE",
+        "VNEAR[0]: the value 1e+308 is not a table value - "
+        "the nearest table values are -1e-09 and 0.5",
+    )
+
+    real_isclose = a2ldef.math.isclose
+    match_calls = Counter()
+
+    def counted_isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
+        if abs_tol == 1e-9:
+            match_calls["inverse"] += 1
+        return real_isclose(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
+
+    monkeypatch.setattr(a2ldef.math, "isclose", counted_isclose)
+    for name, entries, physical, expected_raw in (
+        ("DUP", tuple(f"{i} 1" for i in range(20_000)), 1.0, 0),
+        ("NAN", ("0 nan",) + tuple(f"{i} {i}" for i in range(1, 20_000)), 19_999.0, 19_999),
+    ):
+        scaled = inline(
+            tmp_path,
+            cm(f"CM_{name}", "TAB_NOINTP", fmt='"%.3"', ref=f"CT_{name}"),
+            ctab(f"CT_{name}", "TAB_NOINTP", *entries),
+            valblk(f"V{name}", "0x100", "RL_U16", f"CM_{name}", "0", "65535", extras=("MATRIX_DIM 64",)),
+        )
+        parent = a2ldef.describe_definition(f"V{name}", scaled)
+        image = img(0x100, bytes(128))
+        for position in range(64):
+            res = _encoded(parent, scaled, {(position,): str(physical)}, image)
+            assert res.data[2 * position:2 * position + 2] == expected_raw.to_bytes(2, "big")
+    assert match_calls["inverse"] == 0
+
+
+def test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes(tmp_path):
+    long_lower = "0" * 2_000 + "1"
+    long_zero = "0" * 2_000
+    a2l_data = inline(
+        tmp_path,
+        valblk(
+            "VLIM",
+            "0x10",
+            "RL_U16",
+            "NO_COMPU_METHOD",
+            long_lower,
+            "10",
+            extras=("MATRIX_DIM 2", f"EXTENDED_LIMITS {long_zero} 20"),
+        ),
+    )
+    d = a2ldef.describe_definition("VLIM", a2l_data)
+    image = img(0x10, bytes(4))
+    res = _encoded(d, a2l_data, {(0,): "0"}, image)
+    echo = "0" * 256 + "…"
+    assert res.notices == (
+        f"VLIM[0]: 0 is outside the limits {echo}..10 "
+        f"and inside the extended limits {echo}..20",
+    )
+    assert all(len(notice) <= 1_024 for notice in res.notices)
+    controlled = a2ldef._read_limits("\n1", "\t2")
+    assert controlled.lower_text == "\ufffd1"
+    assert controlled.upper_text == "\ufffd2"
+
+
+def test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks(tmp_path):
+    a2l_data = inline(
+        tmp_path,
+        characteristic("BIG", "VALUE", "0x0", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        characteristic("V", "VALUE", "0x100000", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+    )
+    next(tag for tag in a2l_data["tags"] if tag.get("name") == "BIG")["length"] = 1_048_577
+    d = a2ldef.describe_definition("V", a2l_data)
+    assert d.shared_with == "BIG"
+    image = {0x100000: 0}
+    before = dict(image)
+    res = a2ldef.encode_definition(d, a2l_data, "7", image)
+    _refusal(res, "A2L-DEF-OVERLAP", "V: its bytes at 0x100000 are shared with BIG")
+    assert image == before
+
+
+def test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point(tmp_path):
+    a2l_data = inline(
+        tmp_path,
+        meas("M", "UBYTE", addr="0x10", extras=("MATRIX_DIM x 2",)),
+        characteristic("V", "VALUE", "0x12", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        characteristic("VMD", "VALUE", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535", extras=("MATRIX_DIM 2 2",)),
+        characteristic("V2", "VALUE", "0x21", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+    )
+    a2l_data = _clear_parse_errors(a2l_data)
+    next(tag for tag in a2l_data["tags"] if tag.get("name") == "M")["length"] = 4
+    malformed = a2ldef.describe_definition("M", a2l_data)
+    value_matrix = a2ldef.describe_definition("VMD", a2l_data)
+    assert malformed.byte_length is None and malformed.shared_with is None
+    assert malformed.refusal.code == "A2L-DEF-MATRIX"
+    assert value_matrix.byte_length is None and value_matrix.shared_with is None
+    assert value_matrix.refusal.code == "A2L-DEF-MATRIX"
+    for name, address in (("V", 0x12), ("V2", 0x21)):
+        d = a2ldef.describe_definition(name, a2l_data)
+        assert d.shared_with is None
+        assert a2ldef.encode_definition(d, a2l_data, "7", {address: 0}) == a2ldef.Encoded(address, b"\x07", ())

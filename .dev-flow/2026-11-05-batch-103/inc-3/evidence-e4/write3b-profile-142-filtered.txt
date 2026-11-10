@@ -1,0 +1,43 @@
+         3350728 function calls (3350463 primitive calls) in 1.753 seconds
+
+   Ordered by: cumulative time
+   List reduced from 120 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.401    0.401    1.755    1.755 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:593(describe_definitions)
+      100    1.094    0.011    1.318    0.013 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:3876(_shared_with)
+  3283205    0.203    0.000    0.203    0.000 {method 'get' of 'dict' objects}
+      200    0.000    0.000    0.031    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:729(describe_name)
+      100    0.001    0.000    0.031    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:881(_describe_one)
+      150    0.000    0.000    0.021    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:815(materialize)
+      100    0.021    0.000    0.021    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:796(is_array_entry)
+      100    0.002    0.000    0.020    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:2130(_describe_array)
+      150    0.002    0.000    0.012    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1856(_read_axis)
+      251    0.002    0.000    0.007    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:1290(_flatten_body_tokens)
+      200    0.003    0.000    0.005    0.000 /home/javiergr/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
+      200    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1340(_read_matrix_dim)
+      200    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:470(_object_line_words)
+      100    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:2695(_read_object_lines)
+      753    0.002    0.000    0.003    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:700(_lex_a2l_lines)
+      300    0.001    0.000    0.003    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1240(_conversion_fields)
+      202    0.003    0.000    0.003    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:1211(_strip_a2l_comments)
+      150    0.001    0.000    0.002    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1761(_read_fixed_rule)
+      402    0.000    0.000    0.002    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:353(_echo)
+     1811    0.001    0.000    0.002    0.000 {method 'join' of 'str' objects}
+    266/1    0.001    0.000    0.002    0.002 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:628(walk)
+     2405    0.001    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:371(_unquote)
+     3316    0.001    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:359(<genexpr>)
+      100    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1621(_place_components)
+      100    0.001    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:852(<listcomp>)
+      250    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:558(_read_limits)
+      301    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:432(_read_count)
+    11939    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}
+      100    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1090(_empty_definition)
+      200    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:477(<listcomp>)
+      100    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:2369(_walk_record_layout_components)
+      800    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:364(_finite_number)
+      264    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:1104(parse_begin_meta)
+      503    0.000    0.000    0.001    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:1174(_split_line_respecting_quotes)
+      302    0.000    0.000    0.001    0.000 {built-in method builtins.any}
+
+
