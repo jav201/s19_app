@@ -6,7 +6,7 @@ Base `9ae92c3` (product tree `e07fb00`). Line numbers are as of `e07fb00`. Rows:
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .147 (.116, .117 split into .1 and .2 at E3; .147 at E3 round 2); cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
+| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .147, .153 … .155 (.116, .117 split into .1 and .2 at E3; .147 at E3 round 2; .153 … .155 at the 3b re-review); cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
 | `tools/synth/make_release_case.py` (test-data tooling, not counted toward the source cap: PLAN D6) | 1 new function; 2 of Inc 2's new functions changed (§4) | R-A2L-DEF.133 … .135; cited .59, .63 |
 | `s19_app/tui/a2l.py` and every other source file | **unchanged** (`a2l.py` frozen; private helpers reused, §3) | — |
 
@@ -38,9 +38,9 @@ Types (frozen dataclasses, no logic; I-2 §4): `AxisDefinition`, `DecodedAxis`, 
 | 18 | `_current_count(axis, record) -> int \| Refusal` | new | NO_AXIS_PTS from the record, FIX_NO_AXIS_PTS, else the point count; 0 / above / below (D-3 A) | .90, .115 … .117 |
 | 19 | `_decode_axis(definition, axis, a2l_data, image, record) -> DecodedAxis \| Refusal` | new | STD from the record, FIX from its points, COM from its axis object's record in that object's byte order, none (D-8 A) | .100, .113, .114, .118 |
 | 20 | `_decode_stored(element_definition, a2l_data, stored) -> Decoded \| Refusal` | new, or the second half of Inc 2's `decode_definition` split out (the E2 graph decides) | conversion and display text of a stored value that has no bytes (a FIX_AXIS point) | .110 … .112 |
-| 21 | `encode_values(definition, a2l_data, edit, image) -> Encoded \| Refusal` | new (I-2) | the array encode order: decode the record, positions, fixed / shared / no-points refusals, each element through Inc 2's `encode_definition` on its element definition, the monotony of X then Y; the whole record from the image with the edited bytes | .122 … .130; cited .58 |
-| 22 | `_breaking_point(axis, stored_points) -> int \| None` | new | the monotony rule (D-5 A) | .129 |
-| 23 | `element_name(definition, position) -> str` | new (I-2) | `<name>[i,j]`, `<name>.X[k]` | .121, .125 |
+| 21 | `encode_values(definition, a2l_data, edit, image) -> Encoded \| Refusal` | new (I-2) | scalar `(0,)` and the array encode order: definition refusal, PARSE, decode, total position validation, fixed / shared / no-points and unknown-monotony refusals, each element through Inc 2's `encode_definition` with bounded suffixes and shared inverse forms, then monotony; the whole record from the image with the edited bytes | .122 … .130, .153 … .155; cited .58 |
+| 22 | `_breaking_point(axis, stored_points) -> int \| None` | new | the monotony rule (D-5 A), only after every necessary point decoded and the rule was recognised | .129, .154, .155 |
+| 23 | `element_name(definition, position) -> str` | new (I-2) | bounded `<name>[i,j]`, `<name>.X[k]`; malformed positions rendered without exceptions | .121, .125 |
 
 Not a function: the round-trip rows .131 and .132 are properties of #21 with #15 (tested as properties, `02-test-cases.md`).
 
@@ -120,7 +120,7 @@ Amendment A2 (`../PLAN.md`) splits the increment as it splits Inc 2. **3a**, the
 | 3a | #1 `describe_definitions` (changed), #2 `_object_kind` (changed), #3 `decode_definition` (changed), #5 `_describe_array`, #6 `_read_matrix_dim`, #7 `_array_shape`, #8 `_read_record_layout`, #9 `_place_components`, #10 `_check_module_alignment`, #11 `_read_axis`, #12 `_find_axis_object`, #13 `_fixed_points`, #14 `_element_definition`, #15 `decode_values`, #16 `_element_offset`, #17 `_point_offset`, #18 `_current_count`, #19 `_decode_axis`, #20 `_decode_stored`, #23 `element_name`, `_conversion_fields` (E2), `_module_common` (E2), `_describe_one` (changed; Inc 2a's, E3A-04) | 23 |
 | 3a, synth (§4) | S1 `build_definition_objects`, S2 `emit_definitions_a2l` (changed), S5 `_definition_array_objects` | 3 |
 | 3b | #4 `encode_definition` (changed; Inc 2b's function), #21 `encode_values`, #22 `_breaking_point` | 3 |
-| 3b, added inside a 3a function | `describe_definitions`: the AXIS_PTS entries of R-A2L-DEF.138's span index (Inc 2 E3 census ruling; R-A2L-DEF.140, counted, `01-requirements.md` S2.7h) | — |
+| 3b, added inside a 3a function | `describe_definitions`: AXIS_PTS entries and final `Definition.byte_length` spans in R-A2L-DEF.138's index; no CLEAN exemption for arrays/curves/maps or AXIS_PTS (R-A2L-DEF.140) | — |
 
 What each side reuses from §3:
 - **3a** imports, beyond Inc 2a's list, `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes` (back in D-9's list, graph baseline), `_byte_order_from_section_lines`, `_DATATYPE_ALIGNMENT_DIRECTIVE`, `_ALIGNMENT_DIRECTIVES`, `MAX_A2L_DECODE_BYTES`. It reuses Inc 2a's own helpers (E3A-04): `_clean` (U+FFFD, R-A2L-DEF.137), `_finite_number` (the FIX words, .141), `_read_limits` (the axis limits), `_parse_bit_mask`, `_read_count` (the rule of CTX *whole number*), `_with_refusal` and `_fmt_address` (`<address>`).
@@ -132,4 +132,4 @@ Source files and consumers:
 
 Tests (§5):
 - **3a** adds its cases to `tests/test_b103_a2l_definition_arrays.py` (S2.7e, S2.7f, S2.7g's 3a cases, the cited cases, AT-B103-I3-1's and -3's 3a arms, AT-B103-I3-4), updates the Inc 2 tests D-14 changes, and adds S2.7i and AT-B103-I3-2's 3a arm to `tests/test_b103_synth_definitions_case.py`.
-- **3b** adds S2.7h, .120/2, .121/1, .121/2 and the edit arms to the same two files.
+- **3b** adds S2.7h, .120/2-3, .121/1-2, .125/4, .130/4-5 and the edit arms to the same two files.

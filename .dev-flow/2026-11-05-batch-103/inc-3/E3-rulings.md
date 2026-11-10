@@ -193,3 +193,45 @@ Rulings:
   - Round 9 is not run.
   - E4 waits for Inc 2a's merge into `batch-103`.
   - Carried to E5: E3S3-03, -04, -06 and -21 (backlog: the frozen file), plus the 3b notes (E3S3-37).
+
+## Inc 3b re-review — correction 1 (2026-11-10, orchestrator Kimi)
+
+The first 3b re-review (`E3-architect-3b.md`, `E3-security-3b.md`) is **FAIL**. A-01/A-02/A-03 and S-01/S-02/S-03/S-04/S-05 block E4. The correction is design-first: no product or test change is authorized by this ruling alone.
+
+1. **A-01 = S-06, accepted.** `_element_definition` must set both `name` and the private `_name_echo` to the object/axis name's bounded echo plus the element/point suffix. `A2L-DEF-INDEX`, every delegated refusal, notices and overlap use that same composition. `<layout>` and `<ref>` use `_echo`. The round-7 E3S3-37 note wins over the older `element_name` wording.
+2. **A-02 = S-02, accepted.** Every STD point inherits the parent object's `shared_with`; a whole-record write cannot discard it because one point does not itself touch the neighbour. A new `.140/7` pins this.
+3. **A-03 = S-04, accepted.** CLEAN may be consulted only for an entry whose section is MEASUREMENT or CHARACTERISTIC; never for AXIS_PTS, BLOB or INSTANCE. The homonymous AXIS_PTS case is `.140/4`.
+4. **S-01, accepted.** The tag's provisional length is not the span of an array, curve or map. The index uses the final `Definition.byte_length` and `_entry_overlaps` uses that same value. `describe_definitions` materialises only candidates on pages touched by requested definitions: definitions already built by the walk are reused; an unrequested candidate is described once and cached. The fail-closed point remains only when the final model cannot read a length. `.140/5` covers a VALUE inside a CURVE whose tag has no length; `.140/6` covers masked neighbours with no exception and no exemption.
+5. **S-03, accepted conservatively.** No CLEAN mask exemption applies when either side is array/curve/map. `mask_of` returns a mask only for a clean scalar number/enum; an array's final kind therefore prevents both a false exemption and `range(None)`. A future per-component exemption needs its own increment and is not authorised here. `.140/8` covers repeated elements, both directions, second element and a CURVE with points.
+6. **S-05, accepted.** Encode uses immutable inverse forms shared per walk: enum text → first raw in file order; numeric entries reduced once and indexed by physical value, with bisect for inversion and no per-cell reconstruction or sort. The inverse path must preserve `_reverse_table_lookup`'s tolerance, endpoint, rounding, tie and error behaviour. `.131/2` measures multiple edits against a large shared table and compares results with the frozen oracle; rebuilding per cell is the negative control.
+7. **A-04 = S-10, accepted.** `encode_values` has an explicit scalar branch for number/enum/text: exactly `(0,)` delegates to `encode_definition`; any other position gives A2L-DEF-INDEX. New row R-A2L-DEF.153 with one case covering all three kinds and a rejected position.
+8. **A-05 = S-08, accepted.** The common order is definition refusal → A2L-DEF-PARSE → decode/A2L-DEF-ELEMENTS → positions → edits → monotony. OVERLAP remains late. `.120/3`, `.130/4` and `.130/5` pin single-array encode, missing bytes and invalid position under parse errors.
+9. **S-07, accepted.** Position validation precedes unpacking or offsets. Every malformed form returns A2L-DEF-INDEX with a total, bounded formatter, never an exception. `.125/4` covers short/long axis tuples, non-integer index, `None`, a scalar non-iterable, negatives and an unknown letter.
+10. **S-09, accepted as two new rows.** R-A2L-DEF.154 refuses an unknown MONOTONY rule with `A2L-DEF-MONOTONY` and the exact message `<axis name>: the monotony rule <rule> is not supported`, before bytes. R-A2L-DEF.155 propagates a necessary point's decode refusal; a valid breaking point's text is its bounded display text, preserving the numeric texts of `.129/1-9`. `.155/1` covers an invalid conversion and `/2` a long enum text, with no bytes, exception or unbounded message.
+11. **Counts after correction:** 86 rows; 336 active cases = 280 3a + 56 3b. The new rows are .153, .154 and .155; the other additions are .120/3, .125/4, .130/4-5, .131/2 and .140/4-8. The 42 old 3b cases and the 5 mixed edit arms remain pending until E4.
+
+E4 must implement the corrected graph, including the final-span index and inverse forms, and must run all 56 cases and 5 mixed arms with discriminating RED/GREEN evidence. A narrow architect/security re-review is required before any product change.
+
+## Inc 3b re-review — correction 2 (2026-11-10, orchestrator Kimi)
+
+The second review is **FAIL** on one shared MAJOR (`E3B3R2-A-01` = `E3B3-R2-01`) and the synchronisation/semantic findings below. Correction 1's limited materialisation is withdrawn: a provisional page index cannot bound a final span that starts on an earlier page.
+
+1. **Cross-page completeness.** Every span candidate is materialised once per walk, reusing a definition already built when present and describing an unrequested one once with the same `reads`. The final `Definition.byte_length` is filed under **every page of the final span**, in global file order. There is no partial-page subset. `.140/9` puts a CURVE beginning at 0x20 with tag length absent and a final span ending at 0x5F beside a VALUE at 0x40, which must share and refuse. The performance oracle must compare against the old path and show no repeated describe per candidate.
+2. **Inverse semantics.** `.131/3` adds a discriminating matrix for TAB_INTP and TAB_NOINTP: multiple physical entries, tolerance, ties and their file-order raw, both endpoints, nonnumeric entries, NaN, missing/empty tables, and the written-value flag. Duplicate enum texts resolve to the first raw in file order. The graph now names each branch, not just a generic bisect. `.131/2` remains the scaling oracle and uses TAB_INTP.
+3. **CTX order.** The context's array encode order is definition refusal → PARSE → decode/ELEMENTS → positions → edits → monotony, with OVERLAP late.
+4. **`.155/1` premise.** The conversion-invalid point is **unedited** and becomes necessary for monotony because another point is edited. This keeps scalar PRECISION from masking the required decode refusal.
+5. **Naming.** `.154` uses `<axis point name>` throughout; `.154/1` therefore expects `C.X[0]: the monotony rule UNKNOWN_RULE is not supported`.
+6. **Position text.** Malformed positions use the bounded `repr(position)` after the bounded object name echo and `:`, rather than destructuring. `.125/4` fixes each exact refusal text. Valid positions keep their existing element names.
+7. **Record synchronisation.** Secondary totals, the 3b test list, `encode_values.req` and the E1 summary are rebased. Correction 1's E4 line is corrected to 56 cases before the new two cases.
+
+**Final counts after correction 2:** 86 rows; **338 active cases = 280 3a + 58 3b**. Section totals are S2.7g 46 and S2.7h 52. The new cases are `.131/3` and `.140/9` in addition to correction 1's 14. E4 still requires a narrow PASS/PASS-WITH-NOTES before product changes.
+
+## Inc 3b re-review — E4 addenda and close (2026-11-10, orchestrator Kimi)
+
+Both round-3 reports are **PASS-WITH-NOTES**, with no HIGH/MAJOR. Their notes are discharged without changing counts:
+
+- `.140/9` now requires one build per requested definition and one describe per unrequested candidate, cached thereafter; a duplicate describe is the negative control.
+- `.131/2` is explicitly TAB_INTP. `.131/3` fixes table entries, operator inputs and exact raw/reason/flag values for duplicate physical values, tolerance, interpolation, endpoints, NaN, empty and nonnumeric tables, and duplicate enum texts.
+- CTX distinguishes valid position names from malformed positions' bounded `repr`.
+
+**Inc 3b E3 is CLOSED: PASS-WITH-NOTES.** E4 may implement the corrected graph. The cost and duplicate-describe controls are mandatory evidence, not optional optimizations.
