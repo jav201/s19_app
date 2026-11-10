@@ -724,6 +724,11 @@ def main() -> int:
         action="store_true",
         help="run the verdict-mechanism self-test (fixture-error case) and exit",
     )
+    parser.add_argument(
+        "--only",
+        action="append",
+        help="run only the named arm id, with baseline and control (repeatable)",
+    )
     args = parser.parse_args()
 
     if args.self_test:
@@ -750,6 +755,10 @@ def main() -> int:
         f"expected {EXPECTED_PRODUCT_ARMS} product arms, got {len(ARMS)}"
     )
     assert len(set(product_ids)) == len(product_ids), "duplicate arm ids"
+    selected_arms = [arm for arm in ARMS if not args.only or arm["id"] in args.only]
+    if not selected_arms:
+        print(f"ABORT: no product arms selected by --only={args.only}", flush=True)
+        return 2
 
     # Source identity: record HEAD and reject unexpected dirty product/tests.
     source_commit = git_head(checkout)
@@ -822,7 +831,7 @@ def main() -> int:
         return ok
 
     all_nodes: list[str] = []
-    for arm in ARMS:
+    for arm in selected_arms:
         all_nodes.extend(arm["tests"])
     all_nodes.extend(CONTROL["tests"])
     all_nodes = sorted(set(all_nodes))
@@ -984,7 +993,7 @@ def main() -> int:
         return 2
 
     print("== arms ==", flush=True)
-    for arm in ARMS:
+    for arm in selected_arms:
         results.append(run_arm(arm))
 
     # Final: restore both files and prove the copied tree is byte-identical.
