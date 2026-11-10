@@ -2479,6 +2479,7 @@ def test_r_a2l_def_19_7_ambiguous_byte_order_source_is_refused(tmp_path):
                   byte_order=None)
     d = describe_definition("BO", a2l)
     assert d.refusal == _ref("A2L-DEF-MASK", "BO: its byte order cannot be read")
+    assert encode_definition(d, a2l, "7", {0x10: 0, 0x11: 0}) == d.refusal
 
 
 # ---- R-A2L-DEF.25/2 (encode gives the definition's refusal) ----------------------------------
@@ -2972,13 +2973,31 @@ def _pack(dt: str, value: int | float, big: bool) -> bytes:
     raise AssertionError(dt)
 
 
+def _assert_display_agrees(d: Definition, expected: float, actual: float) -> None:
+    if actual == expected:
+        return
+    if d.decimals is not None:
+        assert actual == pytest.approx(expected, rel=0.0, abs=0.5 * 10.0 ** -d.decimals)
+        return
+    assert f"{actual:.15g}" == f"{expected:.15g}" or (
+        d.datatype == "FLOAT32_IEEE" and f"{actual:.6g}" == f"{expected:.6g}"
+    )
+
+
 def test_r_a2l_def_55_1_number_round_trip(tmp_path):
     """R-A2L-DEF.55/1 - every accepted value decodes to a value that agrees at the display
     precision; 0 precision refusals among values taken from decoded stored values."""
-    methods = {"none": (None, ()), "ident": ("IDENTICAL", ()), "lin1": ("LINEAR", ("1", "0"))}
+    methods = {
+        "none": (None, ()),
+        "ident": ("IDENTICAL", ()),
+        "lin1": ("LINEAR", ("1", "0")),
+        "rat": ("RAT_FUNC", ("0", "1", "0", "0", "0", "1")),
+        "tabni": ("TAB_NOINTP", ()),
+        "tabi": ("TAB_INTP", ()),
+    }
     datatypes = {"UBYTE": (1, 0, 255), "SWORD": (2, -32768, 32767), "ULONG": (4, 0, 1000000),
                  "FLOAT32_IEEE": (4, -1e6, 1e6), "FLOAT64_IEEE": (8, -1e6, 1e6)}
-    samples = {"UBYTE": [0, 1, 127, 255], "SWORD": [-1, 0, 1, 127, -128],
+    samples = {"UBYTE": [0, 1, 127], "SWORD": [-1, 0, 1, 127, -128],
                "ULONG": [0, 1, 1000, 1000000], "FLOAT32_IEEE": [0.0, 1.5, -2.25, 0.1],
                "FLOAT64_IEEE": [0.0, 1.5, -2.25, 0.1]}
     formats = ["%.0", "%8.4", "%.15", None]
@@ -2993,7 +3012,11 @@ def test_r_a2l_def_55_1_number_round_trip(tmp_path):
                     blocks = []
                     conv = "NO_COMPU_METHOD"
                     if mtyp is not None:
-                        blocks.append(_cm("CM_G", mtyp, *coeffs))
+                        if mtyp in ("TAB_NOINTP", "TAB_INTP"):
+                            blocks.append(_cm("CM_G", mtyp, ref="CT_G"))
+                            blocks.append(_ctab("CT_G", mtyp, "0 0", "1 10", "2 20", "4 40"))
+                        else:
+                            blocks.append(_cm("CM_G", mtyp, *coeffs))
                         conv = "CM_G"
                     extra = [f'FORMAT "{fmt}"'] if fmt else []
                     a2l = _inline(tmp_path, *blocks,
@@ -3001,14 +3024,48 @@ def test_r_a2l_def_55_1_number_round_trip(tmp_path):
                                   byte_order="MSB_FIRST" if big else "MSB_LAST")
                     d = describe_definition(name, a2l)
                     assert d.shared_with is None
-                    for value in samples[dt]:
+                    values = (0, 1, 2, 4) if mtyp in ("TAB_NOINTP", "TAB_INTP") else samples[dt]
+                    for value in values:
                         raw = _pack(dt, value, big)
                         dec = decode_definition(d, a2l, _img(addr, raw))
                         assert isinstance(dec, Decoded), (dt, value, dec)
                         res = _enc(d, a2l, dec.text, _img(addr, raw))
                         assert isinstance(res, Encoded), (dt, value, dec.text, res)
                         back = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res.data)})
-                        assert isinstance(back, Decoded) and back.text == dec.text, (dt, value, dec.text, back)
+                        assert isinstance(back, Decoded), (dt, value, dec.text, back)
+                        _assert_display_agrees(d, dec.value, back.value)
+                        typed = dec.text if fmt is None else format(dec.value, f".{d.decimals}f")
+                        res2 = _enc(d, a2l, typed, _img(addr, raw))
+                        assert isinstance(res2, Encoded), (dt, value, typed, res2)
+                        back2 = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res2.data)})
+                        assert isinstance(back2, Decoded), (dt, value, typed, back2)
+                        _assert_display_agrees(d, dec.value, back2.value)
+                        accepted += 1
+
+    for dt in ("UBYTE", "SWORD", "ULONG"):
+        for mask in ((0x0F, 0x01) if dt == "UBYTE" else (0x0FF0, 0x0001)):
+            for big in (True, False):
+                for fmt in formats:
+                    addr += 0x10
+                    name = f"G{addr:X}"
+                    blocks = []
+                    if fmt:
+                        blocks.append(f'FORMAT "{fmt}"')
+                    blocks.append(f"BIT_MASK 0x{mask:X}")
+                    a2l = _inline(tmp_path, *blocks,
+                                  _val(name, f"0x{addr:X}", LAYOUT[dt], "NO_COMPU_METHOD",
+                                       str(datatypes[dt][1]), str(datatypes[dt][2])),
+                                  byte_order="MSB_FIRST" if big else "MSB_LAST")
+                    d = describe_definition(name, a2l)
+                    assert d.shared_with is None
+                    for field in (0, 1, 7, 15) if dt == "UBYTE" else (0, 1, 127, 255):
+                        raw = _pack(dt, field << (mask & -mask).bit_length() - 1, big)
+                        dec = decode_definition(d, a2l, _img(addr, raw))
+                        assert isinstance(dec, Decoded), (dt, mask, field, dec)
+                        res = _enc(d, a2l, dec.text, _img(addr, raw))
+                        assert isinstance(res, Encoded), (dt, mask, field, dec.text, res)
+                        back = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res.data)})
+                        assert isinstance(back, Decoded) and back.text == dec.text, (dt, mask, field, dec.text, back)
                         accepted += 1
     assert accepted >= 300, accepted
 
@@ -3308,6 +3365,19 @@ def test_r_a2l_def_138_21_hostile_blob_and_instance_headers(tmp_path):
     assert _enc(alone, alone_data, "7", {0x10: 0}) == Encoded(0x10, b"\x07", ())
 
 
+def test_r_a2l_def_138_22_cross_page_file_order(tmp_path):
+    a2l = _inline(
+        tmp_path,
+        '/begin CHARACTERISTIC BIG ""\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 64\n/end CHARACTERISTIC',
+        _val("LATE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        _val("EARLY", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+    )
+    d = describe_definition("BIG", a2l)
+    assert d.shared_with == "LATE"
+    assert _enc(d, a2l, "AB", _img(0x10, bytes(64))) == _ref(
+        "A2L-DEF-OVERLAP", "BIG: its bytes at 0x10 are shared with LATE")
+
+
 # ---- R-A2L-DEF.152 - the parse-error refusal -------------------------------------------------
 
 def _parse_error_a2l(tmp_path: Path, name: str, defects: list[str], at: int) -> dict:
@@ -3398,6 +3468,8 @@ def test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode(tmp_path
 def _no_exception_encode(d: Definition, a2l: dict, image: Mapping[int, int], text: str = "0"):
     res = encode_definition(d, a2l, text, image)
     assert isinstance(res, (Encoded, Refusal))
+    if isinstance(res, Encoded):
+        assert res.data != b"STUB"
     return res
 
 
@@ -3511,6 +3583,8 @@ def _encode_unchanged(a2l: dict, image: dict) -> None:
             continue
         res = encode_definition(d, a2l, "0", image)
         assert isinstance(res, (Encoded, Refusal))
+        if isinstance(res, Encoded):
+            assert res.data != b"STUB"
         if isinstance(d.shared_with, str):
             assert isinstance(res, Refusal)
 

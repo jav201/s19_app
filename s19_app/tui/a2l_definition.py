@@ -3560,7 +3560,7 @@ def _shared_with(
         pages = (address >> 4,)
     seen: set[int] = set()
     multi_page = len(pages) > 1
-    own_entry = True
+    candidates: list[tuple] = []
     for page in pages:
         for entry in span_index.get(page, ()):
             if multi_page:
@@ -3568,19 +3568,24 @@ def _shared_with(
                 if key in seen:
                     continue
                 seen.add(key)
-            if own_entry and (
-                entry[1] == definition.name
-                and entry[2] == definition.section
-                and entry[3] == definition.address
-                and entry[4] == definition.byte_length
-                and entry[5] == definition.byte_order
-            ):
-                own_entry = False
-                continue
-            if _entry_overlaps(definition, entry) and not _pair_exempt(
-                definition, entry, mask_of
-            ):
-                return entry[1]
+            candidates.append(entry)
+    if multi_page:
+        candidates.sort(key=lambda entry: entry[0])
+    own_entry = True
+    for entry in candidates:
+        if own_entry and (
+            entry[1] == definition.name
+            and entry[2] == definition.section
+            and entry[3] == definition.address
+            and entry[4] == definition.byte_length
+            and entry[5] == definition.byte_order
+        ):
+            own_entry = False
+            continue
+        if _entry_overlaps(definition, entry) and not _pair_exempt(
+            definition, entry, mask_of
+        ):
+            return entry[1]
     return None
 
 
