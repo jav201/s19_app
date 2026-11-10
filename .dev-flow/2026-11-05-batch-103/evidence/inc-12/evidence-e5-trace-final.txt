@@ -1,2 +1,1 @@
-EVID   .dev-flow/2026-11-05-batch-103/inc-12/04-validation.md cites no evidence path
-trace_check: 1 US, 8 active requirements (0 withdrawn), 1 gap(s)
+trace_check: 1 US, 8 active requirements (0 withdrawn), 0 gap(s)
