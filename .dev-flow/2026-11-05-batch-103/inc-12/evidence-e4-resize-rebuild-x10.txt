@@ -1,0 +1,50 @@
+RUN=1
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.44s
+EXIT=0
+RUN=2
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.47s
+EXIT=0
+RUN=3
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.47s
+EXIT=0
+RUN=4
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.56s
+EXIT=0
+RUN=5
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.52s
+EXIT=0
+RUN=6
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.41s
+EXIT=0
+RUN=7
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.50s
+EXIT=0
+RUN=8
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.71s
+EXIT=0
+RUN=9
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.48s
+EXIT=0
+RUN=10
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.36s
+EXIT=0
