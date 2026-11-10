@@ -1,0 +1,6 @@
+scenario=v171-nameline
+tracked_file=examples/case_00_public/ASAP2_Demo_V171.a2l
+tags=118
+table_rows=118
+cursor_row=0
+surface=ready

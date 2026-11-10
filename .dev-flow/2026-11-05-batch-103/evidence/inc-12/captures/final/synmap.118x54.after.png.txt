@@ -1,0 +1,5 @@
+scenario=synmap
+synthetic_fixture=synmap
+tags=1
+table_rows=1
+surface=ready

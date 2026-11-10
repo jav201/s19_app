@@ -1,0 +1,5 @@
+scenario=page64
+synthetic_fixture=page64
+tags=3
+table_rows=3
+surface=ready

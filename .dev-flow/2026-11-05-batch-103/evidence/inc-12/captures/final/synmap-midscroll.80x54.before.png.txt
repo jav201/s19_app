@@ -1,0 +1,6 @@
+scenario=synmap-midscroll
+synthetic_fixture=synmap-midscroll
+tags=1
+table_rows=1
+scroll_x=25/60
+surface=ready
