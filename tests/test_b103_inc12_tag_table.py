@@ -726,7 +726,7 @@ def _resize_failure(app, table, label: str) -> str:
     stored = table.get_row_at(0)[2].plain
     painted = _painted_tag_cell(table, _geom(table), 0)
     rendered = [
-        line.text
+        "".join(segment.text for segment in line)
         for line in table._render_cell(0, 2, table.rich_style, 38)
     ]
     return (
