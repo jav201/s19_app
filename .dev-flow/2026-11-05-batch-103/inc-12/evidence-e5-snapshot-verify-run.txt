@@ -1,0 +1,166 @@
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch less than a minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  * Check out repository
+  * Set up Python
+  * Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch less than a minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch less than a minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch less than a minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch less than a minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch about 1 minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch about 1 minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch about 1 minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+Refreshing run status every 15 seconds. Press Ctrl+C to quit.
+
+* b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch about 1 minute ago
+
+JOBS
+* regen (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  * Regenerate snapshot baselines (canonical env)
+  * Report which baselines changed
+  * Upload regenerated baselines
+  * Post Set up Python
+  * Post Check out repository
+✓ b103-inc12-integration snapshot-regen · 42744361587
+Triggered via workflow_dispatch about 2 minutes ago
+
+JOBS
+✓ regen in 2m30s (ID 129592812179)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up Python
+  ✓ Install dependencies (with dev extra for pytest-textual-snapshot)
+  ✓ Regenerate snapshot baselines (canonical env)
+  ✓ Report which baselines changed
+  ✓ Upload regenerated baselines
+  ✓ Post Set up Python
+  ✓ Post Check out repository
+  ✓ Complete job
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+regen: .github#2
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+regen: .github#1
+

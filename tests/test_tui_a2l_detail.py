@@ -201,9 +201,46 @@ def _drive_bare(
     asyncio.run(_run())
 
 
+def _tag_column_index(table: DataTable) -> int:
+    """The Tag column's index in ``ordered_columns`` (Inc 12 re-orders the
+    columns to Address, Length, Tag, …; E2-6)."""
+    for index, column in enumerate(table.ordered_columns):
+        if str(column.label) == "Tag":
+            return index
+    raise AssertionError(
+        f"no Tag column in {[str(c.label) for c in table.ordered_columns]}"
+    )
+
+
+def _project_painted(value: str) -> str:
+    """R-TUI-042a.6: each character outside U+0021 … U+007E as U+FFFD."""
+    return "".join(ch if 0x21 <= ord(ch) <= 0x7E else "\ufffd" for ch in value)
+
+
+def _shorten_painted(value: str, w) -> str:
+    """The painted tag name of R-TUI-042a.3/.5/.6, written out independently
+    of the product's ``_shorten_tag_name``."""
+    width = 34 if (w is None or w >= 34) else w
+    if len(value) <= width:
+        return _project_painted(value)
+    head = (width - 1) // 2
+    tail = width - 1 - head
+    return _project_painted(value[:head]) + "…" + _project_painted(value[len(value) - tail:])
+
+
+def _name_width(table: DataTable):
+    """The name width *w* of CTX-A2L-SCREEN, from the measured geometry."""
+    cols = [c.get_render_width(table) for c in table.ordered_columns]
+    visible = table.scrollable_content_region.width
+    if visible <= 0:
+        return None
+    return visible - cols[0] - cols[1] - (2 * table.cell_padding + 2)
+
+
 def _name_cells(app: S19TuiApp) -> list[str]:
     table = app.query_one("#a2l_tags_list", DataTable)
-    return [str(table.get_row_at(i)[0]) for i in range(table.row_count)]
+    tag_column = _tag_column_index(table)
+    return [str(table.get_row_at(i)[tag_column]) for i in range(table.row_count)]
 
 
 # ---------------------------------------------------------------------------
@@ -262,9 +299,10 @@ def test_at069_card_highlight() -> None:
 
 
 # ---------------------------------------------------------------------------
-# AT-069b ★ (GATE-BLOCKING C-17) — hostile description/unit render verbatim in
-# the CARD Text.plain, no payload-derived style, no MarkupError. Injected as an
-# enriched-tag dict so the frozen parser cannot sanitize it away.
+# AT-069b ★ (GATE-BLOCKING C-17) — hostile description/unit render as their
+# non-control projection in the CARD Text.plain (R-TUI-042a.7.1), no
+# payload-derived style, no MarkupError. Injected as an enriched-tag dict so
+# the frozen parser cannot sanitize it away.
 # ---------------------------------------------------------------------------
 
 
@@ -280,9 +318,13 @@ def test_at069b_c17_card() -> None:
             card = app.query_one("#a2l_detail_card", A2LDetailCard)
             rendered = card.render()
             plain = rendered.plain
+            # Inc 12: every file-derived card value goes through _card_value_text,
+            # which deletes C0/DEL/C1 and maps break runs to one space — so the
+            # subject is each payload's non-control projection (batch-77's
+            # _scrub, kept as the card's oracle).
             for payload in _PAYLOADS:
-                assert payload in plain, (
-                    f"payload {payload!r} not verbatim in card; got {plain!r}"
+                assert _scrub(payload) in plain, (
+                    f"payload {payload!r} not verbatim (non-control) in card; got {plain!r}"
                 )
             # no style span originates from the payload (the developer styles are
             # LABEL/VALUE/etc.; a from_markup regression would inject 'red'/'link')
@@ -296,47 +338,68 @@ def test_at069b_c17_card() -> None:
 
 
 # ---------------------------------------------------------------------------
-# AT-069c ★ (GATE-BLOCKING C-17) — hostile NAME renders verbatim in the TABLE
-# CELL Text.plain (distinct builder/path from the card), no payload-derived
-# style span, no MarkupError.
+# AT-069c ★ (GATE-BLOCKING C-17) — hostile NAME renders as its painted tag
+# name in the TABLE CELL (distinct builder/path from the card), no
+# payload-derived style span, no MarkupError.
 # ---------------------------------------------------------------------------
 
 
 def test_at069c_c17_table_name() -> None:
-    """AT-069c — the hostile NAME renders literally in the table cell.
+    """AT-069c — the hostile NAME renders as its *painted tag name* in the Tag
+    cell: each control character as U+FFFD (R-TUI-042a.6), the middle cut of
+    R-TUI-042a.3/.5, no payload-derived style span, no control character.
 
-    **PORTED, batch-77 Inc-2 (LLR-116.7).** Each payload was asserted present
-    *verbatim*, ANSI included. The C0/C1 class is now removed at ``safe_text``,
-    so the subject is each payload's non-control projection — unchanged for the
-    three markup payloads, and ``'[31mX[0m'`` for ``_P_ANSI``. Both original
-    observables survive: every payload is still asserted present in the cell,
-    and the no-span claim is unchanged. The added absence clause is paired with
-    that presence loop, never asserted alone.
+    **Re-pointed, batch-103 Inc 12 (E2-6 / E3S-06 / E3S-12).** The Tag cell is
+    no longer column 0 (it is found by its ``Tag`` label) and the oracle is the
+    painted tag name, not each payload's non-control projection: the cut plus
+    the U+FFFD projection means no payload is verbatim in the combined cell.
+    The call shape sets ``app._a2l_filtered_tags = [tag]`` and passes that list
+    (the shape of all 6 product callers), so the fit's repaint reads the row.
+    Each payload is also placed as its own name where it fits, asserting the
+    exact shortened text.
     """
     for size in _SIZES:
 
         async def _observe(app: S19TuiApp, pilot: object) -> None:
-            tag = _hostile_tag("name", _HOSTILE)
-            app.update_a2l_tags_view([tag])
-            await pilot.pause()
+            combined = _hostile_tag("name", _HOSTILE)
+            app._a2l_filtered_tags = [combined]
+            app.update_a2l_tags_view(app._a2l_filtered_tags)
+            for _ in range(6):
+                await pilot.pause()
             table = app.query_one("#a2l_tags_list", DataTable)
+            tag_column = _tag_column_index(table)
             assert table.row_count == 1, "expected the single hostile row rendered"
-            name_cell = table.get_row_at(0)[0]
+            name_cell = table.get_row_at(0)[tag_column]
             assert isinstance(name_cell, Text), "table cell must be a Rich Text"
             plain = name_cell.plain
             for payload in _PAYLOADS:
-                assert _scrub(payload) in plain, (
-                    f"payload {payload!r} not verbatim (non-control) in cell; "
-                    f"got {plain!r}"
+                assert _scrub(payload) not in plain, (
+                    f"payload {payload!r} verbatim (non-control) in cell; got {plain!r}"
                 )
             # safe_text builds a base-styled Text with NO spans → no payload span
             assert not name_cell.spans, (
                 f"hostile name cell grew spans (markup leak): {name_cell.spans!r}"
             )
-            # LLR-116.7, co-asserted with the presence loop above.
+            # LLR-116.7: the projection keeps controls out of the cell.
             assert not any(ord(ch) in _CONTROL for ch in plain), (
                 f"a control byte reached the table cell: {plain!r}"
             )
+            # each payload as its own name, placed where it fits: the exact
+            # painted tag name (U+FFFD projection, cut when wider than *w*).
+            w = _name_width(table)
+            for payload in _PAYLOADS:
+                tag = _hostile_tag("name", payload)
+                app._a2l_filtered_tags = [tag]
+                app.update_a2l_tags_view(app._a2l_filtered_tags)
+                for _ in range(6):
+                    await pilot.pause()
+                cell = table.get_row_at(0)[tag_column]
+                assert isinstance(cell, Text)
+                assert cell.plain == "✓ " + _shorten_painted(payload, w), (
+                    f"{payload!r} at w={w}: {cell.plain!r}"
+                )
+                assert not cell.spans, cell.spans
+                assert not any(ord(ch) in _CONTROL for ch in cell.plain), cell.plain
 
         _drive_bare(size, _observe)
 
@@ -360,8 +423,11 @@ def test_cells_are_text_and_glyph(tmp_path: Path) -> None:
     assert len(in_cells) == 16, "the DataTable expects a 16-cell row"
     assert all(isinstance(cell, Text) for cell in in_cells), "every cell must be Text"
     assert all(isinstance(cell, Text) for cell in out_cells)
-    assert in_cells[0].plain.startswith("✓ "), in_cells[0].plain
-    assert out_cells[0].plain.startswith("· "), out_cells[0].plain
+    # Inc 12 (E2-6): the Tag cell moved from index 0 to index 2 (Address first).
+    assert in_cells[0].plain.startswith("0x"), in_cells[0].plain
+    assert out_cells[0].plain.startswith("0x"), out_cells[0].plain
+    assert in_cells[2].plain.startswith("✓ "), in_cells[2].plain
+    assert out_cells[2].plain.startswith("· "), out_cells[2].plain
 
 
 # ---------------------------------------------------------------------------

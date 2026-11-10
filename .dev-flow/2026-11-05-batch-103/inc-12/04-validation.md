@@ -1,6 +1,6 @@
 # Inc 12 — A2L tag table: validation record (E5)
 
-**Verdict: PENDING.** Product, independent tests, law guards, static reviews, the 20-arm mutant battery and the operator's visual acceptance are complete. Only canonical snapshot regeneration remains open. No merge to `batch-103`, `main`, or push is authorized by this record.
+**Verdict: PASS-WITH-NOTES.** Product, independent tests, law guards, static reviews, the 20-arm mutant battery, canonical snapshots and the operator's visual acceptance are complete. All 33 cases and both acceptance cases are `full` / `verified`; no MAJOR, HIGH or worse finding remains open. Written 2026-11-09. Branch publication was explicitly authorized by the operator; no merge to `main` is authorized by this record.
 
 ## Final runs
 
@@ -17,6 +17,8 @@
 | Real Windows Terminal | 28 before/after PNGs at 80, 118 and 220 columns plus mid-scroll and Name-line; all sidecars ready | `../evidence/inc-12/captures/final/` |
 | Decision page | 28 images, 0 broken, 0 console errors, 0 failed requests | `../evidence/inc-12/evidence-e5-decision-browser.txt`, `evidence-e5/DECISION.html` |
 | Operator visual acceptance | **APPROVED**, no objections; AT-B103-I12-2 is `full` / `verified` | `evidence-e5/OPERATOR-VERDICT.md` |
+| Canonical snapshot regeneration | CI run `42743855368` succeeded; exactly six A2L baselines applied, two pre-existing Patch baselines excluded | `../evidence/inc-12/evidence-e5-snapshot-regen-run.txt`, `../evidence/inc-12/evidence-e5-snapshot-artifact-diff.txt` |
+| Canonical snapshot verification | **29 passed, 4 deselected in 123.57 s** on `a8513117`; no A2L drift, only the two known Patch cells updated in CI's disposable checkout | `../evidence/inc-12/evidence-e5-snapshot-verify-log.txt` |
 
 The case-06 timing failure is also present on the base (1.399 s) and integrated tree (1.428 s) against 1.000 s. An isolated rerun on `1a907685` measured 1.372 s. It is not attributed to Inc 12 and remains open for the batch-end performance review; no flaky classification is claimed.
 
@@ -26,9 +28,10 @@ The case-06 timing failure is also present on the base (1.399 s) and integrated 
 - Coverage: static **PASS** for 33 full cases plus AT-B103-I12-1 (`E4-coverage-audit.md`); AT-B103-I12-2 is now `full` / `verified` by the operator's recorded approval.
 - Mutation runner: initial instrument findings corrected and self-test passed (`E5-mutant-runner-review.md`). M2 initially survived the off-screen oracle; after `require_visible`, 41 nodes passed and the isolated retry killed it (`../evidence/inc-12/evidence-e5-visible-fixed-cells.txt`).
 
-## Open items
+## Notes carried to batch end
 
-- Six A2L snapshot baselines must be regenerated in the canonical CI environment. The two Patch snapshot mismatches already fail on base and are not included in that update (`../evidence/inc-12/evidence-e5-snapshot-base.txt`, `../evidence/inc-12/evidence-e5-snapshot-final.txt`).
+- The two Patch snapshot mismatches already fail on base and were not changed by Inc 12 (`../evidence/inc-12/evidence-e5-snapshot-base.txt`, `../evidence/inc-12/evidence-e5-snapshot-verify-log.txt`).
+- The pre-existing case-06 timing bound remains open for the batch-end performance review as detailed above.
 
 ## Not run here
 
