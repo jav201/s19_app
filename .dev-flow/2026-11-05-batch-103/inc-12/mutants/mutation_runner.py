@@ -5,22 +5,45 @@ checkout. The runner takes a checkout and an output directory, copies the
 tree to a fresh directory, verifies the green baseline with the selected
 test nodes, then for each arm applies exactly one mutation, runs the
 narrowest discriminating node(s), restores and hash-verifies the pristine
-source bytes, and classifies the arm from the pytest exit code.
+source bytes, and classifies the arm from the pytest report — not from the
+exit code alone.
 
 Rules enforced here:
 
 * every anchor must match exactly once on its reachable product file —
   zero matches or multiple matches is BAD, never SURVIVED;
-* pytest runs under ``python -I -B`` with the mutant checkout inserted at
-  ``sys.path[0]``, ``s19_app.__file__`` printed, stdin closed,
-  ``PYTHONDONTWRITEBYTECODE=1`` and HOME/XDG/LOCALAPPDATA isolated under
-  ``zq_iso_user``;
-* the real worktree is never mutated — only ``<out>/tree`` is touched;
-* one transcript per arm plus a machine-readable ``summary.json``.
+* a verdict is read from the pytest JUnit report, not the raw exit code:
+  a ``rc=1`` is KILLED only when at least one selected node failed in the
+  **call** phase (a real assertion failure); setup/teardown errors and
+  collection errors are BAD and never kill. ``--self-test`` proves this
+  mechanism, including a fixture-error case;
+* the selected nodes must actually be collected, run and passed — a
+  collect-only or typo'd node id is BAD, never SURVIVED. ``PYTEST_ADDOPTS``
+  and ``PYTEST_PLUGINS`` are stripped from the environment so a leaked
+  ``--collect-only`` or plugin cannot poison the run;
+* every pytest invocation is bounded by a per-invocation timeout; a
+  timed-out or signal-killed run (negative return code) is CRASH;
+* source and clone commit ids are recorded and verified equal, and an
+  unexpected dirty ``s19_app/``/``tests/`` tree is rejected before any run;
+  the test modules are hashed alongside the mutated product files;
+* evidence fields are paths relative to the ``transcripts/`` directory and
+  are verified to resolve; the baseline is included as evidence too;
+* publication summaries tokenize the checkout/tree/python paths; transcripts
+  keep the required absolute ``s19_app.__file__`` only in the raw private
+  copies, with a redacted publication copy emitted alongside;
+* CONTROL-KILL is kept out of the product arm results and counts.
+
+The remaining contract is unchanged: pytest runs under ``python -I -B`` with
+the mutant checkout inserted at ``sys.path[0]``, ``s19_app.__file__`` printed,
+stdin closed, ``PYTHONDONTWRITEBYTECODE=1`` and HOME/XDG/LOCALAPPDATA isolated
+under ``zq_iso_user``; the real worktree is never mutated — only
+``<out>/tree`` is touched; one transcript per arm plus a machine-readable
+``summary.json``.
 
 Usage (Linux orchestrator):
 
     python mutation_runner.py <checkout> <outdir> [--python /path/to/python]
+                                 [--timeout 60] [--self-test]
 """
 
 from __future__ import annotations
@@ -29,9 +52,13 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
+import signal
 import subprocess
 import sys
+import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 #: The two reachable product files the arms mutate, as repo-relative paths.
@@ -42,8 +69,17 @@ UTILS = "s19_app/utils.py"
 TT = "tests/test_b103_inc12_tag_table.py::"
 DT = "tests/test_tui_a2l_detail.py::"
 
+#: The two test modules that host every discriminating node (hashed + verified).
+TEST_FILES = ["tests/test_b103_inc12_tag_table.py", "tests/test_tui_a2l_detail.py"]
+
 #: The minimum table from the E5 handoff has exactly this many product arms.
 EXPECTED_PRODUCT_ARMS = 20
+
+#: Publication tokens that stand in for absolute filesystem paths.
+TOKENS = ("<CHECKOUT>", "<TREE>", "<PYTHON>", "<OUTDIR>", "<ISO>")
+
+#: Default per-invocation pytest timeout in seconds (configurable).
+DEFAULT_TIMEOUT = 60.0
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +325,8 @@ ARMS = [
 
 #: A known-bad arm: it must be KILLED, or the runner's PASS results are not
 #: believed (a green baseline alone is not proof). It is not part of the
-#: minimum table and is not counted in ``EXPECTED_PRODUCT_ARMS``.
+#: minimum table and is never counted in ``EXPECTED_PRODUCT_ARMS`` or the
+#: product arm results/counts.
 CONTROL = {
     "id": "CONTROL-KILL",
     "req": "CONTROL — address must render (known-bad; must be KILLED)",
@@ -299,26 +336,181 @@ CONTROL = {
     "tests": [TT + "test_r_tui_042a_4_1_address_length_whole_unscrolled"],
 }
 
+#: Fixture self-test body: one passing node, one call-phase assertion failure,
+#: and one fixture (setup) error — the three report shapes the classifier must
+#: tell apart.
+SELF_TEST_PYTEST_SRC = """\
+import pytest
+
+
+def test_pass():
+    assert True
+
+
+def test_assert_fail():
+    assert False, "mutant caught in call phase"
+
+
+@pytest.fixture
+def broken_fixture():
+    raise RuntimeError("fixture setup boom")
+    yield
+
+
+def test_fixture_error(broken_fixture):
+    assert True
+"""
+
 
 def sha256_bytes(data: bytes) -> str:
     """Hex SHA-256 of ``data``."""
     return hashlib.sha256(data).hexdigest()
 
 
-def classify(rc: int) -> str:
-    """Map a pytest exit code to KILLED / SURVIVED / CRASH / BAD."""
-    return {0: "SURVIVED", 1: "KILLED", 2: "BAD", 3: "CRASH", 4: "BAD", 5: "BAD"}.get(
-        rc, "BAD"
-    )
+def redact(text: str, mappings: list[tuple[str, str]]) -> str:
+    """Replace absolute paths with publication tokens, longest first."""
+    for src, token in sorted(mappings, key=lambda kv: len(kv[0]), reverse=True):
+        text = text.replace(src, token)
+    return text
 
 
-def copy_tree(checkout: Path, tree: Path) -> str:
+def _mangle_node_id(address: str) -> tuple[str, str]:
+    """Reproduce pytest's junit ``mangle_test_address`` -> (classname, name)."""
+    path, possible_open_bracket, params = address.partition("[")
+    names = path.split("::")
+    names[0] = names[0].replace("/", ".")
+    names[0] = re.sub(r"\.py$", "", names[0])
+    names[-1] += possible_open_bracket + params
+    return ".".join(names[:-1]), names[-1]
+
+
+def parse_junit(xml_path: Path, node_ids: list[str]) -> tuple[dict[str, str] | None, int]:
+    """Map each requested node id to a per-node report status.
+
+    Statuses: ``passed``, ``failed`` (call-phase assertion), ``error``
+    (setup/teardown), ``skipped``, or ``missing`` (not collected). Returns
+    ``(None, collection_errors)`` when the report is absent or unreadable.
+    """
+    try:
+        root = ET.parse(str(xml_path)).getroot()
+    except (ET.ParseError, OSError):
+        return None, 0
+
+    statuses: dict[str, str] = {nid: "missing" for nid in node_ids}
+    wanted = {nid: _mangle_node_id(nid) for nid in node_ids}
+    rank = {"missing": -1, "passed": 0, "skipped": 1, "error": 2, "failed": 3}
+    collection_errors = 0
+
+    for tc in root.iter("testcase"):
+        classname = tc.get("classname", "")
+        name = tc.get("name", "")
+        matched_nid = None
+        for nid, (exp_cls, exp_name) in wanted.items():
+            if classname == exp_cls and (
+                name == exp_name or name.startswith(exp_name + "[")
+            ):
+                matched_nid = nid
+                break
+        if matched_nid is None:
+            # A non-test testcase: flag collection failures explicitly.
+            if any(e.get("message") == "collection failure" for e in tc.iter("error")):
+                collection_errors += 1
+            continue
+
+        if any(True for _ in tc.iter("failure")):
+            status = "failed"
+        elif any(True for _ in tc.iter("error")):
+            status = "error"
+        elif any(True for _ in tc.iter("skipped")):
+            status = "skipped"
+        else:
+            status = "passed"
+        if rank[status] > rank[statuses[matched_nid]]:
+            statuses[matched_nid] = status
+
+    return statuses, collection_errors
+
+
+def classify_arm(
+    rc: int | None,
+    statuses: dict[str, str] | None,
+    timed_out: bool,
+    collection_errors: int = 0,
+) -> str:
+    """Classify an arm from the pytest exit code plus the parsed report.
+
+    ``rc=1`` is KILLED only on a call-phase ``failed`` node; setup/teardown
+    errors and collection errors are BAD. Timed-out or signal-killed runs are
+    CRASH.
+    """
+    if timed_out or (rc is not None and rc < 0) or rc == 3:
+        return "CRASH"
+    if collection_errors > 0:
+        return "BAD"
+    if statuses is None:
+        return "BAD"
+    if rc == 0:
+        if statuses and all(s == "passed" for s in statuses.values()):
+            return "SURVIVED"
+        return "BAD"
+    if rc == 1:
+        if any(s == "failed" for s in statuses.values()):
+            return "KILLED"
+        return "BAD"
+    return "BAD"
+
+
+def _kill_process_group(proc: subprocess.Popen) -> None:
+    """Best-effort kill of the process group, then the direct child."""
+    try:
+        if os.name == "posix":
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        else:
+            proc.kill()
+    except (ProcessLookupError, PermissionError, OSError):
+        try:
+            proc.kill()
+        except OSError:
+            pass
+
+
+def run_subprocess(
+    cmd: list[str], cwd: Path, env: dict, timeout: float
+) -> tuple[int | None, str, bool]:
+    """Run a command bounded by ``timeout``; return (rc, stdout, timed_out).
+
+    A negative return code means the process was killed by a signal.
+    """
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(cwd),
+            env=env,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            start_new_session=True,
+        )
+    except OSError as exc:
+        return -1, f"failed to start subprocess: {exc}\n", False
+    try:
+        out, _ = proc.communicate(timeout=timeout)
+        return proc.returncode, out, False
+    except subprocess.TimeoutExpired:
+        _kill_process_group(proc)
+        out, _ = proc.communicate()
+        return proc.returncode, out, True
+
+
+def copy_tree(checkout: Path, tree: Path, source_commit: str | None) -> str:
     """Copy the integrated checkout into a fresh isolated directory.
 
     Prefer ``git clone --no-hardlinks`` when ``checkout`` is a repository so
     tracked-file tests that shell out to ``git ls-files`` keep working; fall
-    back to a plain filesystem copy otherwise. The copy is a separate inode
-    tree, so mutations never touch the real worktree.
+    back to a plain filesystem copy otherwise. The clone is pinned to the
+    source commit (a detached-HEAD source must not clone a different branch
+    tip).
     """
     if tree.exists():
         shutil.rmtree(tree)
@@ -330,9 +522,51 @@ def copy_tree(checkout: Path, tree: Path) -> str:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
+        if source_commit:
+            clone_head = git_head(tree)
+            if clone_head != source_commit:
+                subprocess.run(
+                    ["git", "-C", str(tree), "checkout", "--quiet", "--detach", source_commit],
+                    check=True,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                )
         return "git-clone"
     shutil.copytree(checkout, tree)
     return "copytree"
+
+
+def git_head(repo: Path) -> str | None:
+    """Return ``HEAD`` of ``repo``, or ``None`` when it is not a repository."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "rev-parse", "HEAD"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+    except OSError:
+        return None
+    return proc.stdout.strip() if proc.returncode == 0 else None
+
+
+def git_dirty_product_tests(repo: Path) -> list[str]:
+    """List unexpected uncommitted changes under ``s19_app/`` and ``tests/``."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "status", "--porcelain", "--", "s19_app", "tests"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+    except OSError:
+        return []
+    if proc.returncode != 0:
+        return []
+    return [line for line in proc.stdout.splitlines() if line.strip()]
 
 
 def write_driver(tree: Path, driver_path: Path) -> None:
@@ -355,9 +589,17 @@ def write_driver(tree: Path, driver_path: Path) -> None:
     )
 
 
+def sanitized_env(env: dict) -> dict:
+    """Strip pytest-affecting vars so a leaked option/plugin cannot poison a run."""
+    clean = dict(env)
+    clean.pop("PYTEST_ADDOPTS", None)
+    clean.pop("PYTEST_PLUGINS", None)
+    return clean
+
+
 def iso_env(iso: Path) -> dict:
     """Isolated environment: HOME/XDG/LOCALAPPDATA under ``zq_iso_user``."""
-    env = os.environ.copy()
+    env = sanitized_env(os.environ)
     env["HOME"] = str(iso / "home")
     env["XDG_CACHE_HOME"] = str(iso / "xdg_cache")
     env["XDG_CONFIG_HOME"] = str(iso / "xdg_config")
@@ -374,41 +616,133 @@ def run_tests(
     tree: Path,
     iso: Path,
     node_ids: list[str],
-    out_path: Path,
-) -> tuple[int, str]:
-    """Run the given nodes under ``python -I -B`` and return (rc, stdout)."""
-    cmd = [py, "-I", "-B", str(driver), "-p", "no:cacheprovider", "-q", *node_ids]
-    proc = subprocess.run(
-        cmd,
-        cwd=str(tree),
-        env=iso_env(iso),
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-    )
-    out_path.write_text(proc.stdout, encoding="utf-8")
-    return proc.returncode, proc.stdout
+    transcript_path: Path,
+    junit_path: Path,
+    timeout: float,
+) -> tuple[int | None, str, bool]:
+    """Run the given nodes under ``python -I -B`` and return (rc, stdout, timed_out).
+
+    The JUnit report is the machine-readable verdict source; the stdout is
+    written verbatim to ``transcript_path``.
+    """
+    cmd = [
+        py,
+        "-I",
+        "-B",
+        str(driver),
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--junitxml",
+        str(junit_path),
+        *node_ids,
+    ]
+    rc, out, timed_out = run_subprocess(cmd, cwd=tree, env=iso_env(iso), timeout=timeout)
+    transcript_path.write_text(out, encoding="utf-8")
+    return rc, out, timed_out
+
+
+def run_self_test(py: str, timeout: float) -> int:
+    """Exercise the report->verdict mechanism on a fixture-error case and friends.
+
+    Proves: call-phase assertion -> KILLED; fixture (setup) error -> BAD;
+    all-pass -> SURVIVED; collect-only -> BAD (nodes never ran).
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="s19-mut-selftest-"))
+    try:
+        test_file = tmp / "test_selftest_mechanism.py"
+        test_file.write_text(SELF_TEST_PYTEST_SRC, encoding="utf-8")
+        junit_dir = tmp / "junit"
+        junit_dir.mkdir()
+        env = sanitized_env(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+
+        cases = [
+            ("pass", ["test_selftest_mechanism.py::test_pass"], "SURVIVED", False),
+            ("assert-fail", ["test_selftest_mechanism.py::test_assert_fail"], "KILLED", False),
+            ("fixture-error", ["test_selftest_mechanism.py::test_fixture_error"], "BAD", False),
+            ("collect-only", ["test_selftest_mechanism.py::test_pass"], "BAD", True),
+        ]
+
+        failures: list[str] = []
+        for label, node_ids, expected, collect_only in cases:
+            junit = junit_dir / f"{label}.xml"
+            args = [
+                "-m",
+                "pytest",
+                "-p",
+                "no:cacheprovider",
+                "-q",
+                "--junitxml",
+                str(junit),
+            ]
+            if collect_only:
+                args.append("--collect-only")
+            args.extend(node_ids)
+            rc, _out, timed_out = run_subprocess(
+                [py, "-I", "-B", *args], cwd=tmp, env=env, timeout=timeout
+            )
+            statuses, collection_errors = parse_junit(junit, node_ids)
+            verdict = classify_arm(rc, statuses, timed_out, collection_errors)
+            ok = verdict == expected
+            print(
+                f"self-test {label}: rc={rc} verdict={verdict} "
+                f"expected={expected} {'OK' if ok else 'FAIL'}",
+                flush=True,
+            )
+            if not ok:
+                failures.append(label)
+        if failures:
+            print("SELF-TEST FAILED:", failures, flush=True)
+            return 1
+        print("SELF-TEST PASSED", flush=True)
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Inc 12 E5 mutation runner")
-    parser.add_argument("checkout", type=Path, help="integrated checkout (read-only)")
-    parser.add_argument("outdir", type=Path, help="output directory (fresh)")
+    parser.add_argument(
+        "checkout", type=Path, nargs="?", help="integrated checkout (read-only)"
+    )
+    parser.add_argument("outdir", type=Path, nargs="?", help="output directory (fresh)")
     parser.add_argument(
         "--python",
         type=str,
         default=os.environ.get("S19CI_PYTHON", sys.executable),
         help="Python interpreter used for pytest (default: S19CI_PYTHON or sys.executable)",
     )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=DEFAULT_TIMEOUT,
+        help=f"per-invocation pytest timeout in seconds (default: {DEFAULT_TIMEOUT})",
+    )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="run the verdict-mechanism self-test (fixture-error case) and exit",
+    )
     args = parser.parse_args()
+
+    if args.self_test:
+        return run_self_test(args.python, args.timeout)
+    if args.checkout is None or args.outdir is None:
+        parser.error("checkout and outdir are required unless --self-test is given")
 
     checkout = args.checkout.resolve()
     outdir = args.outdir.resolve()
     tree = outdir / "tree"
     iso = outdir / "zq_iso_user"
     transcripts = outdir / "transcripts"
+    public_transcripts = outdir / "transcripts-public"
+    junit_dir = outdir / "junit"
     transcripts.mkdir(parents=True, exist_ok=True)
+    public_transcripts.mkdir(parents=True, exist_ok=True)
+    junit_dir.mkdir(parents=True, exist_ok=True)
+    for sub in ("home", "xdg_cache", "xdg_config", "xdg_data", "localappdata", "tmp"):
+        (iso / sub).mkdir(parents=True, exist_ok=True)
 
     # The minimum table must be complete before any run starts.
     product_ids = [arm["id"] for arm in ARMS]
@@ -417,12 +751,47 @@ def main() -> int:
     )
     assert len(set(product_ids)) == len(product_ids), "duplicate arm ids"
 
-    method = copy_tree(checkout, tree)
+    # Source identity: record HEAD and reject unexpected dirty product/tests.
+    source_commit = git_head(checkout)
+    dirty = git_dirty_product_tests(checkout)
+    if dirty:
+        print(
+            "ABORT: checkout has unexpected dirty product/tests (refusing to run):",
+            flush=True,
+        )
+        for line in dirty:
+            print(f"  {line}", flush=True)
+        return 2
+
+    method = copy_tree(checkout, tree, source_commit)
     print(f"tree copy method: {method}", flush=True)
     print(f"tree: {tree}", flush=True)
 
+    clone_commit = git_head(tree)
+    if source_commit is not None and clone_commit != source_commit:
+        print(
+            f"ABORT: clone HEAD {clone_commit} != source HEAD {source_commit}",
+            flush=True,
+        )
+        return 2
+    print(f"source commit: {source_commit}", flush=True)
+    print(f"clone commit:  {clone_commit}", flush=True)
+
     driver = outdir / "driver.py"
     write_driver(tree, driver)
+
+    # Redaction map for publication copies (absolute paths only).
+    redact_map: list[tuple[str, str]] = []
+    for token, path in (
+        ("<CHECKOUT>", checkout),
+        ("<TREE>", tree),
+        ("<OUTDIR>", outdir),
+        ("<ISO>", iso),
+    ):
+        redact_map.append((str(path), token))
+    py_path = Path(args.python)
+    if py_path.is_absolute():
+        redact_map.append((str(py_path), "<PYTHON>"))
 
     # Pristine bytes of every mutated file, captured once from the copy.
     mutated_files = sorted({arm["file"] for arm in ARMS} | {CONTROL["file"]})
@@ -433,6 +802,15 @@ def main() -> int:
             print(f"ABORT: reachable product file missing in tree: {rel}", flush=True)
             return 2
         pristine[rel] = path.read_bytes()
+
+    # Test modules must exist and are hashed so verdicts bind to test bytes.
+    test_hashes: dict[str, str] = {}
+    for rel in TEST_FILES:
+        path = tree / rel
+        if not path.is_file():
+            print(f"ABORT: discriminating test module missing in tree: {rel}", flush=True)
+            return 2
+        test_hashes[rel] = sha256_bytes(path.read_bytes())
 
     def write_pristine(rel: str) -> None:
         (tree / rel).write_bytes(pristine[rel])
@@ -449,15 +827,49 @@ def main() -> int:
     all_nodes.extend(CONTROL["tests"])
     all_nodes = sorted(set(all_nodes))
 
-    # Baseline: the selected nodes must be green on the pristine copy.
+    def write_transcript(evidence: str, text: str) -> None:
+        """Write the raw private transcript and a redacted publication copy."""
+        (transcripts / evidence).write_text(text, encoding="utf-8")
+        (public_transcripts / evidence).write_text(
+            redact(text, redact_map), encoding="utf-8"
+        )
+
+    # Baseline: the selected nodes must be collected, run and passed.
     print("== baseline ==", flush=True)
-    base_rc, _base_out = run_tests(
-        args.python, driver, tree, iso, all_nodes, transcripts / "baseline.txt"
+    base_junit = junit_dir / "baseline.xml"
+    base_rc, _base_out, base_timed_out = run_tests(
+        args.python,
+        driver,
+        tree,
+        iso,
+        all_nodes,
+        transcripts / "baseline.txt",
+        base_junit,
+        args.timeout,
     )
-    print(f"baseline rc={base_rc} ({classify(base_rc)})", flush=True)
-    if base_rc != 0:
+    base_statuses, base_collection_errors = parse_junit(base_junit, all_nodes)
+    base_verdict = classify_arm(
+        base_rc, base_statuses, base_timed_out, base_collection_errors
+    )
+    print(
+        f"baseline rc={base_rc} ({base_verdict}) "
+        f"nodes={len(all_nodes)}",
+        flush=True,
+    )
+    if base_verdict != "SURVIVED":
         print("ABORT: baseline not green; cannot trust any mutant verdict", flush=True)
         return 2
+    # Redacted publication copy of the baseline transcript (raw keeps __file__).
+    (public_transcripts / "baseline.txt").write_text(
+        redact((transcripts / "baseline.txt").read_text(encoding="utf-8"), redact_map),
+        encoding="utf-8",
+    )
+    baseline = {
+        "rc": base_rc,
+        "verdict": "GREEN",
+        "evidence": "baseline.txt",
+        "nodes": len(all_nodes),
+    }
 
     results: list[dict] = []
 
@@ -481,11 +893,19 @@ def main() -> int:
         if applied != 1:
             # Zero or multiple matches = BAD, never SURVIVED. Run the nodes on
             # the pristine copy so the transcript still shows the anchor issue.
-            rc, out = run_tests(
-                args.python, driver, tree, iso, arm["tests"], transcripts / evidence
+            rc, out, timed_out = run_tests(
+                args.python,
+                driver,
+                tree,
+                iso,
+                arm["tests"],
+                transcripts / evidence,
+                junit_dir / f"{arm_id}.xml",
+                args.timeout,
             )
-            (transcripts / evidence).write_text(
-                header + f"verdict: BAD (applied={applied})\n\n" + out, encoding="utf-8"
+            write_transcript(
+                evidence,
+                header + f"verdict: BAD (applied={applied})\n\n" + out,
             )
             record = {
                 "id": arm_id,
@@ -497,7 +917,6 @@ def main() -> int:
                 "tests": arm["tests"],
                 "evidence": evidence,
             }
-            results.append(record)
             print(
                 f"{arm_id}: applied={applied} BAD (anchor not unique) rc={rc}",
                 flush=True,
@@ -510,22 +929,35 @@ def main() -> int:
         mut_hash = sha256_bytes((tree / rel).read_bytes())
         assert mut_hash != sha256_bytes(pristine[rel]), f"{arm_id}: bytes unchanged"
 
-        rc, out = run_tests(
-            args.python, driver, tree, iso, arm["tests"], transcripts / evidence
+        rc, out, timed_out = run_tests(
+            args.python,
+            driver,
+            tree,
+            iso,
+            arm["tests"],
+            transcripts / evidence,
+            junit_dir / f"{arm_id}.xml",
+            args.timeout,
         )
+        statuses, collection_errors = parse_junit(junit_dir / f"{arm_id}.xml", arm["tests"])
 
         write_pristine(rel)
         restored_hash = sha256_bytes((tree / rel).read_bytes())
         assert restored_hash == sha256_bytes(pristine[rel]), f"{arm_id}: restore mismatch"
 
-        verdict = classify(rc)
-        (transcripts / evidence).write_text(
+        verdict = classify_arm(rc, statuses, timed_out, collection_errors)
+        if timed_out:
+            note = f"TIMEOUT after {args.timeout}s\n\n"
+        else:
+            note = ""
+        write_transcript(
+            evidence,
             header
             + f"mutated hash: {mut_hash}\n"
             + f"restored hash: {restored_hash}\n"
             + f"verdict: {verdict} (rc={rc})\n\n"
+            + note
             + out,
-            encoding="utf-8",
         )
         record = {
             "id": arm_id,
@@ -537,11 +969,11 @@ def main() -> int:
             "tests": arm["tests"],
             "evidence": evidence,
         }
-        results.append(record)
         print(f"{arm_id}: applied={applied} rc={rc} {verdict}", flush=True)
         return record
 
-    # Control first: a green baseline alone is not proof.
+    # Control first: a green baseline alone is not proof. The control verdict
+    # is recorded separately and is never part of product arms or counts.
     print("== control ==", flush=True)
     control_record = run_arm(CONTROL)
     if control_record["verdict"] != "KILLED":
@@ -553,7 +985,7 @@ def main() -> int:
 
     print("== arms ==", flush=True)
     for arm in ARMS:
-        run_arm(arm)
+        results.append(run_arm(arm))
 
     # Final: restore both files and prove the copied tree is byte-identical.
     for rel in mutated_files:
@@ -561,21 +993,32 @@ def main() -> int:
         if not verify_pristine(rel, "final restore"):
             return 2
 
+    # Every evidence field must be a transcript-relative path that resolves.
+    for rec in results + [baseline, control_record]:
+        evidence = rec["evidence"]
+        if not (transcripts / evidence).is_file():
+            print(f"ABORT: evidence does not resolve: {evidence}", flush=True)
+            return 2
+
     counts: dict[str, int] = {}
     for rec in results:
         counts[rec["verdict"]] = counts.get(rec["verdict"], 0) + 1
 
     summary = {
-        "checkout": str(checkout),
-        "tree": str(tree),
+        "checkout": "<CHECKOUT>",
+        "tree": "<TREE>",
+        "python": "<PYTHON>",
         "copy_method": method,
-        "python": args.python,
+        "source_commit": source_commit,
+        "clone_commit": clone_commit,
         "expected_product_arms": EXPECTED_PRODUCT_ARMS,
-        "baseline": {"rc": base_rc, "verdict": classify(base_rc)},
+        "evidence_base": "transcripts",
+        "baseline": baseline,
         "control": control_record,
         "arms": results,
         "counts": counts,
         "pristine_sha256": {rel: sha256_bytes(pristine[rel]) for rel in mutated_files},
+        "test_sha256": test_hashes,
     }
     (outdir / "summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8"
