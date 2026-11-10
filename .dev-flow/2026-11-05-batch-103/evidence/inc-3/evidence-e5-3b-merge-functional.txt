@@ -1,0 +1,20 @@
+4d273b3e4de892893341de9843cc3e27686ddb38
+commit=4d273b3e4de892893341de9843cc3e27686ddb38
+command=merge-functional-family
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 53%]
+........................................................................ [ 64%]
+........................................................................ [ 75%]
+........................................................................ [ 86%]
+........................................................................ [ 97%]
+....................                                                     [100%]
+============================= QC-TM timing margins =============================
+87.9%  0.060 s / 0.500 s  R-A2L-DEF.131/2  tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell
+89.1%  0.109 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+89.5%  0.526 s / 5.000 s  R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+100.0%  0.000 s / 1.000 s  R-A2L-DEF.147/9 describe FE huge shift  tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_9_huge_shift_computes_no_power
+QC-TM: 4 bounds, 0 under 20 % margin
+668 passed in 106.09s (0:01:46)

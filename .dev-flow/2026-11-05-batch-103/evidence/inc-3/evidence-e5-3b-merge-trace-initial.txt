@@ -1,0 +1,3 @@
+commit=4d273b3e4de892893341de9843cc3e27686ddb38
+EVID   .dev-flow/2026-11-05-batch-103/inc-3/04-validation.md cites no evidence path
+trace_check: 1 US, 88 active requirements (0 withdrawn), 1 gap(s)
