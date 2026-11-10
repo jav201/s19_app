@@ -1,0 +1,10 @@
+/tmp/b103-e4-12-27fb/int-final/s19_app/__init__.py
+........................................................................ [ 64%]
+........................................                                 [100%]
+============================= QC-TM timing margins =============================
+100.0%  0.000 s / 1.000 s  R-TUI-042a.6/1 cell build  tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_1_zero_width_tail
+100.0%  0.000 s / 1.000 s  R-TUI-042a.6/1 cell build  tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_1_zero_width_tail
+100.0%  0.000 s / 1.000 s  R-TUI-042a.6/2 cell build  tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_2_combining_and_esc_tails
+100.0%  0.000 s / 1.000 s  R-TUI-042a.6/2 cell build  tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_2_combining_and_esc_tails
+QC-TM: 4 bounds, 0 under 20 % margin
+112 passed in 811.67s (0:13:31)
