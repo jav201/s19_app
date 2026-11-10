@@ -52,7 +52,7 @@ Run performance serially three times. `evidence-e5/run_3b_mutants.py` applies ea
 
 ### 6. Pending items
 
-- Integrate Inc 3b into `batch-103`, then run merge-clone functional and trace checks.
+- Integrated into `batch-103` as `4d273b3e`; merge evidence `f6875e83`: **668 passed** and trace **0 gaps**.
 - Continue the approved sequence with Inc 5; no push of additional branches is authorized.
 
 ### 7. Suggested next task

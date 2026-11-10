@@ -38,4 +38,4 @@ Nonfinite TAB_INTP fractions and any NaN-y TAB_INTP are not invertible and refus
 
 ## Not run here
 
-The complete repository suite and canon fold belong to batch end. No UI changed, so no new UI capture is owed. Integration into `batch-103` is `4d273b3e`; merge-clone functional evidence: `../evidence/inc-3/evidence-e5-3b-merge-functional.txt` (**668 passed**). Trace is repeated after this canonical evidence citation.
+The complete repository suite and canon fold belong to batch end. No UI changed, so no new UI capture is owed. Integration into `batch-103` is `4d273b3e`; merge-clone functional evidence: `../evidence/inc-3/evidence-e5-3b-merge-functional.txt` (**668 passed**). Final committed merge-clone `f6875e83` trace: **1 US, 88 active requirements, 0 gaps** (`../evidence/inc-3/evidence-e5-3b-merge-trace.txt`).
