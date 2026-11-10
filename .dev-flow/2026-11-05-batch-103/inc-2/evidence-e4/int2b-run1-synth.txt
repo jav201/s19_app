@@ -1,0 +1,3 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+............                                                             [100%]
+12 passed in 5.02s

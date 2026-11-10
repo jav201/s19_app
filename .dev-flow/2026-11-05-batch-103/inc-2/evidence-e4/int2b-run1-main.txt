@@ -1,0 +1,28 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 70%]
+........................................................F............... [ 93%]
+...................                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_138_10_clean_length_refused_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-313/test_r_a2l_def_138_10_clean_le0')
+
+    def test_r_a2l_def_138_10_clean_length_refused_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("ON", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00", "LENGTH 1048577"))
+        d = describe_definition("OA", a2l)
+        assert d.shared_with == "ON"
+        on = describe_definition("ON", a2l)
+>       assert on.refusal is not None and on.refusal.code == "A2L-DEF-ADDRESS" and on.bit_mask is None
+E       AssertionError: assert (Refusal(code='A2L-DEF-ADDRESS', message='ON: the object has no address or no length') is not None and 'A2L-DEF-ADDRESS' == 'A2L-DEF-ADDRESS'
+E        +  where Refusal(code='A2L-DEF-ADDRESS', message='ON: the object has no address or no length') = Definition(name='ON', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=None, dataty...as no address or no length'), shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+E          is None)
+E           A2L-DEF-ADDRESS and 3840
+E        +  and   3840 = Definition(name='ON', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=None, dataty...as no address or no length'), shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).bit_mask
+
+tests/test_b103_a2l_definition.py:3186: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour
+1 failed, 306 passed in 11.87s

@@ -1,0 +1,139 @@
+M-45
+pytest -k a2l_def_45
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..a1eff021 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3330,7 +3330,7 @@ def _check_limits(
+     eabove = extended.upper is not None and _limit_greater(
+         limit_value, extended.upper, definition.datatype
+     )
+-    if ebelow or eabove:
++    if False:
+         return Refusal(
+             "A2L-DEF-EXTENDED",
+             f"{name_echo}: {text} is outside the extended limits "
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_r_a2l_def_45_1_below_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_1_below_the_extended_limits(v171):
+        d = describe_definition(V171_SBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(_clear(d), v171, "-129", {0x810001: 0}) == _ref(
+            "A2L-DEF-EXTENDED", "ASAM.C.SCALAR.SBYTE.IDENTICAL: -129 is outside the extended limits -128..127")
+E       AssertionError: assert Refusal(code=... SBYTE range') == Refusal(code=...ts -128..127')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ENCODE' != 'A2L-DEF-EXTENDED'
+E           - A2L-DEF-EXTENDED...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2747: AssertionError
+________________ test_r_a2l_def_45_2_above_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_2_above_the_extended_limits(v171):
+        d = describe_definition(V171_UBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(_clear(d), v171, "257", {0x810000: 0}) == _ref(
+            "A2L-DEF-EXTENDED", "ASAM.C.SCALAR.UBYTE.IDENTICAL: 257 is outside the extended limits 0..256")
+E       AssertionError: assert Refusal(code=... UBYTE range') == Refusal(code=...imits 0..256')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ENCODE' != 'A2L-DEF-EXTENDED'
+E           - A2L-DEF-EXTENDED...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2754: AssertionError
+________ test_r_a2l_def_45_3_written_value_against_the_extended_limits _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-452/test_r_a2l_def_45_3_written_va0')
+
+    def test_r_a2l_def_45_3_written_value_against_the_extended_limits(tmp_path):
+        """R-A2L-DEF.45/3 (E3S-06) - the written value p=0.6 (raw 5.5 rounds to 6) is outside 0..0.55."""
+        a2l = _inline(tmp_path,
+                      _cm("CM_TI", "TAB_INTP", fmt='"%.1"', ref="TB_L"),
+                      _ctab("TB_L", "TAB_INTP", "0 0.0", "10 1.0"),
+                      _val("L4", "0x10", "RL_U16", "CM_TI", "0", "0.55", 'FORMAT "%.1"', "EXTENDED_LIMITS 0 0.55"))
+        d = describe_definition("L4", a2l)
+>       assert _enc(d, a2l, "0.55", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-EXTENDED", "L4: 0.6 is outside the extended limits 0..0.55")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x06', notices=('L4: 0.6 is outside the limits 0..0.55 and inside the extended limits 0..0.55',)) == Refusal(code='A2L-DEF-EXTENDED', message='L4: 0.6 is outside the extended limits 0..0.55')
+E        +  where Encoded(address=16, data=b'\x00\x06', notices=('L4: 0.6 is outside the limits 0..0.55 and inside the extended limits 0..0.55',)) = _enc(Definition(name='L4', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_TI': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'TB_L', 'conversion_type'...10.0, 1.0)], 'kind': '0', 'lines': ['0 0.0', '10 1.0'], 'name': 'TB_L', ...}}, 'declared_spans': [], 'errors': [], ...}, '0.55', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-EXTENDED', message='L4: 0.6 is outside the extended limits 0..0.55') = _ref('A2L-DEF-EXTENDED', 'L4: 0.6 is outside the extended limits 0..0.55')
+
+tests/test_b103_a2l_definition.py:2765: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_1_below_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_2_above_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_3_written_value_against_the_extended_limits
+3 failed, 319 deselected in 0.92s

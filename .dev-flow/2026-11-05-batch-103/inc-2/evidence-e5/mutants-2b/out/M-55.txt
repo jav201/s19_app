@@ -1,0 +1,133 @@
+M-55
+pytest -k a2l_def_55
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..7da0bb6a 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3368,7 +3368,7 @@ def _encode_number(
+         "matrix_dim": None,
+         "datatype": definition.datatype,
+         "length": definition.byte_length,
+-        "effective_byte_order": definition.byte_order,
++        "effective_byte_order": "little" if definition.byte_order == "big" else "big",
+         "compu_method_name": method_name,
+         "lower_limit": None,
+         "upper_limit": None,
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_55_1_number_round_trip _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-463/test_r_a2l_def_55_1_number_rou0')
+
+    def test_r_a2l_def_55_1_number_round_trip(tmp_path):
+        """R-A2L-DEF.55/1 - every accepted value decodes to a value that agrees at the display
+        precision; 0 precision refusals among values taken from decoded stored values."""
+        methods = {
+            "none": (None, ()),
+            "ident": ("IDENTICAL", ()),
+            "lin1": ("LINEAR", ("1", "0")),
+            "rat": ("RAT_FUNC", ("0", "1", "0", "0", "0", "1")),
+            "tabni": ("TAB_NOINTP", ()),
+            "tabi": ("TAB_INTP", ()),
+        }
+        datatypes = {"UBYTE": (1, 0, 255), "SWORD": (2, -32768, 32767), "ULONG": (4, 0, 1000000),
+                     "FLOAT32_IEEE": (4, -1e6, 1e6), "FLOAT64_IEEE": (8, -1e6, 1e6)}
+        samples = {"UBYTE": [0, 1, 127], "SWORD": [-1, 0, 1, 127, -128],
+                   "ULONG": [0, 1, 1000, 1000000], "FLOAT32_IEEE": [0.0, 1.5, -2.25, 0.1],
+                   "FLOAT64_IEEE": [0.0, 1.5, -2.25, 0.1]}
+        formats = ["%.0", "%8.4", "%.15", None]
+        accepted = 0
+        addr = 0x1000
+        for _mname, (mtyp, coeffs) in methods.items():
+            for dt, (_size, lo, hi) in datatypes.items():
+                for big in (True, False):
+                    for fmt in formats:
+                        addr += 0x10
+                        name = f"G{addr:X}"
+                        blocks = []
+                        conv = "NO_COMPU_METHOD"
+                        if mtyp is not None:
+                            if mtyp in ("TAB_NOINTP", "TAB_INTP"):
+                                blocks.append(_cm("CM_G", mtyp, ref="CT_G"))
+                                blocks.append(_ctab("CT_G", mtyp, "0 0", "1 10", "2 20", "4 40"))
+                            else:
+                                blocks.append(_cm("CM_G", mtyp, *coeffs))
+                            conv = "CM_G"
+                        extra = [f'FORMAT "{fmt}"'] if fmt else []
+                        a2l = _inline(tmp_path, *blocks,
+                                      _val(name, f"0x{addr:X}", LAYOUT[dt], conv, str(lo), str(hi), *extra),
+                                      byte_order="MSB_FIRST" if big else "MSB_LAST")
+                        d = describe_definition(name, a2l)
+                        assert d.shared_with is None
+                        values = (0, 1, 2, 4) if mtyp in ("TAB_NOINTP", "TAB_INTP") else samples[dt]
+                        for value in values:
+                            raw = _pack(dt, value, big)
+                            dec = decode_definition(d, a2l, _img(addr, raw))
+                            assert isinstance(dec, Decoded), (dt, value, dec)
+                            res = _enc(d, a2l, dec.text, _img(addr, raw))
+>                           assert isinstance(res, Encoded), (dt, value, dec.text, res)
+E                           AssertionError: ('SWORD', 1, '1', Refusal(code='A2L-DEF-PRECISION', message='G1090: 1 cannot be stored at the display precision — the nearest stored value is 256'))
+E                           assert False
+E                            +  where False = isinstance(Refusal(code='A2L-DEF-PRECISION', message='G1090: 1 cannot be stored at the display precision — the nearest stored value is 256'), Encoded)
+
+tests/test_b103_a2l_definition.py:3040: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_55_1_number_round_trip
+1 failed, 321 deselected in 0.76s

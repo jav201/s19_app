@@ -1,0 +1,341 @@
+[
+  {
+    "id": "M-40",
+    "selection": "a2l_def_40",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_1_empty_text_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_2_letters_are_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_3_decimal_comma_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_4_underscore_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_5_nan_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_6_inf_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_7_hexadecimal_is_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_9_tab_is_not_a_number"
+    ]
+  },
+  {
+    "id": "M-41",
+    "selection": "a2l_def_41",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_3_linear_with_an_offset"
+    ]
+  },
+  {
+    "id": "M-42",
+    "selection": "a2l_def_42",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_1_linear_coefficient_a_zero",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_2_rat_func_denominator_zero",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_3_lookup_table_missing",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_4_lookup_table_no_numeric_entries",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_5_tab_nointp_nearest_values",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_6_tab_intp_outside_range",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_7_converted_raw_not_finite",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_8_not_integral - ...",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_9_datatype_range",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_10_float16 - Asse...",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_11_float_does_not_pack"
+    ]
+  },
+  {
+    "id": "M-43",
+    "selection": "a2l_def_43",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_1_below_the_lower_limit",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_2_above_the_upper_limit",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_3_one_declared_side",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_4_enum_entry_above_the_limits"
+    ]
+  },
+  {
+    "id": "M-44",
+    "selection": "a2l_def_44",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_1_notice_above_the_limits",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_2_notice_at_the_extended_lower_limit"
+    ]
+  },
+  {
+    "id": "M-45",
+    "selection": "a2l_def_45",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_1_below_the_extended_limits",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_2_above_the_extended_limits",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_3_written_value_against_the_extended_limits"
+    ]
+  },
+  {
+    "id": "M-46",
+    "selection": "a2l_def_46",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_1_multi_bit_write",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_2_single_bit_write",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_4_masked_enum_write",
+      "FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word"
+    ]
+  },
+  {
+    "id": "M-47",
+    "selection": "a2l_def_47",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_1_value_wider_than_the_mask",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_2_negative_value",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_3_non_contiguous_mask"
+    ]
+  },
+  {
+    "id": "M-48",
+    "selection": "a2l_def_48",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_48_3_first_of_two_entries_with_one_text"
+    ]
+  },
+  {
+    "id": "M-49",
+    "selection": "a2l_def_49",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_2_default_text_is_not_an_entry"
+    ]
+  },
+  {
+    "id": "M-49b",
+    "selection": "a2l_def_49",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_1_case_counts - a..."
+    ]
+  },
+  {
+    "id": "M-50",
+    "selection": "a2l_def_50",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_1_short_text_and_padding",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_3_empty_text - As..."
+    ]
+  },
+  {
+    "id": "M-51",
+    "selection": "a2l_def_51",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_51_1_text_too_long"
+    ]
+  },
+  {
+    "id": "M-52",
+    "selection": "a2l_def_52",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_1_non_ascii_letter",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_2_tab - assert En...",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_3_ufffd - assert ..."
+    ]
+  },
+  {
+    "id": "M-53",
+    "selection": "a2l_def_53",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_1_big_endian_uword"
+    ]
+  },
+  {
+    "id": "M-54",
+    "selection": "a2l_def_54",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_1_precision_refusal",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_3_float64_not_accepted_at_6_digits",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_4_exact_integer_above_2_53"
+    ]
+  },
+  {
+    "id": "M-55",
+    "selection": "a2l_def_55",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_55_1_number_round_trip"
+    ]
+  },
+  {
+    "id": "M-55b",
+    "selection": "a2l_def_55 or a2l_def_46",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_1_multi_bit_write",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_2_single_bit_write",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_4_masked_enum_write",
+      "FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word"
+    ]
+  },
+  {
+    "id": "M-55c",
+    "selection": "a2l_def_55 or a2l_def_41_3",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_3_linear_with_an_offset"
+    ]
+  },
+  {
+    "id": "M-55d",
+    "selection": "a2l_def_55 or a2l_def_35_5",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_5_fifteen_or_more_decimals_round_to_15_significant_digits"
+    ]
+  },
+  {
+    "id": "M-56",
+    "selection": "a2l_def_56",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_56_1_text_round_trip"
+    ]
+  },
+  {
+    "id": "M-56b",
+    "selection": "a2l_def_56",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_56_1_text_round_trip"
+    ]
+  },
+  {
+    "id": "M-57",
+    "selection": "a2l_def_57_3",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_3_image_bytes_before_the_mask"
+    ]
+  },
+  {
+    "id": "M-57b",
+    "selection": "a2l_def_57_2",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_2_limits_before_the_encode_direction"
+    ]
+  },
+  {
+    "id": "M-57c",
+    "selection": "a2l_def_57_4",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_4_number_text_before_the_shared_bytes"
+    ]
+  },
+  {
+    "id": "M-138",
+    "selection": "a2l_def_138",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_1_lost_mask_negative_control",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_11_clean_duplicate_named_neighbour",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_12_byte_order_refused_neighbour",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_15_both_masks_select_a_common_bit",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_22_cross_page_file_order",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption"
+    ]
+  },
+  {
+    "id": "M-138b",
+    "selection": "a2l_def_138",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select"
+    ]
+  },
+  {
+    "id": "M-138c",
+    "selection": "a2l_def_138_18",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index"
+    ]
+  },
+  {
+    "id": "M-138d",
+    "selection": "a2l_def_138_19",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address"
+    ]
+  },
+  {
+    "id": "M-138e",
+    "selection": "a2l_def_138",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption"
+    ]
+  },
+  {
+    "id": "M-138f",
+    "selection": "a2l_def_138",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour",
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers"
+    ]
+  },
+  {
+    "id": "M-138g",
+    "selection": "a2l_def_138_23",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption"
+    ]
+  },
+  {
+    "id": "M-152",
+    "selection": "a2l_def_152 or a2l_def_57_5",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_5_parse_errors_before_the_number_text"
+    ]
+  },
+  {
+    "id": "M-58.1",
+    "selection": "a2l_def_58_1 and encode",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_2_encode_does_not_mutate_case08"
+    ]
+  }
+]

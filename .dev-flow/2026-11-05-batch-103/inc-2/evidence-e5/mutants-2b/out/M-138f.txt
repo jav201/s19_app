@@ -1,0 +1,131 @@
+M-138f
+pytest -k a2l_def_138
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..a1b618e9 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            continue
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+...F....FF.........F...                                                  [100%]
+=================================== FAILURES ===================================
+______ test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-477/test_r_a2l_def_138_4_unsized_i0')
+
+    def test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin INSTANCE IU ""\n  T_NONE 0x10\n/end INSTANCE')
+        d = describe_definition("VU", a2l)
+>       assert d.shared_with == "IU"
+E       AssertionError: assert None == 'IU'
+E        +  where None = Definition(name='VU', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3206: AssertionError
+_ test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address __
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-477/test_r_a2l_def_138_9_hostile_u0')
+
+    def test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VH", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      "/begin CHARACTERISTIC H1 \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 1000000000000\n/end CHARACTERISTIC")
+        d = describe_definition("VH", a2l)
+>       assert d.shared_with == "H1"
+E       AssertionError: assert None == 'H1'
+E        +  where None = Definition(name='VH', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3242: AssertionError
+_____________ test_r_a2l_def_138_10_clean_length_refused_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-477/test_r_a2l_def_138_10_clean_le0')
+
+    def test_r_a2l_def_138_10_clean_length_refused_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("ON", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00", "LENGTH 1048577"))
+        d = describe_definition("OA", a2l)
+>       assert d.shared_with == "ON"
+E       AssertionError: assert None == 'ON'
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3255: AssertionError
+___________ test_r_a2l_def_138_21_hostile_blob_and_instance_headers ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-477/test_r_a2l_def_138_21_hostile_0')
+
+    def test_r_a2l_def_138_21_hostile_blob_and_instance_headers(tmp_path):
+        huge_hex = "0x" + "F" * 5000
+        huge_decimal = "9" * 5000
+        a2l = _inline(
+            tmp_path,
+            f'/begin BLOB B1 "" {huge_hex} 2\n/end BLOB',
+            f'/begin TYPEDEF_BLOB TB "" {huge_decimal}\n/end TYPEDEF_BLOB',
+            '/begin INSTANCE I1 "" TB 0x10\n/end INSTANCE',
+            _val("V1", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        clean = _clear_parse_errors(a2l)
+        d = describe_definition("V1", clean)
+>       assert d.shared_with == "I1"
+E       AssertionError: assert None == 'I1'
+E        +  where None = Definition(name='V1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3370: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers
+4 failed, 19 passed, 299 deselected in 1.03s

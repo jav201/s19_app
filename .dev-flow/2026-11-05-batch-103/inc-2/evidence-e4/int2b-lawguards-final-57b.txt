@@ -1,0 +1,573 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+...................................................................F.... [ 98%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-57b.txt: lan address: <runner-ip>
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: user-profile path: C:\\Users\\<user>
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/int2b-lawguards.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: unix-style user-profile path: /c/Users/<user>
+E         inc-2/evidence-e4/kimi-e4-tests-2b.txt: lan address: <runner-ip>
+E       assert not ['evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208', 'evidence...240', 'evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240', ...]
+
+tests/test_suite_hygiene.py:2053: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+55.7%  0.443 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+56.0%  0.440 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+66.5%  0.335 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+69.0%  0.310 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+78.0%  0.220 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+80.0%  0.200 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+80.2%  0.198 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+87.3%  0.127 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 10 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+1 failed, 72 passed, 7774 deselected in 257.34s (0:04:17)

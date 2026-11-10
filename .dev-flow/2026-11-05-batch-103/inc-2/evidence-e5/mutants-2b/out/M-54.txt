@@ -1,0 +1,128 @@
+M-54
+pytest -k a2l_def_54
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..725b8432 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3755,7 +3761,7 @@ def encode_definition(
+     if isinstance(limits_outcome, str):
+         notices = (limits_outcome,)
+ 
+-    if definition.kind == "number":
++    if False:
+         written_image = {definition.address + i: byte for i, byte in enumerate(data)}
+         decoded = decode_definition(definition, a2l_data, written_image)
+         if isinstance(decoded, Refusal):
+
+F.FF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_54_1_precision_refusal _____________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-462/test_r_a2l_def_54_1_precision_0')
+
+    def test_r_a2l_def_54_1_precision_refusal(c08, tmp_path):
+        a2l = _clear_parse_errors(_c08_with_format(c08, tmp_path, "MEASUREMENT_0001", "%.3"))
+        d = describe_definition("MEASUREMENT_0001", a2l)
+>       assert _enc(d, a2l, "5.07", c08["mem"]) == _ref(
+            "A2L-DEF-PRECISION", "MEASUREMENT_0001: 5.07 cannot be stored at the display precision \u2014 the nearest stored value is 5.100")
+E       AssertionError: assert Encoded(address=80, data=b'\x003', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100')
+E        +  where Encoded(address=80, data=b'\x003', notices=()) = _enc(Definition(name='MEASUREMENT_0001', section='MEASUREMENT', char_type=None, kind='number', address=80, byte_length=2, d...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...B_VERB 5', '0 0', '1 5', '2 10', '3 15', '4 20'], 'name': 'TBL_NOINTP', ...}}, 'declared_spans': [], 'errors': [], ...}, '5.07', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100') = _ref('A2L-DEF-PRECISION', 'MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100')
+
+tests/test_b103_a2l_definition.py:2941: AssertionError
+_____________ test_r_a2l_def_54_3_float64_not_accepted_at_6_digits _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-462/test_r_a2l_def_54_3_float64_no0')
+
+    def test_r_a2l_def_54_3_float64_not_accepted_at_6_digits(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_P", "LINEAR", "1", "1e10"),
+                      _val("P64", "0x10", "RL_F64", "CM_P", "-1e300", "1e300", 'FORMAT "%"'))
+        d = describe_definition("P64", a2l)
+>       assert _enc(d, a2l, "1.0000001", _img(0x10, bytes(8))) == _ref(
+            "A2L-DEF-PRECISION", "P64: 1.0000001 cannot be stored at the display precision \u2014 the nearest stored value is 1")
+E       AssertionError: assert Encoded(address=16, data=b'\xc2\x02\xa0_\x1f\xf8\x00\x00', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1')
+E        +  where Encoded(address=16, data=b'\xc2\x02\xa0_\x1f\xf8\x00\x00', notices=()) = _enc(Definition(name='P64', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=8, datatype...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_P': {'coeffs': None, 'coeffs_linear': [1.0, 10000000000.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1.0000001', {16: 0, 17: 0, 18: 0, 19: 0, ...})
+E        +    where {16: 0, 17: 0, 18: 0, 19: 0, ...} = _img(16, b'\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(8)
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1') = _ref('A2L-DEF-PRECISION', 'P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1')
+
+tests/test_b103_a2l_definition.py:2955: AssertionError
+_________________ test_r_a2l_def_54_4_exact_integer_above_2_53 _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-462/test_r_a2l_def_54_4_exact_inte0')
+
+    def test_r_a2l_def_54_4_exact_integer_above_2_53(tmp_path):
+        layout = "\n".join(['    /begin RECORD_LAYOUT RL_U64', "      FNC_VALUES 1 A_UINT64 ROW_DIR DIRECT", "    /end RECORD_LAYOUT"])
+        a2l = _inline(tmp_path, layout, _val("U64", "0x10", "RL_U64", "NO_COMPU_METHOD", "0", str(2**64 - 1)))
+        d = describe_definition("U64", a2l)
+>       assert _enc(d, a2l, "9007199254740993", _img(0x10, bytes(8))) == _ref(
+            "A2L-DEF-PRECISION", "U64: 9007199254740993 cannot be stored at the display precision \u2014 the nearest stored value is 9007199254740992")
+E       AssertionError: assert Encoded(address=16, data=b'\x00 \x00\x00\x00\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992')
+E        +  where Encoded(address=16, data=b'\x00 \x00\x00\x00\x00\x00\x00', notices=()) = _enc(Definition(name='U64', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=8, datatype...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '9007199254740993', {16: 0, 17: 0, 18: 0, 19: 0, ...})
+E        +    where {16: 0, 17: 0, 18: 0, 19: 0, ...} = _img(16, b'\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(8)
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992') = _ref('A2L-DEF-PRECISION', 'U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992')
+
+tests/test_b103_a2l_definition.py:2963: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_1_precision_refusal
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_3_float64_not_accepted_at_6_digits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_4_exact_integer_above_2_53
+3 failed, 1 passed, 318 deselected in 1.69s

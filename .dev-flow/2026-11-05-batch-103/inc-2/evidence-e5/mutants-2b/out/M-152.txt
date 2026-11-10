@@ -1,0 +1,114 @@
+M-152
+pytest -k a2l_def_152 or a2l_def_57_5
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..8e90ee47 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3689,7 +3695,7 @@ def encode_definition(
+     name_echo = _name_echo_of(definition)
+ 
+     errors = a2l_data.get("errors") or []
+-    if errors:
++    if False and errors:
+         return Refusal(
+             "A2L-DEF-PARSE",
+             f"{name_echo}: the A2L cannot be edited while it has parse errors "
+@@ -3726,6 +3732,12 @@ def encode_definition(
+                 "A2L-DEF-NUMBER",
+                 f"{name_echo}: '{_operator_echo(trimmed)}' is not a number",
+             )
++        if errors:
++            return Refusal(
++                "A2L-DEF-PARSE",
++                f"{name_echo}: the A2L cannot be edited while it has parse errors "
++                f"— the first is {errors[0]}",
++            )
+         limit_value = value
+     else:
+         raw = _encode_enum(definition, trimmed)
+
+F.....                                                                   [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_57_5_parse_errors_before_the_number_text ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-479/test_r_a2l_def_57_5_parse_erro0')
+
+    def test_r_a2l_def_57_5_parse_errors_before_the_number_text(tmp_path):
+        a2l = _inline(tmp_path,
+                      _val("PN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      '/include "x.a2l"')
+        d = describe_definition("PN", a2l)
+        first = a2l["errors"][0]
+>       assert _enc(d, a2l, "abc", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", f"PN: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+E       assert Refusal(code=...not a number") == Refusal(code=... is not read')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-NUMBER' != 'A2L-DEF-PARSE'
+E           - A2L-DEF-PARSE...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:3169: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_5_parse_errors_before_the_number_text
+1 failed, 5 passed, 316 deselected in 0.76s

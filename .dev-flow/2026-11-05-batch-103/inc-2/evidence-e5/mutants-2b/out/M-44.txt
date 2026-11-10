@@ -1,0 +1,124 @@
+M-44
+pytest -k a2l_def_44
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..657c748e 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3799,4 +3805,4 @@ def encode_definition(
+             f"{name_echo}: its bytes at {_fmt_address(definition.address)} "
+             f"are shared with {_echo(definition.shared_with)}",
+         )
+-    return Encoded(definition.address, data, notices)
++    return Encoded(definition.address, data, ())
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_def_44_1_notice_above_the_limits __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_44_1_notice_above_the_limits(v171):
+        """R-A2L-DEF.44/1 - 120: overlap first, then 78 with the notice."""
+        d = describe_definition(V171_SBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+        img = {0x810001: 0}
+        assert _enc(d, v171, "120", img) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+        notice = "ASAM.C.SCALAR.SBYTE.IDENTICAL: 120 is outside the limits -100..100 and inside the extended limits -128..127"
+>       assert _enc(_clear(d), v171, "120", img) == Encoded(0x810001, bytes([0x78]), (notice,))
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre... -128..127',))
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['notices']
+E         
+E         Drill down into differing attribute notices:
+E           notices: () != ('ASAM.C.SCALAR.SBYTE.IDENTICAL: 120 is outside the limits -100..100 and inside the extended limits -128..127',)
+E           Right contains one more item: 'ASAM.C.SCALAR.SBYTE.IDENTICAL: 120 is outside the limits -100..100 and inside the extended limits -128..127'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2731: AssertionError
+____________ test_r_a2l_def_44_2_notice_at_the_extended_lower_limit ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_44_2_notice_at_the_extended_lower_limit(v171):
+        d = describe_definition(V171_SBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+        img = {0x810001: 0}
+        assert _enc(d, v171, "-128", img) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+        notice = "ASAM.C.SCALAR.SBYTE.IDENTICAL: -128 is outside the limits -100..100 and inside the extended limits -128..127"
+>       assert _enc(_clear(d), v171, "-128", img) == Encoded(0x810001, bytes([0x80]), (notice,))
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre... -128..127',))
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['notices']
+E         
+E         Drill down into differing attribute notices:
+E           notices: () != ('ASAM.C.SCALAR.SBYTE.IDENTICAL: -128 is outside the limits -100..100 and inside the extended limits -128..127',)
+E           Right contains one more item: 'ASAM.C.SCALAR.SBYTE.IDENTICAL: -128 is outside the limits -100..100 and inside the extended limits -128..127'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2741: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_1_notice_above_the_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_2_notice_at_the_extended_lower_limit
+2 failed, 320 deselected in 0.83s

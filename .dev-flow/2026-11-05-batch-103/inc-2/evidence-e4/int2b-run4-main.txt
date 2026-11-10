@@ -1,0 +1,35 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_b103_a2l_definition.py ______________
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1204: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1176: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:690: in _load_unlocked
+    ???
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/ast.py:50: in parse
+    return compile(source, filename, mode, flags,
+E     File "/tmp/b103-e4-2b-int/tests/test_b103_a2l_definition.py", line 3305
+E       assert alone.shared_with is None
+E       ^^^^^^
+E   SyntaxError: invalid syntax
+=========================== short test summary info ============================
+ERROR tests/test_b103_a2l_definition.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.23s

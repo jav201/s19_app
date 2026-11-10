@@ -1,0 +1,106 @@
+M-49b
+pytest -k a2l_def_49
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..722279f7 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3424,7 +3424,7 @@ def _encode_enum(definition: Definition, text: str) -> float | Refusal:
+     else ``A2L-DEF-ENUM`` (R-A2L-DEF.48, .49)."""
+     name_echo = _name_echo_of(definition)
+     for entry in definition.enum_entries:
+-        if entry.text == text:
++        if entry.text.casefold() == text.casefold():
+             return entry.raw
+     table_echo = (
+         _echo(definition.enum_table)
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_def_49_1_case_counts ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_49_1_case_counts(v171):
+>       _enum_refusal(v171, "square")
+
+tests/test_b103_a2l_definition.py:2855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'square'
+
+    def _enum_refusal(v171: dict, text: str) -> None:
+        d = describe_definition(V171_ENUM, v171)
+>       assert _enc(d, v171, text, {}) == _ref(
+            "A2L-DEF-ENUM", f"{V171_ENUM}: '{text}' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E       assert Refusal(code=...in the image') == Refusal(code=...LT_VALUE.REF")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-BYTES' != 'A2L-DEF-ENUM'
+E           - A2L-DEF-ENUM...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2850: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_1_case_counts - a...
+1 failed, 2 passed, 319 deselected in 0.81s

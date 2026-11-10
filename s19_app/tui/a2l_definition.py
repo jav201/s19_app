@@ -1,13 +1,12 @@
-"""The A2L definition model, read side (Incs 2a and 3a).
+"""The A2L definition model (Incs 2a, 2b and 3a).
 
 This module builds *definitions* of scalar objects, VAL_BLK and MATRIX_DIM
 arrays, curves and maps from the parse payload of
 :func:`s19_app.tui.a2l.parse_a2l_file`. It decodes stored scalars, elements and
-axis points into values and display texts, and formats numbers for display. It
-is the read side of interface I-2 (``describe`` / ``decode`` / ``display``);
-the write side (``encode``, the span index, the overlap guard and the
-text-of-object bit-mask clauses) belongs to Incs 2b and 3b and is not written
-here.
+axis points into values and display texts, formats numbers for display, and
+encodes an operator's text into the bytes of the object's whole span
+(``describe`` / ``decode`` / ``display`` / ``encode`` of interface I-2), with
+the cross-kind span index and the overlap guard of R-A2L-DEF.138.
 
 The module is pure: standard library plus ``s19_app.tui.a2l`` only, no
 ``textual`` import, no file or clipboard I/O, no global mutable state, and it
@@ -19,12 +18,13 @@ from __future__ import annotations
 
 import heapq
 import math
+import re
 import struct
 from bisect import bisect_left
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Iterable, Mapping, Optional
+from typing import Callable, Iterable, Mapping, Optional
 
 from .a2l import (
     DATATYPE_SIZES,
@@ -38,6 +38,7 @@ from .a2l import (
     _strip_a2l_comments,
     _to_float,
     _walk_record_layout_components,
+    encode_physical_to_raw_bytes,
     parse_begin_meta,
 )
 
@@ -141,6 +142,7 @@ class Definition:
     coeffs_linear: Optional[tuple[Optional[float], Optional[float]]]
     coeffs: Optional[tuple[Optional[float], ...]]
     compu_tab_ref: Optional[str]
+    shared_with: Optional[str]
     refusal: Optional[Refusal]
     shape: tuple[int, ...] = ()
     element_count: Optional[int] = 1
@@ -161,6 +163,17 @@ class Decoded:
     stored: Optional[int | float]
     value: Optional[int | float | str]
     text: str
+
+
+@dataclass(frozen=True)
+class Encoded:
+    """The bytes an encode would write: the whole span from ``address``
+    (``data`` is ``byte_length`` bytes), with ``notices`` the at-most-one
+    R-A2L-DEF.44 notice when one applies, else ``()`` (I-2)."""
+
+    address: int
+    data: bytes
+    notices: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -579,9 +592,16 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     axis_pts_by_name: dict[str, tuple[dict, tuple[str, ...], Optional[dict]]] = {}
     mod_common_of: dict[int, Optional[dict]] = {}
     record_layouts = a2l_data.get("record_layouts_by_name") or {}
+    declared_spans = a2l_data.get("declared_spans") or []
+    order = [0]
+    ds_index = [0]
+    tag_consumed: dict[str, int] = {}
+    span_entries: list[tuple] = []
 
     def walk(nodes: Iterable[dict], mod_common: Optional[dict]) -> None:
         for node in nodes:
+            order[0] += 1
+            position = order[0]
             node_name = node.get("name")
             if node_name == "MODULE":
                 child_common = next(
@@ -598,10 +618,44 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
                 object_sections_by_name.setdefault(parsed[0], []).append(node)
                 mod_common_of[id(node)] = mod_common
+                if node.get("end_line") is not None:
+                    idx = tag_consumed.get(parsed[0], 0)
+                    tags = tags_by_name.get(parsed[0]) or []
+                    if idx < len(tags):
+                        tag = tags[idx]
+                        tag_consumed[parsed[0]] = idx + 1
+                        address = tag.get("address")
+                        if address is not None:
+                            span_entries.append(
+                                (
+                                    position,
+                                    parsed[0],
+                                    node_name,
+                                    address,
+                                    tag.get("length"),
+                                    tag.get("effective_byte_order") or "little",
+                                )
+                            )
             elif node_name == "COMPU_METHOD":
                 compu_methods_by_name.setdefault(parsed[0], node)
             elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
                 compu_tables_by_name.setdefault(parsed[0], node)
+            elif node_name in ("BLOB", "INSTANCE"):
+                if ds_index[0] < len(declared_spans):
+                    span = declared_spans[ds_index[0]]
+                    ds_index[0] += 1
+                    address = span.get("address")
+                    if address is not None:
+                        span_entries.append(
+                            (
+                                position,
+                                span.get("name"),
+                                node_name,
+                                address,
+                                span.get("length"),
+                                "little",
+                            )
+                        )
             elif node_name == "AXIS_PTS":
                 tokens = _flatten_body_tokens(
                     [node.get("meta", "") or ""] + (node.get("lines") or [])
@@ -617,6 +671,18 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
 
     walk(a2l_data.get("sections") or [], None)
 
+    span_index: dict[int, list[tuple]] = {}
+    for entry in span_entries:
+        _position, _name, _kind, address, byte_length, _byte_order = entry
+        if byte_length is not None and byte_length >= 1:
+            first_page = address >> 4
+            last_page = (address + byte_length - 1) >> 4
+            pages = range(first_page, last_page + 1)
+        else:
+            pages = (address >> 4,)
+        for page in pages:
+            span_index.setdefault(page, []).append(entry)
+
     result: dict[str, Definition] = {}
     reads: dict[object, object] = {}
     maps = {
@@ -626,10 +692,32 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
         "compu_methods_by_name": compu_methods_by_name,
         "compu_tables_by_name": compu_tables_by_name,
     }
+    mask_cache: dict[str, Optional[int]] = {}
+
+    def mask_of(other_name: str) -> Optional[int]:
+        if other_name in mask_cache:
+            return mask_cache[other_name]
+        other = _describe_one(
+            other_name,
+            tags_by_name,
+            object_sections_by_name,
+            compu_methods_by_name,
+            compu_tables_by_name,
+            a2l_data,
+            maps,
+        )
+        value = (
+            other.bit_mask
+            if (other.refusal is None and other.byte_length is not None)
+            else None
+        )
+        mask_cache[other_name] = value
+        return value
+
     for name in names:
         if name in result:
             continue
-        result[name] = _describe_one(
+        definition = _describe_one(
             name,
             tags_by_name,
             object_sections_by_name,
@@ -637,6 +725,15 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             compu_tables_by_name,
             a2l_data,
             maps,
+        )
+        mask_cache[name] = (
+            definition.bit_mask
+            if (definition.refusal is None and definition.byte_length is not None)
+            else None
+        )
+        result[name] = replace(
+            definition,
+            shared_with=_shared_with(definition, span_index, mask_of),
         )
     return result
 
@@ -730,6 +827,7 @@ def _describe_one(
             coeffs_linear=fields["coeffs_linear"],
             coeffs=fields["coeffs"],
             compu_tab_ref=fields["compu_tab_ref"],
+            shared_with=None,
             refusal=None,
             _name_echo=name_echo,
             _table_form=fields["table_form"],
@@ -794,14 +892,23 @@ def _describe_one(
         mask_number = _parse_bit_mask(mask_word)
 
     if refusal is None and mask_word is not None:
-        if kind == "text":
+        if _mask_byte_order_ambiguous(tag, section, object_lines, a2l_data, maps):
+            refusal = Refusal(
+                "A2L-DEF-MASK",
+                f"{name_echo}: its byte order cannot be read",
+            )
+        elif kind == "text":
             refusal = Refusal(
                 "A2L-DEF-MASK",
                 f"{name_echo}: the bit mask {_echo(mask_word)} cannot be "
                 f"applied to {_echo(char_type)}",
             )
         elif kind in ("number", "enum"):
-            if mask_number is None or not _check_bit_mask(mask_number, datatype):
+            if (
+                object_lines.get("bit_mask_count", 0) > 1
+                or mask_number is None
+                or not _check_bit_mask(mask_number, datatype)
+            ):
                 refusal = Refusal(
                     "A2L-DEF-MASK",
                     f"{name_echo}: the bit mask {_echo(mask_word)} cannot be "
@@ -832,6 +939,7 @@ def _describe_one(
         coeffs_linear=fields["coeffs_linear"],
         coeffs=fields["coeffs"],
         compu_tab_ref=fields["compu_tab_ref"],
+        shared_with=None,
         refusal=refusal,
         element_count=None if value_145 or kind is None else 1,
         _name_echo=name_echo,
@@ -865,6 +973,7 @@ def _empty_definition(name: str, name_echo: str) -> Definition:
         coeffs_linear=None,
         coeffs=None,
         compu_tab_ref=None,
+        shared_with=None,
         refusal=None,
         element_count=None,
         _name_echo=name_echo,
@@ -1794,6 +1903,7 @@ def _read_axis(
         coeffs_linear=points_fields["coeffs_linear"],
         coeffs=points_fields["coeffs"],
         compu_tab_ref=points_fields["compu_tab_ref"],
+        shared_with=None,
         refusal=points_refusal,
         _name_echo=axis_name,
         _table_form=points_fields["table_form"],
@@ -1850,6 +1960,7 @@ def _read_axis(
             coeffs_linear=None,
             coeffs=None,
             compu_tab_ref=None,
+            shared_with=None,
             refusal=None,
             record_layout=axis_object_header[4] if len(axis_object_header) > 4 else None,
             element_count=None,
@@ -2443,7 +2554,9 @@ def _read_enum_table(
 
 def _read_object_lines(section: Optional[dict]) -> dict:
     """The object record's words: ``header``, ``format``, ``extended_limits``,
-    ``unit`` and ``bit_mask`` (the raw word, readable or not, for every kind).
+    ``unit``, ``bit_mask`` (the raw word, readable or not, for every kind),
+    ``bit_mask_count`` and ``byte_order_count`` (the numbers of those live
+    keywords in the record, for the two Inc 2b residual guards).
 
     ``header`` is the first 8 words of a MEASUREMENT or the first 9 of a
     CHARACTERISTIC; the other keys are the first of each keyword after the
@@ -2456,6 +2569,8 @@ def _read_object_lines(section: Optional[dict]) -> dict:
         "extended_limits": None,
         "unit": None,
         "bit_mask": None,
+        "bit_mask_count": 0,
+        "byte_order_count": 0,
     }
     if section is None:
         return result
@@ -2465,6 +2580,8 @@ def _read_object_lines(section: Optional[dict]) -> dict:
     header_len = 8 if section.get("name") == "MEASUREMENT" else 9
     result["header"] = tokens[:header_len]
     body = tokens[header_len:]
+    result["bit_mask_count"] = sum(1 for word in body if word == "BIT_MASK")
+    result["byte_order_count"] = sum(1 for word in body if word == "BYTE_ORDER")
     i = 0
     n = len(body)
     while i < n:
@@ -3119,3 +3236,573 @@ def display_text(definition: Definition, value: int | float) -> str:
             return format(Decimal(f"{value:.15g}"), f".{d}f")
         return f"{value:.{d}f}"
     return f"{value:.15g}"
+
+
+def _operator_echo(text: str) -> str:
+    """Write an operator text into a message: its first 256 characters, each
+    control character (U+0000-U+001F, U+007F, U+0080-U+009F) as U+FFFD, spaces
+    and all other Unicode preserved, then ``…`` when the text is longer
+    (R-A2L-DEF.151/7)."""
+    cut = len(text) > _ECHO_LIMIT
+    body = text[:_ECHO_LIMIT]
+    return _clean(body) + (_ELLIPSIS if cut else "")
+
+
+_NUMBER_TEXT_RE = re.compile(
+    r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", re.ASCII
+)
+
+
+def _parse_number_text(text: str) -> Optional[float]:
+    """``float(text)`` when the whole text is the *number text* grammar (ASCII
+    digits only, an optional point and exponent), else ``None`` — no ``_``,
+    ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+    """
+    if _NUMBER_TEXT_RE.fullmatch(text):
+        return float(text)
+    return None
+
+
+def _pack_float32(value: float) -> float:
+    """The nearest FLOAT32 to ``value`` (E3S-06), for limit comparisons."""
+    try:
+        return struct.unpack("<f", struct.pack("<f", value))[0]
+    except (struct.error, OverflowError):
+        return float(value)
+
+
+def _limit_less(value: float, limit: float, datatype: Optional[str]) -> bool:
+    """``value < limit``, compared packed as FLOAT32 for a FLOAT32_IEEE
+    datatype (E3S-06)."""
+    if datatype == "FLOAT32_IEEE":
+        return _pack_float32(value) < _pack_float32(limit)
+    return value < limit
+
+
+def _limit_greater(value: float, limit: float, datatype: Optional[str]) -> bool:
+    """``value > limit``, compared packed as FLOAT32 for a FLOAT32_IEEE
+    datatype (E3S-06)."""
+    if datatype == "FLOAT32_IEEE":
+        return _pack_float32(value) > _pack_float32(limit)
+    return value > limit
+
+
+def _name_echo_of(definition: Definition) -> str:
+    """The definition's name echo (P-2), the ``_echo`` fallback for a
+    hand-built definition."""
+    return (
+        definition._name_echo
+        if definition._name_echo is not None
+        else _echo(definition.name)
+    )
+
+
+def _check_limits(
+    definition: Definition, limit_value: float, text: str
+) -> Refusal | str | None:
+    """The limit check of the encode order (R-A2L-DEF.43 … .45).
+
+    ``text`` is the final ``<text>`` of the message (the echoed operator text
+    for the limit value, the stored display text for the written value).
+    Returns a refusal outside the (extended) limits, the at-most-one notice
+    inside the extended limits, or ``None``.
+    """
+    name_echo = _name_echo_of(definition)
+    limits = definition.limits
+    below = limits.lower is not None and _limit_less(
+        limit_value, limits.lower, definition.datatype
+    )
+    above = limits.upper is not None and _limit_greater(
+        limit_value, limits.upper, definition.datatype
+    )
+    if not (below or above):
+        return None
+    if definition.extended_limits is None:
+        return Refusal(
+            "A2L-DEF-LIMITS",
+            f"{name_echo}: {text} is outside the limits "
+            f"{limits.lower_text}..{limits.upper_text}",
+        )
+    extended = definition.extended_limits
+    ebelow = extended.lower is not None and _limit_less(
+        limit_value, extended.lower, definition.datatype
+    )
+    eabove = extended.upper is not None and _limit_greater(
+        limit_value, extended.upper, definition.datatype
+    )
+    if ebelow or eabove:
+        return Refusal(
+            "A2L-DEF-EXTENDED",
+            f"{name_echo}: {text} is outside the extended limits "
+            f"{extended.lower_text}..{extended.upper_text}",
+        )
+    return (
+        f"{name_echo}: {text} is outside the limits {limits.lower_text}.."
+        f"{limits.upper_text} and inside the extended limits "
+        f"{extended.lower_text}..{extended.upper_text}"
+    )
+
+
+def _encode_number(
+    definition: Definition, a2l_data: dict, value: float
+) -> bytes | Refusal:
+    """The encode direction (R-A2L-DEF.41, .42) through the frozen
+    ``encode_physical_to_raw_bytes`` on a mask-free tag view, or
+    ``A2L-DEF-ENCODE`` ``<name>: <reason>``."""
+    name_echo = _name_echo_of(definition)
+    method_name = (
+        "NO_COMPU_METHOD" if definition.kind == "enum" else definition.method_name
+    )
+    method_table: dict = {}
+    if method_name is not None and method_name != "NO_COMPU_METHOD":
+        method_table = {
+            method_name: {
+                "conversion_type": definition.conversion_type,
+                "coeffs_linear": definition.coeffs_linear,
+                "coeffs": definition.coeffs,
+                "compu_tab_ref": definition.compu_tab_ref,
+            }
+        }
+    tag = {
+        "char_type": None,
+        "matrix_dim": None,
+        "datatype": definition.datatype,
+        "length": definition.byte_length,
+        "effective_byte_order": definition.byte_order,
+        "compu_method_name": method_name,
+        "lower_limit": None,
+        "upper_limit": None,
+    }
+    raw, reason, _flags = encode_physical_to_raw_bytes(
+        tag,
+        value,
+        method_table,
+        a2l_data.get("compu_tabs_by_name") or {},
+        None,
+    )
+    if reason is not None:
+        return Refusal("A2L-DEF-ENCODE", f"{name_echo}: {reason}")
+    return bytes(raw)
+
+
+def _merge_bit_mask(
+    definition: Definition, field: int, text: str, image: Mapping[int, int]
+) -> bytes | Refusal:
+    """Write ``field`` shifted into the mask and keep every other bit of the
+    image's span (R-A2L-DEF.46, .47)."""
+    name_echo = _name_echo_of(definition)
+    address = definition.address
+    missing = 0
+    values: list[int] = []
+    for offset in range(definition.byte_length):
+        current = address + offset
+        if current not in image:
+            missing += 1
+        else:
+            values.append(image[current] & 0xFF)
+    if missing:
+        return Refusal(
+            "A2L-DEF-BYTES",
+            f"{name_echo}: {_number_text(missing)} of its "
+            f"{_number_text(definition.byte_length)} bytes are not in the image",
+        )
+    word = int.from_bytes(bytes(values), definition.byte_order)
+    mask = definition.bit_mask
+    shift = _mask_shift(mask)
+    if field < 0 or ((field << shift) & ~mask) != 0:
+        return Refusal(
+            "A2L-DEF-MASK-VALUE",
+            f"{name_echo}: {_operator_echo(text)} does not fit the bit mask "
+            f"{_echo(definition.bit_mask_text)}",
+        )
+    merged = (word & ~mask) | (field << shift)
+    return merged.to_bytes(definition.byte_length, definition.byte_order)
+
+
+def _encode_enum(definition: Definition, text: str) -> float | Refusal:
+    """The raw of the first entry whose text equals ``text`` (case included),
+    else ``A2L-DEF-ENUM`` (R-A2L-DEF.48, .49)."""
+    name_echo = _name_echo_of(definition)
+    for entry in definition.enum_entries:
+        if entry.text == text:
+            return entry.raw
+    table_echo = (
+        _echo(definition.enum_table)
+        if definition.enum_table is not None
+        else "(none)"
+    )
+    return Refusal(
+        "A2L-DEF-ENUM",
+        f"{name_echo}: '{_operator_echo(text)}' is not a text of {table_echo}",
+    )
+
+
+def _encode_ascii(definition: Definition, text: str) -> bytes | Refusal:
+    """The text's printable-ASCII bytes padded with 0x00 to the byte length
+    (R-A2L-DEF.50 … .52)."""
+    name_echo = _name_echo_of(definition)
+    length = definition.byte_length
+    if len(text) > length:
+        return Refusal(
+            "A2L-DEF-TEXT-LENGTH",
+            f"{name_echo}: the text has {len(text)} characters — at most "
+            f"{length} fit",
+        )
+    for ch in text:
+        if not (0x20 <= ord(ch) <= 0x7E):
+            return Refusal(
+                "A2L-DEF-TEXT-CHAR",
+                f"{name_echo}: '{_operator_echo(ch)}' is not a printable ASCII "
+                "character",
+            )
+    return text.encode("ascii") + b"\x00" * (length - len(text))
+
+
+def _agrees_at_display_precision(
+    definition: Definition, decoded: float, value: float
+) -> bool:
+    """The CTX *agree at the display precision* rule (R-A2L-DEF.54, .55)."""
+    decimals = definition.decimals
+    if decimals is not None and abs(decoded - value) <= 0.5 * (10.0 ** (-decimals)):
+        return True
+    if f"{decoded:.15g}" == f"{value:.15g}":
+        return True
+    if definition.datatype == "FLOAT32_IEEE" and f"{decoded:.6g}" == f"{value:.6g}":
+        return True
+    return False
+
+
+def _selected_bits(
+    address: int,
+    byte_length: int,
+    byte_order: str,
+    bit_mask: Optional[int],
+) -> dict[int, int]:
+    """The bits an object selects (CTX *bits an object selects*): address →
+    the bits of that byte the mask selects; 0xFF of every byte when the mask is
+    ``None`` (R-A2L-DEF.138)."""
+    if bit_mask is None:
+        return {address + i: 0xFF for i in range(byte_length)}
+    bits: dict[int, int] = {}
+    for i in range(byte_length):
+        if byte_order == "big":
+            shift = 8 * (byte_length - 1 - i)
+        else:
+            shift = 8 * i
+        byte_mask = (bit_mask >> shift) & 0xFF
+        if byte_mask:
+            bits[address + i] = byte_mask
+    return bits
+
+
+def _pair_exempt(
+    definition: Definition, entry: tuple, mask_of: Callable[[str], Optional[int]]
+) -> bool:
+    """Whether the pair ``definition`` / ``entry`` is left out of the overlap
+    guard: both masks read (the definition's own, and the neighbour's via
+    ``mask_of``) and no common selected bit (R-A2L-DEF.138)."""
+    if definition.refusal is not None:
+        return False
+    if definition.byte_length is None or definition.byte_length < 1:
+        return False
+    my_mask = definition.bit_mask
+    if my_mask is None:
+        return False
+    if entry[2] in ("BLOB", "INSTANCE"):
+        return False
+    other_mask = mask_of(entry[1])
+    if other_mask is None:
+        return False
+    my_bits = _selected_bits(
+        definition.address, definition.byte_length, definition.byte_order, my_mask
+    )
+    other_bits = _selected_bits(entry[3], entry[4], entry[5], other_mask)
+    for addr, mask in my_bits.items():
+        if mask & other_bits.get(addr, 0):
+            return False
+    return True
+
+
+def _entry_overlaps(definition: Definition, entry: tuple) -> bool:
+    """Whether the entry's span (an interval, or its declared address as a
+    fail-closed point when its length is unreadable) overlaps the definition's
+    span."""
+    if definition.byte_length is not None and definition.byte_length >= 1:
+        first = definition.address
+        last = definition.address + definition.byte_length - 1
+    else:
+        first = last = definition.address
+    other_address = entry[3]
+    other_length = entry[4]
+    if other_length is not None and other_length >= 1:
+        other_first = other_address
+        other_last = other_address + other_length - 1
+    else:
+        other_first = other_last = other_address
+    return first <= other_last and other_first <= last
+
+
+def _shared_with(
+    definition: Definition,
+    span_index: Mapping[int, tuple],
+    mask_of: Callable[[str], Optional[int]],
+) -> Optional[str]:
+    """The name of the first other entry, in cross-kind file order, whose span
+    overlaps the definition's span (or whose declared address lies inside it
+    when that entry has no readable length), unless the pair's clean masks
+    select no common bit (R-A2L-DEF.138)."""
+    address = definition.address
+    if address is None:
+        return None
+    if definition.byte_length is not None and definition.byte_length >= 1:
+        pages = range(
+            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+        )
+    else:
+        pages = (address >> 4,)
+    seen: set[int] = set()
+    multi_page = len(pages) > 1
+    candidates: list[tuple] = []
+    for page in pages:
+        for entry in span_index.get(page, ()):
+            if multi_page:
+                key = entry[0]
+                if key in seen:
+                    continue
+                seen.add(key)
+            candidates.append(entry)
+    if multi_page:
+        candidates.sort(key=lambda entry: entry[0])
+    own_entry = True
+    for entry in candidates:
+        if own_entry and (
+            entry[1] == definition.name
+            and entry[2] == definition.section
+            and entry[3] == definition.address
+            and entry[4] == definition.byte_length
+            and entry[5] == definition.byte_order
+        ):
+            own_entry = False
+            continue
+        if _entry_overlaps(definition, entry) and not _pair_exempt(
+            definition, entry, mask_of
+        ):
+            return entry[1]
+    return None
+
+
+def _image_span_refusal(
+    definition: Definition, image: Mapping[int, int], name_echo: str
+) -> Optional[Refusal]:
+    """The ``A2L-DEF-BYTES`` refusal when a byte of the span is not in the
+    image, else ``None`` (the encode's step-6 check, every kind)."""
+    missing = 0
+    for offset in range(definition.byte_length):
+        if definition.address + offset not in image:
+            missing += 1
+    if missing:
+        return Refusal(
+            "A2L-DEF-BYTES",
+            f"{name_echo}: {_number_text(missing)} of its "
+            f"{_number_text(definition.byte_length)} bytes are not in the image",
+        )
+    return None
+
+
+def _exact_decimal(text: str) -> Optional[Decimal]:
+    """The exact :class:`decimal.Decimal` of a number text, normalizing the
+    trailing / leading point forms ``1.`` and ``.5`` that ``Decimal`` rejects;
+    ``None`` when the text still does not read (the float round-trip then
+    decides)."""
+    normalized = text
+    if normalized.endswith("."):
+        normalized = normalized + "0"
+    if normalized.startswith("."):
+        normalized = "0" + normalized
+    elif normalized.startswith("+."):
+        normalized = "+0" + normalized[1:]
+    elif normalized.startswith("-."):
+        normalized = "-0" + normalized[1:]
+    try:
+        return Decimal(normalized)
+    except Exception:
+        return None
+
+
+def _count_live_keyword(lines: list[str], keyword: str) -> int:
+    """The number of times ``keyword`` appears in ``lines`` with comments left
+    out (a live keyword)."""
+    return sum(1 for token in _flatten_body_tokens(lines) if token == keyword)
+
+
+def _mask_byte_order_ambiguous(
+    tag: dict,
+    section: Optional[dict],
+    object_lines: dict,
+    a2l_data: dict,
+    maps: dict,
+) -> bool:
+    """Whether a masked definition's own object, record layout or MOD_COMMON
+    holds more than one live BYTE_ORDER keyword (R-A2L-DEF.19/7)."""
+    if object_lines.get("byte_order_count", 0) > 1:
+        return True
+    layouts = a2l_data.get("record_layouts_by_name") or {}
+    layout_name = tag.get("record_layout_name") or tag.get("deposit")
+    layout_section = layouts.get(layout_name) if layout_name else None
+    if layout_section is not None and _count_live_keyword(
+        [layout_section.get("meta", "") or ""] + (layout_section.get("lines") or []),
+        "BYTE_ORDER",
+    ) > 1:
+        return True
+    mc_section = (
+        maps["mod_common_of"].get(id(section)) if section is not None else None
+    )
+    if mc_section is not None and _count_live_keyword(
+        [mc_section.get("meta", "") or ""] + (mc_section.get("lines") or []),
+        "BYTE_ORDER",
+    ) > 1:
+        return True
+    return False
+
+
+def encode_definition(
+    definition: Definition,
+    a2l_data: dict,
+    text: str,
+    image: Mapping[int, int],
+) -> Encoded | Refusal:
+    """Encode an operator's text into the bytes of the definition's whole span
+    (I-2; the encode order of R-A2L-DEF.40 … .57, .138, .152).
+
+    Args:
+        definition (Definition): The definition to encode (its refusal is
+            returned first, R-A2L-DEF.25).
+        a2l_data (dict): The parse payload (its ``errors`` gate the write
+            under R-A2L-DEF.152, its ``compu_tabs_by_name`` serves the encode
+            direction).
+        text (str): The operator's text.
+        image (Mapping[int, int]): address → byte, read only.
+
+    Returns:
+        Encoded | Refusal: the whole span to write, or the first refusal of
+            the encode order.
+
+    Raises:
+        None.
+    """
+    if definition.refusal is not None:
+        return definition.refusal
+    name_echo = _name_echo_of(definition)
+
+    errors = a2l_data.get("errors") or []
+    if errors:
+        return Refusal(
+            "A2L-DEF-PARSE",
+            f"{name_echo}: the A2L cannot be edited while it has parse errors "
+            f"— the first is {errors[0]}",
+        )
+
+    if definition.kind in ("array", "curve", "map"):
+        return Refusal(
+            "A2L-DEF-ELEMENTS",
+            f"{name_echo}: it holds {definition.element_count} values — decode and "
+            "encode it value by value",
+        )
+
+    if definition.kind == "text":
+        data = _encode_ascii(definition, text)
+        if isinstance(data, Refusal):
+            return data
+        byte_refusal = _image_span_refusal(definition, image, name_echo)
+        if byte_refusal is not None:
+            return byte_refusal
+        if definition.shared_with is not None:
+            return Refusal(
+                "A2L-DEF-OVERLAP",
+                f"{name_echo}: its bytes at {_fmt_address(definition.address)} "
+                f"are shared with {_echo(definition.shared_with)}",
+            )
+        return Encoded(definition.address, data, ())
+
+    trimmed = text.strip(" ")
+    if definition.kind == "number":
+        value = _parse_number_text(trimmed)
+        if value is None:
+            return Refusal(
+                "A2L-DEF-NUMBER",
+                f"{name_echo}: '{_operator_echo(trimmed)}' is not a number",
+            )
+        limit_value = value
+    else:
+        raw = _encode_enum(definition, trimmed)
+        if isinstance(raw, Refusal):
+            return raw
+        limit_value = raw
+
+    limits_outcome = _check_limits(definition, limit_value, _operator_echo(trimmed))
+    if isinstance(limits_outcome, Refusal):
+        return limits_outcome
+
+    data = _encode_number(definition, a2l_data, limit_value)
+    if isinstance(data, Refusal):
+        return data
+
+    byte_refusal = _image_span_refusal(definition, image, name_echo)
+    if byte_refusal is not None:
+        return byte_refusal
+
+    if definition.bit_mask is not None:
+        field = _decode_scalar(data, definition.datatype, definition.byte_order)
+        data = _merge_bit_mask(definition, field, trimmed, image)
+        if isinstance(data, Refusal):
+            return data
+
+    notices: tuple[str, ...] = ()
+    if isinstance(limits_outcome, str):
+        notices = (limits_outcome,)
+
+    if definition.kind == "number":
+        written_image = {definition.address + i: byte for i, byte in enumerate(data)}
+        decoded = decode_definition(definition, a2l_data, written_image)
+        if isinstance(decoded, Refusal):
+            return Refusal(
+                "A2L-DEF-PRECISION",
+                f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
+                "display precision — the nearest stored value is (none)",
+            )
+        p = decoded.value
+        stored_text = decoded.text
+
+        rejects = False
+        if (
+            definition.datatype is not None
+            and definition.datatype not in _FLOAT_DATATYPES
+            and definition.conversion_type in (None, "IDENTICAL")
+        ):
+            exact = _exact_decimal(trimmed)
+            if exact is not None and exact != Decimal(int(p)):
+                rejects = True
+        if not rejects and not _agrees_at_display_precision(
+            definition, p, limit_value
+        ):
+            rejects = True
+        if rejects:
+            return Refusal(
+                "A2L-DEF-PRECISION",
+                f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
+                f"display precision — the nearest stored value is {stored_text}",
+            )
+
+        written_outcome = _check_limits(definition, p, stored_text)
+        if isinstance(written_outcome, Refusal):
+            return written_outcome
+        if not notices and isinstance(written_outcome, str):
+            notices = (written_outcome,)
+
+    if definition.shared_with is not None:
+        return Refusal(
+            "A2L-DEF-OVERLAP",
+            f"{name_echo}: its bytes at {_fmt_address(definition.address)} "
+            f"are shared with {_echo(definition.shared_with)}",
+        )
+    return Encoded(definition.address, data, notices)

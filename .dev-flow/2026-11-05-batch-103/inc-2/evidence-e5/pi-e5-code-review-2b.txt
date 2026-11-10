@@ -1,0 +1,29 @@
+The code review is complete and written to `.dev-flow/2026-11-05-batch-103/inc-2/E5-code-review-2b.md`.
+
+## Verdict: **FAIL**
+
+One HIGH working-tree regression blocks integration. The committed HEAD `cb083d07` is otherwise clean on every flagged area.
+
+## Findings
+
+**F-1 — `_shared_with` broken in the working tree (impl, HIGH, blocks integration)**
+`s19_app/tui/a2l_definition.py:3561-3580` (uncommitted, 2026-11-10 00:22:43). The committed `candidates`/`sort` structure was dropped, leaving the own-entry skip and overlap test at the `for page` level, outside the `for entry` loop. Consequences:
+- Only the **last entry of each page** is overlap-tested → overlapping neighbours earlier in a page are missed → encode proceeds and clobbers bytes another object owns (R-A2L-DEF.138 violated).
+- Own-entry skip fires only if the own entry is last → `.138/19` `Z2` returns `shared_with=None` instead of `"Z1"`.
+- Cross-kind file order (`sort` by position) is gone.
+- Not caught by the suite because most overlap cases put two objects per page.
+
+**F-2 — span-index page granularity `>> 8` → `>> 4` (impl, MEDIUM, uncommitted)**
+Same edit changes the page size in both the index build (`:678-682`) and lookup (`:3557`, `:3560`). Consistent (no index mismatch) but an un-reviewed deviation from the approved design; must be reverted or justified with the pending `.136` re-measure.
+
+**F-3 — `.138/9` misses the H1 `address == 0x10` pin (test, LOW)**
+The E3 close listed this as an explicit E4 addendum; the test asserts `shared_with == "H1"` but never pins the address first. Non-vacuous (implied), but the assertion is owed.
+
+## Correction
+Revert the uncommitted `_shared_with` hunk (`:3561-3580`) and the page-size change to HEAD `cb083d07`; add the `address == 0x10` assertion to `.138/9`.
+
+## What I confirmed correct in HEAD
+Span-index identity/cross-kind order (candidates + sort + own-entry skip), CLEAN `mask_of`, duplicate names, byte-order sources, numeric-vs-enum precision, parse-error ordering, mask merging (big-endian bit placement), immutable input, and exact `.151`/`.137` message echo rules — all match the approved design. The 2b tests are discriminating, not smoke.
+
+## Executed vs read-only
+Nothing executed (read-only on Windows; no pytest/probes/git mutations per the brief). Pending on the runner (as the brief notes): the `.136`/`serial_timing` re-measure with the span index in the walk, and the law guards (the 2b diff touches only `a2l_definition.py`, which is outside `_ENGINE_PATHS`).

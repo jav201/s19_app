@@ -1,0 +1,842 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+.......................s..F............................................. [ 14%]
+.............F.......................................................... [ 28%]
+........................................................................ [ 42%]
+........................................................................ [ 56%]
+........................................................................ [ 71%]
+........................................................................ [ 85%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text ________
+
+    def test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text() -> None:
+        """E3S-1 guard case: collecting the parallel lane prints no QC-TM text."""
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-m",
+                "not serial_timing",
+                "-p",
+                "no:cacheprovider",
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=900,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        output = proc.stdout + proc.stderr
+>       assert proc.returncode == 0, output[-2000:]
+E       AssertionError: ts/test_workspace_variants.py::test_build_variant_set_empty_project_has_no_active_variant
+E         
+E         ==================================== ERRORS ====================================
+E         ___________ ERROR collecting s19_app/tui/test_b103_a2l_definition.py ___________
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/python.py:498: in importtestmodule
+E             mod = import_path(
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path
+E             importlib.import_module(module_name)
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
+E             return _bootstrap._gcd_import(name[level:], package, level)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         <frozen importlib._bootstrap>:1204: in _gcd_import
+E             ???
+E         <frozen importlib._bootstrap>:1176: in _find_and_load
+E             ???
+E         <frozen importlib._bootstrap>:1147: in _find_and_load_unlocked
+E             ???
+E         <frozen importlib._bootstrap>:690: in _load_unlocked
+E             ???
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+E             source_stat, co = _rewrite_test(fn, self.config)
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+E             tree = ast.parse(source, filename=strfn)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         /home/<user>/miniconda3/envs/s19ci/lib/python3.11/ast.py:50: in parse
+E             return compile(source, filename, mode, flags,
+E         E     File "/tmp/b103-e4-2b-int/s19_app/tui/test_b103_a2l_definition.py", line 3305
+E         E       assert alone.shared_with is None
+E         E       ^^^^^^
+E         E   SyntaxError: invalid syntax
+E         =========================== short test summary info ============================
+E         ERROR s19_app/tui/test_b103_a2l_definition.py
+E         !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+E         7663/7846 tests collected (183 deselected), 1 error in 16.59s
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/home/<user>/miniconda3/envs/s19ci/bin/python', '-m', 'pytest', '--collect-only', '-q', '-m'...or during collection !!!!!!!!!!!!!!!!!!!!\n7663/7846 tests collected (183 deselected), 1 error in 16.59s\n', stderr='').returncode
+
+tests/test_suite_hygiene.py:427: AssertionError
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         HANDOFF-2026-11-09-KIMI-BATCH-TO-MAIN.md: user-profile path: C:\Users\<user>
+E         HANDOFF-2026-11-09-KIMI-BATCH-TO-MAIN.md: user-profile path: C:\Users\<user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-decision-browser.txt: user-profile path: C:/Users/<user>
+E         evidence/inc-12/evidence-e5-decision-browser.txt: user-profile path: C:\Users\<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         evidence/inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e4-case06-timing-final.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e4-case06-timing-final.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         inc-12/evidence-e4-case06-timing-final.txt: local account or host name: <user>
+E         inc-12/evidence-e5-decision-browser.txt: user-profile path: C:/Users/<user>
+E         inc-12/evidence-e5-decision-browser.txt: user-profile path: C:\Users\<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: posix home path outside the runner image: /home/<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: pytest temp folder of an account: pytest-of-<user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-mutant-M2-retry-detail.txt: local account or host name: <user>
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-base.txt: pytest temp folder of an account: pytest-of-<user>test-208
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-diagnostic.txt: pytest temp folder of an account: pytest-of-<user>test-207
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-12/evidence-e5-snapshot-final.txt: pytest temp folder of an account: pytest-of-<user>test-240
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-architect-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E         inc-2/evidence-e3/pi-e3-security-2b.txt: user-profile path: C:/Users/<user>
+E       assert not ['HANDOFF-2026-11-09-KIMI-BATCH-TO-MAIN.md: user-profile path: C:\\Users\\<user>', 'HANDOFF-2026-11-09-KIMI-BATCH-TO-MA...rgr', 'evidence/inc-12/evidence-e4-case06-timing-final.txt: pytest temp folder of an account: pytest-of-<user>', ...]
+
+tests/test_suite_hygiene.py:2053: AssertionError
+============================= QC-TM timing margins =============================
+49.9%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.6%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+2 failed, 503 passed, 1 skipped in 715.05s (0:11:55)

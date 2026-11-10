@@ -1,0 +1,1996 @@
+/tmp/b103-e4-2b-stub/s19_app/__init__.py
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+............................................FFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 70%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 93%]
+FFFFFFFFFFF.F..F..F                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_def_19_6_second_live_bit_mask_keyword_is_refused __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_19_6_second_liv0')
+
+    def test_r_a2l_def_19_6_second_live_bit_mask_keyword_is_refused(tmp_path):
+        """R-A2L-DEF.19/6 (Security F1) - two live BIT_MASK lines refuse A2L-DEF-MASK."""
+        a2l = _inline(tmp_path, _val("MP", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535",
+                                     "BIT_MASK 0x000F", "BIT_MASK 0x000F"))
+        d = describe_definition("MP", a2l)
+>       assert d.refusal == _ref("A2L-DEF-MASK", "MP: the bit mask 0x000F cannot be applied to UWORD")
+E       AssertionError: assert None == Refusal(code='A2L-DEF-MASK', message='MP: the bit mask 0x000F cannot be applied to UWORD')
+E        +  where None = Definition(name='MP', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+E        +  and   Refusal(code='A2L-DEF-MASK', message='MP: the bit mask 0x000F cannot be applied to UWORD') = _ref('A2L-DEF-MASK', 'MP: the bit mask 0x000F cannot be applied to UWORD')
+
+tests/test_b103_a2l_definition.py:2469: AssertionError
+__________ test_r_a2l_def_19_7_ambiguous_byte_order_source_is_refused __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_19_7_ambiguous_0')
+
+    def test_r_a2l_def_19_7_ambiguous_byte_order_source_is_refused(tmp_path):
+        """R-A2L-DEF.19/7 (E3S-36) - a masked definition whose MOD_COMMON holds two live BYTE_ORDER keywords."""
+        mod_common = "\n".join(['    /begin MOD_COMMON ""', "      BYTE_ORDER MSB_FIRST",
+                                "      BYTE_ORDER MSB_LAST", "    /end MOD_COMMON"])
+        a2l = _inline(tmp_path, mod_common,
+                      _val("BO", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
+                      byte_order=None)
+        d = describe_definition("BO", a2l)
+>       assert d.refusal == _ref("A2L-DEF-MASK", "BO: its byte order cannot be read")
+E       AssertionError: assert None == Refusal(code='A2L-DEF-MASK', message='BO: its byte order cannot be read')
+E        +  where None = Definition(name='BO', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+E        +  and   Refusal(code='A2L-DEF-MASK', message='BO: its byte order cannot be read') = _ref('A2L-DEF-MASK', 'BO: its byte order cannot be read')
+
+tests/test_b103_a2l_definition.py:2481: AssertionError
+___________ test_r_a2l_def_25_2_encode_gives_the_definitions_refusal ___________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_25_2_encode_gives_the_definitions_refusal(c08):
+        """R-A2L-DEF.25/2 - the encode of a refused definition returns that refusal, no bytes."""
+        d = describe_definition("MISSING_CM", c08["issues"])
+        assert d.refusal == _ref("A2L-DEF-METHOD", "MISSING_CM: the conversion method CM_MISSING is not declared in the A2L")
+>       assert encode_definition(d, c08["issues"], "7", c08["mem"]) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-METHOD', message='MISSING_CM: the conversion method CM_MISSING is not declared in the A2L')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='MISSING_CM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=12582912, byte_lengt... the A2L'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...K_0005 declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, '7', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Refusal(code='A2L-DEF-METHOD', message='MISSING_CM: the conversion method CM_MISSING is not declared in the A2L') = Definition(name='MISSING_CM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=12582912, byte_lengt... the A2L'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:2490: AssertionError
+________ test_r_a2l_def_26_2_masked_encode_on_an_empty_image_is_refused ________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_26_2_masked_encode_on_an_empty_image_is_refused(v171):
+        """R-A2L-DEF.26/2 - a masked encode over an empty image refuses A2L-DEF-BYTES."""
+        d = describe_definition(V171_M0FF0, v171)
+>       assert encode_definition(d, v171, "35", {}) == _ref(
+            "A2L-DEF-BYTES", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-BYTES', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '35', {})
+E        +  and   Refusal(code='A2L-DEF-BYTES', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image') = _ref('A2L-DEF-BYTES', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image')
+
+tests/test_b103_a2l_definition.py:2498: AssertionError
+_______ test_r_a2l_def_26_3_unmasked_encode_on_an_empty_image_is_refused _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_26_3_unmasked_e0')
+
+    def test_r_a2l_def_26_3_unmasked_encode_on_an_empty_image_is_refused(tmp_path):
+        """R-A2L-DEF.26/3 (E3S-05) - the image check runs for every kind, not only masked."""
+        a2l = _inline(tmp_path, _val("B3", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("B3", a2l)
+>       assert encode_definition(d, a2l, "7", {}) == _ref("A2L-DEF-BYTES", "B3: 2 of its 2 bytes are not in the image")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-BYTES', message='B3: 2 of its 2 bytes are not in the image')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='B3', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {})
+E        +  and   Refusal(code='A2L-DEF-BYTES', message='B3: 2 of its 2 bytes are not in the image') = _ref('A2L-DEF-BYTES', 'B3: 2 of its 2 bytes are not in the image')
+
+tests/test_b103_a2l_definition.py:2506: AssertionError
+_________ test_r_a2l_def_26_4_text_encode_on_an_empty_image_is_refused _________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_26_4_text_encode_on_an_empty_image_is_refused(v171):
+        """R-A2L-DEF.26/4 (E3S-16) - a text encode over an empty image refuses A2L-DEF-BYTES."""
+        d = describe_definition(V171_ASCII, v171)
+>       assert encode_definition(d, v171, "ABC", {}) == _ref(
+            "A2L-DEF-BYTES", "ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-BYTES', message='ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'ABC', {})
+E        +  and   Refusal(code='A2L-DEF-BYTES', message='ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image') = _ref('A2L-DEF-BYTES', 'ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image')
+
+tests/test_b103_a2l_definition.py:2512: AssertionError
+________________ test_r_a2l_def_40_1_empty_text_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_1_empty_text_is_not_a_number(v171):
+>       _num_refusal(v171, "", "")
+
+tests/test_b103_a2l_definition.py:2524: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '', shown = ''
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+_________________ test_r_a2l_def_40_2_letters_are_not_a_number _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_2_letters_are_not_a_number(v171):
+>       _num_refusal(v171, "abc", "abc")
+
+tests/test_b103_a2l_definition.py:2528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'abc', shown = 'abc'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'abc' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'abc', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'abc' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: 'abc' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+______________ test_r_a2l_def_40_3_decimal_comma_is_not_a_number _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_3_decimal_comma_is_not_a_number(v171):
+>       _num_refusal(v171, "1,5", "1,5")
+
+tests/test_b103_a2l_definition.py:2532: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '1,5', shown = '1,5'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '1,5' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '1,5', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '1,5' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '1,5' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+________________ test_r_a2l_def_40_4_underscore_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_4_underscore_is_not_a_number(v171):
+>       _num_refusal(v171, "1_000", "1_000")
+
+tests/test_b103_a2l_definition.py:2536: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '1_000', shown = '1_000'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '1_000' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '1_000', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '1_000' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '1_000' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+___________________ test_r_a2l_def_40_5_nan_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_5_nan_is_not_a_number(v171):
+>       _num_refusal(v171, "nan", "nan")
+
+tests/test_b103_a2l_definition.py:2540: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'nan', shown = 'nan'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'nan' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'nan', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'nan' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: 'nan' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+___________________ test_r_a2l_def_40_6_inf_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_6_inf_is_not_a_number(v171):
+>       _num_refusal(v171, "inf", "inf")
+
+tests/test_b103_a2l_definition.py:2544: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'inf', shown = 'inf'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'inf' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'inf', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: 'inf' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: 'inf' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+_______________ test_r_a2l_def_40_7_hexadecimal_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_7_hexadecimal_is_not_a_number(v171):
+>       _num_refusal(v171, "0x10", "0x10")
+
+tests/test_b103_a2l_definition.py:2548: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '0x10', shown = '0x10'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '0x10' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '0x10', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '0x10' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '0x10' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+____________ test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number _____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number(v171):
+>       _num_refusal(v171, "１２", "１２")
+
+tests/test_b103_a2l_definition.py:2552: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '１２', shown = '１２'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '１２' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '１２', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '１２' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '１２' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+___________________ test_r_a2l_def_40_9_tab_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_9_tab_is_not_a_number(v171):
+>       _num_refusal(v171, "\t5", FFFD + "5")
+
+tests/test_b103_a2l_definition.py:2556: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '\t5', shown = '�5'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '�5' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = encode_definition(Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '\t5', {})
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="ASAM.C.SCALAR.SWORD.IDENTICAL: '�5' is not a number") = _ref('A2L-DEF-NUMBER', "ASAM.C.SCALAR.SWORD.IDENTICAL: '�5' is not a number")
+
+tests/test_b103_a2l_definition.py:2520: AssertionError
+______________________ test_r_a2l_def_41_1_no_conversion _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_41_1_no_convers0')
+
+    def test_r_a2l_def_41_1_no_conversion(tmp_path):
+        """R-A2L-DEF.41/1 - none: UBYTE 7 -> 07."""
+        a2l = _inline(tmp_path, _val("N0", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        d = describe_definition("N0", a2l)
+>       assert _enc(d, a2l, "7", {0x10: 0}) == Encoded(0x10, bytes([7]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 16...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2565: AssertionError
+______________ test_r_a2l_def_41_2_identical_with_spaces_and_sign ______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_41_2_identical_with_spaces_and_sign(v171):
+        """R-A2L-DEF.41/2 - IDENTICAL SWORD -5 (spaces stripped); first the overlap, then FB FF."""
+        d = describe_definition(V171_SWORD, v171)
+>       assert d.shared_with == "ASAM.C.SCALAR.SWORD.LINEAR_MUL_2"
+E       AssertionError: assert None == 'ASAM.C.SCALAR.SWORD.LINEAR_MUL_2'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SWORD.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2571: AssertionError
+__________________ test_r_a2l_def_41_3_linear_with_an_offset ___________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_41_3_linear_with_an_offset(c08):
+        """R-A2L-DEF.41/3 - LINEAR a=1 b=100, UWORD 150 -> stored 50 (00 32)."""
+        a2l = _clear_parse_errors(c08["a2l"])
+        o = _first_of(c08, "CM_LIN_OFF", "UWORD")
+        assert o["name"] == "VALUE_0019"
+        d = describe_definition(o["name"], a2l)
+        assert d.shared_with is None
+>       assert _enc(d, a2l, "150", c08["mem"]) == Encoded(o["address"], bytes([0x00, 0x32]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 262424...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2585: AssertionError
+_________________________ test_r_a2l_def_41_4_rat_func _________________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_41_4_rat_func(c08):
+        """R-A2L-DEF.41/4 - RAT_FUNC SLONG 100 -> stored 75 (4B 00 00 00)."""
+        a2l = _clear_parse_errors(c08["a2l"])
+        o = c08["by_name"]["VALUE_0004"]
+        d = describe_definition("VALUE_0004", a2l)
+>       assert _enc(d, a2l, "100", c08["mem"]) == Encoded(o["address"], bytes([0x4B, 0, 0, 0]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 60...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2593: AssertionError
+________________________ test_r_a2l_def_41_5_tab_nointp ________________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_41_5_tab_nointp(c08):
+        """R-A2L-DEF.41/5 - TAB_NOINTP 15 -> stored 3 (03 00)."""
+        a2l = _clear_parse_errors(c08["a2l"])
+        o = c08["by_name"]["MEASUREMENT_0002"]
+        d = describe_definition("MEASUREMENT_0002", a2l)
+>       assert _enc(d, a2l, "15", c08["mem"]) == Encoded(o["address"], bytes([0x03, 0x00]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 100...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2601: AssertionError
+________________ test_r_a2l_def_41_6_tab_intp_and_number_forms _________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_41_6_tab_intp_and_number_forms(c08):
+        """R-A2L-DEF.41/6 - TAB_INTP 20 and +2e1 -> 00 C8; .5 and 1. on VALUE_0002 are not integral."""
+        a2l = _clear_parse_errors(c08["a2l"])
+        o = c08["by_name"]["MEASUREMENT_0001"]
+        d = describe_definition("MEASUREMENT_0001", a2l)
+        for text in ("20", "+2e1"):
+>           assert _enc(d, a2l, text, c08["mem"]) == Encoded(o["address"], bytes([0x00, 0xC8]), ())
+E           AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E             
+E             Omitting 1 identical items, use -vv to show
+E             Differing attributes:
+E             ['address', 'data']
+E             
+E             Drill down into differing attribute address:
+E               address: 0 != 80...
+E             
+E             ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2610: AssertionError
+________________ test_r_a2l_def_42_1_linear_coefficient_a_zero _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_1_linear_coe0')
+
+    def test_r_a2l_def_42_1_linear_coefficient_a_zero(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_A", "LINEAR", "0", "5"), _val("E1", "0x10", "RL_S16", "CM_A", "-1000", "1000"))
+        d = describe_definition("E1", a2l)
+>       assert _enc(d, a2l, "5", {}) == _ref("A2L-DEF-ENCODE", "E1: LINEAR conversion coefficient a is zero")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E1: LINEAR conversion coefficient a is zero')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_A': {'coeffs': None, 'coeffs_linear': [0.0, 5.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '5', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E1: LINEAR conversion coefficient a is zero') = _ref('A2L-DEF-ENCODE', 'E1: LINEAR conversion coefficient a is zero')
+
+tests/test_b103_a2l_definition.py:2622: AssertionError
+________________ test_r_a2l_def_42_2_rat_func_denominator_zero _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_2_rat_func_d0')
+
+    def test_r_a2l_def_42_2_rat_func_denominator_zero(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_B", "RAT_FUNC", "0", "1", "0", "0", "0", "0"),
+                      _val("E2", "0x10", "RL_U16", "CM_B", "0", "65535"))
+        d = describe_definition("E2", a2l)
+>       assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E2: RAT_FUNC denominator is zero")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E2: RAT_FUNC denominator is zero')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E2', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_B': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'RAT_FUNC', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '3', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E2: RAT_FUNC denominator is zero') = _ref('A2L-DEF-ENCODE', 'E2: RAT_FUNC denominator is zero')
+
+tests/test_b103_a2l_definition.py:2629: AssertionError
+___________________ test_r_a2l_def_42_3_lookup_table_missing ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_3_lookup_tab0')
+
+    def test_r_a2l_def_42_3_lookup_table_missing(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_C", "TAB_NOINTP", fmt='"%.0"', ref="TB_GONE"),
+                      _val("E3", "0x10", "RL_U16", "CM_C", "0", "65535"))
+        d = describe_definition("E3", a2l)
+>       assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E3: lookup table missing or empty")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E3: lookup table missing or empty')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E3', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_C': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'TB_GONE', 'conversion_type': 'TAB_NOINTP', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E3: lookup table missing or empty') = _ref('A2L-DEF-ENCODE', 'E3: lookup table missing or empty')
+
+tests/test_b103_a2l_definition.py:2636: AssertionError
+_____________ test_r_a2l_def_42_4_lookup_table_no_numeric_entries ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_4_lookup_tab0')
+
+    def test_r_a2l_def_42_4_lookup_table_no_numeric_entries(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_D", "TAB_INTP", fmt='"%.0"', ref="TB_X"),
+                      _ctab("TB_X", "TAB_INTP", '0 "a"', '1 "b"'),
+                      _val("E4", "0x10", "RL_U16", "CM_D", "0", "65535"))
+        d = describe_definition("E4", a2l)
+>       assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E4: lookup table has no numeric entries")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E4: lookup table has no numeric entries')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E4', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_D': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'TB_X', 'conversion_type':... (1.0, 'b')], 'kind': '0', 'lines': ['0 "a"', '1 "b"'], 'name': 'TB_X', ...}}, 'declared_spans': [], 'errors': [], ...}, '1', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E4: lookup table has no numeric entries') = _ref('A2L-DEF-ENCODE', 'E4: lookup table has no numeric entries')
+
+tests/test_b103_a2l_definition.py:2644: AssertionError
+________________ test_r_a2l_def_42_5_tab_nointp_nearest_values _________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_42_5_tab_nointp_nearest_values(c08):
+        a2l = _clear_parse_errors(c08["a2l"])
+        d = describe_definition("MEASUREMENT_0002", a2l)
+>       assert _enc(d, a2l, "12", c08["mem"]) == _ref(
+            "A2L-DEF-ENCODE", "MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MEASUREMENT_0002', section='MEASUREMENT', char_type=None, kind='number', address=100, byte_length=2, ...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...B_VERB 5', '0 0', '1 5', '2 10', '3 15', '4 20'], 'name': 'TBL_NOINTP', ...}}, 'declared_spans': [], 'errors': [], ...}, '12', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0') = _ref('A2L-DEF-ENCODE', 'MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0')
+
+tests/test_b103_a2l_definition.py:2650: AssertionError
+__________________ test_r_a2l_def_42_6_tab_intp_outside_range __________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_42_6_tab_intp_outside_range(c08):
+        a2l = _clear_parse_errors(c08["a2l"])
+        d = describe_definition("MEASUREMENT_0001", a2l)
+>       assert _enc(d, a2l, "45", c08["mem"]) == _ref(
+            "A2L-DEF-ENCODE", "MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MEASUREMENT_0001', section='MEASUREMENT', char_type=None, kind='number', address=80, byte_length=2, d...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...B_VERB 5', '0 0', '1 5', '2 10', '3 15', '4 20'], 'name': 'TBL_NOINTP', ...}}, 'declared_spans': [], 'errors': [], ...}, '45', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]') = _ref('A2L-DEF-ENCODE', 'MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]')
+
+tests/test_b103_a2l_definition.py:2657: AssertionError
+_________________ test_r_a2l_def_42_7_converted_raw_not_finite _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_7_converted_0')
+
+    def test_r_a2l_def_42_7_converted_raw_not_finite(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_E", "LINEAR", "1e-300", "0"),
+                      _val("E7", "0x10", "RL_F64", "CM_E", "-1e308", "1e308"))
+        d = describe_definition("E7", a2l)
+>       assert _enc(d, a2l, "1e300", {}) == _ref("A2L-DEF-ENCODE", "E7: the converted raw value is not finite")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E7: the converted raw value is not finite')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E7', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=8, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': [1e-300, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1e300', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E7: the converted raw value is not finite') = _ref('A2L-DEF-ENCODE', 'E7: the converted raw value is not finite')
+
+tests/test_b103_a2l_definition.py:2665: AssertionError
+_______________________ test_r_a2l_def_42_8_not_integral _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_8_not_integr0')
+
+    def test_r_a2l_def_42_8_not_integral(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_F", "LINEAR", "2", "0"), _val("E8", "0x10", "RL_S16", "CM_F", "-1000", "1000"))
+        d = describe_definition("E8", a2l)
+>       assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E8: the converted raw value 1.5 is not integral")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E8: the converted raw value 1.5 is not integral')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E8', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_F': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '3', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E8: the converted raw value 1.5 is not integral') = _ref('A2L-DEF-ENCODE', 'E8: the converted raw value 1.5 is not integral')
+
+tests/test_b103_a2l_definition.py:2671: AssertionError
+______________________ test_r_a2l_def_42_9_datatype_range ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_9_datatype_r0')
+
+    def test_r_a2l_def_42_9_datatype_range(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_G", "LINEAR", "2", "0"), _val("E9", "0x10", "RL_S16", "CM_G", "-1e10", "1e10"))
+        d = describe_definition("E9", a2l)
+>       assert _enc(d, a2l, "1e9", {}) == _ref("A2L-DEF-ENCODE", "E9: the converted raw value 500000000 is outside the SWORD range")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E9: the converted raw value 500000000 is outside the SWORD range')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E9', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_G': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1e9', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E9: the converted raw value 500000000 is outside the SWORD range') = _ref('A2L-DEF-ENCODE', 'E9: the converted raw value 500000000 is outside the SWORD range')
+
+tests/test_b103_a2l_definition.py:2677: AssertionError
+_________________________ test_r_a2l_def_42_10_float16 _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_10_float160')
+
+    def test_r_a2l_def_42_10_float16(tmp_path):
+        a2l = _inline(tmp_path, _val("E10", "0x10", "RL_F16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("E10", a2l)
+>       assert _enc(d, a2l, "1.0", {}) == _ref("A2L-DEF-ENCODE", "E10: datatype FLOAT16_IEEE is not supported")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E10: datatype FLOAT16_IEEE is not supported')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E10', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1.0', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E10: datatype FLOAT16_IEEE is not supported') = _ref('A2L-DEF-ENCODE', 'E10: datatype FLOAT16_IEEE is not supported')
+
+tests/test_b103_a2l_definition.py:2683: AssertionError
+___________________ test_r_a2l_def_42_11_float_does_not_pack ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_42_11_float_doe0')
+
+    def test_r_a2l_def_42_11_float_does_not_pack(tmp_path):
+        a2l = _inline(tmp_path, _val("E11", "0x10", "RL_F32", "NO_COMPU_METHOD", "-1e300", "1e300"))
+        d = describe_definition("E11", a2l)
+>       assert _enc(d, a2l, "1e39", {}) == _ref(
+            "A2L-DEF-ENCODE", "E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='E11', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1e39', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format') = _ref('A2L-DEF-ENCODE', 'E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format')
+
+tests/test_b103_a2l_definition.py:2689: AssertionError
+__________________ test_r_a2l_def_43_1_below_the_lower_limit ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_43_1_below_the_0')
+
+    def test_r_a2l_def_43_1_below_the_lower_limit(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "-101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: -101 is outside the limits -100..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L1: -101 is outside the limits -100..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='L1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_L': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '-101', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L1: -101 is outside the limits -100..100') = _ref('A2L-DEF-LIMITS', 'L1: -101 is outside the limits -100..100')
+
+tests/test_b103_a2l_definition.py:2698: AssertionError
+__________________ test_r_a2l_def_43_2_above_the_upper_limit ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_43_2_above_the_0')
+
+    def test_r_a2l_def_43_2_above_the_upper_limit(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "200", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 200 is outside the limits -100..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L1: 200 is outside the limits -100..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='L1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_L': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '200', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L1: 200 is outside the limits -100..100') = _ref('A2L-DEF-LIMITS', 'L1: 200 is outside the limits -100..100')
+
+tests/test_b103_a2l_definition.py:2704: AssertionError
+____________________ test_r_a2l_def_43_3_one_declared_side _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_43_3_one_declar0')
+
+    def test_r_a2l_def_43_3_one_declared_side(tmp_path):
+        a2l = _inline(tmp_path, _meas("L3", "UBYTE", "NO_COMPU_METHOD", "x", "100", addr="0x10"))
+        d = describe_definition("L3", a2l)
+>       assert _enc(d, a2l, "101", {0x10: 0}) == _ref("A2L-DEF-LIMITS", "L3: 101 is outside the limits ..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L3: 101 is outside the limits ..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='L3', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UBYTE...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '101', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L3: 101 is outside the limits ..100') = _ref('A2L-DEF-LIMITS', 'L3: 101 is outside the limits ..100')
+
+tests/test_b103_a2l_definition.py:2710: AssertionError
+_______________ test_r_a2l_def_43_4_enum_entry_above_the_limits ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_43_4_enum_entry_above_the_limits(v171):
+        """R-A2L-DEF.43/4 - first the overlap, then the limits refusal on the cleared definition."""
+        name = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
+        d = describe_definition(name, v171)
+>       assert d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL"
+E       AssertionError: assert None == 'ASAM.M.SCALAR.UBYTE.IDENTICAL'
+E        +  where None = Definition(name='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE', section='MEASUREMENT', char_type=None, kind='enum',...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2717: AssertionError
+_________________ test_r_a2l_def_44_1_notice_above_the_limits __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_44_1_notice_above_the_limits(v171):
+        """R-A2L-DEF.44/1 - 120: overlap first, then 78 with the notice."""
+        d = describe_definition(V171_SBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2725: AssertionError
+____________ test_r_a2l_def_44_2_notice_at_the_extended_lower_limit ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_44_2_notice_at_the_extended_lower_limit(v171):
+        d = describe_definition(V171_SBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2735: AssertionError
+________________ test_r_a2l_def_45_1_below_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_1_below_the_extended_limits(v171):
+        d = describe_definition(V171_SBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2743: AssertionError
+________________ test_r_a2l_def_45_2_above_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_2_above_the_extended_limits(v171):
+        d = describe_definition(V171_UBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.UBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2750: AssertionError
+________ test_r_a2l_def_45_3_written_value_against_the_extended_limits _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_45_3_written_va0')
+
+    def test_r_a2l_def_45_3_written_value_against_the_extended_limits(tmp_path):
+        """R-A2L-DEF.45/3 (E3S-06) - the written value p=0.6 (raw 5.5 rounds to 6) is outside 0..0.55."""
+        a2l = _inline(tmp_path,
+                      _cm("CM_TI", "TAB_INTP", fmt='"%.1"', ref="TB_L"),
+                      _ctab("TB_L", "TAB_INTP", "0 0.0", "10 1.0"),
+                      _val("L4", "0x10", "RL_U16", "CM_TI", "0", "0.55", 'FORMAT "%.1"', "EXTENDED_LIMITS 0 0.55"))
+        d = describe_definition("L4", a2l)
+>       assert _enc(d, a2l, "0.55", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-EXTENDED", "L4: 0.6 is outside the extended limits 0..0.55")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-EXTENDED', message='L4: 0.6 is outside the extended limits 0..0.55')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='L4', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_TI': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'TB_L', 'conversion_type'...10.0, 1.0)], 'kind': '0', 'lines': ['0 0.0', '10 1.0'], 'name': 'TB_L', ...}}, 'declared_spans': [], 'errors': [], ...}, '0.55', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-EXTENDED', message='L4: 0.6 is outside the extended limits 0..0.55') = _ref('A2L-DEF-EXTENDED', 'L4: 0.6 is outside the extended limits 0..0.55')
+
+tests/test_b103_a2l_definition.py:2762: AssertionError
+_____________________ test_r_a2l_def_46_1_multi_bit_write ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_46_1_multi_bit_write(v171):
+        d = describe_definition(V171_M0FF0, v171)
+>       assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+E       AssertionError: assert None == 'ASAM.C.SCALAR.UWORD.IDENTICAL'
+E        +  where None = Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2770: AssertionError
+_____________________ test_r_a2l_def_46_2_single_bit_write _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_46_2_single_bit_write(v171):
+        d = describe_definition(V171_M0001, v171)
+>       assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+E       AssertionError: assert None == 'ASAM.C.SCALAR.UWORD.IDENTICAL'
+E        +  where None = Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2779: AssertionError
+____________________ test_r_a2l_def_46_4_masked_enum_write _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_46_4_masked_enu0')
+
+    def test_r_a2l_def_46_4_masked_enum_write(tmp_path):
+        """R-A2L-DEF.46/4 (E3A-11) - a masked enum merges the mask like a number."""
+        a2l = _inline(tmp_path, _cm("CM_ME", "TAB_VERB", fmt='"%.0"', ref="VT_M"),
+                      _vtab("VT_M", "2", '0 "OFF"', '1 "ON"'),
+                      _val("ME", "0x10", "RL_U16", "CM_ME", "0", "1", "BIT_MASK 0x00F0"))
+        d = describe_definition("ME", a2l)
+        assert d.shared_with is None
+>       assert _enc(d, a2l, "ON", _img(0x10, bytes([0x12, 0x34]))) == Encoded(0x10, bytes([0x12, 0x14]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 16...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2791: AssertionError
+________________ test_r_a2l_def_47_1_value_wider_than_the_mask _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_47_1_value_wider_than_the_mask(v171):
+        d = describe_definition(V171_M0FF0, v171)
+>       assert _enc(d, v171, "256", _img(0x810002, bytes([0x0F, 0xF0]))) == _ref(
+            "A2L-DEF-MASK-VALUE", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-MASK-VALUE', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '256', {8454146: 15, 8454147: 240})
+E        +    where {8454146: 15, 8454147: 240} = _img(8454146, b'\x0f\xf0')
+E        +      where b'\x0f\xf0' = bytes([15, 240])
+E        +  and   Refusal(code='A2L-DEF-MASK-VALUE', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0') = _ref('A2L-DEF-MASK-VALUE', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0')
+
+tests/test_b103_a2l_definition.py:2796: AssertionError
+______________________ test_r_a2l_def_47_2_negative_value ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_47_2_negative_v0')
+
+    def test_r_a2l_def_47_2_negative_value(tmp_path):
+        a2l = _inline(tmp_path, _val("MN", "0x10", "RL_S16", "NO_COMPU_METHOD", "-100", "100", "BIT_MASK 0x00F0"))
+        d = describe_definition("MN", a2l)
+>       assert _enc(d, a2l, "-1", _img(0x10, bytes([0, 0]))) == _ref(
+            "A2L-DEF-MASK-VALUE", "MN: -1 does not fit the bit mask 0x00F0")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-MASK-VALUE', message='MN: -1 does not fit the bit mask 0x00F0')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MN', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '-1', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-MASK-VALUE', message='MN: -1 does not fit the bit mask 0x00F0') = _ref('A2L-DEF-MASK-VALUE', 'MN: -1 does not fit the bit mask 0x00F0')
+
+tests/test_b103_a2l_definition.py:2803: AssertionError
+___________________ test_r_a2l_def_47_3_non_contiguous_mask ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_47_3_non_contig0')
+
+    def test_r_a2l_def_47_3_non_contiguous_mask(tmp_path):
+        a2l = _inline(tmp_path, _val("MC", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0A"))
+        d = describe_definition("MC", a2l)
+>       assert _enc(d, a2l, "2", _img(0x10, bytes([0]))) == _ref(
+            "A2L-DEF-MASK-VALUE", "MC: 2 does not fit the bit mask 0x0A")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-MASK-VALUE', message='MC: 2 does not fit the bit mask 0x0A')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MC', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '2', {16: 0})
+E        +    where {16: 0} = _img(16, b'\x00')
+E        +      where b'\x00' = bytes([0])
+E        +  and   Refusal(code='A2L-DEF-MASK-VALUE', message='MC: 2 does not fit the bit mask 0x0A') = _ref('A2L-DEF-MASK-VALUE', 'MC: 2 does not fit the bit mask 0x0A')
+
+tests/test_b103_a2l_definition.py:2810: AssertionError
+_____________________ test_r_a2l_def_48_1_compu_vtab_text ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_48_1_compu_vtab_text(v171):
+        d = describe_definition(V171_ENUM, v171)
+>       assert d.shared_with == "ASAM.C.SCALAR.SWORD.IDENTICAL"
+E       AssertionError: assert None == 'ASAM.C.SCALAR.SWORD.IDENTICAL'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2819: AssertionError
+________________________ test_r_a2l_def_48_2_range_text ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_48_2_range_text(v171):
+        d = describe_definition(V171_RANGE, v171)
+>       assert d.shared_with == "ASAM.C.SCALAR.SWORD.IDENTICAL"
+E       AssertionError: assert None == 'ASAM.C.SCALAR.SWORD.IDENTICAL'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enu...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:2828: AssertionError
+____________ test_r_a2l_def_48_3_first_of_two_entries_with_one_text ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_48_3_first_of_t0')
+
+    def test_r_a2l_def_48_3_first_of_two_entries_with_one_text(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_X", "TAB_VERB", fmt='"%.0"', ref="VT_X"),
+                      _vtab("VT_X", "2", '1 "X"', '2 "X"'),
+                      _val("EX2", "0x10", "RL_U8", "CM_X", "0", "255"))
+        d = describe_definition("EX2", a2l)
+>       assert _enc(d, a2l, "X", _img(0x10, bytes([0]))) == Encoded(0x10, bytes([0x01]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 16...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2837: AssertionError
+_______________________ test_r_a2l_def_49_1_case_counts ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_49_1_case_counts(v171):
+>       _enum_refusal(v171, "square")
+
+tests/test_b103_a2l_definition.py:2847: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'square'
+
+    def _enum_refusal(v171: dict, text: str) -> None:
+        d = describe_definition(V171_ENUM, v171)
+>       assert _enc(d, v171, text, {}) == _ref(
+            "A2L-DEF-ENUM", f"{V171_ENUM}: '{text}' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'square' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'square', {})
+E        +  and   Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'square' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF") = _ref('A2L-DEF-ENUM', "ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'square' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+
+tests/test_b103_a2l_definition.py:2842: AssertionError
+_______________ test_r_a2l_def_49_2_default_text_is_not_an_entry _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_49_2_default_text_is_not_an_entry(v171):
+>       _enum_refusal(v171, "unknown signal type")
+
+tests/test_b103_a2l_definition.py:2851: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'unknown signal type'
+
+    def _enum_refusal(v171: dict, text: str) -> None:
+        d = describe_definition(V171_ENUM, v171)
+>       assert _enc(d, v171, text, {}) == _ref(
+            "A2L-DEF-ENUM", f"{V171_ENUM}: '{text}' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'unknown signal type' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'unknown signal type', {})
+E        +  and   Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'unknown signal type' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF") = _ref('A2L-DEF-ENUM', "ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: 'unknown signal type' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+
+tests/test_b103_a2l_definition.py:2842: AssertionError
+________________________ test_r_a2l_def_49_3_empty_text ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_49_3_empty_text(v171):
+>       _enum_refusal(v171, "")
+
+tests/test_b103_a2l_definition.py:2855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = ''
+
+    def _enum_refusal(v171: dict, text: str) -> None:
+        d = describe_definition(V171_ENUM, v171)
+>       assert _enc(d, v171, text, {}) == _ref(
+            "A2L-DEF-ENUM", f"{V171_ENUM}: '{text}' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: '' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '', {})
+E        +  and   Refusal(code='A2L-DEF-ENUM', message="ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: '' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF") = _ref('A2L-DEF-ENUM', "ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: '' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+
+tests/test_b103_a2l_definition.py:2842: AssertionError
+__________________ test_r_a2l_def_50_1_short_text_and_padding __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_50_1_short_text_and_padding(v171):
+        d = describe_definition(V171_ASCII, v171)
+        assert d.shared_with is None
+>       assert _enc(d, v171, "ABC", _img(0x810200, bytes(42))) == Encoded(0x810200, b"ABC" + bytes(39), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 8454656...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2863: AssertionError
+_________________ test_r_a2l_def_50_2_text_of_the_full_length __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_50_2_text_of_the_full_length(v171):
+        d = describe_definition(V171_ASCII, v171)
+        text = "Z" * 42
+>       assert _enc(d, v171, text, _img(0x810200, bytes(42))) == Encoded(0x810200, text.encode(), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 8454656...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2869: AssertionError
+________________________ test_r_a2l_def_50_3_empty_text ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_50_3_empty_text(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "", _img(0x810200, bytes(42))) == Encoded(0x810200, bytes(42), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 8454656...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2874: AssertionError
+______________________ test_r_a2l_def_51_1_text_too_long _______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_51_1_text_too_long(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "Z" * 43, _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-LENGTH", "ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters \u2014 at most 42 fit")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TEXT-LENGTH', message='ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, ('Z' * 43), {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-LENGTH', message='ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit') = _ref('A2L-DEF-TEXT-LENGTH', 'ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit')
+
+tests/test_b103_a2l_definition.py:2879: AssertionError
+_____________________ test_r_a2l_def_52_1_non_ascii_letter _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_1_non_ascii_letter(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "caf\u00e9", _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", "ASAM.C.ASCII.UBYTE.NUMBER_42: '\u00e9' is not a printable ASCII character")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'café', {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2885: AssertionError
+___________________________ test_r_a2l_def_52_2_tab ____________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_2_tab(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "A\tB", _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'A\tB', {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2891: AssertionError
+__________________________ test_r_a2l_def_52_3_ufffd ___________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_3_ufffd(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "A" + FFFD, _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, ('A' + '�'), {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2897: AssertionError
+_____________________ test_r_a2l_def_53_1_big_endian_uword _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_53_1_big_endian0')
+
+    def test_r_a2l_def_53_1_big_endian_uword(tmp_path):
+        a2l = _inline(tmp_path, _val("B1", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("B1", a2l)
+>       assert _enc(d, a2l, "4660", _img(0x20, bytes([0, 0]))) == Encoded(0x20, bytes([0x12, 0x34]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 32...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2906: AssertionError
+___________________ test_r_a2l_def_53_2_little_endian_uword ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_53_2_little_end0')
+
+    def test_r_a2l_def_53_2_little_endian_uword(tmp_path):
+        a2l = _inline(tmp_path, _val("B2", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535"), byte_order="MSB_LAST")
+        d = describe_definition("B2", a2l)
+>       assert _enc(d, a2l, "4660", _img(0x20, bytes([0, 0]))) == Encoded(0x20, bytes([0x34, 0x12]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 32...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2912: AssertionError
+______________________ test_r_a2l_def_53_3_span_of_a_text ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_53_3_span_of_a_text(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "ABC", _img(0x810200, bytes(42))) == Encoded(0x810200, b"ABC" + bytes(39), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 8454656...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2917: AssertionError
+__________________ test_r_a2l_def_53_4_span_of_a_masked_uword __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_53_4_span_of_a_masked_uword(v171):
+        d = describe_definition(V171_M0FF0, v171)
+        img = _img(0x810002, bytes([0x0F, 0xF0]))
+>       assert _enc(d, v171, "35", img) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '35', {8454146: 15, 8454147: 240})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL') = _ref('A2L-DEF-OVERLAP', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL')
+
+tests/test_b103_a2l_definition.py:2923: AssertionError
+____________________ test_r_a2l_def_54_1_precision_refusal _____________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_54_1_precision_0')
+
+    def test_r_a2l_def_54_1_precision_refusal(c08, tmp_path):
+        a2l = _clear_parse_errors(_c08_with_format(c08, tmp_path, "MEASUREMENT_0001", "%.3"))
+        d = describe_definition("MEASUREMENT_0001", a2l)
+>       assert _enc(d, a2l, "5.07", c08["mem"]) == _ref(
+            "A2L-DEF-PRECISION", "MEASUREMENT_0001: 5.07 cannot be stored at the display precision \u2014 the nearest stored value is 5.100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MEASUREMENT_0001', section='MEASUREMENT', char_type=None, kind='number', address=80, byte_length=2, d...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...B_VERB 5', '0 0', '1 5', '2 10', '3 15', '4 20'], 'name': 'TBL_NOINTP', ...}}, 'declared_spans': [], 'errors': [], ...}, '5.07', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100') = _ref('A2L-DEF-PRECISION', 'MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100')
+
+tests/test_b103_a2l_definition.py:2933: AssertionError
+_____________ test_r_a2l_def_54_2_same_value_passes_at_one_decimal _____________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_54_2_same_value_passes_at_one_decimal(c08):
+        a2l = _clear_parse_errors(c08["a2l"])
+        d = describe_definition("MEASUREMENT_0001", a2l)
+>       assert _enc(d, a2l, "5.07", c08["mem"]) == Encoded(0x50, bytes([0x00, 0x33]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 80...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2940: AssertionError
+_____________ test_r_a2l_def_54_3_float64_not_accepted_at_6_digits _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_54_3_float64_no0')
+
+    def test_r_a2l_def_54_3_float64_not_accepted_at_6_digits(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_P", "LINEAR", "1", "1e10"),
+                      _val("P64", "0x10", "RL_F64", "CM_P", "-1e300", "1e300", 'FORMAT "%"'))
+        d = describe_definition("P64", a2l)
+>       assert _enc(d, a2l, "1.0000001", _img(0x10, bytes(8))) == _ref(
+            "A2L-DEF-PRECISION", "P64: 1.0000001 cannot be stored at the display precision \u2014 the nearest stored value is 1")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P64', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=8, datatype...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_P': {'coeffs': None, 'coeffs_linear': [1.0, 10000000000.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '1.0000001', {16: 0, 17: 0, 18: 0, 19: 0, ...})
+E        +    where {16: 0, 17: 0, 18: 0, 19: 0, ...} = _img(16, b'\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(8)
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1') = _ref('A2L-DEF-PRECISION', 'P64: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1')
+
+tests/test_b103_a2l_definition.py:2947: AssertionError
+_________________ test_r_a2l_def_54_4_exact_integer_above_2_53 _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_54_4_exact_inte0')
+
+    def test_r_a2l_def_54_4_exact_integer_above_2_53(tmp_path):
+        layout = "\n".join(['    /begin RECORD_LAYOUT RL_U64', "      FNC_VALUES 1 A_UINT64 ROW_DIR DIRECT", "    /end RECORD_LAYOUT"])
+        a2l = _inline(tmp_path, layout, _val("U64", "0x10", "RL_U64", "NO_COMPU_METHOD", "0", str(2**64 - 1)))
+        d = describe_definition("U64", a2l)
+>       assert _enc(d, a2l, "9007199254740993", _img(0x10, bytes(8))) == _ref(
+            "A2L-DEF-PRECISION", "U64: 9007199254740993 cannot be stored at the display precision \u2014 the nearest stored value is 9007199254740992")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PRECISION', message='U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='U64', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=8, datatype...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '9007199254740993', {16: 0, 17: 0, 18: 0, 19: 0, ...})
+E        +    where {16: 0, 17: 0, 18: 0, 19: 0, ...} = _img(16, b'\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(8)
+E        +  and   Refusal(code='A2L-DEF-PRECISION', message='U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992') = _ref('A2L-DEF-PRECISION', 'U64: 9007199254740993 cannot be stored at the display precision — the nearest stored value is 9007199254740992')
+
+tests/test_b103_a2l_definition.py:2955: AssertionError
+____________________ test_r_a2l_def_55_1_number_round_trip _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_55_1_number_rou0')
+
+    def test_r_a2l_def_55_1_number_round_trip(tmp_path):
+        """R-A2L-DEF.55/1 - every accepted value decodes to a value that agrees at the display
+        precision; 0 precision refusals among values taken from decoded stored values."""
+        methods = {"none": (None, ()), "ident": ("IDENTICAL", ()), "lin1": ("LINEAR", ("1", "0"))}
+        datatypes = {"UBYTE": (1, 0, 255), "SWORD": (2, -32768, 32767), "ULONG": (4, 0, 1000000),
+                     "FLOAT32_IEEE": (4, -1e6, 1e6), "FLOAT64_IEEE": (8, -1e6, 1e6)}
+        samples = {"UBYTE": [0, 1, 127, 255], "SWORD": [-1, 0, 1, 127, -128],
+                   "ULONG": [0, 1, 1000, 1000000], "FLOAT32_IEEE": [0.0, 1.5, -2.25, 0.1],
+                   "FLOAT64_IEEE": [0.0, 1.5, -2.25, 0.1]}
+        formats = ["%.0", "%8.4", "%.15", None]
+        accepted = 0
+        addr = 0x1000
+        for _mname, (mtyp, coeffs) in methods.items():
+            for dt, (_size, lo, hi) in datatypes.items():
+                for big in (True, False):
+                    for fmt in formats:
+                        addr += 0x10
+                        name = f"G{addr:X}"
+                        blocks = []
+                        conv = "NO_COMPU_METHOD"
+                        if mtyp is not None:
+                            blocks.append(_cm("CM_G", mtyp, *coeffs))
+                            conv = "CM_G"
+                        extra = [f'FORMAT "{fmt}"'] if fmt else []
+                        a2l = _inline(tmp_path, *blocks,
+                                      _val(name, f"0x{addr:X}", LAYOUT[dt], conv, str(lo), str(hi), *extra),
+                                      byte_order="MSB_FIRST" if big else "MSB_LAST")
+                        d = describe_definition(name, a2l)
+                        assert d.shared_with is None
+                        for value in samples[dt]:
+                            raw = _pack(dt, value, big)
+                            dec = decode_definition(d, a2l, _img(addr, raw))
+                            assert isinstance(dec, Decoded), (dt, value, dec)
+                            res = _enc(d, a2l, dec.text, _img(addr, raw))
+                            assert isinstance(res, Encoded), (dt, value, dec.text, res)
+                            back = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res.data)})
+>                           assert isinstance(back, Decoded) and back.text == dec.text, (dt, value, dec.text, back)
+E                           AssertionError: ('UBYTE', 0, '0', Decoded(stored=83, value=83, text='83'))
+E                           assert (True and '83' == '0'
+E                            +  where True = isinstance(Decoded(stored=83, value=83, text='83'), Decoded)
+E                             
+E                             - 0
+E                             + 83)
+
+tests/test_b103_a2l_definition.py:3011: AssertionError
+_____________________ test_r_a2l_def_56_1_text_round_trip ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_56_1_text_round_trip(v171, c08):
+        """R-A2L-DEF.56/1 - every accepted enum text and text object decodes to the same text."""
+        total = 0
+        enum_objects = [
+            (V171_ENUM, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+            ("ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE", "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+            (V171_RANGE, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+        ]
+        for name, other in enum_objects:
+            d = describe_definition(name, v171)
+>           assert d.shared_with == other, (name, d.shared_with)
+E           AssertionError: ('ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', None)
+E           assert None == 'ASAM.C.SCALAR.SWORD.IDENTICAL'
+E            +  where None = Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3028: AssertionError
+______________ test_r_a2l_def_57_1_text_length_before_characters _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_57_1_text_length_before_characters(v171):
+        d = describe_definition(V171_ASCII, v171)
+        text = "Z" * 42 + "\u00e9"
+>       assert _enc(d, v171, text, _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-LENGTH", "ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters \u2014 at most 42 fit")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TEXT-LENGTH', message='ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZé', {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-LENGTH', message='ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit') = _ref('A2L-DEF-TEXT-LENGTH', 'ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit')
+
+tests/test_b103_a2l_definition.py:3070: AssertionError
+____________ test_r_a2l_def_57_2_limits_before_the_encode_direction ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_57_2_limits_bef0')
+
+    def test_r_a2l_def_57_2_limits_before_the_encode_direction(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "301", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 301 is outside the limits -100..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L1: 301 is outside the limits -100..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='L1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_L': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '301', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L1: 301 is outside the limits -100..100') = _ref('A2L-DEF-LIMITS', 'L1: 301 is outside the limits -100..100')
+
+tests/test_b103_a2l_definition.py:3077: AssertionError
+_______________ test_r_a2l_def_57_3_image_bytes_before_the_mask ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_57_3_image_byte0')
+
+    def test_r_a2l_def_57_3_image_bytes_before_the_mask(tmp_path):
+        a2l = _inline(tmp_path, _val("MN", "0x10", "RL_S16", "NO_COMPU_METHOD", "-100", "100", "BIT_MASK 0x00F0"))
+        d = describe_definition("MN", a2l)
+>       assert _enc(d, a2l, "-1", {}) == _ref("A2L-DEF-BYTES", "MN: 2 of its 2 bytes are not in the image")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-BYTES', message='MN: 2 of its 2 bytes are not in the image')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='MN', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '-1', {})
+E        +  and   Refusal(code='A2L-DEF-BYTES', message='MN: 2 of its 2 bytes are not in the image') = _ref('A2L-DEF-BYTES', 'MN: 2 of its 2 bytes are not in the image')
+
+tests/test_b103_a2l_definition.py:3083: AssertionError
+___________ test_r_a2l_def_57_4_number_text_before_the_shared_bytes ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_57_4_number_tex0')
+
+    def test_r_a2l_def_57_4_number_text_before_the_shared_bytes(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        d = describe_definition("OA", a2l)
+>       assert _enc(d, a2l, "abc", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-NUMBER", "OA: 'abc' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="OA: 'abc' is not a number")
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, 'abc', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-NUMBER', message="OA: 'abc' is not a number") = _ref('A2L-DEF-NUMBER', "OA: 'abc' is not a number")
+
+tests/test_b103_a2l_definition.py:3090: AssertionError
+___________ test_r_a2l_def_57_5_parse_errors_before_the_number_text ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_57_5_parse_erro0')
+
+    def test_r_a2l_def_57_5_parse_errors_before_the_number_text(tmp_path):
+        a2l = _inline(tmp_path,
+                      _val("PN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      '/include "x.a2l"')
+        d = describe_definition("PN", a2l)
+        first = a2l["errors"][0]
+>       assert _enc(d, a2l, "abc", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", f"PN: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='PN: the A2L cannot be edited while it has parse errors — the first is Line 34: /include x.a2l is not read')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='PN', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 34: /include x.a2l is not read'], ...}, 'abc', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='PN: the A2L cannot be edited while it has parse errors — the first is Line 34: /include x.a2l is not read') = _ref('A2L-DEF-PARSE', 'PN: the A2L cannot be edited while it has parse errors — the first is Line 34: /include x.a2l is not read')
+
+tests/test_b103_a2l_definition.py:3099: AssertionError
+_______________ test_r_a2l_def_138_1_lost_mask_negative_control ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_1_lost_mask0')
+
+    def test_r_a2l_def_138_1_lost_mask_negative_control(tmp_path):
+        a2l = _inline(tmp_path, _val("MN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                      _val("MC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        mc = describe_definition("MC", a2l)
+>       assert mc.shared_with == "MN"
+E       AssertionError: assert None == 'MN'
+E        +  where None = Definition(name='MC', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3109: AssertionError
+______________________ test_r_a2l_def_138_2_blob_overlap _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_2_blob_over0')
+
+    def test_r_a2l_def_138_2_blob_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VB", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin BLOB B1 ""\n  0x10 2\n/end BLOB')
+        d = describe_definition("VB", a2l)
+>       assert d.shared_with == "B1"
+E       AssertionError: assert None == 'B1'
+E        +  where None = Definition(name='VB', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3119: AssertionError
+_________________ test_r_a2l_def_138_3_sized_instance_overlap __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_3_sized_ins0')
+
+    def test_r_a2l_def_138_3_sized_instance_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VI", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin TYPEDEF_MEASUREMENT T_U16 ""\n  UWORD NO_COMPU_METHOD 0 0 0 65535\n/end TYPEDEF_MEASUREMENT',
+                      '/begin INSTANCE I1 ""\n  T_U16 0x10\n/end INSTANCE')
+        d = describe_definition("VI", a2l)
+>       assert d.shared_with == "I1"
+E       AssertionError: assert None == 'I1'
+E        +  where None = Definition(name='VI', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3128: AssertionError
+______ test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_4_unsized_i0')
+
+    def test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin INSTANCE IU ""\n  T_NONE 0x10\n/end INSTANCE')
+        d = describe_definition("VU", a2l)
+>       assert d.shared_with == "IU"
+E       AssertionError: assert None == 'IU'
+E        +  where None = Definition(name='VU', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3136: AssertionError
+______ test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_UBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.UBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3142: AssertionError
+______ test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_SBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3149: AssertionError
+__________ test_r_a2l_def_138_7_v171_ulong_against_the_array_instance __________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_7_v171_ulong_against_the_array_instance(v171):
+        d = describe_definition("ASAM.C.SCALAR.ULONG.IDENTICAL", v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5'
+E        +  where None = Definition(name='ASAM.C.SCALAR.ULONG.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3156: AssertionError
+____________ test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example(v171):
+        d = describe_definition("ASAM.C.DEPENDENT.REF_1.SWORD", v171)
+>       assert d.shared_with == "ASAM_S_EXAMPLE"
+E       AssertionError: assert None == 'ASAM_S_EXAMPLE'
+E        +  where None = Definition(name='ASAM.C.DEPENDENT.REF_1.SWORD', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=84...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3163: AssertionError
+_ test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address __
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_9_hostile_u0')
+
+    def test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VH", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      "/begin CHARACTERISTIC H1 \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 1000000000000\n/end CHARACTERISTIC")
+        d = describe_definition("VH", a2l)
+>       assert d.shared_with == "H1"
+E       AssertionError: assert None == 'H1'
+E        +  where None = Definition(name='VH', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3172: AssertionError
+_____________ test_r_a2l_def_138_10_clean_length_refused_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_10_clean_le0')
+
+    def test_r_a2l_def_138_10_clean_length_refused_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("ON", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00", "LENGTH 1048577"))
+        d = describe_definition("OA", a2l)
+>       assert d.shared_with == "ON"
+E       AssertionError: assert None == 'ON'
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3184: AssertionError
+____________ test_r_a2l_def_138_11_clean_duplicate_named_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_11_clean_du0')
+
+    def test_r_a2l_def_138_11_clean_duplicate_named_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OD", "0xF000", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                      _val("OD", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"))
+        d = describe_definition("OA", a2l)
+>       assert d.shared_with == "OD"
+E       AssertionError: assert None == 'OD'
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3199: AssertionError
+______________ test_r_a2l_def_138_12_byte_order_refused_neighbour ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_12_byte_ord0')
+
+    def test_r_a2l_def_138_12_byte_order_refused_neighbour(tmp_path):
+        mod_common = "\n".join(['    /begin MOD_COMMON ""', "      BYTE_ORDER MSB_FIRST", "      BYTE_ORDER MSB_LAST", "    /end MOD_COMMON"])
+        a2l = _inline(tmp_path, mod_common,
+                      _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                      byte_order=None)
+        d = describe_definition("OA", a2l)
+>       assert d.shared_with == "OB"
+E       AssertionError: assert None == 'OB'
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3210: AssertionError
+____ test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_13_two_same0')
+
+    def test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F", "BIT_MASK 0x000F"))
+        d = describe_definition("OA", a2l)
+>       assert d.shared_with == "OC"
+E       AssertionError: assert None == 'OC'
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3218: AssertionError
+__________ test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_14_unmasked0')
+
+    def test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        oa = describe_definition("OA", a2l)
+        ob = describe_definition("OB", a2l)
+>       assert oa.shared_with == "OB" and ob.shared_with == "OA"
+E       AssertionError: assert (None == 'OB')
+E        +  where None = Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3232: AssertionError
+_____________ test_r_a2l_def_138_15_both_masks_select_a_common_bit _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_15_both_mas0')
+
+    def test_r_a2l_def_138_15_both_masks_select_a_common_bit(tmp_path):
+        a2l = _inline(tmp_path, _val("MA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
+                      _val("MB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0010"))
+        d = describe_definition("MA", a2l)
+>       assert d.shared_with == "MB"
+E       AssertionError: assert None == 'MB'
+E        +  where None = Definition(name='MA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3242: AssertionError
+_________ test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_17_masks_co0')
+
+    def test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select(tmp_path):
+        a2l = _inline(tmp_path, _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                      _val("MU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"))
+        d = describe_definition("MW", a2l)
+        assert d.shared_with is None
+>       assert _enc(d, a2l, "1", _img(0x10, bytes([0, 0]))) == Encoded(0x10, bytes([0x00, 0x01]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 16...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:3251: AssertionError
+__ test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_18_object_w0')
+
+    def test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index(tmp_path):
+        a2l = _inline(tmp_path,
+                      _meas("MX", "UWORD", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("Z0", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        mx = describe_definition("MX", a2l)
+        z0 = describe_definition("Z0", a2l)
+        assert mx.refusal is not None and mx.refusal.code == "A2L-DEF-ADDRESS" and mx.shared_with is None
+        assert z0.shared_with is None
+>       assert _enc(z0, a2l, "7", _img(0x0, bytes([0, 0]))) == Encoded(0x0, bytes([0x00, 0x07]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'STUB' != b'\x00\x07'
+E           At index 0 diff: b'S' != b'\x00'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:3262: AssertionError
+_______________ test_r_a2l_def_138_19_0x0_is_a_declared_address ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_19_0x0_is_a0')
+
+    def test_r_a2l_def_138_19_0x0_is_a_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("Z1", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("Z2", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        z1 = describe_definition("Z1", a2l)
+        z2 = describe_definition("Z2", a2l)
+>       assert z1.shared_with == "Z2" and z2.shared_with == "Z1"
+E       AssertionError: assert (None == 'Z2')
+E        +  where None = Definition(name='Z1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=2, datatype='...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3270: AssertionError
+____ test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_138_20_text_obj0')
+
+    def test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded(tmp_path):
+        a2l = _inline(tmp_path,
+                      "/begin CHARACTERISTIC TA \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 2\n/end CHARACTERISTIC",
+                      _val("TU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        d = describe_definition("TA", a2l)
+>       assert d.shared_with == "TU"
+E       AssertionError: assert None == 'TU'
+E        +  where None = Definition(name='TA', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=2, datatype='U...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3281: AssertionError
+_________________________ test_r_a2l_def_152_1_include _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_152_1_include0')
+
+    def test_r_a2l_def_152_1_include(tmp_path):
+        a2l = _parse_error_a2l(tmp_path, "P1", ['/include "x.a2l"'], 20)
+        d = describe_definition("P1", a2l)
+        assert d.refusal is None
+        first = a2l["errors"][0]
+        assert first == "Line 20: /include x.a2l is not read"
+>       assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", f"P1: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='P1: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 20: /include x.a2l is not read'], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='P1: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read') = _ref('A2L-DEF-PARSE', 'P1: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read')
+
+tests/test_b103_a2l_definition.py:3306: AssertionError
+____________________ test_r_a2l_def_152_2_stray_star_slash _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_152_2_stray_sta0')
+
+    def test_r_a2l_def_152_2_stray_star_slash(tmp_path):
+        a2l = _parse_error_a2l(tmp_path, "P2", ["*/"], 20)
+        d = describe_definition("P2", a2l)
+        assert d.refusal is None
+        assert a2l["errors"][0] == "Line 20: */ without /*"
+>       assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", "P2: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: */ without /*")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='P2: the A2L cannot be edited while it has parse errors — the first is Line 20: */ without /*')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P2', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 20: */ without /*'], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='P2: the A2L cannot be edited while it has parse errors — the first is Line 20: */ without /*') = _ref('A2L-DEF-PARSE', 'P2: the A2L cannot be edited while it has parse errors — the first is Line 20: */ without /*')
+
+tests/test_b103_a2l_definition.py:3315: AssertionError
+____________________ test_r_a2l_def_152_3_unclosed_comment _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_152_3_unclosed_0')
+
+    def test_r_a2l_def_152_3_unclosed_comment(tmp_path):
+        a2l = _parse_error_a2l(tmp_path, "P3", ["/* never closed"], 20)
+        d = describe_definition("P3", a2l)
+        assert d.refusal is None
+        assert a2l["errors"][0] == "Line 20: comment not closed"
+>       assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", "P3: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: comment not closed")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='P3: the A2L cannot be edited while it has parse errors — the first is Line 20: comment not closed')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P3', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 20: comment not closed'], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='P3: the A2L cannot be edited while it has parse errors — the first is Line 20: comment not closed') = _ref('A2L-DEF-PARSE', 'P3: the A2L cannot be edited while it has parse errors — the first is Line 20: comment not closed')
+
+tests/test_b103_a2l_definition.py:3324: AssertionError
+_________________ test_r_a2l_def_152_4_unclosed_quoted_string __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_152_4_unclosed_0')
+
+    def test_r_a2l_def_152_4_unclosed_quoted_string(tmp_path):
+        a2l = _parse_error_a2l(tmp_path, "P4", ['/begin CHARACTERISTIC Q "unclosed'], 22)
+        d = describe_definition("P4", a2l)
+        assert d.refusal is None
+        assert a2l["errors"][0] == "Line 22: quoted string not closed"
+>       assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", "P4: the A2L cannot be edited while it has parse errors \u2014 the first is Line 22: quoted string not closed")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='P4: the A2L cannot be edited while it has parse errors — the first is Line 22: quoted string not closed')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P4', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 22: quoted string not closed', 'Unclosed /begin sections detected.', 'Line 22: CHARACTERISTIC Q is not closed'], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='P4: the A2L cannot be edited while it has parse errors — the first is Line 22: quoted string not closed') = _ref('A2L-DEF-PARSE', 'P4: the A2L cannot be edited while it has parse errors — the first is Line 22: quoted string not closed')
+
+tests/test_b103_a2l_definition.py:3333: AssertionError
+_____________ test_r_a2l_def_152_5_capped_more_parse_errors_marker _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_152_5_capped_mo0')
+
+    def test_r_a2l_def_152_5_capped_more_parse_errors_marker(tmp_path):
+        a2l = _parse_error_a2l(tmp_path, "P5", ["/end X"] + [f"/end X{i}" for i in range(200)], 20)
+        d = describe_definition("P5", a2l)
+        assert d.refusal is None
+        assert a2l["errors"][0] == "Line 20: /end without /begin"
+        assert a2l["errors"][-1].endswith("more parse errors")
+>       assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+            "A2L-DEF-PARSE", "P5: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: /end without /begin")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-PARSE', message='P5: the A2L cannot be edited while it has parse errors — the first is Line 20: /end without /begin')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='P5', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 20: /end without /begin...out /begin', 'Line 23: /end without /begin', 'Line 24: /end without /begin', 'Line 25: /end without /begin', ...], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-PARSE', message='P5: the A2L cannot be edited while it has parse errors — the first is Line 20: /end without /begin') = _ref('A2L-DEF-PARSE', 'P5: the A2L cannot be edited while it has parse errors — the first is Line 20: /end without /begin')
+
+tests/test_b103_a2l_definition.py:3343: AssertionError
+_ test_r_a2l_def_151_7_operator_text_is_cut_without_changing_spaces_or_unicode _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_151_7_operator_0')
+
+    def test_r_a2l_def_151_7_operator_text_is_cut_without_changing_spaces_or_unicode(tmp_path):
+        a2l = _inline(tmp_path, _val("OT", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("OT", a2l)
+        text = "x" * 252 + " \u00e9 " + "\x1b" + "y"
+        assert len(text) == 257
+        echoed = "x" * 252 + " \u00e9 " + FFFD + ELLIPSIS
+        res = _enc(d, a2l, text, {0x10: 0, 0x11: 0})
+>       assert res == _ref("A2L-DEF-NUMBER", f"OT: '{echoed}' is not a number")
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-NUMBER', message="OT: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx é �…' is not a number")
+E        +  where Refusal(code='A2L-DEF-NUMBER', message="OT: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx é �…' is not a number") = _ref('A2L-DEF-NUMBER', "OT: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx é �…' is not a number")
+
+tests/test_b103_a2l_definition.py:3356: AssertionError
+_____ test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode ______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_21_3_non_finite1')
+
+    def test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_X", "LINEAR", "1", "0"),
+                      _val("XL3", "0x10", "RL_S16", "CM_X", "0", "100", "EXTENDED_LIMITS nan nan"))
+        d = describe_definition("XL3", a2l)
+        assert d.extended_limits is None
+>       assert _enc(d, a2l, "101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "XL3: 101 is outside the limits 0..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='XL3: 101 is outside the limits 0..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='XL3', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_X': {'coeffs': None, 'coeffs_linear': [1.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '101', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='XL3: 101 is outside the limits 0..100') = _ref('A2L-DEF-LIMITS', 'XL3: 101 is outside the limits 0..100')
+
+tests/test_b103_a2l_definition.py:3367: AssertionError
+___________________ test_r_a2l_def_58_2_1_count_1e400_encode ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_1_count_1e1')
+
+    def test_r_a2l_def_58_2_1_count_1e400_encode(tmp_path):
+        a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "1e400", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+        d = describe_definition("EE", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-TABLE-EMPTY"
+>       assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_E', 'conversion_type':...ntries': [(0.0, 'A')], 'kind': '0', 'lines': ['0 "A"'], 'name': 'VT_E', ...}}, 'declared_spans': [], 'errors': [], ...}, {16: 0})
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries') = Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3382: AssertionError
+____________________ test_r_a2l_def_58_2_2_count_nan_encode ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_2_count_na1')
+
+    def test_r_a2l_def_58_2_2_count_nan_encode(tmp_path):
+        a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "nan", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+        d = describe_definition("EE", a2l)
+>       assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_E', 'conversion_type':...ntries': [(0.0, 'A')], 'kind': '0', 'lines': ['0 "A"'], 'name': 'VT_E', ...}}, 'declared_spans': [], 'errors': [], ...}, {16: 0})
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries') = Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3388: AssertionError
+__________________ test_r_a2l_def_58_2_3_count_minus_3_encode __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_3_count_mi1')
+
+    def test_r_a2l_def_58_2_3_count_minus_3_encode(tmp_path):
+        a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "-3", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+        d = describe_definition("EE", a2l)
+>       assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_E', 'conversion_type':...ntries': [(0.0, 'A')], 'kind': '0', 'lines': ['0 "A"'], 'name': 'VT_E', ...}}, 'declared_spans': [], 'errors': [], ...}, {16: 0})
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries') = Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3394: AssertionError
+____________________ test_r_a2l_def_58_2_4_count_2_5_encode ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_4_count_2_1')
+
+    def test_r_a2l_def_58_2_4_count_2_5_encode(tmp_path):
+        a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "2.5", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+        d = describe_definition("EE", a2l)
+>       assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+E       assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_E': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_E', 'conversion_type':...ntries': [(0.0, 'A')], 'kind': '0', 'lines': ['0 "A"'], 'name': 'VT_E', ...}}, 'declared_spans': [], 'errors': [], ...}, {16: 0})
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='EE: the table VT_E has no entries') = Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U... entries'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3400: AssertionError
+____________ test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_encode ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_5_a_5000_d1')
+
+    def test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_encode(tmp_path):
+        word = "1" * 5000
+        a2l = _inline(tmp_path, _val("MX5", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {word}"))
+        d = describe_definition("MX5", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-MASK"
+>       assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-MASK', message='MX5: the bit mask 11111111111111111111111111111111111111111111111111111111111111...11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111… cannot be applied to UWORD')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='MX5', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...to UWORD'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-MASK', message='MX5: the bit mask 11111111111111111111111111111111111111111111111111111111111111...11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111… cannot be applied to UWORD') = Definition(name='MX5', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...to UWORD'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3408: AssertionError
+__________________ test_r_a2l_def_58_2_7_bit_mask_0xzz_encode __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_7_bit_mask1')
+
+    def test_r_a2l_def_58_2_7_bit_mask_0xzz_encode(tmp_path):
+        a2l = _inline(tmp_path, _val("MZ", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0xZZ"))
+        d = describe_definition("MZ", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-MASK"
+>       assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-MASK', message='MZ: the bit mask 0xZZ cannot be applied to UWORD')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='MZ', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...to UWORD'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-MASK', message='MZ: the bit mask 0xZZ cannot be applied to UWORD') = Definition(name='MZ', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...to UWORD'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3415: AssertionError
+_________________ test_r_a2l_def_58_2_8_number_minus_5_encode __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_8_number_m1')
+
+    def test_r_a2l_def_58_2_8_number_minus_5_encode(tmp_path):
+        a2l = _inline(tmp_path, _ascii("T8", "0x10", "-5"))
+        d = describe_definition("T8", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+>       assert _no_exception_encode(d, a2l, {}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ADDRESS', message='T8: the object has no address or no length')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='T8', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 33: NUMBER -5 is not a number'], ...}, {})
+E        +  and   Refusal(code='A2L-DEF-ADDRESS', message='T8: the object has no address or no length') = Definition(name='T8', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3422: AssertionError
+______________ test_r_a2l_def_58_2_9_number_above_one_mib_encode _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_9_number_a1')
+
+    def test_r_a2l_def_58_2_9_number_above_one_mib_encode(tmp_path):
+        a2l = _inline(tmp_path, _ascii("T9", "0x10", "1048577"))
+        d = describe_definition("T9", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+>       assert _no_exception_encode(d, a2l, {}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ADDRESS', message='T9: the object has no address or no length')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='T9', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 31: CHARACTERISTIC T9 has the length 1048577, outside 1 to 1048576 bytes'], ...}, {})
+E        +  and   Refusal(code='A2L-DEF-ADDRESS', message='T9: the object has no address or no length') = Definition(name='T9', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3429: AssertionError
+______________ test_r_a2l_def_58_2_10_negative_ecu_address_encode ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_10_negativ1')
+
+    def test_r_a2l_def_58_2_10_negative_ecu_address_encode(tmp_path):
+        a2l = _inline(tmp_path, _meas("T10", "UWORD", addr="-0x10"))
+        d = describe_definition("T10", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+>       assert _no_exception_encode(d, a2l, {}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ADDRESS', message='T10: the object has no address or no length')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='T10', section='MEASUREMENT', char_type=None, kind='number', address=None, byte_length=2, datatype='UW...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['Line 33: ECU_ADDRESS -0x10 is not a number'], ...}, {})
+E        +  and   Refusal(code='A2L-DEF-ADDRESS', message='T10: the object has no address or no length') = Definition(name='T10', section='MEASUREMENT', char_type=None, kind='number', address=None, byte_length=2, datatype='UW...o length'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3436: AssertionError
+___________ test_r_a2l_def_58_2_11_non_finite_extended_limits_encode ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_11_non_fin1')
+
+    def test_r_a2l_def_58_2_11_non_finite_extended_limits_encode(tmp_path):
+        a2l = _inline(tmp_path, _val("XL", "0x10", "RL_S16", "NO_COMPU_METHOD", "0", "100", "EXTENDED_LIMITS nan nan"))
+        d = describe_definition("XL", a2l)
+>       assert _enc(d, a2l, "101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "XL: 101 is outside the limits 0..100")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='XL: 101 is outside the limits 0..100')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='XL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '101', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='XL: 101 is outside the limits 0..100') = _ref('A2L-DEF-LIMITS', 'XL: 101 is outside the limits 0..100')
+
+tests/test_b103_a2l_definition.py:3442: AssertionError
+_______________ test_r_a2l_def_58_2_13_all_zero_rat_func_encode ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_13_all_zer1')
+
+    def test_r_a2l_def_58_2_13_all_zero_rat_func_encode(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_Z", "RAT_FUNC", "0", "0", "0", "0", "0", "0"),
+                      _val("RZ", "0x10", "RL_U16", "CM_Z", "0", "65535"))
+        d = describe_definition("RZ", a2l)
+>       assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "RZ: RAT_FUNC denominator is zero")
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-ENCODE', message='RZ: RAT_FUNC denominator is zero')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _enc(Definition(name='RZ', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_Z': {'coeffs': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'RAT_FUNC', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '3', {})
+E        +  and   Refusal(code='A2L-DEF-ENCODE', message='RZ: RAT_FUNC denominator is zero') = _ref('A2L-DEF-ENCODE', 'RZ: RAT_FUNC denominator is zero')
+
+tests/test_b103_a2l_definition.py:3456: AssertionError
+_________ test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-320/test_r_a2l_def_58_2_17_masked_1')
+
+    def test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode(tmp_path):
+        a2l = _inline(tmp_path, _val("ND", "0x10", "RL_X", "NO_COMPU_METHOD", "0", "65535", "LENGTH 2", "BIT_MASK 0x0FF0"),
+                      '/begin RECORD_LAYOUT RL_X\n  FNC_VALUES 1 FOO ROW_DIR DIRECT\n/end RECORD_LAYOUT')
+        d = describe_definition("ND", a2l)
+        assert d.refusal is not None and d.refusal.code == "A2L-DEF-DATATYPE"
+>       assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+E       AssertionError: assert Encoded(address=0, data=b'STUB', notices=()) == Refusal(code='A2L-DEF-DATATYPE', message='ND: the object declares no datatype the system can read')
+E        +  where Encoded(address=0, data=b'STUB', notices=()) = _no_exception_encode(Definition(name='ND', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...can read'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-DATATYPE', message='ND: the object declares no datatype the system can read') = Definition(name='ND', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...can read'), shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_a2l_definition.py:3476: AssertionError
+___ test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes ___
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes(v171):
+        """AT-B103-I2-1 (2b arm) - nine V171 objects refuse A2L-DEF-OVERLAP naming the
+        object each shares with, on an accepted value; only the ASCII object encodes,
+        is applied and decodes again."""
+        image: dict[int, int] = {}
+        image.update(_img(0x810000, bytes([0, 0])))          # UBYTE, SBYTE
+        image.update(_img(0x810002, bytes([0x34, 0x12])))    # the UWORD word 0x1234
+        image.update(_img(0x810004, bytes([2, 0])))          # the SWORD
+        image.update(_img(0x810200, b"Hello ASAM" + bytes(32)))
+        image_before = dict(image)
+        expected = {
+            V171_ENUM: "Square",
+            V171_ENUM_NODEF: "red",
+            V171_RANGE: "two_to_three",
+            V171_M0FF0: "35",
+            V171_M0001: "0",
+            V171_M0010: "1",
+            V171_ASCII: "Hello ASAM",
+            V171_SBYTE: "0",
+            V171_UBYTE: "0",
+            V171_SWORD: "2",
+        }
+        for name, expected_text in expected.items():
+            d = describe_definition(name, v171)
+            assert d.refusal is None, (name, d.refusal)
+            assert decode_definition(d, v171, image).text == expected_text, name
+        overlaps = {
+            V171_ENUM: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "Square"),
+            V171_ENUM_NODEF: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "green"),
+            V171_RANGE: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "four_to_seven"),
+            V171_SWORD: ("ASAM.C.SCALAR.SWORD.LINEAR_MUL_2", "0"),
+            V171_M0FF0: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+            V171_M0001: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+            V171_M0010: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+            V171_SBYTE: ("ASAM_I_SCALAR_VALUE_UWORD_SINGLE", "0"),
+            V171_UBYTE: ("ASAM_I_SCALAR_VALUE_UWORD_SINGLE", "0"),
+        }
+        for name, (other, text) in overlaps.items():
+            d = describe_definition(name, v171)
+>           assert d.shared_with == other, (name, d.shared_with)
+E           AssertionError: ('ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', None)
+E           assert None == 'ASAM.C.SCALAR.SWORD.IDENTICAL'
+E            +  where None = Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...fusal=None, shared_with=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3550: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_6_second_live_bit_mask_keyword_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_7_ambiguous_byte_order_source_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_25_2_encode_gives_the_definitions_refusal
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_26_2_masked_encode_on_an_empty_image_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_26_3_unmasked_encode_on_an_empty_image_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_26_4_text_encode_on_an_empty_image_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_1_empty_text_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_2_letters_are_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_3_decimal_comma_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_4_underscore_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_5_nan_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_6_inf_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_7_hexadecimal_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_9_tab_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_1_no_conversion
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_2_identical_with_spaces_and_sign
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_3_linear_with_an_offset
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_4_rat_func - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_5_tab_nointp - As...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_6_tab_intp_and_number_forms
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_1_linear_coefficient_a_zero
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_2_rat_func_denominator_zero
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_3_lookup_table_missing
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_4_lookup_table_no_numeric_entries
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_5_tab_nointp_nearest_values
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_6_tab_intp_outside_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_7_converted_raw_not_finite
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_8_not_integral - ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_9_datatype_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_10_float16 - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_11_float_does_not_pack
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_1_below_the_lower_limit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_2_above_the_upper_limit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_3_one_declared_side
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_4_enum_entry_above_the_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_1_notice_above_the_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_44_2_notice_at_the_extended_lower_limit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_1_below_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_2_above_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_3_written_value_against_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_1_multi_bit_write
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_2_single_bit_write
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_4_masked_enum_write
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_1_value_wider_than_the_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_2_negative_value
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_3_non_contiguous_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_48_1_compu_vtab_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_48_2_range_text - As...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_48_3_first_of_two_entries_with_one_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_1_case_counts - a...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_2_default_text_is_not_an_entry
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_49_3_empty_text - as...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_1_short_text_and_padding
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_2_text_of_the_full_length
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_3_empty_text - As...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_51_1_text_too_long
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_1_non_ascii_letter
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_2_tab - assert En...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_3_ufffd - assert ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_1_big_endian_uword
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_2_little_endian_uword
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_3_span_of_a_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_4_span_of_a_masked_uword
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_1_precision_refusal
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_2_same_value_passes_at_one_decimal
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_3_float64_not_accepted_at_6_digits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_54_4_exact_integer_above_2_53
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_55_1_number_round_trip
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_56_1_text_round_trip
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_1_text_length_before_characters
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_2_limits_before_the_encode_direction
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_3_image_bytes_before_the_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_4_number_text_before_the_shared_bytes
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_5_parse_errors_before_the_number_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_1_lost_mask_negative_control
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_11_clean_duplicate_named_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_12_byte_order_refused_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_15_both_masks_select_a_common_bit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_152_1_include - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_152_2_stray_star_slash
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_152_3_unclosed_comment
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_152_4_unclosed_quoted_string
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_152_5_capped_more_parse_errors_marker
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_7_operator_text_is_cut_without_changing_spaces_or_unicode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_1_count_1e400_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_2_count_nan_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_3_count_minus_3_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_4_count_2_5_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_7_bit_mask_0xzz_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_8_number_minus_5_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_9_number_above_one_mib_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_11_non_finite_extended_limits_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_13_all_zero_rat_func_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes
+114 failed, 193 passed in 22.02s

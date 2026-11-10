@@ -1,0 +1,315 @@
+M-42
+pytest -k a2l_def_42
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..485087c7 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3381,7 +3381,7 @@ def _encode_number(
+         None,
+     )
+     if reason is not None:
+-        return Refusal("A2L-DEF-ENCODE", f"{name_echo}: {reason}")
++        return Refusal("A2L-DEF-ENCODE", f"{name_echo}: refused")
+     return bytes(raw)
+ 
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+________________ test_r_a2l_def_42_1_linear_coefficient_a_zero _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_1_linear_coe0')
+
+    def test_r_a2l_def_42_1_linear_coefficient_a_zero(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_A", "LINEAR", "0", "5"), _val("E1", "0x10", "RL_S16", "CM_A", "-1000", "1000"))
+        d = describe_definition("E1", a2l)
+>       assert _enc(d, a2l, "5", {}) == _ref("A2L-DEF-ENCODE", "E1: LINEAR conversion coefficient a is zero")
+E       AssertionError: assert Refusal(code=...'E1: refused') == Refusal(code=...nt a is zero')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E1: refused' != 'E1: LINEAR conversion coefficient a is zero'
+E           - E1: LINEAR conversion coefficient a is zero
+E           + E1: refused
+
+tests/test_b103_a2l_definition.py:2623: AssertionError
+________________ test_r_a2l_def_42_2_rat_func_denominator_zero _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_2_rat_func_d0')
+
+    def test_r_a2l_def_42_2_rat_func_denominator_zero(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_B", "RAT_FUNC", "0", "1", "0", "0", "0", "0"),
+                      _val("E2", "0x10", "RL_U16", "CM_B", "0", "65535"))
+        d = describe_definition("E2", a2l)
+>       assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E2: RAT_FUNC denominator is zero")
+E       AssertionError: assert Refusal(code=...'E2: refused') == Refusal(code=...ator is zero')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E2: refused' != 'E2: RAT_FUNC denominator is zero'
+E           - E2: RAT_FUNC denominator is zero
+E           + E2: refused
+
+tests/test_b103_a2l_definition.py:2630: AssertionError
+___________________ test_r_a2l_def_42_3_lookup_table_missing ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_3_lookup_tab0')
+
+    def test_r_a2l_def_42_3_lookup_table_missing(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_C", "TAB_NOINTP", fmt='"%.0"', ref="TB_GONE"),
+                      _val("E3", "0x10", "RL_U16", "CM_C", "0", "65535"))
+        d = describe_definition("E3", a2l)
+>       assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E3: lookup table missing or empty")
+E       AssertionError: assert Refusal(code=...'E3: refused') == Refusal(code=...ing or empty')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E3: refused' != 'E3: lookup table missing or empty'
+E           - E3: lookup table missing or empty
+E           + E3: refused
+
+tests/test_b103_a2l_definition.py:2637: AssertionError
+_____________ test_r_a2l_def_42_4_lookup_table_no_numeric_entries ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_4_lookup_tab0')
+
+    def test_r_a2l_def_42_4_lookup_table_no_numeric_entries(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_D", "TAB_INTP", fmt='"%.0"', ref="TB_X"),
+                      _ctab("TB_X", "TAB_INTP", '0 "a"', '1 "b"'),
+                      _val("E4", "0x10", "RL_U16", "CM_D", "0", "65535"))
+        d = describe_definition("E4", a2l)
+>       assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E4: lookup table has no numeric entries")
+E       AssertionError: assert Refusal(code=...'E4: refused') == Refusal(code=...eric entries')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E4: refused' != 'E4: lookup table has no numeric entries'
+E           - E4: lookup table has no numeric entries
+E           + E4: refused
+
+tests/test_b103_a2l_definition.py:2645: AssertionError
+________________ test_r_a2l_def_42_5_tab_nointp_nearest_values _________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_42_5_tab_nointp_nearest_values(c08):
+        a2l = _clear_parse_errors(c08["a2l"])
+        d = describe_definition("MEASUREMENT_0002", a2l)
+>       assert _enc(d, a2l, "12", c08["mem"]) == _ref(
+            "A2L-DEF-ENCODE", "MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0")
+E       AssertionError: assert Refusal(code=...002: refused') == Refusal(code=...0.0 and 15.0')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'MEASUREMENT_0002: refused' != 'MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0'
+E           - MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0
+E           + MEASUREMENT_0002: refused
+
+tests/test_b103_a2l_definition.py:2651: AssertionError
+__________________ test_r_a2l_def_42_6_tab_intp_outside_range __________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_42_6_tab_intp_outside_range(c08):
+        a2l = _clear_parse_errors(c08["a2l"])
+        d = describe_definition("MEASUREMENT_0001", a2l)
+>       assert _enc(d, a2l, "45", c08["mem"]) == _ref(
+            "A2L-DEF-ENCODE", "MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]")
+E       AssertionError: assert Refusal(code=...001: refused') == Refusal(code=... [0.0, 40.0]')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'MEASUREMENT_0001: refused' != 'MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]'
+E           - MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]
+E           + MEASUREMENT_0001: refused
+
+tests/test_b103_a2l_definition.py:2658: AssertionError
+_________________ test_r_a2l_def_42_7_converted_raw_not_finite _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_7_converted_0')
+
+    def test_r_a2l_def_42_7_converted_raw_not_finite(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_E", "LINEAR", "1e-300", "0"),
+                      _val("E7", "0x10", "RL_F64", "CM_E", "-1e308", "1e308"))
+        d = describe_definition("E7", a2l)
+>       assert _enc(d, a2l, "1e300", {}) == _ref("A2L-DEF-ENCODE", "E7: the converted raw value is not finite")
+E       AssertionError: assert Refusal(code=...'E7: refused') == Refusal(code=...s not finite')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E7: refused' != 'E7: the converted raw value is not finite'
+E           - E7: the converted raw value is not finite
+E           + E7: refused
+
+tests/test_b103_a2l_definition.py:2666: AssertionError
+_______________________ test_r_a2l_def_42_8_not_integral _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_8_not_integr0')
+
+    def test_r_a2l_def_42_8_not_integral(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_F", "LINEAR", "2", "0"), _val("E8", "0x10", "RL_S16", "CM_F", "-1000", "1000"))
+        d = describe_definition("E8", a2l)
+>       assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E8: the converted raw value 1.5 is not integral")
+E       AssertionError: assert Refusal(code=...'E8: refused') == Refusal(code=...not integral')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E8: refused' != 'E8: the converted raw value 1.5 is not integral'
+E           - E8: the converted raw value 1.5 is not integral
+E           + E8: refused
+
+tests/test_b103_a2l_definition.py:2672: AssertionError
+______________________ test_r_a2l_def_42_9_datatype_range ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_9_datatype_r0')
+
+    def test_r_a2l_def_42_9_datatype_range(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_G", "LINEAR", "2", "0"), _val("E9", "0x10", "RL_S16", "CM_G", "-1e10", "1e10"))
+        d = describe_definition("E9", a2l)
+>       assert _enc(d, a2l, "1e9", {}) == _ref("A2L-DEF-ENCODE", "E9: the converted raw value 500000000 is outside the SWORD range")
+E       AssertionError: assert Refusal(code=...'E9: refused') == Refusal(code=... SWORD range')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E9: refused' != 'E9: the converted raw value 500000000 is outside the SWORD range'
+E           - E9: the converted raw value 500000000 is outside the SWORD range
+E           + E9: refused
+
+tests/test_b103_a2l_definition.py:2678: AssertionError
+_________________________ test_r_a2l_def_42_10_float16 _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_10_float160')
+
+    def test_r_a2l_def_42_10_float16(tmp_path):
+        a2l = _inline(tmp_path, _val("E10", "0x10", "RL_F16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("E10", a2l)
+>       assert _enc(d, a2l, "1.0", {}) == _ref("A2L-DEF-ENCODE", "E10: datatype FLOAT16_IEEE is not supported")
+E       AssertionError: assert Refusal(code=...E10: refused') == Refusal(code=...ot supported')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E10: refused' != 'E10: datatype FLOAT16_IEEE is not supported'
+E           - E10: datatype FLOAT16_IEEE is not supported
+E           + E10: refused
+
+tests/test_b103_a2l_definition.py:2684: AssertionError
+___________________ test_r_a2l_def_42_11_float_does_not_pack ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-449/test_r_a2l_def_42_11_float_doe0')
+
+    def test_r_a2l_def_42_11_float_does_not_pack(tmp_path):
+        a2l = _inline(tmp_path, _val("E11", "0x10", "RL_F32", "NO_COMPU_METHOD", "-1e300", "1e300"))
+        d = describe_definition("E11", a2l)
+>       assert _enc(d, a2l, "1e39", {}) == _ref(
+            "A2L-DEF-ENCODE", "E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format")
+E       AssertionError: assert Refusal(code=...E11: refused') == Refusal(code=...ith f format')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'E11: refused' != 'E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format'
+E           - E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format
+E           + E11: refused
+
+tests/test_b103_a2l_definition.py:2690: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_1_linear_coefficient_a_zero
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_2_rat_func_denominator_zero
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_3_lookup_table_missing
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_4_lookup_table_no_numeric_entries
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_5_tab_nointp_nearest_values
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_6_tab_intp_outside_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_7_converted_raw_not_finite
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_8_not_integral - ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_9_datatype_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_10_float16 - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_11_float_does_not_pack
+11 failed, 311 deselected in 2.25s

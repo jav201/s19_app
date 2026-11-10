@@ -1,0 +1,617 @@
+kimi version 2.5.2
+• Read the review file first, then check the code and tests.Now I need to do a narrow re-review: F-1 and F-2 only, plus new hostile case .138/21 and strengthened .138/14. HEAD is ce1aa0ec. Confirm:
+  - every entry visited in file order
+  - own entry skipped exactly once
+  - single-page dedup avoided
+  - multi-page uses entry position
+  - .136 measured at 1.212 s
+  - final model 308 passed
+  - stub RED 114 failed + 194 passed
+
+  Write only the r2 file. Return verdict and remaining blockers.
+
+  Let me look at the current working tree state of _shared_with and describe_definitions.
+
+• Now let me check the current state of `_shared_with` in the working tree vs HEAD `ce1aa0ec`.8718715ffe6b681472fcfb6ff873b1d8d948d665
+ M .dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md
+ M .dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md
+ M .dev-flow/2026-11-05-batch-103/inc-2/evidence-e3/pi-e3-architect-2b.txt
+ M .dev-flow/2026-11-05-batch-103/inc-2/evidence-e3/pi-e3-security-2b.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/E5-code-review-2b.md
+?? .dev-flow/2026-11-05-batch-103/inc-2/E5-security-2b.md
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-lawguards-final.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-lawguards.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-perf-1.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-perf-final-1.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-perf-final-2.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-probe-shared-cost-top.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-probe-shared-cost.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/kimi-e5-code-review-2b-r2.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/kimi-e5-coverage-audit-2b.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/pi-e5-code-review-2b-r2.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/pi-e5-code-review-2b.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/pi-e5-coverage-audit-2b.txt
+?? .dev-flow/2026-11-05-batch-103/inc-2/evidence-e5/pi-e5-security-2b.txt
+8718715f batch-103 Inc 2b E4: prove scalar definition writes
+ce1aa0ec batch-103 Inc 2b E4: bound overlap candidate scans
+cb083d07 batch-103 Inc 2b E4: keep enum encoding out of numeric precision
+
+
+• HEAD is 8718715f, not ce1aa0ec — the user said "current product HEAD is ce1aa0ec". Actually git rev-parse HEAD gave 8718715f. Hmm, the user says HEAD is ce1aa0ec but git says 8718715f. Maybe the commit hash changed (rebase). ce1aa0ec exists in the log ("batch-103 Inc 2b E4: bound overlap candidate scans"). So the user is pointing at ce1aa0ec as the relevant product HEAD for this review (the overlap-scan fix commit), and 8718715f is a later commit on top. I should review the state relevant to this increment — probably the working tree, and check whether _shared_with differs between working tree, ce1aa0ec, and HEAD.
+
+  Interesting: page size is still >> 4 in the working tree. F-2's correction was "revert to >> 8, or land it deliberately with a record note". Commit ce1aa0ec is titled "bound overlap candidate scans" — that likely IS the deliberate landing of >> 4 with a record note. So F-2 may be resolved as landed deliberately.
+
+  Let me look at _shared_with in the working tree and in ce1aa0ec.The working tree now has a restructured `_shared_with`:
+  - Loop is properly nested: `for page: for entry:` — every entry of each page visited.
+  - Own entry skip: `own_entry` flag, only fires once (set to False after first match). Uses full tuple match (name, section, address, byte_length, byte_order).
+  - Dedup: `if multi_page:` — dedup only when the span covers multiple pages, using `entry[0]` (position). Single-page spans skip the dedup entirely ("single-page dedup is avoided").
+  - Multi-page uses entry position `entry[0]` as key.
+
+  So the four properties the user asks to confirm:
+  1. Every entry visited in file order — entries within a page are appended in walk order (span_index built with monotonic position). But wait — is "file order" preserved across pages? Pages iterate in address order, entries within a page in insertion order. For multi-page spans, dedup keeps the first occurrence (lowest page), and entries on lower pages come first. Is overall order "file order"? Hmm — entries are bucketed by page, so a file-later entry on a lower address page comes before a file-earlier entry on a higher page. Is that "cross-kind file order"? The original committed code did `candidates.sort(key=lambda e: e[0])` — a global sort by position. The new code doesn't sort globally; it relies on page iteration order + per-page insertion order. That only equals file order if... hmm, not exactly. Wait — but maybe within a page, entries are in position order, and pages iterate in address order. File order across different pages isn't guaranteed by page-major iteration.
+
+  But hold on — maybe the span_index entries per page are sorted by position when built. Let me check describe_definitions around :678. Also check whether there's a comment or docstring explaining "every entry in file order." Also need to check tests .138/21 and .138/14.
+
+  Actually wait — the user's checklist says "Confirm that every entry is visited in file order". Maybe the new design claims page-major order IS file order because... hmm. Let me look at the index build.
+
+• Working tree `_shared_with` is restructured. Now check the index build at `:670-740` and the HEAD version of this function.===
+ s19_app/tui/a2l_definition.py | 49 +++++++++++++++++++++----------------------
+ 1 file changed, 24 insertions(+), 25 deletions(-)
+
+
+• `git diff ce1aa0ec` on the file shows no output — working tree matches ce1aa0ec for this file (no diff output before the `===`). So the fix landed in commit ce1aa0ec "bound overlap candidate scans".
+
+  Wait, the diff output shows nothing between the command and `===`, meaning working tree == ce1aa0ec for that file. Good.
+
+  Now the ordering question: page-major iteration. Entries within a page are appended in `span_entries` order (position monotonic during walk). So within a page, entries are in file order. Across pages: pages iterate in ascending address order, not file order. Does "every entry visited in file order" hold? Not globally for multi-page lookups... unless the claim is that within-page order is file order and the first-overlapping-entry semantics... Hmm.
+
+  Actually wait — think about what matters: the first overlapping entry in file order. With page-major iteration, consider definition D on pages p..q. Candidate entries are only those sharing a page with D. Entries on lower pages (p, p+1...) are visited before entries on higher pages. Is that file order? Not necessarily: an entry E1 at file position 100 on page p+1, and E2 at file position 5 on page q. Page-major visits E1 before E2, but file order is E2 first. So global file order is NOT preserved by page-major iteration.
+
+  But maybe the design (E3 close / commit message) defines this differently — "first overlapping entry in cross-kind file order". Let me check the commit message of ce1aa0ec and the test .138/21 and .138/14 to see what's pinned. Also check whether span_index pages' entry lists maintain file order within the page — yes since append in span_entries order.
+
+  Hmm, but wait — maybe the commit deliberately changed the semantics: within each page, entries are in file order, and the scan returns the first overlap found scanning pages ascending, entries in page order. If two candidates overlap on different pages, the returned one is the one on the lower page regardless of file position. Is there a test pinning cross-page order? .138/21 is the new hostile case — let me read it.
+
+  Let me check the commit message and the tests.batch-103 Inc 2b E4: bound overlap candidate scans
+
+===
+batch-103 Inc 2b E4: prove scalar definition writes
+
+Tests reviewed:
+
+  **.138/14 strengthened** (line 3228): OA (0x10 UWORD), OB (0x11 UBYTE overlapping), OC (0x30 UWORD same page — wait, page size is 16 bytes now, 0x10 and 0x30 are on different 16-byte pages! 0x10>>4 = 1, 0x30>>4 = 3). Hmm, so OC is NOT on the same page as OA/OB. Then OA's pages = {1}, OB pages = {1}. OC on page 3. The original review said OC at 0x30 "same page" (with >>8, 0x10 and 0x30 both >>8 = 0, same page). With >>4 pages, 0x30 is a different page. So the strengthened .138/14 — is OC still relevant? With >>4, OA's span 0x10-0x11 → pages {1}. OB at 0x11 → page {1}. OC at 0x30 → page {3}, doesn't share a page, so it's not even a candidate. So the case now: OA's page has entries [OA, OB]; the OLD buggy code tested only the last entry per page — which was OB (last), so OA → "OB" actually? Wait the old defect: only last entry tested. Page 0 (with >>8) had OA, OB, OC; last was OC. The new test asserts OA.shared_with == "OB" and OC.shared_with is None. With >>4, page 1 = [OA, OB], page 3 = [OC]. For OA: candidates page 1: OA (own, skipped), OB (overlaps) → "OB". Good. For OC: page 3 = [OC] only; own skipped → None. Good.
+
+  But does the test discriminate the old bug? Under the old buggy code with the new >>4 page size: OA's page 1 last entry = OB → overlap test on OB → returns "OB". Hmm, that would pass even with the old bug! Wait — the old bug: `if own_entry and (...)` and overlap test outside the entry loop, using last entry. For OA: last entry of page 1 is OB. own_entry=True, entry=OB, OB.name != OA.name, so skip doesn't fire; overlap test OB vs OA → overlaps → return "OB". So OA passes even with old code. For OB: last entry of page 1 = OB itself. own_entry check: entry[1]==OB name etc. → skip fires, own_entry=False, continue → returns None. Old code gives ob.shared_with = None ≠ "OA" → test fails on old code. OK so still discriminating via the OB arm. And OC: old code last entry of page 3 = OC, own entry skip fires → None. Passes. So the discriminating assertion is `ob.shared_with == "OA"` — the own-entry-is-not-last scenario. Good, that matches F-1 defect #2's fix confirmation.
+
+  Hmm wait, but actually the user said ".138/14 strengthened" — let me diff to see what changed. Let me check git diff cb083d07..ce1aa0ec for the test file.
+
+  **.138/21** (line 3288): BLOB B1 with huge hex address (0xFFFF... 5000 F's — hostile, unreadable), TYPEDEF_BLOB TB with huge decimal size, INSTANCE I1 "" TB 0x10, VAL V1 at 0x10. The hostile part: huge numbers could break address parsing (e.g., Python int is fine, but maybe the concern was huge addresses creating enormous page ranges!). KEY: with byte_length huge, `pages = range(first_page, last_page+1)` could be astronomically large — the "bound overlap candidate scans" commit. The test asserts V1.shared_with == "I1" — so I1's span must resolve to something bounded. And the alone case: V1 with B1 (huge hex address BLOB) → shared_with None, meaning B1 either not in index or non-overlapping, and the scan doesn't explode.
+
+  Wait — B1: `/begin BLOB B1 "" 0xFFF...F 2` — address = huge hex, prg_size=2. Its span: first_page = huge>>4, last_page = (huge+1)>>4. That's fine (just two big page numbers). The danger: I1's TYPEDEF_BLOB TB size = 10^5000-1 decimal → byte_length astronomically huge → last_page = (0x10 + huge - 1) >> 4 — computing that is fine as a bigint, but iterating the range would hang. So "bound overlap candidate scans" likely clamps or iterates only pages present in span_index. Let me check: `_shared_with` computes pages as a range and iterates `span_index.get(page, ())`. For I1 with huge length, pages range is astronomically long → iterating it would hang. So how does the test pass in 1.212s .136? Let me check if _shared_with was changed... The working tree version I read iterates `for page in pages:` directly. Hmm, but I1's describe — would I1 even have a byte_length? Maybe INSTANCE length resolution fails (refusal) → byte_length None → pages = (address>>4,) single page. Then V1 at 0x10 page 0... wait 0x10>>4 = 1. I1 at 0x10 → page 1. V1 at 0x10 → page 1. If I1's byte_length is None (refused), _entry_overlaps uses declared-address-inside-span rule. That explains shared_with == "I1" without iterating a huge range.
+
+  But the alone case: V1 with B1 only. B1 huge address → its page is huge; V1's page 1 → no shared page → None. Fine.
+
+  But wait — what about the multi_page branch `len(pages) > 1`? `pages` is a range object; len works. For a huge range, `len(pages)` is fine. But if _shared_with were called on I1 itself (not in this test), it would iterate a huge range. Not tested here. Hmm, but "bound overlap candidate scans" — let me check the actual diff of _shared_with between cb083d07 and ce1aa0ec to see what the commit changed.
+
+  Actually I already have the working tree version. Let me see cb083d07's version vs current. The diff stat said 24 insertions, 25 deletions in that file between cb083d07 and ce1aa0ec. Let me view that diff.
+
+• Now let me see exactly what the fix commit changed vs the old buggy version, and the test-file diff for `.138/14`.diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..b5d440df 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3554,34 +3554,33 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
+-    candidates: list[tuple] = []
++    multi_page = len(pages) > 1
++    own_entry = True
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
+-    own_entry = True
+-    for entry in candidates:
+-        if own_entry and (
+-            entry[1] == definition.name
+-            and entry[2] == definition.section
+-            and entry[3] == definition.address
+-            and entry[4] == definition.byte_length
+-            and entry[5] == definition.byte_order
+-        ):
+-            own_entry = False
+-            continue
+-        if _entry_overlaps(definition, entry) and not _pair_exempt(
+-            definition, entry, mask_of
+-        ):
+-            return entry[1]
++            if own_entry and (
++                entry[1] == definition.name
++                and entry[2] == definition.section
++                and entry[3] == definition.address
++                and entry[4] == definition.byte_length
++                and entry[5] == definition.byte_order
++            ):
++                own_entry = False
++                continue
++            if _entry_overlaps(definition, entry) and not _pair_exempt(
++                definition, entry, mask_of
++            ):
++                return entry[1]
+     return None
+ 
+ 
+
+
+• Interesting — the second bash returned nothing for the test diff. So tests weren't changed in ce1aa0ec? But the user says .138/21 is new and .138/14 strengthened. Maybe they were changed in 8718715f ("prove scalar definition writes")? Let me diff cb083d07..8718715f for tests, and also check when .138/21 was added. Also check evidence files: perf measurement 1.212s, 308 passed, stub RED 114+194. Check int2b-perf-final and lawguards-final evidence files. tests/test_b103_a2l_definition.py    | 1184 ++++++++++++++++++++++++++++++++++
+ tests/test_b103_synth_definitions.py |   67 ++
+ 2 files changed, 1251 insertions(+)
+===
+8718715f batch-103 Inc 2b E4: prove scalar definition writes
+24fc8d80 batch-103: implement Inc 3a arrays and axes
+45644117 batch-103 Inc 11 E4: test fixes (DeepSeek tester)
+26d3e309 batch-103 Inc 2a E5: fix-pass tests (independent tester)
+e9bad3ca batch-103 Inc 2a E5: gap pass 2 tests (independent tester)
+2b-red-collection.txt
+2b-red-stub-main.txt
+2b-red-stub-synth.txt
+2b-red-synth-real.txt
+diag-2a-transcript.txt
+diag-2a.py
+e4-2b-probe-transcript.txt
+e4-2b-probe.py
+e4-2b-probe2.py
+e4-2b-probe3.py
+e4-2b-probe4.py
+e4-2b-probe5.py
+int-green-laws-importers.txt
+int-green-run2.txt
+int-green-run3.txt
+int-green-run4.txt
+int-run1-behaviour.txt
+int2b-lawguards-final.txt
+int2b-lawguards.txt
+int2b-perf-1.txt
+int2b-perf-final-1.txt
+int2b-perf-final-2.txt
+int2b-perf-fix-136-16b.txt
+int2b-perf-fix-136-dedup.txt
+int2b-perf-fix-136-final.txt
+int2b-perf-fix-136.txt
+int2b-probe-shared-cost-top.txt
+int2b-probe-shared-cost.txt
+int2b-profile-136-16b.txt
+int2b-profile-136.txt
+int2b-red-base-main.txt
+int2b-red-base-synth.txt
+int2b-red-stub-final-main.txt
+int2b-red-stub-final2-main.txt
+int2b-red-stub-final2-synth.txt
+int2b-red-stub-final3-main.txt
+int2b-red-stub-final4-main.txt
+int2b-red-stub-main.txt
+int2b-red-stub-synth.txt
+int2b-run1-main.txt
+int2b-run1-synth.txt
+int2b-run2-main.txt
+int2b-run3-main.txt
+int2b-run4-main.txt
+int2b-run5-main.txt
+kimi-e4-tests-2b.txt
+map_2b_cases.py
+pi-e4-impl-2b.txt
+probe_shared_cost.py
+profile_136.py
+stub_2b_tail.py
+tests-59-3-digest-transcript.txt
+tests-idreg-guard-base-plus-new-files.txt
+tests-red-base-collection.txt
+tests-red-base-synth.txt
+tests-red-stub-all.txt
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+...............
+The perf-final-2.txt tail seems truncated/uninformative. Let me grep the evidence files for the numbers: 1.212, 308 passed, 114 failed, 194 passed. Check int2b-perf-final-1.txt, int2b-perf-fix-136-final.txt, int2b-lawguards-final.txt, and the stub final files.int2b-perf-fix-136-final.txt
+===
+39.4%  1.212 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+===
+.......................s..F............................................. [ 14%]
+.............F.......................................................... [ 28%]
+........................................................................ [ 42%]
+........................................................................ [ 56%]
+.......................................................
+308 passed in 11.06s
+114 failed, 194 passed in 23.67s
+Numbers confirmed:
+  - `.136` measured at 1.212 s (39.4% of the 2.000 s bound) in int2b-perf-fix-136-final.txt.
+  - Final model: 308 passed (which file? probably int2b-run5-main.txt — check which).
+  - Stub RED: 114 failed + 194 passed (23.67s) — stub-final4.
+
+  Let me verify which file each came from, and check the .138/21 test diff (added in 8718715f). Also confirm .138/14 change: diff cb083d07..8718715f for the .138/14 test. Also check whether .138/14 was strengthened relative to the version reviewed before (the E5 review read the 2b arm at cb083d07?). Actually the E5 review read working tree. The "strengthened .138/14" — compare across commits.== int2b-run5-main.txt
+....................                                                     [100%]
+308 passed in 11.06s
+== int2b-red-stub-final4-main.txt
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes
+114 failed, 194 passed in 23.67s
+8718715f batch-103 Inc 2b E4: prove scalar definition writes
+===
++def test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap(tmp_path):
++    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
++                  _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
++                  _val("OC", "0x30", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
++    oa = describe_definition("OA", a2l)
++    ob = describe_definition("OB", a2l)
++    oc = describe_definition("OC", a2l)
++    assert oa.shared_with == "OB" and ob.shared_with == "OA" and oc.shared_with is None
++    img = _img(0x10, bytes([0, 0]))
++    assert _enc(oa, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OB")
++    assert _enc(ob, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "OB: its bytes at 0x11 are shared with OA")
++
++
++def test_r_a2l_def_138_15_both_masks_select_a_common_bit(tmp_path):
++    a2l = _inline(tmp_path, _val("MA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
++                  _val("MB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0010"))
++    d = describe_definition("MA", a2l)
++    assert d.shared_with == "MB"
++    assert _enc(d, a2l, "35", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "MA: its bytes at 0x10 are shared with MB")
++
++
++def test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select(tmp_path):
++    a2l = _inline(tmp_path, _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
++                  _val("MU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"))
++    d = describe_definition("MW", a2l)
++    assert d.shared_with is None
++    assert _enc(d, a2l, "1", _img(0x10, bytes([0, 0]))) == Encoded(0x10, bytes([0x00, 0x01]), ())
++
++
++def test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index(tmp_path):
++    a2l = _inline(tmp_path,
+The tests were added wholesale in 8718715f (the whole 2b test arm is new in that commit — 1184 lines added). So the "strengthened .138/14" is this version. Wait — was .138/14 present before in an earlier commit? The E5 review read "tests/test_b103_a2l_definition.py (2b arm)" in the working tree. The whole 2b arm was committed in 8718715f. The E5 review's read of `.138/14` — actually the E5 review didn't mention .138/14 specifically; the first review's discriminating case for F-1 was the OA/OB/OC scenario ("objects OA (0x10, UWORD), OB (0x11, UBYTE, overlaps), OC (0x30, UWORD, same page, no overlap)"). That matches .138/14 exactly, with "same page" per the old >>8 page size. So .138/14 was the case the reviewer proposed; now it's strengthened with encode-refusal assertions and the OB↔OA mutual check. Wait — was .138/14 in the pre-review working tree? It's in the commit, so yes. The "strengthening" likely = adding the two `_enc` OVERLAP assertions (encode arms) on top of the shared_with assertions. Whatever the delta, what matters is whether the current .138/14 discriminates the old bug:
+
+  Under old buggy code with >>4 pages:
+  - Page of OA/OB = 0x10>>4 = 1; OC = 0x30>>4 = 3.
+  - Old code: for page in pages: for entry: dedup-collect; then outside entry loop, test last entry. For OA: page 1 entries [OA, OB]; last = OB; overlap OB vs OA → "OB" ✓ (passes even with bug).
+  - For OB: page 1 last = OB (own) → skip fires → returns None. Test expects "OA" → FAILS on old code. ✓ discriminating.
+  - Also with >>8: page 0 = [OA, OB, OC], last = OC → OA returns None → fails. ✓.
+
+  So .138/14 discriminates F-1 defect #2 (own-entry skip) and would also catch defect #1 (only-last-tested) in the >>8 layout. With >>4, defect #1 (non-last overlapping neighbour missed) — is it still discriminated? For OA under new code: candidates page 1: OA (own skip), OB overlap → "OB". Under old code same result. Defect #1's discriminating case was OA vs OB where OB overlaps but isn't last — with >>4, OB IS last on page 1. So under >>4, .138/14's OA arm doesn't discriminate defect #1. But .138/21's alone-arm and .138/19's Z1/Z2 cover the 0x0 same-page ordering... .138/19: Z1, Z2 both at 0x0, page 0 = [Z1, Z2]. z1 expects "Z2": old code last entry = Z2 → overlap → "Z2" ✓ passes old code. z2 expects "Z1": old code last = Z2 (own) skip → None ✗ fails old. OK.
+
+  Now .138/21 analysis (already done): hostile huge numbers. Key checks:
+  - B1: address = 0xF*5000 (a ~20k-bit number), prg_size=2. Is B1 in span_entries? BLOB entries are added to span_index via declared_spans. If B1's address parses as a huge int, first_page = huge>>4, last = (huge+1)>>4 → pages range of 2 pages, appended to pages that exist in dict. No explosion at index build. But wait — could `address + byte_length - 1` on enormous ints be fine? Yes, Python bigints.
+  - TB: TYPEDEF_BLOB size 10^5000 — is TB itself in the index? TYPEDEF_BLOB is a type definition, probably not an addressable object; INSTANCE I1 references TB at 0x10. I1's resolved byte_length comes from TB's size = huge. Then in describe_definitions index build, I1 entry: byte_length huge → last_page = (0x10 + huge - 1) >> 4 → iterating `range(first, last+1)` would be ~10^5000 iterations → hang! Unless... something bounds it. But the test passes (308 passed). So either I1's byte_length is refused/None (length unreadable → single page (address>>4,)), or the index build clamps. In _shared_with, `multi_page = len(pages) > 1` — len of a range is O(1), fine.
+
+  Wait — but actually, does the test exercise describe_definitions? `describe_definition("V1", clean)` — singular. Does the singular path build the full span_index? Presumably describe_definition calls describe_definitions([name]) or similar. If building the index requires iterating I1's huge page range, the test would hang. Since final run shows 308 passed in 11.06s, it doesn't hang. Why? Perhaps _describe_one for I1-related length fails (A2L-DEF-LENGTH refusal) because 10^5000 bytes is unrepresentable? Or because the length resolution caps. I should check how INSTANCE byte_length is resolved — but narrow review; the key hostile assertions: shared_with == "I1" (the declared-address-inside rule when length unreadable), the alone case isolates B1 (huge BLOB address must not poison the scan). Both pinned. The `_no_exception_encode` assertion ensures no crash. 
+
+  Let me quickly verify how the length is bounded — check _entry_overlaps and where byte_length for INSTANCE comes from. Actually, let me check whether there is a cap on byte_length in _describe_one. Quick grep for a length cap.
+
+  Also confirm the "single-page dedup avoided / multi-page uses entry position" properties:
+  - `multi_page = len(pages) > 1`; dedup `seen` only consulted when multi_page. Key = entry[0] = position. ✓ (multi-page uses entry position, not id(entry) — deterministic across the two describe passes? position is walk-monotonic, stable).
+  - Single-page: no dedup at all — avoids the overhead. ✓
+  - Own entry skipped exactly once: `own_entry` flag — after first full-tuple match, set False; a second identical tuple (duplicate name with identical attrs) would NOT be skipped and could be tested as a neighbour. That's correct semantics (duplicate-named identical entries are genuinely ambiguous), and matches E3? The E5-r1 said skip own entry once. ✓
+  - Every entry visited in file order: within each page, entries are appended in span_entries order = monotonic position. Pages iterate ascending. Hmm — "file order" across pages: is the first overlapping entry guaranteed to be the first in file order? NO in general: page-major iteration order = (page asc, position asc), whereas file order = position asc globally. Counterexample: definition D spans pages 1-2. Entry X at position 5 on page 2; entry Y at position 9 on page 1. File order: X first. Scan order: Y (page 1) before X (page 2). If both overlap and are non-exempt, scan returns Y, but "first in cross-kind file order" is X.
+
+  Hmm. Is this a real deviation? The committed cb083d07 version collected all candidates across pages, deduped, then `candidates.sort(key=lambda e: e[0])` — global file order. The new ce1aa0ec version removed the sort. So for multi-page spans, cross-page ordering is by page, not file position. Is that a regression against "first overlapping entry in cross-kind file order"?
+
+  Wait — but does the user's checklist say "Confirm that every entry is visited in file order"? Yes: "Confirm that every entry is visited in file order". Hmm, that phrasing suggests the new design's claim is that the iteration visits entries in file order. Within a page, yes. Across pages, no — unless... entries on shared pages: for a candidate to be visited, it must share a page with D. Order of visit: page 1 entries (file order among themselves), then page 2 entries (file order among themselves). Global file order is not guaranteed.
+
+  But hold on — maybe the design doc (graph-inc2.md, modified in working tree) redefined this. The 01-requirements.md and graph-inc2.md are modified (uncommitted). Let me check what they now say about _shared_with ordering. Also there may be a record note for the >>4 landing (F-2 correction option B: "land it deliberately with a record note"). Check the requirements/graph diff.
+
+  Also need to double-check: does any test pin cross-page file order (e.g. .138/13 multi-page)? If the requirement still says "first in cross-kind file order" and the implementation returns page-major order, is there a discriminating case? Possibly a residual finding. Let me check the graph-inc2.md diff and the requirement text for .138.
+
+• Numbers confirmed. Now check how the modified design docs record the new scan semantics (file order vs page order) and the `>>4` landing.diff --git a/.dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md b/.dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md
+index f923a87d..3822f64b 100644
+--- a/.dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md
++++ b/.dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md
+@@ -168,7 +168,7 @@ Every row has at least one concrete example; none is uncovered. Example ids are
+ | R-A2L-DEF.54, .55 | `encode_definition`, `_agrees_at_display_precision` | .54/1 … /4; .55/1 |
+ | R-A2L-DEF.56 | `encode_definition`, `decode_definition` | .56/1 |
+ | R-A2L-DEF.57 | `encode_definition` | .57/1 … /5 |
+-| R-A2L-DEF.138 | `describe_definitions`, `_shared_with`, `_selected_bits`, `encode_definition` | .138/1 … /20 |
++| R-A2L-DEF.138 | `describe_definitions`, `_shared_with`, `_selected_bits`, `encode_definition` | .138/1 … /21 |
+ | R-A2L-DEF.152 | `encode_definition` | .152/1 … /5 |
+ | R-A2L-DEF.58.1, .58.2 | `describe_definition`, `describe_definitions`, `_object_kind`, `decode_definition`, `encode_definition`, `_read_enum_table`, `_display_decimals`, `_check_bit_mask`, `_table_value` | .58.1/1, /2; .58.2/1 … /24 (/18, /19: E5 gap pass 2; /20 … /24: the E5 fix pass) |
+ | R-A2L-DEF.59 | `main`, `generate` | .59/1, /2 |
+@@ -290,7 +290,7 @@ describe_definitions
+ req: R-A2L-DEF.1, R-A2L-DEF.2, R-A2L-DEF.3, R-A2L-DEF.4, R-A2L-DEF.5, R-A2L-DEF.6, R-A2L-DEF.7.1, R-A2L-DEF.7.2, R-A2L-DEF.8, R-A2L-DEF.9, R-A2L-DEF.11, R-A2L-DEF.12, R-A2L-DEF.13, R-A2L-DEF.17, R-A2L-DEF.19, R-A2L-DEF.23, R-A2L-DEF.24, R-A2L-DEF.58.1, R-A2L-DEF.58.2, R-A2L-DEF.136, R-A2L-DEF.137, R-A2L-DEF.138, R-A2L-DEF.139, R-A2L-DEF.149, R-A2L-DEF.151, R-A2L-010, R-A2L-011, R-A2L-014, R-A2L-022, R-A2L-023, R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-030, R-A2L-031
+ in: Iterable[str] names; dict a2l_data
+ out: dict[str, Definition] definitions
+-func: new (I-2 entry; E3A-01 B, E3A-13; E5 gap pass; fixed-reader 2b re-review). Built over one iterative walk of `a2l_data["sections"]`, using an explicit stack in file order so deep nesting cannot raise `RecursionError` (E5 fix pass, E5S-04), which maps the MEASUREMENT / CHARACTERISTIC sections of each name (by `parse_begin_meta`), the first COMPU_METHOD and COMPU_VTAB / COMPU_VTAB_RANGE of each name, the Inc 3a lookups, and the cross-kind positions of R-A2L-DEF.138. A pass over `a2l_data["tags"]` maps the tags of each name. The span index holds every MEASUREMENT / CHARACTERISTIC with a declared address and every BLOB / INSTANCE of `a2l_data["declared_spans"]` with a declared address: readable lengths become `(first, last)` intervals; an unreadable length becomes a fail-closed point at the declared address. Entries are filed under each 256-byte page they touch and sorted by their section-walk position. BLOB/INSTANCE nodes are aligned in walk order with `declared_spans`, preserving cross-kind file order. AXIS_PTS is added by Inc 3b (R-A2L-DEF.140), before Inc 8/9. For each name in `names` (order kept, a repeated name maps once): `_find_tag(name, tags_by_name, object_sections_by_name)`; no tag → refused `A2L-DEF-NAME` `<name>: no tag of that name in the A2L`; a `Refusal` (more than one tag or section of the name) → refused `A2L-DEF-NAME` `<name>: the A2L declares that name more than once` (R-A2L-DEF.139); both with the other fields empty, `kind` `""`, `shared_with` `None`. Else it reads every field it can: the object record (`_read_object_lines(section)`); for a MEASUREMENT whose tag lacks them, the header words fill `datatype`, the conversion word, the limit words and, with a datatype, the length = size × MATRIX_DIM (1 when absent) (E2-1; R-A2L-014); `address` and `byte_length` from the tag; `datatype` = `_resolve_datatype(tag, a2l_data, reads)`; `byte_order` = the tag's `effective_byte_order` (R-A2L-024 … 027 as the tag table applies them); `method_name` = the tag's conversion word; the record `_read_method_record(method_name, compu_methods_by_name, reads)` unless `NO_COMPU_METHOD`; `conversion_type` = its type word; `coeffs_linear`, `coeffs`, `compu_tab_ref` = the record's words (E3A-03); `kind` = `_object_kind`; `display_format` = the object's FORMAT word, else the record's format (R-A2L-DEF.22, .23); `decimals` = `_display_decimals` of the object's FORMAT word, else the record's stored `decimals` (E5 gap pass 2, CM-5: no scan of a shared format per object); `unit` = the object's first PHYS_UNIT or UNIT word, else the record's unit, else `""`; `limits`, `extended_limits` (two number words, else `None`); the mask, recorded while the fields are read and refused only at the mask's place in the refusal order (E3A-28): a BIT_MASK word that does not read as a number, or longer than 20 decimal or 16 hex digits (no `int()` on it, E3S-03) (E3S-01); a kind `text` object with a BIT_MASK line; more than one live BIT_MASK keyword in the object record; or, for a masked definition, more than one live BYTE_ORDER keyword in the object, its record layout or its MOD_COMMON, which gives `<name>: its byte order cannot be read`; else for kind number or enum `bit_mask` = the word read as `0x` + hex digits or decimal digits (E2-12), `bit_mask_text` = the word. The obsolete text-of-object letters, open-comment/quote and `/begin` clauses are not run: Inc 11 made them unreachable; for kind enum `enum_table` = the record's COMPU_TAB_REF word and `_read_enum_table(enum_table, compu_tables_by_name, reads)` → `enum_entries` (the stored tuple itself, held by reference), `default_text`. (E5 gap pass 2: the record resolves its table at reduction, so the enum form is the record's `table_form` — `enum_entries` = its `entries`, `default_text` = its `default_text` — and no object looks the table up by name; `_table_form` = that form for an enum, the record's `_TabForm` for a number whose type verdict is TAB_INTP or TAB_NOINTP, else `None`; `_name_echo` = `_echo(name)`, computed once.) Then the first refusal of the refusal order: kind → `A2L-DEF-KIND` `<name>: the system has no definition for a <kind> object`; no address or no length → `A2L-DEF-ADDRESS` `<name>: the object has no address or no length`; length below 1 or above 1,048,576 bytes (`MAX_A2L_DECODE_BYTES`, E3S-02), or a negative address, or the address of its last byte (address + length − 1) is above 0xFFFFFFFF → `A2L-DEF-ADDRESS` `<name>: its span of <length> bytes at <address> cannot be read`; number/enum without a datatype → `A2L-DEF-DATATYPE` `<name>: the object declares no datatype the system can read`; number/enum length ≠ the datatype's size → `A2L-DEF-LENGTH` `<name>: its length <length> differs from the <size> bytes of <datatype>`; a method other than `NO_COMPU_METHOD` with no record → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a record whose type word is outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB (FORM, unknown, none) → `A2L-DEF-CONVERSION` `<name>: the conversion type <type> of <method> is not supported` (`<type>` `(none)` for no word; gap pass 2, CM-7: the test is the record's stored `type_verdict` and `<type>` its stored `type_echo`, so no `.upper()` or echo of the shared type word per object); the check runs only when the object names a method other than `NO_COMPU_METHOD` and the record exists (E3A-12); enum with no table word or no such COMPU_VTAB / COMPU_VTAB_RANGE → `A2L-DEF-TABLE` `<name>: the table <table> of <method> is not declared in the A2L` (`<table>` `(none)`); enum with no entries → `A2L-DEF-TABLE-EMPTY` `<name>: the table <table> has no entries` (gap pass 2, CM-9, VT-9, E3S3-26: `<table>` is the record's stored `table_echo` in both messages, and "no such table" is the record's `table_form` `None`, resolved at reduction); a recorded mask refusal, or `_check_bit_mask` false → `A2L-DEF-MASK`: `<name>: its byte order cannot be read` for the byte-order-source residual, else `<name>: the bit mask <mask> cannot be applied to <datatype>` (`<mask>` = the word after the first BIT_MASK of the object record, else `(none)`). Last, for every definition with an address, refused or not and whether its length is readable or not: `shared_with` = `_shared_with(definition, span_index, mask_of)` (R-A2L-DEF.138). `mask_of(other)` = `other.bit_mask` only when the other's definition has no refusal and a readable length, else `None`; definitions of neighbours are built on demand and cached by name, so CLEAN needs no whole-file second describe and a duplicate name gives no mask. Each entry keeps its cross-kind section position, name, kind, address, length and byte order. Each call starts the walk's `[Data: reads]` empty and passes it to every name's three readers (E5 gap pass; Inc 3a's E3 rounds 3–4, E3S3-13's COMPU part, E3S3-18): each COMPU_METHOD, COMPU_VTAB, COMPU_VTAB_RANGE and record-layout first line an object names is read once per walk and reduced to the immutable fixed-size form an object needs (the method record's 6 fields, and in gap pass 2 its 5 derived words: `decimals`, the type verdict, the .151 echoes of the type and COMPU_TAB_REF words, the resolved table form; the enum table as its form — entries, cleaned texts, private index — by reference; the layout's resolved datatype), so the time a name takes does not grow with the size of the sections it shares (R-A2L-DEF.149); the map is dropped when the call returns, and a definition keeps nothing of it but the table form it shares (`enum_entries`, `_table_form`, P-2) and references to the shared words it shows (`conversion_type`, `display_format`, `enum_table`). Reads `a2l_data` and never writes it (the tag is copied before the MEASUREMENT fill). Every message echoes a file or operator word with U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F (R-A2L-DEF.137). E5 gap pass 2 (R-A2L-DEF.151; the round-6 addendum, E3S3-25, -26): every file word a refusal message echoes is written as `_echo(word)` — its first 256 characters, each outside U+0021 … U+007E as U+FFFD, then `…` when the word is longer (a private helper beside `_clean`, reading at most 257 characters of the word) — `<name>` (`_echo(name)`, once per describe, carried as `_name_echo`), `<kind>` (as `_object_kind` writes it: the CHARACTERISTIC kind word echoed; `MATRIX_DIM <n> MEASUREMENT` and `(none)` the system's own text, written as they are, `<n>` by the number writer; no test on the text's prefix, E5 fix pass, CR-5), `<method>` (the object's conversion word, once per describe), `<mask>` (the BIT_MASK word; and the ASCII kind in a text object's mask message), and `<type>` / `<table>` (the record's stored echoes). E5 fix pass (CR-2 + E5S-01, E5S-03, CR-3; R-A2L-DEF.151's number rule): every number a message writes — `<length>` and `<address>` (.7.2), `<length>` (.9), the `<n>` of `MATRIX_DIM <n> MEASUREMENT` (.4), and decode's `<n>` and `<length>` (.26) — goes through the number writer `_number_text(n, address=False)`, a private helper beside `_fmt_address`: when `n.bit_length()` is at most 64 (magnitude at most 2^64 − 1) → `str(n)`, or `_fmt_address(n)` for an address; else `_echo(_fmt_address(n))` — `0x` (`-0x`) and the upper-case hexadecimal digits, which have no digit limit, cut at 256 characters with `…` — so no decimal text of a huge int is ever taken (the frozen parser keeps the number, not its word). Every message is then at most 1,024 characters whatever the file holds: it holds at most three file words or numbers, each at most 257 characters, and less than 100 characters of its own text (the longest, `: the system has no definition for a MATRIX_DIM ` … ` MEASUREMENT object`, is 67), so 3 × 257 + 100 < 1,024; names and words as the operator reads them below 256 characters. Traces to R-A2L-DEF.1 … .25 and the cited rows (same behaviour, many names).
++func: new (I-2 entry; E3A-01 B, E3A-13; E5 gap pass; fixed-reader 2b re-review). Built over one iterative walk of `a2l_data["sections"]`, using an explicit stack in file order so deep nesting cannot raise `RecursionError` (E5 fix pass, E5S-04), which maps the MEASUREMENT / CHARACTERISTIC sections of each name (by `parse_begin_meta`), the first COMPU_METHOD and COMPU_VTAB / COMPU_VTAB_RANGE of each name, the Inc 3a lookups, and the cross-kind positions of R-A2L-DEF.138. A pass over `a2l_data["tags"]` maps the tags of each name. The span index holds every MEASUREMENT / CHARACTERISTIC with a declared address and every BLOB / INSTANCE of `a2l_data["declared_spans"]` with a declared address: readable lengths become `(first, last)` intervals; an unreadable length becomes a fail-closed point at the declared address. Entries are filed under each 16-byte page they touch and sorted by their section-walk position (the page size is an internal bound only; R-A2L-DEF.136 is measured with it). BLOB/INSTANCE nodes are aligned in walk order with `declared_spans`, preserving cross-kind file order. AXIS_PTS is added by Inc 3b (R-A2L-DEF.140), before Inc 8/9. For each name in `names` (order kept, a repeated name maps once): `_find_tag(name, tags_by_name, object_sections_by_name)`; no tag → refused `A2L-DEF-NAME` `<name>: no tag of that name in the A2L`; a `Refusal` (more than one tag or section of the name) → refused `A2L-DEF-NAME` `<name>: the A2L declares that name more than once` (R-A2L-DEF.139); both with the other fields empty, `kind` `""`, `shared_with` `None`. Else it reads every field it can: the object record (`_read_object_lines(section)`); for a MEASUREMENT whose tag lacks them, the header words fill `datatype`, the conversion word, the limit words and, with a datatype, the length = size × MATRIX_DIM (1 when absent) (E2-1; R-A2L-014); `address` and `byte_length` from the tag; `datatype` = `_resolve_datatype(tag, a2l_data, reads)`; `byte_order` = the tag's `effective_byte_order` (R-A2L-024 … 027 as the tag table applies them); `method_name` = the tag's conversion word; the record `_read_method_record(method_name, compu_methods_by_name, reads)` unless `NO_COMPU_METHOD`; `conversion_type` = its type word; `coeffs_linear`, `coeffs`, `compu_tab_ref` = the record's words (E3A-03); `kind` = `_object_kind`; `display_format` = the object's FORMAT word, else the record's format (R-A2L-DEF.22, .23); `decimals` = `_display_decimals` of the object's FORMAT word, else the record's stored `decimals` (E5 gap pass 2, CM-5: no scan of a shared format per object); `unit` = the object's first PHYS_UNIT or UNIT word, else the record's unit, else `""`; `limits`, `extended_limits` (two number words, else `None`); the mask, recorded while the fields are read and refused only at the mask's place in the refusal order (E3A-28): a BIT_MASK word that does not read as a number, or longer than 20 decimal or 16 hex digits (no `int()` on it, E3S-03) (E3S-01); a kind `text` object with a BIT_MASK line; more than one live BIT_MASK keyword in the object record; or, for a masked definition, more than one live BYTE_ORDER keyword in the object, its record layout or its MOD_COMMON, which gives `<name>: its byte order cannot be read`; else for kind number or enum `bit_mask` = the word read as `0x` + hex digits or decimal digits (E2-12), `bit_mask_text` = the word. The obsolete text-of-object letters, open-comment/quote and `/begin` clauses are not run: Inc 11 made them unreachable; for kind enum `enum_table` = the record's COMPU_TAB_REF word and `_read_enum_table(enum_table, compu_tables_by_name, reads)` → `enum_entries` (the stored tuple itself, held by reference), `default_text`. (E5 gap pass 2: the record resolves its table at reduction, so the enum form is the record's `table_form` — `enum_entries` = its `entries`, `default_text` = its `default_text` — and no object looks the table up by name; `_table_form` = that form for an enum, the record's `_TabForm` for a number whose type verdict is TAB_INTP or TAB_NOINTP, else `None`; `_name_echo` = `_echo(name)`, computed once.) Then the first refusal of the refusal order: kind → `A2L-DEF-KIND` `<name>: the system has no definition for a <kind> object`; no address or no length → `A2L-DEF-ADDRESS` `<name>: the object has no address or no length`; length below 1 or above 1,048,576 bytes (`MAX_A2L_DECODE_BYTES`, E3S-02), or a negative address, or the address of its last byte (address + length − 1) is above 0xFFFFFFFF → `A2L-DEF-ADDRESS` `<name>: its span of <length> bytes at <address> cannot be read`; number/enum without a datatype → `A2L-DEF-DATATYPE` `<name>: the object declares no datatype the system can read`; number/enum length ≠ the datatype's size → `A2L-DEF-LENGTH` `<name>: its length <length> differs from the <size> bytes of <datatype>`; a method other than `NO_COMPU_METHOD` with no record → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a record whose type word is outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB (FORM, unknown, none) → `A2L-DEF-CONVERSION` `<name>: the conversion type <type> of <method> is not supported` (`<type>` `(none)` for no word; gap pass 2, CM-7: the test is the record's stored `type_verdict` and `<type>` its stored `type_echo`, so no `.upper()` or echo of the shared type word per object); the check runs only when the object names a method other than `NO_COMPU_METHOD` and the record exists (E3A-12); enum with no table word or no such COMPU_VTAB / COMPU_VTAB_RANGE → `A2L-DEF-TABLE` `<name>: the table <table> of <method> is not declared in the A2L` (`<table>` `(none)`); enum with no entries → `A2L-DEF-TABLE-EMPTY` `<name>: the table <table> has no entries` (gap pass 2, CM-9, VT-9, E3S3-26: `<table>` is the record's stored `table_echo` in both messages, and "no such table" is the record's `table_form` `None`, resolved at reduction); a recorded mask refusal, or `_check_bit_mask` false → `A2L-DEF-MASK`: `<name>: its byte order cannot be read` for the byte-order-source residual, else `<name>: the bit mask <mask> cannot be applied to <datatype>` (`<mask>` = the word after the first BIT_MASK of the object record, else `(none)`). Last, for every definition with an address, refused or not and whether its length is readable or not: `shared_with` = `_shared_with(definition, span_index, mask_of)` (R-A2L-DEF.138). `mask_of(other)` = `other.bit_mask` only when the other's definition has no refusal and a readable length, else `None`; definitions of neighbours are built on demand and cached by name, so CLEAN needs no whole-file second describe and a duplicate name gives no mask. Each entry keeps its cross-kind section position, name, kind, address, length and byte order. Each call starts the walk's `[Data: reads]` empty and passes it to every name's three readers (E5 gap pass; Inc 3a's E3 rounds 3–4, E3S3-13's COMPU part, E3S3-18): each COMPU_METHOD, COMPU_VTAB, COMPU_VTAB_RANGE and record-layout first line an object names is read once per walk and reduced to the immutable fixed-size form an object needs (the method record's 6 fields, and in gap pass 2 its 5 derived words: `decimals`, the type verdict, the .151 echoes of the type and COMPU_TAB_REF words, the resolved table form; the enum table as its form — entries, cleaned texts, private index — by reference; the layout's resolved datatype), so the time a name takes does not grow with the size of the sections it shares (R-A2L-DEF.149); the map is dropped when the call returns, and a definition keeps nothing of it but the table form it shares (`enum_entries`, `_table_form`, P-2) and references to the shared words it shows (`conversion_type`, `display_format`, `enum_table`). Reads `a2l_data` and never writes it (the tag is copied before the MEASUREMENT fill). Every message echoes a file or operator word with U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F (R-A2L-DEF.137). E5 gap pass 2 (R-A2L-DEF.151; the round-6 addendum, E3S3-25, -26): every file word a refusal message echoes is written as `_echo(word)` — its first 256 characters, each outside U+0021 … U+007E as U+FFFD, then `…` when the word is longer (a private helper beside `_clean`, reading at most 257 characters of the word) — `<name>` (`_echo(name)`, once per describe, carried as `_name_echo`), `<kind>` (as `_object_kind` writes it: the CHARACTERISTIC kind word echoed; `MATRIX_DIM <n> MEASUREMENT` and `(none)` the system's own text, written as they are, `<n>` by the number writer; no test on the text's prefix, E5 fix pass, CR-5), `<method>` (the object's conversion word, once per describe), `<mask>` (the BIT_MASK word; and the ASCII kind in a text object's mask message), and `<type>` / `<table>` (the record's stored echoes). E5 fix pass (CR-2 + E5S-01, E5S-03, CR-3; R-A2L-DEF.151's number rule): every number a message writes — `<length>` and `<address>` (.7.2), `<length>` (.9), the `<n>` of `MATRIX_DIM <n> MEASUREMENT` (.4), and decode's `<n>` and `<length>` (.26) — goes through the number writer `_number_text(n, address=False)`, a private helper beside `_fmt_address`: when `n.bit_length()` is at most 64 (magnitude at most 2^64 − 1) → `str(n)`, or `_fmt_address(n)` for an address; else `_echo(_fmt_address(n))` — `0x` (`-0x`) and the upper-case hexadecimal digits, which have no digit limit, cut at 256 characters with `…` — so no decimal text of a huge int is ever taken (the frozen parser keeps the number, not its word). Every message is then at most 1,024 characters whatever the file holds: it holds at most three file words or numbers, each at most 257 characters, and less than 100 characters of its own text (the longest, `: the system has no definition for a MATRIX_DIM ` … ` MEASUREMENT object`, is 67), so 3 × 257 + 100 < 1,024; names and words as the operator reads them below 256 characters. Traces to R-A2L-DEF.1 … .25 and the cited rows (same behaviour, many names).
+ module: s19_app/tui/a2l_definition.py
+ examples: (R-A2L-DEF.136/1) `describe_definitions(every tag name, a2l_data)` equals `{n: describe_definition(n, a2l_data)}` on V171 (`118` names) and C08 clean (`322`); software_a (13,990 names) in one walk ≤ 2.0 s on <runner> (measured 0.52 s, B2 P1b/P1c)
+ examples: (R-A2L-DEF.136/1 neg) mutant: one walk per name (per-name `_collect_sections_by_name`) → software_a > 2.0 s → RED
+@@ -447,13 +447,13 @@ _shared_with
+ req: R-A2L-DEF.138
+ in: Definition definition; dict span_index; Callable mask_of
+ out: str | None other
+-func: new (E3 round-4 ruling; fixed-reader re-review). The guard on the consequence: the name of the first other entry, in cross-kind file order, whose readable span overlaps the object's span, or whose declared address lies inside it when that other entry has no readable length. An object with no declared address is never a candidate and 0x0 is an address like any other. Each entry carries `(position, name, kind, address, byte_length, byte_order)`; positions come from one pre-order section walk, with the BLOB/INSTANCE nodes aligned in that same order with `a2l_data["declared_spans"]`, so tags and declared spans are never concatenated as two artificial file-order groups. The candidates are the entries of the 256-byte pages the object's span touches, plus the point entries on those pages. Scan in file order up to the first overlapping entry not left out. Leave out a pair only when both definitions carry no refusal and a readable length, `mask_of(definition)` and `mask_of(other)` are both not `None`, and `_selected_bits` shares no bit. `mask_of` is computed on demand and cached by name: the definition's `bit_mask` when its definition has no refusal, else `None`; a duplicate name therefore gives no mask. BLOB and INSTANCE have no mask exemption. The object's own position is not a candidate. Reads only.
++func: new (E3 round-4 ruling; fixed-reader re-review). The guard on the consequence: the name of the first other entry, in cross-kind file order, whose readable span overlaps the object's span, or whose declared address lies inside it when that other entry has no readable length. An object with no declared address is never a candidate and 0x0 is an address like any other. Each entry carries `(position, name, kind, address, byte_length, byte_order)`; positions come from one pre-order section walk, with the BLOB/INSTANCE nodes aligned in that same order with `a2l_data["declared_spans"]`, so tags and declared spans are never concatenated as two artificial file-order groups. The candidates are the entries of the 16-byte pages the object's span touches, plus the point entries on those pages. Deduplication runs only for multi-page spans; single-page lookup does not call `id()` or `set.add` (the measured R-A2L-DEF.136 optimization). Scan in file order up to the first overlapping entry not left out. Leave out a pair only when both definitions carry no refusal and a readable length, `mask_of(definition)` and `mask_of(other)` are both not `None`, and `_selected_bits` shares no bit. `mask_of` is computed on demand and cached by name: the definition's `bit_mask` when its definition has no refusal, else `None`; a duplicate name therefore gives no mask. BLOB and INSTANCE have no mask exemption. The object's own position is not a candidate. Reads only.
+ module: s19_app/tui/a2l_definition.py
+ examples: (R-A2L-DEF.138/1) INLINE `MN` (position 0, UWORD at 0x10, clean mask `0x000F`) and a directly built `MC` (position 1, UWORD at 0x10, no mask) → for `MC`: `MN`; for `MN`: `MC`
+ examples: (R-A2L-DEF.138/2, /3, /4) BLOB `B1` at 0x10 length 2, INSTANCE `I1` of T_U16 at 0x10, and unsized INSTANCE `IU` at 0x10 each overlap a UBYTE at 0x10; their names are returned, with no mask exemption
+ examples: (R-A2L-DEF.138/5 … /8) V171 UBYTE and SBYTE at 0x810000/1 → `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`; ULONG at 0x810008 → `ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5`; REF_1 at 0x811000 → `ASAM_S_EXAMPLE`
+ examples: (R-A2L-DEF.138/10, /11) a LENGTH-refused or duplicate-named masked neighbour gives `mask_of` `None`, so its mask cannot exempt the pair
+-examples: (R-A2L-DEF.138/14) INLINE `OA` (0x10 … 0x11) and `OB` (0x11), no masks → `OB` for `OA`, `OA` for `OB`
++examples: (R-A2L-DEF.138/14) INLINE `OA` (0x10 … 0x11), `OB` (0x11) and non-overlapping `OC` (0x30 … 0x31), no masks → `OB` for `OA`, `OA` for `OB`, `None` for `OC` (the overlapping entry is not last)
+ examples: (R-A2L-DEF.138/15) INLINE `MA` (`0x0FF0`) and `MB` (`0x0010`), both UWORD at 0x10 → `MB` for `MA` (bit 4 in both)
+ examples: (R-A2L-DEF.138/16) DEFC `MASK_BIT_0001` (`0x0001`) and `MASK_FIELD_0001` (`0x0FF0`) at 0x800010 → `None` for both
+ examples: (R-A2L-DEF.138/17) INLINE (big) `MW` UWORD at 0x10 `0x000F` and `MU` UBYTE at 0x10 `0x0F` → `None` (`MW`'s bits lie in the byte at 0x11)
+@@ -635,8 +635,9 @@ examples: (R-A2L-DEF.57/4 neg) mutant: the shared bytes checked first → `A2L-D
+ examples: (R-A2L-DEF.138/1) a directly built `MC` beside clean masked `MN`, `35` → steps 1 … 8 pass, step 9 → `A2L-DEF-OVERLAP` `MC: its bytes at 0x10 are shared with MN`; 0 bytes
+ examples: (R-A2L-DEF.138/2 … /13) BLOB, sized and unsized INSTANCE, V171's four overlaps, a hostile unknown-length tag and refused neighbours all produce `shared_with`; with no earlier refusal or parse error, step 9 gives `A2L-DEF-OVERLAP` and 0 bytes. `.138/13` also checks the original payload gives `A2L-DEF-PARSE` and isolates the overlap oracle with a copy whose error list is cleared
+ examples: (R-A2L-DEF.138/20) ASCII `TA` beside UBYTE `TU`, `AB` → the text bytes pass the length/character and image checks, then step 9 refuses `TA: its bytes at 0x10 are shared with TU`; mutant: return after `_encode_ascii` → RED
++examples: (R-A2L-DEF.138/21) a BLOB address of `0x` + 5,000 `F` is not indexed, so a UBYTE at 0x10 encodes; a TYPEDEF_BLOB size of 5,000 decimal digits leaves INSTANCE `I1` at 0x10 with address but no readable length, so a UBYTE at 0x10 refuses `A2L-DEF-OVERLAP` naming `I1`; 0 exceptions
+ examples: (R-A2L-DEF.138/1 neg) mutant: step 9 removed → L2C `Encoded(0x10, 00 23, ())` → RED
+-examples: (R-A2L-DEF.138/14) INLINE `OA` (UWORD 0x10) and `OB` (UBYTE 0x11), `7` → `OA: its bytes at 0x10 are shared with OB`; `OB: its bytes at 0x11 are shared with OA`
++examples: (R-A2L-DEF.138/14) INLINE `OA` (UWORD 0x10), `OB` (UBYTE 0x11) and `OC` (UWORD 0x30), `7` → `OA: its bytes at 0x10 are shared with OB`; `OB: its bytes at 0x11 are shared with OA`; `OC.shared_with` is `None` (a non-last overlap is found, not just the page's last entry)
+ examples: (R-A2L-DEF.138/15) INLINE `MA` (`0x0FF0`) beside `MB` (`0x0010`), `35` → `MA: its bytes at 0x10 are shared with MB`
+ examples: (R-A2L-DEF.138/16) DEFC over the generated image (word `0x1AE7`): `MASK_BIT_0001` `0` → `Encoded(0x800010, 1A E6, ())`; `MASK_FIELD_0001` `3` → `Encoded(0x800010, 10 37, ())`
+ examples: (R-A2L-DEF.138/17) INLINE (big) `MW` (`0x000F`) beside `MU` (UBYTE at 0x10, `0x0F`), image 00 00, `1` → `Encoded(0x10, 00 01, ())`
+
+
+• The design doc (graph-inc2.md, uncommitted modifications) now records:
+  - `>>4` 16-byte pages landed deliberately: "Entries are filed under each 16-byte page they touch and sorted by their section-walk position (the page size is an internal bound only; R-A2L-DEF.136 is measured with it)." — F-2 correction option B (landed deliberately with record note + re-measure). ✓
+  - `_shared_with` doc: "Deduplication runs only for multi-page spans; single-page lookup does not call `id()` or `set.add` (the measured R-A2L-DEF.136 optimization). Scan in file order up to the first overlapping entry."
+
+  Now, the ordering question. The doc claims "Scan in file order". The implementation iterates pages ascending, entries within a page in insertion order (walk position). Within a page that's file order; across pages it's page-major, which is not global file order. But the doc says entries are "sorted by their section-walk position" — hmm, "Entries are filed under each 16-byte page they touch and sorted by their section-walk position". Are per-page lists sorted by position? They're appended in span_entries order, which IS walk order, so yes, per-page lists are position-sorted. Across pages: not globally sorted.
+
+  Is cross-page file order a real requirement? "first other entry, in cross-kind file order". With page-major scan, a counterexample needs: definition D spanning pages P1<P2; candidate A on P2 with position lower than candidate B on P1, both overlapping D, both non-exempt. Scan returns B; file order says A. 
+
+  But wait — is that scenario actually possible given how entries are filed? Candidate B overlaps D and shares page P1 (the lower page of D's span). Candidate A overlaps D and is filed on P2 (a higher page of D's span) — but A could also be filed on P1 if A's span touches P1. Not necessarily.
+
+  Example: D: address 0x20, length 0x30 → pages 2..4 (0x20>>4=2, 0x4F>>4=4). A: address 0x40, length 1 → page 4, position 1 (file-first). B: address 0x20, length 1 → page 2, position 5. File order: A first. Scan: page 2 has [B...], B overlaps → returns B. But file order says A. So yes, implementation deviates from "first in cross-kind file order" for multi-page definitions.
+
+  Hmm, but does any requirement/test pin cross-page order? Let me check .138/13 which is the multi-page case. Also check what 01-requirements.md says about .138 now. And does the requirement text define "first overlapping entry in cross-kind file order" globally?
+
+  Also — is there a mitigating factor: does _entry_overlaps only count... no.
+
+  Actually, wait. Let me reconsider: is per-page iteration really not file order? The requirement's intent (from E3 close) is "first overlapping entry in cross-kind file order" — i.e., deterministic, matching file order. The cb083d07 committed implementation guaranteed it via the global sort. The new one doesn't for multi-page spans. However — maybe the modified 01-requirements.md re-stated the rule to match. The requirements file is modified in the working tree. Let me check the .138 requirement text diff.
+
+  Also, importantly: is there a test that discriminates? If no test pins cross-page order, this is at most a LOW/spec-vs-impl note, not a blocker — unless the requirement text still says file order. Let me look.
+
+  Also check .138/13 (multi-page) test to see what's pinned.
+
+• The design doc now records the 16-byte page landing. Let me check what `01-requirements.md` says about `.138` ordering now, and what `.138/13` (the multi-page case) pins.diff --git a/.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md b/.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md
+index af93be91..af56ba91 100644
+--- a/.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md
++++ b/.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md
+@@ -207,7 +207,7 @@ The decode's raw read and conversion follow the cited rows R-A2L-040, 043, 044,
+ | R-A2L-DEF.51 | If | If the operator text of a text definition has more characters than its byte length, then the system shall give the refusal `A2L-DEF-TEXT-LENGTH` with the message `<name>: the text has <k> characters — at most <length> fit`. | 1/1: 43 characters on the 42-byte object → `…: the text has 43 characters — at most 42 fit` | the text cut to 42 → RED | US-103-05 | new | **No** (R) |
+ | R-A2L-DEF.52 | If | If the operator text of a text definition holds a character that is not printable ASCII, then the system shall give the refusal `A2L-DEF-TEXT-CHAR` with the message `<name>: '<character>' is not a printable ASCII character`, naming the first such character. | 3/3: `café` → `'é'`; a tab; U+FFFD | the text encoded as UTF-8 → /1 RED | US-103-05 | new | **No** (R) |
+ | R-A2L-DEF.53 | When | When the system encodes a value, the system shall give as bytes to write the object's whole span, from its address, in its byte order. | 4/4: a UWORD big-endian and a UWORD little-endian (`0x1234` order); the 42-byte text span; a masked UWORD (2 bytes, not the field) | the bytes in the host's order → /1 RED | US-103-05 | new | **Partly** (R: the encode returns the datatype's bytes in the tag's byte order, `a2l.py:2549-2556`; no address, no ASCII, no mask) |
+-| R-A2L-DEF.138 | If | If the bytes an encode would write overlap the span, or the declared address when the byte length cannot be read, of another MEASUREMENT, CHARACTERISTIC, BLOB or INSTANCE of the A2L file whose address the A2L declares, 0x0 included, then the system shall refuse the encode with the refusal `A2L-DEF-OVERLAP` and the message `<name>: its bytes at <address> are shared with <other>`, unless both objects' bit masks were read — their definitions carry no refusal — and select no common bit. | 20/20: /1 a synthetic lost-mask negative control — a definition state built directly, with no bit mask, beside a masked neighbour (`dataclasses.replace`; no longer claimed reader-produced) → `A2L-DEF-OVERLAP`; /2 a BLOB overlapping a VALUE; /3 a sized INSTANCE overlapping a VALUE; /4 an unsized INSTANCE whose declared address is covered; /5 and /6 V171 UBYTE and SBYTE against the single VALUE INSTANCE `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`; /7 V171 ULONG against the array INSTANCE; /8 V171 `REF_1` against `ASAM_S_EXAMPLE`; /9 a hostile unknown-length tag whose declared address is covered; /10 a length-refused neighbour (CLEAN: `mask_of` is `None` when the neighbour's definition has a refusal) → still refused; /11 a duplicate-named neighbour (its NAME refusal gives no mask) → still refused; /12 a byte-order-refused neighbour still names the overlap; /13 two same-valued BIT_MASK lines on the neighbour still name the overlap; /14 an unmasked UWORD at 0x10 and an unmasked UBYTE at 0x11 → each refused; /15 two masks read on one word that select a common bit (0x0FF0, 0x0010) → refused; /16 DEFC's two disjoint masks of one word → both encode; /17 a big-endian UWORD `BIT_MASK 0x000F` and a UBYTE `BIT_MASK 0x0F` at one address (the UWORD's bits lie in its second byte) → encodes; /18 a UWORD MEASUREMENT with no ECU_ADDRESS beside a UWORD VALUE at 0x0 → the VALUE encodes; /19 two unmasked UWORD VALUEs at 0x0 → each refused, naming the other; /20 an ASCII text object beside a UBYTE → each refused (text kind runs the overlap step before `Encoded`) | the guard removed → /1 encodes the neighbour's bytes → RED; the masks compared as integers, not as the bits they select → /17 refused → RED; a missing address read as 0x0 → /18 refused → RED; 0x0 read as no address → /19 encodes → RED; a BLOB or INSTANCE left out of the index → /2, /3 encode → RED; a length-unreadable object dropped instead of a fail-closed point → /4, /9 encode → RED | US-103-05 | new (E3 round-4 ruling; E3S-30, E3S-35; Inc 2b re-review: BLOB and INSTANCE in the index, CLEAN `mask_of`, the declared-address fail-closed point) | **No** (R: no write path looks at another object's span; P4 `[R4-L2C]`: a lost mask writes the whole word `00 23`) |
++| R-A2L-DEF.138 | If | If the bytes an encode would write overlap the span, or the declared address when the byte length cannot be read, of another MEASUREMENT, CHARACTERISTIC, BLOB or INSTANCE of the A2L file whose address the A2L declares, 0x0 included, then the system shall refuse the encode with the refusal `A2L-DEF-OVERLAP` and the message `<name>: its bytes at <address> are shared with <other>`, unless both objects' bit masks were read — their definitions carry no refusal — and select no common bit. | 21/21: /1 a synthetic lost-mask negative control — a definition state built directly, with no bit mask, beside a masked neighbour (`dataclasses.replace`; no longer claimed reader-produced) → `A2L-DEF-OVERLAP`; /2 a BLOB overlapping a VALUE; /3 a sized INSTANCE overlapping a VALUE; /4 an unsized INSTANCE whose declared address is covered; /5 and /6 V171 UBYTE and SBYTE against the single VALUE INSTANCE `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`; /7 V171 ULONG against the array INSTANCE; /8 V171 `REF_1` against `ASAM_S_EXAMPLE`; /9 a hostile unknown-length tag whose declared address is covered; /10 a length-refused neighbour (CLEAN: `mask_of` is `None` when the neighbour's definition has a refusal) → still refused; /11 a duplicate-named neighbour (its NAME refusal gives no mask) → still refused; /12 a byte-order-refused neighbour still names the overlap; /13 two same-valued BIT_MASK lines on the neighbour still name the overlap; /14 an unmasked UWORD at 0x10 and an unmasked UBYTE at 0x11 → each refused; /15 two masks read on one word that select a common bit (0x0FF0, 0x0010) → refused; /16 DEFC's two disjoint masks of one word → both encode; /17 a big-endian UWORD `BIT_MASK 0x000F` and a UBYTE `BIT_MASK 0x0F` at one address (the UWORD's bits lie in its second byte) → encodes; /18 a UWORD MEASUREMENT with no ECU_ADDRESS beside a UWORD VALUE at 0x0 → the VALUE encodes; /19 two unmasked UWORD VALUEs at 0x0 → each refused, naming the other; /20 an ASCII text object beside a UBYTE → each refused (text kind runs the overlap step before `Encoded`); /21 a BLOB address of `0x` + 5,000 `F` is not indexed, and a TYPEDEF_BLOB size of 5,000 decimal digits leaves INSTANCE `I1` at 0x10 with address but no readable length → `A2L-DEF-OVERLAP` naming `I1`, 0 exceptions | the guard removed → /1 encodes the neighbour's bytes → RED; the masks compared as integers, not as the bits they select → /17 refused → RED; a missing address read as 0x0 → /18 refused → RED; 0x0 read as no address → /19 encodes → RED; a BLOB or INSTANCE left out of the index → /2, /3 encode → RED; a length-unreadable object dropped instead of a fail-closed point → /4, /9 encode → RED | US-103-05 | new (E3 round-4 ruling; E3S-30, E3S-35; Inc 2b re-review: BLOB and INSTANCE in the index, CLEAN `mask_of`, the declared-address fail-closed point) | **No** (R: no write path looks at another object's span; P4 `[R4-L2C]`: a lost mask writes the whole word `00 23`) |
+ | R-A2L-DEF.54 | If | If the decoded value of the bytes for an accepted number does not agree with it at the display precision, or an integer datatype whose conversion is none or IDENTICAL decodes to an integer that differs from the exact value of the text, then the system shall give the refusal `A2L-DEF-PRECISION` with the message `<name>: <text> cannot be stored at the display precision — the nearest stored value is <stored>`. | 4/4 (+ .54/3 FLOAT64 `1.0000001`, E3S-07; .54/4 A_UINT64 `9007199254740993`, E3S-09; see 02-test-cases): case 08 `CM_TAB_INTP` with display format `%.3`, `5.07` → stored 51, `…: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100`; the same with `%.1`, `5.07` → accepted (bytes of 51); A_UINT64 IDENTICAL `9007199254740993` → refusal | the guard left out (the flagged write of the existing encode) → /1 gives bytes → RED | US-103-05 | new (D-3 A) | **No** (R: the encode flags `the value <x> is not a table value - the write proceeds as <y>`, `a2l.py:2097-2103`) |
+ | R-A2L-DEF.55 | U | The system shall give every number it accepts for a number definition bytes whose decoded value agrees with it at the display precision. | property: ≥ 300 accepted values over every conversion of R-A2L-DEF.41 × UBYTE, SWORD, ULONG, FLOAT32_IEEE, FLOAT64_IEEE (each conversion with the datatypes it allows) × both byte orders × the formats `%.0`, `%8.4`, `%.15` and none, the integer datatypes also under a multi-bit and a one-bit mask (0x0FF0 and 0x0001; UBYTE 0x0F and 0x01); values = the 17-significant-digit texts of decoded stored values plus typed decimals; 0 values that do not agree; 0 refused for precision among those taken from decoded stored values; 0 refused among typed decimals on the stored grid (the exact decimal text, with at most d decimals, of a decoded stored value) | the encode packs in the opposite byte order → RED; the mask shift off by one → RED; LINEAR inverted as (x + b) / a → RED; the 15-significant-digit clause left out → `4.1` on LINEAR 0.1 UWORD `%.15` refused → RED | US-103-05 | new | **No** (B line 33: FLOAT32 `0.1` stores 0.10000000149011612, which agrees at FLOAT32's 6 digits; R: no model) |
+ | R-A2L-DEF.56 | U | The system shall give every text it accepts for a text definition, and every entry text of an enum definition whose raw value no earlier entry holds (a pair with that raw, or a range that contains it), bytes that decode to the same text. | property: every entry text of V171 `CM.TAB_VERB.DEFAULT_VALUE.REF` (3), `CM.TAB_VERB.NO_DEFAULT_VALUE.REF` (6), `CM.VTAB_RANGE.DEFAULT_VALUE.REF` (11) whose raw value no earlier entry holds; the 10 planned strings of case 08's ASCII objects; `` and a 42-character text on the 42-byte object: 0 texts that come back different | the stored value taken from the entry after the matched one → RED; a text object's text written without its 0x00 padding over a non-zero image → RED | US-103-05 | new | **No** (R) |
+
+
+• The requirement R-A2L-DEF.138 itself does not say "first in file order" — it says refuse naming `<other>` when overlap exists. The "cross-kind file order" phrase lives in the graph doc's `_shared_with` func text ("the first other entry, in cross-kind file order"), which is carried over unchanged in the modified doc, and it now claims "Scan in file order". The implementation scans page-major: pages ascending, entries within a page in walk-position order. Within a page = file order; across pages ≠ file order for multi-page definitions.
+
+  Is this a genuine deviation? The user explicitly asks to "Confirm that every entry is visited in file order". Let me think about whether page-major order can actually differ from file order in a way that changes the returned name.
+
+  The scan returns the FIRST overlapping non-exempt entry in iteration order. Iteration order = sorted by (page-of-first-contact, position). File order = position. These differ when two candidates first contact D's span on different pages and the lower-page candidate has the higher position.
+
+  Concretely: D at 0x20 len 0x30 (pages 2..4). A: position 0, at 0x40 (page 4). B: position 1, at 0x20 (page 2). Both overlap D, no masks. File order → A. Implementation → B.
+
+  But hold on — can the requirement even observe this? The message names `<other>`; tests pin specific names. If a real A2L arranges objects like that, the message would name B instead of A — deterministic but not "first in file order". The requirement table itself (R-A2L-DEF.138) doesn't pin file order — it just says "another MEASUREMENT...". The "first in cross-kind file order" is the graph doc's design language, which is uncommitted-modified and retains the phrase while adding "Scan in file order".
+
+  Hmm wait — actually, let me re-read the new func text: "The candidates are the entries of the 16-byte pages the object's span touches, plus the point entries on those pages. Deduplication runs only for multi-page spans; single-page lookup does not call id() or set.add (the measured R-A2L-DEF.136 optimization). Scan in file order up to the first overlapping entry not left out."
+
+  "Scan in file order" — the implementation's scan is per-page in position order. The graph doc also says "Entries are filed under each 16-byte page they touch and sorted by their section-walk position" — per-page sorted. So the doc's claim "Scan in file order" is only accurate within a page.
+
+  Is this worth flagging? The narrow re-review asks me to confirm "every entry is visited in file order". I should report what I actually find: within each page yes (per-page lists are in walk position); across pages, no — iteration is page-major. Does it matter? The consequence is only which neighbour is NAMED in the refusal when multiple overlap across pages of a multi-page span. The requirement pins the message shape, not which neighbour when several overlap. But the design's stated rule is "first other entry in cross-kind file order". So there is a residual spec-vs-impl discrepancy for multi-page definitions with candidates on different pages.
+
+  Hmm, but wait — maybe I should think again about whether per-page filing preserves global order. span_index page lists: appended in span_entries iteration order. span_entries is built during the walk with monotonically increasing position. So each page list is position-sorted. Page iteration: range(first, last+1) ascending. So the scan order is: all candidates touching page `first` (in position order), then page first+1, etc.
+
+  A candidate that touches multiple pages of D's span appears at its earliest-touch page (dedup keeps first occurrence). Its order in the scan = its position relative to other entries on that earliest page.
+
+  Counterexample stands. So the "first in cross-kind file order" guarantee from cb083d07 (global sort by position) was silently weakened for multi-page spans.
+
+  BUT: is there any test pinning cross-page multi-candidate order? .138/13 is about two BIT_MASK lines, not multi-page. Is there a test with a multi-page span at all? Let me search for a multi-page overlap test — e.g. an object with length > 16 spanning pages and neighbours on both sides. Search tests for something like length 0x20 overlaps. Not seen in the tests I read (/14, /15, /17-/21 all single-page; /13 same address). Possibly none. So no test discriminates, and the requirement text doesn't demand file order — only the graph doc func text does.
+
+  Given the narrow re-review scope (F-1, F-2, .138/21, .138/14), how to grade? Options:
+  1. PASS with a noted LOW observation (graph doc's "Scan in file order" is exact only per page; cross-page order is page-major; no requirement or test pins cross-page order, so non-blocking).
+  2. FAIL if we treat the graph doc sentence as binding.
+
+  The review instructions from the user: "Confirm that every entry is visited in file order" — they want confirmation of each property. If a property doesn't fully hold, I must say so rather than confirm falsely. But I should grade severity: the first-review standard treated design-vs-impl mismatches seriously. The graph doc is the approved design. However the doc was itself amended in this same uncommitted changeset — the author had the chance to restate and kept "first other entry, in cross-kind file order". Hmm.
+
+  Actually wait — let me think about whether cross-page order can ever differ in practice given the overlap semantics... It can, as shown. But does it matter for any pinned example? No pinned example has a multi-page span with multiple non-exempt candidates on different pages. The observable consequence: the named neighbour in the OVERLAP message. Both neighbours are legitimately overlapping; the message is still true ("its bytes are shared with B"). The requirement's acceptance column doesn't pin which one when several overlap.
+
+  Hmm, also consider: is "in cross-kind file order" from the ORIGINAL E3 ruling normative for which name is returned? The requirement R-A2L-DEF.138 text in 01-requirements.md — the If-clause — says "the system shall refuse the encode with ... `<other>`" without specifying which other when multiple. The case ledger examples name specific others in specific setups where only one overlap exists (or the first). So I'd call it a LOW/doc-precision note, not a blocker.
+
+  Wait, one more consideration — maybe there's a subtlety: within the scan, "first overlapping entry" — with page-major order, could the implementation return an entry that file-order would put later, and could a test like V171 (.138/5-/8) be affected? V171 overlaps: UBYTE at 0x810000 vs INSTANCE — the INSTANCE `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`... a single overlap per case. Fine.
+
+  Now the four confirmations:
+
+  1. **Every entry visited in file order**: Nested loops `for page: for entry in span_index.get(page, ())` — every entry on each touched page is visited; per-page lists are in walk position order (appended during the single walk, positions monotonic). ✓ with the cross-page caveat.
+
+  2. **Own entry skipped exactly once**: `own_entry` flag + 6-field tuple match (position not included, but name/section/address/byte_length/byte_order); after the first match `own_entry=False`, so a second identical tuple is treated as a candidate. "Exactly once" ✓ for the definition's own entry. Note: matching is by value not identity — a duplicate-named entry with identical address/length/byte_order/section would be skipped as "own" too (indistinguishable; acceptable, and refusal None only when clean...). Edge: if the definition itself is refused (e.g., A2L-DEF-ADDRESS), its own entry in the index... the index holds entries with declared address; the definition's own entry matches by the same fields. If byte_length unreadable, entry[4] (span.get("length")) vs definition.byte_length — need consistency. .138/21 confirms I1 path works. OK.
+
+     One more check: `entry[2]` is kind? In the walk, entries appended as (position, name, node_name(kind), address, length, byte_order) at :650-657 for MEASUREMENT/CHARACTERISTIC... wait that snippet showed only the tail. The match uses entry[1..5] = name, kind(node_name), address, byte_length, byte_order. And definition.section — does Definition have `section`? It matched in the old committed code too, fine.
+
+  3. **Single-page dedup avoided**: `multi_page = len(pages) > 1`; `if multi_page:` guards both the `seen` check and `seen.add`. Single-page: no set operations at all. ✓ Note: `pages` is a `range` for the length≥1 branch and a 1-tuple otherwise — `len()` works on both. Edge: byte_length ≥ 1 but span within one page → range of length 1 → multi_page False. ✓
+
+  4. **Multi-page uses entry position**: key = entry[0] = position. ✓ Deterministic (better than id(entry), which was process-dependent but consistent within one process; position is stable across calls).
+
+  5. **F-1 fixed**: the loop structure is now correct — overlap test inside the entry loop; every entry on every touched page is tested. Own-entry skip inside the loop. The three defects from F-1 are resolved. Also .138/14 now discriminates: under the old buggy shape, `ob.shared_with` would be None (own entry OB is last on page 1, skip fired at page level, Z... wait for OB: old code page loop for OB's pages: page 1 entries [OA, OB]; inner loop dedups; then page-level test on last entry = OB; own-entry match → skip → continue → return None. New test asserts "OA" → RED on old code. ✓ And the encode arms strengthen it.
+
+  6. **F-2**: `>>4` landed deliberately in commit ce1aa0ec with the design doc amended ("Entries are filed under each 16-byte page they touch ... the page size is an internal bound only; R-A2L-DEF.136 is measured with it") and `_shared_with` doc updated. Index build (:678-682) and lookup (:3557-3560) consistent. Record note ✓. And the re-measure was done: 1.212 s.
+
+  7. **.136 at 1.212 s**: int2b-perf-fix-136-final.txt: "39.4% 1.212 s / 2.000 s R-A2L-DEF.136 describe 13990". ✓ within bound. Need to check that file corresponds to the final model. Let me check its head for context (which commit/worktree). Quick check.
+
+  8. **308 passed**: int2b-run5-main.txt — but is run5 the FINAL model? The stub RED final is int2b-red-stub-final4-main.txt (114 failed, 194 passed = 308 total ✓ consistent). And lawguards-final — tail showed dots with 2 F?? Wait: the tail of int2b-lawguards-final.txt showed ".......................s..F...." — there were F marks in lawguards-final?! Let me check that file more carefully. Hmm, that could be a blocker! Let me look.
+
+  Also should verify that run5-main corresponds to final product state (ce1aa0ec or 8718715f). And check pi-e5 evidence files? The task says write only the r2 review; evidence file kimi-e5-code-review-2b-r2.txt exists (untracked) — presumably the transcript of this session. Not my concern.
+
+  Let me check lawguards-final for failures.===
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+39.4%  1.212 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 4.71s
+===
+lawguards-final.txt: no FAILED/failed/passed lines matched?? grep returned nothing before `===`. But earlier tail showed F marks in progress dots. Let me look at the full tail of lawguards-final — maybe the F marks are inside the file but the summary line uses different wording. Let me read the last 15 lines./tmp/b103-e4-2b-int/s19_app/__init__.py
+.......................s..F............................................. [ 14%]
+.............F.......................................................... [ 28%]
+........................................................................ [ 42%]
+........................................................................ [ 56%]
+........................................................................ [ 71%]
+.....................................
+===
+6 int2b-lawguards-final.txt
+2
+int2b-lawguards-final.txt is truncated — 6 lines, ends mid-progress (".....................................===" with no summary). It shows 2 F marks but no FAILED lines and no final summary. So the law-guard final evidence is INCOMPLETE/truncated. Compare with int2b-lawguards.txt (the earlier one).
+
+  The first review deferred law guards to the runner: "Law guards ... still to be confirmed by the runner." The final lawguard evidence file is truncated mid-run — no verdict line. That's a residual evidence gap. Let me check int2b-lawguards.txt (non-final) for comparison.tests/test_suite_hygiene.py:2053: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+1 failed, 504 passed, 1 skipped in 695.88s (0:11:35)
+===
+2026-11-10 00:49:41.398009100 int2b-lawguards-final.txt
+2026-11-10 00:49:07.234199700 int2b-lawguards.txt
+2026-11-10 00:37:09.324868100 int2b-perf-fix-136-final.txt
+2026-11-10 00:41:09.753103000 int2b-red-stub-final4-main.txt
+2026-11-10 00:38:51.265142900 int2b-run5-main.txt
+The earlier lawguard run (int2b-lawguards.txt) failed only `test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses` — a hygiene test about evidence files containing home paths, i.e., an evidence-hygiene issue, not a product regression. And the "final" lawguard run is truncated (file written at 00:49:41, cut mid-progress, 2 F marks, no summary). Interesting: the two F marks at 14% and 28% — could be the same hygiene failure plus another. Can't tell.
+
+  Timeline:
+  - 00:37 perf-fix-136-final: 1.212 s ✓
+  - 00:38:51 run5-main: 308 passed ✓
+  - 00:41:09 stub-final4: 114 failed + 194 passed ✓ (308 total)
+  - 00:49:07 lawguards: 1 failed (evidence hygiene: home paths in committed evidence), 504 passed
+  - 00:49:41 lawguards-final: truncated
+
+  Hmm wait — lawguards.txt timestamp 00:49:07 and lawguards-final 00:49:41 — only 34 s apart but the run takes 695 s. So lawguards.txt's content might be from an earlier run appended... Actually the mtimes suggest both files were touched around 00:49; the 695 s run must have started ~00:37. Whatever — the evidence on disk:
+
+  1. The completed law-guard run shows 504 passed + 1 failed, where the failure is R-TST-070-2 "committed evidence has no home paths or LAN addresses" — a test-hygiene failure about the evidence files themselves, not about the product code. This is a real failure though: it means some committed evidence file contains a home path or LAN address. That could block integration (law guards expected GREEN). But is it caused by this increment? The evidence files under evidence-e4 contain /tmp paths (that's fine) — maybe pi-e4-impl-2b.txt or similar contains C:\Users\... home paths. Which file? The failing test scans committed evidence. Can't easily tell without running.
+
+  2. lawguards-final is truncated — the final law-guard evidence is incomplete.
+
+  The E5-r1 review deferred law guards to the runner. Now the runner evidence shows: one law-guard failure (evidence hygiene, not engine) and a truncated final re-run. This is a remaining blocker/evidence gap for integration, though not an F-1/F-2 product defect.
+
+  Also note: HEAD is 8718715f ("prove scalar definition writes"), one commit beyond ce1aa0ec. The user said "Current product HEAD is ce1aa0ec" — slight mismatch; actual HEAD is 8718715f, and 8718715f only adds tests (1184+67 lines in tests, no s19_app changes — the diff stat earlier showed only tests/ changed between ce1aa0ec and 8718715f). Let me confirm: `git diff ce1aa0ec 8718715f --stat` showed only tests files. Yes: "tests/test_b103_a2l_definition.py | 1184 +" and synth 67 +. So the product code at HEAD == ce1aa0ec product code. Good — the user's "product HEAD ce1aa0ec" is accurate in substance: the product model is unchanged by 8718715f (tests only). I should note this in the review.
+
+  Also check: does 8718715f's added test arm include .138/21 and strengthened .138/14 — yes, both read in the working tree and both are in the 8718715f commit (the whole 2b arm was added there).
+
+  Wait — actually, the earlier E5 review read the 2b arm too (it cited .138/1-/20, .19/6-/7 etc.). So the 2b arm existed in the pre-review working tree uncommitted, and 8718715f committed it. Fine.
+
+  Now let me also double check the "every entry visited in file order" claim one more time, and the perf probe evidence (int2b-probe-shared-cost) to see the optimization claim. Not strictly needed.
+
+  One more verification: run the specific new tests? The brief says read-only review? The user's instruction: "perform a narrow re-review ... Confirm ..." — the original brief was read-only. I haven't been told I can execute now; the instruction says "The final model has 308 passed; stub RED is 114 failed + 194 passed" — confirming runner numbers. I'll stay read-only (consistent with the original E5 brief, and the user frames these as facts to confirm from evidence, which I did from the evidence files).
+
+  Actually, should I run pytest to independently verify? The first review explicitly said "Executed: nothing. Read-only review on Windows... per the brief." The user's current instruction doesn't lift that. Stay read-only.
+
+  Now let me also verify the .138/21 claim "BLOB address of 0x+5000 F is not indexed" — why is B1 not indexed? Its address 0xFFF...F (huge). The refusal order: address + length - 1 > 0xFFFFFFFF → A2L-DEF-ADDRESS refusal "its span cannot be read". But the index holds entries regardless of refusal ("every MEASUREMENT/CHARACTERISTIC with a declared address and every BLOB/INSTANCE of declared_spans with a declared address"). So B1 IS in the index, at page huge>>4. V1's scan touches page 1 only; B1's page is ~2^19996 — not touched. So "not indexed" in the doc is loose wording ("a BLOB address of 0x+5000 F is not indexed" — actually it's indexed under a page V1 never looks at; effect equivalent). Minor doc imprecision; the observable behavior is pinned by the test (alone case encodes). Also I1: TYPEDEF_BLOB size 10^5000 → I1 byte_length unreadable? The size exceeds MAX_A2L_DECODE_BYTES (1,048,576) → A2L-DEF-ADDRESS refusal "its span of <length> bytes ... cannot be read". Then in _shared_with for I1... not called. For V1's scan: I1's entry in the index — declared_spans gives I1's span; byte_length from declared_spans — is it the refused huge length or None? If declared_spans reports the raw size (10^5000-1), then the index build would file I1 under pages range(1, (16+huge)>>4) — iterating ~10^5000 pages → hang! But the test passes, so declared_spans must bound it, or the length is None/refused there. Let me check extract_declared_spans / how BLOB/INSTANCE spans get lengths, to confirm the "bound" claim rather than assume. Search a2l.py for declared_spans BLOB length handling — the commit title "bound overlap candidate scans" suggests exactly this. Let me grep.`_bounded_length` — that's the bound. Check it:Confirmed: `_bounded_length` clamps any length above `MAX_A2L_DECODE_BYTES` (1,048,576) to `None`. So:
+
+  - TYPEDEF_BLOB TB size 10^5000 → `_instance_length` → `_bounded_length(size * 1)` → None → I1's span has length None → fail-closed point at declared address 0x10 → I1 filed only on page 1. V1 at 0x10 (page 1) finds I1 by the declared-address-inside rule. No page-range explosion. ✓
+  - B1: address 0xF…F (huge but < 2^64? 5000 hex F's = 20000 bits — way over 64 bits; `_number_word`... the parser keeps the number as bigint per the frozen parser note). B1 length 2 → `_bounded_length(2)` = 2. Its span: address huge, first_page = huge>>4. Filed under that page. V1 touches page 1 only → never visits B1's page. And B1's own pages range is 2 pages — fine. But: is B1's address itself bounded? The refusal order gives A2L-DEF-ADDRESS for address+length-1 > 0xFFFFFFFF — that's for definitions; the index takes "declared address" regardless. Filing under huge page is fine (dict key). Also the doc's "not indexed" is imprecise — it IS indexed, just under a page no one visits. Observable behavior pinned by the test's alone-arm. Also `_shared_with` for V1: V1 len 1, single page → no dedup. ✓ And I1 entry: (pos, "I1", kind, 0x10, None, byte_order?) — wait, what's the byte_order for a BLOB/INSTANCE span entry? In the index build the entry tuple is (position, name, kind, address, byte_length, byte_order). For BLOB/INSTANCE aligned with declared_spans — where does byte_order come from? Whatever; own-entry matching only matters for V1 whose own entry is a VALUE with its own fields.
+
+  Edge in `_shared_with` for I1 as a *definition* (not tested): byte_length None → pages = (address>>4,) — fine.
+
+  But one more potential blow-up: a definition with a *readable* length up to 1,048,576 spanning ~65,536 pages of 16 bytes — `for page in pages` iterates 65k dict lookups; fine.
+
+  And in the index build at :680: `pages = range(first_page, last_page + 1)` — with bounded length ≤ 1,048,575 extra, the range is ≤ 65,536 pages. Bounded. ✓ This is the "bound overlap candidate scans" — actually wait, that commit only changed >>8→>>4 and the loop structure per the diff. `_bounded_length` and `extract_declared_spans` predate it (in a2l.py, not part of the diff). Fine — the hostile case works because of `_bounded_length` + the fixed loop.
+
+  Now .138/21's `_no_exception_encode` — verifies no exception during encode. And the requirement ledger now lists /21 with "0 exceptions" and 21/21 count. ✓ The requirements doc + graph doc + case ledger are updated (uncommitted, part of this changeset). The graph row for .138 now says ".138/1 … /21" ✓.
+
+  Now assemble the confirmations and findings:
+
+  **F-1 (HIGH) — RESOLVED.** The working tree `_shared_with` (== ce1aa0ec == HEAD 8718715f for this file; 8718715f touches only tests) has the overlap test inside the per-entry loop:
+  - Every entry on every touched page is visited (nested loops, a2l_definition.py:3564-3583).
+  - Own-entry skip fires exactly once (flag `own_entry`, full 5-field tuple match, :3571-3579).
+  - The three r1 defects are gone. .138/14 (strengthened with mutual shared_with + two encode-refusal arms) discriminates the old shape: under the old code `ob.shared_with` was `None`.
+  - Ordering caveat (see finding R-1 below): page-major order, per-page position order — global "cross-kind file order" is not reconstructed for multi-page spans.
+
+  **F-2 (MEDIUM) — RESOLVED as "landed deliberately".** `>>4` is in commit ce1aa0ec (both index build :678-682 and lookup :3557-3560, consistent), the graph doc now records "filed under each 16-byte page ... the page size is an internal bound only; R-A2L-DEF.136 is measured with it", and the re-measure was done: 1.212 s ≤ 2.0 s. The pending re-measure condition is satisfied.
+
+  **.138/21 — verified as discriminating and correctly designed:**
+  - TB size 10^5000-1 → `_bounded_length` → None (a2l.py:354-360) → I1 is a fail-closed point at 0x10 → V1's scan finds it via declared-address rule → OVERLAP names I1. Pins: shared_with == "I1", exact refusal message, no-exception encode, alone-arm isolation (B1's huge address is filed on a page V1 never visits; note the doc says "not indexed" — imprecise wording, it is indexed but unreachable from page 1; behavior pinned correctly).
+  - Doc imprecision (LOW): graph-inc2.md / 01-requirements say "a BLOB address of 0x+5000 F is not indexed" — it is indexed, under a page outside V1's span. Cosmetic.
+
+  **.138/14 strengthened — verified:** OA/OB/OC; asserts mutual shared_with, OC None, and two exact OVERLAP messages. Discriminates the r1 bug (own-entry-last case) via the `ob.shared_with == "OA"` arm and the OA arm under the old >>8 layout.
+
+  **Requested confirmations:**
+  1. Every entry visited in file order — per page, yes: page lists are appended during the single walk with monotonic position, so each page's list is in walk/file order and every entry on every touched page is visited. Across pages the scan is page-ascending, which is not global file order (see R-1).
+  2. Own entry skipped exactly once — yes (:3571-3579).
+  3. Single-page dedup avoided — yes: `multi_page = len(pages) > 1` guards both `seen` lookup and add; single-page path does no set work.
+  4. Multi-page uses entry position — yes: `key = entry[0]` (walk position), first occurrence wins.
+
+  **.136 = 1.212 s** — confirmed in evidence-e4/int2b-perf-fix-136-final.txt ("39.4% 1.212 s / 2.000 s ... describe 13990 ... 1 passed").
+
+  **308 passed** — int2b-run5-main.txt tail: "308 passed in 11.06s" (00:38:51, after the perf final at 00:37:09, so on the final product model; 8718715f adds only tests... wait, run5 at 00:38 vs 8718715f commit time? The commit is in git; working tree modifications are only .dev-flow docs. run5-main 308 passed at 00:38:51 — consistent with the final model).
+
+  **Stub RED** — int2b-red-stub-final4-main.txt: "114 failed, 194 passed in 23.67s" = 308 total. ✓
+
+  **Remaining blockers:**
+
+  B-1 (evidence gap): law guards not cleanly evidenced. int2b-lawguards.txt (completed run): 504 passed, 1 failed — `test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses` (test-suite hygiene: committed evidence contains home paths/LAN addresses; not an engine/product failure, but a RED law-guard outcome tied to this increment's evidence files). int2b-lawguards-final.txt is truncated mid-run (6 lines, 2 F marks, no summary) — it cannot serve as the final law-guard evidence. Needs a clean re-run and the hygiene failure fixed (scrub home paths from the offending committed evidence file).
+
+  B-2 / R-1 (LOW, spec precision): the scan order for multi-page spans is page-major (page ascending, position within a page), not global cross-kind file order; the graph-inc2.md `_shared_with` text still claims "the first other entry, in cross-kind file order" and "Scan in file order". The committed cb083d07 implementation did a global position sort; ce1aa0ec dropped it. Consequence is limited to WHICH overlapping neighbour is named when several non-exempt candidates sit on different pages of a multi-page span; no requirement row or test pins cross-page order (all pinned .138 cases are single-page or single-candidate). Non-blocking, but the doc sentence should be tightened (e.g. "first overlapping entry in scan order: page ascending, file order within a page") or the sort restored.
+
+  R-2 (LOW, doc wording): .138/21 description "a BLOB address of 0x+5000 F is not indexed" — imprecise; it is indexed under a page the UBYTE's span never touches (plus `_bounded_length` keeps page ranges finite). Behavior is correctly pinned by the test.
+
+  Also worth noting: user said HEAD is ce1aa0ec; actual HEAD is 8718715f which adds only test files (no product change), so product model under review == ce1aa0ec. And the .138/21 + strengthened .138/14 tests are part of that test commit. Also the design/requirements doc updates are uncommitted in the working tree (M 01-requirements.md, M graph-inc2.md) — they need to be committed with the increment.
+
+  Verdict: PASS with conditions? The F-1/F-2 blockers are cleared. Remaining: law-guard evidence incomplete + hygiene failure (that's process/evidence, product unaffected); the spec-precision LOWs. I'd say: **PASS for F-1/F-2 re-review scope** — the product fixes are correct and evidenced (308 passed, stub RED exact, .136 at 1.212 s). Remaining blockers for integration: law-guard final evidence truncated + R-TST-070-2 hygiene failure; plus two LOW doc-precision notes. Whether the law-guard items block integration: r1 deferred them to the runner; the completed run shows 504 passed + 1 hygiene failure; the final re-run is truncated. So integration is blocked on evidence, not on product code. I'll state verdict as PASS (narrow scope) with remaining blockers listed.
+
+  Hmm — but is the truncated lawguards-final really truncated? 6 lines: 5 progress lines + first line "/tmp/...". wc -l = 6, and grep -c "F" = 2 (two F chars in progress lines). Yes truncated, no summary.
+
+  Also should double-check that `test_engine_unchanged.py` / directionb law guards were among the 504 passed in the completed run — can't tell which tests those F marks were; the completed run names only the hygiene failure in the summary (1 failed, 504 passed, 1 skipped) — the failure list shows exactly one FAILED line. So law guards proper (engine unchanged, tc031) passed in the completed run; the only failure is evidence hygiene.
+
+  Now write the review file. Keep it in the same style as r1. Then reply with verdict + blockers.
+
+• All evidence gathered. Now I'll write the re-review file.
+
+• Re-review complete — wrote `.dev-flow/2026-11-05-batch-103/inc-2/E5-code-review-2b-r2.md`.
+
+  **Verdict: PASS (narrow scope: F-1, F-2, .138/21, .138/14).**
+
+  Both round-1 blockers are cleared in the product model at `ce1aa0ec` (actual branch HEAD `8718715f` adds only test files, so the product model is identical):
+
+  - **F-1 resolved.** `_shared_with` (`s19_app/tui/a2l_definition.py:3561-3584`) now has the overlap test inside the per-entry loop. Every entry on every touched page is visited; the own-entry skip fires exactly once via the `own_entry` flag; the strengthened `.138/14` discriminates the old bug (`ob.shared_with == "OA"` was `None` under the broken shape).
+  - **F-2 resolved** as "landed deliberately": `>>4` is committed consistently on both index build (`:678-682`) and lookup (`:3557-3560`), the graph doc records it, and the re-measure condition is met — **.136 at 1.212 s** (39.4% of the 2.0 s bound).
+  - Single-page dedup avoided (`multi_page` guard, no set work), multi-page dedup keys on entry position (`entry[0]`).
+  - **.138/21** verified: `_bounded_length` (`a2l.py:354-360`) turns the 5,000-digit TYPEDEF_BLOB size into a fail-closed point at 0x10, so I1 is named with no page-range blow-up; the alone-arm proves the huge BLOB address can't poison the scan. `.138/14`'s new encode arms pin the exact OVERLAP messages.
+  - Runner numbers confirmed: final model **308 passed** (`int2b-run5-main.txt`), stub RED **114 failed + 194 passed** (`int2b-red-stub-final4-main.txt`).
+
+  **Remaining blockers / notes:**
+
+  1. **B-1 (blocks integration sign-off):** law-guard evidence is not clean — the completed run shows 504 passed + 1 failed, the failure being `test_r_tst_070_2` (committed evidence contains a home path/LAN address — hygiene, not product), and `int2b-lawguards-final.txt` is truncated mid-run with no summary. Needs a scrub + clean re-run.
+  2. **R-1 (LOW):** cross-page scan order is page-major, not global file order — the graph doc's "first other entry, in cross-kind file order / Scan in file order" overclaims for multi-page spans (the `cb083d07` global sort was dropped). No requirement or test pins cross-page neighbour choice; tighten the doc or restore the sort for the multi-page branch.
+  3. **R-2 (LOW):** `.138/21`'s "BLOB … is not indexed" wording is imprecise (it is indexed, just out of reach of the span); behavior is correctly pinned.
+  4. Housekeeping: the `01-requirements.md` / `graph-inc2.md` updates answering F-2 and adding `/21` are still uncommitted.
+
+To resume this session: kimi -r session_5a319d7a-d760-4ae2-b99b-a2dfd3963d82

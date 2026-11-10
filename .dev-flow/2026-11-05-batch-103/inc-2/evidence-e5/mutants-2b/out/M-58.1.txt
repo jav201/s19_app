@@ -1,0 +1,102 @@
+M-58.1
+pytest -k a2l_def_58_1 and encode
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..8ec8b547 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3684,6 +3690,7 @@ def encode_definition(
+     Raises:
+         None.
+     """
++    image[definition.address] = 0
+     if definition.refusal is not None:
+         return definition.refusal
+     name_echo = _name_echo_of(definition)
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_58_1_2_encode_does_not_mutate_case08 ______________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_58_1_2_encode_does_not_mutate_case08(c08):
+        a2l = c08["a2l"]
+        before = copy.deepcopy(a2l)
+        mem = c08["mem"]
+        mem_before = dict(mem)
+        _encode_unchanged(a2l, mem)
+>       assert a2l == before and mem == mem_before
+E       AssertionError: assert ({'compu_metho...6', ...], ...} == {'compu_metho...6', ...], ...}
+E         
+E         Omitting 8 identical items, use -vv to show
+E         Use -v to get more diff and {0: 0, 1: 49,...7, 3: 84, ...} == {0: 108, 1: 4...7, 3: 84, ...}
+E         
+E         Omitting 424325 identical items, use -vv to show
+E         Differing items:
+E         {0: 0} != {0: 108}
+E         {262144: 0} != {262144: 131}
+E         {8388608: 0} != {8388608: 152}
+E         {8407040: 0} != {8407040: 215}...
+E         
+E         ...Full output truncated (408 lines hidden), use '-vv' to show)
+
+tests/test_b103_a2l_definition.py:3646: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_2_encode_does_not_mutate_case08
+1 failed, 1 passed, 320 deselected in 1.82s

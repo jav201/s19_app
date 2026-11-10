@@ -1,0 +1,93 @@
+M-55d
+pytest -k a2l_def_55 or a2l_def_35_5
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..aa9879e6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3233,7 +3233,7 @@ def display_text(definition: Definition, value: int | float) -> str:
+         if d >= 15:
+             # Round to 15 significant digits, then write exactly d decimals of that
+             # decimal value (E3A-06); a float round-trip would bring back binary digits.
+-            return format(Decimal(f"{value:.15g}"), f".{d}f")
++            return format(Decimal(value), f".{d}f")
+         return f"{value:.{d}f}"
+     return f"{value:.15g}"
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_35_5_fifteen_or_more_decimals_round_to_15_significant_digits __
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-466/test_r_a2l_def_35_5_fifteen_or0')
+
+    def test_r_a2l_def_35_5_fifteen_or_more_decimals_round_to_15_significant_digits(tmp_path):
+        """R-A2L-DEF.35/5 - LINEAR 0.1 on stored 41 with %.15 -> ``4.100000000000000``."""
+        res = _num(tmp_path, "D10", "UWORD", "%.15", bytes([0, 0x29]), method="LINEAR", coeffs=("0.1", "0"))
+>       assert res.text == "4.100000000000000"
+E       AssertionError: assert '4.100000000000001' == '4.100000000000000'
+E         
+E         - 4.100000000000000
+E         ?                 ^
+E         + 4.100000000000001
+E         ?                 ^
+
+tests/test_b103_a2l_definition.py:1023: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_5_fifteen_or_more_decimals_round_to_15_significant_digits
+1 failed, 1 passed, 320 deselected in 0.98s

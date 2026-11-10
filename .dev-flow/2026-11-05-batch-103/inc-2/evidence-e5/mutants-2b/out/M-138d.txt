@@ -1,0 +1,87 @@
+M-138d
+pytest -k a2l_def_138_19
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..03754c83 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3550,23 +3552,27 @@ def _shared_with(
+     when that entry has no readable length), unless the pair's clean masks
+     select no common bit (R-A2L-DEF.138)."""
+     address = definition.address
+-    if address is None:
++    if not address:
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_138_19_0x0_is_a_declared_address ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-475/test_r_a2l_def_138_19_0x0_is_a0')
+
+    def test_r_a2l_def_138_19_0x0_is_a_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("Z1", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("Z2", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        z1 = describe_definition("Z1", a2l)
+        z2 = describe_definition("Z2", a2l)
+>       assert z1.shared_with == "Z2" and z2.shared_with == "Z1"
+E       AssertionError: assert (None == 'Z2')
+E        +  where None = Definition(name='Z1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=2, datatype='...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3343: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address
+1 failed, 321 deselected in 0.76s

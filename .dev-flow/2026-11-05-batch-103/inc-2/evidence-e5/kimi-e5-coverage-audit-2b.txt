@@ -1,0 +1,720 @@
+kimi version 2.5.2
+• Let me read the requested files. Start with the test cases file and the two test files, plus the evidence files. These could be large — read with ranges as needed.
+
+• I'll read the requested files to audit the 2b and mixed test cases.total 844
+drwxr-xr-x 1 <user> 197609      0 Nov 10 00:29 .
+drwxr-xr-x 1 <user> 197609      0 Nov  9 22:57 ..
+-rw-r--r-- 1 <user> 197609  88363 Nov 10 00:33 01-requirements.md
+-rw-r--r-- 1 <user> 197609 179696 Nov 10 00:41 02-test-cases.md
+-rw-r--r-- 1 <user> 197609   6302 Nov  9 22:57 04-validation.md
+-rw-r--r-- 1 <user> 197609  28459 Nov  9 22:57 E1-rulings.md
+-rw-r--r-- 1 <user> 197609  15920 Nov  9 22:57 E1-slice.md
+-rw-r--r-- 1 <user> 197609   1139 Nov  9 22:57 E2-rulings.md
+-rw-r--r-- 1 <user> 197609  10194 Nov  9 22:57 E3-architect-2b-r2.md
+-rw-r--r-- 1 <user> 197609  12017 Nov  9 22:57 E3-architect-2b.md
+-rw-r--r-- 1 <user> 197609  56177 Nov  9 22:57 E3-architect.md
+-rw-r--r-- 1 <user> 197609   2463 Nov  9 22:57 E3-rebrief-2b.md
+-rw-r--r-- 1 <user> 197609   1618 Nov  9 22:57 E3-rereview-2b.md
+-rw-r--r-- 1 <user> 197609  45326 Nov  9 22:57 E3-rulings.md
+-rw-r--r-- 1 <user> 197609  12864 Nov  9 22:57 E3-security-2b-r2.md
+-rw-r--r-- 1 <user> 197609  11443 Nov  9 22:57 E3-security-2b.md
+-rw-r--r-- 1 <user> 197609  80771 Nov  9 22:57 E3-security.md
+-rw-r--r-- 1 <user> 197609   3952 Nov  9 22:57 E4-handoff-impl-2a.md
+-rw-r--r-- 1 <user> 197609   2138 Nov  9 22:57 E4-handoff-impl-2b.md
+-rw-r--r-- 1 <user> 197609   4115 Nov  9 22:57 E4-handoff-tests-2a.md
+-rw-r--r-- 1 <user> 197609   2448 Nov  9 22:57 E4-handoff-tests-2b.md
+-rw-r--r-- 1 <user> 197609   2458 Nov  9 22:57 E5-close-brief.md
+-rw-r--r-- 1 <user> 197609  10035 Nov 10 00:28 E5-code-review-2b.md
+-rw-r--r-- 1 <user> 197609  22552 Nov  9 22:57 E5-code-review.md
+-rw-r--r-- 1 <user> 197609   1747 Nov  9 22:57 E5-coverage-audit-brief.md
+-rw-r--r-- 1 <user> 197609   5000 Nov  9 22:57 E5-coverage-audit.md
+-rw-r--r-- 1 <user> 197609   7444 Nov  9 22:57 E5-fix-code.md
+-rw-r--r-- 1 <user> 197609   1054 Nov  9 22:57 E5-gap-code.md
+-rw-r--r-- 1 <user> 197609   2095 Nov  9 22:57 E5-gap2-code.md
+-rw-r--r-- 1 <user> 197609   2882 Nov  9 22:57 E5-mutants-A.md
+-rw-r--r-- 1 <user> 197609   2852 Nov  9 22:57 E5-mutants-B.md
+-rw-r--r-- 1 <user> 197609   1541 Nov 10 00:16 E5-review-brief-2b.md
+-rw-r--r-- 1 <user> 197609   5127 Nov  9 22:57 E5-rulings.md
+-rw-r--r-- 1 <user> 197609   8762 Nov 10 00:29 E5-security-2b.md
+-rw-r--r-- 1 <user> 197609  27211 Nov  9 22:57 E5-security.md
+drwxr-xr-x 1 <user> 197609      0 Nov  9 22:57 codewire
+drwxr-xr-x 1 <user> 197609      0 Nov  9 22:57 evidence-e1
+drwxr-xr-x 1 <user> 197609      0 Nov  9 22:57 evidence-e3
+drwxr-xr-x 1 <user> 197609      0 Nov 10 00:44 evidence-e4
+drwxr-xr-x 1 <user> 197609      0 Nov 10 00:46 evidence-e5
+-rw-r--r-- 1 <user> 197609  17914 Nov  9 22:57 steps.log
+  3588 tests/test_b103_a2l_definition.py
+   371 tests/test_b103_synth_definitions.py
+  3959 total
+
+
+• Continue reading 02-test-cases.md from line 252. Also I need the synth test file and the a2l test file. The a2l test file is 3588 lines — big. The 02-test-cases.md is 399 lines total; I read 251. Continue.Now I have the full case table. Next: read the synth test file (371 lines) fully, and the a2l test file (3588 lines) — that's big. I need to audit every 2b and mixed case's full/partial mark, coverage, exact expected values, and RED/GREEN evidence.
+
+  2b cases per split counts: .19/6, /7, .25/2, .151/7, .26/2,/3,/4, .40 … .57 (65 cases), .138 (21), .152 (5). Mixed: .21/3, .136/1, .58.1/1,/2, .58.2 (24), AT-B103-I2-1, AT-B103-I2-2.
+
+  Let me read the synth test file, then grep the a2l test file for the relevant test functions. Also read the evidence files: evidence-e4/int2b-run5-main.txt, int2b-run1-synth.txt, int2b-red-stub-final4-main.txt, int2b-red-stub-final2-synth.txt.total 1358
+drwxr-xr-x 1 <user> 197609      0 Nov 10 00:44 .
+drwxr-xr-x 1 <user> 197609      0 Nov 10 00:29 ..
+-rw-r--r-- 1 <user> 197609   1368 Nov 10 00:01 2b-red-collection.txt
+-rw-r--r-- 1 <user> 197609 176164 Nov 10 00:01 2b-red-stub-main.txt
+-rw-r--r-- 1 <user> 197609   4889 Nov 10 00:01 2b-red-stub-synth.txt
+-rw-r--r-- 1 <user> 197609   3833 Nov 10 00:01 2b-red-synth-real.txt
+-rw-r--r-- 1 <user> 197609    869 Nov  9 22:57 diag-2a-transcript.txt
+-rw-r--r-- 1 <user> 197609   2161 Nov  9 22:57 diag-2a.py
+-rw-r--r-- 1 <user> 197609   7392 Nov 10 00:14 e4-2b-probe-transcript.txt
+-rw-r--r-- 1 <user> 197609   6136 Nov 10 00:01 e4-2b-probe.py
+-rw-r--r-- 1 <user> 197609   5073 Nov 10 00:01 e4-2b-probe2.py
+-rw-r--r-- 1 <user> 197609    442 Nov 10 00:01 e4-2b-probe3.py
+-rw-r--r-- 1 <user> 197609    971 Nov 10 00:01 e4-2b-probe4.py
+-rw-r--r-- 1 <user> 197609   3247 Nov 10 00:01 e4-2b-probe5.py
+-rw-r--r-- 1 <user> 197609   1561 Nov  9 22:57 int-green-laws-importers.txt
+-rw-r--r-- 1 <user> 197609    410 Nov  9 22:57 int-green-run2.txt
+-rw-r--r-- 1 <user> 197609    593 Nov  9 22:57 int-green-run3.txt
+-rw-r--r-- 1 <user> 197609    696 Nov  9 22:57 int-green-run4.txt
+-rw-r--r-- 1 <user> 197609   2360 Nov  9 22:57 int-run1-behaviour.txt
+-rw-r--r-- 1 <user> 197609    402 Nov 10 00:46 int2b-lawguards-final.txt
+-rw-r--r-- 1 <user> 197609  81936 Nov 10 00:18 int2b-lawguards.txt
+-rw-r--r-- 1 <user> 197609  11961 Nov 10 00:17 int2b-perf-1.txt
+-rw-r--r-- 1 <user> 197609  10045 Nov 10 00:44 int2b-perf-final-1.txt
+-rw-r--r-- 1 <user> 197609     48 Nov 10 00:46 int2b-perf-final-2.txt
+-rw-r--r-- 1 <user> 197609   2313 Nov 10 00:23 int2b-perf-fix-136-16b.txt
+-rw-r--r-- 1 <user> 197609    405 Nov 10 00:29 int2b-perf-fix-136-dedup.txt
+-rw-r--r-- 1 <user> 197609    405 Nov 10 00:37 int2b-perf-fix-136-final.txt
+-rw-r--r-- 1 <user> 197609   2309 Nov 10 00:19 int2b-perf-fix-136.txt
+-rw-r--r-- 1 <user> 197609      0 Nov 10 00:25 int2b-probe-shared-cost-top.txt
+-rw-r--r-- 1 <user> 197609   4331 Nov 10 00:25 int2b-probe-shared-cost.txt
+-rw-r--r-- 1 <user> 197609   3965 Nov 10 00:23 int2b-profile-136-16b.txt
+-rw-r--r-- 1 <user> 197609   3965 Nov 10 00:21 int2b-profile-136.txt
+-rw-r--r-- 1 <user> 197609   1099 Nov 10 00:14 int2b-red-base-main.txt
+-rw-r--r-- 1 <user> 197609   3756 Nov 10 00:14 int2b-red-base-synth.txt
+-rw-r--r-- 1 <user> 197609 179329 Nov 10 00:14 int2b-red-stub-final-main.txt
+-rw-r--r-- 1 <user> 197609   1895 Nov 10 00:37 int2b-red-stub-final2-main.txt
+-rw-r--r-- 1 <user> 197609   4812 Nov 10 00:41 int2b-red-stub-final2-synth.txt
+-rw-r--r-- 1 <user> 197609    462 Nov 10 00:38 int2b-red-stub-final3-main.txt
+-rw-r--r-- 1 <user> 197609 179694 Nov 10 00:41 int2b-red-stub-final4-main.txt
+-rw-r--r-- 1 <user> 197609 178738 Nov 10 00:14 int2b-red-stub-main.txt
+-rw-r--r-- 1 <user> 197609   4812 Nov 10 00:14 int2b-red-stub-synth.txt
+-rw-r--r-- 1 <user> 197609   2332 Nov 10 00:14 int2b-run1-main.txt
+-rw-r--r-- 1 <user> 197609    139 Nov 10 00:02 int2b-run1-synth.txt
+-rw-r--r-- 1 <user> 197609    461 Nov 10 00:03 int2b-run2-main.txt
+-rw-r--r-- 1 <user> 197609    461 Nov 10 00:08 int2b-run3-main.txt
+-rw-r--r-- 1 <user> 197609   1893 Nov 10 00:37 int2b-run4-main.txt
+-rw-r--r-- 1 <user> 197609    461 Nov 10 00:38 int2b-run5-main.txt
+-rw-r--r-- 1 <user> 197609 288576 Nov 10 00:15 kimi-e4-tests-2b.txt
+-rw-r--r-- 1 <user> 197609   4436 Nov 10 00:12 map_2b_cases.py
+-rw-r--r-- 1 <user> 197609   1896 Nov  9 23:16 pi-e4-impl-2b.txt
+-rw-r--r-- 1 <user> 197609    790 Nov 10 00:25 probe_shared_cost.py
+-rw-r--r-- 1 <user> 197609    630 Nov 10 00:20 profile_136.py
+-rw-r--r-- 1 <user> 197609    164 Nov 10 00:39 stub_2b_tail.py
+-rw-r--r-- 1 <user> 197609    319 Nov  9 22:57 tests-59-3-digest-transcript.txt
+-rw-r--r-- 1 <user> 197609    442 Nov  9 22:57 tests-idreg-guard-base-plus-new-files.txt
+-rw-r--r-- 1 <user> 197609   2108 Nov  9 22:57 tests-red-base-collection.txt
+-rw-r--r-- 1 <user> 197609   7800 Nov  9 22:57 tests-red-base-synth.txt
+-rw-r--r-- 1 <user> 197609  42311 Nov  9 22:57 tests-red-stub-all.txt
+     7 .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-run5-main.txt
+     3 .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-run1-synth.txt
+  2002 .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-red-stub-final4-main.txt
+    83 .dev-flow/2026-11-05-batch-103/inc-2/evidence-e4/int2b-red-stub-final2-synth.txt
+  2095 total
+Now read the four evidence files. int2b-run5-main.txt is 7 lines; int2b-run1-synth.txt is 3 lines; int2b-red-stub-final4-main.txt is 2002 lines; int2b-red-stub-final2-synth.txt is 83 lines. Also I need the 2b portions of tests/test_b103_a2l_definition.py. Let me first read the small evidence files, then look at the 2b test functions in the main test file.Now the red-stub-final4-main.txt (2002 lines). Let me look at the summary and the failing test names. And then the 2b test functions in tests/test_b103_a2l_definition.py (3588 lines). The 2b cases per the split: .19/6, /7, .25/2, .151/7, .26/2,/3,/4, .40/1-/9, .41/1-/6, .42/1-/11, .43/1-/4, .44/1-/2, .45/1-/3, .46/1,/2,/4, .47/1-/3, .48/1-/3, .49/1-/3, .50/1-/3, .51/1, .52/1-/3, .53/1-/4, .54/1-/4, .55/1, .56/1, .57/1-/5, .138/1-/21, .152/1-/5, AT-B103-I2-1. Mixed: .21/3, .58.1/1,/2, .58.2 (24), .136/1, AT-B103-I2-2.
+
+  Also check the red-stub-final4-main.txt — I need to verify RED evidence: 2b tests failing on the stub. Let me read its tail/summary.FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_11_non_finite_extended_limits_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_13_all_zero_rat_func_encode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes
+114 failed, 194 passed in 23.67s
+114
+114 failed on the stub. The 2b tests in the main file: per the split, 2b = .19/6, /7, .25/2, .151/7, .26/2,/3,/4, .40/1-/9 (9), .41/1-/6 (6), .42/1-/11 (11), .43/1-/4 (4), .44/1,/2 (2), .45/1-/3 (3), .46/1,/2,/4 (3), .47/1-/3 (3), .48/1-/3 (3), .49/1-/3 (3), .50/1-/3 (3), .51/1 (1), .52/1-/3 (3), .53/1-/4 (4), .54/1-/4 (4), .55/1 (1), .56/1 (1), .57/1-/5 (5), .138/1-/21 (21), .152/1-/5 (5). Total = 2+1+1+3+9+6+11+4+2+3+3+3+3+3+1+3+4+4+1+1+5+21+5 = let me add: 2(.19)+1(.25/2)+1(.151/7)+3(.26)=7; 9+6+11+4+2+3+3+3+3+3+1+3+4+4+1+1+5=64; 21+5=26. 7+64+26=97? Hmm but ledger says .40….56 65, .57/5, .138 21, .152 5 = 96, plus .19/6,/7, .25/2, .151/7, .26/2-/4 = 7 → 103. Let me recount .40… .56: .40/1-/9=9, .41 6, .42 11, .43 4, .44 2, .45 3, .46 3, .47 3, .48 3, .49 3, .50 3, .51 1, .52 3, .53 4, .54 4, .55 1, .56 1 → 9+6+11+4+2+3+3+3+3+3+1+3+4+4+1+1 = 61. Plus .57/5 → 66? Hmm the ledger says 65 for .40….56. Let me recount: 9+6=15, +11=26, +4=30, +2=32, +3=35, +3=38, +3=41, +3=44, +3=47, +1=48, +3=51, +4=55, +4=59, +1=60, +1=61. So .40….56 = 61 by my count, but ledger says 65. Hmm. Wait, does .40… .56 include all rows .40 through .56? .40 (9), .41 (6), .42 (11), .43 (4), .44 (2), .45 (3), .46 (3 — only /1,/2,/4 since /3 is synth... wait /3 is in synth test file but it's a DEFC case counted where? .46/3 row is in main table with synth test. The split table says .40 … .57, .138, .152 → 2b every case 96: ".40 … .56 65, .57/5, .138 21, .152 5". 65+1+21+5=92? No wait: 65+5+21+5 = 96. So .57 is 5 (all .57 cases). Then .40….56 should be 65. My count gives 61. Let me recount from the table rows:
+
+  .40/1,/2,/3,/4,/5,/6,/7,/8,/9 = 9
+  .41/1-/6 = 6 (total 15)
+  .42/1-/11 = 11 (26)
+  .43/1-/4 = 4 (30)
+  .44/1,/2 = 2 (32)
+  .45/1,/2,/3 = 3 (35)
+  .46/1,/2,/3,/4 = 4 (39)  ← I missed .46/3 earlier. .46/3 is a synth-file test but is a 2b case too.
+  .47/1-/3 = 3 (42)
+  .48/1-/3 = 3 (45)
+  .49/1-/3 = 3 (48)
+  .50/1-/3 = 3 (51)
+  .51/1 = 1 (52)
+  .52/1-/3 = 3 (55)
+  .53/1-/4 = 4 (59)
+  .54/1-/4 = 4 (63)
+  .55/1 = 1 (64)
+  .56/1 = 1 (65)
+
+  Good, 65. Total 2b = 65+5+21+5 = 96 + .19/6,/7 (2) + .25/2 (1) + .151/7 (1) + .26/2,/3,/4 (3) = 103. ✓
+
+  RED failures on stub in main file: count FAILED lines = 114. Which 2b tests failed? From the list: .19/6, .25/2, .26/2,/3,/4, .40/1-/9, .41/1-/6, .42/1-/11, .43/1-/4, .44/1,/2, .45/1-/3, .46/1,/2,/4, .47/1-/3, .48/1-/3, .49/1-/3, .50/1-/3, .51/1, .52/1-/3, .53/1-/4, .54/1-/4, .55/1, .56/1, .57/1-/5, .138/1-/15, /17-/21 (i.e. all except /16 which is in synth), .152/1-/5, .151/7, plus mixed-encode-arm tests: .21/3, .58.2/1-/5,/7-/15,/17, AT-B103-I2-1. 
+
+  Count: 2b pure: .19/6 (1) — wait, .19/6 and /7 both? FAILED list shows .19_6 only? Line 1888 shows .19_6. Is .19_7 (ambiguous_byte_order) in the list? I don't see test_r_a2l_def_19_7 in the FAILED list! Let me check. Lines 1888-2001: 19_6 yes; 19_7 not visible. Hmm — .19/7's expected result is a refusal `BO: its byte order cannot be read` — wait no, /7 expects refusal A2L-DEF-MASK `BO: its byte order cannot be read`? Actually reading row .19/7: expected "refusal `A2L-DEF-MASK`, `BO: its byte order cannot be read`". Hmm, that's a describe-time refusal? The row says "Verify the refusal when a masked definition's byte order cannot be read" with inputs "the definition". So maybe on the stub the describe already produced that refusal (since describe side is 2a implemented)... Actually the refusal happens at definition build time (2a code already handles byte order reading), so the stub might already pass .19/7? But the ledger says RED on cb083d07 (int2b-red-stub-final4-main.txt) for .19/7. Need to check whether test 19_7 appears in the run at all and its result.
+
+  Also .26/2,/3,/4: in FAILED list I see 26_2, 26_3, 26_4 — yes lines 1890-1892.
+
+  Let me count FAILED: 114 total. Pure 2b main-file tests expected to fail: .19/6,/7 (2), .25/2 (1), .151/7 (1), .26/2-4 (3), .40-57 group (65+5=70... wait .57/5 counts within "65" statement? The ledger text: ".40 … .56 65, .57/5, .138 21, .152 5". So .57 5 cases), .138 21, .152 5 → 2+1+1+3+65+5+21+5 = 103 pure 2b across both files (3 in synth). Main-file pure 2b = 100. Mixed encode-arm fails: .21/3 (1), .58.2 encode-arm tests: /1,/2,/3,/4,/5,/7,/8,/9,/10,/11,/13,/14,/15,/17 (14), AT-B103-I2-1 (1) → 16. Total expected RED = 100 + 16 = 116? But actual is 114. Hmm. Also .58.2/12 (non-finite coefficients) — expected "a value or refusal" — might pass on stub? And .58.2/5 (5000-digit mask) etc.
+
+  Actually wait — .58.2/6 and /16 are decode-only (2a). /18-/24 describe+decode only (2a, done in gap passes). The encode-arm waits: /1-/5, /7-/15, /17 = 5+9+1 = 15. Plus .21/3 = 16, AT-B103-I2-1 = 17. 100+17 = 117. Actual 114, with .19_7 apparently not failing and maybe .58.2/12 and /14 passing. From FAILED list: .58.2 failures: /1,/2,/3,/4,/5,/7,/8,/9,/10,/11,/13,/17 = 13 (not /12, not /14, not /15?). List lines 1989-2000: 58_2_1, _2, _3, _4, _5, _7, _8, _9, _10, _11, _13, _17 = 12. Plus .21_3, AT_I2_1 = 14 mixed. Pure 2b main fails: 114 - 14 = 100. Let me count from the list: lines 1888-1987 minus mixed ones.
+
+  FAILED lines list:
+  1. 19_6
+  2. 25_2
+  3. 26_2
+  4. 26_3
+  5. 26_4
+  6-14. 40_1..40_9 (9)
+  15-20. 41_1..41_6 (6)
+  21-31. 42_1..42_11 (11)
+  32-35. 43_1..43_4 (4)
+  36-37. 44_1, 44_2 (2)
+  38-40. 45_1..45_3 (3)
+  41-43. 46_1, 46_2, 46_4 (3)
+  44-46. 47_1..47_3 (3)
+  47-49. 48_1..48_3 (3)
+  50-52. 49_1..49_3 (3)
+  53-55. 50_1..50_3 (3)
+  56. 51_1
+  57-59. 52_1..52_3 (3)
+  60-63. 53_1..53_4 (4)
+  64-67. 54_1..54_4 (4)
+  68. 55_1
+  69. 56_1
+  70-74. 57_1..57_5 (5)
+  75-95. 138_1..138_15, 138_17..138_21 (20)
+  96-100. 152_1..152_5 (5)
+  101. 151_7
+  102. 21_3
+  103-114. 58.2 ×12 + AT_I2_1 = 13
+
+  Total = 101 + 13 = 114 ✓.
+
+  So on the stub, .19_7 did NOT fail — but the ledger claims .19/7 is RED on cb083d07. That's a potential discrepancy! Let me check the stub run for test_r_a2l_def_19_7's result. Also GREEN run5: 308 passed in 11.06s — 0 failures, and presumably includes .19_7 passing (expected: on GREEN, .19/7 expects refusal at describe — hmm, but wait, if the describe already refuses byte order on both stub and green, then the test isn't testing 2b code... The expected result for .19/7 is "refusal A2L-DEF-MASK, BO: its byte order cannot be read" — actually maybe the refusal code differs. Need to check the test body).
+
+  Let me now read the 2b sections of tests/test_b103_a2l_definition.py. It's 3588 lines. Find where 2b tests start.
+
+• RED stub run: 114 failed / 194 passed. Notably `test_r_a2l_def_19_7` is absent from the FAILED list. Now let me examine the 2b test code in the main test file.
+
+• Now I need to read the 2b test bodies to audit expected values vs. the case table. The 2b sections are lines 2409-3588 plus mixed ones. Let me read lines 2409-3588 (the whole Inc 2b tail) — about 1180 lines. Also mixed sections: .21/3 at 769, .58.1 at 1109-1123 and 3505-3535, .58.2 encode arms at 3396-3505, AT-B103-I2-1 at 3535-3588, and 138 tests at 3103-3311.
+
+  Let me read the file in chunks. First 2409-2700.
+
+• Now reading the Inc 2b test bodies to verify expected values against the ledger.
+
+• Continue reading 3039-3588.I've now read all the 2b test bodies. Let me note discrepancies found so far:
+
+  1. **.26/4 ledger vs test**: Ledger row .26/4 says inputs "encode `ABC` on the ASCII object (`UNKNOWN`)" and expected "refusal A2L-DEF-BYTES, `UNKNOWN: 42 of its 42 bytes are not in the image`". But the test uses `V171_ASCII` constant — need to check what V171_ASCII is. Test message: "ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image". So V171_ASCII = "ASAM.C.ASCII.UBYTE.NUMBER_42", whereas the ledger says the parser names it `UNKNOWN` (from .3/1: "the parser names it `UNKNOWN`"). Wait — row .3/1 says the object at 0x810200 with NUMBER 42 is named `UNKNOWN` by the parser. But test uses V171_ASCII and expects the message with name "ASAM.C.ASCII.UBYTE.NUMBER_42". Hmm — the 2b probe re-derived names "through the current parser, never from the old census". Maybe the current parser names it differently. Need to check the constant V171_ASCII definition and whether the GREEN run passes — run5 has 308 passed, so the test passes with the current parser. The ledger text says "(`UNKNOWN`)" for .26/4 — that's stale/mismatched vs test. Actually wait — ledger .26/4 inputs: "encode `ABC` on the ASCII object (`UNKNOWN`)" — that parenthetical looks wrong relative to the test's expected name. But maybe the parser actually names it ASAM.C.ASCII.UBYTE.NUMBER_42. Check the constant.
+
+  2. **.44/1 ledger vs test**: Ledger row .44/1: "encode `120` ... refusal A2L-DEF-OVERLAP (against `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`), 0 bytes; then bytes 78; notice ..." — test matches (bytes 0x78, notice tuple). Ledger says address image "00 at 0x810004"? No wait, .44/1 preconditions: "V171; image 00 at 0x810004" — hmm test uses img = {0x810001: 0} and SBYTE at 0x810001. Ledger .44/1 says "image 00 at 0x810004"?? Let me re-check the ledger row: "| R-A2L-DEF.44/1 | ... | V171; image 00 at 0x810004 | encode `120` on `ASAM.C.SCALAR.SBYTE.IDENTICAL`..." Hmm wait actually re-reading line 180: "| R-A2L-DEF.44/1 | Verify the notice above the limits | robustness | V171; image 00 at 0x810004 | encode `120` on `ASAM.C.SCALAR.SBYTE.IDENTICAL`; then on its definition with `shared_with` cleared | refusal `A2L-DEF-OVERLAP` (against `ASAM_I_SCALAR_VALUE_UWORD_SINGLE`), 0 bytes; then bytes 78; notice `...`". The image address in the ledger says 0x810004 but the SBYTE is at 0x810001. That's a ledger typo? The image needs the object's bytes present (0x810001). Saying "image 00 at 0x810004" is inconsistent with the SBYTE's address (0x810001, per .138/6 and .44/2 which says image 00 at 0x810004 too?). Check .44/2: "V171; image 00 at 0x810004" — also 0x810004. Test .44/2 uses img = {0x810001: 0}. So the ledger precondition image address looks wrong (copy-paste from SWORD cases). But is it "malformed"? It's an inaccuracy in Preconditions. The encode of the SBYTE at 0x810001 over an image holding only 0x810004 would refuse A2L-DEF-BYTES... The test is authoritative and passes. The ledger's stated precondition is wrong-ish. Also .45/1 ledger: "V171 | encode -129 ..." no image specified — fine.
+
+  3. **.19/7 RED evidence**: ledger claims "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)". But in the stub run, test_r_a2l_def_19_7 is NOT in the FAILED list. Since .19/7's check is describe-time only (refusal at describe), and the describe side was already implemented in 2a, the test likely PASSED on the stub. That means the RED claim for .19/7 is unsupported — the test would pass on the stub (it doesn't exercise encode). Need to verify: grep the stub file for "19_7".
+
+  4. **.41/2 ledger**: "image 00 00 at 0x810004" matches. ✓
+
+  5. **.55/1 ledger**: expected "≥ 300 accepted values; 0 that do not agree..." test asserts accepted >= 300. Count: methods 3 × datatypes 5 × big 2 × formats 4 × samples 5 = 600. Fine, ≥300 non-vacuous. But note: "0 refused for precision among those taken from decoded stored values" — test asserts isinstance(res, Encoded) — covers.
+
+  6. **.56/1 ledger**: "≥ 32 texts" — test asserts total >= 32. V171: 3 enum objects with entries (TAB_VERB_DEFAULT has 3 pairs, NO_DEFAULT?, VTAB_RANGE 11 entries) + 10 C08 ASCII + 2 = potentially ≥ 32? TAB_VERB_DEFAULT_VALUE entries: (1,SawTooth),(2,Square),(3,Sinus) = 3; NO_DEFAULT maybe several; VTAB_RANGE 11. Plus 10 + 2. If 3+11+10+2=26 < 32? Hmm wait, need ≥32. Entries: default vtab 3, no-default vtab? Let me not compute precisely — the test passed on GREEN (run5 308 passed), so total ≥ 32 holds in practice. OK.
+
+  7. **AT-B103-I2-1**: ledger says expected decode of V171_ENUM_NODEF... test expects "red" as decoded text and "green" as the refused encode text? Wait: overlaps dict has V171_ENUM_NODEF: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "green") and expected decode text "red". Hmm — decode of the no-default enum gives "red"? Whatever — test passes on green. The ledger says "every object decodes to the text its A2L gives the bytes; nine objects are refused A2L-DEF-OVERLAP". Test matches: 9 overlaps + ASCII encodes.
+
+  Also need to check .58.2/9 and /15 pass on the stub (they're in encode-arm list but didn't fail — /9 has "no MemoryError" at describe; describe side already done; /15 V171 unclosed begin — encode "0" on cleared def over an image with bytes — the stub's encode returns refusal not exception, `_no_exception_encode` accepts Refusal → passes vacuously on stub! Hmm: test 58.2/15 asserts only isinstance(res, (Encoded, Refusal)). On the stub, encode_definition is stubbed to return... whatever it returns (a refusal presumably) — the test passes on the stub without exercising real encode. Similarly /12 and /14. These are "vacuous on RED" cases: the RED run passes them, but the ledger's Result column for /12 and /14 (and /6, /16, /18, /19, /20-/24) says "executed: GREEN on a856fab3 (fix-tests-green-main.txt...)" — those cite the E5 fix pass, fine.
+
+  But the ledger's RED claims cite int2b-red-stub-final4-main.txt only for rows that actually failed there. For .19/7 the claim is wrong per the FAILED list. Let me verify by grepping the stub file for 19_7 result and also check whether 58_2_15, 58_2_12, 58_2_14 appear as passed (they're not in FAILED, and no PASSED list, but "194 passed" total).
+
+  8. Also check .54/2 ledger: "accepted; stored 51; no notice" — test asserts Encoded(0x50, bytes([0x00, 0x33]), ()). Address 0x50? Stored 51 decimal = 0x33. Ledger says "stored 51" ✓, no notice ✓, but ledger doesn't mention address 0x50 — fine. Wait but test asserts address 0x50 — where does MEASUREMENT_0001 live? c08 mem. Fine, green passes.
+
+  9. .54/1 ledger: expected message "the nearest stored value is 5.100" ✓ matches test.
+
+  10. .151/7: ledger expects `OT: '<252 × x> é �…' is not a number`; test builds text = 252 x + " é " + ESC + "y"? Wait: test text = "x"*252 + " \u00e9 " + "\x1b" + "y" — that's 252 + 1 space + é + 1 space + ESC + y = 257. But ledger says encode 252 × x then ` é `, ESC and y (257 chars) and echoed first 252 x, the space and é preserved... The ledger's phrasing "'<252 × x> é �…'" implies the cut happens after " é " (space é space → shows as " é ")? Test echoed = 252 x + " é " + FFFD + ELLIPSIS — includes the trailing space too, then ESC→FFFD. Ledger shows ` é �…` — space, é, space, FFFD, … — consistent. ✓
+
+  11. .138/16 ledger expects bytes `1a e6` and `10 37`; test asserts encode bit "0" → 1A E6 and field "3" → 10 37. ✓ (RED synth shows exactly these failing on stub with address 0 vs 0x800010.)
+
+  Wait — in the RED synth failure: `assert Encoded(addre...', notices=()) == Encoded(addre...')` with "address: 0 != 8388624..." — meaning stub returned address 0. Fine.
+
+  12. .46/3 ledger: "encode a new value on the multi-bit object, then decode both masked objects over the image with those bytes applied — the multi-bit object decodes to the new value; the single-bit object to its planned value". Test encodes field "3" then decodes field → "3" and bit → "1". ✓ planned value of MASK_BIT_0001 is "1" (from .61/1: planned_text "1"). ✓
+
+  13. AT-B103-I2-2 (2b): ledger: "each decodes first to its planned value, then to the second value; the image outside the written spans is unchanged". Test covers 4 scalars. Ledger's 2a arm mentioned all objects; the 2b arm test only covers the 4 _SCALAR_DEFC. Ledger row AT-B103-I2-2 expected says "each object of the case: build, decode, encode its planned value's text and a second value" — the test only does the four scalars (ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001). Is that a coverage gap? The row's Tests column cites the synth test (full). Hmm, the test name is "write_arm_encodes_planned_then_a_second_value" and iterates only _SCALAR_DEFC. Other DEFC objects: curves/maps/VAL_BLK refused kinds... The DEFC case has objects like curves/maps (decode_values) whose encode arm... The ledger 2b arm says "encode the planned text and a second value, apply, decode (rows .46, .48, .55, .56)". The test restricts to scalars. Possible partial-coverage discrepancy, but maybe DEFC only has those 4 scalar objects plus refused/axis ones. DEFC objects: ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001 + possibly arrays/curves (AXIS_PTS seen in _defc_decode — "an AXIS_PTS axis record" — so the case does have axis/curve objects). Their write arm may be out of scope for scalar encode_definition (encode_values is Inc 3a?). This could be a finding: AT-B103-I2-2's 2b arm does not encode every object as the ledger row states. I should flag as a discrepancy (medium).
+
+  14. Check "full/partial" marks: AT-B103-I2-1 marked (full) and the test covers both arms (decode + encode)? The 2a arm was a separate test (test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives) and the ledger row cites only the write-arm test as (full)... Row AT-B103-I2-1's Tests column cites only `test_at_b103_i2_1_write_arm_...` (full). Hmm, the 2a-arm test exists separately (line 1563) but isn't cited in the row. The row is one case; the cited test covers the full case? The case's expected result includes decode ("every object decodes to the text its A2L gives the bytes") — the write-arm test does decode each object too (line 3562). So (full) is plausible.
+
+  15. AT-B103-I2-3 partial ✓ (its test is decode-only model check, marked partial in ledger).
+
+  16. Check .136/1 partial — cited tests in both files, Coverage partial ✓.
+
+  17. Malformed table columns: row .149/1 … /10 have very long cells but 9 columns each — need to verify each row has correct pipe count. Let me programmatically check the tables' column counts.
+
+  18. Counts: verify 103 2b cases and the per-section counts (S2.7a 4, S2.7b 3, S2.7c 96), and mixed (21 in 2a with waiting arms: .21/3, .136/1, .58.1/1,/2, 15 of .58.2, AT-I2-1, AT-I2-2). Also verify the "122 newly assigned or updated full cases" claim — from the user prompt: "with 122 newly assigned or updated full cases". The ledger counts line says S2.7c 122. Hmm.
+
+  19. Vacuous checks: 
+  - .58.2/12, /14, /15 encode arms assert only "no exception" — on the stub they passed (not in FAILED list). So their RED evidence: the ledger doesn't claim RED for them (they claim GREEN from earlier runs / .15 claims RED on stub). Wait .58.2/15 ledger says "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt)". But it did NOT fail on the stub! Let me verify: FAILED list contains 58_2_15? Looking: lines 1989-2000 list 58_2_1,2,3,4,5,7,8,9,10,11,13,17 — no 15. So .58.2/15's claimed RED on the stub is unsupported — the test passed on the stub because it only asserts isinstance (Encoded|Refusal), and the stub's encode returns a Refusal. That's both a vacuous-check finding and a wrong RED citation. Similarly .19/7.
+  - .58.2/12 and /14 ledger rows claim GREEN only (from a856fab3 run) — fine, but as 2b evidence they were not RED; they're "mixed" cases whose 2a arm was already covered; acceptable per split doc, but their encode arms are vacuous (any refusal passes). The row threshold for .58.2 says "a value or refusal; 0 exceptions" — so the requirement itself is a no-exception check; not vacuous per se, but as a 2b RED driver it fails to discriminate. Flag as observation.
+
+  Let me now verify:
+  a) V171_ASCII constant and V171 names.
+  b) .19_7 in stub run — grep for "19_7" in int2b-red-stub-final4-main.txt.
+  c) 58_2_15 in stub run.
+  d) Table column-count check via script.
+  e) The "283 cases" count and section counts.
+  f) Check run5 (GREEN) contains the 2b tests: 308 passed total; is 2b subset all included? run5-main has only dots. The deselected count? "308 passed in 11.06s" — presumably the whole main file. Check how many tests are in the main file: let me count test functions. Also int2b-run1-synth 12 passed (synth file has 12 tests: 59/1-4, 60,61,62,63, AT_I2_2 2a, 138/16, 46/3, AT_I2_2 2b = 12 ✓).
+
+  Also verify stub run synth: int2b-red-stub-final2-synth.txt: 3 failed 9 passed ✓ matches RED claims for .46/3, .138/16, AT-I2-2.
+
+  Also check claim "122 newly assigned or updated full cases" — maybe from E4-handoff-tests-2b. The user says the ledger claims this. I can check E4-handoff-tests-2b.md quickly.
+
+  Also need to check the mixed .21/3 (line 769) test body — it's the same function at 3388 (one test). Ledger row .21/3 cites test_r_a2l_def_21_3... which includes both describe-check (2a) and encode (2b). ✓ read earlier at 769? The def at 769 is the 2a-era version; the 2b tail at 3388 redefines? Wait — grep showed `def test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode` only at 3388. Line 769 shows `def test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits(tmp_path):` — a DIFFERENT function name (without _encode)! So there are two tests: the 2a one (describe check, name ..._no_extended_limits) and the 2b one (..._encode). Ledger cites only the _encode one as (full). OK — the 2a part is covered by the other test; the row's Tests column cites the encode test (full). Fine but note: the ledger row .21/3 cites test name `test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode` ✓ exists.
+
+  Now let me check V171 constants, .19_7 and 58_2_15 in the stub evidence, and column counts.---
+1
+Confirmed: `test_r_a2l_def_19_7`, `58_2_15` (and 58_2_12, 58_2_14) do NOT appear in the stub RED run at all — meaning they passed on the stub. So the ledger's RED claims for .19/7 and .58.2/15 citing int2b-red-stub-final4-main.txt are unsupported.
+
+  But wait — I should double check whether these tests were even collected in the stub run. The stub tree is a copy with encode_definition stubbed. Test names 19_7 and 58_2_15 exist in the current test file. Did the stub run include them as passed? The run shows "194 passed" — can't tell individually without a verbose list, but they're not FAILED, and pytest would error if missing. Actually the stub run was run before some tests were added? int2b-red-stub-final4-main.txt at 00:41; run5 at 00:38; the final stub at 00:41. Let me check the stub file's failure list for total collected: "114 failed, 194 passed" = 308 total, same as run5's 308 passed. So same collection — 19_7 and 58_2_15 passed on the stub.
+
+  Hmm, but wait: is 58_2_15's stub pass vacuous? `_no_exception_encode` asserts isinstance(res, (Encoded, Refusal)) — the stub returns a Refusal (or Encoded?) so passes. Yes vacuous on RED.
+
+  And 19_7: the test only checks describe-time refusal — describe side was implemented in 2a, so passes on stub. Its ledger row claims RED on the stub — wrong. Also as a "2b residual guard", the test never exercises encode; but its requirement is a describe-time refusal (byte order unreadable), which is arguably 2a logic. Fine to note.
+
+  Also .58.2/12 and /14: ledger rows claim only GREEN (they say executed: RED on stub? let me re-check). Row .58.2/12 says "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)" — line 233: yes it claims RED on stub for /12! Let me re-check line 233: "R-A2L-DEF.58.2/12 ... executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)". And /14 (line 235) also claims RED on stub. But neither appears in FAILED — both passed on the stub vacuously (isinstance check only). So ledger RED claims for /12, /14, /15 are all unsupported. Also /9? No — /9 failed on stub (in FAILED list: 58_2_9 yes). And /11, /13, /17 failed. Which 58.2 encode-arm tests failed: /1,/2,/3,/4,/5,/7,/8,/9,/10,/11,/13,/17 = 12. Did not fail: /12,/14,/15. Also /6,/16 are decode-only (not encode-arm tests; their tests are named without _encode and live in the 2a section) — correct.
+
+  Now, which ledger rows cite RED-on-stub for these? Let me list the .58.2 rows' Result text from the table:
+  - /12 (line 233): "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)" → UNSUPPORTED (passed on stub).
+  - /14 (line 235): same claim → UNSUPPORTED.
+  - /15 (line 236): same claim → UNSUPPORTED.
+  - /1 (222): RED claimed → supported (in FAILED).
+  - /2,/3,/4,/5,/7,/8,/9,/10,/11,/13,/17: supported.
+
+  Also .19/7 (line 78): "RED on cb083d07 (int2b-red-stub-final4-main.txt)" → UNSUPPORTED.
+
+  Also check mixed rows .21/3, .58.1/1,/2, AT-I2-1 RED claims: 21_3, 58_1_1, 58_1_2, AT_I2_1 all in FAILED ✓.
+
+  Also, are there rows that failed on the stub but whose ledger claims GREEN-only? The stub fails include 138_* etc. all claimed RED. 151_7 claimed RED ✓. 26_2/3/4 claimed RED ✓. 25_2 ✓. 19_6 ✓. What about .40/1-/9, .41/-.57: all claimed RED ✓. 54_* ✓, 55,56 ✓, 57_* ✓, 152_* ✓, 46_1/2/4 ✓, 47,48,49,50,51,52,53 ✓, 42_*, 43_*, 44_*, 45_* ✓. 138_1-15,17-21 ✓.
+
+  So unsupported RED claims: .19/7, .58.2/12, .58.2/14, .58.2/15. Four rows.
+
+  Now the ledger/test value mismatches:
+  - .26/4: ledger says ASCII object "(`UNKNOWN`)" and expected message "UNKNOWN: 42 of its 42 bytes..." but the test (and current parser) use "ASAM.C.ASCII.UBYTE.NUMBER_42". Ledger stale. Also ledger .26/4 Inputs say "encode `ABC`" ✓.
+  - Also check other rows referencing UNKNOWN: .3/1 (2a) fine. .50/1-3, .51/1, .52/1-3, .53/3, .57/1 use "<name>" — fine.
+  - .44/1 and .44/2 ledger preconditions "image 00 at 0x810004" but SBYTE is at 0x810001; test uses 0x810001. Ledger precondition wrong (would change the case). Actually wait — is it wrong? If the image holds bytes only at 0x810004, then encoding the SBYTE at 0x810001 would hit A2L-DEF-BYTES. The case expects the notice path, which requires the bytes present. The ledger's stated precondition contradicts its own expected result. Finding (ledger inaccuracy; test is correct).
+
+  Hmm wait, let me double-check the ledger rows .44/1 and .44/2 — line 180: "V171; image 00 at 0x810004". Yes. And .45/1 line 182: "V171 | encode -129..." no image. .45/2: no image. Tests: .45/1 uses {0x810001: 0}, .45/2 {0x810000: 0}. Ledger preconditions omit the image for .45 — minor.
+
+  Also .43/4 ledger: "V171; image 00 at 0x13A00's object" — awkward but ok. Test uses {0x13A00: 0} ✓. Ledger expected: "refusal A2L-DEF-OVERLAP, 0 bytes; then ... hundredtwo is outside the limits 0..101" ✓ matches test (test asserts shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL" then clears and expects LIMITS refusal; note test does NOT assert the overlap refusal encode for .43/4! Test only asserts shared_with and then the cleared encode. Ledger says "the case first asserts the overlap, then clears shared_with" — test asserts d.shared_with == ... (the describe state), not an actual overlap refusal encode. Minor wording; not a real gap since .138 covers the refusal. Acceptable but could note.
+
+  Wait, also check .44/1: test DOES assert the overlap encode first, then cleared encode with notice ✓. .44/2: test only asserts cleared encode + notice — ledger says "refusal A2L-DEF-OVERLAP, 0 bytes; then bytes 80; notice..." Test .44/2 does not assert the overlap refusal (no first encode on the uncleared def). Ledger claims it does: "encode `-128` on the same; then with `shared_with` cleared | refusal `A2L-DEF-OVERLAP`, 0 bytes; then bytes 80; notice ...". Test line 2733-2738: asserts shared_with, then only cleared encode. So ledger overstates .44/2. Minor discrepancy.
+
+  Also .41/2: ledger expects first "refusal A2L-DEF-OVERLAP ... 0 bytes (R-A2L-DEF.138); then bytes FB FF" ✓ test matches.
+
+  Now check "image 00 00 at 0x810004" for .41/2 ✓ (SWORD at 0x810004).
+
+  .46/1 ledger: image "0F F0 at 0x810002 (word 0xF00F)" ✓; expects cleared encode bytes 3F F2 ✓ test.
+
+  .46/2 ledger ✓ 35 12. .46/4 ✓ 12 14.
+
+  .47/3 ✓. .48/3 ✓ 01. .50/1 ✓ 41 42 43 + 39 zeros. .51/1: ledger message uses em-dash "—" ✓ test \u2014. .52 messages ✓.
+
+  .53/4: ledger "then address 0x810002, 2 bytes (the word, not the field)" ✓ test Encoded(0x810002, 3F F2).
+
+  .54/2: ledger "stored 51" ✓ bytes 00 33 at address 0x50. Ledger omits address; fine. Actually ledger says "accepted; stored 51; no notice" — test also asserts address 0x50, bytes [0x00, 0x33]. ✓ consistent.
+
+  .55/1 ledger expects "the integer datatypes also with a multi-bit and a one-bit mask: 0x0FF0 and 0x0001, UBYTE 0x0F and 0x01" — but the TEST does NOT include masked objects at all! Test iterates methods × datatypes × endianness × formats — no BIT_MASK variants. Let me re-read the test (2975-3013): no mask. The ledger's stated input includes masked variants and ≥300 accepted; test gives 600 unmasked. The masked round-trip input described in the ledger is absent from the test. Discrepancy! Also the row's expected mentions "0 refused for precision among those taken from decoded stored values; 0 refused among typed decimals" — the "typed decimals" part: test encodes dec.text (the display text) — hmm, "≥ 2 typed decimals" per ledger: test only encodes the decoded text, once. So the ledger describes inputs/expectations not implemented: (a) masked objects missing, (b) typed decimals missing, (c) counts: test asserts accepted >= 300 and gets 600 from unmasked only. This is a real coverage discrepancy for .55/1. Wait — maybe I should double check the _val helper to see if masks get added... No, the loop doesn't pass BIT_MASK. Confirmed missing. Finding: FAIL-level? It's a mismatch between ledger and test. The test as written is non-vacuous and passes; the ledger overstates. Rate as an issue.
+
+  Hmm wait, also ledger .55/1 says "formats `%.0`, `%8.4`, `%.15`, none" ✓ test. "≥ 3 stored values" ✓ 5 samples.
+
+  .56/1 ledger: "a V171 entry text is encoded on its object's definition with shared_with cleared (every scalar object using those tables shares its bytes...)" — test clears for every entry ✓. "every V171 entry-text encode before the clearing refused A2L-DEF-OVERLAP" — test asserts the FIRST entry text refuses overlap for each of the 3 objects, not every text. Ledger says "every V171 entry-text encode before the clearing refused" — test only checks the first entry per object. Minor overstatement. Count ≥32 ✓ asserted.
+
+  Also ledger .56/1: "the 10 planned strings on case 08's ASCII objects" — test iterates c08 objs kind == "ASCII" ✓.
+
+  .57/5: ledger expects refusal A2L-DEF-PARSE "not A2L-DEF-NUMBER: the parse check precedes..." ✓ test asserts the PARSE refusal with the first error. Note: test's input is `/include "x.a2l"` at module level — does .152 fire? It asserts first == a2l["errors"][0] and code PARSE ✓.
+
+  .138/21: ledger: "describe and encode 7 on V1, then encode 7 on V1 beside only B1" — test does that plus _no_exception_encode. ✓ "beside only B1, shared_with is None and Encoded(0x10, 07, ())" ✓.
+
+  .138/9 ledger expects the overlap refusal; test also does parse-error first — ledger row says expected "H1 has no readable length; refusal A2L-DEF-OVERLAP..." — the test's first encode asserts PARSE refusal because the huge NUMBER generates a parse error? Actually the ledger's preconditions for .138/9: "image 00 at 0x10" and expected only OVERLAP. Test asserts PARSE first then clears errors then OVERLAP. The ledger row mentions "H1 has no readable length" but not the parse-error step. Slight mismatch in description but consistent intent (mirrors .138/13 isolation note). OK.
+
+  .138/10 ledger ✓ matches test (ON carries A2L-DEF-ADDRESS refusal, bit_mask 0x0F00 kept; parse first then overlap). Ledger expected mentions "ON carries R-A2L-DEF.7.2's refusal and gives no clean mask" — hmm test asserts on.refusal.code == A2L-DEF-ADDRESS AND on.bit_mask == 0x0F00. "gives no clean mask" — whatever. Fine.
+
+  .138/12: ledger "the definitions, then encode 7 on OA" ✓.
+
+  .138/18: ledger expects Z0: shared_with None, Encoded(0x0, 00 07, ()) — test ✓ ("(a missing address is not read as 0x0)").
+
+  .138/19 ✓. .138/20 ✓.
+
+  AT-B103-I2-1: ledger expected "nine objects are refused... and the image stays unchanged" ✓; test checks image outside ASCII span unchanged after ASCII encode. ✓ Also decode texts: ledger says "every object decodes to the text its A2L gives the bytes" — test asserts decode text per object incl. ASCII "Hello ASAM". ✓ Wait ledger 2a-arm description said image holds "0 at 0x810001" etc. — fine.
+
+  Hmm, one more check on AT-I2-1: the expected decode for V171_ENUM_NODEF is "red" and the refused encode text is "green". Whatever the A2L says — passes on green.
+
+  Now the synth file: 12 tests, run1-synth GREEN 12 passed ✓; final2-synth RED 3 failed 9 passed ✓.
+
+  Ledger synth rows: .46/3 RED on int2b-red-stub-synth.txt — but the actual evidence file is int2b-red-stub-final2-synth.txt! Line 187: "executed: RED on cb083d07 (int2b-red-stub-synth.txt); GREEN on cb083d07 (int2b-run1-synth.txt)". The cited file int2b-red-stub-synth.txt also exists (4889 bytes, 00:14). Both exist. int2b-red-stub-synth.txt (earlier) presumably also shows 3 failures. The user asked to audit against int2b-red-stub-final2-synth.txt — which shows the 3 failures ✓. So the citation is to an earlier-but-existing file; the final2 file corroborates. Not an issue, though the ledger could cite the final one. Minor.
+
+  .138/16 and AT-I2-2 rows cite int2b-red-stub-synth.txt too (lines 301, 359). Same situation.
+
+  Now counts verification. Let me count rows in the table:
+  - Section 1 (requirements): rows from line 17 to 314. Withdrawn: .19/8, /10-/23 = 1+14 = 15 withdrawn. Let me count total data rows and subtract.
+  - Section 2 (canon): lines 320-352 = 33 rows ✓ (claims 33).
+  - Section 3: 3 rows ✓.
+
+  Claim: 283 cases of 73 rows (S2.7a 99, S2.7b 54, S2.7c 122, S2.7d 8) + 33 + 3 = 319.
+
+  Let me verify 99+54+122+8 = 283 ✓. 283+33+3 = 319 ✓. And 216+103 = 319 ✓.
+
+  Verify 2a/2b split counts: 2b = S2.7a 4 (.19/6,/7, .25/2, .151/7) + S2.7b 3 (.26/2-/4) + S2.7c 96 (.40-.56 65, .57 5, .138 21, .152 5) = 103 ✓.
+
+  Verify "65" for .40….56: my count = 65 ✓ (including .46/3).
+  .57 = 5 ✓. .138 = 21 ✓ (rows /1-/21 minus /16? no — .138 has 21 rows: /1-/21 = 21 ✓ since there's no withdrawn in .138; wait rows listed: /1-/21 → that's 21 cases, with /16 in synth. ✓). .152 = 5 ✓.
+
+  2a: 216 = 180 (53 rows) + 33 + 3. 2a rows = 73 - 20 2b-rows? 2b rows: .19, .25, .151 (1 case), .26, .40,.41,.42,.43,.44,.45,.46,.47,.48,.49,.50,.51,.52,.53,.54,.55,.56,.57, .138, .152 = 24 rows. 73-24 = 49... but ledger says 53 2a rows. Hmm — 2a rows include .21, .136, .58.1, .58.2, .149, .150, AT rows etc. Let me count: 73 rows total in section 1? Need to verify by counting distinct row IDs. Let me do this with a script — parse the table, count cases, classify.
+
+  Also the "122 newly assigned or updated full cases" claim — user says the ledger claims 122. The counts line says "S2.7c 122". Hmm, "122 newly assigned or updated full cases" might refer to something in the E4 handoff. Let me check E4-handoff-tests-2b.md.
+
+  Also, I need to verify each 2b/mixed row's Tests column names exist in the test files. Let me script:
+  1. Parse 02-test-cases.md rows; check 9 columns each.
+  2. Extract case ids and test names.
+  3. Verify test names exist.
+  4. Count 2b and mixed cases per split.
+
+  Also verify .59/2 (slow) not_run — run5: 308 passed; is 59_2 deselected? run5-main shows "308 passed in 11.06s" with no deselect info. The 2a green (fix-tests-green-main.txt) had "199 passed, 1 deselected". For run5 (int2b), 308 = full main file minus slow? Total test functions in main file: let me count.
+
+  Let me count test functions: grep -c "^def test_" in main file.
+
+• Now let me verify table integrity, test-name references, and counts with a script, and check the handoff claim of 122.total data rows: 350
+bad column rows: [(246, '| R-A2L-DEF.59/1 | Verify the 1 MiB pin | normal | the gener', 10), (247, '| R-A2L-DEF.59/2 | Verify the 10 MiB pin | normal | as /1 | ', 10), (372, '| R-A2L-DEF.1 � .6, .139, .7.1, .7.2, .8 � .18, .20, .22, .2', 3), (373, '| R-A2L-DEF.19 | /1 � /5, /9 (6: the record-word clauses) | ', 3), (374, "| R-A2L-DEF.21 | /1, /2, /3 (3) | � (/3's encode arm waits) ", 3), (375, '| R-A2L-DEF.25 | /1 (decode) | /2 (encode) |', 3), (376, '| R-A2L-DEF.136 | /1 (it is re-run when 2b extends the walk)', 3), (377, '| R-A2L-DEF.149 | every case (10: /1 � /4, E5 gap pass; /5 �', 3), (378, '| R-A2L-DEF.150, .151 | every case (10 and 6: /1 � /9 and /1', 3), (379, '| R-A2L-DEF.26 | /1 (decode) | /2, /3, /4 (encode) |', 3), (380, '| R-A2L-DEF.27 � .39, .137 | every case (40) | � |', 3), (381, '| R-A2L-DEF.40 � .57, .138, .152 | � | every case (96: .40 �', 3), (382, '| R-A2L-DEF.58.1 | /1, /2 (encode arm waits) | � |', 3), (383, '| R-A2L-DEF.58.2 | /1 � /24 (the encode arm of /1 � /5, /7 �', 3), (384, '| R-A2L-DEF.59 � .63 | every case (7) | � |', 3), (386, '| AT-B103-I2-1 | 2a arm: build and decode the ten objects, e', 3), (387, '| AT-B103-I2-2 | 2a arm: build and decode each DEFC object t', 3), (388, '| AT-B103-I2-3 | the whole case | � |', 3)]
+withdrawn: 15 [' R-A2L-DEF.19/8 ', ' R-A2L-DEF.19/10 ', ' R-A2L-DEF.19/11 ', ' R-A2L-DEF.19/12 ', ' R-A2L-DEF.19/13 ', ' R-A2L-DEF.19/14 ', ' R-A2L-DEF.19/15 ', ' R-A2L-DEF.19/16 ', ' R-A2L-DEF.19/17 ', ' R-A2L-DEF.19/18 ', ' R-A2L-DEF.19/19 ', ' R-A2L-DEF.19/20 ', ' R-A2L-DEF.19/21 ', ' R-A2L-DEF.19/22 ', ' R-A2L-DEF.19/23 ']
+active rows: 335
+test_b103_a2l_definition.py:308
+test_b103_synth_definitions.py:12
+
+
+• Rows 372-388 are the split table (3 columns) — not the case table; fine. But rows 246 and 247 (.59/1 and .59/2) have **10 columns** — malformed! Let me inspect them. Looking back at the read: 
+
+  Row 246 (.59/1): `| R-A2L-DEF.59/1 | Verify the 1 MiB pin | normal | the generator of the tree under test | seed 20260001, \`--size-mb 1\`, no case option, into \`tmp_path\` | the 11 SHA-256 values of the \`1 \|` rows of \`evidence-e1/i2e1-case08-hashes-transcript.txt\`, each over the bytes with CR LF read as LF (PR lane) | ...`
+
+  The cell "the 11 SHA-256 values of the `1 \|` rows..." contains an escaped pipe `\|` which splits as a literal column count... wait — my naive split counted `\|` as a delimiter. The cell contains `` `1 \|` `` — an escaped pipe inside inline code. Markdown-wise `\|` inside code spans is still often counted as escaped. My counter didn't handle `\|`. So the 10 count may be an artifact of the escaped pipe, not a real malformation. Let me check: for .59/1, the expected cell contains `\`1 \|` rows\`` — one escaped pipe → 10 naive cells. .59/2 similarly `10 \|`. So it's an escaped pipe; whether it's "malformed" depends on the renderer. In GitHub markdown, `\|` inside a code span within a table is rendered literally as `\|`? Actually inside backticks, `\|` shows as `\|` (backslash not processed inside code spans)... in tables, GitHub does process `\|` escapes even inside code spans (it's required to write `\|` for a pipe inside code in tables). So it's correct-ish. My audit should note it renders fine in GitHub but a naive parser splits it. Not a real defect, but worth noting as "escaped pipes in .59/1 and /2 cells — verify rendering". Hmm — the user asked "check for malformed table columns". The naive check flags only these two; they use `\|` escapes which is the standard way. I'll note it as benign with explanation.
+
+  350 total data rows = 283 + 33 + 3 + ... wait 283+33+3 = 319, plus 15 withdrawn + 16 split-table rows = 350. ✓ 319+15 = 334, +16 = 350 ✓.
+
+  Active rows 335 = 319 + 15 withdrawn + ... 335-15 = 320? Hmm: 350 - 16 (split) = 334 case rows; 334 - 15 withdrawn = 319 active ✓. 
+
+  Test functions: main file 308, synth 12 → 320 total. run5: 308 passed (main, presumably excluding... wait main has 308 test functions and 308 passed — so the slow .59/2 is in synth (marked slow), and main run included all 308). fix-tests-green-main (2a) had "199 passed, 1 deselected" — 2a-era collection. run5 = 308 ✓ matches full main file. Synth run1: 12 passed ✓ full synth file (59_2 slow included? 12 = all synth functions; run1-synth shows 12 passed, so slow ran too).
+
+  Now verify that every 2b/mixed case row's Tests-column names exist and coverage values, and check the per-case (full) marks. Also confirm counts 216/103 classification. Let me extract case→test names for the 2b + mixed rows and check existence.2b cases found: 103  mixed cases found: 30
+('COLUMNS', 'R-A2L-DEF.1 � .6, .139, .7.1, .7.2, .8 � .18, .20, .22, .23, .24', 3)
+('COLUMNS', 'R-A2L-DEF.19', 3)
+('COLUMNS', 'R-A2L-DEF.21', 3)
+('COLUMNS', 'R-A2L-DEF.25', 3)
+('COLUMNS', 'R-A2L-DEF.136', 3)
+('COLUMNS', 'R-A2L-DEF.149', 3)
+('COLUMNS', 'R-A2L-DEF.150, .151', 3)
+('COLUMNS', 'R-A2L-DEF.26', 3)
+('COLUMNS', 'R-A2L-DEF.27 � .39, .137', 3)
+('COLUMNS', 'R-A2L-DEF.40 � .57, .138, .152', 3)
+('COLUMNS', 'R-A2L-DEF.58.1', 3)
+('COLUMNS', 'R-A2L-DEF.58.2', 3)
+('COLUMNS', 'R-A2L-DEF.59 � .63', 3)
+('COLUMNS', 'AT-B103-I2-1', 3)
+('COLUMNS', 'AT-B103-I2-2', 3)
+('COLUMNS', 'AT-B103-I2-3', 3)
+The 3-column "problems" are just the split table rows (3 columns is correct for that table) — my filter caught them since they start with "| R-A2L" or "| AT-B103". Not real issues.
+
+  103 2b cases found ✓, all covered, all tests exist, all marked full. Mixed = 30 found: .21/3, .136/1, .58.1/1,/2, .58.2/24 (all 24 counted as mixed since the row's 2a arm ran and encode arm waited), AT-I2-1, AT-I2-2 → 3+1+2+24+2 = 32? My counter counted 30 — because .58.2/18-/24 maybe... no wait, all .58.2 rows start with .58.2/. 1 (.21/3) + 1 (.136/1) + 2 (.58.1) + 24 (.58.2) + 2 (AT) = 30 ✓.
+
+  But wait — .58.2/18-/24 and /6, /16 are decode-only — are they "mixed"? Per the split doc, .58.2 cases have waiting encode arms except /6, /16, /18-/24. My counter flagged all 24 as mixed. The truly mixed (encode arm waited) = .58.2/1-/5,/7-/15,/17 = 15 + .21/3 + .136/1 + .58.1×2 + AT×2 = 21 ✓ matching the split counts line ("In 21 of them an arm waits"). Fine.
+
+  Now check coverage/result values on the mixed rows: .136/1 partial ✓ (table says partial), AT-I2-1 full, AT-I2-2 full, AT-I2-3 partial. All others covered/full.
+
+  Let me now verify the RED evidence for the 2b synth claims — ledger cites int2b-red-stub-synth.txt; check that file quickly to confirm it also shows the 3 failures (or different count). And also check "2b-red-stub-final2-synth.txt" shows 3 failed — confirmed earlier ✓.
+
+  Also the run5 GREEN: does the main file's 308 include everything and 0 failures ✓. Does run5 include the slow test? Main file has no slow marks? grep slow in main file: 59_2 is in synth. Fine.
+
+  Now, additional checks on the "122" claim. User said: "The ledger claims 319 total cases (216 2a + 103 2b), with 122 newly assigned or updated full cases." The counts line in 02-test-cases says "S2.7c 122". Hmm, but "newly assigned or updated full cases" — maybe from E4-handoff-tests-2b.md. Let me read that file to verify the 122 claim.
+
+  Also verify .59/2 Result "not_run" while run1-synth shows 12 passed including slow? Wait — run1-synth: 12 passed. Synth file has 12 test functions, one marked @pytest.mark.slow. If slow tests are deselected by default... 12 passed means slow ran (unless there are 13 functions? No — grep counted 12 defs). Let me count: 59_1, 59_2, 59_3, 59_4, 60_1, 61_1, 62_1, 63_1, at_i2_2 (2a), 138_16, 46_3, at_i2_2_write = 12 ✓. And .59/2's ledger Result says "not_run" — but run1-synth at 00:02 ran 12 passed... hmm, was slow included? If deselected, it would say "12 passed, 1 deselected". It says "12 passed in 5.02s". So 59/2 RAN and PASSED in run1-synth. But ledger says not_run! Discrepancy? Wait — run1-synth might have been run with --runslow or the marker config. Hmm. But wait: is .59/2 a 2b case? No — .59 is 2a (canon rows). It's not in my audit scope per se, but the user asked about "every 2b and mixed case". .59/2 is neither. Skip, or note briefly. Actually the evidence file int2b-run1-synth.txt shows 12 passed — but maybe that run used -m slow or included slow. The 2b synth evidence for RED is int2b-red-stub-final2-synth.txt (9 passed 3 failed = 12 too). So slow ran there as well. The .59/2 row says not_run — this is outside 2b/mixed scope; I'll mention in passing as an observation? Better keep focused: the user asked to audit 2b and mixed cases. I can note it as out-of-scope observation. Actually careful: maybe run1-synth ran with `--override-ini` or the conftest default includes slow. Whatever — out of scope, but I'll flag it as a side note since it touches evidence files I audited.
+
+  Hmm wait, actually let me reconsider: does run1-synth include test_r_a2l_def_59_2? "12 passed" with no deselect notice. conftest may deselect slow only when a flag absent... 2a green said "199 passed, 1 deselected" for the main file. For synth, if slow were deselected, we'd see "11 passed, 1 deselected". We see 12 passed → slow included (maybe run with -m "slow or not slow"). So .59/2 did run. Ledger says not_run — stale but out of my audit scope. Mention as observation.
+
+  Now read E4-handoff-tests-2b.md for the 122 claim.The 122 figure: the user said "with 122 newly assigned or updated full cases". The counts line in 02-test-cases says S2.7c 122 — that's the count of S2.7c cases, not "newly assigned". Hmm, maybe the user's claim comes from the review brief or coverage audit brief. Let me check E5-review-brief-2b.md and E5-coverage-audit-brief.md quickly.The "122 newly assigned or updated full cases" — probably refers to S2.7c having 122 cases. The user states it as a ledger claim. I'll verify the S2.7c count = 122 by classifying rows per section. Let me count cases per section (S2.7a/b/c/d) to verify 99/54/122/8.
+
+  How do I know which rows are S2.7a/b/c/d? The section numbers aren't in the case table. From context: S2.7a = rows .1-.57ish (requirements), S2.7b = .137? Hmm. Actually per split table: "S2.7a 95 with .149/1…/10, .151/1…/6 and .12/4, S2.7b 51 with .150/1…/10, S2.7c 26 with .58.2/18…/24, S2.7d 8" for 2a. And counts line: "S2.7a 99, S2.7b 54, S2.7c 122, S2.7d 8".
+
+  Rather than reverse-engineering exact section membership, I can check totals differently: total active 319 ✓, 2b 103 ✓, 2a 216 = 319-103 ✓. The 99+54+122+8 = 283 ✓ arithmetic. Section-level splits I can partially verify: S2.7d 8 = .58.1 (2) + .59 (4) + .60,.61,.62,.63? That's 2+4+4 = 10. Hmm. Or .59 (4) + .60/61/62/63 (4) = 8 ✓ and .58.1 belongs to S2.7c? The split table lists .58.1 under its own row. S2.7c: .58.1 (2) + .58.2 (24) + .138 (21) + .152 (5) + .40-.57? no...
+
+  Let me compute: S2.7c 122. Candidates: .19 (8 active: /1-/7,/9), .21 (3), .25 (2), .26 (4), .58.1 (2), .58.2 (24), .138 (21), .139 (3), .152 (5), .40-.57 (75)... too many. 
+
+  Alternatively: requirements S2.7a might be .1-.18, .20-.24, .149, .151 minus... I can't reliably reconstruct sections without the requirements file's section headers. Let me check 01-requirements.md section boundaries quickly via grep for "S2.7".7:Canon home (proposed, `E1-rulings.md` D-11): a new subsection **S2.7 · A value by its A2L definition (CTX-A2L-DEF)** at the end of S2, after S2.6, in four blocks: S2.7a building a definition, S2.7b decoding and display, S2.7c encoding, S2.7d test data. Inc 3 adds its blocks after them.
+132:### S2.7a · Building a definition (US-103-05)
+169:### S2.7b · Decoding and display (US-103-05)
+192:### S2.7c · Encoding an operator's value (US-103-05)
+223:### S2.7d · Test data: the release case stays, a definitions case is added (D6; amendment A1 rule 2)
+252:73 rows, all new: S2.7a 30 (R-A2L-DEF.1 … .25 with .7 as .7.1/.7.2, plus .136, .139, .149 (the E5 gap pass) and .151 (E5 gap pass 2)), S2.7b 16 (.26 … .39, plus .137 and .150 (E5 gap pass 2)), S2.7c 22 (.40 … .58 with .58 as .58.1/.58.2, plus .138 and .152 (the Inc 2b re-review)), S2.7d 5 (.59 … .63); 0 changed, 0 retired (the withdrawn .19 cases are cases, not rows). Cited canon rows with cases here: 29 (above). Context notes: CTX-A2L-DEF new; CTX-A2L-VALUE one line (D-4 A). Rows that depend on an open ruling: D-3 (.54), D-4 (.15, .30), D-5 (.60, .61, .63), D-6 (.62), D-7 (.43, .44, .45); a ruled-out row is marked `— Withdrawn`, keeping its id.
+337:- **2a: 53 rows.** S2.7a 30, S2.7b 16, S2.7c 2 (.58.1, .58.2) and S2.7d 5. Nine of them name clauses that wait: .19 (its two residual guards), .25, .26, .58.1, .58.2, .136, .137, .139 and .151 (.151/7).
+Sections: S2.7a rows = .1-.25 (incl .7.1/.7.2) + .136 + .139 + .149 + .151 (30 rows). S2.7b = .26-.39 + .137 + .150 (16 rows). S2.7c = .40-.58 (.58.1/.58.2) + .138 + .152 (22 rows). S2.7d = .59-.63 (5 rows).
+
+  Let me count active cases per section from the case table and verify 99/54/122/8.
+
+  S2.7a rows and their case counts:
+  .1:4, .2:3, .3:2, .4:8, .5:2, .6:2, .139:3, .7.1:2, .7.2:6, .8:2, .9:1, .10:4, .11:1, .12:4, .13:2, .14:3, .15:2, .16:2, .17:2, .18:3, .19:8 active (/1-/7,/9), .20:2, .21:3, .22:2, .23:2, .24:4, .25:2, .136:1, .149:10, .151:7
+  Sum: 4+3+2+8+2+2+3+2+6+2+1+4+1+4+2+3+2+2+2+3+8+2+3+2+2+4+2+1+10+7.
+  Let me add: 4+3=7, +2=9, +8=17, +2=19, +2=21, +3=24, +2=26, +6=32, +2=34, +1=35, +4=39, +1=40, +4=44, +2=46, +3=49, +2=51, +2=53, +2=55, +3=58, +8=66, +2=68, +3=71, +2=73, +2=75, +4=79, +2=81, +1=82, +10=92, +7=99. → S2.7a = 99 ✓
+
+  S2.7b: .26:4, .27:3, .28:3, .29:1, .30:4, .31:2, .32:2, .33:3, .34:2, .35:6, .36:1, .37:4, .38:2, .39:3, .137:4, .150:10.
+  Sum: 4+3+3+1+4+2+2+3+2+6+1+4+2+3+4+10 = 54 ✓
+
+  S2.7c: .40:9,.41:6,.42:11,.43:4,.44:2,.45:3,.46:4,.47:3,.48:3,.49:3,.50:3,.51:1,.52:3,.53:4,.54:4,.55:1,.56:1,.57:5,.58.1:2,.58.2:24,.138:21,.152:5.
+  Sum: 9+6=15,+11=26,+4=30,+2=32,+3=35,+4=39,+3=42,+3=45,+3=48,+3=51,+1=52,+3=55,+4=59,+4=63,+1=64,+1=65,+5=70,+2=72,+24=96,+21=117,+5=122 → S2.7c = 122 ✓
+
+  S2.7d: .59:4, .60:1, .61:1, .62:1, .63:1 = 8 ✓
+
+  Total 99+54+122+8 = 283 ✓. 2b within: S2.7a 4 (.19/6,/7, .25/2, .151/7) ✓, S2.7b 3 (.26/2-/4) ✓, S2.7c 96 ✓ (.40-.57: 65+5=70, .138:21, .152:5 → 96) ✓.
+
+  "122 newly assigned or updated full cases" — hmm, the user phrasing: "with 122 newly assigned or updated full cases". Maybe they mean S2.7c's 122 (encoding section) as "the 2b-related section". Or maybe there's a claim somewhere that 122 2b/mixed cases were newly assigned. Since 103 2b + 21 mixed-with-waiting-arms = 124, not 122. Hmm: 103 + 19? Or .138/20,/21, .152/1-/5, .151/7, .57/5 = the re-review adds (5+5+1+1=12)... Not obvious. The counts line says "S2.7c 122" — the encoding section has 122 cases total, of which 96 are pure 2b and 26 are 2a-side (.58.1×2, .58.2×24). I'll treat "122" as matching S2.7c=122 ✓.
+
+  Now the remaining verification items:
+
+  A. GREEN evidence: run5-main 308 passed ✓ (all main tests incl. 100 pure-2b + mixed encode arms). run1-synth 12 passed ✓ (incl. 3 synth 2b). But — were the 2b tests actually run in run5? 308 = all main functions ✓.
+
+  B. RED evidence issues found:
+   1. .19/7 claims RED on int2b-red-stub-final4-main.txt — not in FAILED list (passed on stub). UNSUPPORTED.
+   2. .58.2/12 claims RED on that file — not in FAILED (passed vacuously: only asserts isinstance (Encoded, Refusal)). UNSUPPORTED + vacuous on RED.
+   3. .58.2/14 same — UNSUPPORTED + vacuous.
+   4. .58.2/15 same — UNSUPPORTED + vacuous.
+   
+   Wait, let me double check .58.2/12's ledger row (line 233): "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)". Yes.
+   .58.2/14 (line 235): same pattern. Yes.
+   .58.2/15 (line 236): same. Yes.
+
+   Also check: did the stub file collect 308 tests (194 passed + 114 failed = 308 ✓ same collection as run5). So 19_7 and 58_2_12/14/15 passed on stub.
+
+   Hmm — but wait: is it possible the stub returns something that makes 58_2_15 fail? No — it's not in FAILED, so it passed.
+
+   Also E5-review-brief-2b says "final stub RED 114 failed + 193 passed main" — 114+193 = 307, not 308! But the actual final4 file says "114 failed, 194 passed" (23.67s). The brief (written earlier at 00:16) says 193 passed. Minor inconsistency in the brief, but the file itself is authoritative: 308 total. Note: brief says 307+12 GREEN too ("307 passed main") vs run5's 308. Possibly run5 added one test after the brief (e.g., 19_7 re-anchored?). Timestamps: run5 00:38, brief 00:16. So the brief predates the final runs; not an error in the ledger per se.
+
+  C. Ledger/test expected-value mismatches:
+   1. .26/4: ledger expected "UNKNOWN: 42 of its 42 bytes..." and input "the ASCII object (`UNKNOWN`)"; test uses name ASAM.C.ASCII.UBYTE.NUMBER_42 (V171_ASCII). The ledger's parenthetical "(`UNKNOWN`)" contradicts the test and the current parser. Stale text from before the name re-derivation. FAIL-ish (ledger inaccurate).
+   2. .44/1 and .44/2 preconditions say "image 00 at 0x810004" but the SBYTE object is at 0x810001 (and the test images 0x810001). Ledger wrong address.
+   3. .44/2 ledger says "encode -128 on the same; then with shared_with cleared → refusal OVERLAP, 0 bytes; then bytes 80; notice" — the test never encodes on the uncleared definition; it only asserts shared_with state then clears. Ledger overstates (says the case asserts the overlap refusal first, as .44/1 does).
+   4. .43/4 similar: ledger says "the case first asserts the overlap, then clears" — test only asserts d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL" (describe state), not an overlap refusal at encode. Minor.
+   5. .55/1: ledger inputs include masked objects (multi-bit 0x0FF0, one-bit 0x0001, UBYTE 0x0F/0x01) and "≥ 2 typed decimals" per object; the test has NO masks and only encodes the decoded text once. Ledger overstates test content; masked round-trip is untested by this case. Significant coverage discrepancy.
+   6. .56/1: ledger "every V171 entry-text encode before the clearing refused A2L-DEF-OVERLAP" — test only checks the first entry per object (3 overlap assertions), remaining ~30 entry encodes go straight to the cleared definition. Minor overstatement. Also ledger says "≥ 32 texts" ✓ asserted as total >= 32.
+   7. .138/9: ledger expected mentions only the overlap; test's first encode on the uncleared payload gets A2L-DEF-PARSE (huge NUMBER yields a parse error), then clears errors and gets the overlap. Ledger omits the parse step but the Inputs say "image 00 at 0x10" and preconditions don't mention parse errors. Minor mismatch in described behavior (test is a superset).
+   8. AT-B103-I2-2 2b arm: ledger row says "each object of the case: build, decode, encode its planned value's text and a second value" — the synth write-arm test only encodes the four scalars (_SCALAR_DEFC), not every DEFC object (the case also has axis/curve/array objects per _defc_decode's AXIS_PTS/CURVE/MAP branches). Coverage (full) overstates. Medium finding.
+   9. .59/2 ledger says not_run, but int2b-run1-synth.txt shows 12 passed (includes the slow 59/2 if slow wasn't deselected). Out of 2b scope — note as observation. Actually wait: is it possible the synth run deselects slow but the file has 13 tests? No, 12 defs. Hmm, unless the fixture counts... 12 passed = 12 tests. So 59/2 ran. But ledger says not_run (it's a 2a row though). I'll mention as a side observation only.
+
+   Also check .54/2 ledger "stored 51" — test asserts bytes 0x00 0x33 = 51 ✓ and address 0x50. Ledger fine.
+
+   .41/3: ledger "the first UWORD object with CM_LIN_OFF (a = 1, b = 100)"; test asserts o["name"] == "VALUE_0019" and stored 50 → bytes 00 32 ✓ (150-100=50).
+
+   .41/5: "stored 3" ✓ bytes 03 00. Ledger says "the first object with CM_TAB_NOINTP" — test uses MEASUREMENT_0002 by name and doesn't check it's the first; fine.
+
+   .41/6: ledger "encode 20, +2e1 on the first object with CM_TAB_INTP" — test uses MEASUREMENT_0001; stored 200 → 00 C8 ✓; .5 → raw 0.05, 1. → 0.1 ✓.
+
+   .42/5: ledger "the object of R-A2L-DEF.41/5" ✓ MEASUREMENT_0002, message ✓. .42/6: "the object of R-A2L-DEF.41/6" ✓ MEASUREMENT_0001 ✓ [0.0, 40.0] ✓.
+
+   .45/3 ✓. .46/1 ✓ (bytes 3F F2 — word 0xF23F: original 0xF00F, field bits 4-11 set to 35 (0x23) → 0xF00F & ~0x0FF0 = 0xF000; 35<<4 = 0x230 → 0xF230? Hmm: 0xF000 | 0x230 = 0xF230 → little-endian bytes 30 F2. But test expects 3F F2 (word 0xF23F)?? Wait V171 is little-endian (MSB_LAST). Image 0F F0 = word 0xF00F. Clear field: 0xF00F & ~0x0FF0 = 0xF000. New field value 35 = 0x23, shifted left by 4 = 0x230. 0xF000 | 0x230 = 0xF230. Little-endian bytes: 30 F2. But the test asserts bytes([0x3F, 0xF2]) → word 0xF23F!?
+
+  Hold on. 0xF23F: low byte 0x3F, high byte 0xF2. Field bits 4..11 = (0xF23F & 0x0FF0) >> 4 = 0x23 = 35 ✓. Unmasked bits: bit 0-3 = 0xF from original 0xF00F (0x000F) ✓, bits 12-15 = 0xF ✓. 0xF23F = 0xF000 | 0x023F. 0x023F = 35<<4 | 0xF = 0x230 | 0xF = 0x23F ✓. I made an arithmetic slip: 0xF00F & ~0x0FF0 = 0xF000 | 0x000F = 0xF00F? No: 0xF00F & ~0x0FF0 = 0xF000 + (0xF00F & 0xF00F & ~0x0FF0)... 0xF00F = 1111 0000 0000 1111. Mask ~0x0FF0 = 1111 0000 0000 1111. AND = 1111 0000 0000 1111? 0xF00F & 0xF00F = 0xF00F. So preserved = 0xF00F & ~0x0FF0: ~0x0FF0 within 16 bits = 0xF00F. 0xF00F & 0xF00F = 0xF00F. Preserved = 0xF00F?? That means bits 0-3 (0xF) and bits 12-15 (0xF) preserved, field bits cleared: 0xF00F & ~0x0FF0 = 0xF000 | 0x000F = 0xF00F. Hmm no: 0xF00F has field bits (0x0FF0) = 0x000. So preserved = 0xF00F. Then OR new field 0x0230 → 0xF23F ✓. Little-endian bytes of 0xF23F: 3F F2 ✓. Matches ledger "3F F2" and "base: 23 00" — the base produced 23 00 (a wrong impl cleared preserved bits). OK ✓.
+
+   .46/2: image 34 12 = word 0x1234; mask 0x0001, set bit0 → 0x1235 → bytes 35 12 ✓.
+
+  D. Coverage column checks for mixed rows: .136/1 partial ✓ (two tests, partial), AT-I2-1 full, AT-I2-2 full, AT-I2-3 partial ✓. .21/3 full ✓ (single test covers both arms). .58.1/1,/2 full ✓. .58.2 rows full ✓ (their tests include describe+decode+encode).
+
+  Hmm — .58.2 rows: the ledger Tests column for /1-/5 etc. cites e.g. `test_r_a2l_def_58_2_1_count_1e400_encode` (full). The 2a-era test `test_r_a2l_def_58_2_1_count_1e400` (describe+decode, line 1143) exists separately. The ledger now cites only the _encode variant as (full) — the _encode test includes describe+decode+encode ✓ full justified.
+
+  E. Check .21/3's 2a-era test still exists (line 769) but ledger cites only the encode one — fine.
+
+  F. Vacuous checks in 2b tests:
+   - .58.2/12, /14, /15: `_no_exception_encode` asserts only isinstance (Encoded, Refusal) — any refusal passes; on the stub they passed (no RED). These are "no exception" rows by requirement, so acceptable as requirements, but as 2b evidence they don't discriminate encode behavior; and their RED citations are false.
+   - .138/21: `_no_exception_encode(d, clean, ..., text="7")` asserts isinstance Refusal — but then a real assertion follows ✓ fine.
+   - .19/7: no encode call at all — describe-only. As a "2b residual guard" it doesn't test the write side; passes on stub. Its GREEN is fine; RED claim false.
+   - .55/1: asserts accepted >= 300 with actual 600 — fine, non-vacuous (agreement assert per value).
+   - .56/1: total >= 32 — need actual count: enum entries: TAB_VERB_DEFAULT (3 pairs), TAB_VERB_NO_DEFAULT (?), VTAB_RANGE_DEFAULT (11 triples) + 10 C08 ASCII + 2 = need ≥ 32 → 3 + X + 11 + 10 + 2 ≥ 32 → X ≥ 6. NO_DEFAULT vtab — has entries raw 0..? probably ≥ 6. GREEN passes so fine.
+   - AT-I2-1: asserts image unchanged outside ASCII span and 9 refusals ✓ non-vacuous.
+
+  G. Malformed columns: only .59/1 and /2 with `\|` escapes — render correctly in GitHub tables; flag as benign/note. Actually wait — with my escape-aware splitter, do .59/1 and /2 now give 9? Let me re-run mentally: the escape-aware splitter treats `\|` as cell content, so .59/1 → 9 ✓ (it wasn't flagged in the second run — correct, no COLUMNS entries for 59/1 in the problems list... indeed absent). So no malformed rows at all. Good.
+
+  H. Verify RED evidence for synth: int2b-red-stub-final2-synth.txt shows the 3 synth 2b tests failing ✓. The ledger cites int2b-red-stub-synth.txt (earlier run, also exists, 4889 bytes, 00:14). Both consistent presumably. Note the ledger could cite the final2 file. Minor.
+
+  I. Check that run5 actually is at cb083d07 and the tests correspond to the current tree — the audit is about consistency; fine.
+
+  J. One more: ledger .41/2 expected "refusal A2L-DEF-OVERLAP, `ASAM.C.SCALAR.SWORD.IDENTICAL: its bytes at 0x810004 are shared with ASAM.C.SCALAR.SWORD.LINEAR_MUL_2`, 0 bytes (R-A2L-DEF.138); then bytes FB FF (stored −5)" — test: first assert equals refusal (Refusal has no byte count, message only) — "0 bytes" is implied by refusal. Fine.
+
+  K. .53/4 ledger: "refusal A2L-DEF-OVERLAP (as R-A2L-DEF.46/1); then address 0x810002, 2 bytes" ✓.
+
+  L. .19/6 ledger ✓ matches test exactly (incl. encode → refusal).
+
+  M. .25/2 ✓. .151/7 ✓ (len ≤ 1024 asserted ✓ ledger says at most 1,024).
+
+  N. .57/1: ledger input "encode a 43-character text holding é" expected TEXT-LENGTH refusal with 43 characters message ✓ test asserts exactly that (message says 43 characters — note: é counts as 1 character; ledger says "43-character text holding é" — test text is 42 Z + é = 43 chars ✓).
+
+  O. .54/1: ledger "<name>: 5.07 cannot be stored ... nearest stored value is 5.100" — test asserts exactly, with MEASUREMENT_0001 given FORMAT %.3 ✓.
+
+  Now also verify the claimed RED set on stub matches ledger's RED citations for all 2b/mixed rows — done above; only the four rows (.19/7, .58.2/12, /14, /15) are wrong.
+
+  Also check .58.2/9's ledger claim: RED ✓ (in FAILED). Its row says "(no MemoryError)" ✓.
+
+  Additional check — the RED stub file: does it show collection from /tmp/b103-e4-2b-stub? Yes line 1. And run5 from /tmp/b103-e4-2b-int ✓ different trees (stub vs integration).
+
+  Now, the "308 passed" GREEN — but wait, is test_r_a2l_def_19_7 passing on GREEN expected? It checks describe refusal "BO: its byte order cannot be read" — yes 2a describe logic. ✓ consistent.
+
+  One more mixed-case check: .136/1's ledger Tests column cites two tests incl. perf file — partial ✓. The perf file test_b103_a2l_definition_perf.py wasn't provided for audit but row is partial; fine.
+
+  Also .58.1/1,/2 ledger rows cite `test_r_a2l_def_58_1_1_encode_does_not_mutate_v171` — matches file ✓ (lines 3518). These failed on stub ✓ (in FAILED list: 58_1_1? Let me check — FAILED list lines 1988-2000 include 58_2_11, 58_2_13, 58_2_17 and AT_I2_1... I don't see 58_1_1 or 58_1_2 in the FAILED list! Let me re-scan: lines 1989-2000: 58_2_1, 58_2_2, 58_2_3, 58_2_4, 58_2_5, 58_2_7, 58_2_8, 58_2_9, 58_2_10, 58_2_11, 58_2_13, 58_2_17. No 58_1_1/58_1_2! And no 21_3? — line 1988: 21_3 yes. So .58.1/1 and /2 claim RED on stub but are NOT in the FAILED list!
+
+  Wait — really? Let me search the stub file for 58_1_1.
+
+• Two more RED claims to verify — `.58.1/1` and `.58.1/2` don't appear in the FAILED list either. Let me confirm:58_1_1: 
+0
+58_1_2: 
+0
+21_3: 
+4
+19_7: 
+0
+58_2_12: 
+0
+58_2_14: 
+0
+58_2_15: 
+0
+
+
+• Confirmed (grep -c returns 1 exit when count 0; the output is fine):
+  - 58_1_1, 58_1_2, 19_7, 58_2_12, 58_2_14, 58_2_15: **0 occurrences** in the stub failure transcript → they passed on the stub.
+  - 21_3: appears (4×, including FAILED line) ✓.
+
+  So the ledger rows claiming "RED on cb083d07 (int2b-red-stub-final4-main.txt)" for **.58.1/1, .58.1/2, .19/7, .58.2/12, .58.2/14, .58.2/15** are unsupported — six rows.
+
+  Why did 58_1_1/58_1_2 pass on the stub? `_encode_unchanged` encodes "0" on every defined object; asserts res isinstance (Encoded, Refusal); and `if isinstance(d.shared_with, str): assert isinstance(res, Refusal)`. On the stub, encode returns a Refusal (stub behavior: leaves every expected result wrong — but a refusal IS one of the allowed outcomes here). Then `assert v171 == before and image == image_before` — the stub presumably doesn't mutate. So the immutability tests pass vacuously on the stub: any non-mutating encode (even a universal refusal) satisfies them. These are vacuous-on-RED tests: they can't fail on the stub because the stub's wrong result (Refusal) is an accepted outcome. Note the handoff said "record per-arm RED rather than one aggregate" and "no vacuous assertions: every negative control must identify an observable wrong result". The 58.1 encode-arm tests only assert "no mutation + refusal-or-encoded", which a stub returning Refusal for everything passes. So these are genuine vacuous-check findings.
+
+  Similarly .58.2/12, /14, /15 pass on the stub because `_no_exception_encode` accepts any Refusal.
+
+  And .19/7 passes because it's describe-only (2a logic already implemented).
+
+  Now .58.2/15's 2a-era counterpart (test_r_a2l_def_58_2_15_v171_unclosed_begin, line 1246) was GREEN from the 2a fix run; the encode arm adds nothing discriminating.
+
+  Also .21/3 DID fail on stub ✓.
+
+  Now, does the ledger claim RED-on-stub for .58.1/1 and /2? Lines 220-221: "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)" — yes both.
+
+  Summary of findings so far:
+
+  **A. Unsupported RED evidence (6 rows):** .58.1/1, .58.1/2, .19/7, .58.2/12, .58.2/14, .58.2/15 — all claim "RED on cb083d07 (int2b-red-stub-final4-main.txt)" but none appear in that transcript's 114 failures; the stub run collected the same 308 tests (114+194), so they passed on the RED stub. Of these, .58.1/1-/2, .58.2/12/-/14/-/15 pass vacuously (any non-mutating Refusal-returning stub satisfies them) — so no discriminating RED exists for their encode arms. .19/7 is describe-only (no encode call), so it cannot serve as a 2b RED driver at all.
+
+  **B. Ledger vs test mismatches:**
+  1. .55/1: ledger Inputs include masked objects (0x0FF0, 0x0001, UBYTE 0x0F/0x01) and "≥ 2 typed decimals" per object; test has no masks and no typed decimals — only 3 methods × 5 datatypes × 2 orders × 4 formats × 5 samples = 600 unmasked round trips. Masked round-trip coverage claimed but not implemented.
+  2. AT-B103-I2-2 (2b arm): ledger Expected says "each object of the case: build, decode, encode its planned value's text and a second value"; the synth write-arm test encodes only the 4 scalars (_SCALAR_DEFC), not every DEFC object (the case includes AXIS_PTS/curve/array objects per _defc_decode). Coverage "full" overstates; also the ledger's own row text says "rows .46, .48, .55, .56" — hmm the row does say "each object of the case". Partial at best.
+  3. .26/4: ledger input/expected name the object "(`UNKNOWN`)" and message "UNKNOWN: 42 of its 42..."; test uses the re-derived name ASAM.C.ASCII.UBYTE.NUMBER_42. Stale ledger text.
+  4. .44/1, .44/2: Preconditions say "image 00 at 0x810004"; object is at 0x810001 (test images 0x810001). Wrong address in ledger.
+  5. .44/2: ledger says the case first asserts the overlap refusal ("refusal A2L-DEF-OVERLAP, 0 bytes; then bytes 80"); the test asserts only d.shared_with and never encodes on the uncleared definition. Overstated. (.43/4 similar minor overstatement: "first asserts the overlap" = asserts shared_with only.)
+
+  **C. GREEN evidence:** run5-main 308 passed = full main file (308 defs) ✓; run1-synth 12 passed = full synth file ✓. All 2b/mixed tests included. Consistent with ledger GREEN claims.
+
+  **D. Counts:** 319 total = 283 (S2.7a 99 + S2.7b 54 + S2.7c 122 + S2.7d 8, verified by row sums) + 33 canon + 3 acceptance ✓. 2b = 103 (S2.7a 4, S2.7b 3, S2.7c 96) ✓ verified by enumeration; all 103 marked covered/full with existing tests. 2a = 216 = 319 − 103 ✓. 21 mixed cases with waiting arms ✓ (.21/3, .136/1, .58.1×2, .58.2×15, AT×2).
+
+  **E. Malformed columns:** none — the only naive-split anomalies (.59/1, .59/2) are escaped pipes `\|` inside code spans, which is the correct GitHub-table encoding; escape-aware parsing yields 9 columns for every row. Split table rows have their own 3-column header ✓.
+
+  **F. Side observations:** 
+  - .59/2 ledger says not_run, but int2b-run1-synth.txt shows 12 passed (slow included) — outside 2b scope.
+  - E5-review-brief-2b says "114 failed + 193 passed main" and "307 passed main" GREEN; the actual final transcripts say 194 passed / 308 passed. Brief predates final runs; transcripts authoritative.
+  - RED citations for synth rows point to int2b-red-stub-synth.txt (earlier run) rather than int2b-red-stub-final2-synth.txt; both show the same 3 failures — benign but should cite the final artifact.
+
+  Wait, one more check on AT-B103-I2-2's 2b arm scope. Let me confirm DEFC has non-scalar objects. From _defc_decode: AXIS_PTS → None; CURVE/MAP/VAL_BLK → decode_values. So the DEFC case does have axis/curve/map/array objects. The 2a arm test (test_at_b103_i2_2_the_definitions_case_decodes...) decodes all of them. The 2b arm only handles the 4 scalars. Do requirements .46/.48/.55/.56 (cited for the 2b arm) only concern scalars? .55/.56 are round trips "number/text" — the write arm for arrays would be encode_values — likely Inc 3a territory ("the Inc 3a I-D contract" mentioned in _defc_decode docstring). The ledger AT-I2-2 expected result though explicitly says "each object of the case: build, decode, encode its planned value's text and a second value". So ledger overstates vs test. It's a genuine finding (medium).
+
+  Also should I double-check that .55/1's missing masks aren't covered elsewhere (e.g., .46/1-4, .47, .138 cover masked encode). Masked ENCODE round trip specifically: .46/1,/2,/4 do masked encodes with assertions; so masked write is covered by other cases. But .55/1's own row claims the grid includes masked variants and the "0 refused for precision among typed decimals" clause — neither implemented in its test. The precision-of-typed-decimals clause: .54 covers precision. So the gap is real but partially backed by neighboring rows; still a ledger/test mismatch for .55/1.
+
+  One more: check .55/1's "≥ 300 accepted values" — test asserts accepted >= 300, actual 600 ✓ non-vacuous.
+
+  And .56/1's claim "every V171 entry-text encode before the clearing refused" — test checks first-entry-only per table. Minor.
+
+  Also verify .21/3's ledger expected: "refusal A2L-DEF-LIMITS, XL3: 101 is outside the limits 0..100 (nan is not a finite number → no extended limits)" ✓ test matches exactly.
+
+  Also .25/2 ✓. .26/2/3/4 ✓ exact messages.
+
+  Let me also double check .41/2's overlap message name "ASAM.C.SCALAR.SWORD.LINEAR_MUL_2" — ledger ✓ test ✓.
+
+  Also .138/5/6/7/8 ledger vs test ✓ exact.
+
+  .138/17 ledger: "encode 1 on MW; bytes 00 01, no refusal" ✓.
+
+  .138/19 ✓. .138/20 ✓ TA/TU.
+
+  .152/1-/5 ✓ exact messages with Line numbers ✓.
+
+  .57/4: ledger says "`OA` and `OB` of R-A2L-DEF.138/14; image 00 00 at 0x10" — test builds OA at 0x10 and OB at 0x11 (not 0x10 as in 138/14!) — wait: test 57_4 uses _val("OA","0x10",...) and _val("OB","0x11",...). But 138/14 has OA at 0x10 and OB at 0x11 ✓ same. "image 00 00 at 0x10" ✓. Ledger expects A2L-DEF-NUMBER "not A2L-DEF-OVERLAP: shared bytes are last in the encode order" ✓ test asserts NUMBER refusal. But note: OA and OB overlap (0x10-0x11 vs 0x11) → shared_with would be set, but number check precedes overlap ✓ discriminating.
+
+  .57/5 ✓.
+
+  .19/6 ✓. .47/1 ✓. .47/2 ✓ (MN: -1 does not fit the bit mask 0x00F0). .47/3 ✓.
+
+  .49/1: "case counts" — encode "square" refused ✓ message with CM.TAB_VERB.DEFAULT_VALUE.REF ✓.
+
+  .50/2: ledger "encode a 42-character text → those 42 bytes, no 00" ✓ test "Z"*42.
+
+  .53/1: ledger "INLINE (big-endian): UWORD B1 at 0x20" ✓ test uses default _inline byte_order (MSB_FIRST default? _inline(..., byte_order=None) means no MOD_COMMON line; the helper default... test 53_1 calls _inline without byte_order → default big-endian per INLINE fixture def (MSB_FIRST) ✓; 53_2 passes byte_order="MSB_LAST" ✓.
+
+  OK. Now .40/9: ledger expects `…: '�5' is not a number` ✓ test FFFD+"5".
+
+  .52/2: ledger `<name>: '�' is not a printable ASCII character` ✓.
+
+  Also .34/1, .34/2 (2a) not in scope.
+
+  Now write the audit report to .dev-flow/2026-11-05-batch-103/inc-2/E5-coverage-audit-2b.md, then answer PASS/FAIL with per-issue details.
+
+  Verdict: FAIL — six rows cite RED evidence their cited transcript does not contain (four of them structurally vacuous on a refusal-returning stub), plus .55/1's ledger describes masked/typed-decimal inputs the test doesn't implement, plus AT-I2-2's "full" overstates its write-arm scope, plus stale .26/4 name and .44 precondition addresses. GREEN evidence, counts, marks, and table integrity check out.
+
+  Wait — should verdict be FAIL or PASS-WITH-NOTES? The brief for the 2a audit used PASS/PASS-WITH-NOTES/FAIL. The user's ask: "Return PASS/FAIL and per-issue details." Given false RED citations (evidence integrity) and a coverage overstatement, FAIL is right — the ledger's evidence claims are wrong in 6 places, and one case (.55/1) claims coverage the test doesn't implement.
+
+  Hmm, but let me be careful about .58.1/1-/2 and .58.2/12/-/14/-/15: is it possible the stub transcript intentionally shows them passing because the stub leaves "every expected result wrong"? A stub that returns Refusal for every encode leaves the expected Encoded results wrong → tests that assert Encoded fail. Tests that accept Refusal pass. So yes, they passed. The ledger claiming RED for them is factually wrong relative to the cited file.
+
+  Double-check .58.2/12's row (line 233) once more, and .58.1 rows 220-221, .19/7 row 78, .58.2/14 row 235, .58.2/15 row 236 — from my earlier read:
+  - 220 .58.1/1: "executed: RED on cb083d07 (int2b-red-stub-final4-main.txt); GREEN on cb083d07 (int2b-run5-main.txt)" ✓ that's the claim.
+  - 221 .58.1/2: same.
+  - 78 .19/7: same.
+  - 233 .58.2/12: same.
+  - 235 .58.2/14: same.
+  - 236 .58.2/15: same.
+
+  All six cite that exact file. Confirmed unsupported.
+
+  Also note: .58.2/15's test name in ledger: `test_r_a2l_def_58_2_15_v171_unclosed_begin_encode` ✓ exists at line 3492.
+
+  Also verify .58.1/1's cited test name `test_r_a2l_def_58_1_1_encode_does_not_mutate_v171` ✓ exists.
+
+  Now also double-check my claim that stub collected 308: "114 failed, 194 passed in 23.67s" = 308 ✓ same as run5's 308 passed. Good.
+
+  Let me also spot-check that int2b-run5-main.txt really is the GREEN run of the integration tree at cb083d07 — the ledger says "GREEN on cb083d07 (int2b-run5-main.txt)"; file shows /tmp/b103-e4-2b-int path and 308 passed ✓.
+
+  One more consistency check — .138/16 and .46/3 and AT-I2-2 GREEN cite int2b-run1-synth.txt: shows 12 passed ✓ (3 2b among them, can't isolate but full-file pass covers them).
+
+  RED synth citations: rows cite int2b-red-stub-synth.txt; user asked to audit int2b-red-stub-final2-synth.txt which shows 3 failed/9 passed ✓ corroborating. Check int2b-red-stub-synth.txt quickly to make sure it also shows those 3 failures (so the citation isn't wrong).
+
+• One last evidence check — the earlier synth RED file the ledger cites:FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_138_16_two_disjoint_masks_still_encode
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value
+3 failed, 9 passed in 5.24s
+
+
+• Synth RED citations are consistent in both stub synth transcripts.
+
+  Now write the audit report file, then final answer. The report: .dev-flow/2026-11-05-batch-103/inc-2/E5-coverage-audit-2b.md.
+
+• All evidence gathered. Writing the audit report to the assigned file.
+
+• Done. Final answer with PASS/FAIL and per-issue details.
+
+• **Verdict: FAIL.** Report written to `.dev-flow/2026-11-05-batch-103/inc-2/E5-coverage-audit-2b.md`. Only that file was edited.
+
+  ## What checks out
+
+  - **Counts:** 319 total verified — 283 requirement cases (S2.7a 99, S2.7b 54, S2.7c 122, S2.7d 8, each re-summed against `01-requirements.md:132/169/192/223` section boundaries) + 33 canon + 3 acceptance. 2b = 103 exactly as the split table claims (S2.7a 4, S2.7b 3, S2.7c 96); 216 = 319 − 103. All 15 withdrawn `.19` rows retained as history.
+  - **Marks/references:** all 103 2b rows are `covered`/`(full)` and every named test exists; `.136/1`/`AT-B103-I2-3` correctly `partial`.
+  - **GREEN evidence:** `int2b-run5-main.txt` (308 passed = the full main file) and `int2b-run1-synth.txt` (12 passed = full synth file) cover every 2b/mixed test.
+  - **Exact values:** spot-verified bytes/messages for all 2b rows (e.g. `3F F2`, `35 12`, `00 C8`, `1A E6`/`10 37`, em-dash texts) — tests match the ledger.
+  - **Table integrity:** no malformed columns; the only naive-split anomaly (`.59/1`,`.59/2`) is a correctly escaped `\|` in a code span.
+
+  ## Issues
+
+  1. **Six false RED citations (blocker).** `.58.1/1`, `.58.1/2`, `.19/7`, `.58.2/12`, `.58.2/14`, `.58.2/15` claim "RED on cb083d07 (`int2b-red-stub-final4-main.txt`)" but none appears in its 114-failure list — the stub collected the same 308 tests as GREEN, so all six **passed on the RED stub**. Cause: five of them accept any non-mutating `Refusal` (`isinstance(res, (Encoded, Refusal))`), and `.19/7` makes no encode call at all (describe-time only). They are vacuous on the stub and contradict the handoff's no-vacuous-assertions rule.
+  2. **`.55/1` claims inputs the test never builds.** Ledger promises a masked grid (0x0FF0, 0x0001, UBYTE 0x0F/0x01) and "≥ 2 typed decimals"; `test_r_a2l_definition.py:2975` has no masks and no typed decimals — 600 unmasked round trips only.
+  3. **`AT-B103-I2-2` write arm marked `full` but encodes only the 4 DEFC scalars**, not "each object of the case" (the case has AXIS_PTS/curve/array objects).
+  4. **Stale ledger details (column edits only; tests pass):** `.26/4` still names the ASCII object `UNKNOWN` (test uses the re-derived `ASAM.C.ASCII.UBYTE.NUMBER_42`); `.44/1`–`.44/2` preconditions image 0x810004 instead of the SBYTE's 0x810001; `.43/4`/`.44/2` say "first asserts the overlap" but only assert `shared_with` state; `.56/1` says "every entry-text encode … refused" but only the first entry per table is checked pre-clearing.
+
+  Side observation (out of scope): `.59/2` says `not_run` but the synth transcript shows 12 passed with no deselect; `E5-review-brief-2b.md` says 193/307 passed vs the final transcripts' 194/308.
+
+To resume this session: kimi -r session_d622a2ca-d127-4485-b923-8986f6dbcd13

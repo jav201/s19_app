@@ -1,0 +1,31 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-351/test_r_a2l_def_138_23_cross_ki0')
+
+    def test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption(tmp_path):
+        shapes = (
+            ('/begin BLOB B "" 0x10 2\n/end BLOB',),
+            (
+                '/begin TYPEDEF_BLOB TB "" 2\n/end TYPEDEF_BLOB',
+                '/begin INSTANCE B "" TB 0x10\n/end INSTANCE',
+            ),
+        )
+        for shape in shapes:
+            a2l = _inline(
+                tmp_path,
+                *shape,
+                _val("B", "0x100", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"),
+                _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                byte_order="MSB_FIRST",
+            )
+            d = describe_definition("MW", a2l)
+>           assert d.shared_with == "B"
+E           AssertionError: assert None == 'B'
+E            +  where None = Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3411: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption
+1 failed, 309 deselected in 0.71s

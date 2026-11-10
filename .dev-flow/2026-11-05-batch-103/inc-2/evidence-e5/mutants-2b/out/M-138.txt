@@ -1,0 +1,480 @@
+M-138
+pytest -k a2l_def_138
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..bdca2053 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3710,7 +3716,7 @@ def encode_definition(
+         byte_refusal = _image_span_refusal(definition, image, name_echo)
+         if byte_refusal is not None:
+             return byte_refusal
+-        if definition.shared_with is not None:
++        if False:
+             return Refusal(
+                 "A2L-DEF-OVERLAP",
+                 f"{name_echo}: its bytes at {_fmt_address(definition.address)} "
+@@ -3793,7 +3799,7 @@ def encode_definition(
+         if not notices and isinstance(written_outcome, str):
+             notices = (written_outcome,)
+ 
+-    if definition.shared_with is not None:
++    if False:
+         return Refusal(
+             "A2L-DEF-OVERLAP",
+             f"{name_echo}: its bytes at {_fmt_address(definition.address)} "
+
+FFFFFFFFFFFFFFF..FFFFF.                                                  [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_138_1_lost_mask_negative_control ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_1_lost_mask0')
+
+    def test_r_a2l_def_138_1_lost_mask_negative_control(tmp_path):
+        a2l = _inline(tmp_path, _val("MN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                      _val("MC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        mc = describe_definition("MC", a2l)
+        assert mc.shared_with == "MN"
+        lost = dataclasses.replace(mc, refusal=None, bit_mask=None, bit_mask_text=None)
+>       assert _enc(lost, a2l, "35", _img(0x10, bytes([0, 0]))) == _ref(
+            "A2L-DEF-OVERLAP", "MC: its bytes at 0x10 are shared with MN")
+E       AssertionError: assert Encoded(address=16, data=b'\x00#', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='MC: its bytes at 0x10 are shared with MN')
+E        +  where Encoded(address=16, data=b'\x00#', notices=()) = _enc(Definition(name='MC', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='MN', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '35', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='MC: its bytes at 0x10 are shared with MN') = _ref('A2L-DEF-OVERLAP', 'MC: its bytes at 0x10 are shared with MN')
+
+tests/test_b103_a2l_definition.py:3181: AssertionError
+______________________ test_r_a2l_def_138_2_blob_overlap _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_2_blob_over0')
+
+    def test_r_a2l_def_138_2_blob_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VB", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin BLOB B1 ""\n  0x10 2\n/end BLOB')
+        d = describe_definition("VB", a2l)
+        assert d.shared_with == "B1"
+>       assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VB: its bytes at 0x10 are shared with B1")
+E       AssertionError: assert Encoded(address=16, data=b'\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='VB: its bytes at 0x10 are shared with B1')
+E        +  where Encoded(address=16, data=b'\x07', notices=()) = _enc(Definition(name='VB', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with='B1', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [{'address': 16, 'kind': 'BLOB', 'length': 2, 'name': 'B1'}], 'errors': [], ...}, '7', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='VB: its bytes at 0x10 are shared with B1') = _ref('A2L-DEF-OVERLAP', 'VB: its bytes at 0x10 are shared with B1')
+
+tests/test_b103_a2l_definition.py:3190: AssertionError
+_________________ test_r_a2l_def_138_3_sized_instance_overlap __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_3_sized_ins0')
+
+    def test_r_a2l_def_138_3_sized_instance_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VI", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin TYPEDEF_MEASUREMENT T_U16 ""\n  UWORD NO_COMPU_METHOD 0 0 0 65535\n/end TYPEDEF_MEASUREMENT',
+                      '/begin INSTANCE I1 ""\n  T_U16 0x10\n/end INSTANCE')
+        d = describe_definition("VI", a2l)
+        assert d.shared_with == "I1"
+>       assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VI: its bytes at 0x10 are shared with I1")
+E       AssertionError: assert Encoded(address=16, data=b'\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='VI: its bytes at 0x10 are shared with I1')
+E        +  where Encoded(address=16, data=b'\x07', notices=()) = _enc(Definition(name='VI', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with='I1', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [{'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'I1'}], 'errors': [], ...}, '7', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='VI: its bytes at 0x10 are shared with I1') = _ref('A2L-DEF-OVERLAP', 'VI: its bytes at 0x10 are shared with I1')
+
+tests/test_b103_a2l_definition.py:3199: AssertionError
+______ test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_4_unsized_i0')
+
+    def test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin INSTANCE IU ""\n  T_NONE 0x10\n/end INSTANCE')
+        d = describe_definition("VU", a2l)
+        assert d.shared_with == "IU"
+>       assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VU: its bytes at 0x10 are shared with IU")
+E       AssertionError: assert Encoded(address=16, data=b'\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='VU: its bytes at 0x10 are shared with IU')
+E        +  where Encoded(address=16, data=b'\x07', notices=()) = _enc(Definition(name='VU', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with='IU', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [{'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'IU'}], 'errors': [], ...}, '7', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='VU: its bytes at 0x10 are shared with IU') = _ref('A2L-DEF-OVERLAP', 'VU: its bytes at 0x10 are shared with IU')
+
+tests/test_b103_a2l_definition.py:3207: AssertionError
+______ test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_UBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(d, v171, "7", {0x810000: 0}) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+E       AssertionError: assert Encoded(address=8454144, data=b'\x07', notices=('ASAM.C.SCALAR.UBYTE.IDENTICAL: 7 is outside the limits 10..200 and inside the extended limits 0..256',)) == Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE')
+E        +  where Encoded(address=8454144, data=b'\x07', notices=('ASAM.C.SCALAR.UBYTE.IDENTICAL: 7 is outside the limits 10..200 and inside the extended limits 0..256',)) = _enc(Definition(name='ASAM.C.SCALAR.UBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8..._UWORD_SINGLE', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '7', {8454144: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE') = _ref('A2L-DEF-OVERLAP', 'ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE')
+
+tests/test_b103_a2l_definition.py:3213: AssertionError
+______ test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_SBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(d, v171, "7", {0x810001: 0}) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+E       AssertionError: assert Encoded(address=8454145, data=b'\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE')
+E        +  where Encoded(address=8454145, data=b'\x07', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8..._UWORD_SINGLE', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '7', {8454145: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE') = _ref('A2L-DEF-OVERLAP', 'ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE')
+
+tests/test_b103_a2l_definition.py:3220: AssertionError
+__________ test_r_a2l_def_138_7_v171_ulong_against_the_array_instance __________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_7_v171_ulong_against_the_array_instance(v171):
+        d = describe_definition("ASAM.C.SCALAR.ULONG.IDENTICAL", v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5"
+>       assert _enc(d, v171, "7", _img(0x810008, bytes(4))) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.ULONG.IDENTICAL: its bytes at 0x810008 are shared with ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5")
+E       AssertionError: assert Encoded(address=8454152, data=b'\x07\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.ULONG.IDENTICAL: its bytes at 0x810008 are shared with ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5')
+E        +  where Encoded(address=8454152, data=b'\x07\x00\x00\x00', notices=()) = _enc(Definition(name='ASAM.C.SCALAR.ULONG.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...UWORD_ARRAY_5', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '7', {8454152: 0, 8454153: 0, 8454154: 0, 8454155: 0})
+E        +    where {8454152: 0, 8454153: 0, 8454154: 0, 8454155: 0} = _img(8454152, b'\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00' = bytes(4)
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.SCALAR.ULONG.IDENTICAL: its bytes at 0x810008 are shared with ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5') = _ref('A2L-DEF-OVERLAP', 'ASAM.C.SCALAR.ULONG.IDENTICAL: its bytes at 0x810008 are shared with ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5')
+
+tests/test_b103_a2l_definition.py:3227: AssertionError
+____________ test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example(v171):
+        d = describe_definition("ASAM.C.DEPENDENT.REF_1.SWORD", v171)
+        assert d.shared_with == "ASAM_S_EXAMPLE"
+>       assert _enc(d, v171, "0", _img(0x811000, bytes(2))) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.DEPENDENT.REF_1.SWORD: its bytes at 0x811000 are shared with ASAM_S_EXAMPLE")
+E       AssertionError: assert Encoded(address=8458240, data=b'\x00\x00', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.DEPENDENT.REF_1.SWORD: its bytes at 0x811000 are shared with ASAM_S_EXAMPLE')
+E        +  where Encoded(address=8458240, data=b'\x00\x00', notices=()) = _enc(Definition(name='ASAM.C.DEPENDENT.REF_1.SWORD', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=84...SAM_S_EXAMPLE', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, '0', {8458240: 0, 8458241: 0})
+E        +    where {8458240: 0, 8458241: 0} = _img(8458240, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes(2)
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='ASAM.C.DEPENDENT.REF_1.SWORD: its bytes at 0x811000 are shared with ASAM_S_EXAMPLE') = _ref('A2L-DEF-OVERLAP', 'ASAM.C.DEPENDENT.REF_1.SWORD: its bytes at 0x811000 are shared with ASAM_S_EXAMPLE')
+
+tests/test_b103_a2l_definition.py:3234: AssertionError
+_ test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address __
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_9_hostile_u0')
+
+    def test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VH", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      "/begin CHARACTERISTIC H1 \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 1000000000000\n/end CHARACTERISTIC")
+        d = describe_definition("VH", a2l)
+        assert d.shared_with == "H1"
+        first = a2l["errors"][0]
+        assert _enc(d, a2l, "7", {0x10: 0}) == _ref(
+            "A2L-DEF-PARSE", f"VH: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+        clean = _clear_parse_errors(a2l)
+        assert describe_definition("H1", clean).address == 0x10
+>       assert _enc(d, clean, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VH: its bytes at 0x10 are shared with H1")
+E       AssertionError: assert Encoded(address=16, data=b'\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='VH: its bytes at 0x10 are shared with H1')
+E        +  where Encoded(address=16, data=b'\x07', notices=()) = _enc(Definition(name='VH', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with='H1', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='VH: its bytes at 0x10 are shared with H1') = _ref('A2L-DEF-OVERLAP', 'VH: its bytes at 0x10 are shared with H1')
+
+tests/test_b103_a2l_definition.py:3248: AssertionError
+_____________ test_r_a2l_def_138_10_clean_length_refused_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_10_clean_le0')
+
+    def test_r_a2l_def_138_10_clean_length_refused_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("ON", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00", "LENGTH 1048577"))
+        d = describe_definition("OA", a2l)
+        assert d.shared_with == "ON"
+        on = describe_definition("ON", a2l)
+        assert on.refusal is not None and on.refusal.code == "A2L-DEF-ADDRESS" and on.bit_mask == 0x0F00
+        first = a2l["errors"][0]
+        assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref(
+            "A2L-DEF-PARSE", f"OA: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+        clean = _clear_parse_errors(a2l)
+>       assert _enc(d, clean, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with ON")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with ON')
+E        +  where Encoded(address=16, data=b'\x00\x07', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='ON', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with ON') = _ref('A2L-DEF-OVERLAP', 'OA: its bytes at 0x10 are shared with ON')
+
+tests/test_b103_a2l_definition.py:3262: AssertionError
+____________ test_r_a2l_def_138_11_clean_duplicate_named_neighbour _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_11_clean_du0')
+
+    def test_r_a2l_def_138_11_clean_duplicate_named_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OD", "0xF000", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                      _val("OD", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"))
+        d = describe_definition("OA", a2l)
+        assert d.shared_with == "OD"
+>       assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OD")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OD')
+E        +  where Encoded(address=16, data=b'\x00\x07', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='OD', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OD') = _ref('A2L-DEF-OVERLAP', 'OA: its bytes at 0x10 are shared with OD')
+
+tests/test_b103_a2l_definition.py:3271: AssertionError
+______________ test_r_a2l_def_138_12_byte_order_refused_neighbour ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_12_byte_ord0')
+
+    def test_r_a2l_def_138_12_byte_order_refused_neighbour(tmp_path):
+        mod_common = "\n".join(['    /begin MOD_COMMON ""', "      BYTE_ORDER MSB_FIRST", "      BYTE_ORDER MSB_LAST", "    /end MOD_COMMON"])
+        a2l = _inline(tmp_path, mod_common,
+                      _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                      byte_order=None)
+        d = describe_definition("OA", a2l)
+        assert d.shared_with == "OB"
+>       assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OB")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OB')
+E        +  where Encoded(address=16, data=b'\x00\x07', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='OB', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OB') = _ref('A2L-DEF-OVERLAP', 'OA: its bytes at 0x10 are shared with OB')
+
+tests/test_b103_a2l_definition.py:3282: AssertionError
+____ test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_13_two_same0')
+
+    def test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F", "BIT_MASK 0x000F"))
+        d = describe_definition("OA", a2l)
+        assert d.shared_with == "OC"
+        first = a2l["errors"][0]
+        assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref(
+            "A2L-DEF-PARSE", f"OA: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+        clean = copy.deepcopy(a2l)
+        clean["errors"] = []
+>       assert _enc(d, clean, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OC")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OC')
+E        +  where Encoded(address=16, data=b'\x00\x07', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='OC', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OC') = _ref('A2L-DEF-OVERLAP', 'OA: its bytes at 0x10 are shared with OC')
+
+tests/test_b103_a2l_definition.py:3295: AssertionError
+__________ test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_14_unmasked0')
+
+    def test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      _val("OC", "0x30", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        oa = describe_definition("OA", a2l)
+        ob = describe_definition("OB", a2l)
+        oc = describe_definition("OC", a2l)
+        assert oa.shared_with == "OB" and ob.shared_with == "OA" and oc.shared_with is None
+        img = _img(0x10, bytes([0, 0]))
+>       assert _enc(oa, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OB")
+E       AssertionError: assert Encoded(address=16, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OB')
+E        +  where Encoded(address=16, data=b'\x00\x07', notices=()) = _enc(Definition(name='OA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='OB', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='OA: its bytes at 0x10 are shared with OB') = _ref('A2L-DEF-OVERLAP', 'OA: its bytes at 0x10 are shared with OB')
+
+tests/test_b103_a2l_definition.py:3307: AssertionError
+_____________ test_r_a2l_def_138_15_both_masks_select_a_common_bit _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_15_both_mas0')
+
+    def test_r_a2l_def_138_15_both_masks_select_a_common_bit(tmp_path):
+        a2l = _inline(tmp_path, _val("MA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
+                      _val("MB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0010"))
+        d = describe_definition("MA", a2l)
+        assert d.shared_with == "MB"
+>       assert _enc(d, a2l, "35", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "MA: its bytes at 0x10 are shared with MB")
+E       AssertionError: assert Encoded(address=16, data=b'\x020', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='MA: its bytes at 0x10 are shared with MB')
+E        +  where Encoded(address=16, data=b'\x020', notices=()) = _enc(Definition(name='MA', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with='MB', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '35', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='MA: its bytes at 0x10 are shared with MB') = _ref('A2L-DEF-OVERLAP', 'MA: its bytes at 0x10 are shared with MB')
+
+tests/test_b103_a2l_definition.py:3316: AssertionError
+_______________ test_r_a2l_def_138_19_0x0_is_a_declared_address ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_19_0x0_is_a0')
+
+    def test_r_a2l_def_138_19_0x0_is_a_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("Z1", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                      _val("Z2", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        z1 = describe_definition("Z1", a2l)
+        z2 = describe_definition("Z2", a2l)
+        assert z1.shared_with == "Z2" and z2.shared_with == "Z1"
+        img = _img(0x0, bytes([0, 0]))
+>       assert _enc(z1, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "Z1: its bytes at 0x0 are shared with Z2")
+E       AssertionError: assert Encoded(address=0, data=b'\x00\x07', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='Z1: its bytes at 0x0 are shared with Z2')
+E        +  where Encoded(address=0, data=b'\x00\x07', notices=()) = _enc(Definition(name='Z1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=2, datatype='...ared_with='Z2', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '7', {0: 0, 1: 0})
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='Z1: its bytes at 0x0 are shared with Z2') = _ref('A2L-DEF-OVERLAP', 'Z1: its bytes at 0x0 are shared with Z2')
+
+tests/test_b103_a2l_definition.py:3345: AssertionError
+____ test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_20_text_obj0')
+
+    def test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded(tmp_path):
+        a2l = _inline(tmp_path,
+                      "/begin CHARACTERISTIC TA \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 2\n/end CHARACTERISTIC",
+                      _val("TU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        d = describe_definition("TA", a2l)
+        assert d.shared_with == "TU"
+>       assert _enc(d, a2l, "AB", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "TA: its bytes at 0x10 are shared with TU")
+E       AssertionError: assert Encoded(address=16, data=b'AB', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='TA: its bytes at 0x10 are shared with TU')
+E        +  where Encoded(address=16, data=b'AB', notices=()) = _enc(Definition(name='TA', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=2, datatype='U...ared_with='TU', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, 'AB', {16: 0, 17: 0})
+E        +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='TA: its bytes at 0x10 are shared with TU') = _ref('A2L-DEF-OVERLAP', 'TA: its bytes at 0x10 are shared with TU')
+
+tests/test_b103_a2l_definition.py:3355: AssertionError
+___________ test_r_a2l_def_138_21_hostile_blob_and_instance_headers ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_21_hostile_0')
+
+    def test_r_a2l_def_138_21_hostile_blob_and_instance_headers(tmp_path):
+        huge_hex = "0x" + "F" * 5000
+        huge_decimal = "9" * 5000
+        a2l = _inline(
+            tmp_path,
+            f'/begin BLOB B1 "" {huge_hex} 2\n/end BLOB',
+            f'/begin TYPEDEF_BLOB TB "" {huge_decimal}\n/end TYPEDEF_BLOB',
+            '/begin INSTANCE I1 "" TB 0x10\n/end INSTANCE',
+            _val("V1", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        clean = _clear_parse_errors(a2l)
+        d = describe_definition("V1", clean)
+        assert d.shared_with == "I1"
+>       assert isinstance(_no_exception_encode(d, clean, {0x10: 0}, text="7"), Refusal)
+E       AssertionError: assert False
+E        +  where False = isinstance(Encoded(address=16, data=b'\x07', notices=()), Refusal)
+E        +    where Encoded(address=16, data=b'\x07', notices=()) = _no_exception_encode(Definition(name='V1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with='I1', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [{'address': None, 'kind': 'BLOB', 'length': 2, 'name': 'B1'}, {'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'I1'}], 'errors': [], ...}, {16: 0}, text='7')
+
+tests/test_b103_a2l_definition.py:3371: AssertionError
+_________________ test_r_a2l_def_138_22_cross_page_file_order __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_22_cross_pa0')
+
+    def test_r_a2l_def_138_22_cross_page_file_order(tmp_path):
+        a2l = _inline(
+            tmp_path,
+            '/begin CHARACTERISTIC BIG ""\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 64\n/end CHARACTERISTIC',
+            _val("LATE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            _val("EARLY", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        d = describe_definition("BIG", a2l)
+        assert d.shared_with == "LATE"
+>       assert _enc(d, a2l, "AB", _img(0x10, bytes(64))) == _ref(
+            "A2L-DEF-OVERLAP", "BIG: its bytes at 0x10 are shared with LATE")
+E       AssertionError: assert Encoded(address=16, data=b'AB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\...0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='BIG: its bytes at 0x10 are shared with LATE')
+E        +  where Encoded(address=16, data=b'AB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\...0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) = _enc(Definition(name='BIG', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=64, datatype=...ed_with='LATE', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, 'AB', {16: 0, 17: 0, 18: 0, 19: 0, ...})
+E        +    where {16: 0, 17: 0, 18: 0, 19: 0, ...} = _img(16, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(64)
+E        +  and   Refusal(code='A2L-DEF-OVERLAP', message='BIG: its bytes at 0x10 are shared with LATE') = _ref('A2L-DEF-OVERLAP', 'BIG: its bytes at 0x10 are shared with LATE')
+
+tests/test_b103_a2l_definition.py:3390: AssertionError
+____ test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-472/test_r_a2l_def_138_23_cross_ki0')
+
+    def test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption(tmp_path):
+        shapes = (
+            ('/begin BLOB B "" 0x10 2\n/end BLOB',),
+            (
+                '/begin TYPEDEF_BLOB TB "" 2\n/end TYPEDEF_BLOB',
+                '/begin INSTANCE B "" TB 0x10\n/end INSTANCE',
+            ),
+        )
+        for shape in shapes:
+            a2l = _inline(
+                tmp_path,
+                *shape,
+                _val("B", "0x100", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"),
+                _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                byte_order="MSB_FIRST",
+            )
+            d = describe_definition("MW", a2l)
+            assert d.shared_with == "B"
+>           assert _enc(d, a2l, "1", _img(0x10, bytes(2))) == _ref(
+                "A2L-DEF-OVERLAP", "MW: its bytes at 0x10 are shared with B")
+E           AssertionError: assert Encoded(address=16, data=b'\x00\x01', notices=()) == Refusal(code='A2L-DEF-OVERLAP', message='MW: its bytes at 0x10 are shared with B')
+E            +  where Encoded(address=16, data=b'\x00\x01', notices=()) = _enc(Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...hared_with='B', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [{'address': 16, 'kind': 'BLOB', 'length': 2, 'name': 'B'}], 'errors': [], ...}, '1', {16: 0, 17: 0})
+E            +    where {16: 0, 17: 0} = _img(16, b'\x00\x00')
+E            +      where b'\x00\x00' = bytes(2)
+E            +  and   Refusal(code='A2L-DEF-OVERLAP', message='MW: its bytes at 0x10 are shared with B') = _ref('A2L-DEF-OVERLAP', 'MW: its bytes at 0x10 are shared with B')
+
+tests/test_b103_a2l_definition.py:3412: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_1_lost_mask_negative_control
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_11_clean_duplicate_named_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_12_byte_order_refused_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_15_both_masks_select_a_common_bit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_22_cross_page_file_order
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption
+20 failed, 3 passed, 299 deselected in 2.14s

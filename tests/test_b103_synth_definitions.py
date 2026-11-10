@@ -302,3 +302,70 @@ def test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through
     display = decode_definition(describe_definition("DISPLAY_0001", defc["a2l"]), defc["a2l"], image)
     assert display.value == pytest.approx(143.5) and display.text == "143.5"
     assert (image[0x800020], image[0x800021]) == (0x01, 0x1F)
+
+
+# --------------------------------------------------------------------------
+# Inc 2b (G-T2) - the write arm of AT-B103-I2-2 and the DEFC masked writes
+# (.138/16, .46/3).  Rows .46, .48, .55, .56, .138.  Expected bytes from the
+# graph's AT-B103-I2-2 / .138/16 examples over the seed-20260001 word 0x1AE7.
+# --------------------------------------------------------------------------
+
+_SCALAR_DEFC = ("ENUM_0001", "MASK_BIT_0001", "MASK_FIELD_0001", "DISPLAY_0001")
+
+
+def test_r_a2l_def_138_16_two_disjoint_masks_still_encode(defc):
+    """R-A2L-DEF.138/16 - DEFC's two disjoint masks of one word both encode, no OVERLAP."""
+    m = _model()
+    image = defc["mem"]
+    bit = m.describe_definition("MASK_BIT_0001", defc["a2l"])
+    field = m.describe_definition("MASK_FIELD_0001", defc["a2l"])
+    assert bit.shared_with is None and field.shared_with is None
+    assert m.encode_definition(bit, defc["a2l"], "0", image) == m.Encoded(0x800010, bytes([0x1A, 0xE6]), ())
+    assert m.encode_definition(field, defc["a2l"], "3", image) == m.Encoded(0x800010, bytes([0x10, 0x37]), ())
+
+
+def test_r_a2l_def_46_3_two_fields_of_one_big_endian_word(defc):
+    """R-A2L-DEF.46/3 - write the multi-bit field, then decode both masked objects over the applied image."""
+    m = _model()
+    field = m.describe_definition("MASK_FIELD_0001", defc["a2l"])
+    bit = m.describe_definition("MASK_BIT_0001", defc["a2l"])
+    res = m.encode_definition(field, defc["a2l"], "3", defc["mem"])
+    assert isinstance(res, m.Encoded)
+    new_image = dict(defc["mem"])
+    new_image.update({0x800010 + i: b for i, b in enumerate(res.data)})
+    assert m.decode_definition(field, defc["a2l"], new_image).text == "3"
+    assert m.decode_definition(bit, defc["a2l"], new_image).text == "1"
+
+
+def test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value(defc):
+    """AT-B103-I2-2 (2b arm) - encode each DEFC scalar's planned text, apply, then a second value.
+
+    ENUM_0001 IDLE -> FAULT (03); MASK_FIELD_0001 174 -> 3 (word 0x1037) with MASK_BIT_0001
+    still 1; MASK_BIT_0001 1 -> 0 (0x1036); DISPLAY_0001 143.5 -> -12.5 (FF E7); every other
+    byte of the region unchanged.
+    """
+    m = _model()
+    second = {"ENUM_0001": "FAULT", "MASK_BIT_0001": "0", "MASK_FIELD_0001": "3", "DISPLAY_0001": "-12.5"}
+    base_image = defc["mem"]
+    image = dict(base_image)
+    for name in _SCALAR_DEFC:
+        d = m.describe_definition(name, defc["a2l"])
+        assert d.shared_with is None, (name, d.shared_with)
+        planned = m.decode_definition(d, defc["a2l"], image)
+        assert isinstance(planned, m.Decoded), (name, planned)
+        res = m.encode_definition(d, defc["a2l"], planned.text, image)
+        assert isinstance(res, m.Encoded), (name, res)
+        image.update({d.address + i: b for i, b in enumerate(res.data)})
+        assert m.decode_definition(d, defc["a2l"], image).text == planned.text, name
+        res2 = m.encode_definition(d, defc["a2l"], second[name], image)
+        assert isinstance(res2, m.Encoded), (name, res2)
+        image.update({d.address + i: b for i, b in enumerate(res2.data)})
+        assert m.decode_definition(d, defc["a2l"], image).text == second[name], name
+    # the four scalars' final bytes, everything else untouched
+    assert image[0x800000] == 0x03
+    assert (image[0x800010], image[0x800011]) == (0x10, 0x36)
+    assert (image[0x800020], image[0x800021]) == (0xFF, 0xE7)
+    written = {0x800000, 0x800010, 0x800011, 0x800020, 0x800021}
+    for addr, b in base_image.items():
+        if addr not in written:
+            assert image[addr] == b, hex(addr)

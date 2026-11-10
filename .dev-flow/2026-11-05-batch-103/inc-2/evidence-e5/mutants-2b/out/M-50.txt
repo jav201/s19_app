@@ -1,0 +1,115 @@
+M-50
+pytest -k a2l_def_50
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..90955366 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3455,7 +3455,7 @@ def _encode_ascii(definition: Definition, text: str) -> bytes | Refusal:
+                 f"{name_echo}: '{_operator_echo(ch)}' is not a printable ASCII "
+                 "character",
+             )
+-    return text.encode("ascii") + b"\x00" * (length - len(text))
++    return text.encode("ascii")
+ 
+ 
+ def _agrees_at_display_precision(
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_50_1_short_text_and_padding __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_50_1_short_text_and_padding(v171):
+        d = describe_definition(V171_ASCII, v171)
+        assert d.shared_with is None
+>       assert _enc(d, v171, "ABC", _img(0x810200, bytes(42))) == Encoded(0x810200, b"ABC" + bytes(39), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'ABC' != b'ABC\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2871: AssertionError
+________________________ test_r_a2l_def_50_3_empty_text ________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_50_3_empty_text(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "", _img(0x810200, bytes(42))) == Encoded(0x810200, bytes(42), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'' != b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2882: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_1_short_text_and_padding
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_50_3_empty_text - As...
+2 failed, 1 passed, 319 deselected in 0.84s

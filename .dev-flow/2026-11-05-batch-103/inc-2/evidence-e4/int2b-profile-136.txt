@@ -1,0 +1,44 @@
+NAMES 13990
+         30431952 function calls (30409086 primitive calls) in 8.309 seconds
+
+   Ordered by: cumulative time
+   List reduced from 139 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.203    0.203    8.497    8.497 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:556(describe_definitions)
+    13990    3.815    0.000    5.314    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:3543(_shared_with)
+    13990    0.156    0.000    2.339    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:741(_describe_one)
+ 11916771    0.841    0.000    0.841    0.000 {method 'add' of 'set' objects}
+    13990    0.057    0.000    0.742    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:2555(_read_object_lines)
+    14836    0.111    0.000    0.711    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1290(_flatten_body_tokens)
+ 11939552    0.655    0.000    0.655    0.000 {built-in method builtins.id}
+    14949    0.023    0.000    0.629    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:433(_object_line_words)
+    14456    0.012    0.000    0.621    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:1200(_read_matrix_dim)
+    14968    0.391    0.000    0.463    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1211(_strip_a2l_comments)
+    60445    0.245    0.000    0.430    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:700(_lex_a2l_lines)
+    14468    0.254    0.000    0.364    0.000 /home/<user>/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
+   132750    0.093    0.000    0.350    0.000 {method 'join' of 'str' objects}
+    19168    0.021    0.000    0.328    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:316(_echo)
+  22867/1    0.069    0.000    0.282    0.282 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:601(walk)
+   699757    0.203    0.000    0.239    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:322(<genexpr>)
+    22865    0.023    0.000    0.186    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1104(parse_begin_meta)
+    14440    0.025    0.000    0.166    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:1100(_conversion_fields)
+    37309    0.138    0.000    0.160    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1118(_parse_first_field)
+    14949    0.014    0.000    0.137    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:440(<listcomp>)
+    38258    0.077    0.000    0.123    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1174(_split_line_respecting_quotes)
+      466    0.006    0.000    0.106    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:1990(_describe_array)
+    13990    0.038    0.000    0.106    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:950(_empty_definition)
+   161191    0.071    0.000    0.104    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:371(_unquote)
+  1659767    0.090    0.000    0.090    0.000 {method 'append' of 'list' objects}
+     4102    0.006    0.000    0.089    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:2308(_read_method_record)
+    14170    0.019    0.000    0.063    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:521(_read_limits)
+    57690    0.047    0.000    0.061    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:669(_find_string_end)
+   480594    0.052    0.000    0.052    0.000 {method 'get' of 'dict' objects}
+      163    0.003    0.000    0.052    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:2484(_read_enum_table)
+    45609    0.017    0.000    0.049    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:387(_line_words)
+    36982    0.049    0.000    0.049    0.000 {method 'match' of 're.Pattern' objects}
+   758793    0.040    0.000    0.040    0.000 {built-in method builtins.ord}
+   473010    0.037    0.000    0.037    0.000 {built-in method builtins.getattr}
+    36982    0.026    0.000    0.035    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:689(_lex_word_diagnostics)
+
+
