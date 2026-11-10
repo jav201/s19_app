@@ -319,12 +319,18 @@ def _painted_lines(widget) -> list[str]:
     return [widget.render_line(y).text.rstrip("\n") for y in range(widget.size.height)]
 
 
-def _cell_whole_in_painted(table, geom, row_index: int, col_index: int) -> bool:
-    """True iff the cell at (row_index, col_index) paints its text whole."""
+def _cell_whole_in_painted(
+    table, geom, row_index: int, col_index: int, *, require_visible: bool = False
+) -> bool:
+    """True iff the cell at (row_index, col_index) paints its text whole.
+
+    When ``require_visible`` is true, a completely off-screen cell is a failure,
+    not an unchecked success; this is mandatory for fixed Address/Length cells.
+    """
     lines = _painted_lines(table)
     y = 1 + row_index - geom.sy
     if y < 1 or y >= len(lines) - 1:
-        return True  # off-screen: nothing to check
+        return True  # off-screen row: nothing to check
     line = lines[y]
     want = table.get_row_at(row_index)[col_index].plain
     if col_index < geom.fixed:
@@ -333,7 +339,7 @@ def _cell_whole_in_painted(table, geom, row_index: int, col_index: int) -> bool:
         a = max(geom.fixed_w, geom.xs[col_index] - geom.sx)
         b = geom.xs[col_index] - geom.sx + geom.cols[col_index][1]
     if a >= geom.visible or b <= 0:
-        return True
+        return not require_visible
     return line[a:min(b, geom.visible)].strip() == want
 
 
@@ -556,14 +562,18 @@ _P64_WIDTHS = (80, 85, 90, 95, 100, 118, 160, 220)
 _P64_NAMES = (20, 28, 34, 48, 100)
 
 
-def _assert_p64_whole(app, table) -> None:
+def _assert_p64_whole(app, table, *, require_visible: bool = False) -> None:
     geom = _geom(table)
     for r in range(table.row_count):
         cells = table.get_row_at(r)
         assert cells[0].plain == _EXPECTED_ADDRS[r], (r, cells[0].plain)
         assert cells[1].plain == _EXPECTED_LENS[r], (r, cells[1].plain)
-        assert _cell_whole_in_painted(table, geom, r, 0), (r, "Address")
-        assert _cell_whole_in_painted(table, geom, r, 1), (r, "Length")
+        assert _cell_whole_in_painted(
+            table, geom, r, 0, require_visible=require_visible
+        ), (r, "Address")
+        assert _cell_whole_in_painted(
+            table, geom, r, 1, require_visible=require_visible
+        ), (r, "Length")
 
 
 @pytest.mark.parametrize("width", _P64_WIDTHS)
@@ -580,7 +590,8 @@ def test_r_tui_042a_4_2_address_length_whole_scrolled(tmp_path: Path, width: int
     """R-TUI-042a.4 case /2: PAGE64(n) scrolled fully right — Address and
     Length still whole (fixed columns), 40/40."""
     _explore(tmp_path, page64(n), (width, 54),
-             lambda app, pilot, table: _assert_p64_whole(app, table), scrolled=True)
+             lambda app, pilot, table: _assert_p64_whole(app, table, require_visible=True),
+             scrolled=True)
 
 
 def test_r_tui_042a_4_3_widest_address_at_80(tmp_path: Path) -> None:
@@ -595,8 +606,8 @@ def test_r_tui_042a_4_3_widest_address_at_80(tmp_path: Path) -> None:
             cells = table.get_row_at(r)
             assert cells[0].plain in (ADDR_STR, ADDR64_STR, ADDR_0x1000_STR, ADDR16_STR)
             assert cells[1].plain in ("2266", "2", "1048576")
-            assert _cell_whole_in_painted(table, geom, r, 0), r
-            assert _cell_whole_in_painted(table, geom, r, 1), r
+            assert _cell_whole_in_painted(table, geom, r, 0, require_visible=True), r
+            assert _cell_whole_in_painted(table, geom, r, 1, require_visible=True), r
 
     _explore(tmp_path, page64(48, wide16=True), (80, 54), _check)
     _explore(tmp_path, page64(48, wide16=True), (80, 54), _check, scrolled=True)
@@ -721,6 +732,20 @@ def _painted_tag_equals(table, row_index: int, want: str) -> bool:
     return result is not None and result[0] == want and result[1] <= _geom(table).visible
 
 
+def _resize_failure(app, table, label: str) -> str:
+    """Describe stored and painted state when a resize wait expires."""
+    stored = table.get_row_at(0)[2].plain
+    painted = _painted_tag_cell(table, _geom(table), 0)
+    rendered = [
+        "".join(segment.text for segment in line)
+        for line in table._render_cell(0, 2, table.rich_style, 38)
+    ]
+    return (
+        f"{label}: stored={stored!r} painted={painted!r} rendered={rendered!r} "
+        f"geom={_geom(table)} rows_match={_all_rows_in_measured_form(app, table)}"
+    )
+
+
 def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
     """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
     async def _check(app, pilot, table):
@@ -729,7 +754,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
-            "start painted fit",
+            lambda: _resize_failure(app, table, "start painted fit"),
             timeout=30,
         )
         geom = _geom(table)
@@ -739,7 +764,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
-            "220→80 painted fit",
+            lambda: _resize_failure(app, table, "220→80 painted fit"),
             timeout=30,
         )
         geom = _geom(table)
@@ -749,7 +774,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
-            "80→220 painted fit",
+            lambda: _resize_failure(app, table, "80→220 painted fit"),
             timeout=30,
         )
         geom = _geom(table)
