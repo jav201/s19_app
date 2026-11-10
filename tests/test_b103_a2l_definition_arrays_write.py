@@ -25,6 +25,7 @@ from tests.support.b103_a2l_arrays import (
     valblk,
     vtab,
 )
+from tests.support.timing import report_margin
 from tests.test_b103_a2l_definition import (
     _ascii,
     _clear_parse_errors,
@@ -707,7 +708,7 @@ def test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell(tmp_path):
         for position, (physical, _raw, _flag) in enumerate(expected)
     ]
     elapsed = time.process_time() - started
-    assert elapsed <= 0.500, elapsed
+    assert elapsed < report_margin("R-A2L-DEF.131/2", elapsed, 0.500)
     for position, (res, (_physical, raw, flag)) in enumerate(zip(results, expected)):
         decoded = _decoded(d, a2l_data, _apply(image, res))
         assert decoded.values[position].stored == raw, (position, decoded.values[position], raw, flag)

@@ -1,6 +1,6 @@
 # Handoff — batch-103, continuar la batería hasta `main`
 
-Fecha: 2026-11-09. Proyecto: `C:\Users\jjgh8\Github\s19_app-b103`.
+Fecha: 2026-11-09. Proyecto: `<repo>` (`s19_app-b103`).
 
 ## Orden vigente del operador
 
@@ -75,7 +75,7 @@ Orden restante conocido: **2b/3b, 5, 6**, después **1b/10/7/8/9** según G2. Re
 ## Prompt para la nueva sesión
 
 ```text
-Continúa desde C:\Users\jjgh8\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\HANDOFF-2026-11-09-KIMI-BATCH-TO-MAIN.md
+Continúa desde `.dev-flow/2026-11-05-batch-103/HANDOFF-2026-11-09-KIMI-BATCH-TO-MAIN.md` en la raíz del repositorio.
 
 Sigue con el incremento, la batería ba hasta que todos los incrementos estén en el main
 ```
