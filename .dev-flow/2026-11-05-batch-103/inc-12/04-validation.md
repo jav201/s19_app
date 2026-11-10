@@ -25,7 +25,7 @@ The case-06 timing failure is also present on the base (1.399 s) and integrated 
 
 ## Open items
 
-- The first completed battery is **19 KILLED, 1 SURVIVED**. M2 (`fixed_columns=0`) survives because the old oracle accepted off-screen Address/Length as success; the strengthened visible-cell check is running before its retry (`../evidence/inc-12/evidence-e5-mutant-M2.txt`).
+- All 20 discriminating mutants are **KILLED**, with no survivor, CRASH or BAD. M2 initially survived the off-screen oracle; after `require_visible`, 41 nodes passed and the isolated retry killed it (`../evidence/inc-12/evidence-e5-mutant-M2-retry.txt`, `../evidence/inc-12/evidence-e5-visible-fixed-cells.txt`).
 - Six A2L snapshot baselines must be regenerated in the canonical CI environment. The two Patch snapshot mismatches already fail on base and are not included in that update (`../evidence/inc-12/evidence-e5-snapshot-base.txt`, `../evidence/inc-12/evidence-e5-snapshot-final.txt`).
 - AT-B103-I12-2 awaits the operator's verdict on `evidence-e5/DECISION.html`, including look-alike names at 80 columns, the left-cut backlog cell and the Name-line row cost.
 
