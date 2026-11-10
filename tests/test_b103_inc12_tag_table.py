@@ -725,9 +725,13 @@ def _resize_failure(app, table, label: str) -> str:
     """Describe stored and painted state when a resize wait expires."""
     stored = table.get_row_at(0)[2].plain
     painted = _painted_tag_cell(table, _geom(table), 0)
+    rendered = [
+        line.text
+        for line in table._render_cell(0, 2, table.rich_style, 38)
+    ]
     return (
-        f"{label}: stored={stored!r} painted={painted!r} geom={_geom(table)} "
-        f"rows_match={_all_rows_in_measured_form(app, table)}"
+        f"{label}: stored={stored!r} painted={painted!r} rendered={rendered!r} "
+        f"geom={_geom(table)} rows_match={_all_rows_in_measured_form(app, table)}"
     )
 
 
