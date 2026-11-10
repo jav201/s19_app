@@ -1,0 +1,113 @@
+M-56
+pytest -k a2l_def_56
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..38a6ed7a 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3425,7 +3425,7 @@ def _encode_enum(definition: Definition, text: str) -> float | Refusal:
+     name_echo = _name_echo_of(definition)
+     for entry in definition.enum_entries:
+         if entry.text == text:
+-            return entry.raw
++            return entry.raw + 1
+     table_echo = (
+         _echo(definition.enum_table)
+         if definition.enum_table is not None
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_56_1_text_round_trip ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_56_1_text_round_trip(v171, c08):
+        """R-A2L-DEF.56/1 - every accepted enum text and text object decodes to the same text."""
+        total = 0
+        enum_objects = [
+            (V171_ENUM, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+            ("ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE", "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+            (V171_RANGE, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+        ]
+        for name, other in enum_objects:
+            d = describe_definition(name, v171)
+            assert d.shared_with == other, (name, d.shared_with)
+            img = _img(d.address, bytes(d.byte_length))
+            first = d.enum_entries[0].text
+            assert _enc(d, v171, first, img) == _ref(
+                "A2L-DEF-OVERLAP", f"{name}: its bytes at 0x810004 are shared with {other}")
+            seen = set()
+            for e in d.enum_entries:
+                if e.raw in seen:
+                    continue
+                seen.add(e.raw)
+                res = _enc(_clear(d), v171, e.text, img)
+                assert isinstance(res, Encoded), (name, e.text, res)
+                back = decode_definition(_clear(d), v171, {d.address + i: b for i, b in enumerate(res.data)})
+>               assert back.text == e.text, (name, e.text, back.text)
+E               AssertionError: ('ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', 'SawTooth', 'Square')
+E               assert 'Square' == 'SawTooth'
+E                 
+E                 - SawTooth
+E                 + Square
+
+tests/test_b103_a2l_definition.py:3111: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_56_1_text_round_trip
+1 failed, 321 deselected in 1.47s

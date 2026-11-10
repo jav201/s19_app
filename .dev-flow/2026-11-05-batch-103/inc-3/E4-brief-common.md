@@ -13,7 +13,7 @@ Base: `aa7f871c` (`batch-103`, Inc 11 integrated). Approved graph: `codewire/gra
 - Runner: `<runner>@<runner-ip>` (<runner>), Python `/home/<runner>/miniconda3/envs/s19ci/bin/python` 3.11.18.
 - Implementer scratch: `/tmp/b103-e4-3a-impl/tree`.
 - Tester scratch: `/tmp/b103-e4-3a-tests/tree`.
-- Use `python -I -B` with explicit `sys.path.insert(0, scratch)`, isolated HOME/XDG/LOCALAPPDATA under `zq_iso_user`, closed stdin, `PYTHONDONTWRITEBYTECODE=1`. Print `s19_app.__file__` at the start of every transcript.
+- Use `python -I -B` with explicit `sys.path.insert(0, scratch)`, isolated HOME/XDG/LOCALAPPDATA under `<user>`, closed stdin, `PYTHONDONTWRITEBYTECODE=1`. Print `s19_app.__file__` at the start of every transcript.
 - No clipboard, no proprietary A2L material, no public-corpus text in new records, no operator name or LAN address in new evidence. Use synthetic A2L fixtures.
 - No git mutations on the real worktree, no child agents, no stale writers. Each agent works only in its own scratch and returns file lists, commands and evidence paths. Do not commit.
 

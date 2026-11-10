@@ -1,0 +1,98 @@
+M-57b
+pytest -k a2l_def_57_2
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..ca558d8b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+@@ -3733,6 +3739,9 @@ def encode_definition(
+             return raw
+         limit_value = raw
+ 
++    data = _encode_number(definition, a2l_data, limit_value)
++    if isinstance(data, Refusal):
++        return data
+     limits_outcome = _check_limits(definition, limit_value, _operator_echo(trimmed))
+     if isinstance(limits_outcome, Refusal):
+         return limits_outcome
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_57_2_limits_before_the_encode_direction ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-470/test_r_a2l_def_57_2_limits_bef0')
+
+    def test_r_a2l_def_57_2_limits_before_the_encode_direction(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "301", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 301 is outside the limits -100..100")
+E       AssertionError: assert Refusal(code=...not integral') == Refusal(code=...ts -100..100')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ENCODE' != 'A2L-DEF-LIMITS'
+E           - A2L-DEF-LIMITS...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:3147: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_57_2_limits_before_the_encode_direction
+1 failed, 321 deselected in 0.76s

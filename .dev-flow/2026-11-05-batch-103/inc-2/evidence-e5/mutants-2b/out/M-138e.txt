@@ -1,0 +1,211 @@
+M-138e
+pytest -k a2l_def_138
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..b57d028b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -673,13 +673,15 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+ 
+     span_index: dict[int, list[tuple]] = {}
+     for entry in span_entries:
++        if entry[2] in ("BLOB", "INSTANCE"):
++            continue
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3510,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3558,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+.FFFFFFF...........F.F.                                                  [100%]
+=================================== FAILURES ===================================
+______________________ test_r_a2l_def_138_2_blob_overlap _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-476/test_r_a2l_def_138_2_blob_over0')
+
+    def test_r_a2l_def_138_2_blob_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VB", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin BLOB B1 ""\n  0x10 2\n/end BLOB')
+        d = describe_definition("VB", a2l)
+>       assert d.shared_with == "B1"
+E       AssertionError: assert None == 'B1'
+E        +  where None = Definition(name='VB', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3189: AssertionError
+_________________ test_r_a2l_def_138_3_sized_instance_overlap __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-476/test_r_a2l_def_138_3_sized_ins0')
+
+    def test_r_a2l_def_138_3_sized_instance_overlap(tmp_path):
+        a2l = _inline(tmp_path, _val("VI", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin TYPEDEF_MEASUREMENT T_U16 ""\n  UWORD NO_COMPU_METHOD 0 0 0 65535\n/end TYPEDEF_MEASUREMENT',
+                      '/begin INSTANCE I1 ""\n  T_U16 0x10\n/end INSTANCE')
+        d = describe_definition("VI", a2l)
+>       assert d.shared_with == "I1"
+E       AssertionError: assert None == 'I1'
+E        +  where None = Definition(name='VI', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3198: AssertionError
+______ test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-476/test_r_a2l_def_138_4_unsized_i0')
+
+    def test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address(tmp_path):
+        a2l = _inline(tmp_path, _val("VU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                      '/begin INSTANCE IU ""\n  T_NONE 0x10\n/end INSTANCE')
+        d = describe_definition("VU", a2l)
+>       assert d.shared_with == "IU"
+E       AssertionError: assert None == 'IU'
+E        +  where None = Definition(name='VU', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3206: AssertionError
+______ test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_UBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.UBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3212: AssertionError
+______ test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance _______
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance(v171):
+        d = describe_definition(V171_SBYTE, v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SBYTE.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3219: AssertionError
+__________ test_r_a2l_def_138_7_v171_ulong_against_the_array_instance __________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_7_v171_ulong_against_the_array_instance(v171):
+        d = describe_definition("ASAM.C.SCALAR.ULONG.IDENTICAL", v171)
+>       assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5"
+E       AssertionError: assert None == 'ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5'
+E        +  where None = Definition(name='ASAM.C.SCALAR.ULONG.IDENTICAL', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3226: AssertionError
+____________ test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example(v171):
+        d = describe_definition("ASAM.C.DEPENDENT.REF_1.SWORD", v171)
+>       assert d.shared_with == "ASAM_S_EXAMPLE"
+E       AssertionError: assert None == 'ASAM_S_EXAMPLE'
+E        +  where None = Definition(name='ASAM.C.DEPENDENT.REF_1.SWORD', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=84...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3233: AssertionError
+___________ test_r_a2l_def_138_21_hostile_blob_and_instance_headers ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-476/test_r_a2l_def_138_21_hostile_0')
+
+    def test_r_a2l_def_138_21_hostile_blob_and_instance_headers(tmp_path):
+        huge_hex = "0x" + "F" * 5000
+        huge_decimal = "9" * 5000
+        a2l = _inline(
+            tmp_path,
+            f'/begin BLOB B1 "" {huge_hex} 2\n/end BLOB',
+            f'/begin TYPEDEF_BLOB TB "" {huge_decimal}\n/end TYPEDEF_BLOB',
+            '/begin INSTANCE I1 "" TB 0x10\n/end INSTANCE',
+            _val("V1", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        clean = _clear_parse_errors(a2l)
+        d = describe_definition("V1", clean)
+>       assert d.shared_with == "I1"
+E       AssertionError: assert None == 'I1'
+E        +  where None = Definition(name='V1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3370: AssertionError
+____ test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-476/test_r_a2l_def_138_23_cross_ki0')
+
+    def test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption(tmp_path):
+        shapes = (
+            ('/begin BLOB B "" 0x10 2\n/end BLOB',),
+            (
+                '/begin TYPEDEF_BLOB TB "" 2\n/end TYPEDEF_BLOB',
+                '/begin INSTANCE B "" TB 0x10\n/end INSTANCE',
+            ),
+        )
+        for shape in shapes:
+            a2l = _inline(
+                tmp_path,
+                *shape,
+                _val("B", "0x100", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"),
+                _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                byte_order="MSB_FIRST",
+            )
+            d = describe_definition("MW", a2l)
+>           assert d.shared_with == "B"
+E           AssertionError: assert None == 'B'
+E            +  where None = Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition.py:3411: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption
+9 failed, 14 passed, 299 deselected in 1.38s

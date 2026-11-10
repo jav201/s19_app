@@ -1,7 +1,7 @@
 FAIL SELFTEST expected failure 
 PASS SELFTEST red-proof
 PACKAGE /tmp/b103-e3-2b-kimi/tree/s19_app/__init__.py
-PLATFORM Linux-7.3.3-1-cachyos-x86_64-with-glibc2.44 3.11.18
+PLATFORM Linux-7.3.3-1-<runner>-x86_64-with-glibc2.44 3.11.18
 PASS V171 span ASAM_I_SCALAR_VALUE_UWORD_SINGLE (8454144, 2)
 PASS V171 span ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5 (8454146, 10)
 PASS V171 structure address 

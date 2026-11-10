@@ -16,7 +16,7 @@ NAMES 13990
     14456    0.012    0.000    0.621    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:1200(_read_matrix_dim)
     14968    0.391    0.000    0.463    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:1211(_strip_a2l_comments)
     60445    0.245    0.000    0.430    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l.py:700(_lex_a2l_lines)
-    14468    0.254    0.000    0.364    0.000 /home/javiergr/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
+    14468    0.254    0.000    0.364    0.000 /home/<user>/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
    132750    0.093    0.000    0.350    0.000 {method 'join' of 'str' objects}
     19168    0.021    0.000    0.328    0.000 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:316(_echo)
   22867/1    0.069    0.000    0.282    0.282 /tmp/b103-e4-2b-int/s19_app/tui/a2l_definition.py:601(walk)

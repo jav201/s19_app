@@ -1,0 +1,170 @@
+M-55b
+pytest -k a2l_def_55 or a2l_def_46
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..b713b6fc 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -497,7 +497,7 @@ def _mask_shift(mask: int) -> int:
+     while mask and not (mask & 1):
+         mask >>= 1
+         shift += 1
+-    return shift
++    return shift + 1
+ 
+ 
+ def _raw_text(stored: int | float) -> str:
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFF.F                                                                    [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_46_1_multi_bit_write ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_46_1_multi_bit_write(v171):
+        d = describe_definition(V171_M0FF0, v171)
+        assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+        img = _img(0x810002, bytes([0x0F, 0xF0]))
+        assert _enc(d, v171, "35", img) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
+>       assert _enc(_clear(d), v171, "35", img) == Encoded(0x810002, bytes([0x3F, 0xF2]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'o\xf4' != b'?\xf2'
+E           At index 0 diff: b'o' != b'?'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2777: AssertionError
+_____________________ test_r_a2l_def_46_2_single_bit_write _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_46_2_single_bit_write(v171):
+        d = describe_definition(V171_M0001, v171)
+        assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+        img = _img(0x810002, bytes([0x34, 0x12]))
+>       assert _enc(d, v171, "1", img) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
+E       AssertionError: assert Refusal(code=... mask 0x0001') == Refusal(code=...RD.IDENTICAL')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-MASK-VALUE' != 'A2L-DEF-OVERLAP'
+E           - A2L-DEF-OVERLAP...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2784: AssertionError
+____________________ test_r_a2l_def_46_4_masked_enum_write _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-464/test_r_a2l_def_46_4_masked_enu0')
+
+    def test_r_a2l_def_46_4_masked_enum_write(tmp_path):
+        """R-A2L-DEF.46/4 (E3A-11) - a masked enum merges the mask like a number."""
+        a2l = _inline(tmp_path, _cm("CM_ME", "TAB_VERB", fmt='"%.0"', ref="VT_M"),
+                      _vtab("VT_M", "2", '0 "OFF"', '1 "ON"'),
+                      _val("ME", "0x10", "RL_U16", "CM_ME", "0", "1", "BIT_MASK 0x00F0"))
+        d = describe_definition("ME", a2l)
+        assert d.shared_with is None
+>       assert _enc(d, a2l, "ON", _img(0x10, bytes([0x12, 0x34]))) == Encoded(0x10, bytes([0x12, 0x14]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'\x12$' != b'\x12\x14'
+E           At index 1 diff: b'$' != b'\x14'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2796: AssertionError
+____________ test_r_a2l_def_46_3_two_fields_of_one_big_endian_word _____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-464/b103_defc0'), ...}
+
+    def test_r_a2l_def_46_3_two_fields_of_one_big_endian_word(defc):
+        """R-A2L-DEF.46/3 - write the multi-bit field, then decode both masked objects over the applied image."""
+        m = _model()
+        field = m.describe_definition("MASK_FIELD_0001", defc["a2l"])
+        bit = m.describe_definition("MASK_BIT_0001", defc["a2l"])
+        res = m.encode_definition(field, defc["a2l"], "3", defc["mem"])
+        assert isinstance(res, m.Encoded)
+        new_image = dict(defc["mem"])
+        new_image.update({0x800010 + i: b for i, b in enumerate(res.data)})
+        assert m.decode_definition(field, defc["a2l"], new_image).text == "3"
+>       assert m.decode_definition(bit, defc["a2l"], new_image).text == "1"
+E       AssertionError: assert '0' == '1'
+E         
+E         - 1
+E         + 0
+
+tests/test_b103_synth_definitions.py:337: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_1_multi_bit_write
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_2_single_bit_write
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_4_masked_enum_write
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word
+4 failed, 1 passed, 317 deselected in 1.19s

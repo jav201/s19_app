@@ -1,0 +1,99 @@
+M-48
+pytest -k a2l_def_48
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..8c07daea 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3423,7 +3423,7 @@ def _encode_enum(definition: Definition, text: str) -> float | Refusal:
+     """The raw of the first entry whose text equals ``text`` (case included),
+     else ``A2L-DEF-ENUM`` (R-A2L-DEF.48, .49)."""
+     name_echo = _name_echo_of(definition)
+-    for entry in definition.enum_entries:
++    for entry in reversed(definition.enum_entries):
+         if entry.text == text:
+             return entry.raw
+     table_echo = (
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_48_3_first_of_two_entries_with_one_text ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-455/test_r_a2l_def_48_3_first_of_t0')
+
+    def test_r_a2l_def_48_3_first_of_two_entries_with_one_text(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_X", "TAB_VERB", fmt='"%.0"', ref="VT_X"),
+                      _vtab("VT_X", "2", '1 "X"', '2 "X"'),
+                      _val("EX2", "0x10", "RL_U8", "CM_X", "0", "255"))
+        d = describe_definition("EX2", a2l)
+>       assert _enc(d, a2l, "X", _img(0x10, bytes([0]))) == Encoded(0x10, bytes([0x01]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing attributes:
+E         ['data']
+E         
+E         Drill down into differing attribute data:
+E           data: b'\x02' != b'\x01'
+E           At index 0 diff: b'\x02' != b'\x01'
+E           Use -v to get more diff
+
+tests/test_b103_a2l_definition.py:2845: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_48_3_first_of_two_entries_with_one_text
+1 failed, 2 passed, 319 deselected in 0.79s

@@ -1,0 +1,345 @@
+M-40
+pytest -k a2l_def_40
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..97aae087 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3258,7 +3258,7 @@ def _parse_number_text(text: str) -> Optional[float]:
+     digits only, an optional point and exponent), else ``None`` — no ``_``,
+     ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+     """
+-    if _NUMBER_TEXT_RE.fullmatch(text):
++    if True:
+         return float(text)
+     return None
+ 
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+________________ test_r_a2l_def_40_1_empty_text_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_1_empty_text_is_not_a_number(v171):
+>       _num_refusal(v171, "", "")
+
+tests/test_b103_a2l_definition.py:2525: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2521: in _num_refusal
+    assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:3729: in encode_definition
+    value = _parse_number_text(trimmed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = ''
+
+    def _parse_number_text(text: str) -> Optional[float]:
+        """``float(text)`` when the whole text is the *number text* grammar (ASCII
+        digits only, an optional point and exponent), else ``None`` — no ``_``,
+        ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+        """
+        if True:
+>           return float(text)
+                   ^^^^^^^^^^^
+E           ValueError: could not convert string to float: ''
+
+s19_app/tui/a2l_definition.py:3262: ValueError
+_________________ test_r_a2l_def_40_2_letters_are_not_a_number _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_2_letters_are_not_a_number(v171):
+>       _num_refusal(v171, "abc", "abc")
+
+tests/test_b103_a2l_definition.py:2529: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2521: in _num_refusal
+    assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:3729: in encode_definition
+    value = _parse_number_text(trimmed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = 'abc'
+
+    def _parse_number_text(text: str) -> Optional[float]:
+        """``float(text)`` when the whole text is the *number text* grammar (ASCII
+        digits only, an optional point and exponent), else ``None`` — no ``_``,
+        ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+        """
+        if True:
+>           return float(text)
+                   ^^^^^^^^^^^
+E           ValueError: could not convert string to float: 'abc'
+
+s19_app/tui/a2l_definition.py:3262: ValueError
+______________ test_r_a2l_def_40_3_decimal_comma_is_not_a_number _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_3_decimal_comma_is_not_a_number(v171):
+>       _num_refusal(v171, "1,5", "1,5")
+
+tests/test_b103_a2l_definition.py:2533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2521: in _num_refusal
+    assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:3729: in encode_definition
+    value = _parse_number_text(trimmed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '1,5'
+
+    def _parse_number_text(text: str) -> Optional[float]:
+        """``float(text)`` when the whole text is the *number text* grammar (ASCII
+        digits only, an optional point and exponent), else ``None`` — no ``_``,
+        ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+        """
+        if True:
+>           return float(text)
+                   ^^^^^^^^^^^
+E           ValueError: could not convert string to float: '1,5'
+
+s19_app/tui/a2l_definition.py:3262: ValueError
+________________ test_r_a2l_def_40_4_underscore_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_4_underscore_is_not_a_number(v171):
+>       _num_refusal(v171, "1_000", "1_000")
+
+tests/test_b103_a2l_definition.py:2537: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '1_000', shown = '1_000'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Refusal(code=...in the image') == Refusal(code=...not a number")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-BYTES' != 'A2L-DEF-NUMBER'
+E           - A2L-DEF-NUMBER...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2521: AssertionError
+___________________ test_r_a2l_def_40_5_nan_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_5_nan_is_not_a_number(v171):
+>       _num_refusal(v171, "nan", "nan")
+
+tests/test_b103_a2l_definition.py:2541: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'nan', shown = 'nan'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Refusal(code=...s not finite') == Refusal(code=...not a number")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ENCODE' != 'A2L-DEF-NUMBER'
+E           - A2L-DEF-NUMBER...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2521: AssertionError
+___________________ test_r_a2l_def_40_6_inf_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_6_inf_is_not_a_number(v171):
+>       _num_refusal(v171, "inf", "inf")
+
+tests/test_b103_a2l_definition.py:2545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = 'inf', shown = 'inf'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Refusal(code=...32268..32267') == Refusal(code=...not a number")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-EXTENDED' != 'A2L-DEF-NUMBER'
+E           - A2L-DEF-NUMBER...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2521: AssertionError
+_______________ test_r_a2l_def_40_7_hexadecimal_is_not_a_number ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_7_hexadecimal_is_not_a_number(v171):
+>       _num_refusal(v171, "0x10", "0x10")
+
+tests/test_b103_a2l_definition.py:2549: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2521: in _num_refusal
+    assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:3729: in encode_definition
+    value = _parse_number_text(trimmed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '0x10'
+
+    def _parse_number_text(text: str) -> Optional[float]:
+        """``float(text)`` when the whole text is the *number text* grammar (ASCII
+        digits only, an optional point and exponent), else ``None`` — no ``_``,
+        ``,``, hexadecimal, ``nan``, ``inf`` or other digit script (R-A2L-DEF.40).
+        """
+        if True:
+>           return float(text)
+                   ^^^^^^^^^^^
+E           ValueError: could not convert string to float: '0x10'
+
+s19_app/tui/a2l_definition.py:3262: ValueError
+____________ test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number _____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number(v171):
+>       _num_refusal(v171, "１２", "１２")
+
+tests/test_b103_a2l_definition.py:2553: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '１２', shown = '１２'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Refusal(code=...in the image') == Refusal(code=...not a number")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-BYTES' != 'A2L-DEF-NUMBER'
+E           - A2L-DEF-NUMBER...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2521: AssertionError
+___________________ test_r_a2l_def_40_9_tab_is_not_a_number ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_40_9_tab_is_not_a_number(v171):
+>       _num_refusal(v171, "\t5", FFFD + "5")
+
+tests/test_b103_a2l_definition.py:2557: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+text = '\t5', shown = '�5'
+
+    def _num_refusal(v171: dict, text: str, shown: str) -> None:
+        d = describe_definition(V171_SWORD, v171)
+>       assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+E       assert Refusal(code=...in the image') == Refusal(code=...not a number")
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-BYTES' != 'A2L-DEF-NUMBER'
+E           - A2L-DEF-NUMBER...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2521: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_1_empty_text_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_2_letters_are_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_3_decimal_comma_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_4_underscore_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_5_nan_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_6_inf_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_7_hexadecimal_is_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_9_tab_is_not_a_number
+9 failed, 313 deselected in 1.87s

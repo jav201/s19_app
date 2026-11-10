@@ -1,0 +1,23 @@
+Security review complete. Wrote `.dev-flow/2026-11-05-batch-103/inc-2/E5-security-2b.md`.
+
+## Verdict: **PASS-WITH-NOTES** — no MAJOR/HIGH, nothing blocks integration.
+
+### Findings
+
+| # | Severity | Tag | Summary |
+|---|---|---|---|
+| **F-1** | LOW | design-gap (coverage) | No hostile BLOB/INSTANCE header case in `.58.2`/`.138`. Impl degrades safely via `_number_word`/`_bounded_length` → `None` (fail-open/fail-closed), but it's unproven against a huge BLOB address or a hostile/dangling INSTANCE typedef. |
+| **F-2** | LOW | design-gap (render) | `_operator_echo` (`a2l_definition.py:3241` → `_clean` `:294`) replaces only C0/C1 controls, so Unicode bidi/format controls (U+202A–U+202E, U+2066–U+2069, U+200E/F) pass through into TUI-rendered refusals — by-design per frozen R-A2L-DEF.151/7, but a spoofing vector the Inc 8/9 renderer should isolate. |
+| **F-3** | INFO | impl | `_image_span_refusal` runs twice for masked writes (`:3743` and inside `_merge_bit_mask` `:3388`); the second is dead-redundant. Harmless. |
+
+### Key confirmations (read-only)
+
+- **Caps/controls**: every new message routes operator text → `_operator_echo`, file words → `_echo`, numbers → `_number_text`, addresses → `_fmt_address`; the `A2L-DEF-PARSE` first-error is safe because the parser embeds file words only via `_echo_word`. Persisted bytes are strictly printable-ASCII or numeric.
+- **Span-index identity & cross-kind order**: `describe_definitions.walk` and `extract_declared_spans.walk` are the same pre-order DFS, so `declared_spans` aligns 1:1 with BLOB/INSTANCE nodes; the own-entry skip in `_shared_with` (`:3565`) keys on tag-derived fields and cannot self-match.
+- **CLEAN masks / duplicate names / byte-order residual**: `mask_of` returns a mask only when the neighbour has no refusal and a readable length; `.19/7` residual is non-vacuous.
+- **No `None` span reaches the merge** — `byte_length is None` always implies a refusal returned at step 1.
+- **Immutable input** verified against `.58.1` encode arm; hostile encode-direction content is refusal-safe (non-numeric table x dropped at parse; nan/inf → "not finite"/"not invertible").
+
+### Executed vs read-only
+
+**Read-only only** — per the brief I ran no pytest/probes and no git mutations. All conclusions are static analysis over `cb083d07`, the product diff, the frozen encode direction in `a2l.py`, and the current test files.

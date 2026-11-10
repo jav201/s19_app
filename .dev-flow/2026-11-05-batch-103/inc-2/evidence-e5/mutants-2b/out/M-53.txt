@@ -1,0 +1,93 @@
+M-53
+pytest -k a2l_def_53
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..e777e9b1 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3368,7 +3368,7 @@ def _encode_number(
+         "matrix_dim": None,
+         "datatype": definition.datatype,
+         "length": definition.byte_length,
+-        "effective_byte_order": definition.byte_order,
++        "effective_byte_order": "little",
+         "compu_method_name": method_name,
+         "lower_limit": None,
+         "upper_limit": None,
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_53_1_big_endian_uword _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-461/test_r_a2l_def_53_1_big_endian0')
+
+    def test_r_a2l_def_53_1_big_endian_uword(tmp_path):
+        a2l = _inline(tmp_path, _val("B1", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+        d = describe_definition("B1", a2l)
+>       assert _enc(d, a2l, "4660", _img(0x20, bytes([0, 0]))) == Encoded(0x20, bytes([0x12, 0x34]), ())
+E       AssertionError: assert Refusal(code='A2L-DEF-PRECISION', message='B1: 4660 cannot be stored at the display precision — the nearest stored value is 13330') == Encoded(address=32, data=b'\x124', notices=())
+E        +  where Refusal(code='A2L-DEF-PRECISION', message='B1: 4660 cannot be stored at the display precision — the nearest stored value is 13330') = _enc(Definition(name='B1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=32, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '4660', {32: 0, 33: 0})
+E        +    where {32: 0, 33: 0} = _img(32, b'\x00\x00')
+E        +      where b'\x00\x00' = bytes([0, 0])
+E        +  and   Encoded(address=32, data=b'\x124', notices=()) = Encoded(32, b'\x124', ())
+E        +    where b'\x124' = bytes([18, 52])
+
+tests/test_b103_a2l_definition.py:2914: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_53_1_big_endian_uword
+1 failed, 3 passed, 318 deselected in 0.78s

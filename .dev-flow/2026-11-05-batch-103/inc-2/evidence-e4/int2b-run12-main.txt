@@ -1,0 +1,76 @@
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 67%]
+.......F..FF............................................................ [ 89%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_43_4_enum_entry_above_the_limits ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_43_4_enum_entry_above_the_limits(v171):
+        """R-A2L-DEF.43/4 - first the overlap, then the limits refusal on the cleared definition."""
+        name = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
+        d = describe_definition(name, v171)
+        assert d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL"
+>       assert _enc(d, v171, "hundredtwo", {0x13A00: 0}) == _ref(
+            "A2L-DEF-OVERLAP", f"{name}: its bytes at 0x13A00 are shared with ASAM.M.SCALAR.UBYTE.IDENTICAL")
+E       AssertionError: assert Refusal(code=...imits 0..101') == Refusal(code=...TE.IDENTICAL')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-LIMITS' != 'A2L-DEF-OVERLAP'
+E           - A2L-DEF-OVERLAP...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2719: AssertionError
+________________ test_r_a2l_def_45_1_below_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_1_below_the_extended_limits(v171):
+        d = describe_definition(V171_SBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(d, v171, "-129", {0x810001: 0}) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+E       AssertionError: assert Refusal(code=...ts -128..127') == Refusal(code=...UWORD_SINGLE')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-EXTENDED' != 'A2L-DEF-OVERLAP'
+E           - A2L-DEF-OVERLAP...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2749: AssertionError
+________________ test_r_a2l_def_45_2_above_the_extended_limits _________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_45_2_above_the_extended_limits(v171):
+        d = describe_definition(V171_UBYTE, v171)
+        assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+>       assert _enc(d, v171, "257", {0x810000: 0}) == _ref(
+            "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+E       AssertionError: assert Refusal(code=...imits 0..256') == Refusal(code=...UWORD_SINGLE')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-EXTENDED' != 'A2L-DEF-OVERLAP'
+E           - A2L-DEF-OVERLAP...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2758: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_4_enum_entry_above_the_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_1_below_the_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_2_above_the_extended_limits
+3 failed, 318 passed in 15.88s

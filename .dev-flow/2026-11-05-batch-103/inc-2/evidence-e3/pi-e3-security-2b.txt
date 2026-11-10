@@ -1,10 +1,10 @@
 OAuth refresh failed for anthropic: Anthropic token refresh request failed. url=https://platform.claude.com/v1/oauth/token; details=Error: HTTP request failed. status=400; url=https://platform.claude.com/v1/oauth/token; body={"error": "invalid_grant", "error_description": "Refresh token not found or invalid"}; stack=Error: HTTP request failed. status=400; url=https://platform.claude.com/v1/oauth/token; body={"error": "invalid_grant", "error_description": "Refresh token not found or invalid"}
-    at postJson (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/anthropic.js:75:6061)
+    at postJson (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/anthropic.js:75:6061)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
-    at async refreshAnthropicToken (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/anthropic.js:75:9656)
-    at async credentials.modify.signal (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:10477)
-    at async file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:38199
-    at async FileAuthStorageBackend.withLockAsync (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:32295)
-    at async _AuthStorage.modify (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:38098)
-    at async refreshStoredOAuthCredential (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:10289)
-    at async resolveStoredOAuth (file:///C:/Users/jjgh8/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:11270)
+    at async refreshAnthropicToken (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/anthropic.js:75:9656)
+    at async credentials.modify.signal (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:10477)
+    at async file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:38199
+    at async FileAuthStorageBackend.withLockAsync (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:32295)
+    at async _AuthStorage.modify (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-R2EGYMOO.js:3:38098)
+    at async refreshStoredOAuthCredential (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:10289)
+    at async resolveStoredOAuth (file:///C:/Users/<user>/AppData/Roaming/npm/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-NL4X6LBY.js:4:11270)

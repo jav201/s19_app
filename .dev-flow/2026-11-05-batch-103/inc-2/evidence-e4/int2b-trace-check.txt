@@ -1,0 +1,15 @@
+SLICE  s19_app/render/hexview.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/a2l_extract.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/app.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/capped_text_area.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/flow_screens.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/os_clipboard_input.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/screens.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/segment_split_view.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/services/flow_execution_service.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/services/flow_persistence_service.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/services/label_match.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/tui/test_b103_a2l_definition.py changed since e07fb00 and no requirement file names it
+SLICE  s19_app/version.py changed since e07fb00 and no requirement file names it
+trace_check: 1 US, 73 active requirements (0 withdrawn), 14 gap(s)

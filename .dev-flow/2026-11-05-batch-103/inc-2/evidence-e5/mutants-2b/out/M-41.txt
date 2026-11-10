@@ -1,0 +1,41 @@
+M-41
+pytest -k a2l_def_41
+returncode=1
+
+diff --git a/s19_app/tui/a2l.py b/s19_app/tui/a2l.py
+index 4e998df1..c4b5fd7d 100644
+--- a/s19_app/tui/a2l.py
++++ b/s19_app/tui/a2l.py
+@@ -3008,7 +3008,7 @@ def _invert_physical_to_raw(
+         lin_b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
+         if math.isclose(lin_a, 0.0):
+             return None, "LINEAR conversion coefficient a is zero", []
+-        return (physical - lin_b) / lin_a, None, []
++        return (physical + lin_b) / lin_a, None, []
+     if conversion_type == "RAT_FUNC":
+         raw, rat_error = _eval_rat_func(physical, method)
+         if raw is None:
+
+..F...                                                                   [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_41_3_linear_with_an_offset ___________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_41_3_linear_with_an_offset(c08):
+        """R-A2L-DEF.41/3 - LINEAR a=1 b=100, UWORD 150 -> stored 50 (00 32)."""
+        a2l = _clear_parse_errors(c08["a2l"])
+        o = _first_of(c08, "CM_LIN_OFF", "UWORD")
+        assert o["name"] == "VALUE_0019"
+        d = describe_definition(o["name"], a2l)
+        assert d.shared_with is None
+>       assert _enc(d, a2l, "150", c08["mem"]) == Encoded(o["address"], bytes([0x00, 0x32]), ())
+E       AssertionError: assert Refusal(code='A2L-DEF-PRECISION', message='VALUE_0019: 150 cannot be stored at the display precision — the nearest stored value is 350.0') == Encoded(address=262424, data=b'\x002', notices=())
+E        +  where Refusal(code='A2L-DEF-PRECISION', message='VALUE_0019: 150 cannot be stored at the display precision — the nearest stored value is 350.0') = _enc(Definition(name='VALUE_0019', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=262424, byte_length=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...B_VERB 5', '0 0', '1 5', '2 10', '3 15', '4 20'], 'name': 'TBL_NOINTP', ...}}, 'declared_spans': [], 'errors': [], ...}, '150', {0: 108, 1: 49, 2: 57, 3: 84, ...})
+E        +  and   Encoded(address=262424, data=b'\x002', notices=()) = Encoded(262424, b'\x002', ())
+E        +    where b'\x002' = bytes([0, 50])
+
+tests/test_b103_a2l_definition.py:2586: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_3_linear_with_an_offset
+1 failed, 5 passed, 316 deselected in 1.56s

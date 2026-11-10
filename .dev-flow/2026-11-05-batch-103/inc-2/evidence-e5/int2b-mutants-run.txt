@@ -1,0 +1,56 @@
+M-40
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_1_empty_text_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_2_letters_are_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_3_decimal_comma_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_4_underscore_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_5_nan_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_6_inf_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_7_hexadecimal_is_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_40_9_tab_is_not_a_number
+M-41
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_41_3_linear_with_an_offset
+M-42
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_1_linear_coefficient_a_zero
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_2_rat_func_denominator_zero
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_3_lookup_table_missing
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_4_lookup_table_no_numeric_entries
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_5_tab_nointp_nearest_values
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_6_tab_intp_outside_range
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_7_converted_raw_not_finite
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_8_not_integral - ...
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_9_datatype_range
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_10_float16 - Asse...
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_42_11_float_does_not_pack
+M-43
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_1_below_the_lower_limit
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_2_above_the_upper_limit
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_3_one_declared_side
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_4_enum_entry_above_the_limits
+M-44
+  SURVIVED
+M-45
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_1_below_the_extended_limits
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_2_above_the_extended_limits
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_45_3_written_value_against_the_extended_limits
+M-46
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_1_multi_bit_write
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_2_single_bit_write
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_46_4_masked_enum_write
+  FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word
+M-47
+  killed
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_1_value_wider_than_the_mask
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_2_negative_value
+  FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_47_3_non_contiguous_mask
+Traceback (most recent call last):
+  File "/tmp/run_2b_mutants.py", line 65, in <module>
+    assert count == 1, (mid, count)
+           ^^^^^^^^^^
+AssertionError: ('M-48', 2)

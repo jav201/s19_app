@@ -1,0 +1,131 @@
+M-52
+pytest -k a2l_def_52
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..4c9f14a1 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3448,14 +3448,7 @@ def _encode_ascii(definition: Definition, text: str) -> bytes | Refusal:
+             f"{name_echo}: the text has {len(text)} characters — at most "
+             f"{length} fit",
+         )
+-    for ch in text:
+-        if not (0x20 <= ord(ch) <= 0x7E):
+-            return Refusal(
+-                "A2L-DEF-TEXT-CHAR",
+-                f"{name_echo}: '{_operator_echo(ch)}' is not a printable ASCII "
+-                "character",
+-            )
+-    return text.encode("ascii") + b"\x00" * (length - len(text))
++    return text.encode("utf-8") + b"\x00" * (length - len(text))
+ 
+ 
+ def _agrees_at_display_precision(
+@@ -3508,6 +3501,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3549,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_52_1_non_ascii_letter _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_1_non_ascii_letter(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "caf\u00e9", _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", "ASAM.C.ASCII.UBYTE.NUMBER_42: '\u00e9' is not a printable ASCII character")
+E       assert Encoded(address=8454656, data=b'caf\xc3\xa9\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character")
+E        +  where Encoded(address=8454656, data=b'caf\xc3\xa9\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'café', {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2893: AssertionError
+___________________________ test_r_a2l_def_52_2_tab ____________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_2_tab(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "A\tB", _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+E       assert Encoded(address=8454656, data=b'A\tB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+E        +  where Encoded(address=8454656, data=b'A\tB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'A\tB', {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2899: AssertionError
+__________________________ test_r_a2l_def_52_3_ufffd ___________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_52_3_ufffd(v171):
+        d = describe_definition(V171_ASCII, v171)
+>       assert _enc(d, v171, "A" + FFFD, _img(0x810200, bytes(42))) == _ref(
+            "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+E       assert Encoded(address=8454656, data=b'A\xef\xbf\xbd\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) == Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+E        +  where Encoded(address=8454656, data=b'A\xef\xbf\xbd\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', notices=()) = _enc(Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, ('A' + '�'), {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...})
+E        +    where {8454656: 0, 8454657: 0, 8454658: 0, 8454659: 0, ...} = _img(8454656, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+E        +      where b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' = bytes(42)
+E        +  and   Refusal(code='A2L-DEF-TEXT-CHAR', message="ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character") = _ref('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: '�' is not a printable ASCII character")
+
+tests/test_b103_a2l_definition.py:2905: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_1_non_ascii_letter
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_2_tab - assert En...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_52_3_ufffd - assert ...
+3 failed, 319 deselected in 0.92s

@@ -1,0 +1,29 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 69%]
+...................................................................F.... [ 93%]
+.....................                                                    [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_def_138_22_cross_page_file_order __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-335/test_r_a2l_def_138_22_cross_pa0')
+
+    def test_r_a2l_def_138_22_cross_page_file_order(tmp_path):
+        a2l = _inline(
+            tmp_path,
+            '/begin CHARACTERISTIC BIG ""\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 64\n/end CHARACTERISTIC',
+            _val("LATE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            _val("EARLY", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        d = describe_definition("BIG", a2l)
+>       assert d.shared_with == "EARLY"
+E       AssertionError: assert 'LATE' == 'EARLY'
+E         
+E         - EARLY
+E         + LATE
+
+tests/test_b103_a2l_definition.py:3319: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_138_22_cross_page_file_order
+1 failed, 308 passed in 11.41s

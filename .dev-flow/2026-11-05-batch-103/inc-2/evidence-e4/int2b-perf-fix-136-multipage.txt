@@ -1,0 +1,6 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+27.4%  1.453 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 5.38s

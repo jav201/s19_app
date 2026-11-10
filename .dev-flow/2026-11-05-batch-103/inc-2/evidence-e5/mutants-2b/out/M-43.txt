@@ -1,0 +1,143 @@
+M-43
+pytest -k a2l_def_43
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 75d0489f..e7a88c61 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     for entry in span_entries:
+         _position, _name, _kind, address, byte_length, _byte_order = entry
+         if byte_length is not None and byte_length >= 1:
+-            first_page = address >> 8
+-            last_page = (address + byte_length - 1) >> 8
++            first_page = address >> 4
++            last_page = (address + byte_length - 1) >> 4
+             pages = range(first_page, last_page + 1)
+         else:
+-            pages = (address >> 8,)
++            pages = (address >> 4,)
+         for page in pages:
+             span_index.setdefault(page, []).append(entry)
+ 
+@@ -3315,7 +3315,7 @@ def _check_limits(
+     above = limits.upper is not None and _limit_greater(
+         limit_value, limits.upper, definition.datatype
+     )
+-    if not (below or above):
++    if True:
+         return None
+     if definition.extended_limits is None:
+         return Refusal(
+@@ -3508,6 +3508,8 @@ def _pair_exempt(
+     my_mask = definition.bit_mask
+     if my_mask is None:
+         return False
++    if entry[2] in ("BLOB", "INSTANCE"):
++        return False
+     other_mask = mask_of(entry[1])
+     if other_mask is None:
+         return False
+@@ -3554,19 +3556,23 @@ def _shared_with(
+         return None
+     if definition.byte_length is not None and definition.byte_length >= 1:
+         pages = range(
+-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
++            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
+         )
+     else:
+-        pages = (address >> 8,)
++        pages = (address >> 4,)
+     seen: set[int] = set()
++    multi_page = len(pages) > 1
+     candidates: list[tuple] = []
+     for page in pages:
+         for entry in span_index.get(page, ()):
+-            key = id(entry)
+-            if key not in seen:
++            if multi_page:
++                key = entry[0]
++                if key in seen:
++                    continue
+                 seen.add(key)
+-                candidates.append(entry)
+-    candidates.sort(key=lambda e: e[0])
++            candidates.append(entry)
++    if multi_page:
++        candidates.sort(key=lambda entry: entry[0])
+     own_entry = True
+     for entry in candidates:
+         if own_entry and (
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_43_1_below_the_lower_limit ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-450/test_r_a2l_def_43_1_below_the_0')
+
+    def test_r_a2l_def_43_1_below_the_lower_limit(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "-101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: -101 is outside the limits -100..100")
+E       AssertionError: assert Refusal(code=...not integral') == Refusal(code=...ts -100..100')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ENCODE' != 'A2L-DEF-LIMITS'
+E           - A2L-DEF-LIMITS...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2699: AssertionError
+__________________ test_r_a2l_def_43_2_above_the_upper_limit ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-450/test_r_a2l_def_43_2_above_the_0')
+
+    def test_r_a2l_def_43_2_above_the_upper_limit(tmp_path):
+        a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+        d = describe_definition("L1", a2l)
+>       assert _enc(d, a2l, "200", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 200 is outside the limits -100..100")
+E       AssertionError: assert Encoded(address=16, data=b'\x00d', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L1: 200 is outside the limits -100..100')
+E        +  where Encoded(address=16, data=b'\x00d', notices=()) = _enc(Definition(name='L1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM_L': {'coeffs': None, 'coeffs_linear': [2.0, 0.0], 'compu_tab_ref': None, 'conversion_type': 'LINEAR', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '200', {16: 0, 17: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L1: 200 is outside the limits -100..100') = _ref('A2L-DEF-LIMITS', 'L1: 200 is outside the limits -100..100')
+
+tests/test_b103_a2l_definition.py:2705: AssertionError
+____________________ test_r_a2l_def_43_3_one_declared_side _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-450/test_r_a2l_def_43_3_one_declar0')
+
+    def test_r_a2l_def_43_3_one_declared_side(tmp_path):
+        a2l = _inline(tmp_path, _meas("L3", "UBYTE", "NO_COMPU_METHOD", "x", "100", addr="0x10"))
+        d = describe_definition("L3", a2l)
+>       assert _enc(d, a2l, "101", {0x10: 0}) == _ref("A2L-DEF-LIMITS", "L3: 101 is outside the limits ..100")
+E       AssertionError: assert Encoded(address=16, data=b'e', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='L3: 101 is outside the limits ..100')
+E        +  where Encoded(address=16, data=b'e', notices=()) = _enc(Definition(name='L3', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UBYTE...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}, '101', {16: 0})
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='L3: 101 is outside the limits ..100') = _ref('A2L-DEF-LIMITS', 'L3: 101 is outside the limits ..100')
+
+tests/test_b103_a2l_definition.py:2711: AssertionError
+_______________ test_r_a2l_def_43_4_enum_entry_above_the_limits ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_43_4_enum_entry_above_the_limits(v171):
+        """R-A2L-DEF.43/4 - shared state, then the earlier limits refusal on the cleared definition."""
+        name = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
+        d = describe_definition(name, v171)
+        assert d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL"
+>       assert _enc(_clear(d), v171, "hundredtwo", {0x13A00: 0}) == _ref(
+            "A2L-DEF-LIMITS", f"{name}: hundredtwo is outside the limits 0..101")
+E       AssertionError: assert Encoded(address=80384, data=b'f', notices=()) == Refusal(code='A2L-DEF-LIMITS', message='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE: hundredtwo is outside the limits 0..101')
+E        +  where Encoded(address=80384, data=b'f', notices=()) = _enc(Definition(name='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE', section='MEASUREMENT', char_type=None, kind='enum',...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}, 'hundredtwo', {80384: 0})
+E        +    where Definition(name='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE', section='MEASUREMENT', char_type=None, kind='enum',...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()) = _clear(Definition(name='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE', section='MEASUREMENT', char_type=None, kind='enum',...YTE.IDENTICAL', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()))
+E        +  and   Refusal(code='A2L-DEF-LIMITS', message='ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE: hundredtwo is outside the limits 0..101') = _ref('A2L-DEF-LIMITS', 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE: hundredtwo is outside the limits 0..101')
+
+tests/test_b103_a2l_definition.py:2719: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_1_below_the_lower_limit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_2_above_the_upper_limit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_3_one_declared_side
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_43_4_enum_entry_above_the_limits
+4 failed, 318 deselected in 0.96s
