@@ -1,0 +1,63 @@
+# e4-2b-probe shared_with re-derivation
+s19_app.__file__ = /home/<user>/work/b103-inc2b-tests/s19_app/__init__.py
+== V171 shared_with (re-derived) ==
+ASAM.C.SCALAR.SWORD.IDENTICAL  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.LINEAR_MUL_2
+ASAM.C.SCALAR.SWORD.LINEAR_MUL_2  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.IDENTICAL
+ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.IDENTICAL
+ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.IDENTICAL
+ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.IDENTICAL
+ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE  addr=0x810004 len=2 mask=None refusal=None shared_with=ASAM.C.SCALAR.SWORD.IDENTICAL
+ASAM.C.SCALAR.UWORD.IDENTICAL  addr=0x810002 len=2 mask=65535 refusal=None shared_with=ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0
+ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0  addr=0x810002 len=2 mask=4080 refusal=None shared_with=ASAM.C.SCALAR.UWORD.IDENTICAL
+ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001  addr=0x810002 len=2 mask=1 refusal=None shared_with=ASAM.C.SCALAR.UWORD.IDENTICAL
+ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010  addr=0x810002 len=2 mask=16 refusal=None shared_with=ASAM.C.SCALAR.UWORD.IDENTICAL
+ASAM.C.SCALAR.SBYTE.IDENTICAL  addr=0x810001 len=1 mask=None refusal=None shared_with=ASAM_I_SCALAR_VALUE_UWORD_SINGLE
+ASAM.C.SCALAR.UBYTE.IDENTICAL  addr=0x810000 len=1 mask=None refusal=None shared_with=ASAM_I_SCALAR_VALUE_UWORD_SINGLE
+ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  addr=0x13a00 len=1 mask=None refusal=None shared_with=ASAM.M.SCALAR.UBYTE.IDENTICAL
+ASAM.C.SCALAR.ULONG.IDENTICAL  addr=0x810008 len=4 mask=None refusal=None shared_with=ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5
+ASAM.C.DEPENDENT.REF_1.SWORD  addr=0x811000 len=2 mask=None refusal=None shared_with=ASAM_S_EXAMPLE
+== ASCII tag name (current reader) ==
+  name='ASAM.C.ASCII.UBYTE.NUMBER_42' addr=8454656 len=42 char_type=ASCII
+== V171 declared_spans ==
+  {'name': 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE', 'kind': 'INSTANCE', 'address': 8454144, 'length': 2}
+  {'name': 'ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5', 'kind': 'INSTANCE', 'address': 8454146, 'length': 10}
+  {'name': 'ASAM_I_AXIS_PTS_UBYTE_8', 'kind': 'INSTANCE', 'address': 8454160, 'length': None}
+  {'name': 'ASAM_I_MAP_COM_AXIS_FIX_AXIS', 'kind': 'INSTANCE', 'address': 8454192, 'length': None}
+  {'name': 'ASAM_S_EXAMPLE', 'kind': 'INSTANCE', 'address': 8458240, 'length': 84}
+  {'name': 'ASAM.C.BLOB.TRANSFORMER_TEST', 'kind': 'BLOB', 'address': 8462336, 'length': 16}
+== V171 entries at 0x13A00 ==
+  pos=62 ASAM.M.SCALAR.UBYTE.IDENTICAL kind=MEASUREMENT len=1
+  pos=64 ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING kind=MEASUREMENT len=1
+  pos=66 ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING kind=MEASUREMENT len=1
+  pos=68 ASAM.M.SCALAR.UBYTE.RAT_FUNC.DIV_10 kind=MEASUREMENT len=1
+  pos=70 ASAM.M.SCALAR.UBYTE.HYPERBOLIC kind=MEASUREMENT len=1
+  pos=72 ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=74 ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=76 ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=78 ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=80 ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=82 ASAM.M.SCALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=84 ASAM.M.SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=86 ASAM.M.SCALAR.UBYTE.TAB_NOINTP_NO_DEFAULT_VALUE kind=MEASUREMENT len=1
+  pos=88 ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4 kind=MEASUREMENT len=1
+== C08 objects ==
+  VALUE_0019 UWORD LIN_OFF: name=VALUE_0019 dt=UWORD addr=0x40118 be=True bytes=321e phys=12930 low=100 high=65635
+  VALUE_0004: name=VALUE_0004 dt=SLONG addr=0x3C be=False bytes=fe010000 phys=970 low=0 high=2000
+  MEAS_0002: name=MEASUREMENT_0002 dt=UWORD addr=0x64 be=False bytes=0000 phys=0.0 low=0 high=30
+  MEAS_0001: name=MEASUREMENT_0001 dt=UWORD addr=0x50 be=True bytes=00c8 phys=20.0 low=0 high=50
+  VALUE_0002: name=VALUE_0002 dt=UWORD addr=0x14 be=False bytes=a0be phys=488000 low=0 high=655350
+  VALUE_0001: name=VALUE_0001 dt=UBYTE addr=0x0 be=True bytes=6c phys=108 low=0 high=255
+== DEFC CLI rc == 0
+== DEFC objects ==
+   {'name': 'ENUM_0001', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UBYTE', 'conversion': 'CM_DEF_ENUM', 'address': 8388608, 'length': 1, 'big_endian': True, 'bit_mask': None, 'planned_stored': 1, 'planned_text': 'IDLE', 'low': '0', 'high': '3'}
+   {'name': 'MASK_BIT_0001', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UWORD', 'conversion': 'CM_DEF_IDENT', 'address': 8388624, 'length': 2, 'big_endian': True, 'bit_mask': 1, 'planned_stored': 1, 'planned_text': '1', 'low': '0', 'high': '1'}
+   {'name': 'MASK_FIELD_0001', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UWORD', 'conversion': 'CM_DEF_IDENT', 'address': 8388624, 'length': 2, 'big_endian': True, 'bit_mask': 4080, 'planned_stored': 174, 'planned_text': '174', 'low': '0', 'high': '255'}
+   {'name': 'DISPLAY_0001', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'SWORD', 'conversion': 'CM_DEF_LIN', 'address': 8388640, 'length': 2, 'big_endian': True, 'bit_mask': None, 'planned_stored': 287, 'planned_text': '143.5', 'low': '-40', 'high': '150'}
+   {'name': 'AXIS_DEF_0001', 'section': 'AXIS_PTS', 'kind': 'AXIS_PTS', 'datatype': None, 'conversion': 'CM_DEF_LIN', 'address': 8388672, 'length': 12, 'big_endian': True, 'bit_mask': None, 'planned_stored': (485, 635, 696, 828, 901), 'planned_text': ('242.500', '317.500', '348.000', '414.000', '450.500'), 'low': '0', 'high': '1000'}
+   {'name': 'CURVE_DEF_0001', 'section': 'CHARACTERISTIC', 'kind': 'CURVE', 'datatype': 'UWORD', 'conversion': 'CM_DEF_IDENT', 'address': 8388688, 'length': 10, 'big_endian': True, 'bit_mask': None, 'planned_stored': (37818, 52215, 28375, 58106, 11719), 'planned_text': ('37818', '52215', '28375', '58106', '11719'), 'low': '0', 'high': '65535'}
+   {'name': 'CURVE_DEF_0002', 'section': 'CHARACTERISTIC', 'kind': 'CURVE', 'datatype': 'UWORD', 'conversion': 'CM_DEF_IDENT', 'address': 8388704, 'length': 10, 'big_endian': True, 'bit_mask': None, 'planned_stored': (33014, 24541, 24691, 2267, 39540), 'planned_text': ('33014', '24541', '24691', '2267', '39540'), 'low': '0', 'high': '65535'}
+   {'name': 'MAP_DEF_0001', 'section': 'CHARACTERISTIC', 'kind': 'MAP', 'datatype': 'SWORD', 'conversion': 'CM_DEF_IDENT', 'address': 8388720, 'length': 32, 'big_endian': True, 'bit_mask': None, 'planned_stored': (472, 132, 610, 330, 709, -890, -383, -636, 843, -485, 730, -556), 'planned_text': ('472', '132', '610', '330', '709', '-890', '-383', '-636', '843', '-485', '730', '-556'), 'low': '-1000', 'high': '1000'}
+   {'name': 'VAL_BLK_DEF_0001', 'section': 'CHARACTERISTIC', 'kind': 'VAL_BLK', 'datatype': 'SWORD', 'conversion': 'CM_DEF_FINE', 'address': 8388752, 'length': 12, 'big_endian': True, 'bit_mask': None, 'planned_stored': (737, 219, 636, -413, -395, -214), 'planned_text': ('36.9', '11.0', '31.8', '-20.7', '-19.8', '-10.7'), 'low': '-50', 'high': '50'}
+== DEFC 0x800010 region word ==
+  mem[0x800010..11] = 0x1a 0xe7 word 0x1ae7
+# exit 0

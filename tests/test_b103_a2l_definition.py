@@ -48,11 +48,13 @@ from s19_app.core import S19File  # noqa: E402
 from s19_app.tui.a2l_definition import (  # noqa: E402
     Decoded,
     Definition,
+    Encoded,
     Refusal,
     decode_definition,
     describe_definition,
     describe_definitions,
     display_text,
+    encode_definition,
 )
 from s19_app.tui.a2l_parse import parse_a2l_file  # noqa: E402
 
@@ -2402,3 +2404,1185 @@ def test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_a
     assert d.refusal == Refusal("A2L-DEF-KIND", f"QK: the system has no definition for a {_echo256(word)} object"), d.refusal
     assert len(d.refusal.message) <= 1024
     assert d.refusal.message.count(FFFD) == 1                                   # only the space was rewritten
+
+
+# ==========================================================================
+# Inc 2b - the encode side (G-T1).  Rows R-A2L-DEF.19/6-/7, .25/2, .26/2-/4,
+# .40 ... .57, .138, .152, .151/7, the waiting encode arms of .21/3, .58.1,
+# .58.2 and AT-B103-I2-1 (AT-B103-I2-2 lives in test_b103_synth_definitions.py).
+# ``encode_definition`` / ``Encoded`` / ``Definition.shared_with`` are I-2's
+# write side; expected bytes, codes and messages are the requirements' exact
+# texts, and the V171 overlap names are re-derived through the current parser
+# (evidence-e4/e4-2b-probe.py), never from the old census.
+# ==========================================================================
+
+
+def _enc(d: Definition, a2l: dict, text: str, image: Mapping[int, int]):
+    return encode_definition(d, a2l, text, image)
+
+
+def _clear(d: Definition) -> Definition:
+    """The .43/.44/.45/.46/.48/.53/.56 V171 cases clear ``shared_with`` only as a
+    test device; a consumer never clears it and re-describes after an A2L change."""
+    return dataclasses.replace(d, shared_with=None)
+
+
+def _clear_parse_errors(a2l: dict) -> dict:
+    """A copy of the payload with only the parse-error list cleared.
+
+    The pinned case 08 payload carries parse errors (the VAL_BLK size notes), and
+    R-A2L-DEF.152 refuses every encode while one is present; the conversion, limits,
+    precision and round-trip rows are exercised on the clean copy (the objects are
+    unchanged).  Mirrors .138/13's isolation of the overlap oracle from .152.
+    """
+    clean = copy.deepcopy(a2l)
+    clean["errors"] = []
+    return clean
+
+
+def _ref(code: str, message: str) -> Refusal:
+    return Refusal(code, message)
+
+
+def _first_of(c08: dict, conv: str, dt: str | None = None) -> dict:
+    return next(o for o in c08["objs"] if o["conversion"] == conv and (dt is None or o["datatype"] == dt))
+
+
+def _c08_with_format(c08: dict, tmp_path: Path, name: str, fmt: str) -> dict:
+    """Case 08's A2L with one FORMAT line added to the named MEASUREMENT."""
+    src = (c08["dir"] / "firmware.a2l").read_text(encoding="utf-8")
+    pattern = rf'(/begin MEASUREMENT {name} "synthetic measurement"\n)(\s+[^\n]+\n)'
+    new = re.sub(pattern, lambda m: m.group(1) + m.group(2) + f'      FORMAT "{fmt}"\n', src, count=1)
+    assert new != src, name
+    path = tmp_path / f"c08_fmt_{name}.a2l"
+    path.write_text(new, encoding="utf-8")
+    return parse_a2l_file(path)
+
+
+# ---- S2.7a residuals (.19/6, .19/7) ------------------------------------------------------
+
+def test_r_a2l_def_19_6_second_live_bit_mask_keyword_is_refused(tmp_path):
+    """R-A2L-DEF.19/6 (Security F1) - two live BIT_MASK lines refuse A2L-DEF-MASK."""
+    a2l = _inline(tmp_path, _val("MP", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535",
+                                 "BIT_MASK 0x000F", "BIT_MASK 0x000F"))
+    d = describe_definition("MP", a2l)
+    assert d.refusal == _ref("A2L-DEF-MASK", "MP: the bit mask 0x000F cannot be applied to UWORD")
+    assert encode_definition(d, a2l, "7", {0x10: 0, 0x11: 0}) == d.refusal
+
+
+def test_r_a2l_def_19_7_ambiguous_byte_order_source_is_refused(tmp_path):
+    """R-A2L-DEF.19/7 (E3S-36) - a masked definition whose MOD_COMMON holds two live BYTE_ORDER keywords."""
+    mod_common = "\n".join(['    /begin MOD_COMMON ""', "      BYTE_ORDER MSB_FIRST",
+                            "      BYTE_ORDER MSB_LAST", "    /end MOD_COMMON"])
+    a2l = _inline(tmp_path, mod_common,
+                  _val("BO", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
+                  byte_order=None)
+    d = describe_definition("BO", a2l)
+    assert d.refusal == _ref("A2L-DEF-MASK", "BO: its byte order cannot be read")
+
+
+# ---- R-A2L-DEF.25/2 (encode gives the definition's refusal) ----------------------------------
+
+def test_r_a2l_def_25_2_encode_gives_the_definitions_refusal(c08):
+    """R-A2L-DEF.25/2 - the encode of a refused definition returns that refusal, no bytes."""
+    d = describe_definition("MISSING_CM", c08["issues"])
+    assert d.refusal == _ref("A2L-DEF-METHOD", "MISSING_CM: the conversion method CM_MISSING is not declared in the A2L")
+    assert encode_definition(d, c08["issues"], "7", c08["mem"]) == d.refusal
+
+
+# ---- R-A2L-DEF.26/2 ... /4 (missing bytes at encode) -----------------------------------------
+
+def test_r_a2l_def_26_2_masked_encode_on_an_empty_image_is_refused(v171):
+    """R-A2L-DEF.26/2 - a masked encode over an empty image refuses A2L-DEF-BYTES."""
+    d = describe_definition(V171_M0FF0, v171)
+    assert encode_definition(d, v171, "35", {}) == _ref(
+        "A2L-DEF-BYTES", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image")
+
+
+def test_r_a2l_def_26_3_unmasked_encode_on_an_empty_image_is_refused(tmp_path):
+    """R-A2L-DEF.26/3 (E3S-05) - the image check runs for every kind, not only masked."""
+    a2l = _inline(tmp_path, _val("B3", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    d = describe_definition("B3", a2l)
+    assert encode_definition(d, a2l, "7", {}) == _ref("A2L-DEF-BYTES", "B3: 2 of its 2 bytes are not in the image")
+
+
+def test_r_a2l_def_26_4_text_encode_on_an_empty_image_is_refused(v171):
+    """R-A2L-DEF.26/4 (E3S-16) - a text encode over an empty image refuses A2L-DEF-BYTES."""
+    d = describe_definition(V171_ASCII, v171)
+    assert encode_definition(d, v171, "ABC", {}) == _ref(
+        "A2L-DEF-BYTES", "ASAM.C.ASCII.UBYTE.NUMBER_42: 42 of its 42 bytes are not in the image")
+
+
+# ---- R-A2L-DEF.40 - the number text ----------------------------------------------------------
+
+def _num_refusal(v171: dict, text: str, shown: str) -> None:
+    d = describe_definition(V171_SWORD, v171)
+    assert encode_definition(d, v171, text, {}) == _ref("A2L-DEF-NUMBER", f"{V171_SWORD}: '{shown}' is not a number")
+
+
+def test_r_a2l_def_40_1_empty_text_is_not_a_number(v171):
+    _num_refusal(v171, "", "")
+
+
+def test_r_a2l_def_40_2_letters_are_not_a_number(v171):
+    _num_refusal(v171, "abc", "abc")
+
+
+def test_r_a2l_def_40_3_decimal_comma_is_not_a_number(v171):
+    _num_refusal(v171, "1,5", "1,5")
+
+
+def test_r_a2l_def_40_4_underscore_is_not_a_number(v171):
+    _num_refusal(v171, "1_000", "1_000")
+
+
+def test_r_a2l_def_40_5_nan_is_not_a_number(v171):
+    _num_refusal(v171, "nan", "nan")
+
+
+def test_r_a2l_def_40_6_inf_is_not_a_number(v171):
+    _num_refusal(v171, "inf", "inf")
+
+
+def test_r_a2l_def_40_7_hexadecimal_is_not_a_number(v171):
+    _num_refusal(v171, "0x10", "0x10")
+
+
+def test_r_a2l_def_40_8_fullwidth_digits_are_not_a_number(v171):
+    _num_refusal(v171, "１２", "１２")
+
+
+def test_r_a2l_def_40_9_tab_is_not_a_number(v171):
+    _num_refusal(v171, "\t5", FFFD + "5")
+
+
+# ---- R-A2L-DEF.41 - the encode direction -----------------------------------------------------
+
+def test_r_a2l_def_41_1_no_conversion(tmp_path):
+    """R-A2L-DEF.41/1 - none: UBYTE 7 -> 07."""
+    a2l = _inline(tmp_path, _val("N0", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+    d = describe_definition("N0", a2l)
+    assert _enc(d, a2l, "7", {0x10: 0}) == Encoded(0x10, bytes([7]), ())
+
+
+def test_r_a2l_def_41_2_identical_with_spaces_and_sign(v171):
+    """R-A2L-DEF.41/2 - IDENTICAL SWORD -5 (spaces stripped); first the overlap, then FB FF."""
+    d = describe_definition(V171_SWORD, v171)
+    assert d.shared_with == "ASAM.C.SCALAR.SWORD.LINEAR_MUL_2"
+    img = _img(0x810004, bytes([0, 0]))
+    assert _enc(d, v171, "  -5 ", img) == _ref(
+        "A2L-DEF-OVERLAP", f"{V171_SWORD}: its bytes at 0x810004 are shared with ASAM.C.SCALAR.SWORD.LINEAR_MUL_2")
+    assert _enc(_clear(d), v171, "  -5 ", img) == Encoded(0x810004, bytes([0xFB, 0xFF]), ())
+
+
+def test_r_a2l_def_41_3_linear_with_an_offset(c08):
+    """R-A2L-DEF.41/3 - LINEAR a=1 b=100, UWORD 150 -> stored 50 (00 32)."""
+    a2l = _clear_parse_errors(c08["a2l"])
+    o = _first_of(c08, "CM_LIN_OFF", "UWORD")
+    assert o["name"] == "VALUE_0019"
+    d = describe_definition(o["name"], a2l)
+    assert d.shared_with is None
+    assert _enc(d, a2l, "150", c08["mem"]) == Encoded(o["address"], bytes([0x00, 0x32]), ())
+
+
+def test_r_a2l_def_41_4_rat_func(c08):
+    """R-A2L-DEF.41/4 - RAT_FUNC SLONG 100 -> stored 75 (4B 00 00 00)."""
+    a2l = _clear_parse_errors(c08["a2l"])
+    o = c08["by_name"]["VALUE_0004"]
+    d = describe_definition("VALUE_0004", a2l)
+    assert _enc(d, a2l, "100", c08["mem"]) == Encoded(o["address"], bytes([0x4B, 0, 0, 0]), ())
+
+
+def test_r_a2l_def_41_5_tab_nointp(c08):
+    """R-A2L-DEF.41/5 - TAB_NOINTP 15 -> stored 3 (03 00)."""
+    a2l = _clear_parse_errors(c08["a2l"])
+    o = c08["by_name"]["MEASUREMENT_0002"]
+    d = describe_definition("MEASUREMENT_0002", a2l)
+    assert _enc(d, a2l, "15", c08["mem"]) == Encoded(o["address"], bytes([0x03, 0x00]), ())
+
+
+def test_r_a2l_def_41_6_tab_intp_and_number_forms(c08):
+    """R-A2L-DEF.41/6 - TAB_INTP 20 and +2e1 -> 00 C8; .5 and 1. on VALUE_0002 are not integral."""
+    a2l = _clear_parse_errors(c08["a2l"])
+    o = c08["by_name"]["MEASUREMENT_0001"]
+    d = describe_definition("MEASUREMENT_0001", a2l)
+    for text in ("20", "+2e1"):
+        assert _enc(d, a2l, text, c08["mem"]) == Encoded(o["address"], bytes([0x00, 0xC8]), ())
+    v2 = describe_definition("VALUE_0002", a2l)
+    for text, raw in ((".5", "0.05"), ("1.", "0.1")):
+        assert _enc(v2, a2l, text, c08["mem"]) == _ref(
+            "A2L-DEF-ENCODE", f"VALUE_0002: the converted raw value {raw} is not integral")
+
+
+# ---- R-A2L-DEF.42 - the encode reasons -------------------------------------------------------
+
+def test_r_a2l_def_42_1_linear_coefficient_a_zero(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_A", "LINEAR", "0", "5"), _val("E1", "0x10", "RL_S16", "CM_A", "-1000", "1000"))
+    d = describe_definition("E1", a2l)
+    assert _enc(d, a2l, "5", {}) == _ref("A2L-DEF-ENCODE", "E1: LINEAR conversion coefficient a is zero")
+
+
+def test_r_a2l_def_42_2_rat_func_denominator_zero(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_B", "RAT_FUNC", "0", "1", "0", "0", "0", "0"),
+                  _val("E2", "0x10", "RL_U16", "CM_B", "0", "65535"))
+    d = describe_definition("E2", a2l)
+    assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E2: RAT_FUNC denominator is zero")
+
+
+def test_r_a2l_def_42_3_lookup_table_missing(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_C", "TAB_NOINTP", fmt='"%.0"', ref="TB_GONE"),
+                  _val("E3", "0x10", "RL_U16", "CM_C", "0", "65535"))
+    d = describe_definition("E3", a2l)
+    assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E3: lookup table missing or empty")
+
+
+def test_r_a2l_def_42_4_lookup_table_no_numeric_entries(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_D", "TAB_INTP", fmt='"%.0"', ref="TB_X"),
+                  _ctab("TB_X", "TAB_INTP", '0 "a"', '1 "b"'),
+                  _val("E4", "0x10", "RL_U16", "CM_D", "0", "65535"))
+    d = describe_definition("E4", a2l)
+    assert _enc(d, a2l, "1", {}) == _ref("A2L-DEF-ENCODE", "E4: lookup table has no numeric entries")
+
+
+def test_r_a2l_def_42_5_tab_nointp_nearest_values(c08):
+    a2l = _clear_parse_errors(c08["a2l"])
+    d = describe_definition("MEASUREMENT_0002", a2l)
+    assert _enc(d, a2l, "12", c08["mem"]) == _ref(
+        "A2L-DEF-ENCODE", "MEASUREMENT_0002: the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0")
+
+
+def test_r_a2l_def_42_6_tab_intp_outside_range(c08):
+    a2l = _clear_parse_errors(c08["a2l"])
+    d = describe_definition("MEASUREMENT_0001", a2l)
+    assert _enc(d, a2l, "45", c08["mem"]) == _ref(
+        "A2L-DEF-ENCODE", "MEASUREMENT_0001: the value 45.0 is outside the table range [0.0, 40.0]")
+
+
+def test_r_a2l_def_42_7_converted_raw_not_finite(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_E", "LINEAR", "1e-300", "0"),
+                  _val("E7", "0x10", "RL_F64", "CM_E", "-1e308", "1e308"))
+    d = describe_definition("E7", a2l)
+    assert _enc(d, a2l, "1e300", {}) == _ref("A2L-DEF-ENCODE", "E7: the converted raw value is not finite")
+
+
+def test_r_a2l_def_42_8_not_integral(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_F", "LINEAR", "2", "0"), _val("E8", "0x10", "RL_S16", "CM_F", "-1000", "1000"))
+    d = describe_definition("E8", a2l)
+    assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "E8: the converted raw value 1.5 is not integral")
+
+
+def test_r_a2l_def_42_9_datatype_range(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_G", "LINEAR", "2", "0"), _val("E9", "0x10", "RL_S16", "CM_G", "-1e10", "1e10"))
+    d = describe_definition("E9", a2l)
+    assert _enc(d, a2l, "1e9", {}) == _ref("A2L-DEF-ENCODE", "E9: the converted raw value 500000000 is outside the SWORD range")
+
+
+def test_r_a2l_def_42_10_float16(tmp_path):
+    a2l = _inline(tmp_path, _val("E10", "0x10", "RL_F16", "NO_COMPU_METHOD", "0", "65535"))
+    d = describe_definition("E10", a2l)
+    assert _enc(d, a2l, "1.0", {}) == _ref("A2L-DEF-ENCODE", "E10: datatype FLOAT16_IEEE is not supported")
+
+
+def test_r_a2l_def_42_11_float_does_not_pack(tmp_path):
+    a2l = _inline(tmp_path, _val("E11", "0x10", "RL_F32", "NO_COMPU_METHOD", "-1e300", "1e300"))
+    d = describe_definition("E11", a2l)
+    assert _enc(d, a2l, "1e39", {}) == _ref(
+        "A2L-DEF-ENCODE", "E11: the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format")
+
+
+# ---- R-A2L-DEF.43 / .44 / .45 - limits, notices, extended limits -----------------------------
+
+def test_r_a2l_def_43_1_below_the_lower_limit(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+    d = describe_definition("L1", a2l)
+    assert _enc(d, a2l, "-101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: -101 is outside the limits -100..100")
+
+
+def test_r_a2l_def_43_2_above_the_upper_limit(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+    d = describe_definition("L1", a2l)
+    assert _enc(d, a2l, "200", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 200 is outside the limits -100..100")
+
+
+def test_r_a2l_def_43_3_one_declared_side(tmp_path):
+    a2l = _inline(tmp_path, _meas("L3", "UBYTE", "NO_COMPU_METHOD", "x", "100", addr="0x10"))
+    d = describe_definition("L3", a2l)
+    assert _enc(d, a2l, "101", {0x10: 0}) == _ref("A2L-DEF-LIMITS", "L3: 101 is outside the limits ..100")
+
+
+def test_r_a2l_def_43_4_enum_entry_above_the_limits(v171):
+    """R-A2L-DEF.43/4 - first the overlap, then the limits refusal on the cleared definition."""
+    name = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
+    d = describe_definition(name, v171)
+    assert d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL"
+    assert _enc(_clear(d), v171, "hundredtwo", {0x13A00: 0}) == _ref(
+        "A2L-DEF-LIMITS", f"{name}: hundredtwo is outside the limits 0..101")
+
+
+def test_r_a2l_def_44_1_notice_above_the_limits(v171):
+    """R-A2L-DEF.44/1 - 120: overlap first, then 78 with the notice."""
+    d = describe_definition(V171_SBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    img = {0x810001: 0}
+    assert _enc(d, v171, "120", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+    notice = "ASAM.C.SCALAR.SBYTE.IDENTICAL: 120 is outside the limits -100..100 and inside the extended limits -128..127"
+    assert _enc(_clear(d), v171, "120", img) == Encoded(0x810001, bytes([0x78]), (notice,))
+
+
+def test_r_a2l_def_44_2_notice_at_the_extended_lower_limit(v171):
+    d = describe_definition(V171_SBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    img = {0x810001: 0}
+    notice = "ASAM.C.SCALAR.SBYTE.IDENTICAL: -128 is outside the limits -100..100 and inside the extended limits -128..127"
+    assert _enc(_clear(d), v171, "-128", img) == Encoded(0x810001, bytes([0x80]), (notice,))
+
+
+def test_r_a2l_def_45_1_below_the_extended_limits(v171):
+    d = describe_definition(V171_SBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    assert _enc(_clear(d), v171, "-129", {0x810001: 0}) == _ref(
+        "A2L-DEF-EXTENDED", "ASAM.C.SCALAR.SBYTE.IDENTICAL: -129 is outside the extended limits -128..127")
+
+
+def test_r_a2l_def_45_2_above_the_extended_limits(v171):
+    d = describe_definition(V171_UBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    assert _enc(_clear(d), v171, "257", {0x810000: 0}) == _ref(
+        "A2L-DEF-EXTENDED", "ASAM.C.SCALAR.UBYTE.IDENTICAL: 257 is outside the extended limits 0..256")
+
+
+def test_r_a2l_def_45_3_written_value_against_the_extended_limits(tmp_path):
+    """R-A2L-DEF.45/3 (E3S-06) - the written value p=0.6 (raw 5.5 rounds to 6) is outside 0..0.55."""
+    a2l = _inline(tmp_path,
+                  _cm("CM_TI", "TAB_INTP", fmt='"%.1"', ref="TB_L"),
+                  _ctab("TB_L", "TAB_INTP", "0 0.0", "10 1.0"),
+                  _val("L4", "0x10", "RL_U16", "CM_TI", "0", "0.55", 'FORMAT "%.1"', "EXTENDED_LIMITS 0 0.55"))
+    d = describe_definition("L4", a2l)
+    assert _enc(d, a2l, "0.55", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-EXTENDED", "L4: 0.6 is outside the extended limits 0..0.55")
+
+
+# ---- R-A2L-DEF.46 / .47 - the mask merge -----------------------------------------------------
+
+def test_r_a2l_def_46_1_multi_bit_write(v171):
+    d = describe_definition(V171_M0FF0, v171)
+    assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+    img = _img(0x810002, bytes([0x0F, 0xF0]))
+    assert _enc(d, v171, "35", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
+    assert _enc(_clear(d), v171, "35", img) == Encoded(0x810002, bytes([0x3F, 0xF2]), ())
+
+
+def test_r_a2l_def_46_2_single_bit_write(v171):
+    d = describe_definition(V171_M0001, v171)
+    assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
+    img = _img(0x810002, bytes([0x34, 0x12]))
+    assert _enc(_clear(d), v171, "1", img) == Encoded(0x810002, bytes([0x35, 0x12]), ())
+
+
+def test_r_a2l_def_46_4_masked_enum_write(tmp_path):
+    """R-A2L-DEF.46/4 (E3A-11) - a masked enum merges the mask like a number."""
+    a2l = _inline(tmp_path, _cm("CM_ME", "TAB_VERB", fmt='"%.0"', ref="VT_M"),
+                  _vtab("VT_M", "2", '0 "OFF"', '1 "ON"'),
+                  _val("ME", "0x10", "RL_U16", "CM_ME", "0", "1", "BIT_MASK 0x00F0"))
+    d = describe_definition("ME", a2l)
+    assert d.shared_with is None
+    assert _enc(d, a2l, "ON", _img(0x10, bytes([0x12, 0x34]))) == Encoded(0x10, bytes([0x12, 0x14]), ())
+
+
+def test_r_a2l_def_47_1_value_wider_than_the_mask(v171):
+    d = describe_definition(V171_M0FF0, v171)
+    assert _enc(d, v171, "256", _img(0x810002, bytes([0x0F, 0xF0]))) == _ref(
+        "A2L-DEF-MASK-VALUE", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0")
+
+
+def test_r_a2l_def_47_2_negative_value(tmp_path):
+    a2l = _inline(tmp_path, _val("MN", "0x10", "RL_S16", "NO_COMPU_METHOD", "-100", "100", "BIT_MASK 0x00F0"))
+    d = describe_definition("MN", a2l)
+    assert _enc(d, a2l, "-1", _img(0x10, bytes([0, 0]))) == _ref(
+        "A2L-DEF-MASK-VALUE", "MN: -1 does not fit the bit mask 0x00F0")
+
+
+def test_r_a2l_def_47_3_non_contiguous_mask(tmp_path):
+    a2l = _inline(tmp_path, _val("MC", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0A"))
+    d = describe_definition("MC", a2l)
+    assert _enc(d, a2l, "2", _img(0x10, bytes([0]))) == _ref(
+        "A2L-DEF-MASK-VALUE", "MC: 2 does not fit the bit mask 0x0A")
+    assert _enc(d, a2l, "5", _img(0x10, bytes([0]))) == Encoded(0x10, bytes([0x0A]), ())
+
+
+# ---- R-A2L-DEF.48 / .49 - the enum encode ----------------------------------------------------
+
+def test_r_a2l_def_48_1_compu_vtab_text(v171):
+    d = describe_definition(V171_ENUM, v171)
+    assert d.shared_with == "ASAM.C.SCALAR.SWORD.IDENTICAL"
+    img = _img(0x810004, bytes([0, 0]))
+    assert _enc(d, v171, "Square", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE: its bytes at 0x810004 are shared with ASAM.C.SCALAR.SWORD.IDENTICAL")
+    assert _enc(_clear(d), v171, "Square", img) == Encoded(0x810004, bytes([0x02, 0x00]), ())
+
+
+def test_r_a2l_def_48_2_range_text(v171):
+    d = describe_definition(V171_RANGE, v171)
+    assert d.shared_with == "ASAM.C.SCALAR.SWORD.IDENTICAL"
+    assert _enc(_clear(d), v171, "four_to_seven", _img(0x810004, bytes([0, 0]))) == Encoded(0x810004, bytes([0x04, 0x00]), ())
+
+
+def test_r_a2l_def_48_3_first_of_two_entries_with_one_text(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_X", "TAB_VERB", fmt='"%.0"', ref="VT_X"),
+                  _vtab("VT_X", "2", '1 "X"', '2 "X"'),
+                  _val("EX2", "0x10", "RL_U8", "CM_X", "0", "255"))
+    d = describe_definition("EX2", a2l)
+    assert _enc(d, a2l, "X", _img(0x10, bytes([0]))) == Encoded(0x10, bytes([0x01]), ())
+
+
+def _enum_refusal(v171: dict, text: str) -> None:
+    d = describe_definition(V171_ENUM, v171)
+    assert _enc(d, v171, text, {}) == _ref(
+        "A2L-DEF-ENUM", f"{V171_ENUM}: '{text}' is not a text of CM.TAB_VERB.DEFAULT_VALUE.REF")
+
+
+def test_r_a2l_def_49_1_case_counts(v171):
+    _enum_refusal(v171, "square")
+
+
+def test_r_a2l_def_49_2_default_text_is_not_an_entry(v171):
+    _enum_refusal(v171, "unknown signal type")
+
+
+def test_r_a2l_def_49_3_empty_text(v171):
+    _enum_refusal(v171, "")
+
+
+# ---- R-A2L-DEF.50 / .51 / .52 - the text encode ----------------------------------------------
+
+def test_r_a2l_def_50_1_short_text_and_padding(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert d.shared_with is None
+    assert _enc(d, v171, "ABC", _img(0x810200, bytes(42))) == Encoded(0x810200, b"ABC" + bytes(39), ())
+
+
+def test_r_a2l_def_50_2_text_of_the_full_length(v171):
+    d = describe_definition(V171_ASCII, v171)
+    text = "Z" * 42
+    assert _enc(d, v171, text, _img(0x810200, bytes(42))) == Encoded(0x810200, text.encode(), ())
+
+
+def test_r_a2l_def_50_3_empty_text(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "", _img(0x810200, bytes(42))) == Encoded(0x810200, bytes(42), ())
+
+
+def test_r_a2l_def_51_1_text_too_long(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "Z" * 43, _img(0x810200, bytes(42))) == _ref(
+        "A2L-DEF-TEXT-LENGTH", "ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters \u2014 at most 42 fit")
+
+
+def test_r_a2l_def_52_1_non_ascii_letter(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "caf\u00e9", _img(0x810200, bytes(42))) == _ref(
+        "A2L-DEF-TEXT-CHAR", "ASAM.C.ASCII.UBYTE.NUMBER_42: '\u00e9' is not a printable ASCII character")
+
+
+def test_r_a2l_def_52_2_tab(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "A\tB", _img(0x810200, bytes(42))) == _ref(
+        "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+
+
+def test_r_a2l_def_52_3_ufffd(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "A" + FFFD, _img(0x810200, bytes(42))) == _ref(
+        "A2L-DEF-TEXT-CHAR", f"ASAM.C.ASCII.UBYTE.NUMBER_42: '{FFFD}' is not a printable ASCII character")
+
+
+# ---- R-A2L-DEF.53 - the bytes to write -------------------------------------------------------
+
+def test_r_a2l_def_53_1_big_endian_uword(tmp_path):
+    a2l = _inline(tmp_path, _val("B1", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    d = describe_definition("B1", a2l)
+    assert _enc(d, a2l, "4660", _img(0x20, bytes([0, 0]))) == Encoded(0x20, bytes([0x12, 0x34]), ())
+
+
+def test_r_a2l_def_53_2_little_endian_uword(tmp_path):
+    a2l = _inline(tmp_path, _val("B2", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535"), byte_order="MSB_LAST")
+    d = describe_definition("B2", a2l)
+    assert _enc(d, a2l, "4660", _img(0x20, bytes([0, 0]))) == Encoded(0x20, bytes([0x34, 0x12]), ())
+
+
+def test_r_a2l_def_53_3_span_of_a_text(v171):
+    d = describe_definition(V171_ASCII, v171)
+    assert _enc(d, v171, "ABC", _img(0x810200, bytes(42))) == Encoded(0x810200, b"ABC" + bytes(39), ())
+
+
+def test_r_a2l_def_53_4_span_of_a_masked_uword(v171):
+    d = describe_definition(V171_M0FF0, v171)
+    img = _img(0x810002, bytes([0x0F, 0xF0]))
+    assert _enc(d, v171, "35", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
+    assert _enc(_clear(d), v171, "35", img) == Encoded(0x810002, bytes([0x3F, 0xF2]), ())
+
+
+# ---- R-A2L-DEF.54 - the precision refusal ----------------------------------------------------
+
+def test_r_a2l_def_54_1_precision_refusal(c08, tmp_path):
+    a2l = _clear_parse_errors(_c08_with_format(c08, tmp_path, "MEASUREMENT_0001", "%.3"))
+    d = describe_definition("MEASUREMENT_0001", a2l)
+    assert _enc(d, a2l, "5.07", c08["mem"]) == _ref(
+        "A2L-DEF-PRECISION", "MEASUREMENT_0001: 5.07 cannot be stored at the display precision \u2014 the nearest stored value is 5.100")
+
+
+def test_r_a2l_def_54_2_same_value_passes_at_one_decimal(c08):
+    a2l = _clear_parse_errors(c08["a2l"])
+    d = describe_definition("MEASUREMENT_0001", a2l)
+    assert _enc(d, a2l, "5.07", c08["mem"]) == Encoded(0x50, bytes([0x00, 0x33]), ())
+
+
+def test_r_a2l_def_54_3_float64_not_accepted_at_6_digits(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_P", "LINEAR", "1", "1e10"),
+                  _val("P64", "0x10", "RL_F64", "CM_P", "-1e300", "1e300", 'FORMAT "%"'))
+    d = describe_definition("P64", a2l)
+    assert _enc(d, a2l, "1.0000001", _img(0x10, bytes(8))) == _ref(
+        "A2L-DEF-PRECISION", "P64: 1.0000001 cannot be stored at the display precision \u2014 the nearest stored value is 1")
+
+
+def test_r_a2l_def_54_4_exact_integer_above_2_53(tmp_path):
+    layout = "\n".join(['    /begin RECORD_LAYOUT RL_U64', "      FNC_VALUES 1 A_UINT64 ROW_DIR DIRECT", "    /end RECORD_LAYOUT"])
+    a2l = _inline(tmp_path, layout, _val("U64", "0x10", "RL_U64", "NO_COMPU_METHOD", "0", str(2**64 - 1)))
+    d = describe_definition("U64", a2l)
+    assert _enc(d, a2l, "9007199254740993", _img(0x10, bytes(8))) == _ref(
+        "A2L-DEF-PRECISION", "U64: 9007199254740993 cannot be stored at the display precision \u2014 the nearest stored value is 9007199254740992")
+
+
+# ---- R-A2L-DEF.55 - the number round trip ----------------------------------------------------
+
+def _pack(dt: str, value: int | float, big: bool) -> bytes:
+    if dt == "UBYTE":
+        return struct.pack(">B" if big else "<B", value)
+    if dt == "SWORD":
+        return struct.pack(">h" if big else "<h", value)
+    if dt == "ULONG":
+        return struct.pack(">I" if big else "<I", value)
+    if dt == "FLOAT32_IEEE":
+        return struct.pack(">f" if big else "<f", value)
+    if dt == "FLOAT64_IEEE":
+        return struct.pack(">d" if big else "<d", value)
+    raise AssertionError(dt)
+
+
+def test_r_a2l_def_55_1_number_round_trip(tmp_path):
+    """R-A2L-DEF.55/1 - every accepted value decodes to a value that agrees at the display
+    precision; 0 precision refusals among values taken from decoded stored values."""
+    methods = {"none": (None, ()), "ident": ("IDENTICAL", ()), "lin1": ("LINEAR", ("1", "0"))}
+    datatypes = {"UBYTE": (1, 0, 255), "SWORD": (2, -32768, 32767), "ULONG": (4, 0, 1000000),
+                 "FLOAT32_IEEE": (4, -1e6, 1e6), "FLOAT64_IEEE": (8, -1e6, 1e6)}
+    samples = {"UBYTE": [0, 1, 127, 255], "SWORD": [-1, 0, 1, 127, -128],
+               "ULONG": [0, 1, 1000, 1000000], "FLOAT32_IEEE": [0.0, 1.5, -2.25, 0.1],
+               "FLOAT64_IEEE": [0.0, 1.5, -2.25, 0.1]}
+    formats = ["%.0", "%8.4", "%.15", None]
+    accepted = 0
+    addr = 0x1000
+    for _mname, (mtyp, coeffs) in methods.items():
+        for dt, (_size, lo, hi) in datatypes.items():
+            for big in (True, False):
+                for fmt in formats:
+                    addr += 0x10
+                    name = f"G{addr:X}"
+                    blocks = []
+                    conv = "NO_COMPU_METHOD"
+                    if mtyp is not None:
+                        blocks.append(_cm("CM_G", mtyp, *coeffs))
+                        conv = "CM_G"
+                    extra = [f'FORMAT "{fmt}"'] if fmt else []
+                    a2l = _inline(tmp_path, *blocks,
+                                  _val(name, f"0x{addr:X}", LAYOUT[dt], conv, str(lo), str(hi), *extra),
+                                  byte_order="MSB_FIRST" if big else "MSB_LAST")
+                    d = describe_definition(name, a2l)
+                    assert d.shared_with is None
+                    for value in samples[dt]:
+                        raw = _pack(dt, value, big)
+                        dec = decode_definition(d, a2l, _img(addr, raw))
+                        assert isinstance(dec, Decoded), (dt, value, dec)
+                        res = _enc(d, a2l, dec.text, _img(addr, raw))
+                        assert isinstance(res, Encoded), (dt, value, dec.text, res)
+                        back = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res.data)})
+                        assert isinstance(back, Decoded) and back.text == dec.text, (dt, value, dec.text, back)
+                        accepted += 1
+    assert accepted >= 300, accepted
+
+
+# ---- R-A2L-DEF.56 - the text round trip ------------------------------------------------------
+
+def test_r_a2l_def_56_1_text_round_trip(v171, c08):
+    """R-A2L-DEF.56/1 - every accepted enum text and text object decodes to the same text."""
+    total = 0
+    enum_objects = [
+        (V171_ENUM, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+        ("ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE", "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+        (V171_RANGE, "ASAM.C.SCALAR.SWORD.IDENTICAL"),
+    ]
+    for name, other in enum_objects:
+        d = describe_definition(name, v171)
+        assert d.shared_with == other, (name, d.shared_with)
+        img = _img(d.address, bytes(d.byte_length))
+        first = d.enum_entries[0].text
+        assert _enc(d, v171, first, img) == _ref(
+            "A2L-DEF-OVERLAP", f"{name}: its bytes at 0x810004 are shared with {other}")
+        seen = set()
+        for e in d.enum_entries:
+            if e.raw in seen:
+                continue
+            seen.add(e.raw)
+            res = _enc(_clear(d), v171, e.text, img)
+            assert isinstance(res, Encoded), (name, e.text, res)
+            back = decode_definition(_clear(d), v171, {d.address + i: b for i, b in enumerate(res.data)})
+            assert back.text == e.text, (name, e.text, back.text)
+            total += 1
+    # case 08 ASCII objects (the pinned payload's parse errors are cleared, .152)
+    a2l_c08 = _clear_parse_errors(c08["a2l"])
+    for o in c08["objs"]:
+        if o["kind"] == "ASCII":
+            text = o["raw_bytes"].split(b"\x00")[0].decode("ascii")
+            d = describe_definition(o["name"], a2l_c08)
+            res = _enc(d, a2l_c08, text, c08["mem"])
+            assert isinstance(res, Encoded), (o["name"], res)
+            back = decode_definition(d, a2l_c08, {o["address"] + i: b for i, b in enumerate(res.data)})
+            assert back.text == text, (o["name"], back.text, text)
+            total += 1
+    # V171 ASCII: empty and a full-length text
+    d = describe_definition(V171_ASCII, v171)
+    for text in ("", "Z" * 42):
+        res = _enc(d, v171, text, _img(0x810200, bytes(42)))
+        assert isinstance(res, Encoded)
+        back = decode_definition(d, v171, {0x810200 + i: b for i, b in enumerate(res.data)})
+        assert back.text == text
+        total += 1
+    assert total >= 32, total
+
+
+# ---- R-A2L-DEF.57 - the encode order ---------------------------------------------------------
+
+def test_r_a2l_def_57_1_text_length_before_characters(v171):
+    d = describe_definition(V171_ASCII, v171)
+    text = "Z" * 42 + "\u00e9"
+    assert _enc(d, v171, text, _img(0x810200, bytes(42))) == _ref(
+        "A2L-DEF-TEXT-LENGTH", "ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters \u2014 at most 42 fit")
+
+
+def test_r_a2l_def_57_2_limits_before_the_encode_direction(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_L", "LINEAR", "2", "0"), _val("L1", "0x10", "RL_S16", "CM_L", "-100", "100"))
+    d = describe_definition("L1", a2l)
+    assert _enc(d, a2l, "301", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "L1: 301 is outside the limits -100..100")
+
+
+def test_r_a2l_def_57_3_image_bytes_before_the_mask(tmp_path):
+    a2l = _inline(tmp_path, _val("MN", "0x10", "RL_S16", "NO_COMPU_METHOD", "-100", "100", "BIT_MASK 0x00F0"))
+    d = describe_definition("MN", a2l)
+    assert _enc(d, a2l, "-1", {}) == _ref("A2L-DEF-BYTES", "MN: 2 of its 2 bytes are not in the image")
+
+
+def test_r_a2l_def_57_4_number_text_before_the_shared_bytes(tmp_path):
+    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+    d = describe_definition("OA", a2l)
+    assert _enc(d, a2l, "abc", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-NUMBER", "OA: 'abc' is not a number")
+
+
+def test_r_a2l_def_57_5_parse_errors_before_the_number_text(tmp_path):
+    a2l = _inline(tmp_path,
+                  _val("PN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  '/include "x.a2l"')
+    d = describe_definition("PN", a2l)
+    first = a2l["errors"][0]
+    assert _enc(d, a2l, "abc", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", f"PN: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+
+
+# ---- R-A2L-DEF.138 - the overlap guard -------------------------------------------------------
+
+def test_r_a2l_def_138_1_lost_mask_negative_control(tmp_path):
+    a2l = _inline(tmp_path, _val("MN", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                  _val("MC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    mc = describe_definition("MC", a2l)
+    assert mc.shared_with == "MN"
+    lost = dataclasses.replace(mc, refusal=None, bit_mask=None, bit_mask_text=None)
+    assert _enc(lost, a2l, "35", _img(0x10, bytes([0, 0]))) == _ref(
+        "A2L-DEF-OVERLAP", "MC: its bytes at 0x10 are shared with MN")
+
+
+def test_r_a2l_def_138_2_blob_overlap(tmp_path):
+    a2l = _inline(tmp_path, _val("VB", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                  '/begin BLOB B1 ""\n  0x10 2\n/end BLOB')
+    d = describe_definition("VB", a2l)
+    assert d.shared_with == "B1"
+    assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VB: its bytes at 0x10 are shared with B1")
+
+
+def test_r_a2l_def_138_3_sized_instance_overlap(tmp_path):
+    a2l = _inline(tmp_path, _val("VI", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                  '/begin TYPEDEF_MEASUREMENT T_U16 ""\n  UWORD NO_COMPU_METHOD 0 0 0 65535\n/end TYPEDEF_MEASUREMENT',
+                  '/begin INSTANCE I1 ""\n  T_U16 0x10\n/end INSTANCE')
+    d = describe_definition("VI", a2l)
+    assert d.shared_with == "I1"
+    assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VI: its bytes at 0x10 are shared with I1")
+
+
+def test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address(tmp_path):
+    a2l = _inline(tmp_path, _val("VU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                  '/begin INSTANCE IU ""\n  T_NONE 0x10\n/end INSTANCE')
+    d = describe_definition("VU", a2l)
+    assert d.shared_with == "IU"
+    assert _enc(d, a2l, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VU: its bytes at 0x10 are shared with IU")
+
+
+def test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance(v171):
+    d = describe_definition(V171_UBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    assert _enc(d, v171, "7", {0x810000: 0}) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UBYTE.IDENTICAL: its bytes at 0x810000 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+
+
+def test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance(v171):
+    d = describe_definition(V171_SBYTE, v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
+    assert _enc(d, v171, "7", {0x810001: 0}) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
+
+
+def test_r_a2l_def_138_7_v171_ulong_against_the_array_instance(v171):
+    d = describe_definition("ASAM.C.SCALAR.ULONG.IDENTICAL", v171)
+    assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5"
+    assert _enc(d, v171, "7", _img(0x810008, bytes(4))) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.ULONG.IDENTICAL: its bytes at 0x810008 are shared with ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5")
+
+
+def test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example(v171):
+    d = describe_definition("ASAM.C.DEPENDENT.REF_1.SWORD", v171)
+    assert d.shared_with == "ASAM_S_EXAMPLE"
+    assert _enc(d, v171, "0", _img(0x811000, bytes(2))) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.DEPENDENT.REF_1.SWORD: its bytes at 0x811000 are shared with ASAM_S_EXAMPLE")
+
+
+def test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address(tmp_path):
+    a2l = _inline(tmp_path, _val("VH", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                  "/begin CHARACTERISTIC H1 \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 1000000000000\n/end CHARACTERISTIC")
+    d = describe_definition("VH", a2l)
+    assert d.shared_with == "H1"
+    first = a2l["errors"][0]
+    assert _enc(d, a2l, "7", {0x10: 0}) == _ref(
+        "A2L-DEF-PARSE", f"VH: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+    clean = _clear_parse_errors(a2l)
+    assert describe_definition("H1", clean).address == 0x10
+    assert _enc(d, clean, "7", {0x10: 0}) == _ref("A2L-DEF-OVERLAP", "VH: its bytes at 0x10 are shared with H1")
+
+
+def test_r_a2l_def_138_10_clean_length_refused_neighbour(tmp_path):
+    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("ON", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00", "LENGTH 1048577"))
+    d = describe_definition("OA", a2l)
+    assert d.shared_with == "ON"
+    on = describe_definition("ON", a2l)
+    assert on.refusal is not None and on.refusal.code == "A2L-DEF-ADDRESS" and on.bit_mask == 0x0F00
+    first = a2l["errors"][0]
+    assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref(
+        "A2L-DEF-PARSE", f"OA: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+    clean = _clear_parse_errors(a2l)
+    assert _enc(d, clean, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with ON")
+
+
+def test_r_a2l_def_138_11_clean_duplicate_named_neighbour(tmp_path):
+    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("OD", "0xF000", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                  _val("OD", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"))
+    d = describe_definition("OA", a2l)
+    assert d.shared_with == "OD"
+    assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OD")
+
+
+def test_r_a2l_def_138_12_byte_order_refused_neighbour(tmp_path):
+    mod_common = "\n".join(['    /begin MOD_COMMON ""', "      BYTE_ORDER MSB_FIRST", "      BYTE_ORDER MSB_LAST", "    /end MOD_COMMON"])
+    a2l = _inline(tmp_path, mod_common,
+                  _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("OB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0F00"),
+                  byte_order=None)
+    d = describe_definition("OA", a2l)
+    assert d.shared_with == "OB"
+    assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OB")
+
+
+def test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour(tmp_path):
+    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("OC", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F", "BIT_MASK 0x000F"))
+    d = describe_definition("OA", a2l)
+    assert d.shared_with == "OC"
+    first = a2l["errors"][0]
+    assert _enc(d, a2l, "7", _img(0x10, bytes([0, 0]))) == _ref(
+        "A2L-DEF-PARSE", f"OA: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+    clean = copy.deepcopy(a2l)
+    clean["errors"] = []
+    assert _enc(d, clean, "7", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OC")
+
+
+def test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap(tmp_path):
+    a2l = _inline(tmp_path, _val("OA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("OB", "0x11", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+                  _val("OC", "0x30", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    oa = describe_definition("OA", a2l)
+    ob = describe_definition("OB", a2l)
+    oc = describe_definition("OC", a2l)
+    assert oa.shared_with == "OB" and ob.shared_with == "OA" and oc.shared_with is None
+    img = _img(0x10, bytes([0, 0]))
+    assert _enc(oa, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "OA: its bytes at 0x10 are shared with OB")
+    assert _enc(ob, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "OB: its bytes at 0x11 are shared with OA")
+
+
+def test_r_a2l_def_138_15_both_masks_select_a_common_bit(tmp_path):
+    a2l = _inline(tmp_path, _val("MA", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0FF0"),
+                  _val("MB", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x0010"))
+    d = describe_definition("MA", a2l)
+    assert d.shared_with == "MB"
+    assert _enc(d, a2l, "35", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "MA: its bytes at 0x10 are shared with MB")
+
+
+def test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select(tmp_path):
+    a2l = _inline(tmp_path, _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+                  _val("MU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"))
+    d = describe_definition("MW", a2l)
+    assert d.shared_with is None
+    assert _enc(d, a2l, "1", _img(0x10, bytes([0, 0]))) == Encoded(0x10, bytes([0x00, 0x01]), ())
+
+
+def test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index(tmp_path):
+    a2l = _inline(tmp_path,
+                  _meas("MX", "UWORD", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("Z0", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    mx = describe_definition("MX", a2l)
+    z0 = describe_definition("Z0", a2l)
+    assert mx.refusal is not None and mx.refusal.code == "A2L-DEF-ADDRESS" and mx.shared_with is None
+    assert z0.shared_with is None
+    assert _enc(z0, a2l, "7", _img(0x0, bytes([0, 0]))) == Encoded(0x0, bytes([0x00, 0x07]), ())
+
+
+def test_r_a2l_def_138_19_0x0_is_a_declared_address(tmp_path):
+    a2l = _inline(tmp_path, _val("Z1", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+                  _val("Z2", "0x0", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    z1 = describe_definition("Z1", a2l)
+    z2 = describe_definition("Z2", a2l)
+    assert z1.shared_with == "Z2" and z2.shared_with == "Z1"
+    img = _img(0x0, bytes([0, 0]))
+    assert _enc(z1, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "Z1: its bytes at 0x0 are shared with Z2")
+    assert _enc(z2, a2l, "7", img) == _ref("A2L-DEF-OVERLAP", "Z2: its bytes at 0x0 are shared with Z1")
+
+
+def test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded(tmp_path):
+    a2l = _inline(tmp_path,
+                  "/begin CHARACTERISTIC TA \"\"\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 2\n/end CHARACTERISTIC",
+                  _val("TU", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+    d = describe_definition("TA", a2l)
+    assert d.shared_with == "TU"
+    assert _enc(d, a2l, "AB", _img(0x10, bytes([0, 0]))) == _ref("A2L-DEF-OVERLAP", "TA: its bytes at 0x10 are shared with TU")
+
+
+def test_r_a2l_def_138_21_hostile_blob_and_instance_headers(tmp_path):
+    huge_hex = "0x" + "F" * 5000
+    huge_decimal = "9" * 5000
+    a2l = _inline(
+        tmp_path,
+        f'/begin BLOB B1 "" {huge_hex} 2\n/end BLOB',
+        f'/begin TYPEDEF_BLOB TB "" {huge_decimal}\n/end TYPEDEF_BLOB',
+        '/begin INSTANCE I1 "" TB 0x10\n/end INSTANCE',
+        _val("V1", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+    )
+    clean = _clear_parse_errors(a2l)
+    d = describe_definition("V1", clean)
+    assert d.shared_with == "I1"
+    assert isinstance(_no_exception_encode(d, clean, {0x10: 0}, text="7"), Refusal)
+    assert _enc(d, clean, "7", {0x10: 0}) == _ref(
+        "A2L-DEF-OVERLAP", "V1: its bytes at 0x10 are shared with I1")
+    alone_data = _clear_parse_errors(_inline(
+        tmp_path, f'/begin BLOB B1 "" {huge_hex} 2\n/end BLOB', _val("V1", "0x10", "RL_U8")))
+    alone = describe_definition("V1", alone_data)
+    assert alone.shared_with is None
+    assert _enc(alone, alone_data, "7", {0x10: 0}) == Encoded(0x10, b"\x07", ())
+
+
+# ---- R-A2L-DEF.152 - the parse-error refusal -------------------------------------------------
+
+def _parse_error_a2l(tmp_path: Path, name: str, defects: list[str], at: int) -> dict:
+    lines = ["ASAP2_VERSION 1 71", '/begin PROJECT P ""', '  /begin MODULE M ""',
+             f'    /begin CHARACTERISTIC {name} ""',
+             f"      VALUE 0x10 __UWORD_Z 0 NO_COMPU_METHOD 0 65535",
+             f"    /end CHARACTERISTIC", "  /end MODULE", "/end PROJECT"]
+    while len(lines) < at - 1:
+        lines.append("")
+    lines.extend(defects)
+    path = tmp_path / f"parse_{name}.a2l"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return parse_a2l_file(path)
+
+
+def test_r_a2l_def_152_1_include(tmp_path):
+    a2l = _parse_error_a2l(tmp_path, "P1", ['/include "x.a2l"'], 20)
+    d = describe_definition("P1", a2l)
+    assert d.refusal is None
+    first = a2l["errors"][0]
+    assert first == "Line 20: /include x.a2l is not read"
+    assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", f"P1: the A2L cannot be edited while it has parse errors \u2014 the first is {first}")
+
+
+def test_r_a2l_def_152_2_stray_star_slash(tmp_path):
+    a2l = _parse_error_a2l(tmp_path, "P2", ["*/"], 20)
+    d = describe_definition("P2", a2l)
+    assert d.refusal is None
+    assert a2l["errors"][0] == "Line 20: */ without /*"
+    assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", "P2: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: */ without /*")
+
+
+def test_r_a2l_def_152_3_unclosed_comment(tmp_path):
+    a2l = _parse_error_a2l(tmp_path, "P3", ["/* never closed"], 20)
+    d = describe_definition("P3", a2l)
+    assert d.refusal is None
+    assert a2l["errors"][0] == "Line 20: comment not closed"
+    assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", "P3: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: comment not closed")
+
+
+def test_r_a2l_def_152_4_unclosed_quoted_string(tmp_path):
+    a2l = _parse_error_a2l(tmp_path, "P4", ['/begin CHARACTERISTIC Q "unclosed'], 22)
+    d = describe_definition("P4", a2l)
+    assert d.refusal is None
+    assert a2l["errors"][0] == "Line 22: quoted string not closed"
+    assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", "P4: the A2L cannot be edited while it has parse errors \u2014 the first is Line 22: quoted string not closed")
+
+
+def test_r_a2l_def_152_5_capped_more_parse_errors_marker(tmp_path):
+    a2l = _parse_error_a2l(tmp_path, "P5", ["/end X"] + [f"/end X{i}" for i in range(200)], 20)
+    d = describe_definition("P5", a2l)
+    assert d.refusal is None
+    assert a2l["errors"][0] == "Line 20: /end without /begin"
+    assert a2l["errors"][-1].endswith("more parse errors")
+    assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
+        "A2L-DEF-PARSE", "P5: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: /end without /begin")
+
+
+# ---- R-A2L-DEF.151/7 - the operator-text echo -------------------------------------------------
+
+def test_r_a2l_def_151_7_operator_text_is_cut_without_changing_spaces_or_unicode(tmp_path):
+    a2l = _inline(tmp_path, _val("OT", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"))
+    d = describe_definition("OT", a2l)
+    text = "x" * 252 + " \u00e9 " + "\x1b" + "y"
+    assert len(text) == 257
+    echoed = "x" * 252 + " \u00e9 " + FFFD + ELLIPSIS
+    res = _enc(d, a2l, text, {0x10: 0, 0x11: 0})
+    assert res == _ref("A2L-DEF-NUMBER", f"OT: '{echoed}' is not a number")
+    assert len(res.message) <= 1024
+
+
+# ---- R-A2L-DEF.21/3 - the waiting encode arm --------------------------------------------------
+
+def test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits_encode(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_X", "LINEAR", "1", "0"),
+                  _val("XL3", "0x10", "RL_S16", "CM_X", "0", "100", "EXTENDED_LIMITS nan nan"))
+    d = describe_definition("XL3", a2l)
+    assert d.extended_limits is None
+    assert _enc(d, a2l, "101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "XL3: 101 is outside the limits 0..100")
+
+
+# ---- R-A2L-DEF.58.2 - the waiting encode arms -------------------------------------------------
+
+def _no_exception_encode(d: Definition, a2l: dict, image: Mapping[int, int], text: str = "0"):
+    res = encode_definition(d, a2l, text, image)
+    assert isinstance(res, (Encoded, Refusal))
+    return res
+
+
+def test_r_a2l_def_58_2_1_count_1e400_encode(tmp_path):
+    a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "1e400", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+    d = describe_definition("EE", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-TABLE-EMPTY"
+    assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_2_count_nan_encode(tmp_path):
+    a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "nan", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+    d = describe_definition("EE", a2l)
+    assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_3_count_minus_3_encode(tmp_path):
+    a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "-3", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+    d = describe_definition("EE", a2l)
+    assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_4_count_2_5_encode(tmp_path):
+    a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", "2.5", '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+    d = describe_definition("EE", a2l)
+    assert _no_exception_encode(d, a2l, {0x10: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_encode(tmp_path):
+    word = "1" * 5000
+    a2l = _inline(tmp_path, _val("MX5", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {word}"))
+    d = describe_definition("MX5", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-MASK"
+    assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_7_bit_mask_0xzz_encode(tmp_path):
+    a2l = _inline(tmp_path, _val("MZ", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0xZZ"))
+    d = describe_definition("MZ", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-MASK"
+    assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+
+
+def test_r_a2l_def_58_2_8_number_minus_5_encode(tmp_path):
+    a2l = _inline(tmp_path, _ascii("T8", "0x10", "-5"))
+    d = describe_definition("T8", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+    assert _no_exception_encode(d, a2l, {}) == d.refusal
+
+
+def test_r_a2l_def_58_2_9_number_above_one_mib_encode(tmp_path):
+    a2l = _inline(tmp_path, _ascii("T9", "0x10", "1048577"))
+    d = describe_definition("T9", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+    assert _no_exception_encode(d, a2l, {}) == d.refusal
+
+
+def test_r_a2l_def_58_2_10_negative_ecu_address_encode(tmp_path):
+    a2l = _inline(tmp_path, _meas("T10", "UWORD", addr="-0x10"))
+    d = describe_definition("T10", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-ADDRESS"
+    assert _no_exception_encode(d, a2l, {}) == d.refusal
+
+
+def test_r_a2l_def_58_2_11_non_finite_extended_limits_encode(tmp_path):
+    a2l = _inline(tmp_path, _val("XL", "0x10", "RL_S16", "NO_COMPU_METHOD", "0", "100", "EXTENDED_LIMITS nan nan"))
+    d = describe_definition("XL", a2l)
+    assert _enc(d, a2l, "101", {0x10: 0, 0x11: 0}) == _ref("A2L-DEF-LIMITS", "XL: 101 is outside the limits 0..100")
+
+
+def test_r_a2l_def_58_2_12_non_finite_coefficients_encode(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_N", "RAT_FUNC", "nan", "inf", "0", "0", "0", "1"),
+                  _val("RF", "0x10", "RL_U16", "CM_N", "0", "65535"))
+    d = describe_definition("RF", a2l)
+    assert isinstance(_no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}, text="3"), (Encoded, Refusal))
+
+
+def test_r_a2l_def_58_2_13_all_zero_rat_func_encode(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_Z", "RAT_FUNC", "0", "0", "0", "0", "0", "0"),
+                  _val("RZ", "0x10", "RL_U16", "CM_Z", "0", "65535"))
+    d = describe_definition("RZ", a2l)
+    assert _enc(d, a2l, "3", {}) == _ref("A2L-DEF-ENCODE", "RZ: RAT_FUNC denominator is zero")
+
+
+def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_encode(tmp_path):
+    a2l = _inline(tmp_path, _cm("CM_E", "TAB_VERB", fmt='"%.0"', ref="VT_E"),
+                  _vtab("VT_E", "1", '0 "A\x1bB'), _val("EV", "0x10", "RL_U8", "CM_E", "0", "255"))
+    d = describe_definition("EV", a2l)
+    assert isinstance(_no_exception_encode(d, a2l, {0x10: 0}, text="A"), (Encoded, Refusal))
+
+
+def test_r_a2l_def_58_2_15_v171_unclosed_begin_encode(v171):
+    d = describe_definition(V171_SWORD, v171)
+    assert isinstance(_no_exception_encode(_clear(d), v171, {0x810004: 0, 0x810005: 0}, text="0"), (Encoded, Refusal))
+
+
+def test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode(tmp_path):
+    a2l = _inline(tmp_path, _val("ND", "0x10", "RL_X", "NO_COMPU_METHOD", "0", "65535", "LENGTH 2", "BIT_MASK 0x0FF0"),
+                  '/begin RECORD_LAYOUT RL_X\n  FNC_VALUES 1 FOO ROW_DIR DIRECT\n/end RECORD_LAYOUT')
+    d = describe_definition("ND", a2l)
+    assert d.refusal is not None and d.refusal.code == "A2L-DEF-DATATYPE"
+    assert _no_exception_encode(d, a2l, {0x10: 0, 0x11: 0}) == d.refusal
+
+
+# ---- R-A2L-DEF.58.1 - the encode arm of the immutability checks ------------------------------
+
+def _encode_unchanged(a2l: dict, image: dict) -> None:
+    defs = describe_definitions([t["name"] for t in a2l["tags"]], a2l)
+    for d in defs.values():
+        if d.refusal is not None or d.address is None or d.byte_length is None:
+            continue
+        res = encode_definition(d, a2l, "0", image)
+        assert isinstance(res, (Encoded, Refusal))
+        if isinstance(d.shared_with, str):
+            assert isinstance(res, Refusal)
+
+
+def test_r_a2l_def_58_1_1_encode_does_not_mutate_v171(v171):
+    before = copy.deepcopy(v171)
+    image = _zero_image(describe_definitions([t["name"] for t in v171["tags"]], v171).values())
+    image_before = dict(image)
+    _encode_unchanged(v171, image)
+    assert v171 == before and image == image_before
+
+
+def test_r_a2l_def_58_1_2_encode_does_not_mutate_case08(c08):
+    a2l = c08["a2l"]
+    before = copy.deepcopy(a2l)
+    mem = c08["mem"]
+    mem_before = dict(mem)
+    _encode_unchanged(a2l, mem)
+    assert a2l == before and mem == mem_before
+
+
+# ---- AT-B103-I2-1 - the write arm (nine overlap refusals, only ASCII encodes) -----------------
+
+def test_at_b103_i2_1_write_arm_nine_overlap_refusals_and_only_ascii_encodes(v171):
+    """AT-B103-I2-1 (2b arm) - nine V171 objects refuse A2L-DEF-OVERLAP naming the
+    object each shares with, on an accepted value; only the ASCII object encodes,
+    is applied and decodes again."""
+    image: dict[int, int] = {}
+    image.update(_img(0x810000, bytes([0, 0])))          # UBYTE, SBYTE
+    image.update(_img(0x810002, bytes([0x34, 0x12])))    # the UWORD word 0x1234
+    image.update(_img(0x810004, bytes([2, 0])))          # the SWORD
+    image.update(_img(0x810200, b"Hello ASAM" + bytes(32)))
+    image_before = dict(image)
+    expected = {
+        V171_ENUM: "Square",
+        V171_ENUM_NODEF: "red",
+        V171_RANGE: "two_to_three",
+        V171_M0FF0: "35",
+        V171_M0001: "0",
+        V171_M0010: "1",
+        V171_ASCII: "Hello ASAM",
+        V171_SBYTE: "0",
+        V171_UBYTE: "0",
+        V171_SWORD: "2",
+    }
+    for name, expected_text in expected.items():
+        d = describe_definition(name, v171)
+        assert d.refusal is None, (name, d.refusal)
+        assert decode_definition(d, v171, image).text == expected_text, name
+    overlaps = {
+        V171_ENUM: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "Square"),
+        V171_ENUM_NODEF: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "green"),
+        V171_RANGE: ("ASAM.C.SCALAR.SWORD.IDENTICAL", "four_to_seven"),
+        V171_SWORD: ("ASAM.C.SCALAR.SWORD.LINEAR_MUL_2", "0"),
+        V171_M0FF0: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+        V171_M0001: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+        V171_M0010: ("ASAM.C.SCALAR.UWORD.IDENTICAL", "0"),
+        V171_SBYTE: ("ASAM_I_SCALAR_VALUE_UWORD_SINGLE", "0"),
+        V171_UBYTE: ("ASAM_I_SCALAR_VALUE_UWORD_SINGLE", "0"),
+    }
+    for name, (other, text) in overlaps.items():
+        d = describe_definition(name, v171)
+        assert d.shared_with == other, (name, d.shared_with)
+        assert _enc(d, v171, text, image) == _ref(
+            "A2L-DEF-OVERLAP", f"{name}: its bytes at 0x{d.address:X} are shared with {other}")
+    # only the ASCII object encodes, is applied and decodes again
+    d = describe_definition(V171_ASCII, v171)
+    assert d.shared_with is None
+    res = _enc(d, v171, "ABC", image)
+    assert isinstance(res, Encoded)
+    image.update({0x810200 + i: b for i, b in enumerate(res.data)})
+    assert decode_definition(d, v171, image).text == "ABC"
+    for addr, b in image_before.items():
+        if not (0x810200 <= addr < 0x810200 + 42):
+            assert image[addr] == b, hex(addr)

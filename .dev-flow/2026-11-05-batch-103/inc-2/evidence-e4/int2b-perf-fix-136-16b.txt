@@ -1,0 +1,38 @@
+/tmp/b103-e4-2b-int/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_136_1_describing_every_object_is_fast _____________
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_136_1_describing_every_object_is_fast():
+        """R-A2L-DEF.136/1 - 13,990 names in one call: median of 3 runs <= 2.0 s; every name gets a Definition."""
+        a2l = parse_a2l_file(SOFTA)
+        names = [t["name"] for t in a2l["tags"]]
+        assert len(set(names)) == 13990
+        runs = []
+        result = {}
+        for _ in range(3):
+            started = time.perf_counter()
+            result = describe_definitions(names, a2l)
+            runs.append(time.perf_counter() - started)
+        assert len(result) == 13990
+        assert all(isinstance(d, Definition) for d in result.values())
+        # the walk really built definitions (a constant refusal would also be fast)
+        built = [d for d in result.values() if d.refusal is None]
+        assert any(d.kind == "number" for d in built) and any(d.kind == "enum" for d in built)
+        # Integration fix (orchestrator, 2026-11-07): the bound goes through the repo's
+        # timing helpers so the R-TST-002 census sees a timing arm and QC-TM reports it.
+        median = statistics.median(runs)
+>       assert median <= report_margin("R-A2L-DEF.136 describe 13990", median, timing_bound(BOUND_SECONDS)), runs
+E       AssertionError: [2.3729724020013236, 2.3952419460038072, 2.4244241760025034]
+E       assert 2.3952419460038072 <= 2.0
+E        +  where 2.0 = report_margin('R-A2L-DEF.136 describe 13990', 2.3952419460038072, 2.0)
+E        +    where 2.0 = timing_bound(2.0)
+
+tests/test_b103_a2l_definition_perf.py:53: AssertionError
+============================= QC-TM timing margins =============================
+LOW -19.8%  2.395 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+1 failed in 8.20s

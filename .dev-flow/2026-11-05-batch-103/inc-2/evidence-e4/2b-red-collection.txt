@@ -1,0 +1,20 @@
+# red-collection transcript 2026-11-10T05:27:02Z host <runner>
+# command: /home/<user>/miniconda3/envs/s19ci/bin/python -I -B run_pytest_runner.py -q -p no:cacheprovider tests/test_b103_a2l_definition.py tests/test_b103_synth_definitions.py
+s19_app.__file__ = /home/<user>/work/b103-inc2b-tests/s19_app/__init__.py
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_b103_a2l_definition.py ______________
+ImportError while importing test module '/home/<user>/work/b103-inc2b-tests/tests/test_b103_a2l_definition.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition.py:48: in <module>
+    from s19_app.tui.a2l_definition import (  # noqa: E402
+E   ImportError: cannot import name 'Encoded' from 's19_app.tui.a2l_definition' (/home/<user>/work/b103-inc2b-tests/s19_app/tui/a2l_definition.py)
+=========================== short test summary info ============================
+ERROR tests/test_b103_a2l_definition.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.71s
+# exit 2

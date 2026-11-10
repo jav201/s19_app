@@ -1,0 +1,83 @@
+/tmp/b103-e4-2b-stub/s19_app/__init__.py
+.........FFF                                                             [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_138_16_two_disjoint_masks_still_encode _____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-328/b103_defc0'), ...}
+
+    def test_r_a2l_def_138_16_two_disjoint_masks_still_encode(defc):
+        """R-A2L-DEF.138/16 - DEFC's two disjoint masks of one word both encode, no OVERLAP."""
+        m = _model()
+        image = defc["mem"]
+        bit = m.describe_definition("MASK_BIT_0001", defc["a2l"])
+        field = m.describe_definition("MASK_FIELD_0001", defc["a2l"])
+        assert bit.shared_with is None and field.shared_with is None
+>       assert m.encode_definition(bit, defc["a2l"], "0", image) == m.Encoded(0x800010, bytes([0x1A, 0xE6]), ())
+E       AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['address', 'data']
+E         
+E         Drill down into differing attribute address:
+E           address: 0 != 8388624...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_synth_definitions.py:323: AssertionError
+____________ test_r_a2l_def_46_3_two_fields_of_one_big_endian_word _____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-328/b103_defc0'), ...}
+
+    def test_r_a2l_def_46_3_two_fields_of_one_big_endian_word(defc):
+        """R-A2L-DEF.46/3 - write the multi-bit field, then decode both masked objects over the applied image."""
+        m = _model()
+        field = m.describe_definition("MASK_FIELD_0001", defc["a2l"])
+        bit = m.describe_definition("MASK_BIT_0001", defc["a2l"])
+        res = m.encode_definition(field, defc["a2l"], "3", defc["mem"])
+        assert isinstance(res, m.Encoded)
+        new_image = dict(defc["mem"])
+        new_image.update({0x800010 + i: b for i, b in enumerate(res.data)})
+>       assert m.decode_definition(field, defc["a2l"], new_image).text == "3"
+E       AssertionError: assert '53' == '3'
+E         
+E         - 3
+E         + 53
+
+tests/test_b103_synth_definitions.py:336: AssertionError
+_______ test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value ________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-328/b103_defc0'), ...}
+
+    def test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value(defc):
+        """AT-B103-I2-2 (2b arm) - encode each DEFC scalar's planned text, apply, then a second value.
+    
+        ENUM_0001 IDLE -> FAULT (03); MASK_FIELD_0001 174 -> 3 (word 0x1037) with MASK_BIT_0001
+        still 1; MASK_BIT_0001 1 -> 0 (0x1036); DISPLAY_0001 143.5 -> -12.5 (FF E7); every other
+        byte of the region unchanged.
+        """
+        m = _model()
+        second = {"ENUM_0001": "FAULT", "MASK_BIT_0001": "0", "MASK_FIELD_0001": "3", "DISPLAY_0001": "-12.5"}
+        base_image = defc["mem"]
+        image = dict(base_image)
+        for name in _SCALAR_DEFC:
+            d = m.describe_definition(name, defc["a2l"])
+            assert d.shared_with is None, (name, d.shared_with)
+            planned = m.decode_definition(d, defc["a2l"], image)
+            assert isinstance(planned, m.Decoded), (name, planned)
+            res = m.encode_definition(d, defc["a2l"], planned.text, image)
+            assert isinstance(res, m.Encoded), (name, res)
+            image.update({d.address + i: b for i, b in enumerate(res.data)})
+>           assert m.decode_definition(d, defc["a2l"], image).text == planned.text, name
+E           AssertionError: ENUM_0001
+E           assert 'UNKNOWN_STATE' == 'IDLE'
+E             
+E             - IDLE
+E             + UNKNOWN_STATE
+
+tests/test_b103_synth_definitions.py:359: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_138_16_two_disjoint_masks_still_encode
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_46_3_two_fields_of_one_big_endian_word
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value
+3 failed, 9 passed in 5.15s
