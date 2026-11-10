@@ -1530,8 +1530,9 @@ class A2LDetailCard(RichLog):
             - _compose_screen_a2l (mount) ; on_data_table_row_highlighted (update)
 
     Note (Textual internal-name shadowing): the subclass adds only ``on_mount``,
-    ``render``, ``show_tag`` and its current ``_card_text`` — no ``_nodes`` or
-    ``_context`` (or any other ``Widget`` private) name is introduced.
+    ``on_resize``, ``render``, ``show_tag``, ``_rewrite_card_text`` and its
+    current ``_card_text`` — no ``_nodes`` or ``_context`` (or any other
+    ``Widget`` private) name is introduced.
     """
 
     DEFAULT_CSS = """
@@ -21329,8 +21330,10 @@ class S19TuiApp(App):
               severity style — the Tag cell sized by the current name width
               (``_a2l_tag_name_width``) — and write only the cells whose
               plain text or style differs (``update_cell_at`` with
-              ``update_width=True`` so a widened Raw/Physical value is not
-              clipped and the Tag column can shrink).
+              ``update_width=True`` so values use their current render width).
+            - Invalidate the table's cell and line caches with
+              ``notify_style_update`` so the next paint uses the new text and
+              width instead of a stale narrow render.
             - Re-point ``_a2l_row_key_to_tag`` for each shown row and
               recompute the summary label with ``update_a2l_tags_view``'s
               text. No ``clear()``, no ``move_cursor``, no ``scroll_to`` and
@@ -21394,6 +21397,7 @@ class S19TuiApp(App):
         summary_text.append("  ·  ")
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
+        table.notify_style_update()
 
     def _build_a2l_table_cells(
         self, tag: dict, name_width: Optional[int] = None

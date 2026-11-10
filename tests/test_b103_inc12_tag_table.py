@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import os
 import re
 import time
 from pathlib import Path
@@ -714,29 +715,46 @@ def test_r_tui_042a_5_5_narrowest_width(tmp_path: Path) -> None:
     _explore(tmp_path, page64(48, wide16=True), (80, 54), _check)
 
 
+def _painted_tag_equals(table, row_index: int, want: str) -> bool:
+    """Whether the visible Tag span paints ``want`` exactly inside the viewport."""
+    result = _painted_tag_cell(table, _geom(table), row_index)
+    return result is not None and result[0] == want and result[1] <= _geom(table).visible
+
+
 def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
     """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
     async def _check(app, pilot, table):
-        await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "start fit", timeout=30)
+        wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+        narrow = "✓ SYN_MA…LLL_END"
+        await wait_until(
+            pilot,
+            lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+            "start painted fit",
+            timeout=30,
+        )
         geom = _geom(table)
         assert geom.w == 84, geom.w
-        cell = table.get_row_at(0)[geom.idx["Tag"]].plain
-        assert cell == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
-        _assert_painted_tag_cell(table, geom, 0, cell)
+        _assert_painted_tag_cell(table, geom, 0, wide)
         await pilot.resize_terminal(80, 54)
-        await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "220→80 fit", timeout=30)
+        await wait_until(
+            pilot,
+            lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+            "220→80 painted fit",
+            timeout=30,
+        )
         geom = _geom(table)
         assert geom.w == 14, geom.w
-        cell = table.get_row_at(0)[geom.idx["Tag"]].plain
-        assert cell == "✓ SYN_MA…LLL_END", cell
-        _assert_painted_tag_cell(table, geom, 0, cell)
+        _assert_painted_tag_cell(table, geom, 0, narrow)
         await pilot.resize_terminal(220, 60)
-        await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "80→220 fit", timeout=30)
+        await wait_until(
+            pilot,
+            lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+            "80→220 painted fit",
+            timeout=30,
+        )
         geom = _geom(table)
         assert geom.w == 84, geom.w
-        cell = table.get_row_at(0)[geom.idx["Tag"]].plain
-        assert cell == "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
-        _assert_painted_tag_cell(table, geom, 0, cell)
+        _assert_painted_tag_cell(table, geom, 0, wide)
         assert table.cursor_row == 0
 
     _explore(tmp_path, page_long(48), (220, 60), _check)
@@ -960,8 +978,9 @@ def test_r_tui_042a_6_1_zero_width_tail(tmp_path: Path) -> None:
     one ``_build_a2l_table_cells(tag, 14)`` call each, under 1 s, 6 + ``…`` + 7 × U+FFFD."""
     for tail_len in (4_000, 16_000):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + "\u200b" * tail_len, 14)
-        assert elapsed < 1.0, elapsed
-        report_margin("R-TUI-042a.6/1 cell build", elapsed, 1.0)
+        assert elapsed < report_margin(
+            "R-TUI-042a.6/1 cell build", elapsed, 0.5 if os.environ.get("CI") else 1.0
+        ), elapsed
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
 
 
@@ -971,8 +990,9 @@ def test_r_tui_042a_6_2_combining_and_esc_tails(tmp_path: Path) -> None:
     the /1 form, no U+0301 and no ESC in the cell."""
     for tail_char in ("\u0301", "\x1b"):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + tail_char * 16_000, 14)
-        assert elapsed < 1.0, elapsed
-        report_margin("R-TUI-042a.6/2 cell build", elapsed, 1.0)
+        assert elapsed < report_margin(
+            "R-TUI-042a.6/2 cell build", elapsed, 0.5 if os.environ.get("CI") else 1.0
+        ), elapsed
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
         assert "\u0301" not in plain and "\x1b" not in plain, repr(plain)
 
