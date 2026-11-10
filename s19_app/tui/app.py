@@ -21263,7 +21263,7 @@ class S19TuiApp(App):
         Dependencies:
             Uses:
                 - ``_a2l_tag_name_width`` / ``_build_a2l_table_cells``
-                - ``_repaint_a2l_tag_cells``
+                - ``update_a2l_tags_view``
             Used by:
                 - ``update_a2l_tags_view`` (after each non-empty page build)
                 - ``on_a2l_tag_table_measured``
@@ -21358,7 +21358,6 @@ class S19TuiApp(App):
                 - ``_get_window_bounds`` / ``_clamp_viewer_page_size``
             Used by:
                 - ``_refresh_a2l_values_after_write``
-                - ``_fit_a2l_tag_cells``
         """
         table = self.query_one("#a2l_tags_list", DataTable)
         summary_label = self.query_one("#a2l_tags_summary", Label)
