@@ -1,0 +1,331 @@
+regen	Set up job	﻿2026-11-10T02:40:29.8697876Z Current runner version: '2.338.2'
+regen	Set up job	2026-11-10T02:40:29.8724706Z ##[group]Runner Image Provisioner
+regen	Set up job	2026-11-10T02:40:29.8725600Z Hosted Compute Agent
+regen	Set up job	2026-11-10T02:40:29.8726194Z Version: 20261028.624
+regen	Set up job	2026-11-10T02:40:29.8726973Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+regen	Set up job	2026-11-10T02:40:29.8727696Z Build Date: 2026-10-28T21:51:42Z
+regen	Set up job	2026-11-10T02:40:29.8728424Z Worker ID: {2e2fbdc2-13c7-4f04-b4af-66b2f3ef2b0d}
+regen	Set up job	2026-11-10T02:40:29.8729141Z Region: westus
+regen	Set up job	2026-11-10T02:40:29.8729676Z Cloud: Azure
+regen	Set up job	2026-11-10T02:40:29.8730291Z ##[endgroup]
+regen	Set up job	2026-11-10T02:40:29.8731835Z ##[group]Operating System
+regen	Set up job	2026-11-10T02:40:29.8732530Z Ubuntu
+regen	Set up job	2026-11-10T02:40:29.8733064Z 26.04.1
+regen	Set up job	2026-11-10T02:40:29.8733966Z LTS
+regen	Set up job	2026-11-10T02:40:29.8734608Z ##[endgroup]
+regen	Set up job	2026-11-10T02:40:29.8735210Z ##[group]Runner Image
+regen	Set up job	2026-11-10T02:40:29.8735791Z Image: ubuntu-26.04
+regen	Set up job	2026-11-10T02:40:29.8736446Z Version: 20261101.186.1
+regen	Set up job	2026-11-10T02:40:29.8737517Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+regen	Set up job	2026-11-10T02:40:29.8739349Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+regen	Set up job	2026-11-10T02:40:29.8740326Z ##[endgroup]
+regen	Set up job	2026-11-10T02:40:29.8741482Z ##[group]GITHUB_TOKEN Permissions
+regen	Set up job	2026-11-10T02:40:29.8743741Z Contents: read
+regen	Set up job	2026-11-10T02:40:29.8744537Z Metadata: read
+regen	Set up job	2026-11-10T02:40:29.8745143Z ##[endgroup]
+regen	Set up job	2026-11-10T02:40:29.8747270Z Secret source: Actions
+regen	Set up job	2026-11-10T02:40:29.8748218Z Cache mode: write
+regen	Set up job	2026-11-10T02:40:29.8749342Z Prepare workflow directory
+regen	Set up job	2026-11-10T02:40:29.9093039Z Prepare all required actions
+regen	Set up job	2026-11-10T02:40:29.9142148Z Getting action download info
+regen	Set up job	2026-11-10T02:40:30.2695390Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+regen	Set up job	2026-11-10T02:40:30.4082078Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+regen	Set up job	2026-11-10T02:40:30.4701834Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+regen	Set up job	2026-11-10T02:40:30.6631119Z Complete job name: regen
+regen	Check out repository	﻿2026-11-10T02:40:30.7518078Z ##[group]Run actions/checkout@v4
+regen	Check out repository	2026-11-10T02:40:30.7519032Z with:
+regen	Check out repository	2026-11-10T02:40:30.7519478Z   repository: jav201/s19_app
+regen	Check out repository	2026-11-10T02:40:30.7523550Z   token: ***
+regen	Check out repository	2026-11-10T02:40:30.7523996Z   ssh-strict: true
+regen	Check out repository	2026-11-10T02:40:30.7524435Z   ssh-user: git
+regen	Check out repository	2026-11-10T02:40:30.7524883Z   persist-credentials: true
+regen	Check out repository	2026-11-10T02:40:30.7525367Z   clean: true
+regen	Check out repository	2026-11-10T02:40:30.7525813Z   sparse-checkout-cone-mode: true
+regen	Check out repository	2026-11-10T02:40:30.7526334Z   fetch-depth: 1
+regen	Check out repository	2026-11-10T02:40:30.7526764Z   fetch-tags: false
+regen	Check out repository	2026-11-10T02:40:30.7527210Z   show-progress: true
+regen	Check out repository	2026-11-10T02:40:30.7527650Z   lfs: false
+regen	Check out repository	2026-11-10T02:40:30.7528064Z   submodules: false
+regen	Check out repository	2026-11-10T02:40:30.7528512Z   set-safe-directory: true
+regen	Check out repository	2026-11-10T02:40:30.7529017Z   allow-unsafe-pr-checkout: false
+regen	Check out repository	2026-11-10T02:40:30.7529802Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:31.0671730Z Syncing repository: jav201/s19_app
+regen	Check out repository	2026-11-10T02:40:31.0674052Z ##[group]Getting Git version info
+regen	Check out repository	2026-11-10T02:40:31.0675043Z Working directory is '/home/runner/work/s19_app/s19_app'
+regen	Check out repository	2026-11-10T02:40:31.0676607Z [command]/usr/bin/git version
+regen	Check out repository	2026-11-10T02:40:31.0727886Z git version 2.56.0
+regen	Check out repository	2026-11-10T02:40:31.0752507Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:31.0767497Z Temporarily overriding HOME='/home/runner/work/_temp/cc2c0403-0231-4289-b91b-fb69e7922e5b' before making global git config changes
+regen	Check out repository	2026-11-10T02:40:31.0768939Z Adding repository directory to the temporary git global config as a safe directory
+regen	Check out repository	2026-11-10T02:40:31.0773215Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/s19_app/s19_app
+regen	Check out repository	2026-11-10T02:40:31.0852563Z Deleting the contents of '/home/runner/work/s19_app/s19_app'
+regen	Check out repository	2026-11-10T02:40:31.0857885Z ##[group]Initializing the repository
+regen	Check out repository	2026-11-10T02:40:31.0862951Z [command]/usr/bin/git init /home/runner/work/s19_app/s19_app
+regen	Check out repository	2026-11-10T02:40:31.0987924Z hint: Using 'master' as the name for the initial branch. This default branch name
+regen	Check out repository	2026-11-10T02:40:31.0990069Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+regen	Check out repository	2026-11-10T02:40:31.0991623Z hint: to use in all of your new repositories, which will suppress this warning,
+regen	Check out repository	2026-11-10T02:40:31.0993782Z hint: call:
+regen	Check out repository	2026-11-10T02:40:31.0994898Z hint:
+regen	Check out repository	2026-11-10T02:40:31.0996176Z hint: 	git config --global init.defaultBranch <name>
+regen	Check out repository	2026-11-10T02:40:31.0997593Z hint:
+regen	Check out repository	2026-11-10T02:40:31.0998708Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+regen	Check out repository	2026-11-10T02:40:31.1000492Z hint: 'development'. The just-created branch can be renamed via this command:
+regen	Check out repository	2026-11-10T02:40:31.1001879Z hint:
+regen	Check out repository	2026-11-10T02:40:31.1002716Z hint: 	git branch -m <name>
+regen	Check out repository	2026-11-10T02:40:31.1003871Z hint:
+regen	Check out repository	2026-11-10T02:40:31.1005170Z hint: Disable this message with "git config set advice.defaultBranchName false"
+regen	Check out repository	2026-11-10T02:40:31.1006938Z Initialized empty Git repository in /home/runner/work/s19_app/s19_app/.git/
+regen	Check out repository	2026-11-10T02:40:31.1017351Z [command]/usr/bin/git remote add origin https://github.com/jav201/s19_app
+regen	Check out repository	2026-11-10T02:40:31.1071869Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:31.1073227Z ##[group]Disabling automatic garbage collection
+regen	Check out repository	2026-11-10T02:40:31.1076645Z [command]/usr/bin/git config --local gc.auto 0
+regen	Check out repository	2026-11-10T02:40:31.1113183Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:31.1115057Z ##[group]Setting up auth
+regen	Check out repository	2026-11-10T02:40:31.1120921Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+regen	Check out repository	2026-11-10T02:40:31.1156737Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+regen	Check out repository	2026-11-10T02:40:31.1679918Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+regen	Check out repository	2026-11-10T02:40:31.1716453Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+regen	Check out repository	2026-11-10T02:40:31.2011305Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+regen	Check out repository	2026-11-10T02:40:31.2052970Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+regen	Check out repository	2026-11-10T02:40:31.2329415Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+regen	Check out repository	2026-11-10T02:40:31.2370117Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:31.2371576Z ##[group]Fetching the repository
+regen	Check out repository	2026-11-10T02:40:31.2381588Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +a85131178fd1e40c89c2358c3ef7c22916cad288:refs/remotes/origin/b103-inc12-integration
+regen	Check out repository	2026-11-10T02:40:36.1677347Z From https://github.com/jav201/s19_app
+regen	Check out repository	2026-11-10T02:40:36.1679058Z  * [new ref]         a85131178fd1e40c89c2358c3ef7c22916cad288 -> origin/b103-inc12-integration
+regen	Check out repository	2026-11-10T02:40:36.1682576Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:36.1684104Z ##[group]Determining the checkout info
+regen	Check out repository	2026-11-10T02:40:36.1686344Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:36.1697044Z [command]/usr/bin/git sparse-checkout disable
+regen	Check out repository	2026-11-10T02:40:36.1770304Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+regen	Check out repository	2026-11-10T02:40:36.1805636Z ##[group]Checking out the ref
+regen	Check out repository	2026-11-10T02:40:36.1811261Z [command]/usr/bin/git checkout --progress --force -B b103-inc12-integration refs/remotes/origin/b103-inc12-integration
+regen	Check out repository	2026-11-10T02:40:37.2721637Z Updating files:  96% (8611/8962)
+regen	Check out repository	2026-11-10T02:40:37.2920417Z Updating files:  97% (8694/8962)
+regen	Check out repository	2026-11-10T02:40:37.3028792Z Updating files:  98% (8783/8962)
+regen	Check out repository	2026-11-10T02:40:37.3199028Z Updating files:  99% (8873/8962)
+regen	Check out repository	2026-11-10T02:40:37.3199801Z Updating files: 100% (8962/8962)
+regen	Check out repository	2026-11-10T02:40:37.3200265Z Updating files: 100% (8962/8962), done.
+regen	Check out repository	2026-11-10T02:40:37.3290872Z Switched to a new branch 'b103-inc12-integration'
+regen	Check out repository	2026-11-10T02:40:37.3297756Z branch 'b103-inc12-integration' set up to track 'origin/b103-inc12-integration'.
+regen	Check out repository	2026-11-10T02:40:37.3333024Z ##[endgroup]
+regen	Check out repository	2026-11-10T02:40:37.3381478Z [command]/usr/bin/git log -1 --format=%H
+regen	Check out repository	2026-11-10T02:40:37.3407650Z a85131178fd1e40c89c2358c3ef7c22916cad288
+regen	Set up Python	﻿2026-11-10T02:40:37.3694245Z ##[group]Run actions/setup-python@v5
+regen	Set up Python	2026-11-10T02:40:37.3694669Z with:
+regen	Set up Python	2026-11-10T02:40:37.3694926Z   python-version: 3.11
+regen	Set up Python	2026-11-10T02:40:37.3695221Z   check-latest: false
+regen	Set up Python	2026-11-10T02:40:37.3697825Z   token: ***
+regen	Set up Python	2026-11-10T02:40:37.3698101Z   update-environment: true
+regen	Set up Python	2026-11-10T02:40:37.3698411Z   allow-prereleases: false
+regen	Set up Python	2026-11-10T02:40:37.3698697Z   freethreaded: false
+regen	Set up Python	2026-11-10T02:40:37.3698959Z ##[endgroup]
+regen	Set up Python	2026-11-10T02:40:37.5162662Z ##[group]Installed versions
+regen	Set up Python	2026-11-10T02:40:37.5310785Z (node:2400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+regen	Set up Python	2026-11-10T02:40:37.5311682Z (Use `node --trace-deprecation ...` to show where the warning was created)
+regen	Set up Python	2026-11-10T02:40:37.5312521Z Successfully set up CPython (3.11.18)
+regen	Set up Python	2026-11-10T02:40:37.5313659Z ##[endgroup]
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	﻿2026-11-10T02:40:37.5446484Z ##[group]Run python -m pip install --upgrade pip
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5447090Z [36;1mpython -m pip install --upgrade pip[0m
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5447519Z [36;1mpython -m pip install -r requirements.txt[0m
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5447913Z [36;1mpython -m pip install -e ".[dev]"[0m
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5517339Z shell: /usr/bin/bash -e {0}
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5517725Z env:
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5518058Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5518575Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5519064Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5519508Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5519940Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5520375Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:37.5520744Z ##[endgroup]
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.2146440Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (26.2.2)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.3411653Z Collecting pip
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.5079261Z   Downloading pip-26.3-py3-none-any.whl.metadata (4.6 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.5802588Z Downloading pip-26.3-py3-none-any.whl (2.0 MB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.8439262Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 12.4 MB/s  0:00:00
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.8984394Z Installing collected packages: pip
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.8985309Z   Attempting uninstall: pip
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.8997724Z     Found existing installation: pip 26.2.2
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.9580088Z     Uninstalling pip-26.2.2:
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:38.9638593Z       Successfully uninstalled pip-26.2.2
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:39.8860209Z Successfully installed pip-26.3
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.3341796Z Collecting rich>=13.0 (from -r requirements.txt (line 3))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.3800468Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.4414034Z Collecting textual<9,>=8.2.8 (from -r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.4538692Z   Downloading textual-8.2.8-py3-none-any.whl.metadata (9.1 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.4887864Z Collecting markdown-it-py>=3 (from -r requirements.txt (line 5))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.5004248Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.5320345Z Collecting mdit-py-plugins (from textual<9,>=8.2.8->-r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.5428704Z   Downloading mdit_py_plugins-0.6.1-py3-none-any.whl.metadata (2.9 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.5801701Z Collecting platformdirs<5,>=3.6.0 (from textual<9,>=8.2.8->-r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.5906832Z   Downloading platformdirs-4.14.5-py3-none-any.whl.metadata (5.7 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.6231549Z Collecting pygments<3.0.0,>=2.19.2 (from textual<9,>=8.2.8->-r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.6337484Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.6654934Z Collecting typing-extensions<5.0.0,>=4.4.0 (from textual<9,>=8.2.8->-r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.6783876Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.7057437Z Collecting mdurl~=0.1 (from markdown-it-py>=3->-r requirements.txt (line 5))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.7162471Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.7426963Z Collecting linkify-it-py<3,>=1 (from markdown-it-py[linkify]>=2.1.0->textual<9,>=8.2.8->-r requirements.txt (line 4))
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.7537453Z   Downloading linkify_it_py-2.2.0-py3-none-any.whl.metadata (8.6 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.7832759Z Downloading textual-8.2.8-py3-none-any.whl (731 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8203143Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 731.4/731.4 kB 29.6 MB/s  0:00:00
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8317375Z Downloading platformdirs-4.14.5-py3-none-any.whl (35 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8478172Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8616868Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 87.5 MB/s  0:00:00
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8730682Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.8878182Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.9036448Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.9187276Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.9325346Z Downloading linkify_it_py-2.2.0-py3-none-any.whl (21 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:40.9457961Z Downloading mdit_py_plugins-0.6.1-py3-none-any.whl (66 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:41.0252199Z Installing collected packages: typing-extensions, pygments, platformdirs, mdurl, linkify-it-py, markdown-it-py, rich, mdit-py-plugins, textual
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:42.5108104Z 
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:42.5119454Z Successfully installed linkify-it-py-2.2.0 markdown-it-py-4.2.0 mdit-py-plugins-0.6.1 mdurl-0.1.2 platformdirs-4.14.5 pygments-2.21.0 rich-15.0.0 textual-8.2.8 typing-extensions-4.16.0
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:42.8402426Z Obtaining file:///home/runner/work/s19_app/s19_app
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:42.8420420Z   Installing build dependencies: started
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:43.4737077Z   Installing build dependencies: finished with status 'done'
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:43.4742651Z   Checking if build backend supports build_editable: started
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:43.8062379Z   Checking if build backend supports build_editable: finished with status 'done'
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:43.8069902Z   Getting requirements to build editable: started
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.1279044Z   Getting requirements to build editable: finished with status 'done'
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.1289069Z   Preparing editable metadata (pyproject.toml): started
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.3158950Z   Preparing editable metadata (pyproject.toml): finished with status 'done'
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.3196107Z Requirement already satisfied: rich>=13.0 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from s19tool==1.0.0) (15.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.3200874Z Requirement already satisfied: textual<9,>=8.2.8 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from s19tool==1.0.0) (8.2.8)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.3205772Z Requirement already satisfied: markdown-it-py>=3 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from s19tool==1.0.0) (4.2.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.3837233Z Collecting pytest-textual-snapshot==1.1.0 (from s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.5982485Z   Downloading pytest_textual_snapshot-1.1.0-py3-none-any.whl.metadata (4.6 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6036433Z Requirement already satisfied: mdit-py-plugins in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from textual<9,>=8.2.8->s19tool==1.0.0) (0.6.1)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6042050Z Requirement already satisfied: platformdirs<5,>=3.6.0 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from textual<9,>=8.2.8->s19tool==1.0.0) (4.14.5)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6047865Z Requirement already satisfied: pygments<3.0.0,>=2.19.2 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from textual<9,>=8.2.8->s19tool==1.0.0) (2.21.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6074492Z Requirement already satisfied: typing-extensions<5.0.0,>=4.4.0 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from textual<9,>=8.2.8->s19tool==1.0.0) (4.16.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6277233Z Collecting jinja2>=3.0.0 (from pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.6838411Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.7238223Z Collecting pytest>=8.0.0 (from pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.7788711Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.8215208Z Collecting syrupy==4.8.0 (from pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.9010945Z   Downloading syrupy-4.8.0-py3-none-any.whl.metadata (36 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.9320871Z Collecting pytest>=8.0.0 (from pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:44.9840135Z   Downloading pytest-8.4.2-py3-none-any.whl.metadata (7.7 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.0067080Z Collecting iniconfig>=1 (from pytest>=8.0.0->pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.0604782Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.1004434Z Collecting packaging>=20 (from pytest>=8.0.0->pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.1513622Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.1737188Z Collecting pluggy<2,>=1.5 (from pytest>=8.0.0->pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.2247667Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.2938524Z Collecting MarkupSafe>=2.0 (from jinja2>=3.0.0->pytest-textual-snapshot==1.1.0->s19tool==1.0.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.3515822Z   Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.3558292Z Requirement already satisfied: mdurl~=0.1 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from markdown-it-py>=3->s19tool==1.0.0) (0.1.2)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.3587351Z Requirement already satisfied: linkify-it-py<3,>=1 in /opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages (from markdown-it-py[linkify]>=2.1.0->textual<9,>=8.2.8->s19tool==1.0.0) (2.2.0)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.4237273Z Downloading pytest_textual_snapshot-1.1.0-py3-none-any.whl (11 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.4834667Z Downloading syrupy-4.8.0-py3-none-any.whl (49 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.5530248Z Downloading pytest-8.4.2-py3-none-any.whl (365 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.7117006Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.7740531Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.8362748Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.9029176Z Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.9570608Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.9824578Z Building wheels for collected packages: s19tool
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:45.9832100Z   Building editable for s19tool (pyproject.toml): started
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1900785Z   Building editable for s19tool (pyproject.toml): finished with status 'done'
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1910418Z   /tmp/pip-build-env-yjj4k0a2/overlay/lib/python3.11/site-packages/setuptools/command/editable_wheel.py:354: BuildBackendWarning: Editable installation.
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1911678Z   !!
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1912387Z   
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1912975Z           ********************************************************************************
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1914231Z           Please be careful with folders in your working directory with the same
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1915426Z           name as your package as they may take precedence during imports.
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1916548Z   Created wheel for s19tool: filename=s19tool-1.0.0-0.editable-py3-none-any.whl size=11873 sha256=63251d73890f0695c28dd9af13d1e5963dee87dcabe21c8786a8bc4629f3bde7
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1918135Z   Stored in directory: /tmp/pip-ephem-wheel-cache-c87xqqcz/wheels/fe/d9/47/12eb73cc011953b5d0db6ba8bd11c813096e8f9505175313b4
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1919342Z           ********************************************************************************
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1919907Z   
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1920197Z   !!
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1920630Z     with strategy, WheelFile(wheel_path, "w") as wheel_obj:
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.1940460Z Successfully built s19tool
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.2246051Z Installing collected packages: pluggy, packaging, MarkupSafe, iniconfig, pytest, jinja2, syrupy, s19tool, pytest-textual-snapshot
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.6614479Z 
+regen	Install dependencies (with dev extra for pytest-textual-snapshot)	2026-11-10T02:40:46.6627932Z Successfully installed MarkupSafe-3.0.4 iniconfig-2.3.1 jinja2-3.1.6 packaging-26.3 pluggy-1.7.0 pytest-8.4.2 pytest-textual-snapshot-1.1.0 s19tool-1.0.0 syrupy-4.8.0
+regen	Regenerate snapshot baselines (canonical env)	﻿2026-11-10T02:40:46.7342615Z ##[group]Run pytest tests/test_tui_snapshot.py -m snapshot --snapshot-update -q || true
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7343518Z [36;1mpytest tests/test_tui_snapshot.py -m snapshot --snapshot-update -q || true[0m
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7395958Z shell: /usr/bin/bash -e {0}
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7396212Z env:
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7396474Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7396917Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7397340Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7397715Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7398088Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7398466Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:40:46.7398781Z ##[endgroup]
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:42:52.5838041Z .............................                                            [100%]
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:42:52.5838731Z --------------------------- snapshot report summary ----------------------------
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:42:52.5839686Z 27 snapshots passed. 2 snapshots updated.
+regen	Regenerate snapshot baselines (canonical env)	2026-11-10T02:42:52.5840168Z 29 passed, 4 deselected in 123.57s (0:02:03)
+regen	Report which baselines changed	﻿2026-11-10T02:42:53.5353473Z ##[group]Run echo "=== changed baselines ==="
+regen	Report which baselines changed	2026-11-10T02:42:53.5353868Z [36;1mecho "=== changed baselines ==="[0m
+regen	Report which baselines changed	2026-11-10T02:42:53.5354198Z [36;1mgit status --porcelain tests/__snapshots__/[0m
+regen	Report which baselines changed	2026-11-10T02:42:53.5354512Z [36;1mecho "=== diffstat ==="[0m
+regen	Report which baselines changed	2026-11-10T02:42:53.5354785Z [36;1mgit diff --stat tests/__snapshots__/[0m
+regen	Report which baselines changed	2026-11-10T02:42:53.5403837Z shell: /usr/bin/bash -e {0}
+regen	Report which baselines changed	2026-11-10T02:42:53.5404101Z env:
+regen	Report which baselines changed	2026-11-10T02:42:53.5404365Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Report which baselines changed	2026-11-10T02:42:53.5404808Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+regen	Report which baselines changed	2026-11-10T02:42:53.5405242Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Report which baselines changed	2026-11-10T02:42:53.5405621Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Report which baselines changed	2026-11-10T02:42:53.5406014Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Report which baselines changed	2026-11-10T02:42:53.5406395Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+regen	Report which baselines changed	2026-11-10T02:42:53.5406725Z ##[endgroup]
+regen	Report which baselines changed	2026-11-10T02:42:53.5477684Z === changed baselines ===
+regen	Report which baselines changed	2026-11-10T02:42:53.8659655Z  M tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg
+regen	Report which baselines changed	2026-11-10T02:42:53.8660688Z  M tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-80x24].svg
+regen	Report which baselines changed	2026-11-10T02:42:53.8664954Z === diffstat ===
+regen	Report which baselines changed	2026-11-10T02:42:53.8726837Z  .../test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg | 4 ++--
+regen	Report which baselines changed	2026-11-10T02:42:53.8727875Z  .../test_tc016s_density_layout_snapshot[patch-comfortable-80x24].svg  | 4 ++--
+regen	Report which baselines changed	2026-11-10T02:42:53.8728694Z  2 files changed, 4 insertions(+), 4 deletions(-)
+regen	Upload regenerated baselines	﻿2026-11-10T02:42:53.8801947Z ##[group]Run actions/upload-artifact@v4
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8802256Z with:
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8802659Z   name: snapshot-baselines
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8802907Z   path: tests/__snapshots__/
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8803150Z   if-no-files-found: error
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8803709Z   compression-level: 6
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8803944Z   overwrite: false
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8804162Z   include-hidden-files: false
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8804394Z env:
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8804652Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8805084Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8805530Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8805910Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8806282Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8806668Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+regen	Upload regenerated baselines	2026-11-10T02:42:53.8806998Z ##[endgroup]
+regen	Upload regenerated baselines	2026-11-10T02:42:54.0586346Z (node:2592) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+regen	Upload regenerated baselines	2026-11-10T02:42:54.0587266Z (Use `node --trace-deprecation ...` to show where the warning was created)
+regen	Upload regenerated baselines	2026-11-10T02:42:54.0796845Z With the provided path, there will be 29 files uploaded
+regen	Upload regenerated baselines	2026-11-10T02:42:54.0797747Z Artifact name is valid!
+regen	Upload regenerated baselines	2026-11-10T02:42:54.0798174Z Root directory input is valid!
+regen	Upload regenerated baselines	2026-11-10T02:42:54.5504084Z Beginning upload of artifact content to blob storage
+regen	Upload regenerated baselines	2026-11-10T02:42:54.6404506Z (node:2592) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+regen	Upload regenerated baselines	2026-11-10T02:42:55.1232351Z Uploaded bytes 187389
+regen	Upload regenerated baselines	2026-11-10T02:42:55.2056752Z Finished uploading artifact content to blob storage!
+regen	Upload regenerated baselines	2026-11-10T02:42:55.2058132Z SHA256 digest of uploaded artifact zip is 461cc3f3cf918df78ea57e7bcccf7fb6558b769b2a164418cdc50d82d156b7c1
+regen	Upload regenerated baselines	2026-11-10T02:42:55.2059636Z Finalizing artifact upload
+regen	Upload regenerated baselines	2026-11-10T02:42:55.5983891Z Artifact snapshot-baselines.zip successfully finalized. Artifact ID 13730282459
+regen	Upload regenerated baselines	2026-11-10T02:42:55.5984906Z Artifact snapshot-baselines has been successfully uploaded! Final size is 187389 bytes. Artifact ID is 13730282459
+regen	Upload regenerated baselines	2026-11-10T02:42:55.5994063Z Artifact download URL: https://github.com/jav201/s19_app/actions/runs/42744361587/artifacts/13730282459
+regen	Post Set up Python	﻿2026-11-10T02:42:55.6216101Z Post job cleanup.
+regen	Post Set up Python	2026-11-10T02:42:55.7464557Z (node:2607) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+regen	Post Set up Python	2026-11-10T02:42:55.7465563Z (Use `node --trace-deprecation ...` to show where the warning was created)
+regen	Post Check out repository	﻿2026-11-10T02:42:55.7635695Z Post job cleanup.
+regen	Post Check out repository	2026-11-10T02:42:55.8594034Z [command]/usr/bin/git version
+regen	Post Check out repository	2026-11-10T02:42:55.8638191Z git version 2.56.0
+regen	Post Check out repository	2026-11-10T02:42:55.8680965Z Temporarily overriding HOME='/home/runner/work/_temp/a52ef310-95be-4cfb-a6ee-5346206f56a5' before making global git config changes
+regen	Post Check out repository	2026-11-10T02:42:55.8682358Z Adding repository directory to the temporary git global config as a safe directory
+regen	Post Check out repository	2026-11-10T02:42:55.8687917Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/s19_app/s19_app
+regen	Post Check out repository	2026-11-10T02:42:55.8733931Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+regen	Post Check out repository	2026-11-10T02:42:55.8776402Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+regen	Post Check out repository	2026-11-10T02:42:55.9111932Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+regen	Post Check out repository	2026-11-10T02:42:55.9145090Z http.https://github.com/.extraheader
+regen	Post Check out repository	2026-11-10T02:42:55.9160011Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+regen	Post Check out repository	2026-11-10T02:42:55.9215176Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+regen	Post Check out repository	2026-11-10T02:42:55.9544333Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+regen	Post Check out repository	2026-11-10T02:42:55.9587888Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+regen	Complete job	﻿2026-11-10T02:42:56.0036581Z Cleaning up orphan processes
+regen	Complete job	2026-11-10T02:42:56.0510074Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

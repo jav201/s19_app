@@ -1,0 +1,2 @@
+Files 'tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg' and '.dev-flow/2026-11-05-batch-103/inc-12/work-snapshot-baselines/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg' differ
+Files 'tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-80x24].svg' and '.dev-flow/2026-11-05-batch-103/inc-12/work-snapshot-baselines/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-80x24].svg' differ
