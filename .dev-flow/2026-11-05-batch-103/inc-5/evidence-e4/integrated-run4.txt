@@ -1,0 +1,108 @@
+base=1fbfff50-with-integrated-inc5-fix2
+..........F............................................................. [ 69%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/1] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-573/test_r005_unload_publication_R0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efd275cce10>
+case = 'R-A2L-REFRESH.005/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            if kind == "primary":
+                _assert_snap(app, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True)
+            elif kind == "mac":
+                _assert_snap(app, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                _assert_snap(app, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                _assert_snap(app, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:407: in scenario
+    _assert_snap(app, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == (names if image is not None else [])
+E       AssertionError: assert ['OLD_ONLY', ..., 'PAGE2_OLD'] == []
+E         
+E         Left contains 4 more items, first extra item: 'OLD_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:241: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1]
+1 failed, 102 passed in 427.13s (0:07:07)

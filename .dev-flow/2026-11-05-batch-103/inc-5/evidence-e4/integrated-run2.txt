@@ -1,0 +1,1481 @@
+base=1fbfff50-with-integrated-inc5-fix1
+...FFF..FF.......FFF.......................................F............ [ 69%]
+........F...FFFF...........F...                                          [100%]
+=================================== FAILURES ===================================
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r002_image_load_refreshes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa00df1aa90>
+case = 'R-A2L-REFRESH.002/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name == "image.s19"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:352: in scenario
+    _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+>       assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:223: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r002_image_load_refreshes1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa006617dd0>
+case = 'R-A2L-REFRESH.002/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name == "image.s19"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:352: in scenario
+    _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+>       assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:223: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r002_image_load_refreshes2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa006474f50>
+case = 'R-A2L-REFRESH.002/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name == "image.s19"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:352: in scenario
+    _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+>       assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:223: AssertionError
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/1] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r004_a2l_only_project_R_A0')
+case = 'R-A2L-REFRESH.004/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            await _load_project(app, pilot, "P_ONLY")
+            assert app.current_file is None
+            _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:386: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:384: in scenario
+    _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == names
+E       AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E         
+E         Right contains 4 more items, first extra item: 'NEW_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:241: AssertionError
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/2] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r004_a2l_only_project_R_A1')
+case = 'R-A2L-REFRESH.004/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            await _load_project(app, pilot, "P_ONLY")
+            assert app.current_file is None
+            _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:386: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:384: in scenario
+    _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == names
+E       AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E         
+E         Right contains 4 more items, first extra item: 'NEW_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:241: AssertionError
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/3] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r006_viewer_values_R_A2L_2')
+case = 'R-A2L-REFRESH.006/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.006/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r006_viewer_values(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            rows = OLD
+            image = IMG1
+            name = "old.a2l"
+            if case.endswith("/4"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                await _load_project(app, pilot, "P_NEW")
+                rows, image, name = NEW, IMG2, "new.a2l"
+            elif case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+                rows, image, name = NEW, None, "new.a2l"
+            else:
+                if not case.endswith("/1"):
+                    await _load_image(app, pilot, f.img1)
+                    await _load_a2l(app, pilot, f.old)
+                else:
+                    await _load_image(app, pilot, f.img1)
+                if case.endswith("/1"):
+                    await _load_a2l(app, pilot, f.old)
+                elif case.endswith("/2"):
+                    await _load_a2l(app, pilot, f.new)
+                    rows, name = NEW, "new.a2l"
+                elif case.endswith("/3"):
+                    await _load_image(app, pilot, f.img2)
+                    image = IMG2
+                elif case.endswith("/6"):
+                    _unload(app, "a2l")
+                    await pilot.pause()
+                    rows, name = (), None
+            _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:454: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:452: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+>       assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:223: AssertionError
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/4] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r006_viewer_values_R_A2L_3')
+case = 'R-A2L-REFRESH.006/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.006/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r006_viewer_values(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            rows = OLD
+            image = IMG1
+            name = "old.a2l"
+            if case.endswith("/4"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                await _load_project(app, pilot, "P_NEW")
+                rows, image, name = NEW, IMG2, "new.a2l"
+            elif case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+                rows, image, name = NEW, None, "new.a2l"
+            else:
+                if not case.endswith("/1"):
+                    await _load_image(app, pilot, f.img1)
+                    await _load_a2l(app, pilot, f.old)
+                else:
+                    await _load_image(app, pilot, f.img1)
+                if case.endswith("/1"):
+                    await _load_a2l(app, pilot, f.old)
+                elif case.endswith("/2"):
+                    await _load_a2l(app, pilot, f.new)
+                    rows, name = NEW, "new.a2l"
+                elif case.endswith("/3"):
+                    await _load_image(app, pilot, f.img2)
+                    image = IMG2
+                elif case.endswith("/6"):
+                    _unload(app, "a2l")
+                    await pilot.pause()
+                    rows, name = (), None
+            _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:454: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:452: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        assert [t["name"] for t in memory._a2l_tags] == names
+        if image is None:
+            assert memory.rendered_text == memory._EMPTY_TEXT
+        else:
+            assert memory.rendered_text != memory._EMPTY_TEXT
+        loaded = _loaded_text(app)
+        assert (loaded[0] != "(none)") is (image is not None)
+>       assert (loaded[1] != "(none)") is loaded_mac
+E       AssertionError: assert ('records.mac  104 records' != '(none)') is False
+
+tests/test_b103_a2l_refresh.py:248: AssertionError
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/5] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r006_viewer_values_R_A2L_4')
+case = 'R-A2L-REFRESH.006/5'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.006/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r006_viewer_values(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            rows = OLD
+            image = IMG1
+            name = "old.a2l"
+            if case.endswith("/4"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                await _load_project(app, pilot, "P_NEW")
+                rows, image, name = NEW, IMG2, "new.a2l"
+            elif case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+                rows, image, name = NEW, None, "new.a2l"
+            else:
+                if not case.endswith("/1"):
+                    await _load_image(app, pilot, f.img1)
+                    await _load_a2l(app, pilot, f.old)
+                else:
+                    await _load_image(app, pilot, f.img1)
+                if case.endswith("/1"):
+                    await _load_a2l(app, pilot, f.old)
+                elif case.endswith("/2"):
+                    await _load_a2l(app, pilot, f.new)
+                    rows, name = NEW, "new.a2l"
+                elif case.endswith("/3"):
+                    await _load_image(app, pilot, f.img2)
+                    image = IMG2
+                elif case.endswith("/6"):
+                    _unload(app, "a2l")
+                    await pilot.pause()
+                    rows, name = (), None
+            _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:454: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:452: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == names
+E       AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E         
+E         Right contains 4 more items, first extra item: 'NEW_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:241: AssertionError
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/2] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r010_detail_invalidation_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa004103090>
+case = 'R-A2L-REFRESH.010/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.010/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r010_detail_invalidation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                if case.endswith("/4"):
+                    _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            await _highlight_first_tag(app, pilot)
+            if case.endswith("/6"):
+                import importlib
+    
+                module = importlib.import_module("s19_app.tui.app")
+                real_parse = module.parse_a2l_cached
+                started = threading.Event()
+                release = threading.Event()
+    
+                def gated(*args, **kwargs):
+                    started.set()
+                    assert release.wait(20)
+                    return real_parse(*args, **kwargs)
+    
+                monkeypatch.setattr(module, "parse_a2l_cached", gated)
+                app.load_a2l_from_path(f.new, copy=False)
+                await wait_until(pilot, started.is_set, "A2L worker did not reach its parse gate")
+                await pilot.press("d")
+                await pilot.pause()
+                assert type(app.screen).__name__ == "CurveDescriptionScreen"
+                release.set()
+                await settle_workers(pilot)
+                assert type(app.screen).__name__ != "CurveDescriptionScreen"
+            elif case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                await _load_image(app, pilot, f.img2)
+            elif case.endswith("/3"):
+                await _load_project(app, pilot, "P_NEW")
+            elif case.endswith("/4"):
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            await pilot.pause()
+            card = app.query_one("#a2l_detail_card", A2LDetailCard).render().plain
+            assert card == HINT
+            assert not any(type(screen).__name__ == "CurveDescriptionScreen" for screen in app.screen_stack)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:797: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r010_detail_invalidation_1/app'), src=PosixPath('/tmp/..._1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r010_detail_invalidation_1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            if case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        await _highlight_first_tag(app, pilot)
+        if case.endswith("/6"):
+            import importlib
+    
+            module = importlib.import_module("s19_app.tui.app")
+            real_parse = module.parse_a2l_cached
+            started = threading.Event()
+            release = threading.Event()
+    
+            def gated(*args, **kwargs):
+                started.set()
+                assert release.wait(20)
+                return real_parse(*args, **kwargs)
+    
+            monkeypatch.setattr(module, "parse_a2l_cached", gated)
+            app.load_a2l_from_path(f.new, copy=False)
+            await wait_until(pilot, started.is_set, "A2L worker did not reach its parse gate")
+            await pilot.press("d")
+            await pilot.pause()
+            assert type(app.screen).__name__ == "CurveDescriptionScreen"
+            release.set()
+            await settle_workers(pilot)
+            assert type(app.screen).__name__ != "CurveDescriptionScreen"
+        elif case.endswith("/1"):
+            await _load_a2l(app, pilot, f.new)
+        elif case.endswith("/2"):
+            await _load_image(app, pilot, f.img2)
+        elif case.endswith("/3"):
+            await _load_project(app, pilot, "P_NEW")
+        elif case.endswith("/4"):
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+        await pilot.pause()
+        card = app.query_one("#a2l_detail_card", A2LDetailCard).render().plain
+>       assert card == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:794: AssertionError
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/2] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r019_issues_refresh_R_A2L1')
+case = 'R-A2L-REFRESH.019/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.019/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r019_issues_refresh(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            severity = "warning" if case.endswith("/2") else "error"
+            app.validation_issue_filter_mode = severity
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            if case.endswith("/3"):
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+            else:
+                await _load_a2l(app, pilot, f.new)
+                if case.endswith("/1"):
+                    assert set(_issues(app)) == {
+                        ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                        ("", "MAC_PARSE_ERROR", "error"),
+                    }
+                else:
+                    fresh = {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in app._validation_issues
+                        if issue.severity.value == "warning"
+                    }
+                    assert set(_issues(app)) == fresh
+                    assert {
+                        ("old_only", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                        ("no_match", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                    } <= fresh
+                    assert all(code != "NOT_IN_A2L" for _, code, _ in fresh)
+                    assert all(symbol not in {"new_only", "new_error"} for symbol, _, _ in fresh)
+            assert app.validation_issue_filter_mode == severity
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1039: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r019_issues_refresh_R_A2L1/app'), src=PosixPath('/tmp/...L1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r019_issues_refresh_R_A2L1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        severity = "warning" if case.endswith("/2") else "error"
+        app.validation_issue_filter_mode = severity
+        app.action_show_screen("issues")
+        app.update_validation_issues_view()
+        await pilot.pause()
+        if case.endswith("/3"):
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+        else:
+            await _load_a2l(app, pilot, f.new)
+            if case.endswith("/1"):
+                assert set(_issues(app)) == {
+                    ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                    ("", "MAC_PARSE_ERROR", "error"),
+                }
+            else:
+                fresh = {
+                    (issue.symbol or "", issue.code, issue.severity.value)
+                    for issue in app._validation_issues
+                    if issue.severity.value == "warning"
+                }
+>               assert set(_issues(app)) == fresh
+E               AssertionError: assert {('alphashare...arning'), ...} == {('alphashare...arning'), ...}
+E                 
+E                 Extra items in the right set:
+E                 ('fill_060', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_064', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_080', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_069', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_062', 'CROSS_MAC_ONLY_SYMBOL', 'warning')...
+E                 
+E                 ...Full output truncated (59 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_refresh.py:1030: AssertionError
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r021_cancel_is_inert_R_A20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa00cbd38d0>
+case = 'R-A2L-REFRESH.021/1', answer = 'button'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1171: in scenario
+    await settle_workers(pilot)
+tests/support/b100_workers.py:26: in settle_workers
+    await pilot.app.workers.wait_for_complete()
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker_manager.py:179: in wait_for_complete
+    await asyncio.gather(*[worker.wait() for worker in (workers or self)])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Worker CANCELLED name='sleep' group='unrelated' description='<coroutine object sleep at 0x7fa00eab3440>'>
+
+    async def wait(self) -> ResultType:
+        """Wait for the work to complete.
+    
+        Raises:
+            WorkerFailed: If the Worker raised an exception.
+            WorkerCancelled: If the Worker was cancelled before it completed.
+    
+        Returns:
+            The return value of the work.
+        """
+        try:
+            if active_worker.get() is self:
+                raise DeadlockError(
+                    "Can't call worker.wait from within the worker function!"
+                )
+        except LookupError:
+            # Not in a worker
+            pass
+    
+        if self.state == WorkerState.PENDING:
+            raise WorkerError("Worker must be started before calling this method.")
+        if self._task is not None:
+            try:
+                await self._task
+            except asyncio.CancelledError as error:
+                self.state = WorkerState.CANCELLED
+                self._error = error
+        if self.state == WorkerState.ERROR:
+            assert self._error is not None
+            raise WorkerFailed(self._error)
+        elif self.state == WorkerState.CANCELLED:
+>           raise WorkerCancelled("Worker was cancelled, and did not complete.")
+E           textual.worker.WorkerCancelled: Worker was cancelled, and did not complete.
+
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker.py:454: WorkerCancelled
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r021_cancel_is_inert_R_A21')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa004f2e390>
+case = 'R-A2L-REFRESH.021/2', answer = 'n'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1171: in scenario
+    await settle_workers(pilot)
+tests/support/b100_workers.py:26: in settle_workers
+    await pilot.app.workers.wait_for_complete()
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker_manager.py:179: in wait_for_complete
+    await asyncio.gather(*[worker.wait() for worker in (workers or self)])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Worker CANCELLED name='sleep' group='unrelated' description='<coroutine object sleep at 0x7fa006daab40>'>
+
+    async def wait(self) -> ResultType:
+        """Wait for the work to complete.
+    
+        Raises:
+            WorkerFailed: If the Worker raised an exception.
+            WorkerCancelled: If the Worker was cancelled before it completed.
+    
+        Returns:
+            The return value of the work.
+        """
+        try:
+            if active_worker.get() is self:
+                raise DeadlockError(
+                    "Can't call worker.wait from within the worker function!"
+                )
+        except LookupError:
+            # Not in a worker
+            pass
+    
+        if self.state == WorkerState.PENDING:
+            raise WorkerError("Worker must be started before calling this method.")
+        if self._task is not None:
+            try:
+                await self._task
+            except asyncio.CancelledError as error:
+                self.state = WorkerState.CANCELLED
+                self._error = error
+        if self.state == WorkerState.ERROR:
+            assert self._error is not None
+            raise WorkerFailed(self._error)
+        elif self.state == WorkerState.CANCELLED:
+>           raise WorkerCancelled("Worker was cancelled, and did not complete.")
+E           textual.worker.WorkerCancelled: Worker was cancelled, and did not complete.
+
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker.py:454: WorkerCancelled
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r021_cancel_is_inert_R_A22')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa00510e8d0>
+case = 'R-A2L-REFRESH.021/3', answer = 'escape'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1171: in scenario
+    await settle_workers(pilot)
+tests/support/b100_workers.py:26: in settle_workers
+    await pilot.app.workers.wait_for_complete()
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker_manager.py:179: in wait_for_complete
+    await asyncio.gather(*[worker.wait() for worker in (workers or self)])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Worker CANCELLED name='sleep' group='unrelated' description='<coroutine object sleep at 0x7fa00eab3440>'>
+
+    async def wait(self) -> ResultType:
+        """Wait for the work to complete.
+    
+        Raises:
+            WorkerFailed: If the Worker raised an exception.
+            WorkerCancelled: If the Worker was cancelled before it completed.
+    
+        Returns:
+            The return value of the work.
+        """
+        try:
+            if active_worker.get() is self:
+                raise DeadlockError(
+                    "Can't call worker.wait from within the worker function!"
+                )
+        except LookupError:
+            # Not in a worker
+            pass
+    
+        if self.state == WorkerState.PENDING:
+            raise WorkerError("Worker must be started before calling this method.")
+        if self._task is not None:
+            try:
+                await self._task
+            except asyncio.CancelledError as error:
+                self.state = WorkerState.CANCELLED
+                self._error = error
+        if self.state == WorkerState.ERROR:
+            assert self._error is not None
+            raise WorkerFailed(self._error)
+        elif self.state == WorkerState.CANCELLED:
+>           raise WorkerCancelled("Worker was cancelled, and did not complete.")
+E           textual.worker.WorkerCancelled: Worker was cancelled, and did not complete.
+
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/worker.py:454: WorkerCancelled
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r022_confirmation_identit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa00726ffd0>
+case = 'R-A2L-REFRESH.022/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.022/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r022_confirmation_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            if case.endswith("/2"):
+                listed = app.current_project_dir / "old.a2l"
+                listed.rename(app.current_project_dir / "other.a2l")
+                before = _state_snapshot(app)
+            elif case.endswith("/3"):
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_NEW")
+                before = _state_snapshot(app)
+            await pilot.press("y")
+            await settle_workers(pilot)
+            if case.endswith("/1"):
+                assert len(workers) == 1
+                assert app.current_a2l_path == f.new
+                _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+            else:
+                assert workers == []
+                assert _state_snapshot(app) == before
+                assert statuses[-1] == "A2L NOT loaded: project or its A2L changed — load again."
+                assert "A2L loaded" not in statuses[-1]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1195: in scenario
+    _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == names
+E       AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E         
+E         Right contains 4 more items, first extra item: 'NEW_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:241: AssertionError
+______________ test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-571/test_r026_all_painting_on_ui_R1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa00df26690>
+case = 'R-A2L-REFRESH.026/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.026/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r026_all_painting_on_ui(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            ui = threading.get_ident()
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+            calls = _arm_thread_spies(app, monkeypatch)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows, image, name, mac = OLD, IMG1, "old.a2l", False
+            elif case.endswith("/2"):
+                await _load_image(app, pilot, f.img2)
+                rows, image, name, mac = OLD, IMG2, "old.a2l", False
+            else:
+                await _load_project(app, pilot, "P_NEW")
+                rows, image, name, mac = NEW, IMG2, "new.a2l", True
+            assert calls
+            assert all(thread == ui for _, thread in calls)
+            assert "invalidate_a2l_selection" in {name for name, _ in calls}
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            _assert_snap(app, rows=rows, image=image, a2l_name=name, loaded_mac=mac)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1440: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1438: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, loaded_mac=mac)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _assert_snap(
+        app: S19TuiApp,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+>       assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E       AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E         
+E         - Highlight a tag to inspect its fields.
+E         + ✓ OLD_ONLY  0x00000010
+E         + desc OLD_ONLY description
+E         + unit u8 · conv CM_IDENT
+E         + layout RL_U8
+E         + byteorder little
+E         + limits 0..255
+
+tests/test_b103_a2l_refresh.py:223: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/5]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2]
+15 failed, 88 passed in 429.39s (0:07:09)

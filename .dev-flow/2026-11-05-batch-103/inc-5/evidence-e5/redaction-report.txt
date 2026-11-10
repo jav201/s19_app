@@ -1,0 +1,7 @@
+evidence-e4/base-red-full.txt 1 [('<runner-home>', 1)]
+evidence-e4/final-functional.txt 54 [('<runner-home>', 27), ('pytest-of-<account>', 27)]
+evidence-e4/integrated-run1.txt 397 [('<runner-home>', 210), ('pytest-of-<account>', 187)]
+evidence-e4/integrated-run2.txt 70 [('<runner-home>', 51), ('pytest-of-<account>', 19)]
+evidence-e4/integrated-run4.txt 4 [('<runner-home>', 3), ('pytest-of-<account>', 1)]
+evidence-e4/targeted-run3.txt 6 [('<runner-home>', 3), ('pytest-of-<account>', 3)]
+files_changed=6 replacements=532

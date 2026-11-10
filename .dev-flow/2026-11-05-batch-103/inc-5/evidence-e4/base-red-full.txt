@@ -1,0 +1,2061 @@
+BASE=1fbfff502da8ad235580637960b2fe3fd61d8628
+<runner-home>/work/b103-inc5-tests-red/s19_app/__init__.py
+FFFFFFFFFFFFFFFFFFFFF.FF....FF..FFFFFFFFFFFFFF.FF.....FFFFFFFFFFFFFFFFFF [ 69%]
+FFFFF..FFFFFFFFFFFFFFFFFFFFFFFF                                          [100%]
+=================================== FAILURES ===================================
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/1] ___________
+tests/test_b103_a2l_refresh.py:332: in test_r001_direct_attach_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:328: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/2] ___________
+tests/test_b103_a2l_refresh.py:332: in test_r001_direct_attach_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:328: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/3] ___________
+tests/test_b103_a2l_refresh.py:332: in test_r001_direct_attach_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:328: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1] ___________
+tests/test_b103_a2l_refresh.py:355: in test_r002_image_load_refreshes_pair
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:350: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2] ___________
+tests/test_b103_a2l_refresh.py:355: in test_r002_image_load_refreshes_pair
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:350: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] ___________
+tests/test_b103_a2l_refresh.py:355: in test_r002_image_load_refreshes_pair
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:350: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+______________ test_r003_project_final_pair[R-A2L-REFRESH.003/1] _______________
+tests/test_b103_a2l_refresh.py:371: in test_r003_project_final_pair
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:368: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+______________ test_r003_project_final_pair[R-A2L-REFRESH.003/2] _______________
+tests/test_b103_a2l_refresh.py:371: in test_r003_project_final_pair
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:368: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E   AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E     
+E     At index 0 diff: 'OUTCOME' != 'F'
+E     Right contains one more item: 'OUTCOME'
+E     Use -v to get more diff
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/1] ________________
+tests/test_b103_a2l_refresh.py:385: in test_r004_a2l_only_project
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:383: in scenario
+    _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'new.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...=flash\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash'
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/2] ________________
+tests/test_b103_a2l_refresh.py:385: in test_r004_a2l_only_project
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:383: in scenario
+    _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'new.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...=flash\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash'
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/1] _______________
+tests/test_b103_a2l_refresh.py:414: in test_r005_unload_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:404: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E   AssertionError: assert [] == ['F']
+E     
+E     Right contains one more item: 'F'
+E     Use -v to get more diff
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/2] _______________
+tests/test_b103_a2l_refresh.py:414: in test_r005_unload_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:404: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E   AssertionError: assert [] == ['F']
+E     
+E     Right contains one more item: 'F'
+E     Use -v to get more diff
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/3] _______________
+tests/test_b103_a2l_refresh.py:414: in test_r005_unload_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:404: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E   AssertionError: assert [] == ['F']
+E     
+E     Right contains one more item: 'F'
+E     Use -v to get more diff
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/4] _______________
+tests/test_b103_a2l_refresh.py:414: in test_r005_unload_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:404: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E   AssertionError: assert [] == ['F']
+E     
+E     Right contains one more item: 'F'
+E     Use -v to get more diff
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/5] _______________
+tests/test_b103_a2l_refresh.py:414: in test_r005_unload_publication
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:404: in scenario
+    assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E   AssertionError: assert [] == ['F']
+E     
+E     Right contains one more item: 'F'
+E     Use -v to get more diff
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/1] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'old.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...K\n- CHARACTERISTIC OUT_WARN: 0x00000030 len=1 mem=flash OK\n- CHARACTERISTIC PAGE2_OLD: 0x00000070 len=1 mem=flash OK'
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/2] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'new.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash OK\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash OK'
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/3] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'old.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...K\n- CHARACTERISTIC OUT_WARN: 0x00000030 len=1 mem=flash OK\n- CHARACTERISTIC PAGE2_OLD: 0x00000070 len=1 mem=flash OK'
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/4] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'new.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash OK\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash OK'
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/5] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'new.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...=flash\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash'
+_________________ test_r006_viewer_values[R-A2L-REFRESH.006/6] _________________
+tests/test_b103_a2l_refresh.py:453: in test_r006_viewer_values
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:451: in scenario
+    _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False)
+tests/test_b103_a2l_refresh.py:222: in _assert_snap
+    assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+E   AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + ✓ OLD_ONLY  0x00000010
+E     + desc OLD_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+________________ test_r007_r008_filters[R-A2L-REFRESH.007/2---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:518: in scenario
+    assert app._a2l_filtered_tags[0]["raw_value"] == expected
+E   assert 25954 == 25958
+________________ test_r007_r008_filters[R-A2L-REFRESH.007/3---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:518: in scenario
+    assert app._a2l_filtered_tags[0]["raw_value"] == expected
+E   assert 25954 == 25958
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/2---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:518: in scenario
+    assert app._a2l_filtered_tags[0]["raw_value"] == expected
+E   assert 25954 == 25958
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/3---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:518: in scenario
+    assert app._a2l_filtered_tags[0]["raw_value"] == expected
+E   assert 25954 == 25958
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/6---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:516: in scenario
+    assert names == ["AlphaShared"]
+E   AssertionError: assert [] == ['AlphaShared']
+E     
+E     Right contains one more item: 'AlphaShared'
+E     Use -v to get more diff
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/7---] ________________
+tests/test_b103_a2l_refresh.py:520: in test_r007_r008_filters
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:516: in scenario
+    assert names == ["AlphaShared"]
+E   AssertionError: assert [] == ['AlphaShared']
+E     
+E     Right contains one more item: 'AlphaShared'
+E     Use -v to get more diff
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/1--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:566: in scenario
+    assert app.a2l_tags_filter_mode == "all"
+E   AssertionError: assert 'inmem' == 'all'
+E     
+E     - all
+E     + inmem
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/2--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:553: in scenario
+    assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaInvalid"])
+E   AssertionError: assert ['AlphaOutsid...AlphaInvalid'] == ['AlphaInvalid']
+E     
+E     At index 0 diff: 'AlphaOutside' != 'AlphaInvalid'
+E     Left contains one more item: 'AlphaInvalid'
+E     Use -v to get more diff
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/3--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:566: in scenario
+    assert app.a2l_tags_filter_mode == "all"
+E   AssertionError: assert 'inmem' == 'all'
+E     
+E     - all
+E     + inmem
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/4--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:553: in scenario
+    assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaInvalid"])
+E   AssertionError: assert ['AlphaOutsid...AlphaInvalid'] == ['AlphaInvalid']
+E     
+E     At index 0 diff: 'AlphaOutside' != 'AlphaInvalid'
+E     Left contains one more item: 'AlphaInvalid'
+E     Use -v to get more diff
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/5--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:566: in scenario
+    assert app.a2l_tags_filter_mode == "all"
+E   AssertionError: assert 'inmem' == 'all'
+E     
+E     - all
+E     + inmem
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/6--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:553: in scenario
+    assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaInvalid"])
+E   AssertionError: assert ['AlphaOutsid...AlphaInvalid'] == ['AlphaInvalid']
+E     
+E     At index 0 diff: 'AlphaOutside' != 'AlphaInvalid'
+E     Left contains one more item: 'AlphaInvalid'
+E     Use -v to get more diff
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/7--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:566: in scenario
+    assert app.a2l_tags_filter_mode == "all"
+E   AssertionError: assert 'inmem' == 'all'
+E     
+E     - all
+E     + inmem
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/8--] __________________
+tests/test_b103_a2l_refresh.py:574: in test_r009_mode_reset
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:553: in scenario
+    assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaInvalid"])
+E   AssertionError: assert ['AlphaOutsid...AlphaInvalid'] == ['AlphaInvalid']
+E     
+E     At index 0 diff: 'AlphaOutside' != 'AlphaInvalid'
+E     Left contains one more item: 'AlphaInvalid'
+E     Use -v to get more diff
+___________________ test_r014_same_path[R-A2L-REFRESH.014/1] ___________________
+tests/test_b103_a2l_refresh.py:600: in test_r014_same_path
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:598: in scenario
+    _assert_snap(app, rows=NEW, image=IMG1, a2l_name="same.a2l")
+tests/test_b103_a2l_refresh.py:219: in _assert_snap
+    assert a2l_name in summary
+E   assert 'same.a2l' in 'A2L summary lines 1-21 / 21\n---------------------------\nA2L Sections:\n- PROJECT P "" (lines 2-44)\n  - MODULE M ""...\n- CHARACTERISTIC NEW_ERROR: 0x00000050 len=1 mem=flash OK\n- CHARACTERISTIC PAGE2_NEW: 0x00000071 len=1 mem=flash OK'
+___________________ test_r014_same_path[R-A2L-REFRESH.014/2] ___________________
+tests/test_b103_a2l_refresh.py:600: in test_r014_same_path
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:593: in scenario
+    assert isinstance(app.screen, ConfirmQuestionScreen)
+E   AssertionError: assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+__________________ test_r015_memory_map[R-A2L-REFRESH.015/1] ___________________
+tests/test_b103_a2l_refresh.py:627: in test_r015_memory_map
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:621: in scenario
+    assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+E   AssertionError: assert [] == ['OLD_ONLY', ..., 'PAGE2_OLD']
+E     
+E     Right contains 4 more items, first extra item: 'OLD_ONLY'
+E     Use -v to get more diff
+__________________ test_r015_memory_map[R-A2L-REFRESH.015/2] ___________________
+tests/test_b103_a2l_refresh.py:627: in test_r015_memory_map
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:621: in scenario
+    assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+E   AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E     
+E     Right contains 4 more items, first extra item: 'NEW_ONLY'
+E     Use -v to get more diff
+__________________ test_r016_split_join[R-A2L-REFRESH.016/1] ___________________
+tests/test_b103_a2l_refresh.py:664: in test_r016_split_join
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:657: in scenario
+    assert split._sel["a2l"] == set()
+E   assert {0} == set()
+E     
+E     Extra items in the left set:
+E     0
+E     Use -v to get more diff
+__________________ test_r016_split_join[R-A2L-REFRESH.016/2] ___________________
+tests/test_b103_a2l_refresh.py:664: in test_r016_split_join
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:657: in scenario
+    assert split._sel["a2l"] == set()
+E   assert {0} == set()
+E     
+E     Extra items in the left set:
+E     0
+E     Use -v to get more diff
+__________________ test_r027_generations[R-A2L-REFRESH.027/1] __________________
+tests/test_b103_a2l_refresh.py:728: in test_r027_generations
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:726: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   AssertionError: assert None == (1, 1, 256)
+E    +  where None = A2LParameterPicker()._signature
+E    +    where A2LParameterPicker() = _picker(CheckEditorPanel(id='check_editor_panel'))
+E    +  and   (1, 1, 256) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_enriched_key
+__________________ test_r027_generations[R-A2L-REFRESH.027/2] __________________
+tests/test_b103_a2l_refresh.py:728: in test_r027_generations
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:726: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   AssertionError: assert None == (2, 1, 256)
+E    +  where None = A2LParameterPicker()._signature
+E    +    where A2LParameterPicker() = _picker(CheckEditorPanel(id='check_editor_panel'))
+E    +  and   (2, 1, 256) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_enriched_key
+__________________ test_r027_generations[R-A2L-REFRESH.027/3] __________________
+tests/test_b103_a2l_refresh.py:728: in test_r027_generations
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:726: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   AssertionError: assert None == (2, 0, -1)
+E    +  where None = A2LParameterPicker()._signature
+E    +    where A2LParameterPicker() = _picker(CheckEditorPanel(id='check_editor_panel'))
+E    +  and   (2, 0, -1) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_enriched_key
+__________________ test_r027_generations[R-A2L-REFRESH.027/4] __________________
+tests/test_b103_a2l_refresh.py:728: in test_r027_generations
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:726: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   AssertionError: assert None == (3, 1, -1)
+E    +  where None = A2LParameterPicker()._signature
+E    +    where A2LParameterPicker() = _picker(CheckEditorPanel(id='check_editor_panel'))
+E    +  and   (3, 1, -1) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_enriched_key
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/1] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:789: in scenario
+    assert card == HINT
+E   AssertionError: assert '✓ NEW_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + ✓ NEW_ONLY  0x00000040
+E     + desc NEW_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/2] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:789: in scenario
+    assert card == HINT
+E   AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + ✓ OLD_ONLY  0x00000010
+E     + desc OLD_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/3] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:789: in scenario
+    assert card == HINT
+E   AssertionError: assert '✓ NEW_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + ✓ NEW_ONLY  0x00000040
+E     + desc NEW_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/4] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:789: in scenario
+    assert card == HINT
+E   AssertionError: assert '· NEW_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + · NEW_ONLY  0x00000040
+E     + desc NEW_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/5] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:789: in scenario
+    assert card == HINT
+E   AssertionError: assert '✓ OLD_ONLY  ...limits 0..255' == 'Highlight a ...t its fields.'
+E     
+E     - Highlight a tag to inspect its fields.
+E     + ✓ OLD_ONLY  0x00000010
+E     + desc OLD_ONLY description
+E     + unit u8 · conv CM_IDENT
+E     + layout RL_U8
+E     + byteorder little
+E     + limits 0..255
+______________ test_r010_detail_invalidation[R-A2L-REFRESH.010/6] ______________
+tests/test_b103_a2l_refresh.py:792: in test_r010_detail_invalidation
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:775: in scenario
+    assert type(app.screen).__name__ != "CurveDescriptionScreen"
+E   AssertionError: assert 'CurveDescriptionScreen' != 'CurveDescriptionScreen'
+E    +  where 'CurveDescriptionScreen' = <class 's19_app.tui.a2l_describe.CurveDescriptionScreen'>.__name__
+E    +    where <class 's19_app.tui.a2l_describe.CurveDescriptionScreen'> = type(CurveDescriptionScreen())
+E    +      where CurveDescriptionScreen() = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/1] ________________
+tests/test_b103_a2l_refresh.py:842: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:815: in scenario
+    assert any(span.style == FOCUS_HIGHLIGHT_STYLE for span in before.spans)
+E   assert False
+E    +  where False = any(<generator object test_r011_hex_span_repaint.<locals>.scenario.<locals>.<genexpr> at 0x7f0f011f5fc0>)
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/2] ________________
+tests/test_b103_a2l_refresh.py:842: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:815: in scenario
+    assert any(span.style == FOCUS_HIGHLIGHT_STYLE for span in before.spans)
+E   assert False
+E    +  where False = any(<generator object test_r011_hex_span_repaint.<locals>.scenario.<locals>.<genexpr> at 0x7f0efa92f300>)
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/3] ________________
+tests/test_b103_a2l_refresh.py:842: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:815: in scenario
+    assert any(span.style == FOCUS_HIGHLIGHT_STYLE for span in before.spans)
+E   assert False
+E    +  where False = any(<generator object test_r011_hex_span_repaint.<locals>.scenario.<locals>.<genexpr> at 0x7f0f02c15000>)
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/4] ________________
+tests/test_b103_a2l_refresh.py:842: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:815: in scenario
+    assert any(span.style == FOCUS_HIGHLIGHT_STYLE for span in before.spans)
+E   assert False
+E    +  where False = any(<generator object test_r011_hex_span_repaint.<locals>.scenario.<locals>.<genexpr> at 0x7f0efb658820>)
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/5] ________________
+tests/test_b103_a2l_refresh.py:842: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:815: in scenario
+    assert any(span.style == FOCUS_HIGHLIGHT_STYLE for span in before.spans)
+E   assert False
+E    +  where False = any(<generator object test_r011_hex_span_repaint.<locals>.scenario.<locals>.<genexpr> at 0x7f0f01e2bae0>)
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] _____________
+tests/test_b103_a2l_refresh.py:890: in test_r012_visible_check_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:881: in scenario
+    assert _picker_shape(panel)[0] == expected
+E   AssertionError: assert () == (('OLD_ONLY',...', 112, 'u8'))
+E     
+E     Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E     Use -v to get more diff
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/2] _____________
+tests/test_b103_a2l_refresh.py:890: in test_r012_visible_check_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:881: in scenario
+    assert _picker_shape(panel)[0] == expected
+E   AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == (('NEW_ONLY',...', 113, 'u8'))
+E     
+E     At index 0 diff: ('OLD_ONLY', 16, 'u8') != ('NEW_ONLY', 64, 'u8')
+E     Use -v to get more diff
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/3] _____________
+tests/test_b103_a2l_refresh.py:890: in test_r012_visible_check_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:882: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   assert (1, 1, 256) == (2, 2, 256)
+E     
+E     At index 0 diff: 1 != 2
+E     Use -v to get more diff
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/4] _____________
+tests/test_b103_a2l_refresh.py:890: in test_r012_visible_check_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:881: in scenario
+    assert _picker_shape(panel)[0] == expected
+E   AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == ()
+E     
+E     Left contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E     Use -v to get more diff
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1] _____________
+tests/test_b103_a2l_refresh.py:942: in test_r013_visible_patch_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:928: in scenario
+    assert _picker_shape(panel)[0] == tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+E   AssertionError: assert () == (('OLD_ONLY',...', 112, 'u8'))
+E     
+E     Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E     Use -v to get more diff
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2] _____________
+tests/test_b103_a2l_refresh.py:942: in test_r013_visible_patch_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:928: in scenario
+    assert _picker_shape(panel)[0] == tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+E   AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == (('NEW_ONLY',...', 113, 'u8'))
+E     
+E     At index 0 diff: ('OLD_ONLY', 16, 'u8') != ('NEW_ONLY', 64, 'u8')
+E     Use -v to get more diff
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3] _____________
+tests/test_b103_a2l_refresh.py:942: in test_r013_visible_patch_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:929: in scenario
+    assert _picker(panel)._signature == app._a2l_enriched_key
+E   assert (1, 1, 256) == (2, 2, 256)
+E     
+E     At index 0 diff: 1 != 2
+E     Use -v to get more diff
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4] _____________
+tests/test_b103_a2l_refresh.py:942: in test_r013_visible_patch_prefill
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:928: in scenario
+    assert _picker_shape(panel)[0] == tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+E   AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == ()
+E     
+E     Left contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E     Use -v to get more diff
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/1] _________________
+tests/test_b103_a2l_refresh.py:1017: in test_r019_issues_refresh
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1012: in scenario
+    assert set(_issues(app)) == {("NEW_ERROR", "A2L_ADDR_MISMATCH", "error"), ("BROKEN", "ERR_PARSE", "error")}
+E   AssertionError: assert {('', 'MAC_PA...CH', 'error')} == {('BROKEN', '...CH', 'error')}
+E     
+E     Extra items in the left set:
+E     ('', 'MAC_PARSE_ERROR', 'error')
+E     ('new_error', 'TRIPLE_NAME_ADDRESS_MISMATCH', 'error')
+E     Extra items in the right set:
+E     ('NEW_ERROR', 'A2L_ADDR_MISMATCH', 'error')
+E     ('BROKEN', 'ERR_PARSE', 'error')
+E     Use -v to get more diff
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/2] _________________
+tests/test_b103_a2l_refresh.py:1017: in test_r019_issues_refresh
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1014: in scenario
+    assert set(_issues(app)) == {("OLD_ONLY", "NOT_IN_A2L", "warning"), ("NO_MATCH", "NOT_IN_A2L", "warning")}
+E   AssertionError: assert {('alphashare...arning'), ...} == {('NO_MATCH',...', 'warning')}
+E     
+E     Extra items in the left set:
+E     ('fill_032', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E     ('fill_035', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E     ('fill_010', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E     ('fill_024', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E     ('fill_022', 'CROSS_MAC_ONLY_SYMBOL', 'warning')...
+E     
+E     ...Full output truncated (39 lines hidden), use '-vv' to show
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/3] _________________
+tests/test_b103_a2l_refresh.py:1017: in test_r019_issues_refresh
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1008: in scenario
+    assert _issues(app) == [("BROKEN", "ERR_PARSE", "error")]
+E   AssertionError: assert [('', 'MAC_PA...OR', 'error')] == [('BROKEN', '...SE', 'error')]
+E     
+E     At index 0 diff: ('', 'MAC_PARSE_ERROR', 'error') != ('BROKEN', 'ERR_PARSE', 'error')
+E     Use -v to get more diff
+_____________ test_r020_replacement_question[R-A2L-REFRESH.020/1] ______________
+tests/test_b103_a2l_refresh.py:1120: in test_r020_replacement_question
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1095: in scenario
+    listed = await _open_replacement(app, pilot, f)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r020_replacement_question[R-A2L-REFRESH.020/2] ______________
+tests/test_b103_a2l_refresh.py:1120: in test_r020_replacement_question
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1107: in scenario
+    assert isinstance(app.screen, ConfirmQuestionScreen)
+E   AssertionError: assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-] ________________
+tests/test_b103_a2l_refresh.py:1151: in test_r021_cancel_is_inert
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1132: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-] ________________
+tests/test_b103_a2l_refresh.py:1151: in test_r021_cancel_is_inert
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1132: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-] ________________
+tests/test_b103_a2l_refresh.py:1151: in test_r021_cancel_is_inert
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1132: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/1] _____________
+tests/test_b103_a2l_refresh.py:1180: in test_r022_confirmation_identity
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1159: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/2] _____________
+tests/test_b103_a2l_refresh.py:1180: in test_r022_confirmation_identity
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1159: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/3] _____________
+tests/test_b103_a2l_refresh.py:1180: in test_r022_confirmation_identity
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1159: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r023_accepted_replacement[R-A2L-REFRESH.023/1] ______________
+tests/test_b103_a2l_refresh.py:1226: in test_r023_accepted_replacement
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1215: in scenario
+    assert isinstance(app.screen, ConfirmQuestionScreen)
+E   AssertionError: assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r023_accepted_replacement[R-A2L-REFRESH.023/2] ______________
+tests/test_b103_a2l_refresh.py:1226: in test_r023_accepted_replacement
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1215: in scenario
+    assert isinstance(app.screen, ConfirmQuestionScreen)
+E   AssertionError: assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1] ______________
+tests/test_b103_a2l_refresh.py:1304: in test_r024_initial_busy_refusal
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1296: in scenario
+    assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E   AssertionError: assert ['busy: Loadi...t to finish.'] == ['busy: image...t to finish.']
+E     
+E     At index 0 diff: 'busy: Loading image.bin is running — wait for it to finish.' != 'busy: image.bin is running — wait for it to finish.'
+E     Use -v to get more diff
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2] ______________
+tests/test_b103_a2l_refresh.py:1304: in test_r024_initial_busy_refusal
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1296: in scenario
+    assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E   AssertionError: assert ['busy: Loadi...t to finish.'] == ['busy: old.a...t to finish.']
+E     
+E     At index 0 diff: 'busy: Loading old.a2l is running — wait for it to finish.' != 'busy: old.a2l is running — wait for it to finish.'
+E     Use -v to get more diff
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3] ______________
+tests/test_b103_a2l_refresh.py:1304: in test_r024_initial_busy_refusal
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1296: in scenario
+    assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E   AssertionError: assert ['busy: Loadi...t to finish.'] == ['busy: proje...t to finish.']
+E     
+E     At index 0 diff: 'busy: Loading project project_b is running — wait for it to finish.' != 'busy: project_b is running — wait for it to finish.'
+E     Use -v to get more diff
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4] ______________
+tests/test_b103_a2l_refresh.py:1304: in test_r024_initial_busy_refusal
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1296: in scenario
+    assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E   AssertionError: assert ['busy: Savin...t to finish.'] == ['busy: proje...t to finish.']
+E     
+E     At index 0 diff: 'busy: Saving project project_b is running — wait for it to finish.' != 'busy: project_b is running — wait for it to finish.'
+E     Use -v to get more diff
+___________ test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/1] ____________
+tests/test_b103_a2l_refresh.py:1353: in test_r025_post_yes_busy_boundaries
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1312: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+___________ test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2] ____________
+tests/test_b103_a2l_refresh.py:1353: in test_r025_post_yes_busy_boundaries
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1312: in scenario
+    await _open_replacement(app, pilot, f)
+tests/test_b103_a2l_refresh.py:1062: in _open_replacement
+    assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+E   AssertionError: ["Loaded project 'P_OLD' -> (no image) - 0 variants, 1 problem - details: p", 'Project already has an A2L file.']
+E   assert False
+E    +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E    +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+______________ test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1] _______________
+tests/test_b103_a2l_refresh.py:1417: in test_r026_all_painting_on_ui
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1413: in scenario
+    assert "invalidate_a2l_selection" in {name for name, _ in calls}
+E   AssertionError: assert 'invalidate_a2l_selection' in {'_refresh_loaded_panel', 'update_a2l_view', 'update_mac_view', 'update_validation_issues_view'}
+______________ test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2] _______________
+tests/test_b103_a2l_refresh.py:1417: in test_r026_all_painting_on_ui
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1413: in scenario
+    assert "invalidate_a2l_selection" in {name for name, _ in calls}
+E   AssertionError: assert 'invalidate_a2l_selection' in {'_refresh_loaded_panel', 'update_a2l_view', 'update_alt_hex_view', 'update_mac_view', 'update_memory_map', 'update_validation_issues_view'}
+______________ test_r026_all_painting_on_ui[R-A2L-REFRESH.026/3] _______________
+tests/test_b103_a2l_refresh.py:1417: in test_r026_all_painting_on_ui
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1413: in scenario
+    assert "invalidate_a2l_selection" in {name for name, _ in calls}
+E   AssertionError: assert 'invalidate_a2l_selection' in {'_refresh_loaded_panel', 'update_a2l_view', 'update_alt_hex_view', 'update_mac_view', 'update_memory_map', 'update_validation_issues_view'}
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1] ____________
+tests/test_b103_a2l_refresh.py:1471: in test_r028_superseded_prepared_load
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1457: in scenario
+    app._complete_prepared_load(prepared, f.img2, time.perf_counter(), gen=gen, sync_project=False)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'S19TuiApp' object has no attribute '_complete_prepared_load'
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2] ____________
+tests/test_b103_a2l_refresh.py:1471: in test_r028_superseded_prepared_load
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1457: in scenario
+    app._complete_prepared_load(prepared, f.img2, time.perf_counter(), gen=gen, sync_project=False)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'S19TuiApp' object has no attribute '_complete_prepared_load'
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/5]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/5]
+FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/6]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/2---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/3---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/2---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/3---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/6---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/7---]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/1--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/2--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/3--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/4--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/5--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/6--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/7--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/8--]
+FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/5]
+FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/6]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/5]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]
+88 failed, 15 passed in 582.63s (0:09:42)
+PYTEST_RC=1
