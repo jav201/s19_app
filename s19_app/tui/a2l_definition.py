@@ -675,11 +675,11 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     for entry in span_entries:
         _position, _name, _kind, address, byte_length, _byte_order = entry
         if byte_length is not None and byte_length >= 1:
-            first_page = address >> 8
-            last_page = (address + byte_length - 1) >> 8
+            first_page = address >> 4
+            last_page = (address + byte_length - 1) >> 4
             pages = range(first_page, last_page + 1)
         else:
-            pages = (address >> 8,)
+            pages = (address >> 4,)
         for page in pages:
             span_index.setdefault(page, []).append(entry)
 
@@ -3554,34 +3554,33 @@ def _shared_with(
         return None
     if definition.byte_length is not None and definition.byte_length >= 1:
         pages = range(
-            address >> 8, ((address + definition.byte_length - 1) >> 8) + 1
+            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
         )
     else:
-        pages = (address >> 8,)
+        pages = (address >> 4,)
     seen: set[int] = set()
-    candidates: list[tuple] = []
+    multi_page = len(pages) > 1
+    own_entry = True
     for page in pages:
         for entry in span_index.get(page, ()):
-            key = id(entry)
-            if key not in seen:
+            if multi_page:
+                key = entry[0]
+                if key in seen:
+                    continue
                 seen.add(key)
-                candidates.append(entry)
-    candidates.sort(key=lambda e: e[0])
-    own_entry = True
-    for entry in candidates:
-        if own_entry and (
-            entry[1] == definition.name
-            and entry[2] == definition.section
-            and entry[3] == definition.address
-            and entry[4] == definition.byte_length
-            and entry[5] == definition.byte_order
-        ):
-            own_entry = False
-            continue
-        if _entry_overlaps(definition, entry) and not _pair_exempt(
-            definition, entry, mask_of
-        ):
-            return entry[1]
+            if own_entry and (
+                entry[1] == definition.name
+                and entry[2] == definition.section
+                and entry[3] == definition.address
+                and entry[4] == definition.byte_length
+                and entry[5] == definition.byte_order
+            ):
+                own_entry = False
+                continue
+            if _entry_overlaps(definition, entry) and not _pair_exempt(
+                definition, entry, mask_of
+            ):
+                return entry[1]
     return None
 
 
