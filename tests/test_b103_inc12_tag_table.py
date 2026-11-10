@@ -721,6 +721,16 @@ def _painted_tag_equals(table, row_index: int, want: str) -> bool:
     return result is not None and result[0] == want and result[1] <= _geom(table).visible
 
 
+def _resize_failure(app, table, label: str) -> str:
+    """Describe stored and painted state when a resize wait expires."""
+    stored = table.get_row_at(0)[2].plain
+    painted = _painted_tag_cell(table, _geom(table), 0)
+    return (
+        f"{label}: stored={stored!r} painted={painted!r} geom={_geom(table)} "
+        f"rows_match={_all_rows_in_measured_form(app, table)}"
+    )
+
+
 def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
     """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
     async def _check(app, pilot, table):
@@ -729,7 +739,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
-            "start painted fit",
+            lambda: _resize_failure(app, table, "start painted fit"),
             timeout=30,
         )
         geom = _geom(table)
@@ -739,7 +749,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
-            "220→80 painted fit",
+            lambda: _resize_failure(app, table, "220→80 painted fit"),
             timeout=30,
         )
         geom = _geom(table)
@@ -749,7 +759,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
         await wait_until(
             pilot,
             lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
-            "80→220 painted fit",
+            lambda: _resize_failure(app, table, "80→220 painted fit"),
             timeout=30,
         )
         geom = _geom(table)
