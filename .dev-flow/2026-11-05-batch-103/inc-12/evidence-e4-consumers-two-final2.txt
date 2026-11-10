@@ -1,0 +1,131 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_048_4_a_wider_value_is_painted_whole ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-231/test_r_a2l_048_4_a_wider_value0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-231/b101_i10bw_case080')
+
+    def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /4 (robustness, E5 QA-2): case 08 and its A2L, key ``2``
+        (page 1; the Raw and Physical columns are 18 cells wide, the widest value
+        they have painted); the cursor on ``VALUE_0007`` (row 14, Raw
+        ``85.6589584350586``) and the table scrolled right so Raw is its first shown
+        column (the table is 50 cells wide); key ``6``, ``0x00040028`` = ``EA A3 64 C6`` applied;
+        key ``2`` -> the row paints its Raw cell ``-9.876539885039906e+25`` whole
+        (22 characters) and its Physical cell whole, both columns are at least 22
+        cells wide, and the scroll and the cursor are unchanged.
+    
+        The table's columns only widen (Textual keeps their widths across the
+        page refill), so the case needs a written value wider than any value the
+        column has painted, not only wider than the cells on screen.
+    
+        Why: a written value wider than its column is painted at the old width
+        unless the cell write widens the column (R2-7), so the screen would show
+        a cut number while the stored cell holds the written one. Base: Raw
+        ``85.6589584350586`` -> RED at the value wait. Negative control: the cells
+        written with ``update_width=False`` (the call's default) -> the painted
+        cells are cut at 18 -> RED."""
+        import struct
+    
+        expected_raw = str(struct.unpack(">f", WIDE_FLOAT)[0])
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            table = tag_table(app)
+            raw_column, phys_column = table.ordered_columns[4], table.ordered_columns[5]
+            assert (str(raw_column.label), str(phys_column.label)) == ("Raw", "Physical")
+            assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
+            assert raw_phys(app, "VALUE_0007") == ("85.6589584350586", "185.6589584350586")
+            # the table is narrower than its columns: scroll it so Raw is its first shown column
+            raw_x = sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+            table.scroll_to(x=raw_x, animate=False)
+            await wait_until(pilot, lambda: table.scroll_x == raw_x, lambda: f"scroll_x {table.scroll_x}")
+            assert painted_cell(app, 14, 4) == "85.6589584350586", painted_cell(app, 14, 4)
+            assert max(raw_column.content_width, phys_column.content_width) < len(expected_raw), (
+                f"the columns are already {raw_column.content_width} / "
+                f"{phys_column.content_width} cells wide"
+            )
+            table.move_cursor(row=14, animate=False)
+            await wait_until(
+                pilot, lambda: table.cursor_row == 14, lambda: f"cursor row {table.cursor_row}"
+            )
+            first, cursor = (int(table.scroll_x), int(table.scroll_y)), table.cursor_row
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x40028, WIDE_FLOAT)])
+            assert bytes(mem_at(app, 0x40028 + i) for i in range(4)) == WIDE_FLOAT, "no write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: (raw_phys(app, "VALUE_0007") or ("",))[0] == expected_raw,
+                lambda: f"VALUE_0007 holds {raw_phys(app, 'VALUE_0007')!r}, expected Raw "
+                f"{expected_raw!r}",
+                timeout=FIX_WAIT,
+            )
+            stored_phys = raw_phys(app, "VALUE_0007")[1]
+            assert len(stored_phys) >= len(expected_raw), stored_phys
+            await wait_until(
+                pilot,
+                lambda: (painted_cell(app, 14, 4), painted_cell(app, 14, 5))
+                == (expected_raw, stored_phys),
+                lambda: f"the row paints Raw {painted_cell(app, 14, 4)!r}, Physical "
+                f"{painted_cell(app, 14, 5)!r}; columns {raw_column.content_width} / "
+                f"{phys_column.content_width} cells",
+                timeout=FIX_WAIT,
+            )
+            assert raw_column.content_width >= len(expected_raw), raw_column.content_width
+            assert phys_column.content_width >= len(stored_phys), phys_column.content_width
+            assert ((int(table.scroll_x), int(table.scroll_y)), table.cursor_row) == (first, cursor)
+            assert row_name(app, 14) == "VALUE_0007"
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:883: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fcda3c50150>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        table = tag_table(app)
+        raw_column, phys_column = table.ordered_columns[4], table.ordered_columns[5]
+        assert (str(raw_column.label), str(phys_column.label)) == ("Raw", "Physical")
+        assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
+        assert raw_phys(app, "VALUE_0007") == ("85.6589584350586", "185.6589584350586")
+        # the table is narrower than its columns: scroll it so Raw is its first shown column
+        raw_x = sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+        table.scroll_to(x=raw_x, animate=False)
+        await wait_until(pilot, lambda: table.scroll_x == raw_x, lambda: f"scroll_x {table.scroll_x}")
+>       assert painted_cell(app, 14, 4) == "85.6589584350586", painted_cell(app, 14, 4)
+E       AssertionError: 0x00040028  4
+E       assert '0x00040028  4' == '85.6589584350586'
+E         
+E         - 85.6589584350586
+E         + 0x00040028  4
+
+tests/test_b101_inplace_views.py:847: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_4_a_wider_value_is_painted_whole
+1 failed, 1 passed in 29.48s

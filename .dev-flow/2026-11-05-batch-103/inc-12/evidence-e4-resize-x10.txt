@@ -1,0 +1,545 @@
+RUN=1
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tui_042a_5_6_resize_resizes_the_tag_cell ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-241/test_r_tui_042a_5_6_resize_res0')
+
+    def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
+        async def _check(app, pilot, table):
+            wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+            narrow = "✓ SYN_MA…LLL_END"
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "start painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            await pilot.resize_terminal(80, 54)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+                "220→80 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 14, geom.w
+            _assert_painted_tag_cell(table, geom, 0, narrow)
+            await pilot.resize_terminal(220, 60)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "80→220 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            assert table.cursor_row == 0
+    
+>       _explore(tmp_path, page_long(48), (220, 60), _check)
+
+tests/test_b103_inc12_tag_table.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+tests/test_b103_inc12_tag_table.py:749: in _check
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_tui_042a_5_6_resize_resizes_the_tag_cell.<locals>._check.<locals>.<lambda> at 0x7fafe5cde840>
+failure = '80→220 painted fit'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 80→220 painted fit
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell
+1 failed in 37.89s
+EXIT=1
+RUN=2
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.50s
+EXIT=0
+RUN=3
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tui_042a_5_6_resize_resizes_the_tag_cell ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-243/test_r_tui_042a_5_6_resize_res0')
+
+    def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
+        async def _check(app, pilot, table):
+            wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+            narrow = "✓ SYN_MA…LLL_END"
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "start painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            await pilot.resize_terminal(80, 54)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+                "220→80 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 14, geom.w
+            _assert_painted_tag_cell(table, geom, 0, narrow)
+            await pilot.resize_terminal(220, 60)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "80→220 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            assert table.cursor_row == 0
+    
+>       _explore(tmp_path, page_long(48), (220, 60), _check)
+
+tests/test_b103_inc12_tag_table.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+tests/test_b103_inc12_tag_table.py:749: in _check
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_tui_042a_5_6_resize_resizes_the_tag_cell.<locals>._check.<locals>.<lambda> at 0x7fe7f8f57560>
+failure = '80→220 painted fit'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 80→220 painted fit
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell
+1 failed in 37.65s
+EXIT=1
+RUN=4
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tui_042a_5_6_resize_resizes_the_tag_cell ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-244/test_r_tui_042a_5_6_resize_res0')
+
+    def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
+        async def _check(app, pilot, table):
+            wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+            narrow = "✓ SYN_MA…LLL_END"
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "start painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            await pilot.resize_terminal(80, 54)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+                "220→80 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 14, geom.w
+            _assert_painted_tag_cell(table, geom, 0, narrow)
+            await pilot.resize_terminal(220, 60)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "80→220 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            assert table.cursor_row == 0
+    
+>       _explore(tmp_path, page_long(48), (220, 60), _check)
+
+tests/test_b103_inc12_tag_table.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+tests/test_b103_inc12_tag_table.py:749: in _check
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_tui_042a_5_6_resize_resizes_the_tag_cell.<locals>._check.<locals>.<lambda> at 0x7ff1b71eb1a0>
+failure = '80→220 painted fit'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 80→220 painted fit
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell
+1 failed in 38.18s
+EXIT=1
+RUN=5
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.48s
+EXIT=0
+RUN=6
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.27s
+EXIT=0
+RUN=7
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tui_042a_5_6_resize_resizes_the_tag_cell ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-247/test_r_tui_042a_5_6_resize_res0')
+
+    def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
+        async def _check(app, pilot, table):
+            wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+            narrow = "✓ SYN_MA…LLL_END"
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "start painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            await pilot.resize_terminal(80, 54)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+                "220→80 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 14, geom.w
+            _assert_painted_tag_cell(table, geom, 0, narrow)
+            await pilot.resize_terminal(220, 60)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "80→220 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            assert table.cursor_row == 0
+    
+>       _explore(tmp_path, page_long(48), (220, 60), _check)
+
+tests/test_b103_inc12_tag_table.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+tests/test_b103_inc12_tag_table.py:749: in _check
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_tui_042a_5_6_resize_resizes_the_tag_cell.<locals>._check.<locals>.<lambda> at 0x7f5dfea6c040>
+failure = '80→220 painted fit'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 80→220 painted fit
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell
+1 failed in 37.68s
+EXIT=1
+RUN=8
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.44s
+EXIT=0
+RUN=9
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 7.62s
+EXIT=0
+RUN=10
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tui_042a_5_6_resize_resizes_the_tag_cell ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-250/test_r_tui_042a_5_6_resize_res0')
+
+    def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /6: LONGMAP(48) 220×60 → 80×54 → 220×60, no key."""
+        async def _check(app, pilot, table):
+            wide = "✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END"
+            narrow = "✓ SYN_MA…LLL_END"
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "start painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            await pilot.resize_terminal(80, 54)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, narrow),
+                "220→80 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 14, geom.w
+            _assert_painted_tag_cell(table, geom, 0, narrow)
+            await pilot.resize_terminal(220, 60)
+            await wait_until(
+                pilot,
+                lambda: _all_rows_in_measured_form(app, table) and _painted_tag_equals(table, 0, wide),
+                "80→220 painted fit",
+                timeout=30,
+            )
+            geom = _geom(table)
+            assert geom.w == 84, geom.w
+            _assert_painted_tag_cell(table, geom, 0, wide)
+            assert table.cursor_row == 0
+    
+>       _explore(tmp_path, page_long(48), (220, 60), _check)
+
+tests/test_b103_inc12_tag_table.py:760: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+tests/test_b103_inc12_tag_table.py:749: in _check
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_tui_042a_5_6_resize_resizes_the_tag_cell.<locals>._check.<locals>.<lambda> at 0x7f3af6783420>
+failure = '80→220 painted fit'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 80→220 painted fit
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell
+1 failed in 37.66s
+EXIT=1

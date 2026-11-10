@@ -1,0 +1,2 @@
+ABORT: checkout has unexpected dirty product/tests (refusing to run):
+   M tests/test_b103_inc12_tag_table.py

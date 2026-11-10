@@ -1,0 +1,26 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+.......................................................................F [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ____________
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported() -> None:
+        lines = _margin_guard_lines(TESTS_ROOT)
+>       assert lines == [], "\n".join(lines)
+E       AssertionError: timing bound without report_margin: tests/test_b103_inc12_tag_table.py:963
+E         timing bound without report_margin: tests/test_b103_inc12_tag_table.py:974
+E       assert ['timing boun...table.py:974'] == []
+E         
+E         Left contains 2 more items, first extra item: 'timing bound without report_margin: tests/test_b103_inc12_tag_table.py:963'
+E         Use -v to get more diff
+
+tests/test_suite_hygiene.py:1453: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+1 failed, 220 passed in 367.38s (0:06:07)

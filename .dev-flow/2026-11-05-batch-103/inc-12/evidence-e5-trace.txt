@@ -1,0 +1,3 @@
+US     US-103-07 is named by no active requirement
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-12/01-requirements.md
+trace_check: 1 US, 8 active requirements (0 withdrawn), 2 gap(s)

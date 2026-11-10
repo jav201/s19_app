@@ -1,0 +1,7 @@
+tree copy method: git-clone
+tree: /tmp/b103-e5-12-mut/tree
+source commit: 09a94b5bf8e655f53206f9302da128c4b08c900a
+clone commit:  09a94b5bf8e655f53206f9302da128c4b08c900a
+== baseline ==
+baseline rc=-9 (CRASH) nodes=27
+ABORT: baseline not green; cannot trust any mutant verdict

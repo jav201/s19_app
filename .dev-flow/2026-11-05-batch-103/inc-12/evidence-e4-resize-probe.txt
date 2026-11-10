@@ -1,0 +1,8 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+repaint_calls=2 geom=namespace(cols=[('Address', 12), ('Length', 8), ('Tag', 38), ('Source', 9), ('Raw', 6), ('Physical', 10), ('InMem', 7), ('Region', 9), ('Limits', 9), ('Unit', 6), ('Bits', 6), ('Endian', 8), ('Virt', 6), ('Func', 6), ('Access', 8), ('Dtype', 7)], idx={'Address': 0, 'Length': 1, 'Tag': 2, 'Source': 3, 'Raw': 4, 'Physical': 5, 'InMem': 6, 'Region': 7, 'Limits': 8, 'Unit': 9, 'Bits': 10, 'Endian': 11, 'Virt': 12, 'Func': 13, 'Access': 14, 'Dtype': 15}, xs=[0, 12, 20, 58, 67, 73, 83, 90, 99, 108, 114, 120, 128, 134, 140, 148], fixed=2, fixed_w=20, visible=108, sx=0, sy=0, padding=1, w=84)
+stored='✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END'
+painted_tag=('✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END', 56)
+line=' 0x1C2D3E00  2266    ✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END  formula  1792  1792      yes    unknown  0..4095 '
+content_width=36 render_width=38
+after_manual_notify=('✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END', 56)
+after_manual_line=' 0x1C2D3E00  2266    ✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END  formula  1792  1792      yes    unknown  0..4095 '
