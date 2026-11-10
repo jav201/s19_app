@@ -1,0 +1,291 @@
+{
+  "arms": [
+    {
+      "applied": 1,
+      "evidence": "M1.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M1",
+      "rc": 1,
+      "req": "R-TUI-042a.2/1,/2 \u2014 one blank column between adjacent cells",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_2_1_gap_at_220_and_160",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_2_2_gap_at_118_100_80"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M2.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M2",
+      "rc": 0,
+      "req": "R-TUI-042a.4/2 \u2014 Address and Length stay whole under horizontal scroll",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_2_address_length_whole_scrolled"
+      ],
+      "verdict": "SURVIVED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M3.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M3",
+      "rc": 1,
+      "req": "R-TUI-042a.5/1,/3,/5 \u2014 Tag cell sized from the measured width left, not a fixed 34",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_1_width_left_on_a_32_bit_page",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_3_64_bit_page",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_5_narrowest_width"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M4.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M4",
+      "rc": 1,
+      "req": "R-TUI-042a.3/1,/2,/3 \u2014 the 34-cell Tag cap (no cap -> glued/cut values)",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_1_tag_cap_at_118",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_2_tag_cap_at_220",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_3_cap_edge"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M5.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M5",
+      "rc": 1,
+      "req": "R-TUI-042a.5/8,/9 \u2014 the page build re-fits the Tag cell after the refresh",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_8_page_build_widens_the_address_column",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_9_page_build_drops_the_vertical_scrollbar"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M6.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M6",
+      "rc": 1,
+      "req": "R-TUI-042a.5/6 \u2014 the table's own resize re-fits the Tag cells",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_6_resize_resizes_the_tag_cell"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M7.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M7",
+      "rc": 1,
+      "req": "R-TUI-042a.5/7 \u2014 the Save-project repaint keeps the measured w form (E3A-18)",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M8.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M8",
+      "rc": 1,
+      "req": "R-TUI-042a.6/3 \u2014 a trailing space projects to U+FFFD, not stripped",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_3_plain_ascii_unchanged"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M9.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M9",
+      "rc": 1,
+      "req": "R-TUI-042a.6/1 \u2014 O(w) projection, not the E2 quadratic cell-length loop",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_6_1_zero_width_tail"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M10.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M10",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/1,/2 \u2014 the card header value renders through _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_2_display_identifier"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M11.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M11",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/3,/7 \u2014 card field values scrubbed via _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_3_description",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_7_name_on_the_name_line"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M12.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M12",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/4 \u2014 the unit scrubbed via _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_4_unit"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M13.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M13",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/5 \u2014 the conversion scrubbed via _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_5_conversion"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M14.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M14",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/6 \u2014 lower/upper limits scrubbed via _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M15.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M15",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1/7 \u2014 the Name line built through _card_value_text",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_7_name_on_the_name_line"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M16.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M16",
+      "rc": 1,
+      "req": "R-TUI-042a.7.2/1,/2 \u2014 each maximal run of break chars maps to one space",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_1_description_break_run",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_2_unit_break_run"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M17.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M17",
+      "rc": 1,
+      "req": "R-TUI-042a.8/1 \u2014 the Name line shown under a display identifier",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M18.txt",
+      "file": "s19_app/tui/app.py",
+      "id": "M18",
+      "rc": 1,
+      "req": "AT-069c \u2014 the hostile tag NAME renders verbatim, never markup-parsed",
+      "tests": [
+        "tests/test_tui_a2l_detail.py::test_at069c_c17_table_name"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M19.txt",
+      "file": "s19_app/utils.py",
+      "id": "M19",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1 \u2014 U+009D/U+0090 scrubbed, not only ESC and U+009B",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier"
+      ],
+      "verdict": "KILLED"
+    },
+    {
+      "applied": 1,
+      "evidence": "M20.txt",
+      "file": "s19_app/utils.py",
+      "id": "M20",
+      "rc": 1,
+      "req": "R-TUI-042a.7.1 \u2014 DEL (U+007F) scrubbed",
+      "tests": [
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier"
+      ],
+      "verdict": "KILLED"
+    }
+  ],
+  "baseline": {
+    "evidence": "baseline.txt",
+    "nodes": 27,
+    "rc": 0,
+    "verdict": "GREEN"
+  },
+  "checkout": "<CHECKOUT>",
+  "clone_commit": "25dd5661084c4250a049e0053675de63b6296f9f",
+  "control": {
+    "applied": 1,
+    "evidence": "CONTROL-KILL.txt",
+    "file": "s19_app/tui/app.py",
+    "id": "CONTROL-KILL",
+    "rc": 1,
+    "req": "CONTROL \u2014 address must render (known-bad; must be KILLED)",
+    "tests": [
+      "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_4_1_address_length_whole_unscrolled"
+    ],
+    "verdict": "KILLED"
+  },
+  "copy_method": "git-clone",
+  "counts": {
+    "KILLED": 19,
+    "SURVIVED": 1
+  },
+  "evidence_base": "transcripts",
+  "expected_product_arms": 20,
+  "pristine_sha256": {
+    "s19_app/tui/app.py": "83bc6004beca8f9ce86bf1d8bb7d8baf161dcdc4c155e19f97d94b7b644ff4e1",
+    "s19_app/utils.py": "82dc0d42a58c768270ca6f0fb6603905def0a737894273b123250f42328cf858"
+  },
+  "python": "<PYTHON>",
+  "source_commit": "25dd5661084c4250a049e0053675de63b6296f9f",
+  "test_sha256": {
+    "tests/test_b103_inc12_tag_table.py": "ec5e185d642dae7964564537d7243fb66e30e16c9a363ab2865b80e611e6866d",
+    "tests/test_tui_a2l_detail.py": "d2760521a2782385605c6c2681c2d2d03dafb6762b9888a86fe0caba702ecf59"
+  },
+  "tree": "<TREE>"
+}

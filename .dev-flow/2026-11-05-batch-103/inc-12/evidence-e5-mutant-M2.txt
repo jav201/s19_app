@@ -1,0 +1,13 @@
+=== M2 (R-TUI-042a.4/2 — Address and Length stay whole under horizontal scroll) ===
+file: s19_app/tui/app.py
+anchor: '                fixed_columns=2,'
+mutation: '                fixed_columns=0,'
+applied count: 1 (expected 1)
+mutated hash: dc12152bc88b420b7eab3e73dcd2dae7d63b5bb7fb476938b2c2ab0f6ef1fcb2
+restored hash: 83bc6004beca8f9ce86bf1d8bb7d8baf161dcdc4c155e19f97d94b7b644ff4e1
+verdict: SURVIVED (rc=0)
+
+s19_app.__file__ = /tmp/b103-e5-12-mut4/tree/s19_app/__init__.py
+........................................                                 [100%]
+------------ generated xml file: /tmp/b103-e5-12-mut4/junit/M2.xml -------------
+40 passed in 398.08s (0:06:38)
