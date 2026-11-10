@@ -1,6 +1,6 @@
 # Inc 12 — A2L tag table: validation record (E5)
 
-**Verdict: PENDING.** Product, independent tests, law guards, static reviews and the 20-arm mutant battery are complete. Canonical snapshot regeneration and the operator's visual verdict are still open. No merge to `batch-103`, `main`, or push is authorized by this record.
+**Verdict: PENDING.** Product, independent tests, law guards, static reviews, the 20-arm mutant battery and the operator's visual acceptance are complete. Only canonical snapshot regeneration remains open. No merge to `batch-103`, `main`, or push is authorized by this record.
 
 ## Final runs
 
@@ -16,19 +16,19 @@
 | Mutation battery | **20/20 KILLED**, no survivor, CRASH or BAD | `../evidence/inc-12/evidence-e5-mutants-final4.txt`, `../evidence/inc-12/evidence-e5-mutant-M2-retry.txt` |
 | Real Windows Terminal | 28 before/after PNGs at 80, 118 and 220 columns plus mid-scroll and Name-line; all sidecars ready | `../evidence/inc-12/captures/final/` |
 | Decision page | 28 images, 0 broken, 0 console errors, 0 failed requests | `../evidence/inc-12/evidence-e5-decision-browser.txt`, `evidence-e5/DECISION.html` |
+| Operator visual acceptance | **APPROVED**, no objections; AT-B103-I12-2 is `full` / `verified` | `evidence-e5/OPERATOR-VERDICT.md` |
 
 The case-06 timing failure is also present on the base (1.399 s) and integrated tree (1.428 s) against 1.000 s. An isolated rerun on `1a907685` measured 1.372 s. It is not attributed to Inc 12 and remains open for the batch-end performance review; no flaky classification is claimed.
 
 ## Reviews
 
 - Code and security: **PASS-WITH-NOTES** (`E4-code-review.md`). No MAJOR/HIGH/MEDIUM finding remains open.
-- Coverage: static **PASS** for 33 full cases plus AT-B103-I12-1 (`E4-coverage-audit.md`). AT-B103-I12-2 remains `gap` / `not_run`.
+- Coverage: static **PASS** for 33 full cases plus AT-B103-I12-1 (`E4-coverage-audit.md`); AT-B103-I12-2 is now `full` / `verified` by the operator's recorded approval.
 - Mutation runner: initial instrument findings corrected and self-test passed (`E5-mutant-runner-review.md`). M2 initially survived the off-screen oracle; after `require_visible`, 41 nodes passed and the isolated retry killed it (`../evidence/inc-12/evidence-e5-visible-fixed-cells.txt`).
 
 ## Open items
 
 - Six A2L snapshot baselines must be regenerated in the canonical CI environment. The two Patch snapshot mismatches already fail on base and are not included in that update (`../evidence/inc-12/evidence-e5-snapshot-base.txt`, `../evidence/inc-12/evidence-e5-snapshot-final.txt`).
-- AT-B103-I12-2 awaits the operator's verdict on `evidence-e5/DECISION.html`, including look-alike names at 80 columns, the left-cut backlog cell and the Name-line row cost.
 
 ## Not run here
 
