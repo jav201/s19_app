@@ -1,0 +1,40 @@
+M-140b
+pytest -k a2l_def_140_10
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..d2247382 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -870,7 +870,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+         if address is None:
+             result[name] = definition
+             continue
+-        span_index[None] = span_entries
++        span_index[None] = [entry for entry in span_entries if entry[3] >= address - MAX_A2L_DECODE_BYTES + 1]
+         result[name] = replace(
+             definition,
+             shared_with=_shared_with(definition, span_index, mask_of, materialize),
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-552/test_r_a2l_def_140_10_over_cap0')
+
+    def test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            characteristic("BIG", "VALUE", "0x0", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("V", "VALUE", "0x100000", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        next(tag for tag in a2l_data["tags"] if tag.get("name") == "BIG")["length"] = 1_048_577
+        d = a2ldef.describe_definition("V", a2l_data)
+>       assert d.shared_with == "BIG"
+E       AssertionError: assert None == 'BIG'
+E        +  where None = Definition(name='V', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=1048576, byte_length=1, datat...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition_arrays_write.py:1114: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks
+1 failed, 80 deselected in 0.81s

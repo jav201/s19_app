@@ -1,0 +1,84 @@
+M-130
+pytest -k a2l_def_130_4 or a2l_def_130_5
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..7544ee45 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4270,7 +4270,7 @@ def encode_values(
+         return definition.refusal
+     name_echo = _name_echo_of(definition)
+     errors = a2l_data.get("errors") or []
+-    if errors:
++    if False and errors:
+         return Refusal(
+             "A2L-DEF-PARSE",
+             f"{name_echo}: the A2L cannot be edited while it has parse errors "
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_130_4_parse_before_missing_bytes ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-545/test_r_a2l_def_130_4_parse_bef0')
+
+    def test_r_a2l_def_130_4_parse_before_missing_bytes(tmp_path):
+        a2l_data, d = _parse_order_case(tmp_path)
+        res = _encode(d, a2l_data, {(0,): "1"}, img(0x10, bytes(3)))
+>       _refusal(
+            res,
+            "A2L-DEF-PARSE",
+            "VB: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:534: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-BYTES', message='VB: 1 of its 4 bytes are not in the image')
+code = 'A2L-DEF-PARSE'
+message = 'VB: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-BYTES', message='VB: 1 of its 4 bytes are not in the image')
+E       assert ('A2L-DEF-BYT...in the image') == ('A2L-DEF-PAR... is not read')
+E         
+E         At index 0 diff: 'A2L-DEF-BYTES' != 'A2L-DEF-PARSE'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+______________ test_r_a2l_def_130_5_parse_before_invalid_position ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-545/test_r_a2l_def_130_5_parse_bef0')
+
+    def test_r_a2l_def_130_5_parse_before_invalid_position(tmp_path):
+        a2l_data, d = _parse_order_case(tmp_path)
+        res = _encode(d, a2l_data, {(99,): "1"}, img(0x10, bytes(3)))
+>       _refusal(
+            res,
+            "A2L-DEF-PARSE",
+            "VB: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:544: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-BYTES', message='VB: 1 of its 4 bytes are not in the image')
+code = 'A2L-DEF-PARSE'
+message = 'VB: the A2L cannot be edited while it has parse errors — the first is Line 20: /include x.a2l is not read'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-BYTES', message='VB: 1 of its 4 bytes are not in the image')
+E       assert ('A2L-DEF-BYT...in the image') == ('A2L-DEF-PAR... is not read')
+E         
+E         At index 0 diff: 'A2L-DEF-BYTES' != 'A2L-DEF-PARSE'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_4_parse_before_missing_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_5_parse_before_invalid_position
+2 failed, 79 deselected in 0.87s

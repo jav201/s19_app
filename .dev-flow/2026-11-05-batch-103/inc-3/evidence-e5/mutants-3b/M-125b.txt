@@ -1,0 +1,39 @@
+M-125b
+pytest -k a2l_def_125_5
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..caee468b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -2905,7 +2905,7 @@ def _decode_stored(
+ 
+ def element_name(definition: Definition, position: tuple) -> str:
+     """An element or axis point name, or a bounded malformed-position repr."""
+-    return _position_label(definition, position)
++    return f"{definition.name}[{position}]"
+ 
+ 
+ def _element_indexes(shape: tuple[int, ...]):
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_a2l_def_125_5_public_element_name_is_total_and_bounded _________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_125_5_public_element_name_is_total_and_bounded(v171):
+        d = a2ldef.describe_definition(ROW_ARRAY, v171)
+        name = "\x1b" + "N" * 300
+        hostile = replace(d, name=name, _name_echo=None)
+        echo = "\ufffd" + "N" * 255 + "…"
+>       assert a2ldef.element_name(hostile, (1, 2)) == f"{echo}[1,2]"
+E       AssertionError: assert '\x1bNNNNNNNN...NNNNN[(1, 2)]' == '�NNNNNNNNNNN...NNNNNNN…[1,2]'
+E         
+E         - �NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN…[1,2]
+E         + NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN[(1, 2)]
+
+tests/test_b103_a2l_definition_arrays_write.py:987: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_5_public_element_name_is_total_and_bounded
+1 failed, 80 deselected in 0.82s

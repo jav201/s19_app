@@ -1,0 +1,53 @@
+M-120
+pytest -k a2l_def_120
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..51143863 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4000,7 +4000,7 @@ def encode_definition(
+             f"— the first is {errors[0]}",
+         )
+ 
+-    if definition.kind in ("array", "curve", "map"):
++    if False and definition.kind in ("array", "curve", "map"):
+         return Refusal(
+             "A2L-DEF-ELEMENTS",
+             f"{name_echo}: it holds {definition.element_count} values — decode and "
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_120_2_single_text_encode_refuses_array _____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_120_2_single_text_encode_refuses_array(v171):
+        d = a2ldef.describe_definition(ROW_ARRAY, v171)
+        res = a2ldef.encode_definition(d, v171, "5", _array_image(0x810100))
+>       _refusal(
+            res,
+            "A2L-DEF-ELEMENTS",
+            f"{ROW_ARRAY}: it holds 12 values — decode and encode it value by value",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-ENUM', message="ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: '5' is not a text of (none)")
+code = 'A2L-DEF-ELEMENTS'
+message = 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: it holds 12 values — decode and encode it value by value'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-ENUM', message="ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: '5' is not a text of (none)")
+E       assert ('A2L-DEF-ENU...xt of (none)') == ('A2L-DEF-ELE...lue by value')
+E         
+E         At index 0 diff: 'A2L-DEF-ENUM' != 'A2L-DEF-ELEMENTS'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_120_2_single_text_encode_refuses_array
+1 failed, 1 passed, 79 deselected in 0.83s

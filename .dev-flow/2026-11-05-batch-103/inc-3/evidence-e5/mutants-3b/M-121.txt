@@ -1,0 +1,49 @@
+M-121
+pytest -k a2l_def_121
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..7692f90a 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -3015,7 +3015,7 @@ def _element_definition(
+         )
+     if named:
+         suffix = f"[{','.join(str(i) for i in position)}]"
+-        name_echo = _name_echo_of(definition) + suffix
++        name_echo = _name_echo_of(definition)
+         name = name_echo
+     else:
+         name_echo = definition._name_echo
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_121_1_element_name_in_encode_refusal ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-535/test_r_a2l_def_121_1_element_n0')
+
+    def test_r_a2l_def_121_1_element_name_in_encode_refusal(tmp_path):
+        a2l_data = inline(tmp_path, valblk("V", "0x10", "RL_U16", extras=("MATRIX_DIM 3 4",)))
+        d = a2ldef.describe_definition("V", a2l_data)
+        res = _encode(d, a2l_data, {(1, 2): "abc"}, img(0x10, bytes(24)))
+>       _refusal(res, "A2L-DEF-NUMBER", "V[1,2]: 'abc' is not a number")
+
+tests/test_b103_a2l_definition_arrays_write.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-NUMBER', message="V: 'abc' is not a number")
+code = 'A2L-DEF-NUMBER', message = "V[1,2]: 'abc' is not a number"
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-NUMBER', message="V: 'abc' is not a number")
+E       assert ('A2L-DEF-NUM...not a number") == ('A2L-DEF-NUM...not a number")
+E         
+E         At index 1 diff: "V: 'abc' is not a number" != "V[1,2]: 'abc' is not a number"
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_121_1_element_name_in_encode_refusal
+1 failed, 1 passed, 79 deselected in 0.80s

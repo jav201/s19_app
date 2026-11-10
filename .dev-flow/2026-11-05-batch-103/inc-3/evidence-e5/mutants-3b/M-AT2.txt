@@ -1,0 +1,61 @@
+M-AT2
+pytest -k at_b103_i3_2_edit_arm
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..31f0236b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4339,7 +4339,7 @@ def encode_values(
+                     "A2L-DEF-AXIS-FIXED",
+                     f"{point_label}: the points of a fixed axis are not stored in the image",
+                 )
+-            if axis.axis_kind == "COM_AXIS":
++            if False and axis.axis_kind == "COM_AXIS":
+                 ref = _echo(axis.axis_object) if axis.axis_object else "(none)"
+                 return Refusal(
+                     "A2L-DEF-AXIS-SHARED",
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_at_b103_i3_2_edit_arm_definitions_case __________________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-561/b103_defc0'), ...}
+
+    def test_at_b103_i3_2_edit_arm_definitions_case(defc):
+        m = _model()
+        image = dict(defc["mem"])
+        for name in ("CURVE_DEF_0001", "CURVE_DEF_0002", "MAP_DEF_0001", "VAL_BLK_DEF_0001"):
+            d = m.describe_definition(name, defc["a2l"])
+            obj = defc["objs"][name]
+            position = (0,) * len(d.shape)
+            _res, image = _value_edit3b(m, d, defc["a2l"], image, position, obj["planned_text"][1])
+    
+        d = m.describe_definition("MAP_DEF_0001", defc["a2l"])
+        res = _encode3b(m, d, defc["a2l"], {("X", 1): "600"}, image)
+        assert res.data[2:4] == b"\x02\x58"
+        image = _apply3b(image, res)
+        decoded = _decode3b(m, d, defc["a2l"], image)
+        assert [p.stored for p in decoded.axes[0].points] == [224, 600, 648, 909]
+    
+        curve_d = m.describe_definition("CURVE_DEF_0001", defc["a2l"])
+        common = m.encode_values(curve_d, defc["a2l"], {("X", 0): "242.500"}, defc["mem"])
+>       assert common == m.Refusal(
+            "A2L-DEF-AXIS-SHARED",
+            "CURVE_DEF_0001.X[0]: the points of the common axis AXIS_DEF_0001 are not edited through CURVE_DEF_0001",
+        )
+E       AssertionError: assert Refusal(code=...in the image') == Refusal(code=...RVE_DEF_0001')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-BYTES' != 'A2L-DEF-AXIS-SHARED'
+E           - A2L-DEF-AXIS-SHARED...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_synth_definitions.py:540: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_2_edit_arm_definitions_case
+1 failed, 80 deselected in 0.87s

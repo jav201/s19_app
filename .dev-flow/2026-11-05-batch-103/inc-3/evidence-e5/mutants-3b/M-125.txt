@@ -1,0 +1,78 @@
+M-125
+pytest -k a2l_def_125
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..b2ae419d 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4308,9 +4308,7 @@ def encode_values(
+             validated.append((position, text, axis))
+             continue
+         if _element_position(position):
+-            if len(position) != len(definition.shape) or any(
+-                index >= definition.shape[dim] for dim, index in enumerate(position)
+-            ):
++            if False:
+                 return _index_refusal(definition, position)
+             validated.append((position, text, None))
+             continue
+
+FF...                                                                    [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_125_1_index_past_shape _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_125_1_index_past_shape(v171):
+>       _invalid_named_position(v171, (3, 0), "[3,0]")
+
+tests/test_b103_a2l_definition_arrays_write.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:387: in _invalid_named_position
+    _refusal(res, "A2L-DEF-INDEX", f"{ROW_ARRAY}: {ROW_ARRAY}{suffix} is not a value or axis point of it")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x01\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00\n\x00\x0b\x00\x0c\x00', notices=())
+code = 'A2L-DEF-INDEX'
+message = 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR[3,0] is not a value or axis point of it'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x01\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00
+E         \x00\x0b\x00\x0c\x00', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x01\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00\n\x00\x0b\x00\x0c\x00', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+__________________ test_r_a2l_def_125_2_index_of_wrong_length __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_125_2_index_of_wrong_length(v171):
+>       _invalid_named_position(v171, (0, 0, 0), "[0,0,0]")
+
+tests/test_b103_a2l_definition_arrays_write.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:387: in _invalid_named_position
+    _refusal(res, "A2L-DEF-INDEX", f"{ROW_ARRAY}: {ROW_ARRAY}{suffix} is not a value or axis point of it")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00\n\x00\x0b\x00\x0c\x00', notices=())
+code = 'A2L-DEF-INDEX'
+message = 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR[0,0,0] is not a value or axis point of it'
+
+    def _refusal(res, code: str, message: str):
+>       assert isinstance(res, a2ldef.Refusal), res
+E       AssertionError: Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00
+E         \x00\x0b\x00\x0c\x00', notices=())
+E       assert False
+E        +  where False = isinstance(Encoded(address=8454400, data=b'\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00\n\x00\x0b\x00\x0c\x00', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E        +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+
+tests/test_b103_a2l_definition_arrays_write.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_1_index_past_shape
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_2_index_of_wrong_length
+2 failed, 3 passed, 76 deselected in 0.95s

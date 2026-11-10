@@ -1,0 +1,98 @@
+M-120
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_120_2_single_text_encode_refuses_array
+M-121
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_121_1_element_name_in_encode_refusal
+M-122
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_1_converted_element_edit
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_4_converted_axis_point_edit
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_5_float64_element_uses_precision_rule
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_7_written_element_against_extended_limits
+M-123
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes
+M-124
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_1_edit_with_axis_object_missing
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_2_edit_on_partial_record
+M-125
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_1_index_past_shape
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_2_index_of_wrong_length
+M-125b
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_5_public_element_name_is_total_and_bounded
+M-126
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_1_fixed_curve_axis
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_2_fixed_map_axis
+M-127
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_1_common_axis_point
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_2_definitions_case_shared_axis
+M-128
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_128_1_axis_with_no_points
+M-129
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_1_strict_increase
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_2_strict_decrease
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_4_mon_increase
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_5_mon_decrease
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_6_default_rule
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_7_monotonous
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_9_unedited_point_can_break_order
+M-130
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_4_parse_before_missing_bytes
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_5_parse_before_invalid_position
+M-131
+  killed
+M-131b
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale
+M-131c
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising
+M-131d
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes
+M-132
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes
+M-140
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused
+M-140b
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks
+M-140c
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point
+M-153
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_153_1_scalar_values_through_encode_values
+M-154
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_154_1_unknown_monotony_rule_refuses
+M-155
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded
+M-58.1a
+  killed
+  FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged
+M-58.1b
+  killed
+  FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged
+M-AT1
+  killed
+  FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes
+M-AT2
+  killed
+  FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_2_edit_arm_definitions_case
+M-AT3
+  killed
+  FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes
+{"killed": 28, "survived": []}

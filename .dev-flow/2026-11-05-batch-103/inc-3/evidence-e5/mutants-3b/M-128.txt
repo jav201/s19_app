@@ -1,0 +1,59 @@
+M-128
+pytest -k a2l_def_128
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..d9abdd60 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4346,7 +4346,7 @@ def encode_values(
+                     f"{point_label}: the points of the common axis {ref} are not "
+                     f"edited through {name_echo}",
+                 )
+-            if not axis.has_points:
++            if False and not axis.has_points:
+                 layout = (
+                     _echo(definition.record_layout)
+                     if definition.record_layout is not None
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_a2l_def_128_1_axis_with_no_points ___________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...ian': False, 'conversion': 'CM_IDENT', 'datatype': 'UBYTE', ...}, ...}, 'mem': {0: 108, 1: 49, 2: 57, 3: 84, ...}, ...}
+
+    def test_r_a2l_def_128_1_axis_with_no_points(c08):
+        a2l_data = _clear_parse_errors(c08["a2l"])
+        d = a2ldef.describe_definition("CURVE_0001", a2l_data)
+>       res = _encode(d, a2l_data, {("X", 0): "1"}, c08["mem"])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_write.py:449: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_arrays_write.py:75: in _encode
+    return a2ldef.encode_values(d, a2l_data, edit, image)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:4366: in encode_values
+    element = _element_definition(definition, position)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:3001: in _element_definition
+    address = base_address + _point_offset(axis, k)
+                             ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+axis = AxisDefinition(letter='X', axis_kind='STD_AXIS', point_count=32, points=Definition(name='CURVE_0001.X', section='AXIS_...=None, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None)
+k = 0
+
+    def _point_offset(axis: AxisDefinition, k: int) -> int:
+        """The byte offset of point ``k`` in its record (R-A2L-DEF.108, .109)."""
+        size = DATATYPE_SIZES.get(axis.points.datatype) or 0
+        if axis.point_order == "INDEX_DECR":
+            return axis.offset + size * (axis.point_count - 1 - k)
+>       return axis.offset + size * k
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
+
+s19_app/tui/a2l_definition.py:2949: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_128_1_axis_with_no_points
+1 failed, 80 deselected in 1.67s

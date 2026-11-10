@@ -1,0 +1,84 @@
+M-131
+pytest -k a2l_def_122_5 or a2l_def_131_1
+returncode=2
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..028c47c6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4080,7 +4080,7 @@ def encode_definition(
+             exact = _exact_decimal(trimmed)
+             if exact is not None and exact != Decimal(int(p)):
+                 rejects = True
+-        if not rejects and not _agrees_at_display_precision(
++        if not rejects and not True:
+             definition, p, limit_value
+         ):
+             rejects = True
+
+
+==================================== ERRORS ====================================
+_______ ERROR collecting tests/test_b103_a2l_definition_arrays_write.py ________
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1204: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1176: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:690: in _load_unlocked
+    ???
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
+    exec(co, module.__dict__)
+tests/test_b103_a2l_definition_arrays_write.py:13: in <module>
+    from s19_app.tui import a2l, a2l_definition as a2ldef
+E     File "/tmp/b103-e5-3b-mut/M-131/s19_app/tui/a2l_definition.py", line 4085
+E       ):
+E       ^
+E   SyntaxError: unmatched ')'
+____________ ERROR collecting tests/test_b103_synth_definitions.py _____________
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1204: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1176: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:690: in _load_unlocked
+    ???
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
+    exec(co, module.__dict__)
+tests/test_b103_synth_definitions.py:46: in <module>
+    from tests.test_b103_a2l_definition import _clear_parse_errors  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1176: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:690: in _load_unlocked
+    ???
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
+    exec(co, module.__dict__)
+tests/test_b103_a2l_definition.py:48: in <module>
+    from s19_app.tui.a2l_definition import (  # noqa: E402
+E     File "/tmp/b103-e5-3b-mut/M-131/s19_app/tui/a2l_definition.py", line 4085
+E       ):
+E       ^
+E   SyntaxError: unmatched ')'
+=========================== short test summary info ============================
+ERROR tests/test_b103_a2l_definition_arrays_write.py
+ERROR tests/test_b103_synth_definitions.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+2 errors in 0.93s

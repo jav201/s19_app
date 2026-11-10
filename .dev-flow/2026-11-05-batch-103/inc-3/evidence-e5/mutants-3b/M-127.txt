@@ -1,0 +1,84 @@
+M-127
+pytest -k a2l_def_127
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..31f0236b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4339,7 +4339,7 @@ def encode_values(
+                     "A2L-DEF-AXIS-FIXED",
+                     f"{point_label}: the points of a fixed axis are not stored in the image",
+                 )
+-            if axis.axis_kind == "COM_AXIS":
++            if False and axis.axis_kind == "COM_AXIS":
+                 ref = _echo(axis.axis_object) if axis.axis_object else "(none)"
+                 return Refusal(
+                     "A2L-DEF-AXIS-SHARED",
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_127_1_common_axis_point ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_127_1_common_axis_point(v171):
+        d = a2ldef.describe_definition(COM_CURVE, v171)
+        res = _encode(d, v171, {("X", 3): "35"}, _com_image())
+>       _refusal(
+            res,
+            "A2L-DEF-AXIS-SHARED",
+            f"{COM_CURVE}.X[3]: the points of the common axis ASAM.C.AXIS_PTS.UBYTE_8 are not edited through {COM_CURVE}",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:429: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-BYTES', message='ASAM.C.CURVE.COM_AXIS.X[3]: 1 of its 1 bytes are not in the image')
+code = 'A2L-DEF-AXIS-SHARED'
+message = 'ASAM.C.CURVE.COM_AXIS.X[3]: the points of the common axis ASAM.C.AXIS_PTS.UBYTE_8 are not edited through ASAM.C.CURVE.COM_AXIS'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-BYTES', message='ASAM.C.CURVE.COM_AXIS.X[3]: 1 of its 1 bytes are not in the image')
+E       assert ('A2L-DEF-BYT...in the image') == ('A2L-DEF-AXI...RVE.COM_AXIS')
+E         
+E         At index 0 diff: 'A2L-DEF-BYTES' != 'A2L-DEF-AXIS-SHARED'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+______________ test_r_a2l_def_127_2_definitions_case_shared_axis _______________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_a2l_def_127_2_definitions_case_shared_axis(defc):
+        d = a2ldef.describe_definition("CURVE_DEF_0001", defc["a2l"])
+        res = _encode(d, defc["a2l"], {("X", 0): "242.500"}, defc["mem"])
+>       _refusal(
+            res,
+            "A2L-DEF-AXIS-SHARED",
+            "CURVE_DEF_0001.X[0]: the points of the common axis AXIS_DEF_0001 are not edited through CURVE_DEF_0001",
+        )
+
+tests/test_b103_a2l_definition_arrays_write.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-BYTES', message='CURVE_DEF_0001.X[0]: 2 of its 2 bytes are not in the image')
+code = 'A2L-DEF-AXIS-SHARED'
+message = 'CURVE_DEF_0001.X[0]: the points of the common axis AXIS_DEF_0001 are not edited through CURVE_DEF_0001'
+
+    def _refusal(res, code: str, message: str):
+        assert isinstance(res, a2ldef.Refusal), res
+>       assert (res.code, res.message) == (code, message), res
+E       AssertionError: Refusal(code='A2L-DEF-BYTES', message='CURVE_DEF_0001.X[0]: 2 of its 2 bytes are not in the image')
+E       assert ('A2L-DEF-BYT...in the image') == ('A2L-DEF-AXI...RVE_DEF_0001')
+E         
+E         At index 0 diff: 'A2L-DEF-BYTES' != 'A2L-DEF-AXIS-SHARED'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_1_common_axis_point
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_2_definitions_case_shared_axis
+2 failed, 79 deselected in 0.89s

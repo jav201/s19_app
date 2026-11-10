@@ -1,0 +1,107 @@
+M-131c
+pytest -k a2l_def_131_4
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..53f5f61b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -3599,7 +3599,7 @@ def _reverse_table_form(
+                 right_raw - left_raw
+             ) / (right_y - left_y)
+             break
+-    if raw_fraction is None or not math.isfinite(raw_fraction):
++    if raw_fraction is None:
+         return None, f"the value {physical} is not invertible in this table", None
+ 
+     raw_x = round(raw_fraction)
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising _____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-547/test_r_a2l_def_131_4_nonfinite0')
+
+    def test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            cm("CM_INF", "TAB_INTP", fmt='"%.3"', ref="CT_INF"),
+            ctab("CT_INF", "TAB_INTP", "0 -inf", "1 inf"),
+            valblk("VINF", "0x10", "RL_U16", "CM_INF", "-1000", "1000", extras=("MATRIX_DIM 2",)),
+        )
+        d = a2ldef._element_definition(a2ldef.describe_definition("VINF", a2l_data), (0,))
+>       res = a2ldef._encode_number(d, a2l_data, 0.0)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_write.py:1001: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+s19_app/tui/a2l_definition.py:3632: in _encode_number
+    raw_value, reason, _flag = _reverse_table_form(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+form = _TabForm(xs=(0.0, 1.0), ys=(-inf, inf), x_nan=False, ref_echo='CT_INF')
+physical = 0.0, interpolate = True
+
+    def _reverse_table_form(
+        form: _TabForm, physical: float, interpolate: bool
+    ) -> tuple[Optional[float], str, Optional[str]]:
+        """The frozen ``_reverse_table_lookup`` result on the shared inverse form."""
+        if not form.xs:
+            return None, "lookup table missing or empty", None
+        if not form.inverse_file:
+            return None, "lookup table has no numeric entries", None
+        if not interpolate:
+            match = _table_match(form, physical, False)
+            if match is not None:
+                return match[0], "", None
+            nearest = _nearest_table_entries(form, physical)
+            named = sorted({item[1] for item in nearest})
+            nearest_text = (
+                str(named[0])
+                if len(named) == 1
+                else f"{named[0]} and {named[1]}"
+            )
+            return None, (
+                f"the value {physical} is not a table value - "
+                f"the nearest table values are {nearest_text}"
+            ), None
+    
+        ordered = form.inverse_match
+        if form.inverse_y_nan or not ordered or math.isnan(physical):
+            return None, f"the value {physical} is not invertible in this table", None
+        y_min = ordered[0][1]
+        y_max = ordered[-1][1]
+        if physical < y_min or physical > y_max:
+            return None, (
+                f"the value {physical} is outside the table range "
+                f"[{y_min}, {y_max}]"
+            ), None
+        match = _table_match(form, physical, True)
+        if match is not None:
+            return match[0], "", None
+    
+        raw_fraction: Optional[float] = None
+        ys = form.inverse_match_ys
+        pos = bisect_right(ys, physical) - 1
+        pairs = ((ordered[i], ordered[i + 1]) for i in range(pos, len(ordered) - 1))
+        for left, right in pairs:
+            left_raw, left_y = left[:2]
+            right_raw, right_y = right[:2]
+            if left_y <= physical <= right_y and not math.isclose(
+                right_y, left_y, rel_tol=0.0, abs_tol=1e-12
+            ):
+                raw_fraction = left_raw + (physical - left_y) * (
+                    right_raw - left_raw
+                ) / (right_y - left_y)
+                break
+        if raw_fraction is None:
+            return None, f"the value {physical} is not invertible in this table", None
+    
+>       raw_x = round(raw_fraction)
+                ^^^^^^^^^^^^^^^^^^^
+E       ValueError: cannot convert float NaN to integer
+
+s19_app/tui/a2l_definition.py:3605: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising
+1 failed, 80 deselected in 0.90s

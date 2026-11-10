@@ -1,0 +1,53 @@
+M-153
+pytest -k a2l_def_153
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..4c16672b 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -4279,7 +4279,7 @@ def encode_values(
+ 
+     ordered = _ordered_edits(definition, edit)
+     scalar = definition.kind in ("number", "enum", "text")
+-    if scalar and len(ordered) == 1 and _scalar_position(ordered[0][0]):
++    if False and scalar and len(ordered) == 1 and _scalar_position(ordered[0][0]):
+         return encode_definition(definition, a2l_data, ordered[0][1], image)
+ 
+     decoded = decode_values(definition, a2l_data, image)
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_153_1_scalar_values_through_encode_values ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-554/test_r_a2l_def_153_1_scalar_va0')
+
+    def test_r_a2l_def_153_1_scalar_values_through_encode_values(tmp_path):
+        a2l_data = inline2(
+            tmp_path,
+            _val("N", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            *_enum_blocks("CM_E", "VT_E", "2", '0 "OFF"', '1 "ON"'),
+            _val("E", "0x11", "RL_U8", "CM_E", "0", "1"),
+            _ascii("T", "0x20", "2"),
+        )
+        for name, text, expected in (("N", "7", b"\x07"), ("E", "ON", b"\x01"), ("T", "A", b"A\x00")):
+            d = a2ldef.describe_definition(name, a2l_data)
+            image = img(d.address, bytes(d.byte_length))
+            scalar = a2ldef.encode_definition(d, a2l_data, text, image)
+            assert scalar == a2ldef.Encoded(d.address, expected, ())
+>           assert _encode(d, a2l_data, {(0,): text}, image) == scalar
+E           AssertionError: assert Encoded(addre...', notices=()) == Encoded(addre...', notices=())
+E             
+E             Omitting 2 identical items, use -vv to show
+E             Differing attributes:
+E             ['data']
+E             
+E             Drill down into differing attribute data:
+E               data: b'\x00' != b'\x07'
+E               At index 0 diff: b'\x00' != b'\x07'
+E               Use -v to get more diff
+
+tests/test_b103_a2l_definition_arrays_write.py:941: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_153_1_scalar_values_through_encode_values
+1 failed, 80 deselected in 0.81s

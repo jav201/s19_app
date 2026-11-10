@@ -1,0 +1,45 @@
+M-140c
+pytest -k a2l_def_140_11
+returncode=1
+
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index a0a40d07..7c3e267f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -823,7 +823,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+         if tag.get("section") == "MEASUREMENT":
+             matrix = _read_matrix_dim(sections[0])
+             return matrix is not None and (
+-                matrix[1] is None or _is_multi_value_matrix(matrix[0])
++                matrix[1] is not None and _is_multi_value_matrix(matrix[0])
+             )
+         return False
+ 
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-553/test_r_a2l_def_140_11_refused_0')
+
+    def test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point(tmp_path):
+        a2l_data = inline(
+            tmp_path,
+            meas("M", "UBYTE", addr="0x10", extras=("MATRIX_DIM x 2",)),
+            characteristic("V", "VALUE", "0x12", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("VMD", "VALUE", "0x20", "RL_U16", "NO_COMPU_METHOD", "0", "65535", extras=("MATRIX_DIM 2 2",)),
+            characteristic("V2", "VALUE", "0x21", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        a2l_data = _clear_parse_errors(a2l_data)
+        next(tag for tag in a2l_data["tags"] if tag.get("name") == "M")["length"] = 4
+        malformed = a2ldef.describe_definition("M", a2l_data)
+        value_matrix = a2ldef.describe_definition("VMD", a2l_data)
+>       assert malformed.byte_length is None and malformed.shared_with is None
+E       AssertionError: assert (None is None and 'M' is None)
+E        +  where None = Definition(name='M', section='MEASUREMENT', char_type=None, kind='array', address=16, byte_length=None, datatype=None,...e numbers of at least 1'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout=None, axes=()).byte_length
+E        +  and   'M' = Definition(name='M', section='MEASUREMENT', char_type=None, kind='array', address=16, byte_length=None, datatype=None,...e numbers of at least 1'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+
+tests/test_b103_a2l_definition_arrays_write.py:1134: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point
+1 failed, 80 deselected in 0.81s

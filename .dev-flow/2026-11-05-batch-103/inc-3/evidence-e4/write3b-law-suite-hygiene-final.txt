@@ -1,0 +1,3 @@
+commit=98904e820485a3ec15064f95a2b3d1300d42214d
+command=pytest-suite-hygiene
+.........................s................
