@@ -33,4 +33,12 @@ The first RED/GREEN pair running on `549ef3f1` is diagnostic only. Final GREEN a
 
 Tracked-file scenarios must load `prg.s19` before the A2L; otherwise the CURVE before/after Raw/Physical comparison is vacuous. Sidecar reports must not contain checkout/account paths. Accepted and routed to the mechanical capture lane.
 
-The independent capture review's six findings are also accepted: explicit launched-process environment, the same pinned CURVE file in both roots, hard scenario postconditions, redacted error sidecars, verified window/scratch cleanup, and a nonzero/incomplete batch result. The executed `e07fb00` selection pins `examples/case_00_public/software_a.a2l` (151 CURVE tags).
+The independent capture review's six findings are also accepted: explicit launched-process environment, the same pinned CURVE file in both roots, hard scenario postconditions, redacted error sidecars, verified window/scratch cleanup, and a nonzero/incomplete batch result. The executed `e07fb00` selection pins `examples/case_00_public/software_a.a2l` (151 CURVE tags). Its 220/80/118 CURVE images use a deterministic synthetic 64-byte image because `prg.s19` backs none of the required CURVEs; before/after postconditions assert Raw/Physical present/blank.
+
+## Late execution corrections
+
+- The card's Static surface could not scroll to its limits. Use `RichLog` with `markup=False`, `wrap=True`, `min_width=1`, `auto_scroll=False`, a Static-compatible `render()` text API, and measured-width rewrites on resize. Review accepts the resulting behavior; security remains PASS-WITH-NOTES.
+- In-place Tag repaints also need `DataTable.notify_style_update()` to invalidate stale narrow renders. A 220→80→220 probe verifies both stored and painted forms; the test waits for that painted result.
+- `R-A2L-048/4` needs fixed-column-aware spans and a 160-column viewport so Raw and Physical both fit. `R-A2L-048/5` moves to page-2 `MEASUREMENT_0021` because Inc 11 intentionally leaves its former VAL_BLK without decoded values; Raw/Physical 226→225 preserves the second-page oracle.
+- The timing-law metadata uses `serial_timing` and `report_margin` with effective 1.0-second bounds on both the runner and CI. The large case-06 refresh timing remains a separate pre-existing failure: base 1.399 s and integrated 1.428 s against 1.000 s. It is not attributed to Inc 12 and is rerun separately after quieting the host.
+- Final static reviews: code PASS-WITH-NOTES, security PASS-WITH-NOTES, coverage static PASS. The mutation runner received its own instrument review; its fixture/timeout/environment/evidence findings are accepted for correction before any arm counts.
