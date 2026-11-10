@@ -2712,7 +2712,7 @@ def test_r_a2l_def_43_3_one_declared_side(tmp_path):
 
 
 def test_r_a2l_def_43_4_enum_entry_above_the_limits(v171):
-    """R-A2L-DEF.43/4 - first the overlap, then the limits refusal on the cleared definition."""
+    """R-A2L-DEF.43/4 - shared state, then the earlier limits refusal on the cleared definition."""
     name = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
     d = describe_definition(name, v171)
     assert d.shared_with == "ASAM.M.SCALAR.UBYTE.IDENTICAL"
@@ -2781,6 +2781,8 @@ def test_r_a2l_def_46_2_single_bit_write(v171):
     d = describe_definition(V171_M0001, v171)
     assert d.shared_with == "ASAM.C.SCALAR.UWORD.IDENTICAL"
     img = _img(0x810002, bytes([0x34, 0x12]))
+    assert _enc(d, v171, "1", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL")
     assert _enc(_clear(d), v171, "1", img) == Encoded(0x810002, bytes([0x35, 0x12]), ())
 
 
@@ -2829,7 +2831,10 @@ def test_r_a2l_def_48_1_compu_vtab_text(v171):
 def test_r_a2l_def_48_2_range_text(v171):
     d = describe_definition(V171_RANGE, v171)
     assert d.shared_with == "ASAM.C.SCALAR.SWORD.IDENTICAL"
-    assert _enc(_clear(d), v171, "four_to_seven", _img(0x810004, bytes([0, 0]))) == Encoded(0x810004, bytes([0x04, 0x00]), ())
+    img = _img(0x810004, bytes([0, 0]))
+    assert _enc(d, v171, "four_to_seven", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE: its bytes at 0x810004 are shared with ASAM.C.SCALAR.SWORD.IDENTICAL")
+    assert _enc(_clear(d), v171, "four_to_seven", img) == Encoded(0x810004, bytes([0x04, 0x00]), ())
 
 
 def test_r_a2l_def_48_3_first_of_two_entries_with_one_text(tmp_path):
@@ -3386,6 +3391,28 @@ def test_r_a2l_def_138_22_cross_page_file_order(tmp_path):
         "A2L-DEF-OVERLAP", "BIG: its bytes at 0x10 are shared with LATE")
 
 
+def test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption(tmp_path):
+    shapes = (
+        ('/begin BLOB B "" 0x10 2\n/end BLOB',),
+        (
+            '/begin TYPEDEF_BLOB TB "" 2\n/end TYPEDEF_BLOB',
+            '/begin INSTANCE B "" TB 0x10\n/end INSTANCE',
+        ),
+    )
+    for shape in shapes:
+        a2l = _inline(
+            tmp_path,
+            *shape,
+            _val("B", "0x100", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x0F"),
+            _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+            byte_order="MSB_FIRST",
+        )
+        d = describe_definition("MW", a2l)
+        assert d.shared_with == "B"
+        assert _enc(d, a2l, "1", _img(0x10, bytes(2))) == _ref(
+            "A2L-DEF-OVERLAP", "MW: its bytes at 0x10 are shared with B")
+
+
 # ---- R-A2L-DEF.152 - the parse-error refusal -------------------------------------------------
 
 def _parse_error_a2l(tmp_path: Path, name: str, defects: list[str], at: int) -> dict:
@@ -3405,6 +3432,7 @@ def test_r_a2l_def_152_1_include(tmp_path):
     a2l = _parse_error_a2l(tmp_path, "P1", ['/include "x.a2l"'], 20)
     d = describe_definition("P1", a2l)
     assert d.refusal is None
+    assert decode_definition(d, a2l, {0x10: 7, 0x11: 0}) == Decoded(7, 7, "7")
     first = a2l["errors"][0]
     assert first == "Line 20: /include x.a2l is not read"
     assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
@@ -3415,6 +3443,7 @@ def test_r_a2l_def_152_2_stray_star_slash(tmp_path):
     a2l = _parse_error_a2l(tmp_path, "P2", ["*/"], 20)
     d = describe_definition("P2", a2l)
     assert d.refusal is None
+    assert decode_definition(d, a2l, {0x10: 7, 0x11: 0}) == Decoded(7, 7, "7")
     assert a2l["errors"][0] == "Line 20: */ without /*"
     assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
         "A2L-DEF-PARSE", "P2: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: */ without /*")
@@ -3424,6 +3453,7 @@ def test_r_a2l_def_152_3_unclosed_comment(tmp_path):
     a2l = _parse_error_a2l(tmp_path, "P3", ["/* never closed"], 20)
     d = describe_definition("P3", a2l)
     assert d.refusal is None
+    assert decode_definition(d, a2l, {0x10: 7, 0x11: 0}) == Decoded(7, 7, "7")
     assert a2l["errors"][0] == "Line 20: comment not closed"
     assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
         "A2L-DEF-PARSE", "P3: the A2L cannot be edited while it has parse errors \u2014 the first is Line 20: comment not closed")
@@ -3433,6 +3463,7 @@ def test_r_a2l_def_152_4_unclosed_quoted_string(tmp_path):
     a2l = _parse_error_a2l(tmp_path, "P4", ['/begin CHARACTERISTIC Q "unclosed'], 22)
     d = describe_definition("P4", a2l)
     assert d.refusal is None
+    assert decode_definition(d, a2l, {0x10: 7, 0x11: 0}) == Decoded(7, 7, "7")
     assert a2l["errors"][0] == "Line 22: quoted string not closed"
     assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(
         "A2L-DEF-PARSE", "P4: the A2L cannot be edited while it has parse errors \u2014 the first is Line 22: quoted string not closed")
@@ -3442,6 +3473,7 @@ def test_r_a2l_def_152_5_capped_more_parse_errors_marker(tmp_path):
     a2l = _parse_error_a2l(tmp_path, "P5", ["/end X"] + [f"/end X{i}" for i in range(200)], 20)
     d = describe_definition("P5", a2l)
     assert d.refusal is None
+    assert decode_definition(d, a2l, {0x10: 7, 0x11: 0}) == Decoded(7, 7, "7")
     assert a2l["errors"][0] == "Line 20: /end without /begin"
     assert a2l["errors"][-1].endswith("more parse errors")
     assert _enc(d, a2l, "7", {0x10: 0, 0x11: 0}) == _ref(

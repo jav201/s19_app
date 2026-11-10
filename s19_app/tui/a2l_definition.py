@@ -3508,6 +3508,8 @@ def _pair_exempt(
     my_mask = definition.bit_mask
     if my_mask is None:
         return False
+    if entry[2] in ("BLOB", "INSTANCE"):
+        return False
     other_mask = mask_of(entry[1])
     if other_mask is None:
         return False
