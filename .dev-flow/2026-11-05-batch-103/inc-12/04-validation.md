@@ -36,7 +36,7 @@ The case-06 timing failure is also present on the base (1.399 s) and integrated 
 
 ## Trace check
 
-US and requirement links are complete after `01-requirements.md` used `US-103-07` in every US column. The final trace transcript will be appended after the mutant and visual gates; the earlier structural check reported only the missing validation file and the US column issue (`../evidence/inc-12/evidence-e5-trace.txt`).
+Final `trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-12/01-requirements.md --base e07fb00 --src s19_app/tui/app.py`: **1 US, 8 active requirements, 0 gaps** (`../evidence/inc-12/evidence-e5-trace-final.txt`). The earlier structural check reported only the missing validation file and the US column issue (`../evidence/inc-12/evidence-e5-trace.txt`).
 
 ## Models
 
