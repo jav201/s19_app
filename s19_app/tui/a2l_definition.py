@@ -3751,45 +3751,47 @@ def encode_definition(
         if isinstance(data, Refusal):
             return data
 
-    written_image = {definition.address + i: byte for i, byte in enumerate(data)}
-    decoded = decode_definition(definition, a2l_data, written_image)
-    if isinstance(decoded, Refusal):
-        return Refusal(
-            "A2L-DEF-PRECISION",
-            f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
-            "display precision — the nearest stored value is (none)",
-        )
-    p = decoded.value
-    stored_text = decoded.text
-
-    rejects = False
-    if (
-        definition.datatype is not None
-        and definition.datatype not in _FLOAT_DATATYPES
-        and definition.conversion_type in (None, "IDENTICAL")
-    ):
-        exact = _exact_decimal(trimmed)
-        if exact is not None and exact != Decimal(int(p)):
-            rejects = True
-    if not rejects and not _agrees_at_display_precision(
-        definition, p, limit_value
-    ):
-        rejects = True
-    if rejects:
-        return Refusal(
-            "A2L-DEF-PRECISION",
-            f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
-            f"display precision — the nearest stored value is {stored_text}",
-        )
-
-    written_outcome = _check_limits(definition, p, stored_text)
-    if isinstance(written_outcome, Refusal):
-        return written_outcome
     notices: tuple[str, ...] = ()
     if isinstance(limits_outcome, str):
         notices = (limits_outcome,)
-    elif isinstance(written_outcome, str):
-        notices = (written_outcome,)
+
+    if definition.kind == "number":
+        written_image = {definition.address + i: byte for i, byte in enumerate(data)}
+        decoded = decode_definition(definition, a2l_data, written_image)
+        if isinstance(decoded, Refusal):
+            return Refusal(
+                "A2L-DEF-PRECISION",
+                f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
+                "display precision — the nearest stored value is (none)",
+            )
+        p = decoded.value
+        stored_text = decoded.text
+
+        rejects = False
+        if (
+            definition.datatype is not None
+            and definition.datatype not in _FLOAT_DATATYPES
+            and definition.conversion_type in (None, "IDENTICAL")
+        ):
+            exact = _exact_decimal(trimmed)
+            if exact is not None and exact != Decimal(int(p)):
+                rejects = True
+        if not rejects and not _agrees_at_display_precision(
+            definition, p, limit_value
+        ):
+            rejects = True
+        if rejects:
+            return Refusal(
+                "A2L-DEF-PRECISION",
+                f"{name_echo}: {_operator_echo(trimmed)} cannot be stored at the "
+                f"display precision — the nearest stored value is {stored_text}",
+            )
+
+        written_outcome = _check_limits(definition, p, stored_text)
+        if isinstance(written_outcome, Refusal):
+            return written_outcome
+        if not notices and isinstance(written_outcome, str):
+            notices = (written_outcome,)
 
     if definition.shared_with is not None:
         return Refusal(
