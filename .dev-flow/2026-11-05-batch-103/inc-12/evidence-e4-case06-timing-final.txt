@@ -1,0 +1,158 @@
+/tmp/b103-e4-12-27fb/int-final/s19_app/__init__.py
+QC-TM-10b-1 case_06: 220040 tags, 1.372 s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-294/test_qc_tm_10b_1_a2l_refresh_c0')
+
+    @pytest.mark.serial_timing
+    def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None:
+        """QC-TM-10b-1: the UI-thread time of one in-place write's A2L refresh
+        (``_refresh_a2l_values_after_write``) on the largest A2L the repo ships
+        (case_06, re-pointed at E5 R-1) stays under ``timing_bound(1.0)``; the tag
+        count is in the QC-TM label.
+    
+        The refresh is timed where the write notice calls it (the method wrapped on
+        the app instance, one real apply of the complement of the byte at
+        ``0x80100005`` through the Patch Editor). After the bound, the enriched
+        tags must equal a full recompute over the written image (the partial
+        recompute of R-1 must describe the same bytes). Negative controls: the full refresh at
+        every write -> above the bound -> RED; a changed-byte test that reads only
+        a tag's first byte -> the tags covering ``0x80100005`` keep their old
+        values -> RED."""
+        from s19_app.tui.services.a2l_service import enrich_tags_and_render
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+            await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+            await wait_until(
+                pilot,
+                lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+                "the case_06 tags were never enriched",
+                timeout=240.0,
+            )
+            assert hasattr(app, "_refresh_a2l_values_after_write"), (
+                "the write notice has no A2L refresh to time"
+            )
+            real = app._refresh_a2l_values_after_write
+            spans: list = []
+    
+            def timed(*args, **kwargs):
+                start = time.perf_counter()
+                try:
+                    return real(*args, **kwargs)
+                finally:
+                    spans.append(time.perf_counter() - start)
+    
+            app._refresh_a2l_values_after_write = timed
+            tags = len(app._a2l_enriched_tags)
+            old = mem_at(app, CASE06_WRITE)
+            assert old is not None, "0x80100005 is not in the case_06 image"
+            await patch_apply(
+                pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+            )
+            assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+            await wait_until(
+                pilot,
+                lambda: bool(spans),
+                "the write notice never ran the A2L refresh",
+                timeout=240.0,
+            )
+            elapsed = spans[0]
+            print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+            assert elapsed < report_margin(
+                f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+            ), f"{tags} tags: {elapsed:.3f} s"
+            full, _lines = enrich_tags_and_render(
+                app.current_a2l_data, app.current_file.mem_map, max_tag_lines=500
+            )
+            differ = [
+                i for i, (got, want) in enumerate(zip(app._a2l_enriched_tags, full)) if got != want
+            ]
+            assert len(app._a2l_enriched_tags) == len(full) and not differ, (
+                f"{len(differ)} enriched tags differ from a full recompute "
+                f"(first {differ[:3]}; {len(app._a2l_enriched_tags)} vs {len(full)} tags)"
+            )
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:1667: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f1db10f1d90>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+        await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+        await wait_until(
+            pilot,
+            lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+            "the case_06 tags were never enriched",
+            timeout=240.0,
+        )
+        assert hasattr(app, "_refresh_a2l_values_after_write"), (
+            "the write notice has no A2L refresh to time"
+        )
+        real = app._refresh_a2l_values_after_write
+        spans: list = []
+    
+        def timed(*args, **kwargs):
+            start = time.perf_counter()
+            try:
+                return real(*args, **kwargs)
+            finally:
+                spans.append(time.perf_counter() - start)
+    
+        app._refresh_a2l_values_after_write = timed
+        tags = len(app._a2l_enriched_tags)
+        old = mem_at(app, CASE06_WRITE)
+        assert old is not None, "0x80100005 is not in the case_06 image"
+        await patch_apply(
+            pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+        )
+        assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+        await wait_until(
+            pilot,
+            lambda: bool(spans),
+            "the write notice never ran the A2L refresh",
+            timeout=240.0,
+        )
+        elapsed = spans[0]
+        print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+>       assert elapsed < report_margin(
+            f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+        ), f"{tags} tags: {elapsed:.3f} s"
+E       AssertionError: 220040 tags: 1.372 s
+E       assert 1.3718441079981858 < 1.0
+E        +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 1.3718441079981858, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b101_inplace_views.py:1653: AssertionError
+============================= QC-TM timing margins =============================
+LOW -37.2%  1.372 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+1 failed in 29.06s
