@@ -10,3 +10,9 @@ Initial verdict: **FAIL** — one MEDIUM impl and one LOW impl.
 Targeted re-review of `2e441e16` by the same independent reviewer: **PASS**. The raw name reaches `_shorten_tag_name` unchanged; no markup, control or width regression was found. All three docstrings are corrected.
 
 Security pre-review by a separate independent Kimi explore agent: **PASS-WITH-NOTES**, read-only. It confirmed O(width) slicing, the full C0/DEL/C1 card scrub, break-run mapping, every card append site and the Name-line condition. It left the exact hostile-tail, screen-output, break and Name-line executions to the suite and mutants; those are not claimed by this static verdict.
+
+## Final implementation re-reviews
+
+The first RichLog review found HIGH wrapping/clipping and MEDIUM auto-scroll defects plus a stale note. The implementation was corrected with `wrap=True`, `min_width=1`, `auto_scroll=False`, measured-width rewrites, and a Static-compatible `render()` text API. The follow-up review found only an incomplete docstring, corrected before close.
+
+A separate resize defect showed that stored Tag cells were right while the painted line kept a narrow render. `DataTable.notify_style_update()` now invalidates the cell/line caches after in-place updates. A resize probe and the painted-wait test confirm 220→80→220. Final independent code verdict through `375896f0`: **PASS-WITH-NOTES**, with no MAJOR/HIGH/MEDIUM finding open. Final security verdict: **PASS-WITH-NOTES**, with no new injection or stale-content finding.
