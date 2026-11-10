@@ -20,7 +20,7 @@ F..                                                                      [100%]
 =================================== FAILURES ===================================
 _________ test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-550/test_r_a2l_def_140_1_encode_ov0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-550/test_r_a2l_def_140_1_encode_ov0')
 
     def test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused(tmp_path):
         a2l_data = inline(tmp_path, *_axis_span_blocks())

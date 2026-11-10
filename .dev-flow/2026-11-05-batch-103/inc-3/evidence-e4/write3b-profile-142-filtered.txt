@@ -14,7 +14,7 @@
       100    0.002    0.000    0.020    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:2130(_describe_array)
       150    0.002    0.000    0.012    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1856(_read_axis)
       251    0.002    0.000    0.007    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l.py:1290(_flatten_body_tokens)
-      200    0.003    0.000    0.005    0.000 /home/javiergr/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
+      200    0.003    0.000    0.005    0.000 <runner-home>/miniconda3/envs/s19ci/lib/python3.11/dataclasses.py:1455(replace)
       200    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:1340(_read_matrix_dim)
       200    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:470(_object_line_words)
       100    0.000    0.000    0.004    0.000 /tmp/b103-e4-3b-int/s19_app/tui/a2l_definition.py:2695(_read_object_lines)

@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-548/test_r_a2l_def_131_6_long_and_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-548/test_r_a2l_def_131_6_long_and_0')
 
     def test_r_a2l_def_131_6_long_and_nonprintable_limit_echoes(tmp_path):
         long_lower = "0" * 2_000 + "1"

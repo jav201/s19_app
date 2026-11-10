@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____ test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising _____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-547/test_r_a2l_def_131_4_nonfinite0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-547/test_r_a2l_def_131_4_nonfinite0')
 
     def test_r_a2l_def_131_4_nonfinite_interpolation_refuses_without_raising(tmp_path):
         a2l_data = inline(

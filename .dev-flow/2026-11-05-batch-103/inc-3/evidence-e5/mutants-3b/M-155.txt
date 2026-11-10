@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-556/test_r_a2l_def_155_2_breaking_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-556/test_r_a2l_def_155_2_breaking_0')
 
     def test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded(tmp_path):
         long_text = "L" * 300

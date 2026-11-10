@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _________________ test_at_b103_i3_2_edit_arm_definitions_case __________________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-561/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-561/b103_defc0'), ...}
 
     def test_at_b103_i3_2_edit_arm_definitions_case(defc):
         m = _model()

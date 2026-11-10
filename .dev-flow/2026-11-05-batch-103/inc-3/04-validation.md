@@ -1,56 +1,37 @@
-# Inc 3a — A2L definition model II: validation record (E5)
+# Inc 3b — A2L definition writes: validation record (E5)
 
-**Verdict: PASS-WITH-NOTES.** No MAJOR, HIGH or worse is open. Inc 3a has **71 active requirements / 280 cases**: **275 full + 5 partial, 0 gap**. Every full case is covered and verified; the five mixed cases have their read arm verified and their edit arm explicitly deferred to Inc 3b. The 42 Inc 3b cases remain `gap` / `not_run`. Written 2026-11-09.
+**Verdict: PENDING two law chunks.** Product, functional, scale, performance, mutation, review and trace gates are complete. No HIGH/MAJOR is open. **86 requirements / 344 cases = 280 3a + 64 3b; all 344 full, covered and verified.** Product tree `98904e82`; evidence/record commit `43276135`.
 
-**Platforms.** Final functional, timing, cap, scalar-performance and mutant-B runs used `<runner>`, Python 3.11.18. Mutant A and law guards used the operator-provided laptop `<runner>`, Python 3.11.18. Windows execution was limited to `py_compile`; no Windows test result is claimed.
+**Platform.** Linux `<runner>`, Python 3.11.18, real Git checkout, isolated neutral HOME/XDG/LOCALAPPDATA, stdin closed and bytecode disabled. Windows was limited to `py_compile` and static reviews.
 
 ## Final runs
 
 | Run | Result | Evidence |
 |---|---|---|
-| Functional integration | **471 passed, 35 deselected** | `../evidence/inc-3/evidence-e5-green-final.txt` |
-| Final RED on the Inc 3a base | **269 failed, 6 passed, 34 deselected**; no collection/fixture errors | `../evidence/inc-3/evidence-e5-red-final.txt` |
-| Full array timing | **33 passed, 1 deselected**; 96 bounds, 0 under 20 % margin | `../evidence/inc-3/evidence-e5-timing-final.txt` |
-| FIX cap `.142/5` | 1 passed; **0.090 / 1.000 s**, peak **1.2 MiB** | `../evidence/inc-3/evidence-e5-fix-cap5-green.txt` |
-| FIX cap `.142/6` | 1 passed; **0.514 / 5.000 s**, peak **63.5 MiB** after the PAR_LIST correction | `../evidence/inc-3/evidence-e5-fix-cap6-green-fixed.txt` |
-| `.147/9` hostile shift | 1 passed, refusal within 1.0 s | `../evidence/inc-3/evidence-e5-fix147-9.txt` |
-| Scalar Inc 2a performance | **22 passed**; 52 bounds, 0 under 20 % margin | `../evidence/inc-3/evidence-e5-scalar-perf.txt` |
-| Synth, including slow pin and determinism | **3 passed**; final full synth file **9 passed** | `../evidence/inc-3/evidence-e5-synth-cited.txt`, `../evidence/inc-3/evidence-e5-synth-final.txt` |
-| Law guards | **375 passed, 1 skipped**; skipped TC-027 then **1 passed** explicitly; final ID/engine selection **13 passed** | `../evidence/inc-3/evidence-e5-lawguards-laptop-final.txt`, `../evidence/inc-3/evidence-e5-tc027-laptop.txt`, `../evidence/inc-3/evidence-e5-id-registry-final.txt` |
-| Mutant A | **61 KILLED, 0 SURVIVED, 0 BAD** across the full run plus the corrected M-141 arm | `../evidence/inc-3/evidence-e5-mutants-A-final.txt`, `../evidence/inc-3/evidence-e5-mutants-A-M141.txt` |
-| Mutant B | **29 KILLED, 0 SURVIVED, 0 CRASH, 0 BAD** | `../evidence/inc-3/evidence-e5-mutants-B-run.txt` |
-| Supplemental mutants | **13 KILLED** across the extra run and corrected M-148-reduce arm | `../evidence/inc-3/evidence-e5-mutants-extra-run.txt`, `../evidence/inc-3/evidence-e5-mutant-M148-reduce.txt` |
+| Integrated write + synth | **81 passed** | `evidence-e4/write3b-run9-int.txt` |
+| Functional family | **668 passed**; 4 timing bounds, 0 under 20 % | `evidence-e4/write3b-family-final-98904e82.txt` |
+| Base RED | **58 failed / 5 passed**, behavioral, on `c089df37` | `evidence-e4/write3b-red-base.txt` |
+| Array scale | **34 passed**, 96 bounds, 0 under 20 %, 530.41 s | `evidence-e4/write3b-arrays-scale-final.txt` |
+| Scalar performance ×3 | **22 passed each**, 52 bounds each, 0 under 20 %; 251.03 / 246.32 / 245.85 s | `evidence-e4/write3b-definition-perf-run{1,2,3}.txt` |
+| Mutants | **28 killed / 0 survived**, 17 write rows + 6 E5 controls + 5 mixed arms | `evidence-e5/mutant-table-3b.md`, `evidence-e5/mutants-3b/` |
+| Trace | **1 US, 88 active requirements, 0 gaps** | `evidence-e5/write3b-trace-final.txt` |
+| Canon/ID/docs laws | **254 passed, 1 skipped** | `evidence-e4/write3b-law-canon-id-docs-final.txt` |
+| Suite hygiene | **64 passed, 2 skipped, 1 failed** — only redaction | `evidence-e4/write3b-law-suite-hygiene-final.txt` |
+| Direction-B laws | **running; not yet accepted** | `evidence-e4/write3b-law-directionb-final.txt` |
 
-Total practical mutants: **103 KILLED, 0 open survivors**. Timing-only and non-discriminating controls are listed separately in the mutant README/build reports, not counted as kills.
+The two earlier combined law attempts were not accepted: the archive lacked `.git`; the 600-second combined run had no summary. The corrected real-checkout chunks above supersede them. Inc 3's evidence was sanitized reproducibly and the official scan reports **inc3_redaction_hits=0** (`evidence-e5/write3b-redaction-scan-2.txt`). The full redaction law still fails only on inherited Inc 12 evidence and `inc-2/steps.log`, reproduced on base `8cb8f479` (`evidence-e4/write3b-law-redaction-after-inc3.txt`); those files were left intact as instructed. No redaction GREEN is claimed.
 
-## Review verdicts
+## Reviews
 
-- **Code:** `../evidence/inc-3/evidence-e5-code-review-1.txt` — **PASS-WITH-NOTES**. Empty-kind element count and array span defects are closed.
-- **Security:** `../evidence/inc-3/evidence-e5-security-review-1.txt` — **PASS-WITH-NOTES**, no confirmed crash, collision, immutability or fail-open defect.
-- **Final targeted re-review:** `../evidence/inc-3/evidence-e5-final-review-2.txt` — **PASS-WITH-NOTES**. PAR_LIST keeps values and refusals unchanged and avoids aliases to parser payload.
-- **Coverage:** `../evidence/inc-3/evidence-e5-coverage-audit-1.txt`, `../evidence/inc-3/evidence-e5-coverage-audit-2.txt`, `../evidence/inc-3/evidence-e5-coverage-audit-3.txt` — initial gaps and partials corrected; final remaining points all full, no unrun arm.
+- **Code:** `E5-code-review-3b-rereview.md` — **PASS**. Span candidates, tolerance/file order, RMQ, NaN and message bounds closed.
+- **Security:** `E5-security-3b-rereview.md` — **PASS**, 0 MAJOR remaining.
+- **Coverage:** `E5-coverage-audit-3b.md` — **PASS**, 344 cases and 64 write tests one-to-one.
+- **Mutation-driver audit:** three non-discriminating controls were fixed before execution; all 28 final mutants were killed.
 
-## Open LOW notes / backlog
+## Contract amendments
 
-- Multiple FIX forms on one AXIS_DESCR use deterministic PAR > PAR_DIST > PAR_LIST precedence; no corpus object declares more than one and the requirement has no explicit multi-form case.
-- A hostile MATRIX_DIM line with very many words can exceed the aggregate 1,024-character message bound, although each word is echo-capped. No memory-safety impact; recorded as a LOW design-gap.
-- A truncated FIX form can fall through to the no-points refusal rather than the cannot-read wording. No crash; no pinned case.
-- Timing-only read/echo/lookup mutants and non-discriminating cited controls are documented in `../evidence/inc-3/evidence-e5-mutants-extra-builder.txt`; no assertion was weakened to eliminate a survivor.
+Nonfinite TAB_INTP fractions and any NaN-y TAB_INTP are not invertible and refuse without bytes. The frozen oracle raises on the first and has no sound ordered domain on the second; `.131/4` records the amendments. TAB_NOINTP keeps first-file-order tolerance matching through the precomputed range-minimum tree.
 
 ## Not run here
 
-- The complete repository suite: reserved for batch end.
-- Inc 3b encode cases and the five mixed edit arms: require Inc 2b/3b, not Inc 3a.
-- Real Windows Terminal UI captures: no UI changed here; Inc 12 owns its captures and operator approval.
-
-## Trace check
-
-Final command on committed Linux clone `1452c838afe6`: `trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-3/01-requirements.md --base e07fb00 --src s19_app/tui/a2l_definition.py tools/synth/make_release_case.py`.
-
-**Result: 1 US, 85 active requirements, 12 gaps.** All 12 are TEST gaps on the Inc 3b rows R-A2L-DEF.122 … .132 and .140. **0 EVID gaps and 0 gaps on any Inc 3a row.** Transcript: `../evidence/inc-3/evidence-e5-trace-check-final.txt`. The earlier path-convention failure is retained as history in `../evidence/inc-3/evidence-e5-trace-check.txt`.
-
-The integrated `batch-103` merge `3feed9cc9a66` independently repeats **471 passed, 35 deselected** (`../evidence/inc-3/evidence-e5-merge-functional-green.txt`) and the same 12 Inc 3b-only TEST gaps (`../evidence/inc-3/evidence-e5-merge-trace.txt`).
-
-## Models
-
-Kimi conducted integration, corrections, records and rulings. DeepSeek v4 Pro implemented mechanical product/test/coverage passes, reviews, timing and mutant drivers. Independent functional RED/GREEN, code, security and coverage reviews were used. No source mutation was made in the real worktree and no threshold or assertion was weakened to obtain a pass.
+The complete repository suite and canon fold belong to batch end. No UI changed, so no new UI capture is owed. Integration into `batch-103` waits for the two remaining law results and the completed review packet.

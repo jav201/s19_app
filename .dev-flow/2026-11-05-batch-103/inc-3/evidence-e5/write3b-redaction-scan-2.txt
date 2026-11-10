@@ -1,0 +1,2 @@
+inc3_redaction_hits 0
+

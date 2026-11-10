@@ -7,7 +7,7 @@ import subprocess
 BASE = Path("/tmp/b103-e5-3b-98904e82")
 ROOT = Path("/tmp/b103-e5-3b-mut")
 OUT = ROOT / "out"
-PYTHON = Path("/home/javiergr/miniconda3/envs/s19ci/bin/python")
+PYTHON = Path(os.environ["S19CI_PYTHON"])
 PRODUCT = "s19_app/tui/a2l_definition.py"
 
 MUTANTS = [

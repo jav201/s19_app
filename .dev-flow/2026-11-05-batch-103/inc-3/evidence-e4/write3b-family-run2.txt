@@ -124,7 +124,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _________ test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_138_17_masks_co0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_138_17_masks_co0')
 
     def test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select(tmp_path):
         a2l = _inline(tmp_path, _val("MW", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
@@ -521,7 +521,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 __________________ test_r_a2l_def_94_2_axis_object_count_wins __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_94_2_axis_objec0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_94_2_axis_objec0')
 
     def test_r_a2l_def_94_2_axis_object_count_wins(tmp_path):
 >       d = _describe("CR", _com_curve(tmp_path))
@@ -553,7 +553,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _________________ test_r_a2l_def_95_3_axis_object_max_minus_3 __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_95_3_axis_objec0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_95_3_axis_objec0')
 
     def test_r_a2l_def_95_3_axis_object_max_minus_3(tmp_path):
 >       d = _describe("CR", _com_curve(tmp_path, axo_max="-3"))
@@ -585,7 +585,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 __________________ test_r_a2l_def_97_1_undeclared_axis_layout __________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_97_1_undeclared0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_97_1_undeclared0')
 
     def test_r_a2l_def_97_1_undeclared_axis_layout(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_GONE", "5")
@@ -622,7 +622,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ________________ test_r_a2l_def_97_2_axis_layout_no_axis_pts_x _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_97_2_axis_layou0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_97_2_axis_layou0')
 
     def test_r_a2l_def_97_2_axis_layout_no_axis_pts_x(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_FNC", "5",
@@ -660,7 +660,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ______________ test_r_a2l_def_101_2_in_record_points_for_com_axis ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_101_2_in_record0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_101_2_in_record0')
 
     def test_r_a2l_def_101_2_in_record_points_for_com_axis(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_AXO", "5",
@@ -732,7 +732,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ___________ test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_102_4_axis_desc0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_102_4_axis_desc0')
 
     def test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis(tmp_path):
         blocks = [cm("CM_A", "LINEAR", "2", "0"), cm("CM_B", "LINEAR", "3", "0"),
@@ -770,7 +770,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _______________ test_r_a2l_def_142_3_axis_object_count_over_cap ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_142_3_axis_obje0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_142_3_axis_obje0')
 
     def test_r_a2l_def_142_3_axis_object_count_over_cap(tmp_path):
 >       d = _describe("CR", _com_curve(tmp_path, axo_max="1048577"))
@@ -802,7 +802,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ______________ test_r_a2l_def_143_1_axis_object_negative_address _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_143_1_axis_obje0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_143_1_axis_obje0')
 
     def test_r_a2l_def_143_1_axis_object_negative_address(tmp_path):
         axo = axis_pts("AXO", "-0x10", "RL_AXO", "5",
@@ -840,7 +840,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ______________ test_r_a2l_def_143_3_axis_object_record_above_1mib ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_143_3_axis_obje0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_143_3_axis_obje0')
 
     def test_r_a2l_def_143_3_axis_object_record_above_1mib(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_AXO", "600000",
@@ -878,7 +878,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _______ test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_136_arr_3_share0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_136_arr_3_share0')
 
     def test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once(tmp_path):
         # (a) COM_AXIS curves sharing AXO whose body holds 256 KiB of DEPOSIT.
@@ -943,7 +943,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _________ test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_136_arr_4_k1_k30')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_136_arr_4_k1_k30')
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 
     def test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh(tmp_path, v171):
@@ -1012,7 +1012,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ________________ test_r_a2l_def_148_5_com_path_under_mod_common ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_148_5_com_path_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_148_5_com_path_0')
 
     def test_r_a2l_def_148_5_com_path_under_mod_common(tmp_path):
         mc = ("ALIGNMENT_BYTE 1",) * (S // 17)
@@ -1046,7 +1046,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _____________ test_r_a2l_def_148_15_long_part_word_of_axis_layout ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_148_15_long_par0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_148_15_long_par0')
 
     def test_r_a2l_def_148_15_long_part_word_of_axis_layout(tmp_path):
         word = "P" * S
@@ -1080,7 +1080,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 __________ test_r_a2l_def_148_16_long_layout_name_part_message_count ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_148_16_long_lay0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_148_16_long_lay0')
 
     def test_r_a2l_def_148_16_long_layout_name_part_message_count(tmp_path):
         word = "L" * S
@@ -1116,7 +1116,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ________ test_r_a2l_def_148_17_long_layout_name_alignment_message_count ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_148_17_long_lay0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_148_17_long_lay0')
 
     def test_r_a2l_def_148_17_long_layout_name_alignment_message_count(tmp_path):
         word = "L" * S
@@ -1363,7 +1363,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _______________ test_r_a2l_def_114_1_axis_object_own_byte_order ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_114_1_axis_obje0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_114_1_axis_obje0')
 
     def test_r_a2l_def_114_1_axis_object_own_byte_order(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_AXO", "5", "CM_IDENT", "0", "255",
@@ -1397,7 +1397,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ____________ test_r_a2l_def_114_2_module_byte_order_for_axis_object ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_114_2_module_by0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_114_2_module_by0')
 
     def test_r_a2l_def_114_2_module_byte_order_for_axis_object(tmp_path):
         axo = axis_pts("AXO", "0x40", "RL_AXO", "5",
@@ -1685,7 +1685,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _____________________ test_r_a2l_def_131_1_edit_round_trip _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_131_1_edit_roun0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_131_1_edit_roun0')
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
 
@@ -1719,7 +1719,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 __________ test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_132_1_unedited_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_132_1_unedited_0')
 v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
 defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...TE', ...}}, 'declared_spans': [], 'errors': [], ...}, 'mem': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
 
@@ -1753,7 +1753,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _________ test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_140_1_encode_ov0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_140_1_encode_ov0')
 
     def test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused(tmp_path):
         a2l_data = inline(tmp_path, *_axis_span_blocks())
@@ -1783,7 +1783,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _____________ test_r_a2l_def_140_2_value_just_past_axis_pts_record _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_140_2_value_jus0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_140_2_value_jus0')
 
     def test_r_a2l_def_140_2_value_just_past_axis_pts_record(tmp_path):
         a2l_data = inline(tmp_path, *_axis_span_blocks(value_address="0x15"))
@@ -1813,7 +1813,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 __________ test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_140_4_axis_pts_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_140_4_axis_pts_0')
 
     def test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask(tmp_path):
         a2l_data = inline(
@@ -1849,7 +1849,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _ test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-508/test_r_a2l_def_59_4_every_seed0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-508/test_r_a2l_def_59_4_every_seed0')
 
     def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan(tmp_path):
         """R-A2L-DEF.59/4 (CR-6; E5 fix pass) - seeds 1 ... 5: the enum's planned text is the text the model decodes.
@@ -1896,7 +1896,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 _ test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders _
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-508/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-508/b103_defc0'), ...}
 
     def test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders(defc):
         """AT-B103-I2-2 (2a arm) - build and decode each DEFC object to its planned value.
@@ -1938,7 +1938,7 @@ E       TypeError: unhashable type: 'dict'
 s19_app/tui/a2l_definition.py:816: TypeError
 ____________ test_r_a2l_def_138_16_two_disjoint_masks_still_encode _____________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-508/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-508/b103_defc0'), ...}
 
     def test_r_a2l_def_138_16_two_disjoint_masks_still_encode(defc):
         """R-A2L-DEF.138/16 - DEFC's two disjoint masks of one word both encode, no OVERLAP."""
@@ -1953,7 +1953,7 @@ E        +  where 'MASK_FIELD_0001' = Definition(name='MASK_BIT_0001', section='
 tests/test_b103_synth_definitions.py:324: AssertionError
 ____________ test_r_a2l_def_46_3_two_fields_of_one_big_endian_word _____________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-508/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-508/b103_defc0'), ...}
 
     def test_r_a2l_def_46_3_two_fields_of_one_big_endian_word(defc):
         """R-A2L-DEF.46/3 - write the multi-bit field, then decode both masked objects over the applied image."""
@@ -1969,7 +1969,7 @@ E        +    where <class 's19_app.tui.a2l_definition.Encoded'> = <module 's19_
 tests/test_b103_synth_definitions.py:335: AssertionError
 _______ test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value ________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-508/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-508/b103_defc0'), ...}
 
     def test_at_b103_i2_2_write_arm_encodes_planned_then_a_second_value(defc):
         """AT-B103-I2-2 (2b arm) - encode each DEFC scalar's planned text, apply, then a second value.
@@ -1992,7 +1992,7 @@ E            +  where 'MASK_FIELD_0001' = Definition(name='MASK_BIT_0001', secti
 tests/test_b103_synth_definitions.py:355: AssertionError
 _________________ test_at_b103_i3_2_edit_arm_definitions_case __________________
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-508/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<account>/pytest-508/b103_defc0'), ...}
 
     def test_at_b103_i3_2_edit_arm_definitions_case(defc):
         m = _model()

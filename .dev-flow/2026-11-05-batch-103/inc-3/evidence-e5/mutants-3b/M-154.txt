@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______________ test_r_a2l_def_154_1_unknown_monotony_rule_refuses ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-555/test_r_a2l_def_154_1_unknown_m0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-555/test_r_a2l_def_154_1_unknown_m0')
 
     def test_r_a2l_def_154_1_unknown_monotony_rule_refuses(tmp_path):
         a2l_data = inline(tmp_path, *_std_blocks("C", "UNKNOWN_RULE"))

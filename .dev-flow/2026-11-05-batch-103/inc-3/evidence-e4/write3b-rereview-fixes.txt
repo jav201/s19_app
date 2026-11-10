@@ -2,7 +2,7 @@
 =================================== FAILURES ===================================
 _________ test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale _________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-518/test_r_a2l_def_131_5_nointp_ne0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-518/test_r_a2l_def_131_5_nointp_ne0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f28e6f62e90>
 
     def test_r_a2l_def_131_5_nointp_neighbours_and_exact_match_scale(tmp_path, monkeypatch):

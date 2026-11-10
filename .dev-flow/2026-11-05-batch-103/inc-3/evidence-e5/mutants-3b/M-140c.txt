@@ -20,7 +20,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ________ test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-553/test_r_a2l_def_140_11_refused_0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-553/test_r_a2l_def_140_11_refused_0')
 
     def test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point(tmp_path):
         a2l_data = inline(
