@@ -8,6 +8,10 @@ Fecha: 2026-11-09. Proyecto: `<repo>` (`s19_app-b103`).
 
 Interpretación operativa: continuar los incrementos restantes, uno por uno, sin detener la batería después de cada review packet. El operador ya dio aprobación general para avanzar hasta integrar todos los incrementos en `main`. Las decisiones visuales, de alcance y las compuertas G2/G3 que requieran al operador siguen siendo obligatorias; esta orden no autoriza omitir pruebas ni relajar requisitos.
 
+### Enmienda del operador, 2026-11-10: suite completa no bloqueante después de Inc 6
+
+Después de Inc 6 se ejecutará la batería completa, pero su resultado **no bloqueará la integración ni el push a `main`**. El operador autoriza expresamente ese push sin esperar el resultado y pide continuar las implementaciones; los findings de la batería se registrarán para el siguiente batch. Las compuertas E1–E5 de cada incremento, la trazabilidad y la verificación del clon de cada merge siguen siendo obligatorias. No se declarará la suite completa GREEN ni el batch integralmente validado mientras su corrida esté pendiente o tenga fallos sin resolver; esta excepción de secuencia no elimina la evidencia ni convierte G3 en un PASS.
+
 ## Estado al cerrar esta sesión
 
 - **Inc 12 está cerrado e integrado localmente en `batch-103`.** No repetir su implementación ni sus compuertas.
@@ -58,7 +62,7 @@ Orden restante conocido: **2b/3b, 5, 6**, después **1b/10/7/8/9** según G2. Re
 
 3. Reanudar la fase real que registre cada incremento; no reiniciar E1–E5 ni regenerar evidencia ya válida.
 4. Mantener la aprobación general del operador: entregar el review packet y continuar con el siguiente incremento. Solo detener la batería ante una decisión que sea realmente del operador, una compuerta roja o un riesgo externo no autorizado.
-5. Al terminar todos los incrementos: ejecutar la suite completa en chunks secuenciales, plegar requisitos al canon, comprobar trazabilidad del batch, preparar la revisión final y completar G3 antes del merge/push final a `main`.
+5. Después de Inc 6: ejecutar la suite completa en chunks secuenciales, integrar y hacer push a `main` sin esperar su resultado según la enmienda superior, y continuar los incrementos restantes. Plegar requisitos al canon, comprobar trazabilidad y registrar el estado real de G3; los findings de la batería completa pasan al siguiente batch.
 6. Si el contexto crece, cerrar el incremento en curso y escribir otro handoff. No compactar a mitad de un incremento.
 
 ## Controles que no deben perderse
@@ -70,7 +74,7 @@ Orden restante conocido: **2b/3b, 5, 6**, después **1b/10/7/8/9** según G2. Re
 - Snapshots solo mediante CI canónico; no regenerarlos localmente.
 - No clipboard ni material A2L propietario.
 - No llamar *flaky* a un fallo sin las 10 repeticiones y la tasa exigidas por C-66.
-- No hacer push de ramas adicionales sin autorización. La orden general sí contempla el resultado final en `main`, pero no elimina G3 ni permite saltarse compuertas.
+- No hacer push de ramas adicionales sin autorización. El push a `main` después de Inc 6 sí está autorizado por la enmienda superior, sin esperar la batería completa; G3 debe reflejar ese estado pendiente, no un PASS ficticio.
 
 ## Prompt para la nueva sesión
 
