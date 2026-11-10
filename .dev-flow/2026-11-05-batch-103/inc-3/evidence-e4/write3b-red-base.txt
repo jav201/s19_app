@@ -1,0 +1,651 @@
+s19_app.__file__=/tmp/b103-e4-3b-tests-c089df37/s19_app/__init__.py
+..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..F.FFFFFFFFFFFFF          [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_121_1_element_name_in_encode_refusal ______________
+tests/test_b103_a2l_definition_arrays_write.py:188: in test_r_a2l_def_121_1_element_name_in_encode_refusal
+    res = _encode(d, a2l_data, {(1, 2): "abc"}, img(0x10, bytes(24)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____________ test_r_a2l_def_121_2_axis_point_name_in_encode_refusal ____________
+tests/test_b103_a2l_definition_arrays_write.py:201: in test_r_a2l_def_121_2_axis_point_name_in_encode_refusal
+    res = _encode(d, a2l_data, {("X", 1): "120"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________________ test_r_a2l_def_122_1_converted_element_edit __________________
+tests/test_b103_a2l_definition_arrays_write.py:213: in test_r_a2l_def_122_1_converted_element_edit
+    res = _encoded(d, a2l_data, {(0,): "2.5"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____________________ test_r_a2l_def_122_2_enum_element_edit ____________________
+tests/test_b103_a2l_definition_arrays_write.py:227: in test_r_a2l_def_122_2_enum_element_edit
+    res = _encoded(d, a2l_data, {(1,): "ON"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________________ test_r_a2l_def_122_3_element_outside_limits __________________
+tests/test_b103_a2l_definition_arrays_write.py:239: in test_r_a2l_def_122_3_element_outside_limits
+    res = _encode(d, a2l_data, {(0,): "11"}, img(0x10, bytes(4)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+________________ test_r_a2l_def_122_4_converted_axis_point_edit ________________
+tests/test_b103_a2l_definition_arrays_write.py:252: in test_r_a2l_def_122_4_converted_axis_point_edit
+    res = _encoded(d, a2l_data, {("X", 3): "10"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________ test_r_a2l_def_122_5_float64_element_uses_precision_rule ___________
+tests/test_b103_a2l_definition_arrays_write.py:264: in test_r_a2l_def_122_5_float64_element_uses_precision_rule
+    res = _encode(d, a2l_data, {(1,): "1.0000001"}, img(0x10, bytes(16)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________ test_r_a2l_def_122_6_exact_integer_check_on_element ______________
+tests/test_b103_a2l_definition_arrays_write.py:278: in test_r_a2l_def_122_6_exact_integer_check_on_element
+    res = _encode(d, a2l_data, {(0,): "9007199254740993"}, img(0x10, bytes(16)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________ test_r_a2l_def_122_7_written_element_against_extended_limits _________
+tests/test_b103_a2l_definition_arrays_write.py:302: in test_r_a2l_def_122_7_written_element_against_extended_limits
+    res = _encode(d, a2l_data, {(1,): "0.55"}, img(0x10, bytes(4)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_______________ test_r_a2l_def_123_1_row_dir_whole_record_bytes ________________
+tests/test_b103_a2l_definition_arrays_write.py:310: in test_r_a2l_def_123_1_row_dir_whole_record_bytes
+    res = _encoded(d, v171, {(1, 0): "-7"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_123_2_column_dir_whole_record_bytes ______________
+tests/test_b103_a2l_definition_arrays_write.py:319: in test_r_a2l_def_123_2_column_dir_whole_record_bytes
+    res = _encoded(d, v171, {(1, 0): "-7"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+__________________ test_r_a2l_def_123_3_index_decr_point_edit __________________
+tests/test_b103_a2l_definition_arrays_write.py:329: in test_r_a2l_def_123_3_index_decr_point_edit
+    res = _encoded(d, a2l_data, {("X", 0): "5"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________________ test_r_a2l_def_123_4_count_byte_is_kept ____________________
+tests/test_b103_a2l_definition_arrays_write.py:339: in test_r_a2l_def_123_4_count_byte_is_kept
+    res = _encoded(d, a2l_data, {(2,): "9"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_124_1_edit_with_axis_object_missing ______________
+tests/test_b103_a2l_definition_arrays_write.py:346: in test_r_a2l_def_124_1_edit_with_axis_object_missing
+    res = _encode(d, v171, {(0,): "1"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________________ test_r_a2l_def_124_2_edit_on_partial_record __________________
+tests/test_b103_a2l_definition_arrays_write.py:356: in test_r_a2l_def_124_2_edit_on_partial_record
+    res = _encode(d, v171, {(0,): "1"}, _com_image(5))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_124_3_edit_with_record_byte_missing ______________
+tests/test_b103_a2l_definition_arrays_write.py:367: in test_r_a2l_def_124_3_edit_with_record_byte_missing
+    res = _encode(d, a2l_data, {(0,): "1"}, img(0x10, bytes(3)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____________________ test_r_a2l_def_125_1_index_past_shape _____________________
+tests/test_b103_a2l_definition_arrays_write.py:378: in test_r_a2l_def_125_1_index_past_shape
+    _invalid_named_position(v171, (3, 0), "[3,0]")
+tests/test_b103_a2l_definition_arrays_write.py:373: in _invalid_named_position
+    res = _encode(d, v171, {position: "1"}, _array_image(0x810100))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+__________________ test_r_a2l_def_125_2_index_of_wrong_length __________________
+tests/test_b103_a2l_definition_arrays_write.py:382: in test_r_a2l_def_125_2_index_of_wrong_length
+    _invalid_named_position(v171, (0, 0, 0), "[0,0,0]")
+tests/test_b103_a2l_definition_arrays_write.py:373: in _invalid_named_position
+    res = _encode(d, v171, {position: "1"}, _array_image(0x810100))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________________ test_r_a2l_def_125_3_axis_point_of_array ___________________
+tests/test_b103_a2l_definition_arrays_write.py:386: in test_r_a2l_def_125_3_axis_point_of_array
+    _invalid_named_position(v171, ("X", 0), ".X[0]")
+tests/test_b103_a2l_definition_arrays_write.py:373: in _invalid_named_position
+    res = _encode(d, v171, {position: "1"}, _array_image(0x810100))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________ test_r_a2l_def_125_4_malformed_positions_fail_closed _____________
+tests/test_b103_a2l_definition_arrays_write.py:395: in test_r_a2l_def_125_4_malformed_positions_fail_closed
+    res = _encode(d, v171, {position: "1"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____________________ test_r_a2l_def_126_1_fixed_curve_axis _____________________
+tests/test_b103_a2l_definition_arrays_write.py:403: in test_r_a2l_def_126_1_fixed_curve_axis
+    res = _encode(d, v171, {("X", 0): "0"}, img(0x810350, _swords(*range(6))))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________________ test_r_a2l_def_126_2_fixed_map_axis ______________________
+tests/test_b103_a2l_definition_arrays_write.py:409: in test_r_a2l_def_126_2_fixed_map_axis
+    res = _encode(d, v171, {("Y", 2): "4"}, _map_image())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____________________ test_r_a2l_def_127_1_common_axis_point ____________________
+tests/test_b103_a2l_definition_arrays_write.py:415: in test_r_a2l_def_127_1_common_axis_point
+    res = _encode(d, v171, {("X", 3): "35"}, _com_image())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_127_2_definitions_case_shared_axis _______________
+tests/test_b103_a2l_definition_arrays_write.py:425: in test_r_a2l_def_127_2_definitions_case_shared_axis
+    res = _encode(d, defc["a2l"], {("X", 0): "242.500"}, defc["mem"])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________________ test_r_a2l_def_128_1_axis_with_no_points ___________________
+tests/test_b103_a2l_definition_arrays_write.py:435: in test_r_a2l_def_128_1_axis_with_no_points
+    res = _encode(d, c08["a2l"], {("X", 0): "1"}, c08["mem"])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________________ test_r_a2l_def_129_1_strict_increase _____________________
+tests/test_b103_a2l_definition_arrays_write.py:455: in test_r_a2l_def_129_1_strict_increase
+    _monotony_refusal(tmp_path, "STRICT_INCREASE", [10, 20, 30, 40], 2, "20", "CM1.X[2]: 20 breaks the STRICT_INCREASE order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________________ test_r_a2l_def_129_2_strict_decrease _____________________
+tests/test_b103_a2l_definition_arrays_write.py:459: in test_r_a2l_def_129_2_strict_decrease
+    _monotony_refusal(tmp_path, "STRICT_DECREASE", [40, 30, 20, 10], 1, "45", "CM1.X[1]: 45 breaks the STRICT_DECREASE order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________ test_r_a2l_def_129_3_mon_increase_takes_equal_point ______________
+tests/test_b103_a2l_definition_arrays_write.py:463: in test_r_a2l_def_129_3_mon_increase_takes_equal_point
+    _monotony_accepted(tmp_path, "MON_INCREASE", 2, "20", [10, 20, 20, 40])
+tests/test_b103_a2l_definition_arrays_write.py:450: in _monotony_accepted
+    res = _encoded(d, a2l_data, {("X", position): text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________________ test_r_a2l_def_129_4_mon_increase _______________________
+tests/test_b103_a2l_definition_arrays_write.py:467: in test_r_a2l_def_129_4_mon_increase
+    _monotony_refusal(tmp_path, "MON_INCREASE", [10, 20, 30, 40], 2, "15", "CM1.X[2]: 15 breaks the MON_INCREASE order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________________ test_r_a2l_def_129_5_mon_decrease _______________________
+tests/test_b103_a2l_definition_arrays_write.py:471: in test_r_a2l_def_129_5_mon_decrease
+    _monotony_refusal(tmp_path, "MON_DECREASE", [40, 30, 20, 10], 2, "35", "CM1.X[2]: 35 breaks the MON_DECREASE order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________________ test_r_a2l_def_129_6_default_rule _______________________
+tests/test_b103_a2l_definition_arrays_write.py:475: in test_r_a2l_def_129_6_default_rule
+    _monotony_refusal(tmp_path, None, [10, 20, 30, 40], 3, "30", "CM1.X[3]: 30 breaks the STRICT_MON order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_______________________ test_r_a2l_def_129_7_monotonous ________________________
+tests/test_b103_a2l_definition_arrays_write.py:479: in test_r_a2l_def_129_7_monotonous
+    _monotony_refusal(tmp_path, "MONOTONOUS", [10, 20, 30, 40], 1, "5", "CM1.X[2]: 30 breaks the MONOTONOUS order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________________________ test_r_a2l_def_129_8_not_mon _________________________
+tests/test_b103_a2l_definition_arrays_write.py:483: in test_r_a2l_def_129_8_not_mon
+    _monotony_accepted(tmp_path, "NOT_MON", 1, "50", [10, 50, 30, 40])
+tests/test_b103_a2l_definition_arrays_write.py:450: in _monotony_accepted
+    res = _encoded(d, a2l_data, {("X", position): text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________ test_r_a2l_def_129_9_unedited_point_can_break_order ______________
+tests/test_b103_a2l_definition_arrays_write.py:487: in test_r_a2l_def_129_9_unedited_point_can_break_order
+    _monotony_refusal(tmp_path, "STRICT_INCREASE", [10, 20, 30, 40], 1, "35", "CM1.X[2]: 30 breaks the STRICT_INCREASE order of the axis")
+tests/test_b103_a2l_definition_arrays_write.py:442: in _monotony_refusal
+    res = _encode(d, a2l_data, {("X", position): text}, _std_image(bytes(points)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+________________ test_r_a2l_def_130_1_decode_before_shared_axis ________________
+tests/test_b103_a2l_definition_arrays_write.py:493: in test_r_a2l_def_130_1_decode_before_shared_axis
+    res = _encode(d, v171, {("X", 0): "1"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________________ test_r_a2l_def_130_2_axis_before_values ____________________
+tests/test_b103_a2l_definition_arrays_write.py:501: in test_r_a2l_def_130_2_axis_before_values
+    res = _encode(d, a2l_data, edit, _std_image(bytes([10, 20, 30, 40])))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+________________ test_r_a2l_def_130_3_each_edit_before_monotony ________________
+tests/test_b103_a2l_definition_arrays_write.py:509: in test_r_a2l_def_130_3_each_edit_before_monotony
+    res = _encode(d, a2l_data, edit, _std_image(bytes([10, 20, 30, 40])))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_______________ test_r_a2l_def_130_4_parse_before_missing_bytes ________________
+tests/test_b103_a2l_definition_arrays_write.py:519: in test_r_a2l_def_130_4_parse_before_missing_bytes
+    res = _encode(d, a2l_data, {(0,): "1"}, img(0x10, bytes(3)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_130_5_parse_before_invalid_position ______________
+tests/test_b103_a2l_definition_arrays_write.py:529: in test_r_a2l_def_130_5_parse_before_invalid_position
+    res = _encode(d, a2l_data, {(99,): "1"}, img(0x10, bytes(3)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_____________________ test_r_a2l_def_131_1_edit_round_trip _____________________
+tests/test_b103_a2l_definition_arrays_write.py:662: in test_r_a2l_def_131_1_edit_round_trip
+    _round_trip_edit(d, a2l_data, image, edit)
+tests/test_b103_a2l_definition_arrays_write.py:570: in _round_trip_edit
+    res = _encoded(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+________ test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell ________
+tests/test_b103_a2l_definition_arrays_write.py:692: in test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell
+    results = [
+tests/test_b103_a2l_definition_arrays_write.py:693: in <listcomp>
+    _encoded(d, a2l_data, {(position,): str(physical)}, image)
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_131_3_exact_inverse_table_semantics ______________
+tests/test_b103_a2l_definition_arrays_write.py:733: in test_r_a2l_def_131_3_exact_inverse_table_semantics
+    _check_inverse(d, a2l_data, physical, table, kind == "TAB_INTP")
+tests/test_b103_a2l_definition_arrays_write.py:707: in _check_inverse
+    _refusal(res, "A2L-DEF-ENCODE", f"{d.name}: {expected_reason}")
+tests/test_b103_a2l_definition_arrays_write.py:74: in _refusal
+    assert (res.code, res.message) == (code, message), res
+E   AssertionError: Refusal(code='A2L-DEF-ENCODE', message='VI: the value -1.0 is outside the table range [0.0, 40.0]')
+E   assert ('A2L-DEF-ENC... [0.0, 40.0]') == ('A2L-DEF-ENC... [0.0, 40.0]')
+E     
+E     At index 1 diff: 'VI: the value -1.0 is outside the table range [0.0, 40.0]' != 'VI[0]: the value -1.0 is outside the table range [0.0, 40.0]'
+E     Use -v to get more diff
+__________ test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes ___________
+tests/test_b103_a2l_definition_arrays_write.py:760: in test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes
+    _round_trip_edit(d, a2l_data, image, edit)
+tests/test_b103_a2l_definition_arrays_write.py:570: in _round_trip_edit
+    res = _encoded(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:66: in _encoded
+    res = _encode(d, a2l_data, edit, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_________ test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused __________
+tests/test_b103_a2l_definition_arrays_write.py:775: in test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused
+    assert d.shared_with == "AXS"
+E   AssertionError: assert None == 'AXS'
+E    +  where None = Definition(name='VS', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=20, byte_length=1, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+__________ test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask ___________
+tests/test_b103_a2l_definition_arrays_write.py:810: in test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask
+    assert d.shared_with == "AXS"
+E   AssertionError: assert None == 'AXS'
+E    +  where None = Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+________ test_r_a2l_def_140_6_final_span_pair_with_masks_cannot_exempt _________
+tests/test_b103_a2l_definition_arrays_write.py:839: in test_r_a2l_def_140_6_final_span_pair_with_masks_cannot_exempt
+    _refusal(res, "A2L-DEF-OVERLAP", "V: its bytes at 0x21 are shared with C8")
+tests/test_b103_a2l_definition_arrays_write.py:73: in _refusal
+    assert isinstance(res, a2ldef.Refusal), res
+E   AssertionError: Encoded(address=33, data=b'\x07', notices=())
+E   assert False
+E    +  where False = isinstance(Encoded(address=33, data=b'\x07', notices=()), <class 's19_app.tui.a2l_definition.Refusal'>)
+E    +    where <class 's19_app.tui.a2l_definition.Refusal'> = a2ldef.Refusal
+_________ test_r_a2l_def_140_7_std_point_inherits_parent_shared_bytes __________
+tests/test_b103_a2l_definition_arrays_write.py:851: in test_r_a2l_def_140_7_std_point_inherits_parent_shared_bytes
+    assert point.shared_with == "OTHER"
+E   AssertionError: assert None == 'OTHER'
+E    +  where None = Definition(name='C.X[0]', section='AXIS_DESCR', char_type=None, kind='number', address=16, byte_length=1, datatype='UB...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).shared_with
+_________ test_r_a2l_def_140_8_arrays_receive_no_clean_mask_exemption __________
+tests/test_b103_a2l_definition_arrays_write.py:869: in test_r_a2l_def_140_8_arrays_receive_no_clean_mask_exemption
+    res = _encode(arr, a2l_data, {(1,): "1"}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+____ test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization _____
+tests/test_b103_a2l_definition_arrays_write.py:892: in test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization
+    assert a2ldef.describe_definition("CX", a2l_data).byte_length == 64
+E   AssertionError: assert 12 == 64
+E    +  where 12 = Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=12, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)).byte_length
+E    +    where Definition(name='CX', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=32, byte_length=12, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)) = <function describe_definition at 0x7f60b5ea1f80>('CX', {'compu_methods_by_name': {'CM_IDENT': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'conversion_type': 'IDENTICAL', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...})
+E    +      where <function describe_definition at 0x7f60b5ea1f80> = a2ldef.describe_definition
+___________ test_r_a2l_def_153_1_scalar_values_through_encode_values ___________
+tests/test_b103_a2l_definition_arrays_write.py:923: in test_r_a2l_def_153_1_scalar_values_through_encode_values
+    assert _encode(d, a2l_data, {(0,): text}, image) == scalar
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+______________ test_r_a2l_def_154_1_unknown_monotony_rule_refuses ______________
+tests/test_b103_a2l_definition_arrays_write.py:932: in test_r_a2l_def_154_1_unknown_monotony_rule_refuses
+    res = _encode(d, a2l_data, {("X", 0): "5"}, _std_image(bytes([10, 20, 30, 40])))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+________ test_r_a2l_def_155_1_unedited_point_decode_refusal_propagates _________
+tests/test_b103_a2l_definition_arrays_write.py:944: in test_r_a2l_def_155_1_unedited_point_decode_refusal_propagates
+    res = _encode(d, a2l_data, {("X", 1): "5"}, _std_image(bytes([0, 1, 2, 3])))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+___________ test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded ___________
+tests/test_b103_a2l_definition_arrays_write.py:958: in test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded
+    res = _encode(d, a2l_data, {("X", 1): long_text}, _std_image(bytes([3, 1, 2, 3])))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_arrays_write.py:61: in _encode
+    assert hasattr(a2ldef, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(a2ldef, 'encode_values')
+_______ test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged ________
+tests/test_b103_synth_definitions.py:482: in test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged
+    _value_edit3b(m, d, arrays_v171, image, position, decoded.values[0].text)
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:401: in _encode3b
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(<module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-tests-c089df37/s19_app/tui/a2l_definition.py'>, 'encode_values')
+______ test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged _______
+tests/test_b103_synth_definitions.py:497: in test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged
+    _value_edit3b(m, d, a2l_data, image, (0,) * len(d.shape), decoded.values[0].text)
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:401: in _encode3b
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(<module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-tests-c089df37/s19_app/tui/a2l_definition.py'>, 'encode_values')
+_____________ test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes _____________
+tests/test_b103_synth_definitions.py:511: in test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes
+    _value_edit3b(m, d, arrays_v171, image, (0,) * len(d.shape), format(float(old) + 1, ".17g"))
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:401: in _encode3b
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(<module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-tests-c089df37/s19_app/tui/a2l_definition.py'>, 'encode_values')
+_________________ test_at_b103_i3_2_edit_arm_definitions_case __________________
+tests/test_b103_synth_definitions.py:525: in test_at_b103_i3_2_edit_arm_definitions_case
+    _res, image = _value_edit3b(m, d, defc["a2l"], image, position, obj["planned_text"][1])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:401: in _encode3b
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(<module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-tests-c089df37/s19_app/tui/a2l_definition.py'>, 'encode_values')
+___________________ test_at_b103_i3_3_edit_arm_case08_arrays ___________________
+tests/test_b103_synth_definitions.py:555: in test_at_b103_i3_3_edit_arm_case08_arrays
+    _value_edit3b(m, d, a2l_data, arrays_c08["mem"], (0,) * len(d.shape), text)
+tests/test_b103_synth_definitions.py:427: in _value_edit3b
+    res = _encode3b(m, d, a2l_data, {position: text}, image)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_synth_definitions.py:401: in _encode3b
+    assert hasattr(m, "encode_values"), "encode_values not implemented"
+E   AssertionError: encode_values not implemented
+E   assert False
+E    +  where False = hasattr(<module 's19_app.tui.a2l_definition' from '/tmp/b103-e4-3b-tests-c089df37/s19_app/tui/a2l_definition.py'>, 'encode_values')
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_121_1_element_name_in_encode_refusal
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_121_2_axis_point_name_in_encode_refusal
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_1_converted_element_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_2_enum_element_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_3_element_outside_limits
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_4_converted_axis_point_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_5_float64_element_uses_precision_rule
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_6_exact_integer_check_on_element
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_122_7_written_element_against_extended_limits
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_1_row_dir_whole_record_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_2_column_dir_whole_record_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_3_index_decr_point_edit
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_123_4_count_byte_is_kept
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_1_edit_with_axis_object_missing
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_2_edit_on_partial_record
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_124_3_edit_with_record_byte_missing
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_1_index_past_shape
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_2_index_of_wrong_length
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_3_axis_point_of_array
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_125_4_malformed_positions_fail_closed
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_1_fixed_curve_axis
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_126_2_fixed_map_axis
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_1_common_axis_point
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_127_2_definitions_case_shared_axis
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_128_1_axis_with_no_points
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_1_strict_increase
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_2_strict_decrease
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_3_mon_increase_takes_equal_point
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_4_mon_increase
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_5_mon_decrease
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_6_default_rule
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_7_monotonous
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_8_not_mon
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_129_9_unedited_point_can_break_order
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_1_decode_before_shared_axis
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_2_axis_before_values
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_3_each_edit_before_monotony
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_4_parse_before_missing_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_130_5_parse_before_invalid_position
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_1_edit_round_trip
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_3_exact_inverse_table_semantics
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_132_1_unedited_cells_keep_values_and_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_6_final_span_pair_with_masks_cannot_exempt
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_7_std_point_inherits_parent_shared_bytes
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_8_arrays_receive_no_clean_mask_exemption
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_153_1_scalar_values_through_encode_values
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_154_1_unknown_monotony_rule_refuses
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_155_1_unedited_point_decode_refusal_propagates
+FAILED tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_155_2_breaking_enum_point_text_is_bounded
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_1_edit_arm_asam_demo_arrays_and_axes
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_2_edit_arm_definitions_case
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i3_3_edit_arm_case08_arrays
+58 failed, 5 passed in 4.13s
+PYTEST_EXIT=1
