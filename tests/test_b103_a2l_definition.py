@@ -2735,6 +2735,8 @@ def test_r_a2l_def_44_2_notice_at_the_extended_lower_limit(v171):
     d = describe_definition(V171_SBYTE, v171)
     assert d.shared_with == "ASAM_I_SCALAR_VALUE_UWORD_SINGLE"
     img = {0x810001: 0}
+    assert _enc(d, v171, "-128", img) == _ref(
+        "A2L-DEF-OVERLAP", "ASAM.C.SCALAR.SBYTE.IDENTICAL: its bytes at 0x810001 are shared with ASAM_I_SCALAR_VALUE_UWORD_SINGLE")
     notice = "ASAM.C.SCALAR.SBYTE.IDENTICAL: -128 is outside the limits -100..100 and inside the extended limits -128..127"
     assert _enc(_clear(d), v171, "-128", img) == Encoded(0x810001, bytes([0x80]), (notice,))
 
@@ -3034,6 +3036,12 @@ def test_r_a2l_def_55_1_number_round_trip(tmp_path):
                         back = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res.data)})
                         assert isinstance(back, Decoded), (dt, value, dec.text, back)
                         _assert_display_agrees(d, dec.value, back.value)
+                        precise = format(dec.value, ".17g")
+                        res17 = _enc(d, a2l, precise, _img(addr, raw))
+                        assert isinstance(res17, Encoded), (dt, value, precise, res17)
+                        back17 = decode_definition(d, a2l, {addr + i: b for i, b in enumerate(res17.data)})
+                        assert isinstance(back17, Decoded), (dt, value, precise, back17)
+                        _assert_display_agrees(d, dec.value, back17.value)
                         typed = dec.text if fmt is None else format(dec.value, f".{d.decimals}f")
                         res2 = _enc(d, a2l, typed, _img(addr, raw))
                         assert isinstance(res2, Encoded), (dt, value, typed, res2)
