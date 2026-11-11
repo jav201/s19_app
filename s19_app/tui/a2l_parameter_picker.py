@@ -694,31 +694,47 @@ class A2LParameterPicker(Vertical):
         yield Static("", id=ids.full_name, classes="nowrap-heading")
         status = Static("", id=ids.status)
         status.display = False
-        yield status
-        with Horizontal(
-            id=ids.controls,
-            classes="patch-docked-row patch-chip-entry",
-        ):
-            yield Button("Prev", id=ids.page_prev, classes="patch-chip")
+        compact = ids.controls == "patch_param_controls"
+        if compact:
+            status.styles.width = "auto"
+
+        def page_controls():
+            yield Button(
+                "<" if compact else "Prev",
+                id=ids.page_prev,
+                classes="patch-chip",
+                compact=compact,
+            )
             yield Static("Page 1/1", id=ids.page_label)
-            yield Button("Next", id=ids.page_next, classes="patch-chip")
+            yield Button(
+                ">" if compact else "Next",
+                id=ids.page_next,
+                classes="patch-chip",
+                compact=compact,
+            )
             if self._show_include_button:
                 yield Button(
-                    "Include parameter",
+                    "Pick" if compact else "Include parameter",
                     id=ids.include,
                     classes="patch-chip",
+                    compact=compact,
                 )
             if self._show_bulk_button:
                 yield Button(
                     "Add list",
                     id=ids.bulk,
                     classes="patch-chip",
+                    compact=compact,
                 )
-            if self._mode == "pick":
-                yield Static(
-                    "space also toggles ✓ on the highlighted row",
-                    classes="ce-hint",
-                )
+            if self._mode == "pick" and not compact:
+                yield Static("space toggles ✓", classes="ce-hint")
+
+        yield status
+        with Horizontal(
+            id=ids.controls,
+            classes="patch-docked-row patch-chip-entry",
+        ):
+            yield from page_controls()
 
     def on_mount(self) -> None:
         """Add the ledger's columns once, at the pre-measure widths."""

@@ -1,0 +1,11 @@
+/tmp/b103-inc6-green-a43b/s19_app/__init__.py
+......                                                                   [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally
+PASSED tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118
+PASSED tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/1]
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-]
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-]
+6 passed, 69 deselected in 40.33s

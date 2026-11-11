@@ -1,0 +1,263 @@
+/tmp/b103-inc6-green-a43b/s19_app/__init__.py
+..F.FF                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_r019_2_twenty_filter_page_rebuilds_never_describe ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r019_2_twenty_filter_page0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f23c2c21490>
+
+    @pytest.mark.serial_timing
+    def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch):
+        """R-PICKER-CORRECT.019/2: zero describes, 20 rebuilds, <=200 rows, formats stable."""
+        describes = _describe_spy(monkeypatch)
+        rebuilds = []
+        real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
+    
+        def counting_rebuild(self):
+            rebuilds.append(self)
+            return real_rebuild(self)
+    
+        monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
+        data = parse_a2l_file(SOFTA)
+        rows = data["tags"]
+        assert len(rows) == 13990
+        needle = max(
+            ("_", "A", "0", "S"),
+            key=lambda candidate: sum(
+                candidate.lower() in tag["name"].lower() for tag in rows
+            ),
+        )
+        assert sum(needle.lower() in tag["name"].lower() for tag in rows) > 200
+    
+        async def body(app, pilot):
+            panel = await _show_panel(app, pilot, "check")
+            picker = _picker(panel)
+            assert picker.set_parameters(rows, ("software_a", "rebuilds"), a2l_data=data) is True
+            await _settle(pilot)
+            formats = {name: values[2] for name, values in picker.param_rows.items()}
+            describes.clear()
+            rebuilds.clear()
+            mounted = []
+            for index in range(10):
+                panel.query_one("#check_param_filter", Input).value = "" if index % 2 == 0 else needle
+                await pilot.pause(0.2)
+                assert len(picker.filtered_params) > 200
+                panel.query_one("#check_param_page_next_button", Button).press()
+                await _settle(pilot, 2)
+                mounted.append(panel.query_one("#check_param_table", DataTable).row_count)
+            return mounted, formats, {name: values[2] for name, values in picker.param_rows.items()}
+    
+        mounted, before_formats, after_formats = _run(tmp_path, body, size=MIN_SIZE)
+>       assert len(rebuilds) == 20
+E       assert 19 == 20
+E        +  where 19 = len([A2LParameterPicker(), A2LParameterPicker(), A2LParameterPicker(), A2LParameterPicker(), A2LParameterPicker(), A2LParameterPicker(), ...])
+
+tests/test_b103_picker_model.py:793: AssertionError
+_ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-] __
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r020_patch_surfaces_fit_r0')
+case = 'R-PICKER-CORRECT.020/1', size = (80, 24)
+
+    @pytest.mark.parametrize(
+        "case,size",
+        [("R-PICKER-CORRECT.020/1", (80, 24)), ("R-PICKER-CORRECT.020/2", (118, 54))],
+        ids=lambda value: value if isinstance(value, str) and value.startswith("R-") else "",
+    )
+    def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str, size: tuple[int, int]) -> None:
+        """R-PICKER-CORRECT.020/1 measures and operates 80x24;
+        R-PICKER-CORRECT.020/2 measures and operates 118x54, including every named region."""
+        a2l = _write_editor_a2l(tmp_path)
+    
+        async def body(app, pilot, panel):
+            await _show_patch_a2l(panel, pilot)
+            await _pick(panel, pilot, "ARR12")
+            assert panel._a2l_picker.picked_params == ["ARR12"]
+            await _use(panel, pilot, "ARR12")
+            assert _use_status(panel) == NO_BYTES
+            selectors = [
+                "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+                "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+                "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+                "#patch_param_use_button", "#patch_param_use_status",
+            ]
+            widgets = [_need(panel, selector) for selector in selectors]
+            for widget in widgets:
+                region = widget.region
+                assert is_displayed(widget), (size, widget.id, "not displayed")
+                assert region.width > 0 and region.height > 0, (size, widget.id, region)
+                assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                    size, widget.id, region, panel.region,
+                )
+                assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                    size, widget.id, region, panel.region,
+                )
+                assert 0 <= region.x and region.right <= size[0]
+                assert 0 <= region.y and region.bottom <= size[1]
+            modal = await _open_bulk(app, pilot, panel)
+            await _close_bulk(app, pilot, modal)
+    
+>       _run(tmp_path, body, a2l=a2l, size=size)
+
+tests/test_b103_picker_editor.py:774: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_editor.py:226: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_editor.py:224: in drive
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await _show_patch_a2l(panel, pilot)
+        await _pick(panel, pilot, "ARR12")
+        assert panel._a2l_picker.picked_params == ["ARR12"]
+        await _use(panel, pilot, "ARR12")
+        assert _use_status(panel) == NO_BYTES
+        selectors = [
+            "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+            "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+            "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+            "#patch_param_use_button", "#patch_param_use_status",
+        ]
+        widgets = [_need(panel, selector) for selector in selectors]
+        for widget in widgets:
+            region = widget.region
+            assert is_displayed(widget), (size, widget.id, "not displayed")
+            assert region.width > 0 and region.height > 0, (size, widget.id, region)
+            assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                size, widget.id, region, panel.region,
+            )
+>           assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                size, widget.id, region, panel.region,
+            )
+E           AssertionError: ((80, 24), 'patch_param_page_prev_button', Region(x=34, y=13, width=6, height=1), Region(x=5, y=4, width=74, height=9))
+E           assert (4 <= 13 and 14 <= 13)
+E            +  where 4 = Region(x=5, y=4, width=74, height=9).y
+E            +    where Region(x=5, y=4, width=74, height=9) = PatchEditorPanel(id='patch_editor_panel').region
+E            +  and   13 = Region(x=34, y=13, width=6, height=1).y
+E            +  and   14 = Region(x=34, y=13, width=6, height=1).bottom
+E            +  and   13 = Region(x=5, y=4, width=74, height=9).bottom
+E            +    where Region(x=5, y=4, width=74, height=9) = PatchEditorPanel(id='patch_editor_panel').region
+
+tests/test_b103_picker_editor.py:766: AssertionError
+_ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-] __
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r020_patch_surfaces_fit_r1')
+case = 'R-PICKER-CORRECT.020/2', size = (118, 54)
+
+    @pytest.mark.parametrize(
+        "case,size",
+        [("R-PICKER-CORRECT.020/1", (80, 24)), ("R-PICKER-CORRECT.020/2", (118, 54))],
+        ids=lambda value: value if isinstance(value, str) and value.startswith("R-") else "",
+    )
+    def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str, size: tuple[int, int]) -> None:
+        """R-PICKER-CORRECT.020/1 measures and operates 80x24;
+        R-PICKER-CORRECT.020/2 measures and operates 118x54, including every named region."""
+        a2l = _write_editor_a2l(tmp_path)
+    
+        async def body(app, pilot, panel):
+            await _show_patch_a2l(panel, pilot)
+            await _pick(panel, pilot, "ARR12")
+            assert panel._a2l_picker.picked_params == ["ARR12"]
+            await _use(panel, pilot, "ARR12")
+            assert _use_status(panel) == NO_BYTES
+            selectors = [
+                "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+                "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+                "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+                "#patch_param_use_button", "#patch_param_use_status",
+            ]
+            widgets = [_need(panel, selector) for selector in selectors]
+            for widget in widgets:
+                region = widget.region
+                assert is_displayed(widget), (size, widget.id, "not displayed")
+                assert region.width > 0 and region.height > 0, (size, widget.id, region)
+                assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                    size, widget.id, region, panel.region,
+                )
+                assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                    size, widget.id, region, panel.region,
+                )
+                assert 0 <= region.x and region.right <= size[0]
+                assert 0 <= region.y and region.bottom <= size[1]
+            modal = await _open_bulk(app, pilot, panel)
+            await _close_bulk(app, pilot, modal)
+    
+>       _run(tmp_path, body, a2l=a2l, size=size)
+
+tests/test_b103_picker_editor.py:774: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_editor.py:226: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_editor.py:224: in drive
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await _show_patch_a2l(panel, pilot)
+        await _pick(panel, pilot, "ARR12")
+        assert panel._a2l_picker.picked_params == ["ARR12"]
+        await _use(panel, pilot, "ARR12")
+        assert _use_status(panel) == NO_BYTES
+        selectors = [
+            "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+            "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+            "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+            "#patch_param_use_button", "#patch_param_use_status",
+        ]
+        widgets = [_need(panel, selector) for selector in selectors]
+        for widget in widgets:
+            region = widget.region
+            assert is_displayed(widget), (size, widget.id, "not displayed")
+            assert region.width > 0 and region.height > 0, (size, widget.id, region)
+>           assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                size, widget.id, region, panel.region,
+            )
+E           AssertionError: ((118, 54), 'patch_param_include_button', Region(x=99, y=36, width=19, height=1), Region(x=5, y=4, width=112, height=39))
+E           assert (5 <= 99 and 118 <= 117)
+E            +  where 5 = Region(x=5, y=4, width=112, height=39).x
+E            +    where Region(x=5, y=4, width=112, height=39) = PatchEditorPanel(id='patch_editor_panel').region
+E            +  and   99 = Region(x=99, y=36, width=19, height=1).x
+E            +  and   118 = Region(x=99, y=36, width=19, height=1).right
+E            +  and   117 = Region(x=5, y=4, width=112, height=39).right
+E            +    where Region(x=5, y=4, width=112, height=39) = PatchEditorPanel(id='patch_editor_panel').region
+
+tests/test_b103_picker_editor.py:763: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally
+PASSED tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/1]
+FAILED tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe
+FAILED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-]
+FAILED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-]
+3 failed, 3 passed, 69 deselected in 39.58s

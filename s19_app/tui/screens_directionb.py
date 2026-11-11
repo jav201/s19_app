@@ -5226,14 +5226,14 @@ class PatchEditorPanel(ScrollableContainer):
                                 id="patch_param_use_button",
                                 classes="patch-chip",
                             )
-                        use_status = Static(
-                            "",
-                            id="patch_param_use_status",
-                            classes="patch-field-label",
-                            markup=False,
-                        )
-                        use_status.display = False
-                        yield use_status
+                            use_status = Static(
+                                "",
+                                id="patch_param_use_status",
+                                classes="patch-field-label",
+                                markup=False,
+                            )
+                            use_status.display = False
+                            yield use_status
         with Horizontal(id="patch_doc_file_row", classes="patch-docked-row"):
             yield Label("File", classes="pe-label")
             with Horizontal(id="patch_doc_file_line1"):
@@ -5428,11 +5428,18 @@ class PatchEditorPanel(ScrollableContainer):
         knows. An unchanged layout repaints nothing. Otherwise it sets each
         column's width and rewrites the Parameter and ``Fmt · Unit`` cells
         with ``update_cell`` (the public repaint path, D21/PC-8); it never
-        adds a column. The ledger rows themselves belong to the picker.
+        adds a column. At no more than 12 panel rows the ledger shows one
+        data row without its header and the picker sizes to its content;
+        taller panels keep the flexible table and header. The Use button and
+        its status share one docked row. The ledger rows belong to the picker.
         """
         table = self.query_one("#patch_param_table", DataTable)
         if table.content_region.width == 0:
             return
+        compact = self.region.height <= 12
+        table.styles.height = 1 if compact else "1fr"
+        table.show_header = not compact
+        self._a2l_picker.styles.height = "auto"
         layout = check_layout(
             table.content_region.width,
             self.query_one("#patch_inspector").content_region.width,

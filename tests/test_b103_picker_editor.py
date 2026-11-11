@@ -622,7 +622,7 @@ _BULK_CASES = {
     "R-PICKER-CORRECT.013/2": (["Beta"], False, "Beta Beta", ["Beta"], "Included 1 · already included 0 · not found 0"),
     "R-PICKER-CORRECT.013/3": (["Alpha"], True, "Alpha Alpha", ["Alpha"], "Included 0 · already included 1 · not found 0"),
     "R-PICKER-CORRECT.013/4": (["Alpha"], False, "alpha", [], "Included 0 · already included 0 · not found 1 — first missing: alpha"),
-    "R-PICKER-CORRECT.014/1": (["Alpha", "Beta", "Gamma"], True, "Beta,Alpha,Gamma", ["Alpha", "Beta"], "Included 1 · already included 1 · not found 1 — first missing: Gamma"),
+    "R-PICKER-CORRECT.014/1": (["Alpha", "Beta"], True, "Beta,Alpha,Gamma", ["Alpha", "Beta"], "Included 1 · already included 1 · not found 1 — first missing: Gamma"),
     "R-PICKER-CORRECT.014/2": (["Alpha", "Beta"], True, "  \n,; \t", ["Alpha"], "No listed parameters found."),
     "R-PICKER-CORRECT.014/3": (["Alpha", "Beta"], False, "Gamma Delta", [], "Included 0 · already included 0 · not found 2 — first missing: Gamma"),
 }

@@ -1,0 +1,530 @@
+/tmp/b103-inc6-green-a43b/s19_app/__init__.py
+....................................FF.....F.....................F...... [ 96%]
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_r017_2_hostile_unit_is_replaced_literally ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r017_2_hostile_unit_is_re0')
+
+    def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
+        """R-PICKER-CORRECT.017/2: u16 [link=e] plus two replacements, no link span."""
+        unit = "[link=e]\x1b\x7f%"
+        expected = "u16 [link=e]" + CONTROL_REPLACEMENT * 2 + "%"
+    
+        async def body(app, pilot):
+            results = {}
+            for editor in ("check", "patch"):
+                panel = await _show_panel(app, pilot, editor)
+                panel.set_a2l_parameters(
+                    [{
+                        "name": "HOSTILE_UNIT",
+                        "address": 0x1000,
+                        "length": 2,
+                        "byte_size": 2,
+                        "datatype": "UWORD",
+                        "compu_method_unit": unit,
+                    }],
+                    ("hostile-unit", editor),
+                )
+                await _settle(pilot)
+                results[editor] = (_cells(panel, "HOSTILE_UNIT")[3], _full_name(panel))
+            return results
+    
+        results = _run(tmp_path, body, size=(160, 54))
+        for cell, full in results.values():
+>           _assert_literal_surface(cell, expected)
+
+tests/test_b103_picker_model.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = <text 'u16…' [] ''>, expected = 'u16 [link=e]��%'
+
+    def _assert_literal_surface(text: Text, expected: str):
+>       assert text.plain == expected
+E       AssertionError: assert 'u16…' == 'u16 [link=e]��%'
+E         
+E         - u16 [link=e]��%
+E         + u16…
+
+tests/test_b103_picker_model.py:228: AssertionError
+______ test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118 ______
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r017_3_long_hostile_unit_0')
+
+    def test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118(tmp_path):
+        """R-PICKER-CORRECT.017/3: exact literal clip at 80 and 118 on both editors."""
+        unit = "[red]\x1b\x00\x85" + "x" * 395
+        assert cell_len(unit) == 400
+        normalized = "u16 " + _normalized_literal(unit)
+    
+        async def body(app, pilot):
+            results = {}
+            for editor in ("check", "patch"):
+                panel = await _show_panel(app, pilot, editor)
+                panel.set_a2l_parameters(
+                    [{
+                        "name": "LONGUNIT",
+                        "address": 0x1000,
+                        "length": 2,
+                        "byte_size": 2,
+                        "datatype": "UWORD",
+                        "compu_method_unit": unit,
+                    }],
+                    ("long-unit", editor),
+                )
+                await _settle(pilot, 8)
+                picker = _picker(panel)
+                layout = picker._layout()
+                fmt_budget = layout.full_name - cell_len("0x00001000") - 2 - 2 - cell_len("LONGUNIT")
+                results[editor] = (
+                    _cells(panel, "LONGUNIT")[3],
+                    _full_name(panel),
+                    _clip_cells(normalized, layout.fmt),
+                    "0x00001000  " + _clip_cells(normalized, fmt_budget) + "  LONGUNIT",
+                    layout.full_name,
+                )
+            return results
+    
+        for size in (MIN_SIZE, SIZE):
+            results = _run(tmp_path / f"w{size[0]}", body, size=size)
+            for cell, full, expected_cell, expected_full, full_budget in results.values():
+                _assert_literal_surface(cell, expected_cell)
+                _assert_literal_surface(full, expected_full)
+>               assert cell.plain.endswith("…") and full.plain.startswith("0x00001000  u16 ")
+E               AssertionError: assert (True and False)
+E                +  where True = <built-in method endswith of str object at 0x7fca8ea6e2b0>('…')
+E                +    where <built-in method endswith of str object at 0x7fca8ea6e2b0> = 'u16…'.endswith
+E                +      where 'u16…' = <text 'u16…' [] ''>.plain
+E                +  and   False = <built-in method startswith of str object at 0x7fca8fd515b0>('0x00001000  u16 ')
+E                +    where <built-in method startswith of str object at 0x7fca8fd515b0> = '0x00001000  u16…  LONGUNIT'.startswith
+E                +      where '0x00001000  u16…  LONGUNIT' = Content('0x00001000  u16…  LONGUNIT', spans=[Span(0, 26, style='#7dd3fc'), Span(10, 18, style=Style(foreground=Color(150, 154, 173))), Span(18, 26, style=Style(foreground=Color(233, 233, 233)))]).plain
+
+tests/test_b103_picker_model.py:556: AssertionError
+____________ test_r019_2_twenty_filter_page_rebuilds_never_describe ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r019_2_twenty_filter_page0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca8f8b2b90>
+
+    @pytest.mark.serial_timing
+    def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch):
+        """R-PICKER-CORRECT.019/2: zero describes, 20 rebuilds, <=200 rows, formats stable."""
+        describes = _describe_spy(monkeypatch)
+        rebuilds = []
+        real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
+    
+        def counting_rebuild(self):
+            rebuilds.append(self)
+            return real_rebuild(self)
+    
+        monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
+        data = parse_a2l_file(SOFTA)
+        rows = data["tags"]
+        assert len(rows) == 13990
+    
+        async def body(app, pilot):
+            panel = await _show_panel(app, pilot, "check")
+            picker = _picker(panel)
+            assert picker.set_parameters(rows, ("software_a", "rebuilds"), a2l_data=data) is True
+            await _settle(pilot)
+            formats = {name: values[2] for name, values in picker.param_rows.items()}
+            describes.clear()
+            rebuilds.clear()
+            mounted = []
+            for index in range(10):
+                panel.query_one("#check_param_filter", Input).value = "" if index % 2 == 0 else "ASAM"
+                await pilot.pause(0.2)
+                assert len(picker.filtered_params) > 200
+                panel.query_one("#check_param_page_next_button", Button).press()
+                await _settle(pilot, 2)
+                mounted.append(panel.query_one("#check_param_table", DataTable).row_count)
+            return mounted, formats, {name: values[2] for name, values in picker.param_rows.items()}
+    
+>       mounted, before_formats, after_formats = _run(tmp_path, body, size=MIN_SIZE)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_picker_model.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_model.py:68: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:66: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        panel = await _show_panel(app, pilot, "check")
+        picker = _picker(panel)
+        assert picker.set_parameters(rows, ("software_a", "rebuilds"), a2l_data=data) is True
+        await _settle(pilot)
+        formats = {name: values[2] for name, values in picker.param_rows.items()}
+        describes.clear()
+        rebuilds.clear()
+        mounted = []
+        for index in range(10):
+            panel.query_one("#check_param_filter", Input).value = "" if index % 2 == 0 else "ASAM"
+            await pilot.pause(0.2)
+>           assert len(picker.filtered_params) > 200
+E           AssertionError: assert 1 > 200
+E            +  where 1 = len(['CstsnXuzf__Yasamvu.FHNRxeawclIsu_AyxOnqEswi'])
+E            +    where ['CstsnXuzf__Yasamvu.FHNRxeawclIsu_AyxOnqEswi'] = A2LParameterPicker().filtered_params
+
+tests/test_b103_picker_model.py:775: AssertionError
+_ test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r013_r014_patch_bulk_coun4')
+case = 'R-PICKER-CORRECT.014/1'
+
+    @pytest.mark.parametrize("case", list(_BULK_CASES), ids=lambda value: value)
+    def test_r013_r014_patch_bulk_counts_and_exact_summaries(tmp_path: Path, case: str) -> None:
+        """R-PICKER-CORRECT.013/1, R-PICKER-CORRECT.013/2, R-PICKER-CORRECT.013/3,
+        R-PICKER-CORRECT.013/4, R-PICKER-CORRECT.014/1, R-PICKER-CORRECT.014/2 and
+        R-PICKER-CORRECT.014/3 pin exact picks, unique counts and every summary alternative."""
+        names, preseed, payload, expected_picks, expected_summary = _BULK_CASES[case]
+        a2l = _write_names_a2l(tmp_path, names)
+    
+        async def body(app, pilot, panel):
+            await _show_patch_a2l(panel, pilot)
+            before = _arm_doc(app, panel)
+            if preseed:
+                await _pick(panel, pilot, "Alpha")
+            modal = await _open_bulk(app, pilot, panel)
+            summary = await _include_text(modal, pilot, payload)
+            assert summary == expected_summary
+            assert panel._a2l_picker.picked_params == expected_picks
+            _assert_doc_unchanged(app, panel, before)
+            await _close_bulk(app, pilot, modal)
+    
+>       _run(tmp_path, body, a2l=a2l)
+
+tests/test_b103_picker_editor.py:651: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_editor.py:226: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_editor.py:224: in drive
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await _show_patch_a2l(panel, pilot)
+        before = _arm_doc(app, panel)
+        if preseed:
+            await _pick(panel, pilot, "Alpha")
+        modal = await _open_bulk(app, pilot, panel)
+        summary = await _include_text(modal, pilot, payload)
+>       assert summary == expected_summary
+E       AssertionError: assert 'Included 2 ·...· not found 0' == 'Included 1 ·...issing: Gamma'
+E         
+E         - Included 1 · already included 1 · not found 1 — first missing: Gamma
+E         ?          ^                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+E         + Included 2 · already included 1 · not found 0
+E         ?          ^                                  ^
+
+tests/test_b103_picker_editor.py:646: AssertionError
+_ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-] __
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r020_patch_surfaces_fit_r0')
+case = 'R-PICKER-CORRECT.020/1', size = (80, 24)
+
+    @pytest.mark.parametrize(
+        "case,size",
+        [("R-PICKER-CORRECT.020/1", (80, 24)), ("R-PICKER-CORRECT.020/2", (118, 54))],
+        ids=lambda value: value if isinstance(value, str) and value.startswith("R-") else "",
+    )
+    def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str, size: tuple[int, int]) -> None:
+        """R-PICKER-CORRECT.020/1 measures and operates 80x24;
+        R-PICKER-CORRECT.020/2 measures and operates 118x54, including every named region."""
+        a2l = _write_editor_a2l(tmp_path)
+    
+        async def body(app, pilot, panel):
+            await _show_patch_a2l(panel, pilot)
+            await _pick(panel, pilot, "ARR12")
+            assert panel._a2l_picker.picked_params == ["ARR12"]
+            await _use(panel, pilot, "ARR12")
+            assert _use_status(panel) == NO_BYTES
+            selectors = [
+                "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+                "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+                "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+                "#patch_param_use_button", "#patch_param_use_status",
+            ]
+            widgets = [_need(panel, selector) for selector in selectors]
+            for widget in widgets:
+                region = widget.region
+                assert is_displayed(widget), (size, widget.id, "not displayed")
+                assert region.width > 0 and region.height > 0, (size, widget.id, region)
+                assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                    size, widget.id, region, panel.region,
+                )
+                assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                    size, widget.id, region, panel.region,
+                )
+                assert 0 <= region.x and region.right <= size[0]
+                assert 0 <= region.y and region.bottom <= size[1]
+            modal = await _open_bulk(app, pilot, panel)
+            await _close_bulk(app, pilot, modal)
+    
+>       _run(tmp_path, body, a2l=a2l, size=size)
+
+tests/test_b103_picker_editor.py:774: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_editor.py:226: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_editor.py:224: in drive
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await _show_patch_a2l(panel, pilot)
+        await _pick(panel, pilot, "ARR12")
+        assert panel._a2l_picker.picked_params == ["ARR12"]
+        await _use(panel, pilot, "ARR12")
+        assert _use_status(panel) == NO_BYTES
+        selectors = [
+            "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+            "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+            "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+            "#patch_param_use_button", "#patch_param_use_status",
+        ]
+        widgets = [_need(panel, selector) for selector in selectors]
+        for widget in widgets:
+            region = widget.region
+            assert is_displayed(widget), (size, widget.id, "not displayed")
+            assert region.width > 0 and region.height > 0, (size, widget.id, region)
+            assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                size, widget.id, region, panel.region,
+            )
+>           assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                size, widget.id, region, panel.region,
+            )
+E           AssertionError: ((80, 24), 'patch_param_page_prev_button', Region(x=34, y=13, width=6, height=1), Region(x=5, y=4, width=74, height=9))
+E           assert (4 <= 13 and 14 <= 13)
+E            +  where 4 = Region(x=5, y=4, width=74, height=9).y
+E            +    where Region(x=5, y=4, width=74, height=9) = PatchEditorPanel(id='patch_editor_panel').region
+E            +  and   13 = Region(x=34, y=13, width=6, height=1).y
+E            +  and   14 = Region(x=34, y=13, width=6, height=1).bottom
+E            +  and   13 = Region(x=5, y=4, width=74, height=9).bottom
+E            +    where Region(x=5, y=4, width=74, height=9) = PatchEditorPanel(id='patch_editor_panel').region
+
+tests/test_b103_picker_editor.py:766: AssertionError
+_ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-] __
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-703/test_r020_patch_surfaces_fit_r1')
+case = 'R-PICKER-CORRECT.020/2', size = (118, 54)
+
+    @pytest.mark.parametrize(
+        "case,size",
+        [("R-PICKER-CORRECT.020/1", (80, 24)), ("R-PICKER-CORRECT.020/2", (118, 54))],
+        ids=lambda value: value if isinstance(value, str) and value.startswith("R-") else "",
+    )
+    def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str, size: tuple[int, int]) -> None:
+        """R-PICKER-CORRECT.020/1 measures and operates 80x24;
+        R-PICKER-CORRECT.020/2 measures and operates 118x54, including every named region."""
+        a2l = _write_editor_a2l(tmp_path)
+    
+        async def body(app, pilot, panel):
+            await _show_patch_a2l(panel, pilot)
+            await _pick(panel, pilot, "ARR12")
+            assert panel._a2l_picker.picked_params == ["ARR12"]
+            await _use(panel, pilot, "ARR12")
+            assert _use_status(panel) == NO_BYTES
+            selectors = [
+                "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+                "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+                "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+                "#patch_param_use_button", "#patch_param_use_status",
+            ]
+            widgets = [_need(panel, selector) for selector in selectors]
+            for widget in widgets:
+                region = widget.region
+                assert is_displayed(widget), (size, widget.id, "not displayed")
+                assert region.width > 0 and region.height > 0, (size, widget.id, region)
+                assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                    size, widget.id, region, panel.region,
+                )
+                assert panel.region.y <= region.y and region.bottom <= panel.region.bottom, (
+                    size, widget.id, region, panel.region,
+                )
+                assert 0 <= region.x and region.right <= size[0]
+                assert 0 <= region.y and region.bottom <= size[1]
+            modal = await _open_bulk(app, pilot, panel)
+            await _close_bulk(app, pilot, modal)
+    
+>       _run(tmp_path, body, a2l=a2l, size=size)
+
+tests/test_b103_picker_editor.py:774: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_picker_editor.py:226: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_editor.py:224: in drive
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await _show_patch_a2l(panel, pilot)
+        await _pick(panel, pilot, "ARR12")
+        assert panel._a2l_picker.picked_params == ["ARR12"]
+        await _use(panel, pilot, "ARR12")
+        assert _use_status(panel) == NO_BYTES
+        selectors = [
+            "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+            "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
+            "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
+            "#patch_param_use_button", "#patch_param_use_status",
+        ]
+        widgets = [_need(panel, selector) for selector in selectors]
+        for widget in widgets:
+            region = widget.region
+            assert is_displayed(widget), (size, widget.id, "not displayed")
+            assert region.width > 0 and region.height > 0, (size, widget.id, region)
+>           assert panel.region.x <= region.x and region.right <= panel.region.right, (
+                size, widget.id, region, panel.region,
+            )
+E           AssertionError: ((118, 54), 'patch_param_include_button', Region(x=99, y=36, width=19, height=1), Region(x=5, y=4, width=112, height=39))
+E           assert (5 <= 99 and 118 <= 117)
+E            +  where 5 = Region(x=5, y=4, width=112, height=39).x
+E            +    where Region(x=5, y=4, width=112, height=39) = PatchEditorPanel(id='patch_editor_panel').region
+E            +  and   99 = Region(x=99, y=36, width=19, height=1).x
+E            +  and   118 = Region(x=99, y=36, width=19, height=1).right
+E            +  and   117 = Region(x=5, y=4, width=112, height=39).right
+E            +    where Region(x=5, y=4, width=112, height=39) = PatchEditorPanel(id='patch_editor_panel').region
+
+tests/test_b103_picker_editor.py:763: AssertionError
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+35.5%  1.290 s / 2.000 s  R-PICKER-CORRECT.019 picker describe 13990  tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+QC-TM: 1 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/1---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/2---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/3---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/4---]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/2--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/3--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/4--]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/1------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/2------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/3------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/4------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/5------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/6------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/7------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/8------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/9------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/10------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/11------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/12------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/13------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/14------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/15------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/16------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/17------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/18------]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/1]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/2]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/3]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/4]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/1]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/2]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/3]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/4]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/5]
+PASSED tests/test_b103_picker_model.py::test_r017_1_hostile_parameter_name_is_replaced_literally
+PASSED tests/test_b103_picker_model.py::test_r018_1_equal_signature_is_a_zero_describe_noop
+PASSED tests/test_b103_picker_model.py::test_r018_2_changed_generation_batches_once_per_picker
+PASSED tests/test_b103_picker_model.py::test_r018_3_none_always_repopulates_with_real_a2l_data
+PASSED tests/test_b103_picker_model.py::test_r018_4_live_reload_refreshes_both_without_reentry
+PASSED tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/1---]
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/2---]
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/3---]
+PASSED tests/test_b103_picker_editor.py::test_r007_unavailable_bytes_are_all_or_nothing[R-PICKER-CORRECT.007/1]
+PASSED tests/test_b103_picker_editor.py::test_r007_unavailable_bytes_are_all_or_nothing[R-PICKER-CORRECT.007/2]
+PASSED tests/test_b103_picker_editor.py::test_r008_declared_length_observes_decode_cap[R-PICKER-CORRECT.008/1]
+PASSED tests/test_b103_picker_editor.py::test_r008_declared_length_observes_decode_cap[R-PICKER-CORRECT.008/2]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/1]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/2]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/3]
+PASSED tests/test_b103_picker_editor.py::test_r010_new_generation_keeps_or_demotes_full_spec[R-PICKER-CORRECT.010/1]
+PASSED tests/test_b103_picker_editor.py::test_r010_new_generation_keeps_or_demotes_full_spec[R-PICKER-CORRECT.010/2]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/1]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/2]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/3]
+PASSED tests/test_b103_picker_editor.py::test_r012_patch_add_list_opens_shared_modal[R-PICKER-CORRECT.012/1]
+PASSED tests/test_b103_picker_editor.py::test_r012_patch_add_list_opens_shared_modal[R-PICKER-CORRECT.012/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/1]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/3]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/4]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/3]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/1]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/2]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/3]
+PASSED tests/test_b103_picker_editor.py::test_r016_use_after_bulk_transfers_only_highlight[R-PICKER-CORRECT.016/1]
+PASSED tests/test_b103_picker_editor.py::test_r016_use_after_bulk_transfers_only_highlight[R-PICKER-CORRECT.016/2]
+FAILED tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally
+FAILED tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118
+FAILED tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe
+FAILED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/1]
+FAILED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-]
+FAILED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-]
+6 failed, 69 passed in 370.05s (0:06:10)

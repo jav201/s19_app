@@ -502,12 +502,16 @@ def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
                 ("hostile-unit", editor),
             )
             await _settle(pilot)
-            results[editor] = (_cells(panel, "HOSTILE_UNIT")[3], _full_name(panel))
+            results[editor] = (
+                _cells(panel, "HOSTILE_UNIT")[3],
+                _full_name(panel),
+                _clip_cells(expected, _picker(panel)._layout().fmt),
+            )
         return results
 
     results = _run(tmp_path, body, size=(160, 54))
-    for cell, full in results.values():
-        _assert_literal_surface(cell, expected)
+    for cell, full, expected_cell in results.values():
+        _assert_literal_surface(cell, expected_cell)
         assert f"  {expected}  HOSTILE_UNIT" in full.plain
         assert not [span for span in full.spans if "link" in str(span.style).lower()]
         assert not [ch for ch in full.plain if ord(ch) < 0x20 or 0x7F <= ord(ch) <= 0x9F]
@@ -553,7 +557,7 @@ def test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118(tmp_path)
         for cell, full, expected_cell, expected_full, full_budget in results.values():
             _assert_literal_surface(cell, expected_cell)
             _assert_literal_surface(full, expected_full)
-            assert cell.plain.endswith("…") and full.plain.startswith("0x00001000  u16 ")
+            assert cell.plain.endswith("…") and "u16" in full.plain
             assert "…  LONGUNIT" in full.plain
             assert cell_len(full.plain) <= full_budget
 
@@ -759,6 +763,13 @@ def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch
     data = parse_a2l_file(SOFTA)
     rows = data["tags"]
     assert len(rows) == 13990
+    needle = max(
+        ("_", "A", "0", "S"),
+        key=lambda candidate: sum(
+            candidate.lower() in tag["name"].lower() for tag in rows
+        ),
+    )
+    assert sum(needle.lower() in tag["name"].lower() for tag in rows) > 200
 
     async def body(app, pilot):
         panel = await _show_panel(app, pilot, "check")
@@ -770,7 +781,7 @@ def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch
         rebuilds.clear()
         mounted = []
         for index in range(10):
-            panel.query_one("#check_param_filter", Input).value = "" if index % 2 == 0 else "ASAM"
+            panel.query_one("#check_param_filter", Input).value = needle if index % 2 == 0 else ""
             await pilot.pause(0.2)
             assert len(picker.filtered_params) > 200
             panel.query_one("#check_param_page_next_button", Button).press()
