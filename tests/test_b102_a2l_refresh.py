@@ -464,10 +464,9 @@ def test_tc_b102_a2l_06_clear_unload_renders_empty_state(tmp_path: Path) -> None
 #
 # Arm 2 (stale snapshot discarded): a ``PreparedLoad`` shaped like the
 # pre-fix worker bundle carries an A2L enrichment captured against image 1
-# (generation N) while the apply installs image 2 (generation N+1, and the
-# pre-fix bundle carries no generation stamp at all). The apply must NOT
-# install the precomputed cache: ``_compute_a2l_enriched_tags`` recomputes on
-# the UI thread and the painted rows describe image 2.
+# (generation N) while the prepared apply expects image 2 (generation N+1, and the
+# pre-fix bundle carries no generation stamp at all). Inc 5 rejects the whole
+# prepared load before installing any state, keeping the previous image and rows.
 # RED in base: ``_apply_prepared_load`` installs ``prepared.a2l_enriched_*``
 # unconditionally and the identity key matches, so image-1 membership paints.
 # Mutant control: install ``prepared.a2l_enriched_*`` without generation
@@ -509,16 +508,13 @@ def test_tc_b102_a2l_07_stale_prepared_load_discarded(tmp_path: Path) -> None:
             a2l_enriched_key=(id(loaded2.a2l_data), len(loaded2.mem_map)),
             a2l_summary_lines=["stale snapshot"],
         )
-        app._apply_prepared_load(stale_prepared, img2, 0.0)
+        previous_file = app.current_file
+        previous_tags = app._a2l_enriched_tags
+        assert app._apply_prepared_load(stale_prepared, img2, 0.0) is False
         await _settle(pilot)
-        assert app._a2l_enriched_tags is not stale_tags, (
-            "the stale worker precompute was installed verbatim — apply-time "
-            "generation verification is missing"
-        )
+        assert app.current_file is previous_file
+        assert app._a2l_enriched_tags is previous_tags
         assert _row_names(app) == ["Alpha", "Beta"]
-        assert _in_memory_cells(app) == ["no", "no"], (
-            "painted A2L rows came from the stale worker snapshot instead of "
-            "a UI-thread recompute against the applied image"
-        )
+        assert _in_memory_cells(app) == ["yes", "yes"]
 
     projects.run_app(tmp_path / "app", scenario, size=SIZE)

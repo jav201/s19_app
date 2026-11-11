@@ -1,0 +1,327 @@
+M-028
+pytest -k r028
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..63f564b3 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19421,7 +19421,7 @@ class S19TuiApp(App):
+                 self._a2l_view_generation + int(bool(prepared.loaded.a2l_data)),
+                 self._image_generation + 1,
+             )
+-            if actual != expected:
++            if False and actual != expected:
+                 return False
+         loaded = prepared.loaded
+         # Q-h1: the file-load worker's cache entry is stored on the main
+
+/tmp/b103-inc5-mut/M-028/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca48bb9150>
+case = 'R-A2L-REFRESH.028/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.028/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            started = threading.Event()
+            release = threading.Event()
+            dispatched = []
+            real_call_from_thread = app.call_from_thread
+    
+            def gated_dispatch(callback, *args, **kwargs):
+                if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                    dispatched.append((callback, args, kwargs))
+                    started.set()
+                    assert release.wait(20)
+                return real_call_from_thread(callback, *args, **kwargs)
+    
+            monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+            await _submit_load_path(app, pilot, str(f.img2))
+            await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+            assert len(dispatched) == 1
+            prepared = dispatched[0][1][0]
+            assert prepared.a2l_enriched_key is not None
+            assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+            if case.endswith("/1"):
+                prepared.a2l_view_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            else:
+                prepared.a2l_image_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            await pilot.pause()
+            before = _state_snapshot(app)
+            current_file = app.current_file
+            current_data = app.current_a2l_data
+            enriched_key = app._a2l_enriched_key
+            statuses = _status_recorder(app, monkeypatch)
+            sync_calls = []
+            real_sync = app._sync_loaded_file_to_project
+    
+            def sync() -> None:
+                sync_calls.append(threading.get_ident())
+                real_sync()
+    
+            monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+            widget_calls = _arm_thread_spies(app, monkeypatch)
+            release.set()
+            await settle_workers(pilot)
+            after = _state_snapshot(app)
+            assert after[:-1] == before[:-1]
+            assert after[-1] != before[-1]
+            assert app.current_file is current_file
+            assert app.current_a2l_data is current_data
+            assert app._a2l_enriched_key == enriched_key
+            assert app.current_a2l_path.name == expected_name
+            assert [tag["name"] for tag in app._a2l_enriched_tags] == [row[0] for row in expected_rows]
+            assert sync_calls == []
+            assert widget_calls == []
+            assert statuses[-1] == "Load superseded — current state kept."
+            _assert_visible_log(app, statuses[-1])
+            assert not any(message.startswith("Loaded ") for message in statuses)
+            assert "file_load" not in app._busy.runs
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_0/app'), src=PosixPath('/tmp/..._0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        started = threading.Event()
+        release = threading.Event()
+        dispatched = []
+        real_call_from_thread = app.call_from_thread
+    
+        def gated_dispatch(callback, *args, **kwargs):
+            if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                dispatched.append((callback, args, kwargs))
+                started.set()
+                assert release.wait(20)
+            return real_call_from_thread(callback, *args, **kwargs)
+    
+        monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+        await _submit_load_path(app, pilot, str(f.img2))
+        await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+        assert len(dispatched) == 1
+        prepared = dispatched[0][1][0]
+        assert prepared.a2l_enriched_key is not None
+        assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+        if case.endswith("/1"):
+            prepared.a2l_view_generation -= 1
+            expected_rows = OLD
+            expected_name = "old.a2l"
+        else:
+            prepared.a2l_image_generation -= 1
+            expected_rows = OLD
+            expected_name = "old.a2l"
+        await pilot.pause()
+        before = _state_snapshot(app)
+        current_file = app.current_file
+        current_data = app.current_a2l_data
+        enriched_key = app._a2l_enriched_key
+        statuses = _status_recorder(app, monkeypatch)
+        sync_calls = []
+        real_sync = app._sync_loaded_file_to_project
+    
+        def sync() -> None:
+            sync_calls.append(threading.get_ident())
+            real_sync()
+    
+        monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+        widget_calls = _arm_thread_spies(app, monkeypatch)
+        release.set()
+        await settle_workers(pilot)
+        after = _state_snapshot(app)
+>       assert after[:-1] == before[:-1]
+E       AssertionError: assert (None, None, ...nt=0), 2, ...) == (None, None, ...nt=0), 1, ...)
+E         
+E         At index 4 diff: LoadedFile(path=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_0/app/.s19tool/workarea/temp/img2.s19'), file_type='s19', mem_map={0: 2, 1: 5, 2: 8, 3: 11, 4: 14, 5: 17, 6: 20, 7: 23, 8: 26, 9: 29, 10: 32, 11: 35, 12: 38, 13: 41, 14: 44, 15: 47, 16: 50, 17: 53, 18: 56, 19: 59, 20: 62, 21: 65, 22: 68, 23: 71, 24: 74, 25: 77, 26: 80, 27: 83, 28: 86, 29: 89, 30: 92, 31: 95, 32: 98, 33: 101, 34: 104, 35: 107, 36: 110, 37: 113, 38: 116, 39: 119, 40: 122, 41: 125, 42: 128, 43: 131, 44: 134, 45: 137, 46: 140, 47: 143, 48: 146, 49: 1...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_refresh.py:1805: AssertionError
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca46781c10>
+case = 'R-A2L-REFRESH.028/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.028/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            started = threading.Event()
+            release = threading.Event()
+            dispatched = []
+            real_call_from_thread = app.call_from_thread
+    
+            def gated_dispatch(callback, *args, **kwargs):
+                if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                    dispatched.append((callback, args, kwargs))
+                    started.set()
+                    assert release.wait(20)
+                return real_call_from_thread(callback, *args, **kwargs)
+    
+            monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+            await _submit_load_path(app, pilot, str(f.img2))
+            await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+            assert len(dispatched) == 1
+            prepared = dispatched[0][1][0]
+            assert prepared.a2l_enriched_key is not None
+            assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+            if case.endswith("/1"):
+                prepared.a2l_view_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            else:
+                prepared.a2l_image_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            await pilot.pause()
+            before = _state_snapshot(app)
+            current_file = app.current_file
+            current_data = app.current_a2l_data
+            enriched_key = app._a2l_enriched_key
+            statuses = _status_recorder(app, monkeypatch)
+            sync_calls = []
+            real_sync = app._sync_loaded_file_to_project
+    
+            def sync() -> None:
+                sync_calls.append(threading.get_ident())
+                real_sync()
+    
+            monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+            widget_calls = _arm_thread_spies(app, monkeypatch)
+            release.set()
+            await settle_workers(pilot)
+            after = _state_snapshot(app)
+            assert after[:-1] == before[:-1]
+            assert after[-1] != before[-1]
+            assert app.current_file is current_file
+            assert app.current_a2l_data is current_data
+            assert app._a2l_enriched_key == enriched_key
+            assert app.current_a2l_path.name == expected_name
+            assert [tag["name"] for tag in app._a2l_enriched_tags] == [row[0] for row in expected_rows]
+            assert sync_calls == []
+            assert widget_calls == []
+            assert statuses[-1] == "Load superseded — current state kept."
+            _assert_visible_log(app, statuses[-1])
+            assert not any(message.startswith("Loaded ") for message in statuses)
+            assert "file_load" not in app._busy.runs
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_1/app'), src=PosixPath('/tmp/..._1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        started = threading.Event()
+        release = threading.Event()
+        dispatched = []
+        real_call_from_thread = app.call_from_thread
+    
+        def gated_dispatch(callback, *args, **kwargs):
+            if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                dispatched.append((callback, args, kwargs))
+                started.set()
+                assert release.wait(20)
+            return real_call_from_thread(callback, *args, **kwargs)
+    
+        monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+        await _submit_load_path(app, pilot, str(f.img2))
+        await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+        assert len(dispatched) == 1
+        prepared = dispatched[0][1][0]
+        assert prepared.a2l_enriched_key is not None
+        assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+        if case.endswith("/1"):
+            prepared.a2l_view_generation -= 1
+            expected_rows = OLD
+            expected_name = "old.a2l"
+        else:
+            prepared.a2l_image_generation -= 1
+            expected_rows = OLD
+            expected_name = "old.a2l"
+        await pilot.pause()
+        before = _state_snapshot(app)
+        current_file = app.current_file
+        current_data = app.current_a2l_data
+        enriched_key = app._a2l_enriched_key
+        statuses = _status_recorder(app, monkeypatch)
+        sync_calls = []
+        real_sync = app._sync_loaded_file_to_project
+    
+        def sync() -> None:
+            sync_calls.append(threading.get_ident())
+            real_sync()
+    
+        monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+        widget_calls = _arm_thread_spies(app, monkeypatch)
+        release.set()
+        await settle_workers(pilot)
+        after = _state_snapshot(app)
+>       assert after[:-1] == before[:-1]
+E       AssertionError: assert (None, None, ...nt=0), 2, ...) == (None, None, ...nt=0), 1, ...)
+E         
+E         At index 4 diff: LoadedFile(path=PosixPath('/tmp/pytest-of-<account>/pytest-695/test_r028_superseded_prepared_1/app/.s19tool/workarea/temp/img2.s19'), file_type='s19', mem_map={0: 2, 1: 5, 2: 8, 3: 11, 4: 14, 5: 17, 6: 20, 7: 23, 8: 26, 9: 29, 10: 32, 11: 35, 12: 38, 13: 41, 14: 44, 15: 47, 16: 50, 17: 53, 18: 56, 19: 59, 20: 62, 21: 65, 22: 68, 23: 71, 24: 74, 25: 77, 26: 80, 27: 83, 28: 86, 29: 89, 30: 92, 31: 95, 32: 98, 33: 101, 34: 104, 35: 107, 36: 110, 37: 113, 38: 116, 39: 119, 40: 122, 41: 125, 42: 128, 43: 131, 44: 134, 45: 137, 46: 140, 47: 143, 48: 146, 49: 1...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_refresh.py:1805: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]
+2 failed, 101 deselected in 54.84s

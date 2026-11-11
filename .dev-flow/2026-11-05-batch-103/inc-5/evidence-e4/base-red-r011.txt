@@ -1,0 +1,67 @@
+F..FF                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/1] ________________
+tests/test_b103_a2l_refresh.py:845: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:831: in scenario
+    assert app._a2l_tag_hex_highlight is None
+E   AssertionError: assert (16, 1) is None
+E    +  where (16, 1) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_tag_hex_highlight
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/4] ________________
+tests/test_b103_a2l_refresh.py:845: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:831: in scenario
+    assert app._a2l_tag_hex_highlight is None
+E   AssertionError: assert (16, 1) is None
+E    +  where (16, 1) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._a2l_tag_hex_highlight
+_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/5] ________________
+tests/test_b103_a2l_refresh.py:845: in test_r011_hex_span_repaint
+    _run(tmp_path, scenario)
+tests/test_b103_a2l_refresh.py:311: in _run
+    asyncio.run(drive())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:309: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:833: in scenario
+    assert not has_focus_style(after)
+E   assert not True
+E    +  where True = <function test_r011_hex_span_repaint.<locals>.scenario.<locals>.has_focus_style at 0x7fb1a8199760>(Content('  0x00000000  01 04 07 0A 0D 10 13 16 19 1C 1F 22 25 28 2B 2E  |..........."%(+.|\n  0x00000010  31 34 37 3A ..., 1289, style=Style(foreground=Color(233, 233, 233))), Span(1289, 1292, style=Style(foreground=Color(233, 233, 233)))]))
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/5]
+3 failed, 2 passed, 98 deselected in 19.90s

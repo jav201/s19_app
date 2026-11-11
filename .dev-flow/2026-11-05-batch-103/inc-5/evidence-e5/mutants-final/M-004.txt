@@ -1,0 +1,143 @@
+M-004
+pytest -k r004
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..23070faf 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -15175,7 +15175,7 @@ class S19TuiApp(App):
+                     "project_load", gen, "Load superseded — current state kept."
+                 )
+                 return
+-            self._refresh_a2l_dependent_views()
++            pass  # no A2L-only fanout
+             loaded = self.current_file
+             announcement = compose_load_announcement(
+                 request.name,
+
+/tmp/b103-inc5-mut/M-004/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/1] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7cc5f44fd0>
+case = 'R-A2L-REFRESH.004/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_ONLY")
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            assert app.current_file is None
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:527: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A0/app'), src=PosixPath('/tmp/...A0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_ONLY", image=None, a2l=f.new)
+        if case.endswith("/2"):
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        await _load_project(app, pilot, "P_ONLY")
+>       assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+E       AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E         
+E         At index 0 diff: 'OUTCOME' != 'F'
+E         Right contains one more item: 'OUTCOME'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:523: AssertionError
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/2] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7cc53cd210>
+case = 'R-A2L-REFRESH.004/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_ONLY")
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            assert app.current_file is None
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:527: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A1/app'), src=PosixPath('/tmp/...A1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-671/test_r004_a2l_only_project_R_A1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_ONLY", image=None, a2l=f.new)
+        if case.endswith("/2"):
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        await _load_project(app, pilot, "P_ONLY")
+>       assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+E       AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E         
+E         At index 0 diff: 'OUTCOME' != 'F'
+E         Right contains one more item: 'OUTCOME'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:523: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]
+2 failed, 101 deselected in 18.84s

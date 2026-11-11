@@ -1719,21 +1719,50 @@ class SplitJoinWindow(WindowSection):
     # State -> screen
     # ------------------------------------------------------------------ #
 
+    def invalidate_a2l_selection(self) -> None:
+        """
+        Summary:
+            Invalidate A2L-derived row selection before the window refreshes
+            from a new A2L generation.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clear only the A2L selection and cursor, and disarm export.
+            - Preserve manual text/state, ranges, caches and all other tabs.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp._refresh_a2l_dependent_views``
+        """
+        self._sel["a2l"].clear()
+        self._cursor["a2l"] = 0
+        self._armed = False
+
     def refresh_window(self) -> None:
         """The app's one seam into this window: open + reload hook.
 
-        A NEW loaded image invalidates the ranges/A2L row indices (the
+        A NEW memory map invalidates the ranges/A2L row indices (the
         selections key into a table that just changed), so the seats reset
-        on an image swap; the typed manual localities survive (they are the
-        operator's own text, not image rows).
+        on an image swap or image-presence change. Replacing LoadedFile for an
+        A2L/MAC update with the same map preserves ranges; explicit A2L
+        invalidation owns that tab. Typed manual localities always survive.
         """
         loaded = self._loaded()
         if loaded is not self._loaded_cache:
+            previous = self._loaded_cache
+            previous_mem_map = previous.mem_map if previous is not None else None
+            mem_map = loaded.mem_map if loaded is not None else None
             self._loaded_cache = loaded
-            for key in ("ranges", "a2l"):
-                self._sel[key] = set()
-                self._cursor[key] = 0
-            self._armed = False
+            if mem_map is not previous_mem_map:
+                for key in ("ranges", "a2l"):
+                    self._sel[key] = set()
+                    self._cursor[key] = 0
+                self._armed = False
         self._sync()
         # One settled re-sync: the first pass may run before the freshly
         # unhidden window has real measured widths (content_size 0 — the

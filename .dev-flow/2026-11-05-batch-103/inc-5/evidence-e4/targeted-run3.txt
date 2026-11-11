@@ -1,0 +1,78 @@
+..F..........................                                            [100%]
+=================================== FAILURES ===================================
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-572/test_r002_image_load_refreshes2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f44a189fbd0>
+case = 'R-A2L-REFRESH.002/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name == "image.s19"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:312: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:310: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-572/test_r002_image_load_refreshes2/app'), src=PosixPath('/tmp/...s2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-572/test_r002_image_load_refreshes2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        source = f.img1
+        if case.endswith("/3"):
+            source = f.src / "image.s19"
+            source.write_bytes(f.img1.read_bytes())
+        if not case.endswith("/1"):
+            await _load_image(app, pilot, source)
+        await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        if case.endswith("/3"):
+            source.write_bytes(f.img2.read_bytes())
+        await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+        assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+        _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+        if case.endswith("/3"):
+>           assert app.current_file.path.name == "image.s19"
+E           AssertionError: assert 'image_1.s19' == 'image.s19'
+E             
+E             - image.s19
+E             + image_1.s19
+E             ?      ++
+
+tests/test_b103_a2l_refresh.py:354: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+1 failed, 28 passed, 74 deselected in 115.04s (0:01:55)

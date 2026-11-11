@@ -1377,8 +1377,8 @@ def test_handle_load_dialog_none_path_skips_scheduling(
 def test_apply_prepared_load_chains_updates_via_call_later(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
-    """``_apply_prepared_load`` must install reactive state synchronously and defer
-    every heavy UI refresh through ``call_later`` so the event loop can repaint.
+    """Install reactive state and the common A2L fan-out synchronously, then defer
+    sections, hex and the final labels/Memory Map through ``call_later``.
     """
     from s19_app.tui.app import PreparedLoad
 
@@ -1442,10 +1442,7 @@ def test_apply_prepared_load_chains_updates_via_call_later(
 
     assert len(deferred) == 3
     deferred[2]()
-    assert "a2l" in call_log
-
-    assert len(deferred) == 4
-    deferred[3]()
+    assert "a2l" in call_log, "the common A2L fan-out is synchronous"
     assert "labels" in call_log
     assert "memory_map" in call_log, "Memory Map refresh runs in the finalize step"
 

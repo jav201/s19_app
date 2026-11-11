@@ -1,0 +1,1382 @@
+....FFFFFFFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+__________________ test_r027_generations[R-A2L-REFRESH.027/1] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE0')
+case = 'R-A2L-REFRESH.027/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.027/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r027_generations(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            elif case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_image(app, pilot, f.img1)
+            before = (app._a2l_view_generation, app._image_generation)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            assert app._a2l_view_generation > before[0]
+            assert app._image_generation == before[1]
+            assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+            expected_rows = OLD if case.endswith("/1") else NEW
+            for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+                picker = _picker(panel)
+                assert picker._signature == app._a2l_enriched_key
+                assert [
+                    (name, address, fmt.split()[0])
+                    for name, address, fmt in _picker_visible_shape(panel)
+                ] == [
+                    (name, f"0x{address:08X}", f"u{size * 8}")
+                    for name, address, size in expected_rows
+                ]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE0/app'), src=PosixPath('/tmp/...E0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        elif case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_image(app, pilot, f.img1)
+        before = (app._a2l_view_generation, app._image_generation)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        assert app._a2l_view_generation > before[0]
+        assert app._image_generation == before[1]
+        assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
+        for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+>           assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == [
+                (name, f"0x{address:08X}", f"u{size * 8}")
+                for name, address, size in expected_rows
+            ]
+E           AssertionError: assert [('OLD_ONLY',...00070', 'u8')] == [('OLD_ONLY',...00070', 'u8')]
+E             
+E             At index 1 diff: ('AlphaShared', '0x00000020', 'u16…') != ('AlphaShared', '0x00000020', 'u16')
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:928: AssertionError
+__________________ test_r027_generations[R-A2L-REFRESH.027/2] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE1')
+case = 'R-A2L-REFRESH.027/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.027/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r027_generations(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            elif case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_image(app, pilot, f.img1)
+            before = (app._a2l_view_generation, app._image_generation)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            assert app._a2l_view_generation > before[0]
+            assert app._image_generation == before[1]
+            assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+            expected_rows = OLD if case.endswith("/1") else NEW
+            for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+                picker = _picker(panel)
+                assert picker._signature == app._a2l_enriched_key
+                assert [
+                    (name, address, fmt.split()[0])
+                    for name, address, fmt in _picker_visible_shape(panel)
+                ] == [
+                    (name, f"0x{address:08X}", f"u{size * 8}")
+                    for name, address, size in expected_rows
+                ]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE1/app'), src=PosixPath('/tmp/...E1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        elif case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_image(app, pilot, f.img1)
+        before = (app._a2l_view_generation, app._image_generation)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        assert app._a2l_view_generation > before[0]
+        assert app._image_generation == before[1]
+        assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
+        for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+>           assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == [
+                (name, f"0x{address:08X}", f"u{size * 8}")
+                for name, address, size in expected_rows
+            ]
+E           AssertionError: assert [('NEW_ONLY',...00071', 'u8')] == [('NEW_ONLY',...00071', 'u8')]
+E             
+E             At index 1 diff: ('AlphaShared', '0x00000020', 'u16…') != ('AlphaShared', '0x00000020', 'u16')
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:928: AssertionError
+__________________ test_r027_generations[R-A2L-REFRESH.027/3] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE2')
+case = 'R-A2L-REFRESH.027/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.027/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r027_generations(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            elif case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_image(app, pilot, f.img1)
+            before = (app._a2l_view_generation, app._image_generation)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            assert app._a2l_view_generation > before[0]
+            assert app._image_generation == before[1]
+            assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+            expected_rows = OLD if case.endswith("/1") else NEW
+            for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+                picker = _picker(panel)
+                assert picker._signature == app._a2l_enriched_key
+                assert [
+                    (name, address, fmt.split()[0])
+                    for name, address, fmt in _picker_visible_shape(panel)
+                ] == [
+                    (name, f"0x{address:08X}", f"u{size * 8}")
+                    for name, address, size in expected_rows
+                ]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE2/app'), src=PosixPath('/tmp/...E2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        elif case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_image(app, pilot, f.img1)
+        before = (app._a2l_view_generation, app._image_generation)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        assert app._a2l_view_generation > before[0]
+        assert app._image_generation == before[1]
+        assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
+        for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+>           assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == [
+                (name, f"0x{address:08X}", f"u{size * 8}")
+                for name, address, size in expected_rows
+            ]
+E           AssertionError: assert [('NEW_ONLY',...00071', 'u8')] == [('NEW_ONLY',...00071', 'u8')]
+E             
+E             At index 1 diff: ('AlphaShared', '0x00000020', 'u16…') != ('AlphaShared', '0x00000020', 'u16')
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:928: AssertionError
+__________________ test_r027_generations[R-A2L-REFRESH.027/4] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE3')
+case = 'R-A2L-REFRESH.027/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.027/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r027_generations(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            elif case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_image(app, pilot, f.img1)
+            before = (app._a2l_view_generation, app._image_generation)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            assert app._a2l_view_generation > before[0]
+            assert app._image_generation == before[1]
+            assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+            expected_rows = OLD if case.endswith("/1") else NEW
+            for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+                picker = _picker(panel)
+                assert picker._signature == app._a2l_enriched_key
+                assert [
+                    (name, address, fmt.split()[0])
+                    for name, address, fmt in _picker_visible_shape(panel)
+                ] == [
+                    (name, f"0x{address:08X}", f"u{size * 8}")
+                    for name, address, size in expected_rows
+                ]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE3/app'), src=PosixPath('/tmp/...E3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r027_generations_R_A2L_RE3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        elif case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_image(app, pilot, f.img1)
+        before = (app._a2l_view_generation, app._image_generation)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        assert app._a2l_view_generation > before[0]
+        assert app._image_generation == before[1]
+        assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
+        for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+>           assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == [
+                (name, f"0x{address:08X}", f"u{size * 8}")
+                for name, address, size in expected_rows
+            ]
+E           AssertionError: assert [('NEW_ONLY',...00071', 'u8')] == [('NEW_ONLY',...00071', 'u8')]
+E             
+E             At index 1 diff: ('AlphaShared', '0x00000020', 'u16…') != ('AlphaShared', '0x00000020', 'u16')
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:928: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil0')
+case = 'R-A2L-REFRESH.012/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil0/app'), src=PosixPath('/tmp/...l0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('OLD_ONLY',...00070', 'u8')] == (('OLD_ONLY',...', 112, 'u8'))
+E         
+E         At index 0 diff: ('OLD_ONLY', '0x00000010', 'u8') != ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1097: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/2] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil1')
+case = 'R-A2L-REFRESH.012/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil1/app'), src=PosixPath('/tmp/...l1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('NEW_ONLY',...00071', 'u8')] == (('NEW_ONLY',...', 113, 'u8'))
+E         
+E         At index 0 diff: ('NEW_ONLY', '0x00000040', 'u8') != ('NEW_ONLY', 64, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1097: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/3] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil2')
+case = 'R-A2L-REFRESH.012/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil2/app'), src=PosixPath('/tmp/...l2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('OLD_ONLY',...00070', 'u8')] == (('OLD_ONLY',...', 112, 'u8'))
+E         
+E         At index 0 diff: ('OLD_ONLY', '0x00000010', 'u8') != ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1097: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/4] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil3')
+case = 'R-A2L-REFRESH.012/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil3/app'), src=PosixPath('/tmp/...l3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r012_visible_check_prefil3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       assert [] == ()
+E         
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1097: AssertionError
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil0')
+case = 'R-A2L-REFRESH.013/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.013/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r013_visible_patch_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("patch")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            app._change_service.add_entry("0x00F0", "", "AA")
+            app._change_service.add_entry("0x00F1", "", "BB")
+            app._change_service.undo()
+            panel.mark_pasted()
+            await pilot.pause()
+            document = app._change_service.document
+            before = (
+                document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "patch"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#patch_param_full_name_line", Static).render()) == NO_PICKERS
+            after = (
+                app._change_service.document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            assert after == before
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil0/app'), src=PosixPath('/tmp/...l0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("patch")
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        app._change_service.add_entry("0x00F0", "", "AA")
+        app._change_service.add_entry("0x00F1", "", "BB")
+        app._change_service.undo()
+        panel.mark_pasted()
+        await pilot.pause()
+        document = app._change_service.document
+        before = (
+            document,
+            panel.is_dirty,
+            len(app._change_service._undo_stack),
+            len(app._change_service._redo_stack),
+        )
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "patch"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('OLD_ONLY',...00070', 'u8')] == (('OLD_ONLY',...', 112, 'u8'))
+E         
+E         At index 0 diff: ('OLD_ONLY', '0x00000010', 'u8') != ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1149: AssertionError
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil1')
+case = 'R-A2L-REFRESH.013/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.013/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r013_visible_patch_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("patch")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            app._change_service.add_entry("0x00F0", "", "AA")
+            app._change_service.add_entry("0x00F1", "", "BB")
+            app._change_service.undo()
+            panel.mark_pasted()
+            await pilot.pause()
+            document = app._change_service.document
+            before = (
+                document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "patch"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#patch_param_full_name_line", Static).render()) == NO_PICKERS
+            after = (
+                app._change_service.document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            assert after == before
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil1/app'), src=PosixPath('/tmp/...l1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("patch")
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        app._change_service.add_entry("0x00F0", "", "AA")
+        app._change_service.add_entry("0x00F1", "", "BB")
+        app._change_service.undo()
+        panel.mark_pasted()
+        await pilot.pause()
+        document = app._change_service.document
+        before = (
+            document,
+            panel.is_dirty,
+            len(app._change_service._undo_stack),
+            len(app._change_service._redo_stack),
+        )
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "patch"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('NEW_ONLY',...00071', 'u8')] == (('NEW_ONLY',...', 113, 'u8'))
+E         
+E         At index 0 diff: ('NEW_ONLY', '0x00000040', 'u8') != ('NEW_ONLY', 64, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1149: AssertionError
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil2')
+case = 'R-A2L-REFRESH.013/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.013/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r013_visible_patch_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("patch")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            app._change_service.add_entry("0x00F0", "", "AA")
+            app._change_service.add_entry("0x00F1", "", "BB")
+            app._change_service.undo()
+            panel.mark_pasted()
+            await pilot.pause()
+            document = app._change_service.document
+            before = (
+                document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "patch"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#patch_param_full_name_line", Static).render()) == NO_PICKERS
+            after = (
+                app._change_service.document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            assert after == before
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil2/app'), src=PosixPath('/tmp/...l2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("patch")
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        app._change_service.add_entry("0x00F0", "", "AA")
+        app._change_service.add_entry("0x00F1", "", "BB")
+        app._change_service.undo()
+        panel.mark_pasted()
+        await pilot.pause()
+        document = app._change_service.document
+        before = (
+            document,
+            panel.is_dirty,
+            len(app._change_service._undo_stack),
+            len(app._change_service._redo_stack),
+        )
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "patch"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       AssertionError: assert [('OLD_ONLY',...00070', 'u8')] == (('OLD_ONLY',...', 112, 'u8'))
+E         
+E         At index 0 diff: ('OLD_ONLY', '0x00000010', 'u8') != ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1149: AssertionError
+_____________ test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil3')
+case = 'R-A2L-REFRESH.013/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.013/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r013_visible_patch_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("patch")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            app._change_service.add_entry("0x00F0", "", "AA")
+            app._change_service.add_entry("0x00F1", "", "BB")
+            app._change_service.undo()
+            panel.mark_pasted()
+            await pilot.pause()
+            document = app._change_service.document
+            before = (
+                document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "patch"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            assert [
+                (name, address, fmt.split()[0])
+                for name, address, fmt in _picker_visible_shape(panel)
+            ] == expected
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#patch_param_full_name_line", Static).render()) == NO_PICKERS
+            after = (
+                app._change_service.document,
+                panel.is_dirty,
+                len(app._change_service._undo_stack),
+                len(app._change_service._redo_stack),
+            )
+            assert after == before
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil3/app'), src=PosixPath('/tmp/...l3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-653/test_r013_visible_patch_prefil3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("patch")
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        app._change_service.add_entry("0x00F0", "", "AA")
+        app._change_service.add_entry("0x00F1", "", "BB")
+        app._change_service.undo()
+        panel.mark_pasted()
+        await pilot.pause()
+        document = app._change_service.document
+        before = (
+            document,
+            panel.is_dirty,
+            len(app._change_service._undo_stack),
+            len(app._change_service._redo_stack),
+        )
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "patch"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+>       assert [
+            (name, address, fmt.split()[0])
+            for name, address, fmt in _picker_visible_shape(panel)
+        ] == expected
+E       assert [] == ()
+E         
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1149: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4]
+12 failed, 4 passed, 87 deselected in 292.04s (0:04:52)

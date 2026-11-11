@@ -1,0 +1,308 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-614/test_r028_superseded_prepared_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2bfbac5090>
+case = 'R-A2L-REFRESH.028/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.028/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            started = threading.Event()
+            release = threading.Event()
+            dispatched = []
+            real_call_from_thread = app.call_from_thread
+    
+            def gated_dispatch(callback, *args, **kwargs):
+                if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                    dispatched.append((callback, args, kwargs))
+                    started.set()
+                    assert release.wait(20)
+                return real_call_from_thread(callback, *args, **kwargs)
+    
+            monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+            await _submit_load_path(app, pilot, str(f.img2))
+            await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+            assert len(dispatched) == 1
+            prepared = dispatched[0][1][0]
+            assert prepared.a2l_enriched_key is not None
+            assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+            if case.endswith("/1"):
+                prepared.a2l_view_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            else:
+                prepared.a2l_image_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            await pilot.pause()
+            before = _state_snapshot(app)
+            current_file = app.current_file
+            current_data = app.current_a2l_data
+            enriched_key = app._a2l_enriched_key
+            statuses = _status_recorder(app, monkeypatch)
+            sync_calls = []
+            real_sync = app._sync_loaded_file_to_project
+    
+            def sync() -> None:
+                sync_calls.append(threading.get_ident())
+                real_sync()
+    
+            monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+            widget_calls = _arm_thread_spies(app, monkeypatch)
+            release.set()
+            await settle_workers(pilot)
+            after = _state_snapshot(app)
+            assert after[:-1] == before[:-1]
+            assert after[-1] != before[-1]
+            assert app.current_file is current_file
+            assert app.current_a2l_data is current_data
+            assert app._a2l_enriched_key == enriched_key
+            assert app.current_a2l_path.name == expected_name
+            assert [tag["name"] for tag in app._a2l_enriched_tags] == [row[0] for row in expected_rows]
+            assert sync_calls == []
+            assert widget_calls == []
+            assert statuses[-1] == "Load superseded — current state kept."
+            _assert_visible_log(app, statuses[-1])
+            assert not any(message.startswith("Loaded ") for message in statuses)
+            assert "file_load" not in app._busy.runs
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1807: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1776: in scenario
+    before = _state_snapshot(app)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _state_snapshot(app: S19TuiApp) -> tuple:
+        import copy
+    
+        check = app.query_one("#check_editor_panel", CheckEditorPanel)
+        patch = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        workers = tuple(sorted(
+            (id(worker), worker.name, worker.group, worker.is_running, worker.is_cancelled)
+            for worker in app.workers
+        ))
+        return (
+            app.current_project,
+            app.current_project_dir,
+            app.current_a2l_path,
+            copy.deepcopy(app.current_a2l_data),
+            copy.deepcopy(app.current_file),
+            app._a2l_view_generation,
+            app._image_generation,
+            copy.deepcopy(app._a2l_enriched_tags),
+            app._mac_window_start,
+            copy.deepcopy(app._mac_view_cache_summary),
+            app.validation_issue_filter_mode,
+            copy.deepcopy(app._validation_report),
+            copy.deepcopy(app._validation_issues),
+            _table_names(app.query_one("#a2l_tags_list", DataTable)),
+            _a2l_visible_shape(app),
+            _loaded_text(app),
+            _project_digests(app.current_project_dir) if app.current_project_dir else {},
+            _picker_visible_shape(check),
+            _picker_visible_shape(patch),
+            _picker(check)._signature,
+            _picker(patch)._signature,
+            copy.deepcopy(memory._a2l_tags),
+            memory.rendered_text,
+            _memory_visible_text(memory),
+            copy.deepcopy(split._a2l_rows_cache),
+            copy.deepcopy(split._sel),
+            copy.deepcopy(split._cursor),
+            split._armed,
+            split._tab,
+            split.query_one("#sje_manual", TextArea).text,
+            _split_visible_text(split),
+            patch.is_dirty,
+            copy.deepcopy(app._change_service.document),
+            copy.deepcopy(app._change_service._undo_stack),
+            copy.deepcopy(app._change_service._redo_stack),
+            app._change_service._last_check_message,
+>           copy.deepcopy(app._last_flow_run),
+                          ^^^^^^^^^^^^^^^^^^
+            copy.deepcopy(app._diff_last_result),
+            workers,
+        )
+E       AttributeError: 'S19TuiApp' object has no attribute '_last_flow_run'
+
+tests/test_b103_a2l_refresh.py:1360: AttributeError
+___________ test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-614/test_r028_superseded_prepared_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2bfa65e710>
+case = 'R-A2L-REFRESH.028/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.028/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            started = threading.Event()
+            release = threading.Event()
+            dispatched = []
+            real_call_from_thread = app.call_from_thread
+    
+            def gated_dispatch(callback, *args, **kwargs):
+                if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                    dispatched.append((callback, args, kwargs))
+                    started.set()
+                    assert release.wait(20)
+                return real_call_from_thread(callback, *args, **kwargs)
+    
+            monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+            await _submit_load_path(app, pilot, str(f.img2))
+            await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+            assert len(dispatched) == 1
+            prepared = dispatched[0][1][0]
+            assert prepared.a2l_enriched_key is not None
+            assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
+            if case.endswith("/1"):
+                prepared.a2l_view_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            else:
+                prepared.a2l_image_generation -= 1
+                expected_rows = OLD
+                expected_name = "old.a2l"
+            await pilot.pause()
+            before = _state_snapshot(app)
+            current_file = app.current_file
+            current_data = app.current_a2l_data
+            enriched_key = app._a2l_enriched_key
+            statuses = _status_recorder(app, monkeypatch)
+            sync_calls = []
+            real_sync = app._sync_loaded_file_to_project
+    
+            def sync() -> None:
+                sync_calls.append(threading.get_ident())
+                real_sync()
+    
+            monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
+            widget_calls = _arm_thread_spies(app, monkeypatch)
+            release.set()
+            await settle_workers(pilot)
+            after = _state_snapshot(app)
+            assert after[:-1] == before[:-1]
+            assert after[-1] != before[-1]
+            assert app.current_file is current_file
+            assert app.current_a2l_data is current_data
+            assert app._a2l_enriched_key == enriched_key
+            assert app.current_a2l_path.name == expected_name
+            assert [tag["name"] for tag in app._a2l_enriched_tags] == [row[0] for row in expected_rows]
+            assert sync_calls == []
+            assert widget_calls == []
+            assert statuses[-1] == "Load superseded — current state kept."
+            _assert_visible_log(app, statuses[-1])
+            assert not any(message.startswith("Loaded ") for message in statuses)
+            assert "file_load" not in app._busy.runs
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1807: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1776: in scenario
+    before = _state_snapshot(app)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    def _state_snapshot(app: S19TuiApp) -> tuple:
+        import copy
+    
+        check = app.query_one("#check_editor_panel", CheckEditorPanel)
+        patch = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        workers = tuple(sorted(
+            (id(worker), worker.name, worker.group, worker.is_running, worker.is_cancelled)
+            for worker in app.workers
+        ))
+        return (
+            app.current_project,
+            app.current_project_dir,
+            app.current_a2l_path,
+            copy.deepcopy(app.current_a2l_data),
+            copy.deepcopy(app.current_file),
+            app._a2l_view_generation,
+            app._image_generation,
+            copy.deepcopy(app._a2l_enriched_tags),
+            app._mac_window_start,
+            copy.deepcopy(app._mac_view_cache_summary),
+            app.validation_issue_filter_mode,
+            copy.deepcopy(app._validation_report),
+            copy.deepcopy(app._validation_issues),
+            _table_names(app.query_one("#a2l_tags_list", DataTable)),
+            _a2l_visible_shape(app),
+            _loaded_text(app),
+            _project_digests(app.current_project_dir) if app.current_project_dir else {},
+            _picker_visible_shape(check),
+            _picker_visible_shape(patch),
+            _picker(check)._signature,
+            _picker(patch)._signature,
+            copy.deepcopy(memory._a2l_tags),
+            memory.rendered_text,
+            _memory_visible_text(memory),
+            copy.deepcopy(split._a2l_rows_cache),
+            copy.deepcopy(split._sel),
+            copy.deepcopy(split._cursor),
+            split._armed,
+            split._tab,
+            split.query_one("#sje_manual", TextArea).text,
+            _split_visible_text(split),
+            patch.is_dirty,
+            copy.deepcopy(app._change_service.document),
+            copy.deepcopy(app._change_service._undo_stack),
+            copy.deepcopy(app._change_service._redo_stack),
+            app._change_service._last_check_message,
+>           copy.deepcopy(app._last_flow_run),
+                          ^^^^^^^^^^^^^^^^^^
+            copy.deepcopy(app._diff_last_result),
+            workers,
+        )
+E       AttributeError: 'S19TuiApp' object has no attribute '_last_flow_run'
+
+tests/test_b103_a2l_refresh.py:1360: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]
+2 failed, 101 deselected in 92.94s (0:01:32)

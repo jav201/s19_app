@@ -1,0 +1,335 @@
+M-016
+pytest -k r016
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..1ab604e8 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21345,7 +21345,7 @@ class S19TuiApp(App):
+         except Exception:
+             window = None
+         if window is not None:
+-            window.invalidate_a2l_selection()
++            window.refresh_window()
+         self.watch_current_file()
+         self._refresh_loaded_panel()
+ 
+
+/tmp/b103-inc5-mut/M-016/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+__________________ test_r016_split_join[R-A2L-REFRESH.016/1] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF0')
+case = 'R-A2L-REFRESH.016/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.016/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r016_split_join(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            path = f.old
+            if case.endswith("/2"):
+                path = f.src / "same.a2l"
+                path.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, path)
+            app.action_open_split_join_export()
+            split = app.query_one("#screen_split_join", SplitJoinWindow)
+            split._tab = "a2l"
+            split._sel["a2l"] = {0}
+            split._cursor["a2l"] = 0
+            split._armed = True
+            split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+            split._sync()
+            await pilot.pause()
+            assert len(split._a2l_rows_cache) == 4
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                path.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, path)
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert split._sel["a2l"] == set()
+            assert split._cursor["a2l"] == 0
+            assert split._armed is False
+            assert split.query_one("#sje_manual", TextArea).text == "manual: keep [x]"
+            expected = () if case.endswith("/3") else NEW
+            assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == list(expected)
+            split_text = _split_visible_text(split)
+            if not expected:
+                assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+            for name, address, size in expected:
+                assert name in split_text
+                assert f"0x{address:08X}" in split_text
+                assert f"{size} B" in split_text
+            assert "OLD_ONLY" not in split_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:864: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF0/app'), src=PosixPath('/tmp/...F0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        path = f.old
+        if case.endswith("/2"):
+            path = f.src / "same.a2l"
+            path.write_bytes(f.old.read_bytes())
+        await _load_image(app, pilot, f.img1)
+        await _load_a2l(app, pilot, path)
+        app.action_open_split_join_export()
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        split._tab = "a2l"
+        split._sel["a2l"] = {0}
+        split._cursor["a2l"] = 0
+        split._armed = True
+        split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+        split._sync()
+        await pilot.pause()
+        assert len(split._a2l_rows_cache) == 4
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.new)
+        elif case.endswith("/2"):
+            path.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, path)
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+>       assert split._sel["a2l"] == set()
+E       assert {0} == set()
+E         
+E         Extra items in the left set:
+E         0
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:849: AssertionError
+__________________ test_r016_split_join[R-A2L-REFRESH.016/2] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF1')
+case = 'R-A2L-REFRESH.016/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.016/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r016_split_join(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            path = f.old
+            if case.endswith("/2"):
+                path = f.src / "same.a2l"
+                path.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, path)
+            app.action_open_split_join_export()
+            split = app.query_one("#screen_split_join", SplitJoinWindow)
+            split._tab = "a2l"
+            split._sel["a2l"] = {0}
+            split._cursor["a2l"] = 0
+            split._armed = True
+            split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+            split._sync()
+            await pilot.pause()
+            assert len(split._a2l_rows_cache) == 4
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                path.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, path)
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert split._sel["a2l"] == set()
+            assert split._cursor["a2l"] == 0
+            assert split._armed is False
+            assert split.query_one("#sje_manual", TextArea).text == "manual: keep [x]"
+            expected = () if case.endswith("/3") else NEW
+            assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == list(expected)
+            split_text = _split_visible_text(split)
+            if not expected:
+                assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+            for name, address, size in expected:
+                assert name in split_text
+                assert f"0x{address:08X}" in split_text
+                assert f"{size} B" in split_text
+            assert "OLD_ONLY" not in split_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:864: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF1/app'), src=PosixPath('/tmp/...F1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        path = f.old
+        if case.endswith("/2"):
+            path = f.src / "same.a2l"
+            path.write_bytes(f.old.read_bytes())
+        await _load_image(app, pilot, f.img1)
+        await _load_a2l(app, pilot, path)
+        app.action_open_split_join_export()
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        split._tab = "a2l"
+        split._sel["a2l"] = {0}
+        split._cursor["a2l"] = 0
+        split._armed = True
+        split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+        split._sync()
+        await pilot.pause()
+        assert len(split._a2l_rows_cache) == 4
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.new)
+        elif case.endswith("/2"):
+            path.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, path)
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+>       assert split._sel["a2l"] == set()
+E       assert {0} == set()
+E         
+E         Extra items in the left set:
+E         0
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:849: AssertionError
+__________________ test_r016_split_join[R-A2L-REFRESH.016/3] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF2')
+case = 'R-A2L-REFRESH.016/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.016/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r016_split_join(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            path = f.old
+            if case.endswith("/2"):
+                path = f.src / "same.a2l"
+                path.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, path)
+            app.action_open_split_join_export()
+            split = app.query_one("#screen_split_join", SplitJoinWindow)
+            split._tab = "a2l"
+            split._sel["a2l"] = {0}
+            split._cursor["a2l"] = 0
+            split._armed = True
+            split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+            split._sync()
+            await pilot.pause()
+            assert len(split._a2l_rows_cache) == 4
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                path.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, path)
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert split._sel["a2l"] == set()
+            assert split._cursor["a2l"] == 0
+            assert split._armed is False
+            assert split.query_one("#sje_manual", TextArea).text == "manual: keep [x]"
+            expected = () if case.endswith("/3") else NEW
+            assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == list(expected)
+            split_text = _split_visible_text(split)
+            if not expected:
+                assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+            for name, address, size in expected:
+                assert name in split_text
+                assert f"0x{address:08X}" in split_text
+                assert f"{size} B" in split_text
+            assert "OLD_ONLY" not in split_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:864: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF2/app'), src=PosixPath('/tmp/...F2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-683/test_r016_split_join_R_A2L_REF2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        path = f.old
+        if case.endswith("/2"):
+            path = f.src / "same.a2l"
+            path.write_bytes(f.old.read_bytes())
+        await _load_image(app, pilot, f.img1)
+        await _load_a2l(app, pilot, path)
+        app.action_open_split_join_export()
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        split._tab = "a2l"
+        split._sel["a2l"] = {0}
+        split._cursor["a2l"] = 0
+        split._armed = True
+        split.query_one("#sje_manual", TextArea).text = "manual: keep [x]"
+        split._sync()
+        await pilot.pause()
+        assert len(split._a2l_rows_cache) == 4
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.new)
+        elif case.endswith("/2"):
+            path.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, path)
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+>       assert split._sel["a2l"] == set()
+E       assert {0} == set()
+E         
+E         Extra items in the left set:
+E         0
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:849: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/3]
+3 failed, 100 deselected in 56.59s

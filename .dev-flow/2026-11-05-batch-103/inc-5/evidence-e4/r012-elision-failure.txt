@@ -1,0 +1,107 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <runner-python>
+rootdir: /tmp/b103-inc5-e5
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] FAILED [100%]
+
+=================================== FAILURES ===================================
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-656/test_r012_visible_check_prefil0')
+case = 'R-A2L-REFRESH.012/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            _assert_picker_visible(panel, expected)
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:1102: in scenario
+    _assert_picker_visible(panel, expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+panel = CheckEditorPanel(id='check_editor_panel')
+expected = (('OLD_ONLY', 16, 'u8'), ('AlphaShared', 32, 'u16'), ('OUT_WARN', 48, 'u8'), ('PAGE2_OLD', 112, 'u8'))
+
+    def _assert_picker_visible(panel: CheckEditorPanel | PatchEditorPanel, expected: tuple) -> None:
+        visible = _picker_visible_shape(panel)
+        assert len(visible) == len(expected)
+        for (name, address, fmt), (expected_name, expected_address, expected_fmt) in zip(visible, expected):
+>           assert (name, address) == (expected_name, expected_address)
+E           AssertionError: assert ('OLD_ONLY', '0x00000010') == ('OLD_ONLY', 16)
+E             
+E             At index 1 diff: '0x00000010' != 16
+E             
+E             Full diff:
+E               (
+E                   'OLD_ONLY',
+E             -     16,
+E             +     '0x00000010',
+E               )
+
+tests/test_b103_a2l_refresh.py:1069: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] - AssertionError: assert ('OLD_ONLY', '0x00000010') == ('OLD_ONLY', 16)
+  
+  At index 1 diff: '0x00000010' != 16
+  
+  Full diff:
+    (
+        'OLD_ONLY',
+  -     16,
+  +     '0x00000010',
+    )
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+============================== 1 failed in 14.70s ==============================

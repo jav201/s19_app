@@ -1,0 +1,185 @@
+M-020
+pytest -k r020
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..3621cd1d 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -16729,6 +16729,8 @@ class S19TuiApp(App):
+                     self.logger.warning("Project validation failed: %s", error)
+                     return
+                 if len(a2l_files) == 1:
++                    self.set_status("Project already has an A2L file.")
++                    return
+                     self._confirm_project_a2l_replacement(
+                         path,
+                         normalized,
+
+/tmp/b103-inc5-mut/M-020/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r020_replacement_question[R-A2L-REFRESH.020/1] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f29de6aa0d0>
+case = 'R-A2L-REFRESH.020/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.020/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r020_replacement_question(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            source = f.old if case.endswith("/1") else f.src / "same.a2l"
+            if case.endswith("/2"):
+                source.write_bytes(f.old.read_bytes())
+            _project(f, "P_OLD", image=None, a2l=source)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            listed = app.current_a2l_path
+            candidate_path = f.new if case.endswith("/1") else listed
+            candidate = candidate_path.name
+            if case.endswith("/2"):
+                listed.write_bytes(f.new.read_bytes())
+            before = _state_snapshot(app)
+            await _request_a2l(app, pilot, candidate_path)
+            await pilot.pause()
+            assert isinstance(app.screen, ConfirmQuestionScreen)
+            assert _modal_text(app) == (
+                "Replace project A2L?",
+                f"Project 'Proj One' already has A2L '{listed.name}'. Load '{candidate}' instead?",
+                "Yes (y)",
+                "No (n)",
+            )
+            assert workers == []
+            assert _state_snapshot(app) == before
+            assert len([screen for screen in app.screen_stack if isinstance(screen, ConfirmQuestionScreen)]) == 1
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1407: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question0/app'), src=PosixPath('/tmp/...n0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        source = f.old if case.endswith("/1") else f.src / "same.a2l"
+        if case.endswith("/2"):
+            source.write_bytes(f.old.read_bytes())
+        _project(f, "P_OLD", image=None, a2l=source)
+        await _load_project(app, pilot, "P_OLD")
+        app.current_project = "Proj One"
+        listed = app.current_a2l_path
+        candidate_path = f.new if case.endswith("/1") else listed
+        candidate = candidate_path.name
+        if case.endswith("/2"):
+            listed.write_bytes(f.new.read_bytes())
+        before = _state_snapshot(app)
+        await _request_a2l(app, pilot, candidate_path)
+        await pilot.pause()
+>       assert isinstance(app.screen, ConfirmQuestionScreen)
+E       AssertionError: assert False
+E        +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E        +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+
+tests/test_b103_a2l_refresh.py:1396: AssertionError
+_____________ test_r020_replacement_question[R-A2L-REFRESH.020/2] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f29def15550>
+case = 'R-A2L-REFRESH.020/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.020/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r020_replacement_question(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            source = f.old if case.endswith("/1") else f.src / "same.a2l"
+            if case.endswith("/2"):
+                source.write_bytes(f.old.read_bytes())
+            _project(f, "P_OLD", image=None, a2l=source)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            listed = app.current_a2l_path
+            candidate_path = f.new if case.endswith("/1") else listed
+            candidate = candidate_path.name
+            if case.endswith("/2"):
+                listed.write_bytes(f.new.read_bytes())
+            before = _state_snapshot(app)
+            await _request_a2l(app, pilot, candidate_path)
+            await pilot.pause()
+            assert isinstance(app.screen, ConfirmQuestionScreen)
+            assert _modal_text(app) == (
+                "Replace project A2L?",
+                f"Project 'Proj One' already has A2L '{listed.name}'. Load '{candidate}' instead?",
+                "Yes (y)",
+                "No (n)",
+            )
+            assert workers == []
+            assert _state_snapshot(app) == before
+            assert len([screen for screen in app.screen_stack if isinstance(screen, ConfirmQuestionScreen)]) == 1
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1407: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question1/app'), src=PosixPath('/tmp/...n1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-687/test_r020_replacement_question1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        source = f.old if case.endswith("/1") else f.src / "same.a2l"
+        if case.endswith("/2"):
+            source.write_bytes(f.old.read_bytes())
+        _project(f, "P_OLD", image=None, a2l=source)
+        await _load_project(app, pilot, "P_OLD")
+        app.current_project = "Proj One"
+        listed = app.current_a2l_path
+        candidate_path = f.new if case.endswith("/1") else listed
+        candidate = candidate_path.name
+        if case.endswith("/2"):
+            listed.write_bytes(f.new.read_bytes())
+        before = _state_snapshot(app)
+        await _request_a2l(app, pilot, candidate_path)
+        await pilot.pause()
+>       assert isinstance(app.screen, ConfirmQuestionScreen)
+E       AssertionError: assert False
+E        +  where False = isinstance(Screen(id='_default'), ConfirmQuestionScreen)
+E        +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).screen
+
+tests/test_b103_a2l_refresh.py:1396: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/2]
+2 failed, 101 deselected in 19.64s

@@ -1,0 +1,236 @@
+M-002
+pytest -k r002
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..3e53c66a 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19574,7 +19574,7 @@ class S19TuiApp(App):
+             if prepared.a2l_enriched_key is not None:
+                 # The preflight already proved both post-install generations;
+                 # accepted precomputed enrichment is therefore installed as-is.
+-                self._a2l_enriched_tags = prepared.a2l_enriched_tags
++                self._a2l_enriched_tags = self._a2l_enriched_tags
+                 self._a2l_enriched_key = prepared.a2l_enriched_key
+                 self._a2l_summary_lines = prepared.a2l_summary_lines
+                 self._a2l_summary_start = 0
+
+/tmp/b103-inc5-mut/M-002/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-669/test_r002_image_load_refreshes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f077bcf68d0>
+case = 'R-A2L-REFRESH.002/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:494: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:490: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+>       assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+E       AssertionError: assert [] == [('OLD_ONLY',...OLD', 112, 1)]
+E         
+E         Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 1)
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:251: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-669/test_r002_image_load_refreshes1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f077bcf6890>
+case = 'R-A2L-REFRESH.002/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:494: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:490: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+>       assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+E       AssertionError: assert [] == [('OLD_ONLY',...OLD', 112, 1)]
+E         
+E         Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 1)
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:251: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-669/test_r002_image_load_refreshes2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f077ae7cf90>
+case = 'R-A2L-REFRESH.002/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:494: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:490: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+>       assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+E       AssertionError: assert [] == [('OLD_ONLY',...OLD', 112, 1)]
+E         
+E         Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 1)
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:251: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+3 failed, 100 deselected in 55.56s

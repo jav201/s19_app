@@ -1,0 +1,370 @@
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..d459f7b0 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -9035,7 +9035,7 @@ class S19TuiApp(App):
+ 
+     def action_load_file(self) -> None:
+         """Open the Load dialog on the typed-path field (``l`` / ``ctrl+l``)."""
+-        if self._refuse_if_busy():
++        if False and self._refuse_if_busy():
+             return
+         self.logger.info("Load file action triggered.")
+         self.push_screen(
+/tmp/b103-inc5-m024-final/s19_app/__init__.py
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff045c23ed0>
+case = 'R-A2L-REFRESH.024/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.024/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            before = _state_snapshot(app)
+            progress_before = str(app.query_one("#status_text").render())
+            worker_count = len(app.workers)
+            starts = []
+            real_start = app._start_a2l_load
+    
+            def start_spy(*args, **kwargs):
+                starts.append((args, kwargs))
+                return real_start(*args, **kwargs)
+    
+            monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+            await pilot.press("ctrl+l")
+            await pilot.pause()
+            labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+            label = labels[int(case.rsplit("/", 1)[1]) - 1]
+            assert statuses == [f"busy: {label} is running — wait for it to finish."]
+            _assert_visible_log(app, statuses[0])
+            assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
+            assert starts == []
+            assert workers == []
+            assert len(app.workers) == worker_count
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            release.set()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal0/app'), src=PosixPath('/tmp/...l0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        before = _state_snapshot(app)
+        progress_before = str(app.query_one("#status_text").render())
+        worker_count = len(app.workers)
+        starts = []
+        real_start = app._start_a2l_load
+    
+        def start_spy(*args, **kwargs):
+            starts.append((args, kwargs))
+            return real_start(*args, **kwargs)
+    
+        monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+        await pilot.press("ctrl+l")
+        await pilot.pause()
+        labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+        label = labels[int(case.rsplit("/", 1)[1]) - 1]
+>       assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E       AssertionError: assert [] == ['busy: Loadi...t to finish.']
+E         
+E         Right contains one more item: 'busy: Loading image.bin is running — wait for it to finish.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1596: AssertionError
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff0448a3890>
+case = 'R-A2L-REFRESH.024/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.024/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            before = _state_snapshot(app)
+            progress_before = str(app.query_one("#status_text").render())
+            worker_count = len(app.workers)
+            starts = []
+            real_start = app._start_a2l_load
+    
+            def start_spy(*args, **kwargs):
+                starts.append((args, kwargs))
+                return real_start(*args, **kwargs)
+    
+            monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+            await pilot.press("ctrl+l")
+            await pilot.pause()
+            labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+            label = labels[int(case.rsplit("/", 1)[1]) - 1]
+            assert statuses == [f"busy: {label} is running — wait for it to finish."]
+            _assert_visible_log(app, statuses[0])
+            assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
+            assert starts == []
+            assert workers == []
+            assert len(app.workers) == worker_count
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            release.set()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal1/app'), src=PosixPath('/tmp/...l1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        before = _state_snapshot(app)
+        progress_before = str(app.query_one("#status_text").render())
+        worker_count = len(app.workers)
+        starts = []
+        real_start = app._start_a2l_load
+    
+        def start_spy(*args, **kwargs):
+            starts.append((args, kwargs))
+            return real_start(*args, **kwargs)
+    
+        monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+        await pilot.press("ctrl+l")
+        await pilot.pause()
+        labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+        label = labels[int(case.rsplit("/", 1)[1]) - 1]
+>       assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E       AssertionError: assert [] == ['busy: Loadi...t to finish.']
+E         
+E         Right contains one more item: 'busy: Loading old.a2l is running — wait for it to finish.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1596: AssertionError
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff045ac6450>
+case = 'R-A2L-REFRESH.024/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.024/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            before = _state_snapshot(app)
+            progress_before = str(app.query_one("#status_text").render())
+            worker_count = len(app.workers)
+            starts = []
+            real_start = app._start_a2l_load
+    
+            def start_spy(*args, **kwargs):
+                starts.append((args, kwargs))
+                return real_start(*args, **kwargs)
+    
+            monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+            await pilot.press("ctrl+l")
+            await pilot.pause()
+            labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+            label = labels[int(case.rsplit("/", 1)[1]) - 1]
+            assert statuses == [f"busy: {label} is running — wait for it to finish."]
+            _assert_visible_log(app, statuses[0])
+            assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
+            assert starts == []
+            assert workers == []
+            assert len(app.workers) == worker_count
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            release.set()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal2/app'), src=PosixPath('/tmp/...l2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        before = _state_snapshot(app)
+        progress_before = str(app.query_one("#status_text").render())
+        worker_count = len(app.workers)
+        starts = []
+        real_start = app._start_a2l_load
+    
+        def start_spy(*args, **kwargs):
+            starts.append((args, kwargs))
+            return real_start(*args, **kwargs)
+    
+        monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+        await pilot.press("ctrl+l")
+        await pilot.pause()
+        labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+        label = labels[int(case.rsplit("/", 1)[1]) - 1]
+>       assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E       AssertionError: assert [] == ['busy: Loadi...t to finish.']
+E         
+E         Right contains one more item: 'busy: Loading project project_b is running — wait for it to finish.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1596: AssertionError
+_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff045fa4fd0>
+case = 'R-A2L-REFRESH.024/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.024/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            before = _state_snapshot(app)
+            progress_before = str(app.query_one("#status_text").render())
+            worker_count = len(app.workers)
+            starts = []
+            real_start = app._start_a2l_load
+    
+            def start_spy(*args, **kwargs):
+                starts.append((args, kwargs))
+                return real_start(*args, **kwargs)
+    
+            monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+            await pilot.press("ctrl+l")
+            await pilot.pause()
+            labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+            label = labels[int(case.rsplit("/", 1)[1]) - 1]
+            assert statuses == [f"busy: {label} is running — wait for it to finish."]
+            _assert_visible_log(app, statuses[0])
+            assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
+            assert starts == []
+            assert workers == []
+            assert len(app.workers) == worker_count
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            release.set()
+            await settle_workers(pilot)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal3/app'), src=PosixPath('/tmp/...l3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-696/test_r024_initial_busy_refusal3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        before = _state_snapshot(app)
+        progress_before = str(app.query_one("#status_text").render())
+        worker_count = len(app.workers)
+        starts = []
+        real_start = app._start_a2l_load
+    
+        def start_spy(*args, **kwargs):
+            starts.append((args, kwargs))
+            return real_start(*args, **kwargs)
+    
+        monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+        await pilot.press("ctrl+l")
+        await pilot.pause()
+        labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+        label = labels[int(case.rsplit("/", 1)[1]) - 1]
+>       assert statuses == [f"busy: {label} is running — wait for it to finish."]
+E       AssertionError: assert [] == ['busy: Savin...t to finish.']
+E         
+E         Right contains one more item: 'busy: Saving project project_b is running — wait for it to finish.'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1596: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4]
+4 failed, 99 deselected in 101.45s (0:01:41)

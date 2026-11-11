@@ -1,0 +1,242 @@
+M-001
+pytest -k r001
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..a5502dc6 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -17002,7 +17002,7 @@ class S19TuiApp(App):
+                 self.current_file.a2l_path = copied
+                 self.current_file.a2l_data = self.current_a2l_data
+             view_started = time.perf_counter()
+-            self._refresh_a2l_dependent_views()
++            pass  # no fanout
+             view_elapsed = time.perf_counter() - view_started
+             if view_elapsed > self.slow_parse_warn_seconds:
+                 self.logger.warning(
+
+/tmp/b103-inc5-mut/M-001/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/1] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7124017610>
+case = 'R-A2L-REFRESH.001/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public0/app'), src=PosixPath('/tmp/...c0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if case.endswith("/2"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/3"):
+            await _load_a2l(app, pilot, f.old)
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert app.current_a2l_path is None
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        ui_calls = _arm_thread_spies(app, monkeypatch)
+        await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E       AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E         
+E         At index 0 diff: 'OUTCOME' != 'F'
+E         Right contains one more item: 'OUTCOME'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:466: AssertionError
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/2] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7123f26c10>
+case = 'R-A2L-REFRESH.001/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public1/app'), src=PosixPath('/tmp/...c1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if case.endswith("/2"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/3"):
+            await _load_a2l(app, pilot, f.old)
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert app.current_a2l_path is None
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        ui_calls = _arm_thread_spies(app, monkeypatch)
+        await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E       AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E         
+E         At index 0 diff: 'OUTCOME' != 'F'
+E         Right contains one more item: 'OUTCOME'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:466: AssertionError
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7123e26c10>
+case = 'R-A2L-REFRESH.001/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public2/app'), src=PosixPath('/tmp/...c2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-668/test_r001_direct_attach_public2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if case.endswith("/2"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/3"):
+            await _load_a2l(app, pilot, f.old)
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert app.current_a2l_path is None
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        ui_calls = _arm_thread_spies(app, monkeypatch)
+        await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+E       AssertionError: assert ['OUTCOME'] == ['F', 'OUTCOME']
+E         
+E         At index 0 diff: 'OUTCOME' != 'F'
+E         Right contains one more item: 'OUTCOME'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:466: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]
+3 failed, 100 deselected in 55.25s

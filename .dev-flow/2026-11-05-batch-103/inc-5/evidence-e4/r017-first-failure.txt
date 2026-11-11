@@ -1,0 +1,105 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <runner-python>
+rootdir: /tmp/b103-inc5-e5
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/1] FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________ test_r017_loaded_panel[R-A2L-REFRESH.017/1] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-651/test_r017_loaded_panel_R_A2L_R0')
+case = 'R-A2L-REFRESH.017/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.017/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r017_loaded_panel(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/3"):
+                _unload(app, "a2l")
+                await pilot.pause()
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            slots = _loaded_text(app)
+            if case.endswith("/4"):
+                assert slots == ["(none)", "(none)", "new.a2l  4 tags"]
+                assert app.current_file is None
+            else:
+                assert slots[0] == "img1.s19  256 B · 1 rng"
+                assert slots[1] == "records.mac  103 records"
+                assert slots[2] == "(none)" if case.endswith("/3") else slots[2] == ("new.a2l  4 tags" if case.endswith("/2") else "old.a2l  4 tags")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:894: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-651/test_r017_loaded_panel_R_A2L_R0/app'), src=PosixPath('/tmp/...R0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-651/test_r017_loaded_panel_R_A2L_R0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+        elif case.endswith("/3"):
+            _unload(app, "a2l")
+            await pilot.pause()
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        slots = _loaded_text(app)
+        if case.endswith("/4"):
+            assert slots == ["(none)", "(none)", "new.a2l  4 tags"]
+            assert app.current_file is None
+        else:
+            assert slots[0] == "img1.s19  256 B · 1 rng"
+>           assert slots[1] == "records.mac  103 records"
+E           AssertionError: assert 'records.mac  104 records' == 'records.mac  103 records'
+E             
+E             - records.mac  103 records
+E             ?                ^
+E             + records.mac  104 records
+E             ?                ^
+
+tests/test_b103_a2l_refresh.py:891: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/1] - AssertionError: assert 'records.mac  104 records' == 'records.mac  103 records'
+  
+  - records.mac  103 records
+  ?                ^
+  + records.mac  104 records
+  ?                ^
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+============================== 1 failed in 20.92s ==============================

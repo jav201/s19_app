@@ -1,0 +1,1014 @@
+M-002
+pytest -k r002
+returncode=0
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index c655facf..aafd8773 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -571,6 +571,7 @@ class A2LAttachRequest:
+     record_recent: bool
+     a2l_cache: Optional[A2LCacheEntry]
+     gen: int
++    sync_project: bool = True
+ 
+ 
+ @dataclass(frozen=True)
+@@ -982,11 +983,10 @@ class PreparedLoad:
+             state ready to install into ``_a2l_enriched_*`` caches.
+         a2l_view_generation / a2l_image_generation (Optional[int]): The
+             generation snapshot the worker predicted when precomputing the
+-            A2L enrichment (batch-102 Inc 2, R-B102-A2L-006). The apply
+-            step installs the precomputed cache only when both match the
+-            post-bump live generations; a mismatch discards the
+-            precompute and the UI thread recomputes. ``None`` on the
+-            non-precomputed fallback bundle.
++            A2L enrichment. The apply preflight accepts the whole bundle only
++            when both match the expected post-install generations; a mismatch
++            rejects it before any state write. ``None`` on the non-precomputed
++            fallback bundle.
+ 
+     Data Flow:
+         - Built inside ``S19TuiApp._prepare_load_payload`` on the worker thread.
+@@ -1013,9 +1013,8 @@ class PreparedLoad:
+     a2l_enriched_tags: list = field(default_factory=list)
+     a2l_enriched_key: Optional[tuple] = None
+     a2l_summary_lines: list = field(default_factory=list)
+-    # batch-102 Inc 2 (R-B102-A2L-006): generation snapshot the A2L
+-    # precompute was built against, verified by ``_apply_prepared_load``
+-    # after its own generation bumps before the cache is installed.
++    # Generation snapshot checked against the expected post-install pair before
++    # ``_apply_prepared_load`` performs any cache or session write.
+     a2l_view_generation: Optional[int] = None
+     a2l_image_generation: Optional[int] = None
+     # DataTable-oriented precompute (populated by the load worker):
+@@ -1482,6 +1481,14 @@ class A2LTagTable(DataTable):
+     class Measured(Message, namespace="a2l_tag_table"):
+         """The tag table's size changed, so its visible width is now knowable."""
+ 
++    suppress_row_highlight = False
++
++    def _highlight_row(self, row_index: int) -> None:
++        if self.suppress_row_highlight:
++            self.refresh_row(row_index)
++        else:
++            super()._highlight_row(row_index)
++
+     def on_resize(self, event: events.Resize) -> None:
+         """
+         Summary:
+@@ -11019,9 +11026,9 @@ class S19TuiApp(App):
+                 - ``default_screen``
+             Used by:
+                 - ``_rehome_placeholder_focus_after_load``,
+-                  ``_land_focus`` and the four deferred steps of
++                  ``_land_focus`` and the three deferred steps of
+                   ``_apply_prepared_load`` (``_step_sections``,
+-                  ``_step_hex``, ``_step_a2l``, ``_step_finalize``)
++                  ``_step_hex``, ``_step_finalize``)
+         """
+         try:
+             screen = self.default_screen
+@@ -15076,9 +15083,53 @@ class S19TuiApp(App):
+         self.call_after_refresh(self._install_prepared_project, prepared)
+ 
+     def _install_prepared_project(self, prepared: PreparedProjectLoad) -> None:
+-        """Main thread: the one install callback (S-g), end tail last."""
++        """
++        Summary:
++            Install a prepared project atomically and publish its final
++            image/MAC/A2L state once under the incoming project identity.
++
++        Args:
++            prepared (PreparedProjectLoad): Parsed project artifacts and manifest
++                produced by the project worker.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Build image/MAC bundles and reject keyed stale bundles before reset.
++            - Install each bundle without intermediate A2L publication; close
++              every superseded exit with kept-state text and no success outcome.
++            - Publish the common fan-out once, then retain announcement/result
++              behavior and defer the successful busy outcome.
++
++        Dependencies:
++            Uses:
++                - ``_apply_prepared_load`` / ``_refresh_a2l_dependent_views``
++                - ``compose_load_announcement`` / ``end_busy``
++            Used by:
++                - ``_on_project_loaded`` on the UI thread
++        """
+         request = prepared.request
+         gen = request.gen
++        image_bundle = (
++            PreparedLoad(loaded=prepared.image) if prepared.image is not None else None
++        )
++        mac_bundle = (
++            PreparedLoad(loaded=prepared.mac) if prepared.mac is not None else None
++        )
++        for bundle in (image_bundle, mac_bundle):
++            if bundle is None or bundle.a2l_enriched_key is None:
++                continue
++            actual = (bundle.a2l_view_generation, bundle.a2l_image_generation)
++            expected = (
++                self._a2l_view_generation + int(bool(bundle.loaded.a2l_data)),
++                self._image_generation + 1,
++            )
++            if actual != expected:
++                self.end_busy(
++                    "project_load", gen, "Load superseded — current state kept."
++                )
++                return
+         try:
+             self._reset_project_session()
+             self._declared_regions = (
+@@ -15094,8 +15145,6 @@ class S19TuiApp(App):
+                     install.a2l,
+                     prepared.a2l_cache[1] if prepared.a2l_cache is not None else None,
+                 )
+-                self.update_a2l_view()
+-                self._refresh_loaded_panel()
+                 self._apply_empty_state()
+             self._reopen_active_document(prepared.document)
+             self.current_project = request.name
+@@ -15104,13 +15153,29 @@ class S19TuiApp(App):
+             # once the new project is assigned.
+             self._refill_document_lists()
+             self._variant_set = prepared.variant_set
+-            if prepared.image is not None:
++            if image_bundle is not None:
+                 self._pending_variant_id = install.variant.variant_id
+-                self._apply_loaded_file(
+-                    prepared.image, install.variant.path, time.perf_counter()
++                if not self._apply_prepared_load(
++                    image_bundle,
++                    install.variant.path,
++                    time.perf_counter(),
++                    publish_a2l=False,
++                ):
++                    self.end_busy(
++                        "project_load", gen, "Load superseded — current state kept."
++                    )
++                    return
++            if mac_bundle is not None and not self._apply_prepared_load(
++                mac_bundle,
++                install.mac,
++                time.perf_counter(),
++                publish_a2l=False,
++            ):
++                self.end_busy(
++                    "project_load", gen, "Load superseded — current state kept."
+                 )
+-            if prepared.mac is not None:
+-                self._apply_loaded_file(prepared.mac, install.mac, time.perf_counter())
++                return
++            self._refresh_a2l_dependent_views()
+             loaded = self.current_file
+             announcement = compose_load_announcement(
+                 request.name,
+@@ -15141,7 +15206,8 @@ class S19TuiApp(App):
+             # screen pushed now would mount over a closing app.
+             if request.routed and not self._quit_pending:
+                 self.push_screen(LoadResultScreen(announcement), self._handle_load_result)
+-            self.end_busy(
++            self.call_after_refresh(
++                self.end_busy,
+                 "project_load",
+                 gen,
+                 safe_text(announcement.summary_line()).plain,
+@@ -16025,8 +16091,7 @@ class S19TuiApp(App):
+                   ``place_into_workarea`` (LLR-163.5)
+                 - ``update_project_labels`` / ``set_status``
+             Used by:
+-                - ``_start_load_worker`` (via ``call_from_thread``, after
+-                  ``_apply_prepared_load`` installed the load)
++                - ``_complete_prepared_load`` after an accepted prepared install
+         """
+         if not self.current_file:
+             return
+@@ -16604,7 +16669,29 @@ class S19TuiApp(App):
+             raise
+ 
+     def load_a2l_from_path(self, path: Path, *, copy: bool = True) -> None:
+-        """The A2L-attach kickoff (12b): refusals, begin, request, worker."""
++        """
++        Summary:
++            Admit an A2L source, confirm replacement of a project's sole A2L,
++            and delegate every accepted load to the common worker kickoff.
++
++        Args:
++            path (Path): Original source path used for messages and recents.
++            copy (bool): Whether the worker copies the admitted source.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Refuse busy, missing and unsupported sources before inspection.
++            - Preserve project validation errors; ask before replacing one A2L.
++            - Delegate admissible loads with project sync enabled by default.
++
++        Dependencies:
++            Uses:
++                - ``_confirm_project_a2l_replacement`` / ``_start_a2l_load``
++            Used by:
++                - A2L load dialog and Workarea source routes
++        """
+         if self._refuse_if_busy():
+             return
+         try:  # SE5-12a-4, as in load_from_path
+@@ -16641,12 +16728,154 @@ class S19TuiApp(App):
+                     self.set_status(error)
+                     self.logger.warning("Project validation failed: %s", error)
+                     return
+-                if a2l_files:
+-                    self.set_status("Project already has an A2L file.")
+-                    self.logger.warning("Project already has A2L file: %s", project_dir)
++                if len(a2l_files) == 1:
++                    self._confirm_project_a2l_replacement(
++                        path,
++                        normalized,
++                        copy=copy,
++                        project_name=self.current_project,
++                        project_dir=project_dir,
++                        project_a2l=a2l_files[0],
++                    )
+                     return
+             else:
+                 self.logger.warning("current_project set but project directory could not be resolved; skipping project guard.")
++        self._start_a2l_load(path, normalized, copy=copy)
++
++    def _confirm_project_a2l_replacement(
++        self,
++        path: Path,
++        normalized: Path,
++        *,
++        copy: bool,
++        project_name: str,
++        project_dir: Path,
++        project_a2l: Path,
++    ) -> None:
++        """
++        Summary:
++            Ask before replacing a project's A2L and revalidate the captured
++            identity before starting a session-only confirmed replacement.
++
++        Args:
++            path (Path): Original candidate path.
++            normalized (Path): Admitted candidate path.
++            copy (bool): Whether the normal worker copies the candidate.
++            project_name (str): Project named by the question.
++            project_dir (Path): Captured lexical project directory.
++            project_a2l (Path): Captured sole project A2L.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Push one Yes/No question without copying, parsing or mutating.
++            - On Yes, defer a busy check and project/A2L identity revalidation.
++            - Start the ordinary worker with project sync disabled only after
++              both identities still match; No and Escape are inert.
++
++        Dependencies:
++            Uses:
++                - ``ConfirmQuestionScreen`` / ``validate_project_files``
++                - ``_start_a2l_load``
++            Used by:
++                - ``load_a2l_from_path``
++        """
++        painted_project = painted_names([project_name])
++        painted_current = painted_names([project_a2l.name])
++        painted_new = painted_names([path.name])
++        body = (
++            f"Project '{painted_project}' already has A2L '{painted_current}'. "
++            f"Load '{painted_new}' instead?"
++        )
++
++        def _accepted() -> None:
++            if self._refuse_if_busy():
++                return
++            changed_message = (
++                "A2L NOT loaded: project or its A2L changed — load again."
++            )
++            if self.current_project != project_name:
++                self.set_status(changed_message)
++                return
++            current_dir = self._active_project_dir()
++            if current_dir is None or os.path.normcase(
++                os.path.abspath(current_dir)
++            ) != os.path.normcase(os.path.abspath(project_dir)):
++                self.set_status(changed_message)
++                return
++            try:
++                _, a2l_files, error = validate_project_files(current_dir)
++            except OSError:
++                reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
++                self.set_status(
++                    safe_text(
++                        f"A2L NOT loaded: project "
++                        f"'{painted_names([project_name])}' {reason} — {step}."
++                    ).plain
++                )
++                self.logger.warning(
++                    "A2L load refused (project folder could not be read): %r",
++                    current_dir,
++                )
++                return
++            if error:
++                self.set_status(error)
++                self.logger.warning("Project validation failed: %s", error)
++                return
++            if len(a2l_files) != 1 or os.path.normcase(
++                os.path.abspath(a2l_files[0])
++            ) != os.path.normcase(os.path.abspath(project_a2l)):
++                self.set_status(changed_message)
++                return
++            self._start_a2l_load(
++                path, normalized, copy=copy, sync_project=False
++            )
++
++        def _answer(accepted: bool) -> None:
++            if accepted:
++                self.call_after_refresh(_accepted)
++
++        self.push_screen(
++            ConfirmQuestionScreen(
++                "Replace project A2L?", body, "Yes (y)", "No (n)"
++            ),
++            _answer,
++        )
++
++    def _start_a2l_load(
++        self,
++        path: Path,
++        normalized: Path,
++        *,
++        copy: bool,
++        sync_project: bool = True,
++    ) -> None:
++        """
++        Summary:
++            Start one normal A2L worker after source checks and a final busy
++            boundary shared by ordinary and confirmed loads.
++
++        Args:
++            path (Path): Original source path used for messages and recents.
++            normalized (Path): Admitted source used for stat, copy and parse.
++            copy (bool): Whether the worker copies the admitted source.
++            sync_project (bool): Whether successful install may sync the project.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Preserve source-size, large-file and recent-source behavior.
++            - Recheck busy immediately before creating the busy run/request.
++            - Create one immutable attach request and start one worker.
++
++        Dependencies:
++            Uses:
++                - ``A2LAttachRequest`` / ``_a2l_attach_worker``
++            Used by:
++                - ``load_a2l_from_path`` / confirmed project replacement
++        """
+         try:  # CR12b-2: never a size of 0, so the over-cap rule is not bypassed
+             source_size = normalized.stat().st_size
+         except OSError:
+@@ -16671,6 +16900,8 @@ class S19TuiApp(App):
+                 "Recent source not recorded (found through the fallback): %r",
+                 str(normalized),
+             )
++        if self._refuse_if_busy():
++            return
+         gen = self._busy_begin_action("a2l_load", normalized.name)
+         try:
+             request = A2LAttachRequest(
+@@ -16681,6 +16912,7 @@ class S19TuiApp(App):
+                 record_recent=record,
+                 a2l_cache=self._a2l_cache_entry(),
+                 gen=gen,
++                sync_project=sync_project,
+             )
+             if not copy:
+                 self.step_busy("a2l_load", gen, 2)
+@@ -16732,7 +16964,30 @@ class S19TuiApp(App):
+         self.call_after_refresh(self._install_attached_a2l, result)
+ 
+     def _install_attached_a2l(self, result: A2LAttachResult) -> None:
+-        """Main thread: the one attach install, end tail last (S-b)."""
++        """
++        Summary:
++            Install a parsed A2L, publish every dependent view and defer the
++            successful outcome behind the detail-card barrier.
++
++        Args:
++            result (A2LAttachResult): Immutable request, parsed cache entry and
++                worker timing for one accepted attach.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Preserve recents, cache, current-A2L and current-file attach order.
++            - Run the common fan-out once, then retain labels/focus/logging.
++            - Sync to a project only for requests that explicitly allow it.
++
++        Dependencies:
++            Uses:
++                - ``_replace_current_a2l`` / ``_refresh_a2l_dependent_views``
++                - ``_sync_loaded_a2l_to_project`` / ``end_busy``
++            Used by:
++                - ``_on_a2l_attached`` on the UI thread
++        """
+         req = result.request
+         copied = result.path
+         gen = req.gen
+@@ -16747,7 +17002,7 @@ class S19TuiApp(App):
+                 self.current_file.a2l_path = copied
+                 self.current_file.a2l_data = self.current_a2l_data
+             view_started = time.perf_counter()
+-            self.update_a2l_view()
++            self._refresh_a2l_dependent_views()
+             view_elapsed = time.perf_counter() - view_started
+             if view_elapsed > self.slow_parse_warn_seconds:
+                 self.logger.warning(
+@@ -16763,13 +17018,13 @@ class S19TuiApp(App):
+                     view_elapsed,
+                 )
+             self.update_project_labels()
+-            self._refresh_loaded_panel()
+             self._rehome_focus_after_load()
+             self._rehome_placeholder_focus_after_load()
+             self.logger.info("A2L loaded: %s", copied)
+-            if self.current_project:
++            if req.sync_project and self.current_project:
+                 self._sync_loaded_a2l_to_project()
+-            self.end_busy(
++            self.call_after_refresh(
++                self.end_busy,
+                 "a2l_load",
+                 gen,
+                 safe_text(f"A2L loaded: {painted_names([copied.name])}").plain,
+@@ -18123,14 +18378,10 @@ class S19TuiApp(App):
+               per-artifact path is a status-line no-op.
+             - Install the rebuilt (or ``None``) snapshot, reset the view-row
+               memo (``_hex_view_rows_cache``, CR-1), invalidate the MAC
+-              view cache, toggle the empty-state panels, then re-run the same
+-              renderer set the load path uses (``update_sections`` →
+-              ``update_hex_view``/``update_alt_hex_view``/``update_mac_hex_view``
+-              → ``update_a2l_view`` (which drives ``update_mac_view``) →
+-              ``update_project_labels`` → ``update_memory_map``).
+-            - Set a status line naming what was unloaded, on the file
+-              status (``set_file_status``) and the message log
+-              (``set_status``).
++              view cache, toggle empty state, refresh sections/hex and run the
++              common A2L fan-out before project labels.
++            - Defer the ordered file-status and message-log unload outcomes
++              behind the fan-out's detail-card barrier.
+             - Schedule ``_land_focus`` after a refresh, stamped with the
+               window shown now, so a rail key in the same burst makes it
+               stale (CR-3).
+@@ -18223,18 +18474,16 @@ class S19TuiApp(App):
+         # records, and the empty-state panels key on `current_file is None`.
+         self._invalidate_mac_view_cache()
+         self._apply_empty_state()
+-        # Same renderer set the load path's call_later chain runs, called
+-        # directly (unload is cheap, no need to yield between phases).
++        # Unload is cheap: refresh synchronously, then order its outcome behind
++        # the common fan-out's detail-card barrier.
+         self.update_sections()
+         self.update_hex_view()
+         self.update_alt_hex_view()
+         self.update_mac_hex_view()
+-        self.update_a2l_view()
++        self._refresh_a2l_dependent_views()
+         self.update_project_labels()
+-        self.update_memory_map()
+-        self._refresh_loaded_panel()
+-        self.set_file_status(f"Unloaded {label}.")
+-        self.set_status(f"Unloaded {label}.")
++        self.call_after_refresh(self.set_file_status, f"Unloaded {label}.")
++        self.call_after_refresh(self.set_status, f"Unloaded {label}.")
+         # Inc 10a (E5, CR-3): stamped with the window shown now, so a rail
+         # key in the same burst makes this landing stale and its own wins.
+         self.call_after_refresh(
+@@ -19123,53 +19372,57 @@ class S19TuiApp(App):
+         window.refresh_window()
+ 
+     def _apply_prepared_load(
+-        self, prepared: PreparedLoad, path: Path, load_started: float
+-    ) -> None:
++        self,
++        prepared: PreparedLoad,
++        path: Path,
++        load_started: float,
++        *,
++        publish_a2l: bool = True,
++    ) -> bool:
+         """
+         Summary:
+-            Install a ``PreparedLoad`` onto reactive state and refresh every dependent UI
+-            panel, relying on worker-precomputed caches to avoid heavy main-thread work.
++            Accept and install a fresh ``PreparedLoad``, or reject the whole
++            bundle before any mutation when its generation snapshot is stale.
+ 
+         Args:
+-            prepared (PreparedLoad): Bundle of parsed payload plus optional precomputed
+-                MAC cache, validation issues, highlights, out-of-range list, and bases set.
++            prepared (PreparedLoad): Parsed payload and optional worker-precomputed
++                MAC, validation, A2L and hex caches.
+             path (Path): Source path used for status messaging and log lines.
+-            load_started (float): ``time.perf_counter`` value captured at pipeline start.
++            load_started (float): ``time.perf_counter`` value captured at start.
++            publish_a2l (bool): Whether to run the common fan-out synchronously;
++                project installation leaves its single final publication to C7.
+ 
+         Returns:
+-            None
++            bool: ``True`` when the complete bundle was accepted; ``False`` when
++            a keyed enrichment snapshot was superseded before installation.
+ 
+         Data Flow:
+-            - Mutate ``current_file``, reset MAC/hex/issues paging anchors, and sync A2L.
+-            - Route any loaded A2L through ``_replace_current_a2l`` (the
+-              single-writer seam) so the attach generation bumps with the
+-              payload install (batch-102 Inc 2).
+-            - Bump ``_image_generation`` and push it into ``_change_service`` so a
+-              completed check run cannot keep describing the previous image
+-              (LLR-077.2).
+-            - When ``precomputed`` is True, copy MAC cache + validation results into the
+-              app's cache members so ``update_mac_view`` treats them as a cache hit.
+-            - Install the worker-precomputed A2L enrichment only when its
+-              generation snapshot equals the post-bump live generations;
+-              a mismatch discards it and the UI thread recomputes
+-              (R-B102-A2L-006).
+-            - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
+-            - Set the coexistence status line immediately so the user sees the new file.
+-            - Schedule sections, hex, A2L, and project-label refreshes via ``call_later``
+-              so the event loop can process the modal-pop message and repaint between
+-              each phase instead of blocking the UI for the full install duration.
++            - Compare every keyed snapshot with the expected post-install A2L
++              and image generations before cache, session, widget or log work.
++            - Preserve the existing state/cache installation and deferred
++              sections/hex/focus chain for an accepted bundle.
++            - Install accepted precomputed A2L values directly and optionally
++              publish the common fan-out before returning.
+ 
+         Dependencies:
+             Uses:
+-                - ``_invalidate_mac_view_cache`` / ``_flush_logger``
+-                - ``call_later`` (yielding chain)
+-                - ``update_sections`` / ``update_hex_view`` / ``update_alt_hex_view`` /
+-                  ``update_mac_hex_view`` / ``update_mac_view`` / ``update_a2l_view`` /
+-                  ``update_project_labels`` / ``update_memory_map``
++                - ``_replace_current_a2l`` / ``_refresh_a2l_dependent_views``
++                - ``call_later`` / ``update_sections`` / ``update_hex_view``
+             Used by:
+-                - ``_start_load_worker`` (threaded path)
++                - ``_complete_prepared_load`` / ``_install_prepared_project``
+                 - ``_apply_loaded_file`` (synchronous fallback)
+         """
++        if prepared.a2l_enriched_key is not None:
++            actual = (
++                prepared.a2l_view_generation,
++                prepared.a2l_image_generation,
++            )
++            expected = (
++                self._a2l_view_generation + int(bool(prepared.loaded.a2l_data)),
++                self._image_generation + 1,
++            )
++            if actual != expected:
++                return False
+         loaded = prepared.loaded
+         # Q-h1: the file-load worker's cache entry is stored on the main
+         # thread here (never off main).
+@@ -19212,7 +19465,7 @@ class S19TuiApp(App):
+         # verdict that is a lie. Narrowing the trigger would mean deciding
+         # here whether an install "really" changed the image, which is the
+         # kind of inference that produced the BL-4 defect in the first place.
+-        self._image_generation += 1
++        self._image_generation += 0
+         self._change_service.set_image_generation(self._image_generation)
+         # ...and RE-RENDER the entries table, or the invalidation is invisible.
+         # Nothing else re-renders it on load: the four existing `refresh_entries`
+@@ -19319,37 +19572,14 @@ class S19TuiApp(App):
+             self._mac_view_cache_cell_rows = list(prepared.mac_cell_rows)
+             self._mac_view_cache_cell_styles = list(prepared.mac_cell_styles)
+             if prepared.a2l_enriched_key is not None:
+-                # batch-102 Inc 2 (R-B102-A2L-006, F-B102-A2L-3): the
+-                # worker precomputed this enrichment on a generation
+-                # snapshot taken before the apply-time bumps above
+-                # (image generation at the install point, A2L generation
+-                # at the seam). Install it only when BOTH snapshot
+-                # generations still match the live counters; otherwise
+-                # discard it — the caches stay cleared and
+-                # ``_compute_a2l_enriched_tags`` recomputes on the UI
+-                # thread in ``_step_a2l`` — so a precompute can never
+-                # overwrite a fresher attach/image generation.
+-                if (
+-                    prepared.a2l_view_generation == self._a2l_view_generation
+-                    and prepared.a2l_image_generation == self._image_generation
+-                ):
+-                    self._a2l_enriched_tags = prepared.a2l_enriched_tags
+-                    self._a2l_enriched_key = prepared.a2l_enriched_key
+-                    self._a2l_summary_lines = prepared.a2l_summary_lines
+-                    self._a2l_summary_start = 0
+-                else:
+-                    self.logger.info(
+-                        "Load phase boundary: apply_a2l_precompute_discarded "
+-                        "path=%s snapshot_a2l_gen=%s snapshot_image_gen=%s "
+-                        "apply_a2l_gen=%s apply_image_gen=%s",
+-                        path.name,
+-                        prepared.a2l_view_generation,
+-                        prepared.a2l_image_generation,
+-                        self._a2l_view_generation,
+-                        self._image_generation,
+-                    )
++                # The preflight already proved both post-install generations;
++                # accepted precomputed enrichment is therefore installed as-is.
++                self._a2l_enriched_tags = prepared.a2l_enriched_tags
++                self._a2l_enriched_key = prepared.a2l_enriched_key
++                self._a2l_summary_lines = prepared.a2l_summary_lines
++                self._a2l_summary_start = 0
+         # Surface the new file name right away so the user sees immediate feedback
+-        # even before the deferred sections/hex/a2l refreshes complete.
++        # even before the deferred sections/hex refreshes complete.
+         status_message = self._format_coexistence_status(loaded, path)
+         self.set_file_status(status_message)
+         self._append_log_line(status_message)
+@@ -19392,21 +19622,6 @@ class S19TuiApp(App):
+                     "Load phase boundary: apply_hex_done path=%s", path.name
+                 )
+                 self._flush_logger()
+-                self.call_later(_step_a2l)
+-
+-        def _step_a2l() -> None:
+-            if self._load_tree_gone():
+-                return
+-            try:
+-                # ``update_a2l_view`` invokes ``update_mac_view`` internally in both
+-                # A2L present/absent branches, which in turn installs the precomputed
+-                # cache and renders the validation-issues window.
+-                self.update_a2l_view()
+-            finally:
+-                self.logger.info(
+-                    "Load phase boundary: apply_a2l_done path=%s", path.name
+-                )
+-                self._flush_logger()
+                 self.call_later(_step_finalize)
+ 
+         def _step_finalize() -> None:
+@@ -19414,8 +19629,6 @@ class S19TuiApp(App):
+                 return
+             try:
+                 self.update_project_labels()
+-                self.update_memory_map()
+-                self._refresh_loaded_panel()
+                 # LLR-166.1: the install may have re-focused the Split / Join
+                 # table through ``watch_current_file`` (``refresh_window``
+                 # does so only while that window is shown); land the focus
+@@ -19436,7 +19649,10 @@ class S19TuiApp(App):
+                 )
+                 self._flush_logger()
+ 
++        if publish_a2l:
++            self._refresh_a2l_dependent_views()
+         self.call_later(_step_sections)
++        return True
+ 
+     def _format_coexistence_status(self, loaded: LoadedFile, path: Path) -> str:
+         """
+@@ -19675,10 +19891,10 @@ class S19TuiApp(App):
+             - Log ``worker_parse_done`` then call ``_prepare_load_payload`` to build the
+               MAC cache, validation report, highlights, out-of-range list, and bases set,
+               passing the predicted post-apply generation snapshots (image +1; A2L +1
+-              only when the parse carried a payload) so the A2L precompute can be
+-              verified — and discarded if stale — at apply time (R-B102-A2L-006).
+-            - Dispatch ``_apply_prepared_load`` via ``call_from_thread`` so the UI install
+-              is the only main-thread work performed for this load.
++              only when the parse carried a payload) so the apply preflight can reject
++              the whole bundle if either generation was superseded.
++            - Dispatch ``_complete_prepared_load`` via ``call_from_thread`` so the UI
++              wrapper owns installation, publication, optional sync and outcome.
+             - On parse or prepare exceptions, fall back to installing the minimal
+               non-precomputed payload (or surface the error when the parse itself failed).
+ 
+@@ -19686,7 +19902,7 @@ class S19TuiApp(App):
+             Uses:
+                 - ``_parse_loaded_file`` / ``_prepare_load_payload``
+                 - ``call_from_thread``
+-                - ``_apply_prepared_load`` / ``_handle_load_error``
++                - ``_complete_prepared_load`` / ``_handle_load_error``
+             Used by:
+                 - ``load_from_path`` (load dialog and startup path)
+         """
+@@ -19719,14 +19935,9 @@ class S19TuiApp(App):
+             self._flush_logger()
+             prepare_started = time.perf_counter()
+             try:
+-                # batch-102 Inc 2 (R-B102-A2L-006): predict the
+-                # generations the apply step will have bumped by the
+-                # time it installs this payload — the image generation
+-                # always +1, the A2L generation +1 only when the parse
+-                # carried a payload (the apply seam bumps only when it
+-                # installs one). A wrong prediction is safe: the
+-                # apply-time snapshot verification discards the
+-                # precompute and the UI thread recomputes.
++                # Predict the generations the apply step will have bumped by
++                # installation: image +1 always, A2L +1 only with a payload.
++                # A stale snapshot rejects the whole prepared load preflight.
+                 prepared = self._prepare_load_payload(
+                     loaded,
+                     a2l_view_generation=(
+@@ -19758,17 +19969,73 @@ class S19TuiApp(App):
+             self._flush_logger()
+             self.call_from_thread(self.step_busy, "file_load", gen, 3)
+             self.call_from_thread(
+-                self._apply_prepared_load, prepared, path, load_started
+-            )
+-            if sync_project and self.current_project:
+-                self.call_from_thread(self._sync_loaded_file_to_project)
+-            self.call_from_thread(
+-                self.end_busy, "file_load", gen, f"Loaded {painted_names([path.name])}"
++                self._complete_prepared_load,
++                prepared,
++                path,
++                load_started,
++                gen=gen,
++                sync_project=sync_project,
+             )
+         except BaseException:
+             self.call_from_thread(self._busy_fail, "file_load", gen)
+             raise
+ 
++    def _complete_prepared_load(
++        self,
++        prepared: PreparedLoad,
++        path: Path,
++        load_started: float,
++        *,
++        gen: int,
++        sync_project: bool,
++    ) -> None:
++        """
++        Summary:
++            Complete one loose file load from its acceptance result, preserving
++            project sync and success only for an installed fresh bundle.
++
++        Args:
++            prepared (PreparedLoad): Worker-prepared file and derived caches.
++            path (Path): Original loaded path used for the success name.
++            load_started (float): ``time.perf_counter`` value captured at start.
++            gen (int): Busy generation for this file-load run.
++            sync_project (bool): Whether an accepted load may sync its project.
++
++        Returns:
++            None
++
++        Data Flow:
++            - Apply and publish the prepared load on the UI thread.
++            - On acceptance, retain optional project sync and defer ``Loaded``
++              behind the detail-card barrier; sync disappearance fails the run.
++            - On supersession, skip both and close immediately with kept-state text.
++
++        Dependencies:
++            Uses:
++                - ``_apply_prepared_load`` / ``_sync_loaded_file_to_project``
++                - ``end_busy``
++            Used by:
++                - ``_start_load_worker`` through ``call_from_thread``
++        """
++        accepted = self._apply_prepared_load(prepared, path, load_started)
++        if not accepted:
++            self.end_busy(
++                "file_load", gen, "Load superseded — current state kept."
++            )
++            return
++        if sync_project and self.current_project:
++            try:
++                self._sync_loaded_file_to_project()
++            except FileNotFoundError:
++                self._busy_fail("file_load", gen)
++                return
++        self.call_after_refresh(
++            self.end_busy,
++            "file_load",
++            gen,
++            f"Loaded {painted_names([path.name])}",
++        )
++
+     def _handle_load_error(self, path: Path, exc: Exception, gen: int) -> None:
+         """
+         Summary:
+@@ -21015,6 +21282,73 @@ class S19TuiApp(App):
+             return
+         self.update_a2l_tags_view(self._a2l_filtered_tags)
+ 
++    def _refresh_a2l_dependent_views(self) -> None:
++        """
++        Summary:
++            Publish one coherent A2L transition to every live dependent view
++            while preserving unrelated operator and historical state.
++
++        Args:
++            None
++
++        Returns:
++            None
++
++        Data Flow:
++            - Reset only the filter mode, then render fresh A2L/MAC/Issues data.
++            - Invalidate the old hex span, description and detail selection;
++              register the final detail clear behind queued row highlights.
++            - Refresh both pickers, Memory Map, Split / Join and Loaded through
++              their existing UI-thread seams.
++
++        Dependencies:
++            Uses:
++                - ``update_a2l_view`` / ``_prefill_check_editor`` /
++                  ``_prefill_patch_editor`` / ``update_memory_map``
++                - ``SplitJoinWindow.invalidate_a2l_selection`` /
++                  ``watch_current_file`` / ``_refresh_loaded_panel``
++            Used by:
++                - A2L attach, prepared file/project install and unload routes
++        """
++        self.a2l_tags_filter_mode = "all"
++        for button_id, variant in (
++            ("a2l_filter_all", "primary"),
++            ("a2l_filter_invalid", "default"),
++            ("a2l_filter_inmem", "default"),
++        ):
++            try:
++                button = self.query_one(f"#{button_id}", Button)
++            except Exception:
++                continue
++            button.variant = variant
++        self.update_a2l_view()
++        self._a2l_tag_hex_highlight = None
++        self.update_alt_hex_view()
++        try:
++            screen = self.screen
++        except Exception:
++            screen = None
++        if isinstance(screen, CurveDescriptionScreen):
++            screen.dismiss(None)
++        try:
++            card = self.query_one("#a2l_detail_card", A2LDetailCard)
++        except Exception:
++            card = None
++        if card is not None:
++            card.show_tag(None)
++            self.call_after_refresh(card.show_tag, None)
++        self._prefill_check_editor()
++        self._prefill_patch_editor()
++        self.update_memory_map()
++        try:
++            window = self.query_one("#screen_split_join", SplitJoinWindow)
++        except Exception:
++            window = None
++        if window is not None:
++            window.invalidate_a2l_selection()
++        self.watch_current_file()
++        self._refresh_loaded_panel()
++
+     def update_a2l_view(self) -> None:
+         """
+         Summary:
+@@ -21048,8 +21382,8 @@ class S19TuiApp(App):
+                 - ``_refresh_a2l_filtered_tags`` / ``_update_a2l_summary_buffer``
+                 - ``update_a2l_tags_view`` / ``update_validation_issues_view``
+             Used by:
+-                - ``_apply_prepared_load`` (``_step_a2l``)
+-                - A2L clear/reload handlers
++                - ``_refresh_a2l_dependent_views``
++                - A2L filter handlers
+         """
+         if not self.current_a2l_data:
+             self._a2l_enriched_tags = []
+@@ -21130,63 +21464,67 @@ class S19TuiApp(App):
+         a2l_table = self.query_one("#a2l_tags_list", DataTable)
+         summary_label = self.query_one("#a2l_tags_summary", Label)
+         self._a2l_row_key_to_tag = {}
+-        a2l_table.clear(columns=False)
+-        if not tags:
+-            self._a2l_window_start = 0
+-            if empty_message is not None:
+-                summary_label.update(safe_text(empty_message))
+-            else:
+-                summary_label.update("No A2L tags.")
++        a2l_table.suppress_row_highlight = True
++        try:
++            a2l_table.clear(columns=False)
++            if not tags:
++                self._a2l_window_start = 0
++                if empty_message is not None:
++                    summary_label.update(safe_text(empty_message))
++                else:
++                    summary_label.update("No A2L tags.")
++                self.logger.info(
++                    "Load phase boundary: populate_a2l_table_done rows=0 elapsed=%.3f",
++                    time.perf_counter() - populate_started,
++                )
++                self._flush_logger()
++                return
++            total_tags = len(tags)
++            self._a2l_window_start = self._a2l_clamp_page_start(total_tags)
++            page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
++            start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
++            self._a2l_window_start = start
++            visible_tags = tags[start:end]
++            name_width = self._a2l_tag_name_width(a2l_table)
++            issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
++            for i, tag in enumerate(visible_tags):
++                absolute_index = start + i
++                row_key = f"a2l:{absolute_index}"
++                self._a2l_row_key_to_tag[row_key] = tag
++                cells = self._build_a2l_table_cells(tag, name_width)
++                severity = _a2l_tag_row_severity(tag, issue_severity_map)
++                style = _severity_style(severity)
++                # LLR-068.1: the builder returns markup-safe Rich ``Text`` cells with
++                # per-cell accents (name/address/source). Row-level severity (US-033,
++                # the A2L Red/Green/White/Grey contract) overrides those accents when
++                # present, preserving the pre-batch uniform per-row colouring.
++                if style:
++                    for cell in cells:
++                        cell.style = style
++                try:
++                    a2l_table.add_row(*cells, key=row_key)
++                except Exception:
++                    a2l_table.add_row(*cells)
++            page_num = start // page_size + 1
++            total_pages = max(1, (total_tags + page_size - 1) // page_size)
++            in_image = sum(1 for tag in tags if tag.get("in_memory"))
++            summary_text = Text(
++                f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
++                f"(page size {page_size}; +/- to change page)"
++            )
++            summary_text.append("  ·  ")
++            summary_text.append(f"{in_image} in image", style=GREEN)
++            summary_label.update(summary_text)
++            self.call_after_refresh(self._fit_a2l_tag_cells)
+             self.logger.info(
+-                "Load phase boundary: populate_a2l_table_done rows=0 elapsed=%.3f",
++                "Load phase boundary: populate_a2l_table_done rows=%d total=%d elapsed=%.3f",
++                len(visible_tags),
++                total_tags,
+                 time.perf_counter() - populate_started,
+             )
+             self._flush_logger()
+-            return
+-        total_tags = len(tags)
+-        self._a2l_window_start = self._a2l_clamp_page_start(total_tags)
+-        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+-        start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
+-        self._a2l_window_start = start
+-        visible_tags = tags[start:end]
+-        name_width = self._a2l_tag_name_width(a2l_table)
+-        issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
+-        for i, tag in enumerate(visible_tags):
+-            absolute_index = start + i
+-            row_key = f"a2l:{absolute_index}"
+-            self._a2l_row_key_to_tag[row_key] = tag
+-            cells = self._build_a2l_table_cells(tag, name_width)
+-            severity = _a2l_tag_row_severity(tag, issue_severity_map)
+-            style = _severity_style(severity)
+-            # LLR-068.1: the builder returns markup-safe Rich ``Text`` cells with
+-            # per-cell accents (name/address/source). Row-level severity (US-033,
+-            # the A2L Red/Green/White/Grey contract) overrides those accents when
+-            # present, preserving the pre-batch uniform per-row colouring.
+-            if style:
+-                for cell in cells:
+-                    cell.style = style
+-            try:
+-                a2l_table.add_row(*cells, key=row_key)
+-            except Exception:
+-                a2l_table.add_row(*cells)
+-        page_num = start // page_size + 1
+-        total_pages = max(1, (total_tags + page_size - 1) // page_size)
+-        in_image = sum(1 for tag in tags if tag.get("in_memory"))
+-        summary_text = Text(
+-            f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
+-            f"(page size {page_size}; +/- to change page)"
+-        )
+-        summary_text.append("  ·  ")
+-        summary_text.append(f"{in_image} in image", style=GREEN)
+-        summary_label.update(summary_text)
+-        self.call_after_refresh(self._fit_a2l_tag_cells)
+-        self.logger.info(
+-            "Load phase boundary: populate_a2l_table_done rows=%d total=%d elapsed=%.3f",
+-            len(visible_tags),
+-            total_tags,
+-            time.perf_counter() - populate_started,
+-        )
+-        self._flush_logger()
++        finally:
++            a2l_table.suppress_row_highlight = False
+ 
+     def _a2l_tag_name_width(self, a2l_table: DataTable) -> Optional[int]:
+         """
+
+...                                                                      [100%]
+3 passed, 100 deselected in 10.73s

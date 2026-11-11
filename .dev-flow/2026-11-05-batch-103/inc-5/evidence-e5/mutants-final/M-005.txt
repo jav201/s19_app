@@ -1,0 +1,738 @@
+M-005
+pytest -k r005
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..daf4d556 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18480,7 +18480,7 @@ class S19TuiApp(App):
+         self.update_hex_view()
+         self.update_alt_hex_view()
+         self.update_mac_hex_view()
+-        self._refresh_a2l_dependent_views()
++        pass  # no unload fanout
+         self.update_project_labels()
+         self.call_after_refresh(self.set_file_status, f"Unloaded {label}.")
+         self.call_after_refresh(self.set_status, f"Unloaded {label}.")
+
+/tmp/b103-inc5-mut/M-005/s19_app/__init__.py
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/1] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f558cd2aed0>
+case = 'R-A2L-REFRESH.005/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:591: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R0/app'), src=PosixPath('/tmp/...R0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E       AssertionError: assert [] == ['F']
+E         
+E         Right contains one more item: 'F'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:577: AssertionError
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/2] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f558aa288d0>
+case = 'R-A2L-REFRESH.005/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:591: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R1/app'), src=PosixPath('/tmp/...R1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E       AssertionError: assert [] == ['F']
+E         
+E         Right contains one more item: 'F'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:577: AssertionError
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/3] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f558d0dda90>
+case = 'R-A2L-REFRESH.005/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:591: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R2/app'), src=PosixPath('/tmp/...R2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E       AssertionError: assert [] == ['F']
+E         
+E         Right contains one more item: 'F'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:577: AssertionError
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/4] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f558ce4ad90>
+case = 'R-A2L-REFRESH.005/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:591: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R3/app'), src=PosixPath('/tmp/...R3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E       AssertionError: assert [] == ['F']
+E         
+E         Right contains one more item: 'F'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:577: AssertionError
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/5] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f558ba58c10>
+case = 'R-A2L-REFRESH.005/5'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:591: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R4/app'), src=PosixPath('/tmp/...R4/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-672/test_r005_unload_publication_R4/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+>       assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+E       AssertionError: assert [] == ['F']
+E         
+E         Right contains one more item: 'F'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:577: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4]
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/5]
+5 failed, 98 deselected in 89.71s (0:01:29)
