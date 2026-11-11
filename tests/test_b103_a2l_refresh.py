@@ -199,8 +199,45 @@ def _expected_values(rows: tuple[tuple[str, int, int], ...], image: dict[int, in
     return [sum(image[address + offset] << (8 * offset) for offset in range(size)) for _, address, size in rows]
 
 
-def _assert_snap(
+def _a2l_visible_shape(app: S19TuiApp) -> list[tuple[str, str, str, str]]:
+    table = app.query_one("#a2l_tags_list", DataTable)
+    columns = {str(column.label): index for index, column in enumerate(table.ordered_columns)}
+    result = []
+    for index in range(table.row_count):
+        cells = table.get_row_at(index)
+        result.append((
+            _plain(cells[columns["Tag"]]).removeprefix("✓ ").removeprefix("· "),
+            _plain(cells[columns["Address"]]),
+            _plain(cells[columns["Length"]]),
+            _plain(cells[columns["Raw"]]),
+        ))
+    return result
+
+
+def _picker_visible_shape(panel: CheckEditorPanel | PatchEditorPanel) -> list[tuple[str, str, str]]:
+    table = panel.query_one("#check_param_table" if isinstance(panel, CheckEditorPanel) else "#patch_param_table", DataTable)
+    result = []
+    for index in range(table.row_count):
+        cells = table.get_row_at(index)
+        result.append(tuple(_plain(cell) for cell in cells[1:4]))
+    return result
+
+
+def _split_visible_text(split: SplitJoinWindow) -> str:
+    return _plain(split.query_one("#sje_table").query_one(Static).render())
+
+
+def _memory_visible_text(memory: MemoryMapPanel) -> str:
+    parts = [memory.rendered_text]
+    parts.extend(_plain(row.render()) for row in memory.query(".map-region-row"))
+    if len(memory.query("#map_detail_body")) > 0:
+        parts.append(_plain(memory.query_one("#map_detail_body", Static).render()))
+    return "\n".join(parts)
+
+
+async def _assert_snap(
     app: S19TuiApp,
+    pilot,
     *,
     rows: tuple[tuple[str, int, int], ...] | None,
     image: dict[int, int] | None,
@@ -221,6 +258,11 @@ def _assert_snap(
         assert app.current_a2l_path.name == a2l_name
     table = app.query_one("#a2l_tags_list", DataTable)
     assert _table_names(table) == names
+    raw_values = _expected_values(expected, image)
+    assert _a2l_visible_shape(app) == [
+        (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+        for (name, address, size), raw in zip(expected, raw_values)
+    ]
     assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
     assert app._a2l_tag_hex_highlight is None
     for panel in (
@@ -231,6 +273,18 @@ def _assert_snap(
         assert list(picker.param_rows) == names
         assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
         assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+        visible_rows = _picker_visible_shape(panel)
+        assert len(visible_rows) == len(expected)
+        for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+            assert visible_name == name
+            assert visible_address == f"0x{address:08X}"
+            assert visible_format.startswith(f"u{size * 8}")
+        full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+        if not names:
+            assert _plain(full_name.render()) == NO_PICKERS
+        else:
+            first = expected[0]
+            assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
         if check_pick:
             assert picker._signature == app._a2l_enriched_key
     split = app.query_one("#screen_split_join", SplitJoinWindow)
@@ -238,17 +292,50 @@ def _assert_snap(
     assert split._sel["a2l"] == set()
     assert split._cursor["a2l"] == 0
     assert split._armed is False
+    while split._tab != "a2l":
+        split.action_cycle_tab()
+    app.action_open_split_join_export()
+    await pilot.pause()
+    split_text = _split_visible_text(split)
+    if not expected:
+        assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+    else:
+        visible_rows = [line for line in split_text.splitlines() if line.strip()]
+        assert len(visible_rows) == len(expected)
+        for name, address, size in expected:
+            assert name in split_text
+            assert f"0x{address:08X}" in split_text
+            assert f"{size} B" in split_text
     memory = app.query_one("#memory_map_panel", MemoryMapPanel)
     expected_memory_names = memory_names if memory_names is not None else (names if image is not None else [])
     assert [t["name"] for t in memory._a2l_tags] == expected_memory_names
+    memory_text = _memory_visible_text(memory)
     if image is None:
         assert memory.rendered_text == memory._EMPTY_TEXT
     else:
         assert memory.rendered_text != memory._EMPTY_TEXT
+        assert "256 B mapped" in memory_text
+        for name in expected_memory_names:
+            assert name in memory_text
+        assert any(line.strip().startswith("Symbols") and line.rstrip().endswith(str(len(expected_memory_names))) for line in memory_text.splitlines()), memory_text
+    stale_names = {row[0] for row in (*OLD, *NEW, *PLAIN)} - set(names)
+    for stale in stale_names:
+        assert stale not in split_text
+        if image is not None:
+            assert stale not in memory_text
     loaded = _loaded_text(app)
-    assert (loaded[0] != "(none)") is (image is not None)
-    assert (loaded[1] != "(none)") is loaded_mac
-    assert (a2l_name is not None and loaded[2].startswith(a2l_name)) or (a2l_name is None and loaded[2] == "(none)")
+    if image is None:
+        assert loaded[0] == "(none)"
+    else:
+        assert loaded[0] == f"{app.current_file.path.name}  {len(app.current_file.mem_map)} B · {len(app.current_file.ranges)} rng"
+    if loaded_mac:
+        assert loaded[1] == f"{app.current_file.mac_path.name}  {len(app.current_file.mac_records)} records"
+    else:
+        assert loaded[1] == "(none)"
+    if a2l_name is None:
+        assert loaded[2] == "(none)"
+    else:
+        assert loaded[2] == f"{a2l_name}  {len(expected)} tags"
 
 
 def _arm_fanout(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch, events: list[tuple]) -> None:
@@ -264,6 +351,7 @@ def _arm_fanout(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch, events: list[tu
     real_end = app.end_busy
 
     def end_busy(kind: str, gen: int, message: str) -> None:
+        assert message.startswith(("Loaded ", "A2L loaded", "Unloaded "))
         events.append(("OUTCOME", threading.get_ident(), message))
         real_end(kind, gen, message)
 
@@ -271,32 +359,71 @@ def _arm_fanout(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch, events: list[tu
     events.append(("UI", ui, None))
 
 
+async def _submit_load_path(app: S19TuiApp, pilot, value: str, *, project: bool = False, action: bool = False) -> None:
+    if project:
+        if action:
+            app.action_load_project()
+        else:
+            await pilot.press("p")
+    else:
+        await pilot.press("ctrl+l")
+    await wait_until(pilot, lambda: len(app.screen.query("#load_path")) > 0, "Load dialog did not open")
+    if project:
+        rows = app.screen._rows
+        index = next(
+            index for index, (_section, _label, choice) in enumerate(rows)
+            if choice is not None and choice.kind == "project" and choice.value == value
+        )
+        assert await pilot.click("#load_list"), "click missed #load_list"
+        app.screen.query_one("#load_list").highlighted = index
+        await pilot.press("enter")
+    else:
+        assert await pilot.click("#load_path"), "click missed #load_path"
+        await pilot.press("ctrl+a", "delete")
+        await pilot.press(*value)
+        assert await pilot.click("#load_ok"), "click missed #load_ok"
+    await pilot.pause()
+
+
+async def _request_a2l(app: S19TuiApp, pilot, path: Path) -> None:
+    await _submit_load_path(app, pilot, str(path))
+
+
 async def _load_a2l(app: S19TuiApp, pilot, path: Path) -> None:
-    app.load_a2l_from_path(path, copy=False)
+    await _request_a2l(app, pilot, path)
     await settle_workers(pilot)
     assert app.current_a2l_path == path, list(app.log_lines)
 
 
 async def _load_image(app: S19TuiApp, pilot, path: Path) -> None:
-    app.load_from_path(path)
+    await _submit_load_path(app, pilot, str(path))
+    if isinstance(app.screen, ConfirmQuestionScreen):
+        await pilot.press("y")
     await settle_workers(pilot)
     assert app.current_file is not None and app.current_file.mem_map, list(app.log_lines)
 
 
-async def _load_project(app: S19TuiApp, pilot, name: str) -> None:
-    app._handle_load_project(name)
+async def _load_project(app: S19TuiApp, pilot, name: str, *, action: bool = False) -> None:
+    await _submit_load_path(app, pilot, name, project=True, action=action)
+    if isinstance(app.screen, ConfirmQuestionScreen):
+        await pilot.press("y")
     await settle_workers(pilot)
     assert app.current_project == name, list(app.log_lines)
+    if len(app.screen.query("#result_ok")) > 0:
+        await pilot.press("escape")
+        await wait_until(pilot, lambda: len(app.screen.query("#result_ok")) == 0, "Load result did not close")
 
 
 def _unload(app: S19TuiApp, kind: str) -> None:
-    app.on_loaded_artifacts_panel_unload_requested(LoadedArtifactsPanel.UnloadRequested(kind))
+    panel = app.query_one("#loaded_panel", LoadedArtifactsPanel)
+    next(button for button in panel.query(Button) if button.name == kind).press()
 
 
 def _mount_views(app: S19TuiApp, visible: str = "a2l") -> None:
     app.action_show_screen("check_editor")
     app.action_show_screen("patch")
     app.action_show_screen("map")
+    app.action_open_split_join_export()
     app.action_show_screen(visible)
 
 
@@ -305,6 +432,12 @@ def _run(tmp_path: Path, scenario) -> None:
 
     async def drive():
         app = S19TuiApp(base_dir=fixture.base)
+        real_a2l_route = app.load_a2l_from_path
+
+        def in_place_a2l_route(path: Path, *, copy: bool = False) -> None:
+            real_a2l_route(path, copy=copy)
+
+        app.load_a2l_from_path = in_place_a2l_route
         async with app.run_test(size=(160, 50)) as pilot:
             await pilot.pause()
             _mount_views(app)
@@ -327,10 +460,13 @@ def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.Monk
             assert app.current_a2l_path is None
         events = []
         _arm_fanout(app, monkeypatch, events)
+        ui_calls = _arm_thread_spies(app, monkeypatch)
         await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+        await pilot.pause()
         assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
         assert events[0][1] == events[1][1] == events[2][1]
-        _assert_snap(app, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+        assert all(thread == events[0][1] for _, thread in ui_calls)
+        await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
 
     _run(tmp_path, scenario)
 
@@ -351,7 +487,7 @@ def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.Monk
             source.write_bytes(f.img2.read_bytes())
         await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
         assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
-        _assert_snap(app, rows=OLD, image=IMG2, a2l_name="old.a2l")
+        await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
         if case.endswith("/3"):
             assert app.current_file.path.name in {"image.s19", "image_1.s19"}
 
@@ -369,21 +505,24 @@ def test_r003_project_final_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
         _arm_fanout(app, monkeypatch, events)
         await _load_project(app, pilot, "P_NEW")
         assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
-        _assert_snap(app, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
+        await _assert_snap(app, pilot, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
 
     _run(tmp_path, scenario)
 
 
 @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
-def test_r004_a2l_only_project(tmp_path: Path, case: str) -> None:
+def test_r004_a2l_only_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
     async def scenario(app, pilot, f):
         _project(f, "P_ONLY", image=None, a2l=f.new)
         if case.endswith("/2"):
             await _load_image(app, pilot, f.img1)
             await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
         await _load_project(app, pilot, "P_ONLY")
+        assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
         assert app.current_file is None
-        _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+        await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
 
     _run(tmp_path, scenario)
 
@@ -401,21 +540,53 @@ def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
             await _load_a2l(app, pilot, f.old)
         events = []
         _arm_fanout(app, monkeypatch, events)
-        statuses = _status_recorder(app, monkeypatch)
+        timeline = []
+
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+
+        real_empty = app._apply_empty_state
+
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+
+        monkeypatch.setattr(app, "set_status", status_event)
         _unload(app, kind)
         await pilot.pause()
         await pilot.pause()
         assert [e[0] for e in events if e[0] != "UI"] == ["F"]
         unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
-        assert statuses == [f"Unloaded {unload_label}."]
+        assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+        assert timeline[0][1] == timeline[1][1] == artifacts()
+        assert timeline[-1][1] == f"Unloaded {unload_label}."
         if kind == "primary":
-            _assert_snap(app, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
         elif kind == "mac":
-            _assert_snap(app, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
         elif kind == "a2l" and not case.endswith("/5"):
-            _assert_snap(app, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
         else:
-            _assert_snap(app, rows=None, image=None, a2l_name=None)
+            await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
 
     _run(tmp_path, scenario)
 
@@ -454,7 +625,7 @@ def test_r006_viewer_values(tmp_path: Path, case: str) -> None:
                 _unload(app, "a2l")
                 await pilot.pause()
                 rows, name = (), None
-        _assert_snap(app, rows=rows, image=image, a2l_name=name, check_pick=False, loaded_mac=case.endswith("/4"))
+        await _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, check_pick=False, loaded_mac=case.endswith("/4"))
 
     _run(tmp_path, scenario)
 
@@ -575,7 +746,9 @@ def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> No
         assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
         assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
         assert app.a2l_tags_filter_field == "name"
-        assert [t["name"] for t in app._a2l_filtered_tags] == ([] if route == "unload" else [row[0] for row in MODE])
+        expected_names = [] if route == "unload" else [row[0] for row in MODE]
+        assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+        assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
 
     _run(tmp_path, scenario)
 
@@ -587,14 +760,15 @@ def test_r014_same_path(tmp_path: Path, case: str) -> None:
         same.write_bytes(f.old.read_bytes())
         await _load_image(app, pilot, f.img1)
         await _load_a2l(app, pilot, same)
-        old_generation = app._a2l_view_generation
-        image_generation = app._image_generation
         same.write_bytes(f.new.read_bytes())
         if case.endswith("/2"):
-            _project(f, "Proj1", image=None, a2l=same)
+            _project(f, "Proj1", image=None, a2l=same, mac=True)
+            await _load_image(app, pilot, f.mac)
             app.current_project = "Proj One"
             app.current_project_dir = f.base / ".s19tool" / "workarea" / "Proj1"
             project_hashes = _project_digests(app.current_project_dir)
+        old_generation = app._a2l_view_generation
+        image_generation = app._image_generation
         await _load_a2l(app, pilot, same)
         if case.endswith("/2"):
             assert isinstance(app.screen, ConfirmQuestionScreen)
@@ -603,7 +777,7 @@ def test_r014_same_path(tmp_path: Path, case: str) -> None:
             assert _project_digests(app.current_project_dir) == project_hashes
         assert app._a2l_view_generation > old_generation
         assert app._image_generation == image_generation
-        _assert_snap(app, rows=NEW, image=IMG1, a2l_name="same.a2l")
+        await _assert_snap(app, pilot, rows=NEW, image=IMG1, a2l_name="same.a2l", loaded_mac=case.endswith("/2"))
 
     _run(tmp_path, scenario)
 
@@ -629,8 +803,18 @@ def test_r015_memory_map(tmp_path: Path, case: str) -> None:
         assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
         assert len(memory._a2l_tags) == len(rows)
         assert memory.rendered_text != memory._EMPTY_TEXT
-        if not rows:
+        memory_text = _memory_visible_text(memory)
+        assert "256 B mapped" in memory_text
+        assert memory._ordered_ranges == [(0, 256, True)]
+        assert "Region" in memory_text and "0x00000000" in memory_text
+        for name in [row[0] for row in rows]:
+            assert name in memory_text
+        if rows:
+            assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("4") for line in memory_text.splitlines()), memory_text
+        else:
             assert memory.rendered_text == baseline
+            assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("0") for line in memory_text.splitlines()), memory_text
+            assert "OLD_ONLY" not in memory_text
 
     _run(tmp_path, scenario)
 
@@ -668,6 +852,14 @@ def test_r016_split_join(tmp_path: Path, case: str) -> None:
         assert split.query_one("#sje_manual", TextArea).text == "manual: keep [x]"
         expected = () if case.endswith("/3") else NEW
         assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == list(expected)
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        for name, address, size in expected:
+            assert name in split_text
+            assert f"0x{address:08X}" in split_text
+            assert f"{size} B" in split_text
+        assert "OLD_ONLY" not in split_text
 
     _run(tmp_path, scenario)
 
@@ -692,13 +884,12 @@ def test_r017_loaded_panel(tmp_path: Path, case: str) -> None:
             await _load_project(app, pilot, "P_ONLY")
         slots = _loaded_text(app)
         if case.endswith("/4"):
-            assert slots[0] == "(none)" and slots[1] == "(none)"
-            assert slots[2].startswith("new.a2l")
+            assert slots == ["(none)", "(none)", "new.a2l  4 tags"]
             assert app.current_file is None
         else:
-            assert slots[0].startswith("img1.s19")
-            assert slots[1].startswith("records.mac")
-            assert slots[2] == "(none)" if case.endswith("/3") else slots[2].startswith("new.a2l" if case.endswith("/2") else "old.a2l")
+            assert slots[0] == "img1.s19  256 B · 1 rng"
+            assert slots[1] == "records.mac  104 records"
+            assert slots[2] == "(none)" if case.endswith("/3") else slots[2] == ("new.a2l  4 tags" if case.endswith("/2") else "old.a2l  4 tags")
 
     _run(tmp_path, scenario)
 
@@ -730,8 +921,14 @@ def test_r027_generations(tmp_path: Path, case: str) -> None:
         assert app._a2l_view_generation > before[0]
         assert app._image_generation == before[1]
         assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
         for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
-            assert _picker(panel)._signature == app._a2l_enriched_key
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+            _assert_picker_visible(panel, tuple(
+                (name, f"0x{address:08X}", f"u{size * 8}")
+                for name, address, size in expected_rows
+            ))
 
     _run(tmp_path, scenario)
 
@@ -777,7 +974,7 @@ def test_r010_detail_invalidation(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
                 return real_parse(*args, **kwargs)
 
             monkeypatch.setattr(module, "parse_a2l_cached", gated)
-            app.load_a2l_from_path(f.new, copy=False)
+            await _request_a2l(app, pilot, f.new)
             await wait_until(pilot, started.is_set, "A2L worker did not reach its parse gate")
             await pilot.press("d")
             await pilot.pause()
@@ -865,6 +1062,16 @@ def _picker_shape(panel: CheckEditorPanel | PatchEditorPanel) -> tuple:
     )
 
 
+def _assert_picker_visible(panel: CheckEditorPanel | PatchEditorPanel, expected: tuple) -> None:
+    visible = _picker_visible_shape(panel)
+    assert len(visible) == len(expected)
+    for (name, address, fmt), (expected_name, expected_address, expected_fmt) in zip(visible, expected):
+        if isinstance(expected_address, int):
+            expected_address = f"0x{expected_address:08X}"
+        assert (name, address) == (expected_name, expected_address)
+        assert fmt.startswith(expected_fmt)
+
+
 @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
 def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
     async def scenario(app, pilot, f):
@@ -894,6 +1101,7 @@ def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
         assert app._active_screen_key == "check_editor"
         expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
         assert _picker_shape(panel)[0] == expected
+        _assert_picker_visible(panel, expected)
         assert _picker(panel)._signature == app._a2l_enriched_key
         if case.endswith("/3"):
             assert _picker(panel)._signature != before_key
@@ -940,7 +1148,9 @@ def test_r013_visible_patch_prefill(tmp_path: Path, case: str) -> None:
             await pilot.pause()
             rows = ()
         assert app._active_screen_key == "patch"
-        assert _picker_shape(panel)[0] == tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+        _assert_picker_visible(panel, expected)
         assert _picker(panel)._signature == app._a2l_enriched_key
         if case.endswith("/3"):
             assert _picker(panel)._signature != before_key
@@ -1065,6 +1275,11 @@ def _status_recorder(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch) -> list[st
     return messages
 
 
+def _assert_visible_log(app: S19TuiApp, expected: str) -> None:
+    lines = [_plain(app.query_one(f"#log_line_{index}", Label).render()) for index in range(1, 5)]
+    assert expected in lines, (expected, lines)
+
+
 def _worker_spy(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch) -> list:
     calls = []
     real = app._a2l_attach_worker
@@ -1092,7 +1307,7 @@ async def _open_replacement(app: S19TuiApp, pilot, f: Fixture, candidate: Path |
     await _load_project(app, pilot, "P_OLD")
     app.current_project = "Proj One"
     path = candidate or f.new
-    app.load_a2l_from_path(path, copy=False)
+    await _request_a2l(app, pilot, path)
     await pilot.pause()
     assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
     return app.current_project_dir / app.current_a2l_path.name
@@ -1109,16 +1324,54 @@ def _project_digests(folder: Path) -> dict[str, str]:
 def _state_snapshot(app: S19TuiApp) -> tuple:
     import copy
 
+    check = app.query_one("#check_editor_panel", CheckEditorPanel)
+    patch = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+    split = app.query_one("#screen_split_join", SplitJoinWindow)
+    workers = tuple(sorted(
+        (id(worker), worker.name, worker.group, worker.is_running, worker.is_cancelled)
+        for worker in app.workers
+    ))
     return (
+        app.current_project,
+        app.current_project_dir,
         app.current_a2l_path,
         copy.deepcopy(app.current_a2l_data),
         copy.deepcopy(app.current_file),
         app._a2l_view_generation,
         app._image_generation,
         copy.deepcopy(app._a2l_enriched_tags),
+        app._mac_window_start,
+        copy.deepcopy(app._mac_view_cache_summary),
+        app.validation_issue_filter_mode,
+        copy.deepcopy(app._validation_report),
         copy.deepcopy(app._validation_issues),
         _table_names(app.query_one("#a2l_tags_list", DataTable)),
+        _a2l_visible_shape(app),
         _loaded_text(app),
+        _project_digests(app.current_project_dir) if app.current_project_dir else {},
+        _picker_visible_shape(check),
+        _picker_visible_shape(patch),
+        _picker(check)._signature,
+        _picker(patch)._signature,
+        copy.deepcopy(memory._a2l_tags),
+        memory.rendered_text,
+        _memory_visible_text(memory),
+        copy.deepcopy(split._a2l_rows_cache),
+        copy.deepcopy(split._sel),
+        copy.deepcopy(split._cursor),
+        split._armed,
+        split._tab,
+        split.query_one("#sje_manual", TextArea).text,
+        _split_visible_text(split),
+        patch.is_dirty,
+        copy.deepcopy(app._change_service.document),
+        copy.deepcopy(app._change_service._undo_stack),
+        copy.deepcopy(app._change_service._redo_stack),
+        app._change_service._last_check_message,
+        copy.deepcopy(getattr(app, "_last_flow_run", None)),
+        copy.deepcopy(getattr(app, "_diff_last_result", None)),
+        workers,
     )
 
 
@@ -1126,22 +1379,21 @@ def _state_snapshot(app: S19TuiApp) -> tuple:
 def test_r020_replacement_question(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
     async def scenario(app, pilot, f):
         workers = _worker_spy(app, monkeypatch)
-        if case.endswith("/1"):
-            listed = await _open_replacement(app, pilot, f)
-            candidate = "new.a2l"
-        else:
-            same = f.src / "same.a2l"
-            same.write_bytes(f.old.read_bytes())
-            _project(f, "P_OLD", image=None, a2l=same)
-            await _load_project(app, pilot, "P_OLD")
-            app.current_project = "Proj One"
-            listed = app.current_a2l_path
+        source = f.old if case.endswith("/1") else f.src / "same.a2l"
+        if case.endswith("/2"):
+            source.write_bytes(f.old.read_bytes())
+        _project(f, "P_OLD", image=None, a2l=source)
+        await _load_project(app, pilot, "P_OLD")
+        app.current_project = "Proj One"
+        listed = app.current_a2l_path
+        candidate_path = f.new if case.endswith("/1") else listed
+        candidate = candidate_path.name
+        if case.endswith("/2"):
             listed.write_bytes(f.new.read_bytes())
-            app.load_a2l_from_path(listed, copy=False)
-            await pilot.pause()
-            assert isinstance(app.screen, ConfirmQuestionScreen)
-            candidate = "same.a2l"
         before = _state_snapshot(app)
+        await _request_a2l(app, pilot, candidate_path)
+        await pilot.pause()
+        assert isinstance(app.screen, ConfirmQuestionScreen)
         assert _modal_text(app) == (
             "Replace project A2L?",
             f"Project 'Proj One' already has A2L '{listed.name}'. Load '{candidate}' instead?",
@@ -1198,18 +1450,19 @@ def test_r022_confirmation_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             before = _state_snapshot(app)
         elif case.endswith("/3"):
             _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
-            await _load_project(app, pilot, "P_NEW")
+            await _load_project(app, pilot, "P_NEW", action=True)
             before = _state_snapshot(app)
         await pilot.press("y")
         await settle_workers(pilot)
         if case.endswith("/1"):
             assert len(workers) == 1
             assert app.current_a2l_path == f.new
-            _assert_snap(app, rows=NEW, image=None, a2l_name="new.a2l")
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
         else:
             assert workers == []
             assert _state_snapshot(app) == before
             assert statuses[-1] == "A2L NOT loaded: project or its A2L changed — load again."
+            _assert_visible_log(app, statuses[-1])
             assert "A2L loaded" not in statuses[-1]
 
     _run(tmp_path, scenario)
@@ -1232,8 +1485,7 @@ def test_r023_accepted_replacement(tmp_path: Path, monkeypatch: pytest.MonkeyPat
             app.current_project = "Proj One"
             candidate = app.current_a2l_path
             candidate.write_bytes(f.new.read_bytes())
-        manifest = app.current_project_dir / "project.json"
-        manifest_hash = hashlib.sha256(manifest.read_bytes()).hexdigest()
+        project_hashes = _project_digests(app.current_project_dir)
         events = []
         _arm_fanout(app, monkeypatch, events)
         if case.endswith("/2"):
@@ -1245,7 +1497,7 @@ def test_r023_accepted_replacement(tmp_path: Path, monkeypatch: pytest.MonkeyPat
                 real_attached(result)
 
             monkeypatch.setattr(app, "_on_a2l_attached", disappear_before_install)
-        app.load_a2l_from_path(candidate, copy=False)
+        await _request_a2l(app, pilot, candidate)
         await pilot.pause()
         assert isinstance(app.screen, ConfirmQuestionScreen)
         await pilot.press("y")
@@ -1253,15 +1505,18 @@ def test_r023_accepted_replacement(tmp_path: Path, monkeypatch: pytest.MonkeyPat
         assert len(workers) == 1
         assert workers[0].sync_project is False
         assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
-        _assert_snap(app, rows=NEW, image=IMG1, a2l_name=candidate.name, loaded_mac=True)
-        assert hashlib.sha256(manifest.read_bytes()).hexdigest() == manifest_hash
+        await _assert_snap(app, pilot, rows=NEW, image=IMG1, a2l_name=candidate.name, loaded_mac=True)
+        expected_hashes = dict(project_hashes)
         if case.endswith("/2"):
             assert not candidate.exists()
+            del expected_hashes[candidate.name]
+        assert _project_digests(app.current_project_dir) == expected_hashes
 
     _run(tmp_path, scenario)
 
 
 async def _start_busy_action(app: S19TuiApp, pilot, f: Fixture, monkeypatch: pytest.MonkeyPatch, case: str) -> threading.Event:
+    """Setup auxiliary: start a real session worker and hold its actual work step."""
     started = threading.Event()
     release = threading.Event()
     if case.endswith("/1"):
@@ -1287,7 +1542,7 @@ async def _start_busy_action(app: S19TuiApp, pilot, f: Fixture, monkeypatch: pyt
             return real(*args, **kwargs)
 
         monkeypatch.setattr(module, "parse_a2l_cached", gated)
-        app.load_a2l_from_path(f.old, copy=False)
+        await _request_a2l(app, pilot, f.old)
     elif case.endswith("/3"):
         _project(f, "project_b", image=f.img1, a2l=f.old)
         real = app._prepare_project_load
@@ -1298,7 +1553,7 @@ async def _start_busy_action(app: S19TuiApp, pilot, f: Fixture, monkeypatch: pyt
             return real(*args, **kwargs)
 
         monkeypatch.setattr(app, "_prepare_project_load", gated)
-        app._handle_load_project("project_b")
+        await _submit_load_path(app, pilot, "project_b", project=True, action=True)
     else:
         from s19_app.tui.screens import SaveProjectPayload
 
@@ -1334,11 +1589,12 @@ def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPat
             return real_start(*args, **kwargs)
 
         monkeypatch.setattr(app, "_start_a2l_load", start_spy)
-        app.load_a2l_from_path(f.new, copy=False)
+        await pilot.press("ctrl+l")
         await pilot.pause()
         labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
         label = labels[int(case.rsplit("/", 1)[1]) - 1]
         assert statuses == [f"busy: {label} is running — wait for it to finish."]
+        _assert_visible_log(app, statuses[0])
         assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
         assert starts == []
         assert workers == []
@@ -1392,8 +1648,12 @@ def test_r025_post_yes_busy_boundaries(tmp_path: Path, monkeypatch: pytest.Monke
             await pilot.pause()
             expected = "busy: Saving project project_b is running — wait for it to finish."
         assert expected in statuses
+        _assert_visible_log(app, expected)
         assert workers == []
-        assert _state_snapshot(app) == before
+        after = _state_snapshot(app)
+        assert after[:-1] == before[:-1]
+        assert after[-1] != before[-1]
+        assert app._running_session_action() is not None
         release.set()
         await settle_workers(pilot)
 
@@ -1428,6 +1688,33 @@ def _arm_thread_spies(app: S19TuiApp, monkeypatch: pytest.MonkeyPatch) -> list[t
             real()
 
     monkeypatch.setattr(split, "invalidate_a2l_selection", invalidate, raising=False)
+    for panel in (
+        app.query_one("#check_editor_panel", CheckEditorPanel),
+        app.query_one("#patch_editor_panel", PatchEditorPanel),
+    ):
+        picker = _picker(panel)
+        real_set = picker.set_parameters
+
+        def set_parameters(*args, __real=real_set, **kwargs):
+            calls.append(("picker.set_parameters", threading.get_ident()))
+            return __real(*args, **kwargs)
+
+        monkeypatch.setattr(picker, "set_parameters", set_parameters)
+    memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+    real_ranges = memory.render_ranges
+
+    def render_ranges(*args, **kwargs):
+        calls.append(("MemoryMap.render_ranges", threading.get_ident()))
+        return real_ranges(*args, **kwargs)
+
+    monkeypatch.setattr(memory, "render_ranges", render_ranges)
+    real_refresh = split.refresh_window
+
+    def refresh_window() -> None:
+        calls.append(("Split.refresh_window", threading.get_ident()))
+        real_refresh()
+
+    monkeypatch.setattr(split, "refresh_window", refresh_window)
     return calls
 
 
@@ -1457,9 +1744,9 @@ def test_r026_all_painting_on_ui(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
             rows, image, name, mac = NEW, IMG2, "new.a2l", True
         assert calls
         assert all(thread == ui for _, thread in calls)
-        assert "invalidate_a2l_selection" in {name for name, _ in calls}
+        assert {"invalidate_a2l_selection", "picker.set_parameters", "MemoryMap.render_ranges", "Split.refresh_window"} <= {name for name, _ in calls}
         assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
-        _assert_snap(app, rows=rows, image=image, a2l_name=name, loaded_mac=mac)
+        await _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, loaded_mac=mac)
 
     _run(tmp_path, scenario)
 
@@ -1470,22 +1757,34 @@ def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.Monke
         await _load_image(app, pilot, f.img1)
         await _load_image(app, pilot, f.mac)
         await _load_a2l(app, pilot, f.old)
-        loaded = app._parse_loaded_file(f.img2, [f.new])
-        prepared = app._prepare_load_payload(
-            loaded,
-            a2l_view_generation=app._a2l_view_generation + 1,
-            image_generation=app._image_generation + 1,
-        )
+        started = threading.Event()
+        release = threading.Event()
+        dispatched = []
+        real_call_from_thread = app.call_from_thread
+
+        def gated_dispatch(callback, *args, **kwargs):
+            if getattr(callback, "__name__", "") == "_complete_prepared_load" and not dispatched:
+                dispatched.append((callback, args, kwargs))
+                started.set()
+                assert release.wait(20)
+            return real_call_from_thread(callback, *args, **kwargs)
+
+        monkeypatch.setattr(app, "call_from_thread", gated_dispatch)
+        await _submit_load_path(app, pilot, str(f.img2))
+        await wait_until(pilot, started.is_set, "real worker did not reach N5 dispatch")
+        assert len(dispatched) == 1
+        prepared = dispatched[0][1][0]
         assert prepared.a2l_enriched_key is not None
-        assert any(tag["name"] == "NEW_ONLY" for tag in prepared.a2l_enriched_tags)
+        assert any(tag["name"] == "OLD_ONLY" for tag in prepared.a2l_enriched_tags)
         if case.endswith("/1"):
-            await _load_a2l(app, pilot, f.plain)
-            expected_rows = PLAIN
-            expected_name = "plain.a2l"
-        else:
-            await _load_image(app, pilot, f.img1)
+            prepared.a2l_view_generation -= 1
             expected_rows = OLD
             expected_name = "old.a2l"
+        else:
+            prepared.a2l_image_generation -= 1
+            expected_rows = OLD
+            expected_name = "old.a2l"
+        await pilot.pause()
         before = _state_snapshot(app)
         current_file = app.current_file
         current_data = app.current_a2l_data
@@ -1500,10 +1799,11 @@ def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.Monke
 
         monkeypatch.setattr(app, "_sync_loaded_file_to_project", sync)
         widget_calls = _arm_thread_spies(app, monkeypatch)
-        gen = app._busy_begin_action("file_load", f.img2.name)
-        app._complete_prepared_load(prepared, f.img2, time.perf_counter(), gen=gen, sync_project=False)
-        await pilot.pause()
-        assert _state_snapshot(app) == before
+        release.set()
+        await settle_workers(pilot)
+        after = _state_snapshot(app)
+        assert after[:-1] == before[:-1]
+        assert after[-1] != before[-1]
         assert app.current_file is current_file
         assert app.current_a2l_data is current_data
         assert app._a2l_enriched_key == enriched_key
@@ -1512,6 +1812,7 @@ def test_r028_superseded_prepared_load(tmp_path: Path, monkeypatch: pytest.Monke
         assert sync_calls == []
         assert widget_calls == []
         assert statuses[-1] == "Load superseded — current state kept."
+        _assert_visible_log(app, statuses[-1])
         assert not any(message.startswith("Loaded ") for message in statuses)
         assert "file_load" not in app._busy.runs
 

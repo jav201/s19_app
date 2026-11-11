@@ -1,0 +1,1517 @@
+M-023
+pytest -k r023
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..639c53f6 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -16829,7 +16829,7 @@ class S19TuiApp(App):
+                 self.set_status(changed_message)
+                 return
+             self._start_a2l_load(
+-                path, normalized, copy=copy, sync_project=False
++                path, normalized, copy=copy, sync_project=True
+             )
+ 
+         def _answer(accepted: bool) -> None:
+
+/tmp/b103-inc5-mut/M-023/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r023_accepted_replacement[R-A2L-REFRESH.023/1] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa1e01b16d0>
+case = 'R-A2L-REFRESH.023/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.023/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r023_accepted_replacement(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            if case.endswith("/1"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                candidate = f.new
+            else:
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                _project(f, "P_OLD", image=f.img1, a2l=same, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                candidate = app.current_a2l_path
+                candidate.write_bytes(f.new.read_bytes())
+            project_hashes = _project_digests(app.current_project_dir)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/2"):
+                real_attached = app._on_a2l_attached
+    
+                def disappear_before_install(result) -> None:
+                    assert result.request.sync_project is False
+                    candidate.unlink()
+                    real_attached(result)
+    
+                monkeypatch.setattr(app, "_on_a2l_attached", disappear_before_install)
+            await _request_a2l(app, pilot, candidate)
+            await pilot.pause()
+            assert isinstance(app.screen, ConfirmQuestionScreen)
+            await pilot.press("y")
+            await settle_workers(pilot)
+            assert len(workers) == 1
+            assert workers[0].sync_project is False
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=NEW, image=IMG1, a2l_name=candidate.name, loaded_mac=True)
+            expected_hashes = dict(project_hashes)
+            if case.endswith("/2"):
+                assert not candidate.exists()
+                del expected_hashes[candidate.name]
+            assert _project_digests(app.current_project_dir) == expected_hashes
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1515: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement0/app'), src=PosixPath('/tmp/...t0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        if case.endswith("/1"):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            candidate = f.new
+        else:
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            _project(f, "P_OLD", image=f.img1, a2l=same, mac=True)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            candidate = app.current_a2l_path
+            candidate.write_bytes(f.new.read_bytes())
+        project_hashes = _project_digests(app.current_project_dir)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        if case.endswith("/2"):
+            real_attached = app._on_a2l_attached
+    
+            def disappear_before_install(result) -> None:
+                assert result.request.sync_project is False
+                candidate.unlink()
+                real_attached(result)
+    
+            monkeypatch.setattr(app, "_on_a2l_attached", disappear_before_install)
+        await _request_a2l(app, pilot, candidate)
+        await pilot.pause()
+        assert isinstance(app.screen, ConfirmQuestionScreen)
+        await pilot.press("y")
+        await settle_workers(pilot)
+        assert len(workers) == 1
+>       assert workers[0].sync_project is False
+E       AssertionError: assert True is False
+E        +  where True = A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement0/src/new.a2l'), c...fs': None, 'compu_tab_ref': None, 'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=2, sync_project=True).sync_project
+
+tests/test_b103_a2l_refresh.py:1506: AssertionError
+_____________ test_r023_accepted_replacement[R-A2L-REFRESH.023/2] ______________
+
+    async def drive():
+        app = S19TuiApp(base_dir=fixture.base)
+        real_a2l_route = app.load_a2l_from_path
+    
+        def in_place_a2l_route(path: Path, *, copy: bool = False) -> None:
+            real_a2l_route(path, copy=copy)
+    
+        app.load_a2l_from_path = in_place_a2l_route
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            _mount_views(app)
+            await pilot.pause()
+>           await scenario(app, pilot, fixture)
+
+tests/test_b103_a2l_refresh.py:445: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement1/app'), src=PosixPath('/tmp/...t1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        if case.endswith("/1"):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            candidate = f.new
+        else:
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            _project(f, "P_OLD", image=f.img1, a2l=same, mac=True)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            candidate = app.current_a2l_path
+            candidate.write_bytes(f.new.read_bytes())
+        project_hashes = _project_digests(app.current_project_dir)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        if case.endswith("/2"):
+            real_attached = app._on_a2l_attached
+    
+            def disappear_before_install(result) -> None:
+                assert result.request.sync_project is False
+                candidate.unlink()
+                real_attached(result)
+    
+            monkeypatch.setattr(app, "_on_a2l_attached", disappear_before_install)
+        await _request_a2l(app, pilot, candidate)
+        await pilot.pause()
+        assert isinstance(app.screen, ConfirmQuestionScreen)
+        await pilot.press("y")
+        await settle_workers(pilot)
+        assert len(workers) == 1
+>       assert workers[0].sync_project is False
+E       AssertionError: assert True is False
+E        +  where True = A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement1/app/.s19tool/wor...fs': None, 'compu_tab_ref': None, 'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=2, sync_project=True).sync_project
+
+tests/test_b103_a2l_refresh.py:1506: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_replacement1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa1dee83910>
+case = 'R-A2L-REFRESH.023/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.023/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r023_accepted_replacement(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            if case.endswith("/1"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                candidate = f.new
+            else:
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                _project(f, "P_OLD", image=f.img1, a2l=same, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                candidate = app.current_a2l_path
+                candidate.write_bytes(f.new.read_bytes())
+            project_hashes = _project_digests(app.current_project_dir)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/2"):
+                real_attached = app._on_a2l_attached
+    
+                def disappear_before_install(result) -> None:
+                    assert result.request.sync_project is False
+                    candidate.unlink()
+                    real_attached(result)
+    
+                monkeypatch.setattr(app, "_on_a2l_attached", disappear_before_install)
+            await _request_a2l(app, pilot, candidate)
+            await pilot.pause()
+            assert isinstance(app.screen, ConfirmQuestionScreen)
+            await pilot.press("y")
+            await settle_workers(pilot)
+            assert len(workers) == 1
+            assert workers[0].sync_project is False
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=NEW, image=IMG1, a2l_name=candidate.name, loaded_mac=True)
+            expected_hashes = dict(project_hashes)
+            if case.endswith("/2"):
+                assert not candidate.exists()
+                del expected_hashes[candidate.name]
+            assert _project_digests(app.current_project_dir) == expected_hashes
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1515: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:441: in drive
+    async with app.run_test(size=(160, 50)) as pilot:
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    @asynccontextmanager
+    async def run_test(
+        self,
+        *,
+        headless: bool = True,
+        size: tuple[int, int] | None = (80, 24),
+        tooltips: bool = False,
+        notifications: bool = False,
+        message_hook: Callable[[Message], None] | None = None,
+    ) -> AsyncGenerator[Pilot[ReturnType], None]:
+        """An asynchronous context manager for testing apps.
+    
+        !!! tip
+    
+            See the guide for [testing](/guide/testing) Textual apps.
+    
+        Use this to run your app in "headless" mode (no output) and drive the app via a [Pilot][textual.pilot.Pilot] object.
+    
+        Example:
+    
+            ```python
+            async with app.run_test() as pilot:
+                await pilot.click("#Button.ok")
+                assert ...
+            ```
+    
+        Args:
+            headless: Run in headless mode (no output or input).
+            size: Force terminal size to `(WIDTH, HEIGHT)`,
+                or None to auto-detect.
+            tooltips: Enable tooltips when testing.
+            notifications: Enable notifications when testing.
+            message_hook: An optional callback that will be called each time any message arrives at any
+                message pump in the app.
+        """
+        from textual.pilot import Pilot
+    
+        app = self
+        app._disable_tooltips = not tooltips
+        app._disable_notifications = not notifications
+        app_ready_event = asyncio.Event()
+    
+        def on_app_ready() -> None:
+            """Called when app is ready to process events."""
+            app_ready_event.set()
+    
+        async def run_app(app: App[ReturnType]) -> None:
+            """Run the apps message loop.
+    
+            Args:
+                app: App to run.
+            """
+    
+            with app._context():
+                try:
+                    if message_hook is not None:
+                        message_hook_context_var.set(message_hook)
+                    app._loop = asyncio.get_running_loop()
+                    app._thread_id = threading.get_ident()
+                    await app._process_messages(
+                        ready_callback=on_app_ready,
+                        headless=headless,
+                        terminal_size=size,
+                    )
+                finally:
+                    app_ready_event.set()
+    
+        # Launch the app in the "background"
+    
+        self._task = app_task = create_task(run_app(app), name=f"run_test {app}")
+    
+        # Wait until the app has performed all startup routines.
+        await app_ready_event.wait()
+        with app._context():
+            # Context manager returns pilot object to manipulate the app
+            try:
+                pilot = Pilot(app)
+                await pilot._wait_for_screen()
+                yield pilot
+            finally:
+                await asyncio.sleep(0)
+                # Shutdown the app cleanly
+                await app._shutdown()
+                await app_task
+                # Re-raise the exception which caused panic so test frameworks are aware
+                if self._exception:
+>                   raise self._exception
+E                   textual.worker.WorkerFailed: Worker raised exception: AssertionError("assert False\n +  where False = <built-in method startswith of str object at 0x7fa1e025a470>(('Loaded ', 'A2L loaded', 'Unloaded '))\n +    where <built-in method startswith of str object at 0x7fa1e025a470> = 'Loading same.a2l failed'.startswith")
+
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: WorkerFailed
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /tmp/b103-inc5-mut/M-023/tests/test_b103_a2l_refresh.py:1495 in              │
+│ disappear_before_install                                                     │
+│                                                                              │
+│   1492 │   │   │   real_attached = app._on_a2l_attached                      │
+│   1493 │   │   │                                                             │
+│   1494 │   │   │   def disappear_before_install(result) -> None:             │
+│ ❱ 1495 │   │   │   │   assert result.request.sync_project is False           │
+│   1496 │   │   │   │   candidate.unlink()                                    │
+│   1497 │   │   │   │   real_attached(result)                                 │
+│   1498                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   @py_assert1 = A2LAttachRequest(                                        │ │
+│ │                 │                                                        │ │
+│ │                 source=PosixPath('/tmp/pytest-of-<account>/pytest-690/te… │ │
+│ │                 │   copy=False,                                          │ │
+│ │                 │                                                        │ │
+│ │                 temp_dir=PosixPath('/tmp/pytest-of-<account>/pytest-690/… │ │
+│ │                 │                                                        │ │
+│ │                 workarea=PosixPath('/tmp/pytest-of-<account>/pytest-690/… │ │
+│ │                 │   record_recent=False,                                 │ │
+│ │                 │   a2l_cache=(                                          │ │
+│ │                 │   │   (                                                │ │
+│ │                 │   │   │                                                │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   1794356213546059807,                         │ │
+│ │                 │   │   │   1465                                         │ │
+│ │                 │   │   ),                                               │ │
+│ │                 │   │   {                                                │ │
+│ │                 │   │   │   'path':                                      │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   'sections': [                                │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'name': 'PROJECT',                   │ │
+│ │                 │   │   │   │   │   'meta': 'P ""',                      │ │
+│ │                 │   │   │   │   │   'meta_line': 2,                      │ │
+│ │                 │   │   │   │   │   'start_line': 2,                     │ │
+│ │                 │   │   │   │   │   'end_line': 44,                      │ │
+│ │                 │   │   │   │   │   'lines': [''],                       │ │
+│ │                 │   │   │   │   │   'line_numbers': [3],                 │ │
+│ │                 │   │   │   │   │   'children': [                        │ │
+│ │                 │   │   │   │   │   │   {                                │ │
+│ │                 │   │   │   │   │   │   │   'name': 'MODULE',            │ │
+│ │                 │   │   │   │   │   │   │   'meta': 'M ""',              │ │
+│ │                 │   │   │   │   │   │   │   'meta_line': 3,              │ │
+│ │                 │   │   │   │   │   │   │   'start_line': 3,             │ │
+│ │                 │   │   │   │   │   │   │   'end_line': 43,              │ │
+│ │                 │   │   │   │   │   │   │   'lines': [                   │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ],                           │ │
+│ │                 │   │   │   │   │   │   │   'line_numbers': [            │ │
+│ │                 │   │   │   │   │   │   │   │   4,                       │ │
+│ │                 │   │   │   │   │   │   │   │   7,                       │ │
+│ │                 │   │   │   │   │   │   │   │   10,                      │ │
+│ │                 │   │   │   │   │   │   │   │   13,                      │ │
+│ │                 │   │   │   │   │   │   │   │   15,                      │ │
+│ │                 │   │   │   │   │   │   │   │   18,                      │ │
+│ │                 │   │   │   │   │   │   │   │   22,                      │ │
+│ │                 │   │   │   │   │   │   │   │   25,                      │ │
+│ │                 │   │   │   │   │   │   │   │   29,                      │ │
+│ │                 │   │   │   │   │   │   │   │   32,                      │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ],                           │ │
+│ │                 │   │   │   │   │   │   │   'children': [                │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MOD_COMMON',                                            │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': '""',        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 4,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 4,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 6,       │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'BYTE_ORDER      │ │
+│ │                 LITTLE_ENDIAN'                                           │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   5                │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 7,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 7,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 9,       │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'FNC_VALUES 1    │ │
+│ │                 UBYTE ROW_DIR DIRECT'                                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   8                │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 10,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 10,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 12,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'FNC_VALUES 1    │ │
+│ │                 UWORD ROW_DIR DIRECT'                                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   11               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'COMPU_METHOD',                                          │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "" │ │
+│ │                 IDENTICAL "%.3" ""',                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 13,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 13,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 14,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [],         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [],  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'OLD_ONLY    │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 15,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 15,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 17,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0010 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   16               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'OLD_ONLY    │ │
+│ │                 "OLD_ONLY description"',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 18,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 18,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 21,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0010    │ │
+│ │                 RL_U8 0 CM_IDENT 0 255',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'      │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   19,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   20               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'AlphaShared │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 22,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 22,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 24,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0020 0x0002 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   23               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'AlphaShared │ │
+│ │                 "AlphaShared description"',                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 25,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 25,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 28,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0020    │ │
+│ │                 RL_U16 0 CM_IDENT 0 65535',                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u16"'     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   26,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   27               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'OUT_WARN    │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 29,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 29,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 31,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0030 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   30               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'OUT_WARN    │ │
+│ │                 "OUT_WARN description"',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 32,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 32,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 35,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0030    │ │
+│ │                 RL_U8 0 CM_IDENT 0 255',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'      │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   33,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   34               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ]                            │ │
+│ │                 │   │   │   │   │   │   }                                │ │
+│ │                 │   │   │   │   │   ]                                    │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   ],                                           │ │
+│ │                 │   │   │   'errors': [],                                │ │
+│ │                 │   │   │   'tags': [                                    │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 16,                       │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 32,                       │ │
+│ │                 │   │   │   │   │   'length': 2,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u16',                       │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '65535',              │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U16',                 │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 48,                       │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 112,                      │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   ],                                           │ │
+│ │                 │   │   │   'declared_spans': [],                        │ │
+│ │                 │   │   │   'record_layouts_by_name': {                  │ │
+│ │                 │   │   │   │   'RL_U8': {                               │ │
+│ │                 │   │   │   │   │   'name': 'RL_U8',                     │ │
+│ │                 │   │   │   │   │   'tokens': [                          │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES',                    │ │
+│ │                 │   │   │   │   │   │   '1',                             │ │
+│ │                 │   │   │   │   │   │   'UBYTE',                         │ │
+│ │                 │   │   │   │   │   │   'ROW_DIR',                       │ │
+│ │                 │   │   │   │   │   │   'DIRECT'                         │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'lines': [                           │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES 1 UBYTE ROW_DIR      │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'byte_order': None                   │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   'RL_U16': {                              │ │
+│ │                 │   │   │   │   │   'name': 'RL_U16',                    │ │
+│ │                 │   │   │   │   │   'tokens': [                          │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES',                    │ │
+│ │                 │   │   │   │   │   │   '1',                             │ │
+│ │                 │   │   │   │   │   │   'UWORD',                         │ │
+│ │                 │   │   │   │   │   │   'ROW_DIR',                       │ │
+│ │                 │   │   │   │   │   │   'DIRECT'                         │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'lines': [                           │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES 1 UWORD ROW_DIR      │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'byte_order': None                   │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'compu_methods_by_name': {                   │ │
+│ │                 │   │   │   │   'CM_IDENT': {                            │ │
+│ │                 │   │   │   │   │   'name': 'CM_IDENT',                  │ │
+│ │                 │   │   │   │   │   'long_identifier': None,             │ │
+│ │                 │   │   │   │   │   'conversion_type': 'IDENTICAL',      │ │
+│ │                 │   │   │   │   │   'format': '',                        │ │
+│ │                 │   │   │   │   │   'unit': '%.3',                       │ │
+│ │                 │   │   │   │   │   'coeffs_linear': None,               │ │
+│ │                 │   │   │   │   │   'coeffs': None,                      │ │
+│ │                 │   │   │   │   │   'compu_tab_ref': None,               │ │
+│ │                 │   │   │   │   │   'formula': None,                     │ │
+│ │                 │   │   │   │   │   'lines': []                          │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'compu_tabs_by_name': {}                     │ │
+│ │                 │   │   }                                                │ │
+│ │                 │   ),                                                   │ │
+│ │                 │   gen=2,                                               │ │
+│ │                 │   sync_project=True                                    │ │
+│ │                 )                                                        │ │
+│ │   @py_assert3 = True                                                     │ │
+│ │   @py_assert5 = False                                                    │ │
+│ │   @py_assert6 = False                                                    │ │
+│ │  @py_format10 = "assert True\n{True =                                    │ │
+│ │                 A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>… │ │
+│ │   @py_format8 = "True\n{True =                                           │ │
+│ │                 A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>… │ │
+│ │     candidate = PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023… │ │
+│ │ real_attached = <bound method S19TuiApp._on_a2l_attached of              │ │
+│ │                 S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, │ │
+│ │                 pseudo_classes={'focus', 'dark'})>                       │ │
+│ │        result = A2LAttachResult(                                         │ │
+│ │                 │   request=A2LAttachRequest(                            │ │
+│ │                 │   │                                                    │ │
+│ │                 source=PosixPath('/tmp/pytest-of-<account>/pytest-690/te… │ │
+│ │                 │   │   copy=False,                                      │ │
+│ │                 │   │                                                    │ │
+│ │                 temp_dir=PosixPath('/tmp/pytest-of-<account>/pytest-690/… │ │
+│ │                 │   │                                                    │ │
+│ │                 workarea=PosixPath('/tmp/pytest-of-<account>/pytest-690/… │ │
+│ │                 │   │   record_recent=False,                             │ │
+│ │                 │   │   a2l_cache=(                                      │ │
+│ │                 │   │   │   (                                            │ │
+│ │                 │   │   │   │                                            │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   │   1794356213546059807,                     │ │
+│ │                 │   │   │   │   1465                                     │ │
+│ │                 │   │   │   ),                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'path':                                  │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   │   'sections': [                            │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'name': 'PROJECT',               │ │
+│ │                 │   │   │   │   │   │   'meta': 'P ""',                  │ │
+│ │                 │   │   │   │   │   │   'meta_line': 2,                  │ │
+│ │                 │   │   │   │   │   │   'start_line': 2,                 │ │
+│ │                 │   │   │   │   │   │   'end_line': 44,                  │ │
+│ │                 │   │   │   │   │   │   'lines': [''],                   │ │
+│ │                 │   │   │   │   │   │   'line_numbers': [3],             │ │
+│ │                 │   │   │   │   │   │   'children': [                    │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'MODULE',        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'M ""',          │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 3,          │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 3,         │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 43,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   '',                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   ... +2               │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   4,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   7,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   10,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   13,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   15,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   18,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   22,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   25,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   29,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   32,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   ... +2               │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': [            │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'MOD_COMMON',                                            │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta': '""',    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 4,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line': 4, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 6,   │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'BYTE_ORDER  │ │
+│ │                 LITTLE_ENDIAN'                                           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   5            │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta': 'RL_U8', │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 7,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line': 7, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 9,   │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'FNC_VALUES  │ │
+│ │                 1 UBYTE ROW_DIR DIRECT'                                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   8            │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'RL_U16',                                                │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 10, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 10,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 12,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'FNC_VALUES  │ │
+│ │                 1 UWORD ROW_DIR DIRECT'                                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   11           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'COMPU_METHOD',                                          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'CM_IDENT "" IDENTICAL "%.3" ""',                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 13, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 13,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 14,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [],     │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [],                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'OLD_ONLY ""',                                           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 15, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 15,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 17,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'DATA FLASH  │ │
+│ │                 INTERN 0x0010 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   16           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'OLD_ONLY "OLD_ONLY description"',                       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 18, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 18,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 21,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'VALUE       │ │
+│ │                 0x0010 RL_U8 0 CM_IDENT 0 255',                          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   19,          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   20           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'AlphaShared ""',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 22, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 22,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 24,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'DATA FLASH  │ │
+│ │                 INTERN 0x0020 0x0002 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   23           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'AlphaShared "AlphaShared description"',                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 25, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 25,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 28,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'VALUE       │ │
+│ │                 0x0020 RL_U16 0 CM_IDENT 0 65535',                       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'UNIT "u16"' │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   26,          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   27           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'OUT_WARN ""',                                           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 29, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 29,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 31,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'DATA FLASH  │ │
+│ │                 INTERN 0x0030 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   30           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   {                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'name':          │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta':          │ │
+│ │                 'OUT_WARN "OUT_WARN description"',                       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'meta_line': 32, │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'start_line':    │ │
+│ │                 32,                                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'end_line': 35,  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'lines': [       │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'VALUE       │ │
+│ │                 0x0030 RL_U8 0 CM_IDENT 0 255',                          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'  │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'line_numbers':  │ │
+│ │                 [                                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   33,          │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   │   34           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   ],               │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'children': []   │ │
+│ │                 │   │   │   │   │   │   │   │   │   },                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   ... +2               │ │
+│ │                 │   │   │   │   │   │   │   │   ]                        │ │
+│ │                 │   │   │   │   │   │   │   }                            │ │
+│ │                 │   │   │   │   │   │   ]                                │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'errors': [],                            │ │
+│ │                 │   │   │   │   'tags': [                                │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'address': 16,                   │ │
+│ │                 │   │   │   │   │   │   'length': 1,                     │ │
+│ │                 │   │   │   │   │   │   'source': 'formula',             │ │
+│ │                 │   │   │   │   │   │   'unit': 'u8',                    │ │
+│ │                 │   │   │   │   │   │   'lower_limit': '0',              │ │
+│ │                 │   │   │   │   │   │   'upper_limit': '255',            │ │
+│ │                 │   │   │   │   │   │   'bit_org': None,                 │ │
+│ │                 │   │   │   │   │   │   'datatype': None,                │ │
+│ │                 │   │   │   │   │   │   'deposit': 'RL_U8',              │ │
+│ │                 │   │   │   │   │   │   'conversion': 'CM_IDENT',        │ │
+│ │                 │   │   │   │   │   │   ... +18                          │ │
+│ │                 │   │   │   │   │   },                                   │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'address': 32,                   │ │
+│ │                 │   │   │   │   │   │   'length': 2,                     │ │
+│ │                 │   │   │   │   │   │   'source': 'formula',             │ │
+│ │                 │   │   │   │   │   │   'unit': 'u16',                   │ │
+│ │                 │   │   │   │   │   │   'lower_limit': '0',              │ │
+│ │                 │   │   │   │   │   │   'upper_limit': '65535',          │ │
+│ │                 │   │   │   │   │   │   'bit_org': None,                 │ │
+│ │                 │   │   │   │   │   │   'datatype': None,                │ │
+│ │                 │   │   │   │   │   │   'deposit': 'RL_U16',             │ │
+│ │                 │   │   │   │   │   │   'conversion': 'CM_IDENT',        │ │
+│ │                 │   │   │   │   │   │   ... +18                          │ │
+│ │                 │   │   │   │   │   },                                   │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'address': 48,                   │ │
+│ │                 │   │   │   │   │   │   'length': 1,                     │ │
+│ │                 │   │   │   │   │   │   'source': 'formula',             │ │
+│ │                 │   │   │   │   │   │   'unit': 'u8',                    │ │
+│ │                 │   │   │   │   │   │   'lower_limit': '0',              │ │
+│ │                 │   │   │   │   │   │   'upper_limit': '255',            │ │
+│ │                 │   │   │   │   │   │   'bit_org': None,                 │ │
+│ │                 │   │   │   │   │   │   'datatype': None,                │ │
+│ │                 │   │   │   │   │   │   'deposit': 'RL_U8',              │ │
+│ │                 │   │   │   │   │   │   'conversion': 'CM_IDENT',        │ │
+│ │                 │   │   │   │   │   │   ... +18                          │ │
+│ │                 │   │   │   │   │   },                                   │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'address': 112,                  │ │
+│ │                 │   │   │   │   │   │   'length': 1,                     │ │
+│ │                 │   │   │   │   │   │   'source': 'formula',             │ │
+│ │                 │   │   │   │   │   │   'unit': 'u8',                    │ │
+│ │                 │   │   │   │   │   │   'lower_limit': '0',              │ │
+│ │                 │   │   │   │   │   │   'upper_limit': '255',            │ │
+│ │                 │   │   │   │   │   │   'bit_org': None,                 │ │
+│ │                 │   │   │   │   │   │   'datatype': None,                │ │
+│ │                 │   │   │   │   │   │   'deposit': 'RL_U8',              │ │
+│ │                 │   │   │   │   │   │   'conversion': 'CM_IDENT',        │ │
+│ │                 │   │   │   │   │   │   ... +18                          │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'declared_spans': [],                    │ │
+│ │                 │   │   │   │   'record_layouts_by_name': {              │ │
+│ │                 │   │   │   │   │   'RL_U8': {                           │ │
+│ │                 │   │   │   │   │   │   'name': 'RL_U8',                 │ │
+│ │                 │   │   │   │   │   │   'tokens': [                      │ │
+│ │                 │   │   │   │   │   │   │   'FNC_VALUES',                │ │
+│ │                 │   │   │   │   │   │   │   '1',                         │ │
+│ │                 │   │   │   │   │   │   │   'UBYTE',                     │ │
+│ │                 │   │   │   │   │   │   │   'ROW_DIR',                   │ │
+│ │                 │   │   │   │   │   │   │   'DIRECT'                     │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'lines': [                       │ │
+│ │                 │   │   │   │   │   │   │   'FNC_VALUES 1 UBYTE ROW_DIR  │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'byte_order': None               │ │
+│ │                 │   │   │   │   │   },                                   │ │
+│ │                 │   │   │   │   │   'RL_U16': {                          │ │
+│ │                 │   │   │   │   │   │   'name': 'RL_U16',                │ │
+│ │                 │   │   │   │   │   │   'tokens': [                      │ │
+│ │                 │   │   │   │   │   │   │   'FNC_VALUES',                │ │
+│ │                 │   │   │   │   │   │   │   '1',                         │ │
+│ │                 │   │   │   │   │   │   │   'UWORD',                     │ │
+│ │                 │   │   │   │   │   │   │   'ROW_DIR',                   │ │
+│ │                 │   │   │   │   │   │   │   'DIRECT'                     │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'lines': [                       │ │
+│ │                 │   │   │   │   │   │   │   'FNC_VALUES 1 UWORD ROW_DIR  │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'byte_order': None               │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   'compu_methods_by_name': {               │ │
+│ │                 │   │   │   │   │   'CM_IDENT': {                        │ │
+│ │                 │   │   │   │   │   │   'name': 'CM_IDENT',              │ │
+│ │                 │   │   │   │   │   │   'long_identifier': None,         │ │
+│ │                 │   │   │   │   │   │   'conversion_type': 'IDENTICAL',  │ │
+│ │                 │   │   │   │   │   │   'format': '',                    │ │
+│ │                 │   │   │   │   │   │   'unit': '%.3',                   │ │
+│ │                 │   │   │   │   │   │   'coeffs_linear': None,           │ │
+│ │                 │   │   │   │   │   │   'coeffs': None,                  │ │
+│ │                 │   │   │   │   │   │   'compu_tab_ref': None,           │ │
+│ │                 │   │   │   │   │   │   'formula': None,                 │ │
+│ │                 │   │   │   │   │   │   'lines': []                      │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   'compu_tabs_by_name': {}                 │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   ),                                               │ │
+│ │                 │   │   gen=2,                                           │ │
+│ │                 │   │   sync_project=True                                │ │
+│ │                 │   ),                                                   │ │
+│ │                 │                                                        │ │
+│ │                 path=PosixPath('/tmp/pytest-of-<account>/pytest-690/test… │ │
+│ │                 │   entry=(                                              │ │
+│ │                 │   │   (                                                │ │
+│ │                 │   │   │                                                │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   1794356215060543399,                         │ │
+│ │                 │   │   │   1468                                         │ │
+│ │                 │   │   ),                                               │ │
+│ │                 │   │   {                                                │ │
+│ │                 │   │   │   'path':                                      │ │
+│ │                 '/tmp/pytest-of-<account>/pytest-690/test_r023_accepted_… │ │
+│ │                 │   │   │   'sections': [                                │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'name': 'PROJECT',                   │ │
+│ │                 │   │   │   │   │   'meta': 'P ""',                      │ │
+│ │                 │   │   │   │   │   'meta_line': 2,                      │ │
+│ │                 │   │   │   │   │   'start_line': 2,                     │ │
+│ │                 │   │   │   │   │   'end_line': 44,                      │ │
+│ │                 │   │   │   │   │   'lines': [''],                       │ │
+│ │                 │   │   │   │   │   'line_numbers': [3],                 │ │
+│ │                 │   │   │   │   │   'children': [                        │ │
+│ │                 │   │   │   │   │   │   {                                │ │
+│ │                 │   │   │   │   │   │   │   'name': 'MODULE',            │ │
+│ │                 │   │   │   │   │   │   │   'meta': 'M ""',              │ │
+│ │                 │   │   │   │   │   │   │   'meta_line': 3,              │ │
+│ │                 │   │   │   │   │   │   │   'start_line': 3,             │ │
+│ │                 │   │   │   │   │   │   │   'end_line': 43,              │ │
+│ │                 │   │   │   │   │   │   │   'lines': [                   │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   '',                      │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ],                           │ │
+│ │                 │   │   │   │   │   │   │   'line_numbers': [            │ │
+│ │                 │   │   │   │   │   │   │   │   4,                       │ │
+│ │                 │   │   │   │   │   │   │   │   7,                       │ │
+│ │                 │   │   │   │   │   │   │   │   10,                      │ │
+│ │                 │   │   │   │   │   │   │   │   13,                      │ │
+│ │                 │   │   │   │   │   │   │   │   15,                      │ │
+│ │                 │   │   │   │   │   │   │   │   18,                      │ │
+│ │                 │   │   │   │   │   │   │   │   22,                      │ │
+│ │                 │   │   │   │   │   │   │   │   25,                      │ │
+│ │                 │   │   │   │   │   │   │   │   29,                      │ │
+│ │                 │   │   │   │   │   │   │   │   32,                      │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ],                           │ │
+│ │                 │   │   │   │   │   │   │   'children': [                │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MOD_COMMON',                                            │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': '""',        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 4,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 4,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 6,       │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'BYTE_ORDER      │ │
+│ │                 LITTLE_ENDIAN'                                           │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   5                │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 7,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 7,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 9,       │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'FNC_VALUES 1    │ │
+│ │                 UBYTE ROW_DIR DIRECT'                                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   8                │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'RECORD_LAYOUT',                                         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 10,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 10,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 12,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'FNC_VALUES 1    │ │
+│ │                 UWORD ROW_DIR DIRECT'                                    │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   11               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'COMPU_METHOD',                                          │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "" │ │
+│ │                 IDENTICAL "%.3" ""',                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 13,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 13,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 14,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [],         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [],  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'NEW_ONLY    │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 15,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 15,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 17,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0040 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   16               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'NEW_ONLY    │ │
+│ │                 "NEW_ONLY description"',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 18,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 18,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 21,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0040    │ │
+│ │                 RL_U8 0 CM_IDENT 0 255',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'      │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   19,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   20               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'AlphaShared │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 22,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 22,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 24,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0020 0x0002 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   23               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'AlphaShared │ │
+│ │                 "AlphaShared description"',                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 25,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 25,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 28,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0020    │ │
+│ │                 RL_U16 0 CM_IDENT 0 65535',                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u16"'     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   26,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   27               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'NEW_ERROR   │ │
+│ │                 ""',                                                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 29,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 29,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 31,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'DATA FLASH      │ │
+│ │                 INTERN 0x0050 0x0001 -1 -1 -1 -1 -1'                     │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   30               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   {                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'name':              │ │
+│ │                 'CHARACTERISTIC',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta': 'NEW_ERROR   │ │
+│ │                 "NEW_ERROR description"',                                │ │
+│ │                 │   │   │   │   │   │   │   │   │   'meta_line': 32,     │ │
+│ │                 │   │   │   │   │   │   │   │   │   'start_line': 32,    │ │
+│ │                 │   │   │   │   │   │   │   │   │   'end_line': 35,      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'lines': [           │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'VALUE 0x0050    │ │
+│ │                 RL_U8 0 CM_IDENT 0 255',                                 │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   'UNIT "u8"'      │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'line_numbers': [    │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   33,              │ │
+│ │                 │   │   │   │   │   │   │   │   │   │   34               │ │
+│ │                 │   │   │   │   │   │   │   │   │   ],                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   'children': []       │ │
+│ │                 │   │   │   │   │   │   │   │   },                       │ │
+│ │                 │   │   │   │   │   │   │   │   ... +2                   │ │
+│ │                 │   │   │   │   │   │   │   ]                            │ │
+│ │                 │   │   │   │   │   │   }                                │ │
+│ │                 │   │   │   │   │   ]                                    │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   ],                                           │ │
+│ │                 │   │   │   'errors': [],                                │ │
+│ │                 │   │   │   'tags': [                                    │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 64,                       │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 32,                       │ │
+│ │                 │   │   │   │   │   'length': 2,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u16',                       │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '65535',              │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U16',                 │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 80,                       │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   {                                        │ │
+│ │                 │   │   │   │   │   'address': 113,                      │ │
+│ │                 │   │   │   │   │   'length': 1,                         │ │
+│ │                 │   │   │   │   │   'source': 'formula',                 │ │
+│ │                 │   │   │   │   │   'unit': 'u8',                        │ │
+│ │                 │   │   │   │   │   'lower_limit': '0',                  │ │
+│ │                 │   │   │   │   │   'upper_limit': '255',                │ │
+│ │                 │   │   │   │   │   'bit_org': None,                     │ │
+│ │                 │   │   │   │   │   'datatype': None,                    │ │
+│ │                 │   │   │   │   │   'deposit': 'RL_U8',                  │ │
+│ │                 │   │   │   │   │   'conversion': 'CM_IDENT',            │ │
+│ │                 │   │   │   │   │   ... +18                              │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   ],                                           │ │
+│ │                 │   │   │   'declared_spans': [],                        │ │
+│ │                 │   │   │   'record_layouts_by_name': {                  │ │
+│ │                 │   │   │   │   'RL_U8': {                               │ │
+│ │                 │   │   │   │   │   'name': 'RL_U8',                     │ │
+│ │                 │   │   │   │   │   'tokens': [                          │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES',                    │ │
+│ │                 │   │   │   │   │   │   '1',                             │ │
+│ │                 │   │   │   │   │   │   'UBYTE',                         │ │
+│ │                 │   │   │   │   │   │   'ROW_DIR',                       │ │
+│ │                 │   │   │   │   │   │   'DIRECT'                         │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'lines': [                           │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES 1 UBYTE ROW_DIR      │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'byte_order': None                   │ │
+│ │                 │   │   │   │   },                                       │ │
+│ │                 │   │   │   │   'RL_U16': {                              │ │
+│ │                 │   │   │   │   │   'name': 'RL_U16',                    │ │
+│ │                 │   │   │   │   │   'tokens': [                          │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES',                    │ │
+│ │                 │   │   │   │   │   │   '1',                             │ │
+│ │                 │   │   │   │   │   │   'UWORD',                         │ │
+│ │                 │   │   │   │   │   │   'ROW_DIR',                       │ │
+│ │                 │   │   │   │   │   │   'DIRECT'                         │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'lines': [                           │ │
+│ │                 │   │   │   │   │   │   'FNC_VALUES 1 UWORD ROW_DIR      │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   │   ],                                   │ │
+│ │                 │   │   │   │   │   'byte_order': None                   │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'compu_methods_by_name': {                   │ │
+│ │                 │   │   │   │   'CM_IDENT': {                            │ │
+│ │                 │   │   │   │   │   'name': 'CM_IDENT',                  │ │
+│ │                 │   │   │   │   │   'long_identifier': None,             │ │
+│ │                 │   │   │   │   │   'conversion_type': 'IDENTICAL',      │ │
+│ │                 │   │   │   │   │   'format': '',                        │ │
+│ │                 │   │   │   │   │   'unit': '%.3',                       │ │
+│ │                 │   │   │   │   │   'coeffs_linear': None,               │ │
+│ │                 │   │   │   │   │   'coeffs': None,                      │ │
+│ │                 │   │   │   │   │   'compu_tab_ref': None,               │ │
+│ │                 │   │   │   │   │   'formula': None,                     │ │
+│ │                 │   │   │   │   │   'lines': []                          │ │
+│ │                 │   │   │   │   }                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'compu_tabs_by_name': {}                     │ │
+│ │                 │   │   }                                                │ │
+│ │                 │   ),                                                   │ │
+│ │                 │   parse_seconds=0.0016070020064944401                  │ │
+│ │                 )                                                        │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+AssertionError: assert True is False
+ +  where True = 
+A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_
+accepted_replacement1/app/.s19tool/wor...fs': None, 'compu_tab_ref': None, 
+'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=2, 
+sync_project=True).sync_project
+ +    where 
+A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-690/test_r023_
+accepted_replacement1/app/.s19tool/wor...fs': None, 'compu_tab_ref': None, 
+'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=2, 
+sync_project=True) = 
+A2LAttachResult(request=A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>
+gr/pytest-690/test_r023_accepted_repla...'compu_tab_ref': None, 'formula': None,
+'lines': []}}, 'compu_tabs_by_name': {}}), 
+parse_seconds=0.0016070020064944401).request
+
+During handling of the above exception, another exception occurred:
+
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /tmp/b103-inc5-mut/M-023/s19_app/tui/app.py:22966 in _busy_fail              │
+│                                                                              │
+│   22963 │   │   run = self._busy.runs.get(key)                               │
+│   22964 │   │   if run is None or run.gen != gen:                            │
+│   22965 │   │   │   return False                                             │
+│ ❱ 22966 │   │   return self.end_busy(key, gen, f"{run.label} failed")        │
+│   22967 │                                                                    │
+│   22968 │   def _running_session_action(self) -> Optional[_BusyRun]:         │
+│   22969 │   │   """S-a: the newest running session action, or ``None`` (HLR- │
+│                                                                              │
+│ ╭────────────────── locals ───────────────────╮                              │
+│ │  gen = 2                                    │                              │
+│ │  key = 'a2l_load'                           │                              │
+│ │  run = _BusyRun(                            │                              │
+│ │        │   gen=2,                           │                              │
+│ │        │   label='Loading same.a2l',        │                              │
+│ │        │   steps=(                          │                              │
+│ │        │   │   'Copy into the work area',   │                              │
+│ │        │   │   'Parse',                     │                              │
+│ │        │   │   'Build the tag table'        │                              │
+│ │        │   ),                               │                              │
+│ │        │   n=2,                             │                              │
+│ │        │   fraction=1.0,                    │                              │
+│ │        │   started=123228.152845109         │                              │
+│ │        )                                    │                              │
+│ │ self = S19TuiApp(                           │                              │
+│ │        │   title='Hex Edit Tool',           │                              │
+│ │        │   classes={'-dark-mode'},          │                              │
+│ │        │   pseudo_classes={                 │                              │
+│ │        │   │   'focus',                     │                              │
+│ │        │   │   'dark'                       │                              │
+│ │        │   }                                │                              │
+│ │        )                                    │                              │
+│ ╰─────────────────────────────────────────────╯                              │
+│                                                                              │
+│ /tmp/b103-inc5-mut/M-023/tests/test_b103_a2l_refresh.py:354 in end_busy      │
+│                                                                              │
+│    351 │   real_end = app.end_busy                                           │
+│    352 │                                                                     │
+│    353 │   def end_busy(kind: str, gen: int, message: str) -> None:          │
+│ ❱  354 │   │   assert message.startswith(("Loaded ", "A2L loaded", "Unloaded │
+│    355 │   │   events.append(("OUTCOME", threading.get_ident(), message))    │
+│    356 │   │   real_end(kind, gen, message)                                  │
+│    357                                                                       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ @py_assert1 = <built-in method startswith of str object at               │ │
+│ │               0x7fa1e025a470>                                            │ │
+│ │ @py_assert3 = ('Loaded ', 'A2L loaded', 'Unloaded ')                     │ │
+│ │ @py_assert5 = False                                                      │ │
+│ │ @py_format7 = 'assert False\n{False = <built-in method startswith of str │ │
+│ │               object at 0x7fa1e025a47'+147                               │ │
+│ │      events = [('UI', 140333289137984, None)]                            │ │
+│ │         gen = 2                                                          │ │
+│ │        kind = 'a2l_load'                                                 │ │
+│ │     message = 'Loading same.a2l failed'                                  │ │
+│ │    real_end = <bound method S19TuiApp.end_busy of S19TuiApp(title='Hex   │ │
+│ │               Edit Tool', classes={'-dark-mode'},                        │ │
+│ │               pseudo_classes={'focus', 'dark'})>                         │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+AssertionError: assert False
+ +  where False = <built-in method startswith of str object at 
+0x7fa1e025a470>(('Loaded ', 'A2L loaded', 'Unloaded '))
+ +    where <built-in method startswith of str object at 0x7fa1e025a470> = 
+'Loading same.a2l failed'.startswith
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/2]
+2 failed, 101 deselected in 23.59s

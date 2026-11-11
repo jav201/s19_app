@@ -1,0 +1,991 @@
+M-009
+pytest -k r009
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..d6a1db72 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21310,7 +21310,7 @@ class S19TuiApp(App):
+             Used by:
+                 - A2L attach, prepared file/project install and unload routes
+         """
+-        self.a2l_tags_filter_mode = "all"
++        self.a2l_tags_filter_mode = "inmem"
+         for button_id, variant in (
+             ("a2l_filter_all", "primary"),
+             ("a2l_filter_invalid", "default"),
+
+/tmp/b103-inc5-mut/M-009/s19_app/__init__.py
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/1--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF0')
+case = 'R-A2L-REFRESH.009/1', route = 'replace', mode = 'inmem'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF0/app'), src=PosixPath('/tmp/...F0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/2--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF1')
+case = 'R-A2L-REFRESH.009/2', route = 'replace', mode = 'invalid'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF1/app'), src=PosixPath('/tmp/...F1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/3--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF2')
+case = 'R-A2L-REFRESH.009/3', route = 'image', mode = 'inmem'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF2/app'), src=PosixPath('/tmp/...F2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/4--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF3')
+case = 'R-A2L-REFRESH.009/4', route = 'image', mode = 'invalid'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF3/app'), src=PosixPath('/tmp/...F3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/5--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF4')
+case = 'R-A2L-REFRESH.009/5', route = 'unload', mode = 'inmem'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF4/app'), src=PosixPath('/tmp/...F4/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF4/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/6--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF5')
+case = 'R-A2L-REFRESH.009/6', route = 'unload', mode = 'invalid'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF5/app'), src=PosixPath('/tmp/...F5/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF5/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/7--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF6')
+case = 'R-A2L-REFRESH.009/7', route = 'project', mode = 'inmem'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF6/app'), src=PosixPath('/tmp/...F6/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF6/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+_________________ test_r009_mode_reset[R-A2L-REFRESH.009/8--] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF7')
+case = 'R-A2L-REFRESH.009/8', route = 'same', mode = 'invalid'
+
+    @pytest.mark.parametrize(
+        ("case", "route", "mode"),
+        [
+            (f"R-A2L-REFRESH.009/{i}", route, mode)
+            for i, (route, mode) in enumerate(
+                (("replace", "inmem"), ("replace", "invalid"), ("image", "inmem"), ("image", "invalid"), ("unload", "inmem"), ("unload", "invalid"), ("project", "inmem"), ("same", "invalid")), 1
+            )
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r009_mode_reset(tmp_path: Path, case: str, route: str, mode: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+            a2l = f.mode1
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                await _load_image(app, pilot, f.img1)
+                if route == "same":
+                    a2l = f.src / "same.a2l"
+                    a2l.write_bytes(f.mode1.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            app.a2l_tags_filter_mode = mode
+            app._set_a2l_filter_field("name")
+            app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+            app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+            app.query_one("#a2l_filter_all", Button).variant = "default"
+            app._refresh_a2l_filtered_tags(preserve_anchor=False)
+            await pilot.pause()
+            assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+            if route == "replace":
+                await _load_a2l(app, pilot, f.mode2)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "unload":
+                _unload(app, "a2l")
+                await pilot.pause()
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            else:
+                a2l.write_bytes(f.mode2.read_bytes())
+                await _load_a2l(app, pilot, a2l)
+            assert app.a2l_tags_filter_mode == "all"
+            assert app.query_one("#a2l_filter_all", Button).variant == "primary"
+            assert app.query_one("#a2l_filter_inmem", Button).variant == "default"
+            assert app.query_one("#a2l_filter_invalid", Button).variant == "default"
+            assert app.query_one("#a2l_tags_filter_input", Input).value == "  Alpha  "
+            assert app.a2l_tags_filter_field == "name"
+            expected_names = [] if route == "unload" else [row[0] for row in MODE]
+            assert [t["name"] for t in app._a2l_filtered_tags] == expected_names
+            assert _table_names(app.query_one("#a2l_tags_list", DataTable)) == expected_names
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF7/app'), src=PosixPath('/tmp/...F7/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-676/test_r009_mode_reset_R_A2L_REF7/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.mode1, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.mode2, mac=True)
+        a2l = f.mode1
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        else:
+            await _load_image(app, pilot, f.img1)
+            if route == "same":
+                a2l = f.src / "same.a2l"
+                a2l.write_bytes(f.mode1.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+        app.a2l_tags_filter_mode = mode
+        app._set_a2l_filter_field("name")
+        app.query_one("#a2l_tags_filter_input", Input).value = "  Alpha  "
+        app.query_one(f"#a2l_filter_{mode}", Button).variant = "primary"
+        app.query_one("#a2l_filter_all", Button).variant = "default"
+        app._refresh_a2l_filtered_tags(preserve_anchor=False)
+        await pilot.pause()
+        assert [t["name"] for t in app._a2l_filtered_tags] == (["AlphaIn"] if mode == "inmem" else ["AlphaOutside", "AlphaInvalid"])
+        if route == "replace":
+            await _load_a2l(app, pilot, f.mode2)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "unload":
+            _unload(app, "a2l")
+            await pilot.pause()
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        else:
+            a2l.write_bytes(f.mode2.read_bytes())
+            await _load_a2l(app, pilot, a2l)
+>       assert app.a2l_tags_filter_mode == "all"
+E       AssertionError: assert 'inmem' == 'all'
+E         
+E         - all
+E         + inmem
+
+tests/test_b103_a2l_refresh.py:743: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/1--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/2--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/3--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/4--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/5--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/6--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/7--]
+FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/8--]
+8 failed, 95 deselected in 141.80s (0:02:21)

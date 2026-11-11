@@ -16,28 +16,33 @@ REPLACEMENTS = (
 )
 
 changed = []
-for path in sorted(ROOT.rglob("*")):
-    if not path.is_file():
-        continue
-    data = path.read_bytes()
-    if b"\x00" in data:
-        continue
-    try:
-        text = data.decode("utf-8")
-    except UnicodeDecodeError:
-        continue
-    counts = []
-    for old, new in REPLACEMENTS:
-        count = text.count(old)
+roots = [ROOT]
+canonical = ROOT.parent / "evidence" / "inc-5"
+if canonical.is_dir():
+    roots.append(canonical)
+for root in roots:
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        data = path.read_bytes()
+        if b"\x00" in data:
+            continue
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        counts = []
+        for old, new in REPLACEMENTS:
+            count = text.count(old)
+            if count:
+                text = text.replace(old, new)
+                counts.append((new, count))
+        text, count = re.subn(r"pytest-of-[A-Za-z0-9_.-]+", "pytest-of-<account>", text)
         if count:
-            text = text.replace(old, new)
-            counts.append((new, count))
-    text, count = re.subn(r"pytest-of-[A-Za-z0-9_.-]+", "pytest-of-<account>", text)
-    if count:
-        counts.append(("pytest-of-<account>", count))
-    if counts:
-        path.write_bytes(text.encode("utf-8"))
-        changed.append((path.relative_to(ROOT).as_posix(), counts))
+            counts.append(("pytest-of-<account>", count))
+        if counts:
+            path.write_bytes(text.encode("utf-8"))
+            changed.append((path.relative_to(ROOT.parent).as_posix(), counts))
 for name, counts in changed:
     print(name, sum(count for _, count in counts), counts)
 print(f"files_changed={len(changed)} replacements={sum(count for _, counts in changed for _, count in counts)}")

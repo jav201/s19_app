@@ -1,0 +1,425 @@
+M-012
+pytest -k r012
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..e75c1a94 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21337,7 +21337,7 @@ class S19TuiApp(App):
+         if card is not None:
+             card.show_tag(None)
+             self.call_after_refresh(card.show_tag, None)
+-        self._prefill_check_editor()
++        pass  # no visible picker refresh
+         self._prefill_patch_editor()
+         self.update_memory_map()
+         try:
+
+/tmp/b103-inc5-mut/M-012/s19_app/__init__.py
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil0')
+case = 'R-A2L-REFRESH.012/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            _assert_picker_visible(panel, expected)
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil0/app'), src=PosixPath('/tmp/...l0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+>       assert _picker_shape(panel)[0] == expected
+E       AssertionError: assert () == (('OLD_ONLY',...', 112, 'u8'))
+E         
+E         Right contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1103: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/2] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil1')
+case = 'R-A2L-REFRESH.012/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            _assert_picker_visible(panel, expected)
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil1/app'), src=PosixPath('/tmp/...l1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+>       assert _picker_shape(panel)[0] == expected
+E       AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == (('NEW_ONLY',...', 113, 'u8'))
+E         
+E         At index 0 diff: ('OLD_ONLY', 16, 'u8') != ('NEW_ONLY', 64, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1103: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/3] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil2')
+case = 'R-A2L-REFRESH.012/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            _assert_picker_visible(panel, expected)
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil2/app'), src=PosixPath('/tmp/...l2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+        assert _picker_shape(panel)[0] == expected
+        _assert_picker_visible(panel, expected)
+>       assert _picker(panel)._signature == app._a2l_enriched_key
+E       assert (1, 1, 256) == (2, 2, 256)
+E         
+E         At index 0 diff: 1 != 2
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1105: AssertionError
+_____________ test_r012_visible_check_prefill[R-A2L-REFRESH.012/4] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil3')
+case = 'R-A2L-REFRESH.012/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.012/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r012_visible_check_prefill(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            app.action_show_screen("check_editor")
+            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+            panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+            app._change_service._last_check_message = "HIST_KEEP"
+            await pilot.pause()
+            before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+            before_key = _picker(panel)._signature
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            elif case.endswith("/3"):
+                await _load_image(app, pilot, f.img2)
+                rows = OLD
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            assert app._active_screen_key == "check_editor"
+            expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+            assert _picker_shape(panel)[0] == expected
+            _assert_picker_visible(panel, expected)
+            assert _picker(panel)._signature == app._a2l_enriched_key
+            if case.endswith("/3"):
+                assert _picker(panel)._signature != before_key
+            if not rows:
+                assert _plain(panel.query_one("#check_full_name_line", Static).render()) == NO_PICKERS
+            assert (panel._spec_bytes, panel._memory_rows) == before_spec
+            assert app._change_service._last_check_message == "HIST_KEEP"
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil3/app'), src=PosixPath('/tmp/...l3/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-679/test_r012_visible_check_prefil3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        app.action_show_screen("check_editor")
+        panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec([{"address": 0xF0, "size": 1, "expected": (0xAA,)}], "SPEC_KEEP.chk.json")
+        app._change_service._last_check_message = "HIST_KEEP"
+        await pilot.pause()
+        before_spec = (panel._spec_bytes.copy(), list(panel._memory_rows))
+        before_key = _picker(panel)._signature
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        elif case.endswith("/3"):
+            await _load_image(app, pilot, f.img2)
+            rows = OLD
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        assert app._active_screen_key == "check_editor"
+        expected = tuple((name, address, f"u{size * 8}") for name, address, size in rows)
+>       assert _picker_shape(panel)[0] == expected
+E       AssertionError: assert (('OLD_ONLY',...', 112, 'u8')) == ()
+E         
+E         Left contains 4 more items, first extra item: ('OLD_ONLY', 16, 'u8')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1103: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]
+4 failed, 99 deselected in 71.40s (0:01:11)

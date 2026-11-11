@@ -1,0 +1,146 @@
+M-001
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]
+M-002
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+M-003
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/2]
+M-004
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]
+M-005
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4]
+  FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/5]
+M-006
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/4]
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/5]
+  FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/6]
+M-007
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/1---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/2---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/3---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/5---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/6---]
+M-008
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/6---]
+  FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/7---]
+M-009
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/1--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/2--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/3--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/4--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/5--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/6--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/7--]
+  FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/8--]
+M-010
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/4]
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/5]
+  FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/6]
+M-011
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/4]
+  FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/5]
+M-012
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]
+M-013
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4]
+M-014
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]
+M-015
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/3]
+M-016
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/3]
+M-017
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/4]
+M-018
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/2]
+M-019
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/3]
+M-020
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/2]
+M-021
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]
+  FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]
+  FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]
+M-022
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3]
+M-023
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/2]
+M-024
+  SURVIVED
+M-025
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2]
+M-026
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2]
+M-027
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/2]
+  FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/3]
+  FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/4]
+M-028
+  killed
+  FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]
+  FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]
+{"killed": 27, "survived": ["M-024"]}

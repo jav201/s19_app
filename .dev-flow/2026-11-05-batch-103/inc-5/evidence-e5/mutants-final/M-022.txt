@@ -1,0 +1,221 @@
+M-022
+pytest -k r022
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..8ab9e8a5 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -16795,39 +16795,7 @@ class S19TuiApp(App):
+             changed_message = (
+                 "A2L NOT loaded: project or its A2L changed — load again."
+             )
+-            if self.current_project != project_name:
+-                self.set_status(changed_message)
+-                return
+-            current_dir = self._active_project_dir()
+-            if current_dir is None or os.path.normcase(
+-                os.path.abspath(current_dir)
+-            ) != os.path.normcase(os.path.abspath(project_dir)):
+-                self.set_status(changed_message)
+-                return
+-            try:
+-                _, a2l_files, error = validate_project_files(current_dir)
+-            except OSError:
+-                reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+-                self.set_status(
+-                    safe_text(
+-                        f"A2L NOT loaded: project "
+-                        f"'{painted_names([project_name])}' {reason} — {step}."
+-                    ).plain
+-                )
+-                self.logger.warning(
+-                    "A2L load refused (project folder could not be read): %r",
+-                    current_dir,
+-                )
+-                return
+-            if error:
+-                self.set_status(error)
+-                self.logger.warning("Project validation failed: %s", error)
+-                return
+-            if len(a2l_files) != 1 or os.path.normcase(
+-                os.path.abspath(a2l_files[0])
+-            ) != os.path.normcase(os.path.abspath(project_a2l)):
+-                self.set_status(changed_message)
+-                return
++            # no project/A2L identity revalidation
+             self._start_a2l_load(
+                 path, normalized, copy=copy, sync_project=False
+             )
+
+/tmp/b103-inc5-mut/M-022/s19_app/__init__.py
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/2] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f76379fde90>
+case = 'R-A2L-REFRESH.022/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.022/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r022_confirmation_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            if case.endswith("/2"):
+                listed = app.current_project_dir / "old.a2l"
+                listed.rename(app.current_project_dir / "other.a2l")
+                before = _state_snapshot(app)
+            elif case.endswith("/3"):
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_NEW", action=True)
+                before = _state_snapshot(app)
+            await pilot.press("y")
+            await settle_workers(pilot)
+            if case.endswith("/1"):
+                assert len(workers) == 1
+                assert app.current_a2l_path == f.new
+                await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+            else:
+                assert workers == []
+                assert _state_snapshot(app) == before
+                assert statuses[-1] == "A2L NOT loaded: project or its A2L changed — load again."
+                _assert_visible_log(app, statuses[-1])
+                assert "A2L loaded" not in statuses[-1]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1468: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit1/app'), src=PosixPath('/tmp/...t1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        await _open_replacement(app, pilot, f)
+        if case.endswith("/2"):
+            listed = app.current_project_dir / "old.a2l"
+            listed.rename(app.current_project_dir / "other.a2l")
+            before = _state_snapshot(app)
+        elif case.endswith("/3"):
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            await _load_project(app, pilot, "P_NEW", action=True)
+            before = _state_snapshot(app)
+        await pilot.press("y")
+        await settle_workers(pilot)
+        if case.endswith("/1"):
+            assert len(workers) == 1
+            assert app.current_a2l_path == f.new
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+        else:
+>           assert workers == []
+E           AssertionError: assert [A2LAttachReq...roject=False)] == []
+E             
+E             Left contains one more item: A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit1/src/new.a2l'), c...s': None, 'compu_tab_ref': None, 'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=2, sync_project=False)
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1462: AssertionError
+_____________ test_r022_confirmation_identity[R-A2L-REFRESH.022/3] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7636ee8550>
+case = 'R-A2L-REFRESH.022/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.022/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r022_confirmation_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            if case.endswith("/2"):
+                listed = app.current_project_dir / "old.a2l"
+                listed.rename(app.current_project_dir / "other.a2l")
+                before = _state_snapshot(app)
+            elif case.endswith("/3"):
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_NEW", action=True)
+                before = _state_snapshot(app)
+            await pilot.press("y")
+            await settle_workers(pilot)
+            if case.endswith("/1"):
+                assert len(workers) == 1
+                assert app.current_a2l_path == f.new
+                await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+            else:
+                assert workers == []
+                assert _state_snapshot(app) == before
+                assert statuses[-1] == "A2L NOT loaded: project or its A2L changed — load again."
+                _assert_visible_log(app, statuses[-1])
+                assert "A2L loaded" not in statuses[-1]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1468: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit2/app'), src=PosixPath('/tmp/...t2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        statuses = _status_recorder(app, monkeypatch)
+        await _open_replacement(app, pilot, f)
+        if case.endswith("/2"):
+            listed = app.current_project_dir / "old.a2l"
+            listed.rename(app.current_project_dir / "other.a2l")
+            before = _state_snapshot(app)
+        elif case.endswith("/3"):
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            await _load_project(app, pilot, "P_NEW", action=True)
+            before = _state_snapshot(app)
+        await pilot.press("y")
+        await settle_workers(pilot)
+        if case.endswith("/1"):
+            assert len(workers) == 1
+            assert app.current_a2l_path == f.new
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+        else:
+>           assert workers == []
+E           AssertionError: assert [A2LAttachReq...roject=False)] == []
+E             
+E             Left contains one more item: A2LAttachRequest(source=PosixPath('/tmp/pytest-of-<account>/pytest-689/test_r022_confirmation_identit2/src/new.a2l'), c...s': None, 'compu_tab_ref': None, 'formula': None, 'lines': []}}, 'compu_tabs_by_name': {}}), gen=3, sync_project=False)
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1462: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3]
+2 failed, 1 passed, 100 deselected in 30.35s

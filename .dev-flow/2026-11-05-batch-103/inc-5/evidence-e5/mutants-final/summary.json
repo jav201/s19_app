@@ -1,0 +1,314 @@
+[
+  {
+    "id": "M-001",
+    "selection": "r001",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-002",
+    "selection": "r002",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-003",
+    "selection": "r003",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-004",
+    "selection": "r004",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-005",
+    "selection": "r005",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/5]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-006",
+    "selection": "r006",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/4]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/5]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/6]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-007",
+    "selection": "REFRESH.007",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/1---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/2---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/3---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/5---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/6---]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-008",
+    "selection": "REFRESH.008",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/6---]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/7---]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-009",
+    "selection": "r009",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/1--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/2--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/3--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/4--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/5--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/6--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/7--]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/8--]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-010",
+    "selection": "r010",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/4]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/5]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/6]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-011",
+    "selection": "r011",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/4]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/5]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-012",
+    "selection": "r012",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-013",
+    "selection": "r013",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-014",
+    "selection": "r014",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-015",
+    "selection": "r015",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-016",
+    "selection": "r016",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-017",
+    "selection": "r017",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/4]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-018",
+    "selection": "r018",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-019",
+    "selection": "r019",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-020",
+    "selection": "r020",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-021",
+    "selection": "r021",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-022",
+    "selection": "r022",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-023",
+    "selection": "r023",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-024",
+    "selection": "r024",
+    "result": "SURVIVED",
+    "failures": [],
+    "errors": []
+  },
+  {
+    "id": "M-025",
+    "selection": "r025",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-026",
+    "selection": "r026",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-027",
+    "selection": "r027",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/2]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/3]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/4]"
+    ],
+    "errors": []
+  },
+  {
+    "id": "M-028",
+    "selection": "r028",
+    "result": "killed",
+    "failures": [
+      "FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]",
+      "FAILED tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]"
+    ],
+    "errors": []
+  }
+]

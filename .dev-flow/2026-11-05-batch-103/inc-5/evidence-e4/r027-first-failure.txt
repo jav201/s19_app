@@ -1,0 +1,172 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <runner-python>
+rootdir: /tmp/b103-inc5-e5
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1] FAILED [100%]
+
+=================================== FAILURES ===================================
+__________________ test_r027_generations[R-A2L-REFRESH.027/1] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-652/test_r027_generations_R_A2L_RE0')
+case = 'R-A2L-REFRESH.027/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.027/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r027_generations(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+            elif case.endswith("/4"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same = f.src / "same.a2l"
+                same.write_bytes(f.old.read_bytes())
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_image(app, pilot, f.img1)
+            before = (app._a2l_view_generation, app._image_generation)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/2"):
+                same.write_bytes(f.new.read_bytes())
+                await _load_a2l(app, pilot, same)
+            else:
+                await _load_project(app, pilot, "P_ONLY")
+            assert app._a2l_view_generation > before[0]
+            assert app._image_generation == before[1]
+            assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+            expected_rows = OLD if case.endswith("/1") else NEW
+            for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+                picker = _picker(panel)
+                assert picker._signature == app._a2l_enriched_key
+                assert _picker_visible_shape(panel) == [
+                    (name, f"0x{address:08X}", picker.param_rows[name][2])
+                    for name, address, _size in expected_rows
+                ]
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-652/test_r027_generations_R_A2L_RE0/app'), src=PosixPath('/tmp/...E0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-652/test_r027_generations_R_A2L_RE0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        if case.endswith("/3"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+        elif case.endswith("/4"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same = f.src / "same.a2l"
+            same.write_bytes(f.old.read_bytes())
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_image(app, pilot, f.img1)
+        before = (app._a2l_view_generation, app._image_generation)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        elif case.endswith("/2"):
+            same.write_bytes(f.new.read_bytes())
+            await _load_a2l(app, pilot, same)
+        else:
+            await _load_project(app, pilot, "P_ONLY")
+        assert app._a2l_view_generation > before[0]
+        assert app._image_generation == before[1]
+        assert app._a2l_enriched_key[:2] == (app._a2l_view_generation, app._image_generation)
+        expected_rows = OLD if case.endswith("/1") else NEW
+        for panel in (app.query_one("#check_editor_panel", CheckEditorPanel), app.query_one("#patch_editor_panel", PatchEditorPanel)):
+            picker = _picker(panel)
+            assert picker._signature == app._a2l_enriched_key
+>           assert _picker_visible_shape(panel) == [
+                (name, f"0x{address:08X}", picker.param_rows[name][2])
+                for name, address, _size in expected_rows
+            ]
+E           AssertionError: assert [('OLD_ONLY', '0x00000010', 'u8 %.3'), ('AlphaShared', '0x00000020', 'u16 %…'), ('OUT_WARN', '0x00000030', 'u8 %.3'), ('PAGE2_OLD', '0x00000070', 'u8 %.3')] == [('OLD_ONLY', '0x00000010', 'u8 %.3'), ('AlphaShared', '0x00000020', 'u16 %.3'), ('OUT_WARN', '0x00000030', 'u8 %.3'), ('PAGE2_OLD', '0x00000070', 'u8 %.3')]
+E             
+E             At index 1 diff: ('AlphaShared', '0x00000020', 'u16 %…') != ('AlphaShared', '0x00000020', 'u16 %.3')
+E             
+E             Full diff:
+E               [
+E                   (
+E                       'OLD_ONLY',
+E                       '0x00000010',
+E                       'u8 %.3',
+E                   ),
+E                   (
+E                       'AlphaShared',
+E                       '0x00000020',
+E             -         'u16 %.3',
+E             ?               ^^
+E             +         'u16 %…',
+E             ?               ^
+E                   ),
+E                   (
+E                       'OUT_WARN',
+E                       '0x00000030',
+E                       'u8 %.3',
+E                   ),
+E                   (
+E                       'PAGE2_OLD',
+E                       '0x00000070',
+E                       'u8 %.3',
+E                   ),
+E               ]
+
+tests/test_b103_a2l_refresh.py:928: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1] - AssertionError: assert [('OLD_ONLY', '0x00000010', 'u8 %.3'), ('AlphaShared', '0x00000020', 'u16 %…'), ('OUT_WARN', '0x00000030', 'u8 %.3'), ('PAGE2_OLD', '0x00000070', 'u8 %.3')] == [('OLD_ONLY', '0x00000010', 'u8 %.3'), ('AlphaShared', '0x00000020', 'u16 %.3'), ('OUT_WARN', '0x00000030', 'u8 %.3'), ('PAGE2_OLD', '0x00000070', 'u8 %.3')]
+  
+  At index 1 diff: ('AlphaShared', '0x00000020', 'u16 %…') != ('AlphaShared', '0x00000020', 'u16 %.3')
+  
+  Full diff:
+    [
+        (
+            'OLD_ONLY',
+            '0x00000010',
+            'u8 %.3',
+        ),
+        (
+            'AlphaShared',
+            '0x00000020',
+  -         'u16 %.3',
+  ?               ^^
+  +         'u16 %…',
+  ?               ^
+        ),
+        (
+            'OUT_WARN',
+            '0x00000030',
+            'u8 %.3',
+        ),
+        (
+            'PAGE2_OLD',
+            '0x00000070',
+            'u8 %.3',
+        ),
+    ]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+============================== 1 failed in 14.34s ==============================

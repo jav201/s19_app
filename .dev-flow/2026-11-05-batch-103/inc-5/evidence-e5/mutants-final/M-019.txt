@@ -1,0 +1,335 @@
+M-019
+pytest -k r019
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..23d3cd8f 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21321,6 +21321,7 @@ class S19TuiApp(App):
+             except Exception:
+                 continue
+             button.variant = variant
++        self.validation_issue_filter_mode = "all"
+         self.update_a2l_view()
+         self._a2l_tag_hex_highlight = None
+         self.update_alt_hex_view()
+
+/tmp/b103-inc5-mut/M-019/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/1] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L0')
+case = 'R-A2L-REFRESH.019/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.019/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r019_issues_refresh(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            severity = "warning" if case.endswith("/2") else "error"
+            app.validation_issue_filter_mode = severity
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            if case.endswith("/3"):
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+            else:
+                await _load_a2l(app, pilot, f.new)
+                if case.endswith("/1"):
+                    assert set(_issues(app)) == {
+                        ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                        ("", "MAC_PARSE_ERROR", "error"),
+                    }
+                else:
+                    fresh = {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in app._validation_issues
+                        if issue.severity.value == "warning"
+                    }
+                    filtered = app._filtered_validation_issues()
+                    start = app._validation_issues_window_start
+                    visible = filtered[start:start + app._issues_page_size()]
+                    assert set(_issues(app)) == {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in visible
+                    }
+                    assert {
+                        ("old_only", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                        ("no_match", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                    } <= fresh
+                    assert all(code != "NOT_IN_A2L" for _, code, _ in fresh)
+                    assert all(symbol not in {"new_only", "new_error"} for symbol, _, _ in fresh)
+            assert app.validation_issue_filter_mode == severity
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L0/app'), src=PosixPath('/tmp/...L0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        severity = "warning" if case.endswith("/2") else "error"
+        app.validation_issue_filter_mode = severity
+        app.action_show_screen("issues")
+        app.update_validation_issues_view()
+        await pilot.pause()
+        if case.endswith("/3"):
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+        else:
+            await _load_a2l(app, pilot, f.new)
+            if case.endswith("/1"):
+>               assert set(_issues(app)) == {
+                    ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                    ("", "MAC_PARSE_ERROR", "error"),
+                }
+E               AssertionError: assert {('', 'MAC_PA...arning'), ...} == {('', 'MAC_PA...CH', 'error')}
+E                 
+E                 Extra items in the left set:
+E                 ('fill_013', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_020', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('fill_026', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E                 ('alphashared', 'CROSS_A2L_ONLY_SYMBOL', 'warning')
+E                 ('fill_008', 'CROSS_MAC_ONLY_SYMBOL', 'warning')...
+E                 
+E                 ...Full output truncated (34 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_refresh.py:1237: AssertionError
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/2] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L1')
+case = 'R-A2L-REFRESH.019/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.019/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r019_issues_refresh(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            severity = "warning" if case.endswith("/2") else "error"
+            app.validation_issue_filter_mode = severity
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            if case.endswith("/3"):
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+            else:
+                await _load_a2l(app, pilot, f.new)
+                if case.endswith("/1"):
+                    assert set(_issues(app)) == {
+                        ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                        ("", "MAC_PARSE_ERROR", "error"),
+                    }
+                else:
+                    fresh = {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in app._validation_issues
+                        if issue.severity.value == "warning"
+                    }
+                    filtered = app._filtered_validation_issues()
+                    start = app._validation_issues_window_start
+                    visible = filtered[start:start + app._issues_page_size()]
+                    assert set(_issues(app)) == {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in visible
+                    }
+                    assert {
+                        ("old_only", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                        ("no_match", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                    } <= fresh
+                    assert all(code != "NOT_IN_A2L" for _, code, _ in fresh)
+                    assert all(symbol not in {"new_only", "new_error"} for symbol, _, _ in fresh)
+            assert app.validation_issue_filter_mode == severity
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L1/app'), src=PosixPath('/tmp/...L1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        severity = "warning" if case.endswith("/2") else "error"
+        app.validation_issue_filter_mode = severity
+        app.action_show_screen("issues")
+        app.update_validation_issues_view()
+        await pilot.pause()
+        if case.endswith("/3"):
+            _unload(app, "a2l")
+            await pilot.pause()
+            assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+        else:
+            await _load_a2l(app, pilot, f.new)
+            if case.endswith("/1"):
+                assert set(_issues(app)) == {
+                    ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                    ("", "MAC_PARSE_ERROR", "error"),
+                }
+            else:
+                fresh = {
+                    (issue.symbol or "", issue.code, issue.severity.value)
+                    for issue in app._validation_issues
+                    if issue.severity.value == "warning"
+                }
+                filtered = app._filtered_validation_issues()
+                start = app._validation_issues_window_start
+                visible = filtered[start:start + app._issues_page_size()]
+                assert set(_issues(app)) == {
+                    (issue.symbol or "", issue.code, issue.severity.value)
+                    for issue in visible
+                }
+                assert {
+                    ("old_only", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                    ("no_match", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                } <= fresh
+                assert all(code != "NOT_IN_A2L" for _, code, _ in fresh)
+                assert all(symbol not in {"new_only", "new_error"} for symbol, _, _ in fresh)
+>       assert app.validation_issue_filter_mode == severity
+E       AssertionError: assert 'all' == 'warning'
+E         
+E         - warning
+E         + all
+
+tests/test_b103_a2l_refresh.py:1260: AssertionError
+________________ test_r019_issues_refresh[R-A2L-REFRESH.019/3] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L2')
+case = 'R-A2L-REFRESH.019/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.019/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r019_issues_refresh(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+            severity = "warning" if case.endswith("/2") else "error"
+            app.validation_issue_filter_mode = severity
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            if case.endswith("/3"):
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+            else:
+                await _load_a2l(app, pilot, f.new)
+                if case.endswith("/1"):
+                    assert set(_issues(app)) == {
+                        ("new_error", "TRIPLE_NAME_ADDRESS_MISMATCH", "error"),
+                        ("", "MAC_PARSE_ERROR", "error"),
+                    }
+                else:
+                    fresh = {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in app._validation_issues
+                        if issue.severity.value == "warning"
+                    }
+                    filtered = app._filtered_validation_issues()
+                    start = app._validation_issues_window_start
+                    visible = filtered[start:start + app._issues_page_size()]
+                    assert set(_issues(app)) == {
+                        (issue.symbol or "", issue.code, issue.severity.value)
+                        for issue in visible
+                    }
+                    assert {
+                        ("old_only", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                        ("no_match", "CROSS_MAC_ONLY_SYMBOL", "warning"),
+                    } <= fresh
+                    assert all(code != "NOT_IN_A2L" for _, code, _ in fresh)
+                    assert all(symbol not in {"new_only", "new_error"} for symbol, _, _ in fresh)
+            assert app.validation_issue_filter_mode == severity
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L2/app'), src=PosixPath('/tmp/...L2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-686/test_r019_issues_refresh_R_A2L2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        await _load_image(app, pilot, f.mac)
+        await _load_a2l(app, pilot, f.old)
+        severity = "warning" if case.endswith("/2") else "error"
+        app.validation_issue_filter_mode = severity
+        app.action_show_screen("issues")
+        app.update_validation_issues_view()
+        await pilot.pause()
+        if case.endswith("/3"):
+            _unload(app, "a2l")
+            await pilot.pause()
+>           assert _issues(app) == [("", "MAC_PARSE_ERROR", "error")]
+E           AssertionError: assert [('', 'MAC_PA...arning'), ...] == [('', 'MAC_PA...OR', 'error')]
+E             
+E             Left contains 39 more items, first extra item: ('fill_000', 'CROSS_MAC_ONLY_SYMBOL', 'warning')
+E             Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1233: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/3]
+3 failed, 100 deselected in 77.44s (0:01:17)

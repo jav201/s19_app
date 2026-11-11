@@ -1,0 +1,1191 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/1] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r001_direct_attach_public0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bc6d4e10>
+case = 'R-A2L-REFRESH.001/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:467: in scenario
+    await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'OLD_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/2] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r001_direct_attach_public1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56ba742d90>
+case = 'R-A2L-REFRESH.001/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:467: in scenario
+    await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+___________ test_r001_direct_attach_publication[R-A2L-REFRESH.001/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r001_direct_attach_public2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56b98a15d0>
+case = 'R-A2L-REFRESH.001/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.001/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r001_direct_attach_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            if case.endswith("/2"):
+                await _load_a2l(app, pilot, f.old)
+            elif case.endswith("/3"):
+                await _load_a2l(app, pilot, f.old)
+                _unload(app, "a2l")
+                await pilot.pause()
+                assert app.current_a2l_path is None
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            ui_calls = _arm_thread_spies(app, monkeypatch)
+            await _load_a2l(app, pilot, f.old if case.endswith("/1") else f.new)
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            assert events[0][1] == events[1][1] == events[2][1]
+            assert all(thread == events[0][1] for _, thread in ui_calls)
+            await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:467: in scenario
+    await _assert_snap(app, pilot, rows=OLD if case.endswith("/1") else NEW, image=IMG1, a2l_name="old.a2l" if case.endswith("/1") else "new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r002_image_load_refreshes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bb39f750>
+case = 'R-A2L-REFRESH.002/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:488: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'OLD_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r002_image_load_refreshes1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bd536dd0>
+case = 'R-A2L-REFRESH.002/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:488: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'OLD_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+___________ test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r002_image_load_refreshes2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56b9652490>
+case = 'R-A2L-REFRESH.002/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.002/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r002_image_load_refreshes_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            source = f.img1
+            if case.endswith("/3"):
+                source = f.src / "image.s19"
+                source.write_bytes(f.img1.read_bytes())
+            if not case.endswith("/1"):
+                await _load_image(app, pilot, source)
+            await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            if case.endswith("/3"):
+                source.write_bytes(f.img2.read_bytes())
+            await _load_image(app, pilot, source if case.endswith("/3") else f.img2)
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+            if case.endswith("/3"):
+                assert app.current_file.path.name in {"image.s19", "image_1.s19"}
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:488: in scenario
+    await _assert_snap(app, pilot, rows=OLD, image=IMG2, a2l_name="old.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'OLD_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+______________ test_r003_project_final_pair[R-A2L-REFRESH.003/1] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r003_project_final_pair_R0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bc45c750>
+case = 'R-A2L-REFRESH.003/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.003/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r003_project_final_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            if case.endswith("/2"):
+                await _load_project(app, pilot, "P_OLD")
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_NEW")
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:508: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:506: in scenario
+    await _assert_snap(app, pilot, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+______________ test_r003_project_final_pair[R-A2L-REFRESH.003/2] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r003_project_final_pair_R1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56b33ed210>
+case = 'R-A2L-REFRESH.003/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.003/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r003_project_final_pair(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            if case.endswith("/2"):
+                await _load_project(app, pilot, "P_OLD")
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_NEW")
+            assert [e[0] for e in events if e[0] != "UI"] == ["F", "OUTCOME"]
+            await _assert_snap(app, pilot, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:508: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:506: in scenario
+    await _assert_snap(app, pilot, rows=NEW, image=IMG2, a2l_name="new.a2l", loaded_mac=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/1] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r004_a2l_only_project_R_A0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bc638710>
+case = 'R-A2L-REFRESH.004/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_ONLY")
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            assert app.current_file is None
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:525: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:523: in scenario
+    await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+_______________ test_r004_a2l_only_project[R-A2L-REFRESH.004/2] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-617/test_r004_a2l_only_project_R_A1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f56bc27a690>
+case = 'R-A2L-REFRESH.004/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.004/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r004_a2l_only_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if case.endswith("/2"):
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            await _load_project(app, pilot, "P_ONLY")
+            assert [event[0] for event in events if event[0] != "UI"] == ["F", "OUTCOME"]
+            assert app.current_file is None
+            await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:525: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:445: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:443: in drive
+    await scenario(app, pilot, fixture)
+tests/test_b103_a2l_refresh.py:523: in scenario
+    await _assert_snap(app, pilot, rows=NEW, image=None, a2l_name="new.a2l")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -> None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+        assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+        assert [t.get("raw_value") for t in app._a2l_enriched_tags] == _expected_values(expected, image)
+        summary = _plain(app.query_one("#a2l_view", Static).render())
+        if a2l_name is None:
+            assert summary == "No A2L loaded."
+        else:
+            assert app.current_a2l_path is not None
+            assert app.current_a2l_path.name == a2l_name
+        table = app.query_one("#a2l_tags_list", DataTable)
+        assert _table_names(table) == names
+        raw_values = _expected_values(expected, image)
+        assert _a2l_visible_shape(app) == [
+            (name, f"0x{address:08X}", str(size), "" if raw is None else str(raw))
+            for (name, address, size), raw in zip(expected, raw_values)
+        ]
+        assert app.query_one("#a2l_detail_card", A2LDetailCard).render().plain == HINT
+        assert app._a2l_tag_hex_highlight is None
+        for panel in (
+            app.query_one("#check_editor_panel", CheckEditorPanel),
+            app.query_one("#patch_editor_panel", PatchEditorPanel),
+        ):
+            picker = _picker(panel)
+            assert list(picker.param_rows) == names
+            assert [picker.param_rows[name][0] for name in names] == [row[1] for row in expected]
+            assert [picker.param_rows[name][2].split()[0] for name in names] == [f"u{row[2] * 8}" for row in expected]
+            visible_rows = _picker_visible_shape(panel)
+            assert len(visible_rows) == len(expected)
+            for (name, address, size), (visible_name, visible_address, visible_format) in zip(expected, visible_rows):
+                assert visible_name == name
+                assert visible_address == f"0x{address:08X}"
+                assert visible_format.startswith(f"u{size * 8}")
+            full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+            if not names:
+                assert _plain(full_name.render()) == NO_PICKERS
+            else:
+                first = expected[0]
+                assert _plain(full_name.render()) == f"0x{first[1]:08X}  {picker.param_rows[first[0]][2]}  {first[0]}"
+            if check_pick:
+                assert picker._signature == app._a2l_enriched_key
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+        assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == expected
+        assert split._sel["a2l"] == set()
+        assert split._cursor["a2l"] == 0
+        assert split._armed is False
+        while split._tab != "a2l":
+            split.action_cycle_tab()
+        split_text = _split_visible_text(split)
+        if not expected:
+            assert split_text == "no A2L loaded — load one (^L) or use ranges/manual"
+        else:
+            visible_rows = [line for line in split_text.splitlines() if line.strip()]
+            assert len(visible_rows) == len(expected)
+            for name, address, size in expected:
+>               assert name in split_text
+E               AssertionError: assert 'NEW_ONLY' in '○…\n○…\n○…\n○…'
+
+tests/test_b103_a2l_refresh.py:304: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]
+FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2]
+10 failed, 93 deselected in 141.32s (0:02:21)

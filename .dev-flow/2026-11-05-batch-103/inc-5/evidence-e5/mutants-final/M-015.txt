@@ -1,0 +1,282 @@
+M-015
+pytest -k r015
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..a2483b28 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21339,7 +21339,7 @@ class S19TuiApp(App):
+             self.call_after_refresh(card.show_tag, None)
+         self._prefill_check_editor()
+         self._prefill_patch_editor()
+-        self.update_memory_map()
++        pass  # no memory map
+         try:
+             window = self.query_one("#screen_split_join", SplitJoinWindow)
+         except Exception:
+
+/tmp/b103-inc5-mut/M-015/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+__________________ test_r015_memory_map[R-A2L-REFRESH.015/1] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF0')
+case = 'R-A2L-REFRESH.015/1'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.015/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r015_memory_map(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+            assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+            assert len(memory._a2l_tags) == len(rows)
+            assert memory.rendered_text != memory._EMPTY_TEXT
+            memory_text = _memory_visible_text(memory)
+            assert "256 B mapped" in memory_text
+            assert memory._ordered_ranges == [(0, 256, True)]
+            assert "Region" in memory_text and "0x00000000" in memory_text
+            for name in [row[0] for row in rows]:
+                assert name in memory_text
+            if rows:
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("4") for line in memory_text.splitlines()), memory_text
+            else:
+                assert memory.rendered_text == baseline
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("0") for line in memory_text.splitlines()), memory_text
+                assert "OLD_ONLY" not in memory_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF0/app'), src=PosixPath('/tmp/...F0/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF0/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+E       AssertionError: assert [] == ['OLD_ONLY', ..., 'PAGE2_OLD']
+E         
+E         Right contains 4 more items, first extra item: 'OLD_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:803: AssertionError
+__________________ test_r015_memory_map[R-A2L-REFRESH.015/2] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF1')
+case = 'R-A2L-REFRESH.015/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.015/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r015_memory_map(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+            assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+            assert len(memory._a2l_tags) == len(rows)
+            assert memory.rendered_text != memory._EMPTY_TEXT
+            memory_text = _memory_visible_text(memory)
+            assert "256 B mapped" in memory_text
+            assert memory._ordered_ranges == [(0, 256, True)]
+            assert "Region" in memory_text and "0x00000000" in memory_text
+            for name in [row[0] for row in rows]:
+                assert name in memory_text
+            if rows:
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("4") for line in memory_text.splitlines()), memory_text
+            else:
+                assert memory.rendered_text == baseline
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("0") for line in memory_text.splitlines()), memory_text
+                assert "OLD_ONLY" not in memory_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF1/app'), src=PosixPath('/tmp/...F1/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF1/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+>       assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+E       AssertionError: assert [] == ['NEW_ONLY', ..., 'PAGE2_NEW']
+E         
+E         Right contains 4 more items, first extra item: 'NEW_ONLY'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:803: AssertionError
+__________________ test_r015_memory_map[R-A2L-REFRESH.015/3] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF2')
+case = 'R-A2L-REFRESH.015/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.015/{i}" for i in range(1, 4)], ids=lambda x: x)
+    def test_r015_memory_map(tmp_path: Path, case: str) -> None:
+        async def scenario(app, pilot, f):
+            await _load_image(app, pilot, f.img1)
+            baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+            if not case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.old)
+                rows = OLD
+            elif case.endswith("/2"):
+                await _load_a2l(app, pilot, f.new)
+                rows = NEW
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+                rows = ()
+            memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+            assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+            assert len(memory._a2l_tags) == len(rows)
+            assert memory.rendered_text != memory._EMPTY_TEXT
+            memory_text = _memory_visible_text(memory)
+            assert "256 B mapped" in memory_text
+            assert memory._ordered_ranges == [(0, 256, True)]
+            assert "Region" in memory_text and "0x00000000" in memory_text
+            for name in [row[0] for row in rows]:
+                assert name in memory_text
+            if rows:
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("4") for line in memory_text.splitlines()), memory_text
+            else:
+                assert memory.rendered_text == baseline
+                assert any(line.strip().startswith("Symbols") and line.rstrip().endswith("0") for line in memory_text.splitlines()), memory_text
+                assert "OLD_ONLY" not in memory_text
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF2/app'), src=PosixPath('/tmp/...F2/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-682/test_r015_memory_map_R_A2L_REF2/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        await _load_image(app, pilot, f.img1)
+        baseline = app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text
+        if not case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+        if case.endswith("/1"):
+            await _load_a2l(app, pilot, f.old)
+            rows = OLD
+        elif case.endswith("/2"):
+            await _load_a2l(app, pilot, f.new)
+            rows = NEW
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+            rows = ()
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        assert [t["name"] for t in memory._a2l_tags] == [row[0] for row in rows]
+        assert len(memory._a2l_tags) == len(rows)
+>       assert memory.rendered_text != memory._EMPTY_TEXT
+E       assert "No file loaded - press Ctrl+L (or 'l') to load a file." != "No file loaded - press Ctrl+L (or 'l') to load a file."
+E        +  where "No file loaded - press Ctrl+L (or 'l') to load a file." = MemoryMapPanel(id='memory_map_panel').rendered_text
+E        +  and   "No file loaded - press Ctrl+L (or 'l') to load a file." = MemoryMapPanel(id='memory_map_panel')._EMPTY_TEXT
+
+tests/test_b103_a2l_refresh.py:805: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/1]
+FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/2]
+FAILED tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/3]
+3 failed, 100 deselected in 49.54s

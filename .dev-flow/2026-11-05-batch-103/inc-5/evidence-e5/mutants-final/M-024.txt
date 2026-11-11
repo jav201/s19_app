@@ -1,0 +1,21 @@
+M-024
+pytest -k r024
+returncode=0
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..17cd8ba7 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -16692,7 +16692,7 @@ class S19TuiApp(App):
+             Used by:
+                 - A2L load dialog and Workarea source routes
+         """
+-        if self._refuse_if_busy():
++        if False and self._refuse_if_busy():
+             return
+         try:  # SE5-12a-4, as in load_from_path
+             normalized = resolve_input_path(path, self.base_dir)
+
+/tmp/b103-inc5-mut/M-024/s19_app/__init__.py
+....                                                                     [100%]
+4 passed, 99 deselected in 23.84s

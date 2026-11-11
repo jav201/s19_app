@@ -1,0 +1,260 @@
+M-021
+pytest -k r021
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..978fc719 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -16833,7 +16833,7 @@ class S19TuiApp(App):
+             )
+ 
+         def _answer(accepted: bool) -> None:
+-            if accepted:
++            if True:
+                 self.call_after_refresh(_accepted)
+ 
+         self.push_screen(
+
+/tmp/b103-inc5-mut/M-021/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6c1c842610>
+case = 'R-A2L-REFRESH.021/1', answer = 'button'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await wait_until(pilot, lambda: not unrelated.is_running, "unrelated worker did not stop")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1438: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A20/app'), src=PosixPath('/tmp/...20/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A20/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        await _open_replacement(app, pilot, f)
+        unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+        before = _state_snapshot(app)
+        hashes = _project_digests(app.current_project_dir)
+        statuses = _status_recorder(app, monkeypatch)
+        if answer == "button":
+            app.screen.query_one("#confirm_no", Button).press()
+        else:
+            await pilot.press(answer)
+        await pilot.pause()
+        await pilot.pause()
+        assert not isinstance(app.screen, ConfirmQuestionScreen)
+>       assert _state_snapshot(app) == before
+E       AssertionError: assert ('Proj One', ... None, 3, ...) == ('Proj One', ... None, 2, ...)
+E         
+E         At index 2 diff: PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A20/src/new.a2l') != PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A20/app/.s19tool/workarea/P_OLD/old.a2l')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1430: AssertionError
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A21')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6c1b5d8c50>
+case = 'R-A2L-REFRESH.021/2', answer = 'n'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await wait_until(pilot, lambda: not unrelated.is_running, "unrelated worker did not stop")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1438: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A21/app'), src=PosixPath('/tmp/...21/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A21/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        await _open_replacement(app, pilot, f)
+        unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+        before = _state_snapshot(app)
+        hashes = _project_digests(app.current_project_dir)
+        statuses = _status_recorder(app, monkeypatch)
+        if answer == "button":
+            app.screen.query_one("#confirm_no", Button).press()
+        else:
+            await pilot.press(answer)
+        await pilot.pause()
+        await pilot.pause()
+        assert not isinstance(app.screen, ConfirmQuestionScreen)
+>       assert _state_snapshot(app) == before
+E       AssertionError: assert ('Proj One', ... None, 3, ...) == ('Proj One', ... None, 2, ...)
+E         
+E         At index 2 diff: PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A21/src/new.a2l') != PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A21/app/.s19tool/workarea/P_OLD/old.a2l')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1430: AssertionError
+_______________ test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A22')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6c19ecf350>
+case = 'R-A2L-REFRESH.021/3', answer = 'escape'
+
+    @pytest.mark.parametrize(
+        ("case", "answer"),
+        [("R-A2L-REFRESH.021/1", "button"), ("R-A2L-REFRESH.021/2", "n"), ("R-A2L-REFRESH.021/3", "escape")],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r021_cancel_is_inert(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, answer: str) -> None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+            before = _state_snapshot(app)
+            hashes = _project_digests(app.current_project_dir)
+            statuses = _status_recorder(app, monkeypatch)
+            if answer == "button":
+                app.screen.query_one("#confirm_no", Button).press()
+            else:
+                await pilot.press(answer)
+            await pilot.pause()
+            await pilot.pause()
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            assert _project_digests(app.current_project_dir) == hashes
+            assert workers == []
+            assert unrelated.is_running
+            assert statuses == []
+            unrelated.cancel()
+            await wait_until(pilot, lambda: not unrelated.is_running, "unrelated worker did not stop")
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:1438: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A22/app'), src=PosixPath('/tmp/...22/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A22/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        workers = _worker_spy(app, monkeypatch)
+        await _open_replacement(app, pilot, f)
+        unrelated = app.run_worker(asyncio.sleep(30), group="unrelated")
+        before = _state_snapshot(app)
+        hashes = _project_digests(app.current_project_dir)
+        statuses = _status_recorder(app, monkeypatch)
+        if answer == "button":
+            app.screen.query_one("#confirm_no", Button).press()
+        else:
+            await pilot.press(answer)
+        await pilot.pause()
+        await pilot.pause()
+        assert not isinstance(app.screen, ConfirmQuestionScreen)
+>       assert _state_snapshot(app) == before
+E       AssertionError: assert ('Proj One', ... None, 3, ...) == ('Proj One', ... None, 2, ...)
+E         
+E         At index 2 diff: PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A22/src/new.a2l') != PosixPath('/tmp/pytest-of-<account>/pytest-688/test_r021_cancel_is_inert_R_A22/app/.s19tool/workarea/P_OLD/old.a2l')
+E         Use -v to get more diff
+
+tests/test_b103_a2l_refresh.py:1430: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]
+FAILED tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]
+3 failed, 100 deselected in 28.66s

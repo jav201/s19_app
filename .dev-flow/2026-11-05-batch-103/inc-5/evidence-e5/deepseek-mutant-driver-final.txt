@@ -1,0 +1,46 @@
+## Audit result: MAJOR finding
+
+### MAJOR — `run_5_mutants.py:71-72` hard-codes `expected_count=2` for M-007/8/9, but the anchor occurs once; harness aborts at M-007
+
+- `run_5_mutants.py:71` — `expected_count = … 2 if mid in {"M-007", "M-008", "M-009"} else 1`
+- `run_5_mutants.py:72` — `assert text.count(old) == expected_count, (mid, text.count(old), expected_count, old)`
+
+The anchor `        self.a2l_tags_filter_mode = "all"\n` (8-space indent) appears **exactly once**:
+- `s19_app/tui/app.py:21313` (8 spaces, inside `_refresh_a2l_dependent_views`) ✅ matches
+- `s19_app/tui/app.py:22376` (12 spaces, inside `elif event.button.id == "a2l_filter_all":`) ❌ does not match the 8-space anchor
+
+So `text.count(old)` == **1**, not 2. The `assert` raises `AssertionError` on **M-007** (first of the three in loop order), killing the script before M-007, M-008, M-009 and every subsequent mutant (M-010…M-028) ever runs. The mutation semantics themselves are fine (`occurrence=1` targets the correct reset at 21313), but the count guard is wrong.
+
+### What I verified as clean
+
+1. **Isolation (issue 1)** — PASS. `PYTEST_WRAPPER` does `sys.path.insert(0,'.')` before `import s19_app`; baseline runs with `cwd=BASE`, each mutant with `cwd=work` (a full `copytree` of BASE). `-I` (`-E -s`) ignores PYTHONPATH/user-site, and the explicit cwd-first insert beats any system-site install. Each copy imports its own mutated `s19_app`.
+
+2. **Discrimination (issue 2)** — all 27 non-M-007/8/9 mutants have correct anchors and counts (verified each against `app.py`):
+   - **M-002** (`app.py:19577`, `_apply_install_state`, under `if prepared.precomputed:` + `if prepared.a2l_enriched_key is not None:`) — self-assign keeps stale IMG1 enrichment; `r002` asserts raw values vs IMG2 → killed. ✅
+   - **M-022** — old block starts at `app.py:16798` (`if self.current_project != project_name:`) and ends before `_start_a2l_load`; it contains **no** `_refuse_if_busy`. The busy guard at `app.py:16793` stays intact, and **M-025** separately targets the `_start_a2l_load` guard at `app.py:16903` (`gen = self._busy_begin_action("a2l_load", …)`). Clean separation, `r022`/`r025` both kill. ✅
+   - M-001/3/4/5 (`expected_count=4` correct: 15178/17005/18483/19653), M-006/18/19 (single `button.variant…update_a2l_view` at 21323-24), M-014/27 (single `_a2l_view_generation += 1` at 21156), M-020/21/23/24/26/28 (all single, exact-match) — each discriminates via its `-k` selection.
+
+3. **ERROR/TIMEOUT ≠ killed (issue 3)** — PASS. `run_5_mutants.py:92`: `"killed"` requires ≥1 `"FAILED "` line; no-FAILED nonzero → `ERROR`, `124` → `TIMEOUT`, and the final tally (`survived = [r for r in results if r["result"] != "killed"]`) correctly treats both as not-killed.
+
+4. **Path hygiene (issue 4)** — PASS. Only `BASE=/tmp/b103-inc5-e5` (baseline cwd), `ROOT=/tmp/b103-inc5-mut` (work copies, `out/`, and isolated `HOME`/`XDG_*`/`LOCALAPPDATA`) are used; tests write into pytest `tmp_path`. `shutil.rmtree(work)` after each mutant.
+
+### Minor notes (not blockers)
+
+- **M-014 and M-027 are identical** (same old/new/occurrence → both mutate `app.py:21156`). Redundant duplicate, but each is still killed by its own selection (`r014`/`r027`).
+- `run_5_mutants.py:92` — `killed` takes precedence over `TIMEOUT`/`ERROR` when FAILED lines coexist with a nonzero/124 returncode; those FAILED lines are genuine test failures, so acceptable.
+- `run_5_mutants.py:12` — `SPLIT` constant is dead. `run_5_mutants.py:88` (`git diff … check=True`) requires `BASE` to be a git checkout; not verifiable from the repo tree.
+
+**Verdict: not PASS — one MAJOR finding (the M-007/8/9 count assertion aborts the run at M-007).**
+ing copy path, so there is no guard against that failure mode. MINOR.
+
+### MINOR-2 (point 2) — M-003 and M-004 are duplicate mutants
+Both use `occurrence=1` of `self._refresh_a2l_dependent_views()` (the `_install_prepared_project` fanout, app.py:15178). The labels "no final project fanout" vs "no A2L-only fanout" imply two call sites, but there is only one project-install fanout; they are the same mutation run against two test groups. Functionally both are killed, so this is redundant/labeling only.
+
+### Point 3 — PASS
+Classification (`run_5_mutants.py` result line): `"killed" if failures else "SURVIVED" if returncode==0 else "TIMEOUT" if returncode==124 else "ERROR"`. With `-q`, pytest emits `FAILED …` lines only in the final summary, so a genuine timeout (returncode 124, summary never printed) lands on `TIMEOUT`, not `killed`; a test-only ERROR lands on `ERROR`. The collected `errors` list is dead but harmless. Classification is conservative (it can under-report kills — e.g. ERROR counted as "survived" — but cannot misreport a timeout/error as a kill). Baseline timeout (2400s) is uncaught and fails loud, which is acceptable.
+
+### Point 4 — PASS
+Results are written only under `/tmp/b103-inc5-mut` (`baseline.txt`, `out/*.txt`, `out/summary.json`); HOME/XDG/LOCALAPPDATA are redirected into `ROOT`; `PYTHONDONTWRITEBYTECODE=1` + `-B` + `-p no:cacheprovider`. The `git diff` runs with `cwd=work` against the copied `.git`. The real repo is never written; `BASE=/tmp/b103-inc5-e5` is read-only input (it must be pre-provisioned, which is an external setup dependency, not a defect).
+
+---
+**Bottom line:** the script's mechanics (points 1, 3, 4) and its mutation definitions are sound, but the shipped evidence that M-002 and M-022 survived is wrong against this worktree — both are discriminated and would be killed. The mutation evidence should be regenerated before it is cited as Inc-5 validation.

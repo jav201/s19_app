@@ -1,0 +1,284 @@
+M-008
+pytest -k REFRESH.008
+returncode=1
+
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index ee5891fd..6f23308b 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21311,6 +21311,7 @@ class S19TuiApp(App):
+                 - A2L attach, prepared file/project install and unload routes
+         """
+         self.a2l_tags_filter_mode = "all"
++        self.a2l_tags_filter_field = "name"
+         for button_id, variant in (
+             ("a2l_filter_all", "primary"),
+             ("a2l_filter_invalid", "default"),
+
+/tmp/b103-inc5-mut/M-008/s19_app/__init__.py
+.....FF                                                                  [100%]
+=================================== FAILURES ===================================
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/6---] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R5')
+case = 'R-A2L-REFRESH.008/6', route = 'replace', field = 'address'
+text = '  32  '
+
+    @pytest.mark.parametrize(
+        ("case", "route", "field", "text"),
+        [
+            ("R-A2L-REFRESH.007/1", "attach", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/2", "image", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/3", "project", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/4", "only", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/5", "unload", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/6", "plain", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/1", "attach", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/2", "image", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/3", "project", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/4", "only", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/5", "unload", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/6", "replace", "address", "  32  "),
+            ("R-A2L-REFRESH.008/7", "image", "address", "  32  "),
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r007_r008_filters(tmp_path: Path, case: str, route: str, field: str, text: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            elif route not in {"attach"}:
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            else:
+                await _load_image(app, pilot, f.img1)
+            app._set_a2l_filter_field(field)
+            app.query_one("#a2l_tags_filter_input", Input).value = text
+            await pilot.pause(0.15)
+            if route == "attach":
+                await _load_a2l(app, pilot, f.old)
+            elif route == "replace":
+                await _load_a2l(app, pilot, f.new)
+            elif route == "plain":
+                await _load_a2l(app, pilot, f.plain)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            elif route == "only":
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert app.query_one("#a2l_tags_filter_input", Input).value == text
+            assert app.a2l_tags_filter_field == field
+            assert str(app.query_one("#a2l_filter_field", Button).label) == f"Field: {field}"
+            names = _table_names(app.query_one("#a2l_tags_list", DataTable))
+            if route == "unload":
+                assert names == []
+                assert _plain(app.query_one("#a2l_view", Static).render()) == "No A2L loaded."
+            elif route == "plain":
+                assert names == []
+                assert _plain(app.query_one("#a2l_tags_summary", Label).render()) == "No A2L tags match 'Alpha'."
+            else:
+                assert names == ["AlphaShared"]
+                expected = 0x6562 if route in {"image", "project"} else (0x6461 if route != "only" else None)
+                assert app._a2l_filtered_tags[0]["raw_value"] == expected
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:697: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R5/app'), src=PosixPath('/tmp/...R5/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R5/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+        _project(f, "P_ONLY", image=None, a2l=f.new)
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        elif route not in {"attach"}:
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        else:
+            await _load_image(app, pilot, f.img1)
+        app._set_a2l_filter_field(field)
+        app.query_one("#a2l_tags_filter_input", Input).value = text
+        await pilot.pause(0.15)
+        if route == "attach":
+            await _load_a2l(app, pilot, f.old)
+        elif route == "replace":
+            await _load_a2l(app, pilot, f.new)
+        elif route == "plain":
+            await _load_a2l(app, pilot, f.plain)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        elif route == "only":
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+        assert app.query_one("#a2l_tags_filter_input", Input).value == text
+>       assert app.a2l_tags_filter_field == field
+E       AssertionError: assert 'name' == 'address'
+E         
+E         - address
+E         + name
+
+tests/test_b103_a2l_refresh.py:683: AssertionError
+________________ test_r007_r008_filters[R-A2L-REFRESH.008/7---] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R6')
+case = 'R-A2L-REFRESH.008/7', route = 'image', field = 'address'
+text = '  32  '
+
+    @pytest.mark.parametrize(
+        ("case", "route", "field", "text"),
+        [
+            ("R-A2L-REFRESH.007/1", "attach", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/2", "image", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/3", "project", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/4", "only", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/5", "unload", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.007/6", "plain", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/1", "attach", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/2", "image", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/3", "project", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/4", "only", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/5", "unload", "name", "  Alpha  "),
+            ("R-A2L-REFRESH.008/6", "replace", "address", "  32  "),
+            ("R-A2L-REFRESH.008/7", "image", "address", "  32  "),
+        ],
+        ids=lambda x: x if isinstance(x, str) and x.startswith("R-") else "",
+    )
+    def test_r007_r008_filters(tmp_path: Path, case: str, route: str, field: str, text: str) -> None:
+        async def scenario(app, pilot, f):
+            _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+            _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            if route == "project":
+                await _load_project(app, pilot, "P_OLD")
+            elif route not in {"attach"}:
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            else:
+                await _load_image(app, pilot, f.img1)
+            app._set_a2l_filter_field(field)
+            app.query_one("#a2l_tags_filter_input", Input).value = text
+            await pilot.pause(0.15)
+            if route == "attach":
+                await _load_a2l(app, pilot, f.old)
+            elif route == "replace":
+                await _load_a2l(app, pilot, f.new)
+            elif route == "plain":
+                await _load_a2l(app, pilot, f.plain)
+            elif route == "image":
+                await _load_image(app, pilot, f.img2)
+            elif route == "project":
+                await _load_project(app, pilot, "P_NEW")
+            elif route == "only":
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert app.query_one("#a2l_tags_filter_input", Input).value == text
+            assert app.a2l_tags_filter_field == field
+            assert str(app.query_one("#a2l_filter_field", Button).label) == f"Field: {field}"
+            names = _table_names(app.query_one("#a2l_tags_list", DataTable))
+            if route == "unload":
+                assert names == []
+                assert _plain(app.query_one("#a2l_view", Static).render()) == "No A2L loaded."
+            elif route == "plain":
+                assert names == []
+                assert _plain(app.query_one("#a2l_tags_summary", Label).render()) == "No A2L tags match 'Alpha'."
+            else:
+                assert names == ["AlphaShared"]
+                expected = 0x6562 if route in {"image", "project"} else (0x6461 if route != "only" else None)
+                assert app._a2l_filtered_tags[0]["raw_value"] == expected
+    
+>       _run(tmp_path, scenario)
+
+tests/test_b103_a2l_refresh.py:697: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_refresh.py:447: in _run
+    asyncio.run(drive())
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_a2l_refresh.py:445: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+f = Fixture(base=PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R6/app'), src=PosixPath('/tmp/...R6/src/img2.s19'), mac=PosixPath('/tmp/pytest-of-<account>/pytest-675/test_r007_r008_filters_R_A2L_R6/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+        _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+        _project(f, "P_ONLY", image=None, a2l=f.new)
+        if route == "project":
+            await _load_project(app, pilot, "P_OLD")
+        elif route not in {"attach"}:
+            await _load_image(app, pilot, f.img1)
+            await _load_a2l(app, pilot, f.old)
+        else:
+            await _load_image(app, pilot, f.img1)
+        app._set_a2l_filter_field(field)
+        app.query_one("#a2l_tags_filter_input", Input).value = text
+        await pilot.pause(0.15)
+        if route == "attach":
+            await _load_a2l(app, pilot, f.old)
+        elif route == "replace":
+            await _load_a2l(app, pilot, f.new)
+        elif route == "plain":
+            await _load_a2l(app, pilot, f.plain)
+        elif route == "image":
+            await _load_image(app, pilot, f.img2)
+        elif route == "project":
+            await _load_project(app, pilot, "P_NEW")
+        elif route == "only":
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            _unload(app, "a2l")
+            await pilot.pause()
+        assert app.query_one("#a2l_tags_filter_input", Input).value == text
+>       assert app.a2l_tags_filter_field == field
+E       AssertionError: assert 'name' == 'address'
+E         
+E         - address
+E         + name
+
+tests/test_b103_a2l_refresh.py:683: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/6---]
+FAILED tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/7---]
+2 failed, 5 passed, 96 deselected in 113.65s (0:01:53)
