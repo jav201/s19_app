@@ -453,8 +453,9 @@ CTX-TEXT  Text from a file, on screen
   markup             Square-bracket text that the screen library could read as a
                      style or a link, for example [red].
   safe-text views    The Memory Map, the Issues view, the Checks view, the Flow screens,
-                     the Split/Join view (D-7), the A2L Explorer (table and detail
-                     card), the MAC View (added from S2, tested there), the
+                     the Split/Join view (D-7), the A2L Explorer (detail card; table,
+                     its Tag cell showing a painted tag name, R-TUI-042a.3/.5/.6), the
+                     MAC View (added from S2, tested there), the
                      Workarea Files list and the status line (added from S5), the
                      message lines (S6), the Select variant, Save project and
                      Reports dialog lists (S7, S11), the Reports
@@ -572,7 +573,7 @@ Conversion methods (ASAM MCD-2 MC):
   RAT_FUNC    raw = (a·p² + b·p + c) / (d·p² + e·p + f), solved for p (COEFFS a … f).
   TAB_INTP    a COMPU_TAB of raw → physical pairs, interpolated.
   TAB_NOINTP  a COMPU_TAB of raw → physical pairs, not interpolated.
-  TAB_VERB    a COMPU_VTAB of raw → text pairs.
+  TAB_VERB    a COMPU_VTAB of raw → text pairs, or a COMPU_VTAB_RANGE of raw ranges → text.
   FORM        a formula in text.
 ```
 
@@ -598,9 +599,9 @@ tag status text  OK (in image) · OUT(image) (out of image) · ERR (<reason>)
 A2L Explorer    The screen with the tag table (left, with its filter bar, page bar
                 and summary line) and the hex pane (right, with the detail card on top).
 tag table columns, in order:
-  Tag       in-image glyph, a space, the name
-  Address   the address as 0x + 8 uppercase hexadecimal digits
+  Address   the address as 0x + at least 8 uppercase hexadecimal digits, up to 16
   Length    the length in bytes
+  Tag       in-image glyph, a space, the name
   Source    assigned or formula
   Raw       the raw value
   Physical  the physical value
@@ -628,6 +629,91 @@ description window  The window that describes one CHARACTERISTIC: its axes, its
                 point table and the shape of its values.
 highlighted row The row under the table cursor.
 selected row    A row the operator confirms with Enter or a click.
+painted whole   The painted line holds the cell's full text within its column's span.
+width left      The tag table's visible content width minus the Address and Length
+                column widths, including their padding.
+name width      The width left minus 4 cells for Tag padding, glyph and space (w).
+painted tag name  Characters outside U+0021 … U+007E become U+FFFD before the
+                middle cut of R-TUI-042a.3/.5; the Tag cell is the scoped exception
+                to R-TUI-103a and R-TUI-103.1. The detail card keeps the full name.
+```
+
+#### CTX-A2L-MATCH · Label similarity (S2.8)
+
+```text
+name list         The names a ranking runs over: the A2L tag names (S2.2), as the A2L
+                  views list them. A name may appear more than once (C: case 08's
+                  firmware_issues.a2l lists VALUE_0001 twice).
+query             The text the operator types to find names.
+query text        What the rows compare with the names (R-A2L-MATCH.1).
+whitespace        Space (U+0020), tab (U+0009), line feed (U+000A), carriage return (U+000D), vertical tab (U+000B), form feed (U+000C).
+uppercase letter  A to Z (U+0041 … U+005A).
+lowercase letter  a to z (U+0061 … U+007A).
+letter            An uppercase or lowercase letter, or any character above U+007F
+                  (a letter that has no case).
+digit             0 to 9 (U+0030 … U+0039).
+separator         Every other character: _ . [ ] - space * and the rest of ASCII.
+token             Of a name or of the query text: a maximal run of digits, or a maximal
+                  run of letters cut before an uppercase letter that follows a lowercase
+                  letter, and before the last uppercase letter of a run of two or more
+                  uppercase letters that a lowercase letter follows. Separators belong
+                  to no token. Examples (B, i4e1-pilot-transcript.txt §2):
+                    VAL_BLK_0001                         VAL · BLK · 0001
+                    model.MainClass.ledRing[0].red       model · Main · Class · led · Ring · 0 · red
+                    parameter_instance[0].Knife[1].x     parameter · instance · 0 · Knife · 1 · x
+                    ABSValue · AValue · Map3D            ABS · Value | A · Value | Map · 3 · D
+                    LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy    Luk · Pvq · JXML · UPQ · BI · OKS · Ahwvcueaniy
+                    Aabcx_GgrDwx_kaudIvm_ydmuH_uoz3._5_  Aabcx · Ggr · Dwx · kaud · Ivm · ydmu · H · uoz · 3 · 5
+                    Drück_Max                            Drück · Max
+name token        A token of a name.   query token   A token of the query text.
+digit token       A token of digits.
+boundary offset   In a name: offset 0, the first offset of a token, or the offset of a
+                  separator.
+key characters    The letters and digits of the query text, in their order.
+edit distance     Between two texts: the least number of insertions, deletions and
+                  substitutions of one character and transpositions of two adjacent
+                  characters that turn one text into the other, no character edited
+                  twice (the optimal string alignment distance); characters compare as
+                  R-A2L-MATCH.3 and .4 say.
+prefix distance   From a query token to a name token: the smallest edit distance between
+                  the query token and a prefix of the name token, the empty prefix
+                  included (cuvre → CURVE: 1; valuee → VALUE: 1; value → VAL: 2).
+allowed edits     Of a query token: R-A2L-MATCH.11 … .13.
+total edits       Of a fuzzy match: the sum, over the query tokens, of the smallest prefix
+                  distance from each query token to a name token of the name.
+match rules       exact · prefix · substring · token · fuzzy · subsequence
+                  (R-A2L-MATCH.5 … .10). Rank order: that order.
+rule key          substring: whether the query text occurs at a boundary offset;
+                  fuzzy: the total edits; every other rule: none.
+case-exact        A listed name with the rule `exact`, `prefix` or `substring` whose rule
+                  still holds when an uppercase letter and its lowercase letter are compared
+                  as different characters (for `substring`: the query text occurs at any
+                  offset of the name, as R-A2L-MATCH.7 says, not only at a boundary offset);
+                  a name listed with any other rule is not case-exact.
+listed names      The names the system ranks for a query (R-A2L-MATCH.14), in rank order.
+limit             The largest number of names the ranked list may hold.
+ranked list       What the system returns: the first listed names (R-A2L-MATCH.18), each
+                  with its rule, its total edits (fuzzy only) and its match spans.
+match span        [start, end): the offsets of the name characters a match covers.
+prepared name list  A name list the system has prepared for ranking (R-A2L-MATCH.35).
+distinct query tokens  The query tokens of the query text, each counted once: two query
+                  tokens are the same when they are the same text with an uppercase letter
+                  and its lowercase letter compared as the same character (R-A2L-MATCH.3)
+                  (`cuvre CUVRE` holds 2 query tokens and 1 distinct query token).
+ASCII name        A name whose characters are all at most U+007F.
+trie node         Of a prepared name list: a distinct non-empty prefix of its distinct
+                  folded name tokens (REF: 177,148 trie nodes; W40: 753,276).
+node visit        One step of the fuzzy rule's walk for a query token of 1 or 2 allowed
+                  edits: the walk takes the trie nodes in code-point order of their
+                  prefixes, computes each node's prefix distances from its parent's and
+                  skips the nodes below one from which no name token comes closer
+                  (`codewire/graph-inc4.md` `_fuzzy_token_distances`); each node it
+                  computes is one visit. A name token is found when the walk reaches it
+                  or skips it within the allowed edits. A query token of 0 allowed edits
+                  makes no visit.
+node budget       400,000 node visits per ranking, shared by the walks of the distinct
+                  query tokens in the order the fuzzy rule takes them (ascending allowed
+                  edits, ties in query order).
 ```
 
 #### CTX-MAC · MAC files and the MAC View (S2.6)
@@ -665,13 +751,15 @@ coverage strip  The line above the MAC table: MAC→S19 coverage and A2L↔MAC m
 
 Replaces: the "A2L Structural Parsing" block, R-A2L-001, R-A2L-004, R-A2L-005.
 
+R-A2L-004.5 was retired at the batch-103 fold: R-A2L-REFRESH.020 replaces its terminal refusal for one project A2L; other project-validation refusals remain.
+
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-001.1 | When | When the operator loads an A2L file, the system shall build its sections from its /begin and /end lines. |
-| R-A2L-001.2 | U | The system shall ignore the text of comments when it builds sections. |
+| R-A2L-001.1 | When | When the operator loads an A2L file, the system shall build its sections from its /begin and /end words, wherever those words stand on a line. |
+| R-A2L-001.2 | U | The system shall read no word from the text of a comment. |
 | R-A2L-001.3 | U | The system shall read a quoted string as one value, without its quotes. |
-| R-A2L-001.4 | If | If an /end line has no open section, then the system shall record the parse error `Line <n>: /end without /begin`. |
-| R-A2L-001.5 | If | If an /end line names a section other than the one it closes, then the system shall record the parse error `Line <n>: /end <name> does not close /begin <name>`. |
+| R-A2L-001.4 | If | If an /end word has no open section, then the system shall record the parse error `Line <n>: /end without /begin`. |
+| R-A2L-001.5 | If | If an /end word names a section other than the one it closes, then the system shall record the parse error `Line <n>: /end <name> does not close /begin <name>`. |
 | R-A2L-001.6 | If | If a section is still open at the end of the file, then the system shall record the parse error `Unclosed /begin sections detected.` |
 | R-A2L-001.7 | If | If an A2L file holds bytes that are not valid UTF-8, then the system shall read each such byte as the character U+FFFD. |
 | R-A2L-005.1 | When | When the system reads an A2L file, the system shall create one tag for each MEASUREMENT and each CHARACTERISTIC section, at any depth. |
@@ -680,7 +768,6 @@ Replaces: the "A2L Structural Parsing" block, R-A2L-001, R-A2L-004, R-A2L-005.
 | R-A2L-004.2 | If | If an A2L file loads with parse errors, then the system shall show the status `A2L loaded with <n> parse errors: <file name>`. |
 | R-A2L-004.3 | If | If the A2L file is missing, or its size cannot be read, when the system starts the A2L load, then the system shall show the status `A2L file not found: <path>`. |
 | R-A2L-004.4 | If | If the file to load as A2L does not end in `.a2l`, then the system shall show the status `Unsupported A2L type: <extension>`. |
-| R-A2L-004.5 | If | If the project already has an A2L file, then the system shall show the status `Project already has an A2L file.` |
 | R-A2L-004.6 | If | If the system cannot copy or parse the A2L file, then the system shall show the status `File NOT loaded: '<file name>' could not be read — check that the file can be opened, then load again.` |
 
 **(from batch-100 HLR-177, HLR-176, HLR-165: LLR-177.1b, 177.2b, 177.2c, 177.5, 176.4, 165.4)**
@@ -694,6 +781,77 @@ Replaces: the "A2L Structural Parsing" block, R-A2L-001, R-A2L-004, R-A2L-005.
 | R-A2L-004.11 | While | While the system parses an A2L file, the system shall move the progress bar within the parse step in proportion to the bytes of the file read so far. |
 | R-A2L-004.12 | When | When the system loads an A2L file from the Workarea Files list, the system shall show its progress line at the Parse step from the start of the load. |
 | R-A2L-004.13 | When | When the operator loads a primary image after unloading the A2L file, the system shall show no A2L tags. |
+| R-A2L-001.3.1 | U | The system shall read a quoted string as one word, without its quotes. |
+| R-A2L-001.3.2 | U | The system shall read a backslash in a quoted string together with the character after it, when that character is not a line end, so that neither `\"` nor `\\` ends the string. |
+| R-A2L-READ.1 | U | The system shall read a CRLF or a lone CR in an A2L file as one line end, as it reads an LF. |
+| R-A2L-READ.2 | U | The system shall end a word at a blank or a line end. |
+| R-A2L-READ.3 | U | The system shall read every character other than a blank, a line end, a double quote and the start of a comment as a word character. |
+| R-A2L-READ.4 | If | If a word outside comments and quoted strings, or the quoted name word of a MEASUREMENT or CHARACTERISTIC, holds a character outside U+0021 … U+007E, then the system shall record the parse error `Line <n>: unexpected character U+<XXXX>`. |
+| R-A2L-READ.5 | When | When an A2L file starts with the UTF-8 byte order mark, the system shall read the file from the byte after the mark. |
+| R-A2L-READ.6 | If | If an A2L file starts with a UTF-16 byte order mark, then the system shall record the parse error `File is UTF-16 encoded; save it as UTF-8 and load it again.` |
+| R-A2L-READ.7 | U | The system shall read a comment as a word break. |
+| R-A2L-READ.8 | U | The system shall end a block comment at the first `*/` after its `/*`. |
+| R-A2L-READ.9 | U | The system shall end a line comment at the next line end. |
+| R-A2L-READ.10 | If | If a block comment is still open at the end of an A2L file, then the system shall record the parse error `Line <n>: comment not closed`. |
+| R-A2L-READ.11 | If | If `*/` stands outside a comment and outside a quoted string, then the system shall record the parse error `Line <n>: */ without /*`. |
+| R-A2L-READ.12 | U | The system shall create no tag from a MEASUREMENT or CHARACTERISTIC section that stands inside a comment or has no /end word. |
+| R-A2L-READ.13 | U | The system shall read no comment, /begin or /end from the text of a quoted string. |
+| R-A2L-READ.14 | U | The system shall read a quoted string that spans line ends as one word. |
+| R-A2L-READ.15 | If | If a quoted string is still open at the end of an A2L file, then the system shall record the parse error `Line <n>: quoted string not closed`. |
+| R-A2L-READ.16 | U | The system shall end a word at a double quote. |
+| R-A2L-READ.17 | U | The system shall close a section whose /begin and /end stand on one line at that /end. |
+| R-A2L-READ.18 | U | The system shall read /begin and /end in any letter case. |
+| R-A2L-READ.19 | U | The system shall read a word that starts with /begin or /end and holds more characters as an ordinary word. |
+| R-A2L-READ.20 | U | The system shall take the word after a /begin word as the section's keyword, wherever that word stands. |
+| R-A2L-READ.21 | When | When the system reads an /end word, the system shall close the innermost open section. |
+| R-A2L-READ.22 | If | If an A2L file holds an /include word outside comments and quoted strings, then the system shall record the parse error `Line <n>: /include <file> is not read`. |
+| R-A2L-READ.23 | U | The system shall take a tag's name from the first word after its section keyword, whether that word stands on the /begin line or on a later line. |
+| R-A2L-READ.24 | When | When the word after the name of a section of a named kind is a quoted string, the system shall take that string as the section's long identifier. |
+| R-A2L-READ.25 | U | The system shall take a MEASUREMENT's header words from the words that follow its name and long identifier, across line ends and comments. |
+| R-A2L-READ.26 | U | The system shall take a CHARACTERISTIC's header words from the words that follow its name and long identifier, across line ends and comments, the /begin line included. |
+| R-A2L-READ.27 | If | If a word in a header position of a MEASUREMENT or CHARACTERISTIC is a keyword, then the system shall end the header before that word. |
+| R-A2L-READ.28 | If | If a MEASUREMENT has 1 to 5 header words, or a CHARACTERISTIC 1 to 6, then the system shall record the parse error `Line <n>: <section> <name> has <k> of its <m> header words`. |
+| R-A2L-READ.29 | U | The system shall read a keyword's argument words from the words that follow it in the same section, up to the next keyword, whether they stand on its line or on later lines. |
+| R-A2L-READ.30 | U | The system shall read every keyword among a tag's own words, wherever it stands on its line. |
+| R-A2L-READ.31 | U | The system shall read a tag's keywords from its own words only. |
+| R-A2L-READ.32 | If | If a keyword stands more than once among a tag's own words, then the system shall record the parse error `Line <n>: <keyword> is declared twice in <section> <name>`. |
+| R-A2L-READ.33 | U | The system shall take a tag's display identifier from the word after its DISPLAY_IDENTIFIER keyword. |
+| R-A2L-READ.34 | When | When the system reads an address, length or count word that is `0x` or `0X` followed by 1 to 16 hexadecimal digits, the system shall read the word as a hexadecimal number. |
+| R-A2L-READ.35 | When | When the system reads an address, length or count word of 1 to 20 decimal digits, the system shall read the word as a decimal number, leading zeros included. |
+| R-A2L-READ.36 | If | If an address, length or count word is neither a hexadecimal nor a decimal number word, then the system shall read it as no number. |
+| R-A2L-READ.37 | U | The system shall take a tag's MATRIX_DIM as the product of the numbers that follow its MATRIX_DIM keyword. |
+| R-A2L-READ.38 | If | If a tag's length is below 1 or above 1,048,576 bytes, then the system shall give the tag no length. |
+| R-A2L-READ.39 | If | If a tag's length is below 1 or above 1,048,576 bytes, then the system shall record the parse error `Line <n>: <section> <name> has the length <length>, outside 1 to 1048576 bytes`. |
+| R-A2L-READ.40 | When | When the system reads a BLOB section, the system shall list a declared span with the BLOB's name, its address word as address and its size word as length. |
+| R-A2L-READ.41 | When | When the system reads an INSTANCE section, the system shall list a declared span with the INSTANCE's name and its address word as address. |
+| R-A2L-READ.42 | When | When an INSTANCE names a TYPEDEF_MEASUREMENT, the system shall take the span's length as the size of the typedef's datatype × the typedef's MATRIX_DIM × the INSTANCE's MATRIX_DIM. |
+| R-A2L-READ.43 | When | When an INSTANCE names a TYPEDEF_CHARACTERISTIC of kind VALUE, VAL_BLK or ASCII, the system shall take the span's length as the length that R-A2L-015, R-A2L-016 or R-A2L-017 gives the typedef × the INSTANCE's MATRIX_DIM. |
+| R-A2L-READ.44 | When | When an INSTANCE names a TYPEDEF_BLOB or a TYPEDEF_STRUCTURE, the system shall take the span's length as the typedef's size word × the INSTANCE's MATRIX_DIM. |
+| R-A2L-READ.45 | If | If the system cannot size an INSTANCE by R-A2L-READ.42 to .44, then the system shall list its span with no length. |
+| R-A2L-READ.46 | If | If a declared span's length is below 1 or above 1,048,576 bytes, then the system shall list the span with no length. |
+| R-A2L-READ.48 | U | The system shall give every A2L file the sections, tags, declared spans and parse errors that the reference reading of that file gives. |
+| R-A2L-READ.49 | U | The system shall give every tag of the 35 tracked fixture files, other than the defect tags at e07fb00, the same name, address, length, datatype, byte order and BIT_MASK word as e07fb00 gives. |
+| R-A2L-READ.50 | U | The system shall show a section's begin words in the A2L summary, joined by single spaces. |
+| R-A2L-READ.51 | U | The system shall show each character U+0000 … U+001F, U+007F … U+009F, U+2028 and U+2029 of a file word as U+FFFD in the A2L summary. |
+| R-A2L-READ.52 | U | The system shall parse an A2L file within 1.5 times the time the e07fb00 reader takes for the same file on the same host, at a peak memory per byte of the file of at most 2 times the e07fb00 reader's. |
+| R-A2L-READ.53 | If | If a VAL_BLK CHARACTERISTIC has no MATRIX_DIM and has a NUMBER keyword, then the system shall take its length as the size of its datatype × the number after NUMBER. |
+| R-A2L-READ.54 | U | The system shall take the name of a section of a named kind from its first own word, whether that word stands on the /begin line or on a later line. |
+| R-A2L-READ.55 | If | If an A2L file that does not start with a UTF-16 byte order mark holds a NUL byte, then the system shall record the parse error `File is not UTF-8 text; save it as UTF-8 and load it again.` |
+| R-A2L-READ.56 | If | If an A2L file gives more than 100 parse errors, then the system shall replace every parse error after the 100th with the one parse error `… <k> more parse errors`, where `<k>` is their count. |
+| R-A2L-READ.57 | If | If a MEASUREMENT has an ARRAY_SIZE keyword and no DATA_SIZE or LENGTH keyword, then the system shall take its length as the size of its datatype × the number after ARRAY_SIZE. |
+| R-A2L-READ.58 | If | If a keyword is followed by fewer argument words than its arity, a MATRIX_DIM keyword by none or by more than 3, or a keyword by a surplus word, then the system shall record the parse error `Line <n>: <keyword> has <k> of its <m> arguments`. |
+| R-A2L-READ.59 | If | If a tag's sizes do not agree, or its address words give different addresses, then the system shall record the parse error `Line <n>: <section> <name> declares the <what> <a> and <b>`, where `<what>` is `sizes` or `addresses`. |
+| R-A2L-READ.60 | If | If a tag's address words give different addresses, one of its address words is not a number word, its ECU_ADDRESS keyword gives no number, or its BIT_MASK or BYTE_ORDER keyword stands twice with different arguments, has fewer argument words than its arity or has a surplus word, or its byte-order source is not a byte-order word, then the system shall give the tag no address. |
+| R-A2L-READ.61 | If | If a tag's sizes do not agree, or one of its DATA_SIZE, LENGTH, NUMBER, MATRIX_DIM or ARRAY_SIZE keywords gives no number, then the system shall give the tag no length. |
+| R-A2L-READ.62 | If | If a CHARACTERISTIC has 1 to 6 header words, then the system shall read no field from its header. |
+| R-A2L-READ.63 | If | If an argument word of an ECU_ADDRESS, DATA_SIZE, LENGTH, NUMBER, MATRIX_DIM or ARRAY_SIZE keyword, or a CHARACTERISTIC's header address word, is not a number word, then the system shall record the parse error `Line <n>: <keyword> <word> is not a number`. |
+| R-A2L-READ.64 | If | If a /begin word would open a section deeper than 32 levels, then the system shall record the parse error `Line <n>: sections nested deeper than 32` as the file's only parse error. |
+| R-A2L-READ.65 | U | The system shall raise no exception other than OSError while it parses an A2L file and renders its A2L summary. |
+| R-A2L-READ.66 | U | The system shall write a file word into a parse error text as at most its first 256 characters, each character outside U+0021 … U+007E written as U+FFFD, and `…` after it when the word is longer. |
+| R-A2L-READ.67 | If | If a MEASUREMENT or CHARACTERISTIC section has no /end word, then the system shall record the parse error `Line <n>: <section> <name> is not closed`. |
+| R-A2L-READ.68 | If | If the argument word of a BYTE_ORDER keyword of a MEASUREMENT, CHARACTERISTIC, RECORD_LAYOUT or MOD_COMMON section is not a byte-order word, then the system shall record the parse error `Line <n>: BYTE_ORDER <word> is not a byte order`. |
+| R-A2L-READ.69 | If | If a tag's address word is above 0xFFFFFFFFFFFFFFFF, then the system shall give the tag no address. |
+| R-A2L-READ.70 | If | If an A2L file ends before a BLOB, INSTANCE or typedef section used to construct a declared span is closed, then the system shall give every affected declared span no address and no length. |
 
 #### S2.2 · What a tag declares (CTX-A2L-TAG)
 
@@ -704,11 +862,11 @@ Replaces: the "RECORD_LAYOUT Interpretation" block, the byte-order precedence, t
 | R-A2L-010 | When | When the system reads a CHARACTERISTIC, the system shall take its address from its header. |
 | R-A2L-011 | If | If a tag has an ECU_ADDRESS line, then the system shall take the tag's address from that line. |
 | R-A2L-012 | If | If a MEASUREMENT has no ECU_ADDRESS line, then the system shall give it no address. |
-| R-A2L-013 | If | If a tag has a DATA_SIZE or LENGTH line, then the system shall take its length from that line. |
-| R-A2L-014 | If | If a MEASUREMENT has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). |
+| R-A2L-013 | If | If a tag whose sizes agree has a DATA_SIZE or LENGTH keyword, then the system shall take its length from that keyword. |
+| R-A2L-014 | If | If a MEASUREMENT has no DATA_SIZE, LENGTH or ARRAY_SIZE keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). |
 | R-A2L-015 | If | If a VALUE CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype. |
-| R-A2L-016 | If | If a VAL_BLK CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM. |
-| R-A2L-017 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length from its NUMBER line. |
+| R-A2L-016 | If | If a VAL_BLK CHARACTERISTIC has a MATRIX_DIM keyword and no DATA_SIZE or LENGTH keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM. |
+| R-A2L-017 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH keyword, then the system shall take its length as the number after its NUMBER keyword, else as its MATRIX_DIM. |
 | R-A2L-018 | If | If a CURVE or MAP has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its whole record: the components of its record layout, with their alignment, for its number of axis points. |
 | R-A2L-019 | If | If an axis of a CURVE or MAP takes its points from another section, then the system shall count the points of that section. |
 | R-A2L-020 | If | If the system cannot determine a tag's length, then the system shall give the tag no length. |
@@ -780,7 +938,7 @@ Replaces: the "A2L Decode Validation" block, R-A2L-002, R-A2L-ISSUE-RECONCILE-00
 | R-A2L-073 | If | If a checked tag's physical value is outside its limits, then the system shall mark the value as outside the limits. |
 | R-A2L-074 | When | When an A2L file is loaded, the system shall show the A2L summary in the Workspace "Context" pane. |
 | R-A2L-075 | When | When the system shows the A2L summary, the system shall list the parse errors under the heading `A2L parse errors:`, one `- <error>` line each. |
-| R-A2L-076 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <header> (lines <first>-<last>)` line each, indented by depth. |
+| R-A2L-076 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <begin words> (lines <first>-<last>)` line each, indented by depth. |
 | R-A2L-077 | When | When the system shows the A2L summary, the system shall list the tags under the heading `A2L Tags:`, one `- <section> <name>: <address> len=<length> mem=<region> <tag status text>` line each. |
 | R-A2L-078 | If | If the A2L summary has more than 500 lines, then the system shall replace the rest with the line `... truncated <k> additional tag lines ...`. |
 | R-A2L-079 | If | If no A2L file is loaded, then the system shall show `No A2L loaded.` in the A2L summary. |
@@ -921,6 +1079,12 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 | R-A2L-118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. |
 | R-A2L-119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. |
 | R-A2L-119a | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. |
+| R-TUI-042a.4 | U | The system shall show the Address and Length cells of every tag table row painted whole at every horizontal scroll position. |
+| R-TUI-042a.5 | While | While the name width *w* of the tag table is less than 34 cells, the system shall show a tag name longer than *w* characters in the Tag cell as its *painted tag name*: its first ⌊(*w* − 1)/2⌋ characters, `…` and its last ⌈(*w* − 1)/2⌉ characters. |
+| R-TUI-042a.6 | If | If a tag name holds a character outside U+0021 … U+007E, then the system shall show each such character that the Tag cell's *painted tag name* keeps as U+FFFD. |
+| R-TUI-042a.7.1 | If | If a value that the A2L detail card shows from the A2L file holds a control character, then the system shall show that value in the card without any control character. |
+| R-TUI-042a.7.2 | If | If a value that the A2L detail card shows from the A2L file holds a run of break characters, then the system shall show that run in the card as one space. |
+| R-TUI-042a.8 | When | When the system shows a tag's display identifier in the first line of the A2L detail card, the system shall show the tag's name on a line of its own in the card. |
 
 #### S2.6 · MAC files and the MAC View (CTX-MAC)
 
@@ -992,6 +1156,254 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-TUI-071.9 | If | If Y is 0, then the system shall draw the bar with no cell filled. |
 
 
+
+
+#### S2.7 · A2L definition model (batch-103 Inc 2/3)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-A2L-DEF.1 | When | When the system builds the definition of a defined object that is not ASCII and whose conversion type is not TAB_VERB, the system shall give the definition the kind number. |
+| R-A2L-DEF.2 | When | When the system builds the definition of a defined object that is not ASCII and whose conversion type is TAB_VERB, the system shall give the definition the kind enum. |
+| R-A2L-DEF.3 | When | When the system builds the definition of an ASCII CHARACTERISTIC, the system shall give the definition the kind text. |
+| R-A2L-DEF.4 | If | If an object is not a defined object, then the system shall give its definition the refusal `A2L-DEF-KIND` with the message `<name>: the system has no definition for a <kind> object`. |
+| R-A2L-DEF.5 | When | When the system builds the definition of a name that exactly one tag has, case included, the system shall use that tag. |
+| R-A2L-DEF.6 | If | If no tag has the name, then the system shall give the refusal `A2L-DEF-NAME` with the message `<name>: no tag of that name in the A2L`. |
+| R-A2L-DEF.7.1 | If | If an object has no address or no length, then the system shall give its definition the refusal `A2L-DEF-ADDRESS` with the message `<name>: the object has no address or no length`. |
+| R-A2L-DEF.7.2 | If | If an object's length is below 1 or above 1,048,576 bytes, or its address is negative, or the address of its last byte (address + length − 1) is above 0xFFFFFFFF, then the system shall give its definition the refusal `A2L-DEF-ADDRESS` with the message `<name>: its span of <length> bytes at <address> cannot be read`. |
+| R-A2L-DEF.8 | If | If an object of the kind number or enum has no datatype the system can read, then the system shall give its definition the refusal `A2L-DEF-DATATYPE` with the message `<name>: the object declares no datatype the system can read`. |
+| R-A2L-DEF.9 | If | If the length of an object of the kind number or enum differs from the size of its datatype, then the system shall give its definition the refusal `A2L-DEF-LENGTH` with the message `<name>: its length <length> differs from the <size> bytes of <datatype>`. |
+| R-A2L-DEF.10 | When | When the system reads the conversion method of a definition, the system shall take as its conversion type the word of the conversion method record that follows the long identifier. |
+| R-A2L-DEF.11 | If | If an object names a conversion method other than NO_COMPU_METHOD that the A2L does not declare, then the system shall give its definition the refusal `A2L-DEF-METHOD` with the message `<name>: the conversion method <method> is not declared in the A2L`. |
+| R-A2L-DEF.12 | If | If an object names a method other than NO_COMPU_METHOD whose record's type is FORM or a word that is not, letter case included, a type CTX-A2L-VALUE lists, then the system shall give its definition the refusal `A2L-DEF-CONVERSION` with the message `<name>: the conversion type <type> of <method> is not supported`. |
+| R-A2L-DEF.13 | If | If an enum definition names no table, or a table the A2L declares neither as COMPU_VTAB nor as COMPU_VTAB_RANGE, then the system shall give it the refusal `A2L-DEF-TABLE` with the message `<name>: the table <table> of <method> is not declared in the A2L`. |
+| R-A2L-DEF.14 | When | When the table of an enum definition is a COMPU_VTAB, the system shall take as its entries the pairs of the table in file order. |
+| R-A2L-DEF.15 | When | When the table of an enum definition is a COMPU_VTAB_RANGE, the system shall take as its entries the triples of the table in file order. |
+| R-A2L-DEF.16 | When | When an enum table has a DEFAULT_VALUE line, the system shall take its text as the definition's default text. |
+| R-A2L-DEF.17 | If | If an enum table holds no entry, then the system shall give the definition the refusal `A2L-DEF-TABLE-EMPTY` with the message `<name>: the table <table> has no entries`. |
+| R-A2L-DEF.18 | When | When an object of the kind number or enum has a BIT_MASK line, the system shall take its number as the definition's bit mask. |
+| R-A2L-DEF.19 | If | If a bit mask is 0, has a 1 bit at or above the bit width of the datatype, belongs to a float datatype, is a BIT_MASK line whose word the system cannot read as a number, holds both bit 0 and the sign bit on a signed datatype, belongs to a text object, or the object record holds more than one live BIT_MASK keyword, or a masked definition's own object, record layout or MOD_COMMON holds more than one live BYTE_ORDER keyword, then the system shall give the definition the refusal `A2L-DEF-MASK` with the message `<name>: its byte order cannot be read` when the object, record layout or MOD_COMMON holds more than one live BYTE_ORDER keyword, else `<name>: the bit mask <mask> cannot be applied to <datatype>`, where `<mask>` is the word after the first word BIT_MASK in the object record, or `(none)` when there is none. |
+| R-A2L-DEF.20 | When | When an object has an EXTENDED_LIMITS line that holds two numbers, the system shall take them as the definition's extended limits. |
+| R-A2L-DEF.21 | If | If an EXTENDED_LIMITS line does not hold two numbers, or a number that is not finite, then the system shall give the definition no extended limits. |
+| R-A2L-DEF.22 | When | When an object has a FORMAT line, the system shall take its quoted text as the definition's display format. |
+| R-A2L-DEF.23 | If | If an object has no FORMAT line, then the system shall take the format of its conversion method record as the definition's display format. |
+| R-A2L-DEF.24 | If | If more than one refusal of R-A2L-DEF.4 … .19 applies to an object, then the system shall give its definition the first in the refusal order. |
+| R-A2L-DEF.25 | If | If a definition has a refusal, then the system shall give that refusal when asked to decode or encode its value. |
+| R-A2L-DEF.26 | If | If a byte of an object's span is not in the image when the system decodes or encodes the object, then the system shall give the refusal `A2L-DEF-BYTES` with the message `<name>: <n> of its <length> bytes are not in the image`. |
+| R-A2L-DEF.27 | When | When a definition has a bit mask, the system shall convert the bits of the raw value that the mask selects, shifted right by the mask shift, in place of the raw value. |
+| R-A2L-DEF.28 | If | If the conversion method of a number definition gives a conversion error for its stored value, then the system shall give the refusal `A2L-DEF-DECODE` with the message `<name>: <conversion error>`. |
+| R-A2L-DEF.29 | If | If two entries of an enum table hold the same stored value, then the system shall decode that value to the text of the first in file order. |
+| R-A2L-DEF.30 | When | When the stored value of an enum definition lies within an entry of its COMPU_VTAB_RANGE, min and max included, the system shall give as display text the text of the first such entry in file order. |
+| R-A2L-DEF.31 | If | If the stored value of an enum definition matches no entry and its table has a default text, then the system shall give the default text as display text. |
+| R-A2L-DEF.32 | If | If the stored value of an enum definition matches no entry and its table has no default text, then the system shall give the display text `<raw> (no text)`. |
+| R-A2L-DEF.33 | When | When the system decodes a text definition, the system shall give as display text the span's bytes before the first 0x00 byte, or every byte when none is 0x00, as ASCII characters. |
+| R-A2L-DEF.34 | If | If a byte before the first 0x00 byte of a text definition is not printable ASCII, then the system shall show it as U+FFFD in the display text. |
+| R-A2L-DEF.35 | When | When the display format of a number definition gives decimals and the definition has a float datatype or a conversion other than none and IDENTICAL, the system shall show the number with exactly that many digits after the decimal point, rounded to the nearest, a tie to the even digit; for 15 or more decimals, rounded first to 15 significant digits, then written with exactly d decimals (`4.100000000000000`, a FLOAT32 keeping its stored digits to 15 significant digits). |
+| R-A2L-DEF.36 | If | If the display format gives more than 17 decimals, then the system shall show 17 decimals. |
+| R-A2L-DEF.37 | If | If the display format of a number definition with a float datatype or a conversion other than none and IDENTICAL gives no decimals, then the system shall show the number as its 15-significant-digit text. |
+| R-A2L-DEF.38 | When | When the system shows the value of a number definition with an integer datatype whose conversion is none or IDENTICAL, the system shall show it as an integer with no decimal point. |
+| R-A2L-DEF.39 | If | If the value to show is not a finite number, then the system shall show `nan`, `inf` or `-inf`. |
+| R-A2L-DEF.40 | If | If the operator text of a number definition is not a number text, then the system shall give the refusal `A2L-DEF-NUMBER` with the message `<name>: '<text>' is not a number`. |
+| R-A2L-DEF.41 | When | When the system encodes a number text, the system shall take as its stored value the result of the encode direction of the definition's conversion method. |
+| R-A2L-DEF.42 | If | If the encode direction gives no stored value for the number, then the system shall give the refusal `A2L-DEF-ENCODE` with the message `<name>: <reason>`, where `<reason>` is one of the encode reasons. |
+| R-A2L-DEF.43 | If | If the limit value or the written value is outside the limits and the definition has no extended limits, then the system shall give the refusal `A2L-DEF-LIMITS` with the message `<name>: <text> is outside the limits <lower>..<upper>` (`<text>` = `<stored>` for the written value). |
+| R-A2L-DEF.44 | If | If the limit value or the written value is outside the limits and inside the extended limits, then the system shall accept the value with at most one notice — the limit value's notice when the limit value is outside the limits, else the written value's — `<name>: <text> is outside the limits <lower>..<upper> and inside the extended limits <elower>..<eupper>` (`<text>` = `<stored>` for the written value). |
+| R-A2L-DEF.45 | If | If the limit value or the written value is outside the extended limits, then the system shall give the refusal `A2L-DEF-EXTENDED` with the message `<name>: <text> is outside the extended limits <elower>..<eupper>` (`<text>` = `<stored>` for the written value). |
+| R-A2L-DEF.46 | When | When a definition has a bit mask, the system shall write the stored value, shifted left by the mask shift, into the bits the mask selects and keep every other bit of the image's bytes. |
+| R-A2L-DEF.47 | If | If a stored value under a bit mask is negative, or has a 1 bit outside the mask once shifted left, then the system shall give the refusal `A2L-DEF-MASK-VALUE` with the message `<name>: <text> does not fit the bit mask <mask>`. |
+| R-A2L-DEF.48 | When | When the operator text of an enum definition equals the text of an entry, case included, the system shall take as the stored value the raw value of the first such entry in file order. |
+| R-A2L-DEF.49 | If | If the operator text of an enum definition equals the text of no entry, then the system shall give the refusal `A2L-DEF-ENUM` with the message `<name>: '<text>' is not a text of <table>`. |
+| R-A2L-DEF.50 | When | When the operator text of a text definition has at most as many characters as its byte length, all printable ASCII, the system shall give as bytes its characters followed by 0x00 bytes up to the byte length. |
+| R-A2L-DEF.51 | If | If the operator text of a text definition has more characters than its byte length, then the system shall give the refusal `A2L-DEF-TEXT-LENGTH` with the message `<name>: the text has <k> characters — at most <length> fit`. |
+| R-A2L-DEF.52 | If | If the operator text of a text definition holds a character that is not printable ASCII, then the system shall give the refusal `A2L-DEF-TEXT-CHAR` with the message `<name>: '<character>' is not a printable ASCII character`, naming the first such character. |
+| R-A2L-DEF.53 | When | When the system encodes a value, the system shall give as bytes to write the object's whole span, from its address, in its byte order. |
+| R-A2L-DEF.54 | If | If the decoded value of the bytes for an accepted number does not agree with it at the display precision, or an integer datatype whose conversion is none or IDENTICAL decodes to an integer that differs from the exact value of the text, then the system shall give the refusal `A2L-DEF-PRECISION` with the message `<name>: <text> cannot be stored at the display precision — the nearest stored value is <stored>`. |
+| R-A2L-DEF.55 | U | The system shall give every number it accepts for a number definition bytes whose decoded value agrees with it at the display precision. |
+| R-A2L-DEF.56 | U | The system shall give every text it accepts for a text definition, and every entry text of an enum definition whose raw value no earlier entry holds (a pair with that raw, or a range that contains it), bytes that decode to the same text. |
+| R-A2L-DEF.57 | If | If an operator text breaks more than one rule, then the system shall give the refusal of the first broken rule in the encode order. |
+| R-A2L-DEF.58.1 | U | The system shall leave the A2L data and the image unchanged when it builds a definition, decodes a value or encodes a value. |
+| R-A2L-DEF.58.2 | If | If the A2L payload or the image holds content the system cannot read, then the system shall give a refusal in place of an exception. |
+| R-A2L-DEF.59 | When | When the synthetic case generator runs with seed 20260001 at 10 MiB or 1 MiB and no case option, the system shall write each of the 11 files of case 08 with its case 08 pin digest. |
+| R-A2L-DEF.60 | When | When the generator runs the definitions case, the system shall write an A2L with a VALUE CHARACTERISTIC of the kind enum whose COMPU_VTAB holds at least 3 pairs and a DEFAULT_VALUE, its stored value in the image being the raw of one pair. |
+| R-A2L-DEF.61 | When | When the generator runs the definitions case, the system shall write two VALUE CHARACTERISTICs with BIT_MASK lines at the same address, one mask of one bit and one of several bits, the two masks disjoint, their stored values in the image. |
+| R-A2L-DEF.62 | When | When the generator runs the definitions case, the system shall write one VALUE CHARACTERISTIC with a FORMAT line, a PHYS_UNIT line and an EXTENDED_LIMITS line wider than its limits. |
+| R-A2L-DEF.63 | When | When the generator runs the definitions case twice with the same seed, the system shall write byte-identical files. |
+| R-A2L-DEF.64 | When | When the system builds the definition of a VAL_BLK CHARACTERISTIC, or of a MEASUREMENT that has a multi-value MATRIX_DIM line, the system shall give the definition the kind array. |
+| R-A2L-DEF.65 | When | When the system builds the definition of a CURVE CHARACTERISTIC, the system shall give the definition the kind curve. |
+| R-A2L-DEF.66 | When | When the system builds the definition of a MAP CHARACTERISTIC, the system shall give the definition the kind map. |
+| R-A2L-DEF.67 | When | When the system builds the definition of an array that has a MATRIX_DIM line, the system shall take as its shape the numbers of that line with every trailing 1 left out, keeping at least one. |
+| R-A2L-DEF.68 | When | When the system builds the definition of a VAL_BLK that has no MATRIX_DIM line and has a NUMBER line, the system shall take the number of that line as its shape. |
+| R-A2L-DEF.69 | When | When the system builds the definition of a VAL_BLK that has neither a MATRIX_DIM nor a NUMBER line, the system shall take as its shape its length divided by the size of its datatype. |
+| R-A2L-DEF.70 | If | If a VAL_BLK has neither a MATRIX_DIM nor a NUMBER line and its length is not a whole multiple of the size of its datatype, then the system shall give its definition the refusal `A2L-DEF-SHAPE` with the message `<name>: its length <length> is not a whole number of <datatype> values`. |
+| R-A2L-DEF.71 | If | If a MATRIX_DIM line holds no number, more than three numbers, or a word that is not a whole number of at least 1, then the system shall give the definition the refusal `A2L-DEF-MATRIX` with the message `<name>: MATRIX_DIM <dims> is not 1 to 3 whole numbers of at least 1`. |
+| R-A2L-DEF.72 | When | When the system builds the definition of a curve or map, the system shall take as its shape the point counts of its axes, axis X first. |
+| R-A2L-DEF.73 | U | The system shall give every array, curve and map as its element count the product of the numbers of its shape. |
+| R-A2L-DEF.74 | When | When the system builds the definition of an array, the system shall take as its byte length its element count times the size of its datatype. |
+| R-A2L-DEF.75 | When | When the system builds the definition of a curve or map, the system shall take as its byte length the end offset of the last component of its record. |
+| R-A2L-DEF.76 | If | If an array has a LENGTH or DATA_SIZE line whose number differs from its byte length, then the system shall give its definition the refusal `A2L-DEF-LENGTH` with the message `<name>: its length <length> differs from the <bytes> bytes of <count> <datatype> values`. |
+| R-A2L-DEF.77 | When | When the system builds the definition of a VAL_BLK, curve or map, the system shall take the datatype, index mode and offset of its values from the FNC_VALUES component of its record layout. |
+| R-A2L-DEF.78 | When | When the system builds the definition of a MEASUREMENT array that has a LAYOUT line, the system shall take the word of that line as its index mode. |
+| R-A2L-DEF.79 | When | When the system builds the definition of a MEASUREMENT array that has no LAYOUT line, the system shall take ROW_DIR as its index mode. |
+| R-A2L-DEF.80 | If | If an array of three dimensions has the index mode COLUMN_DIR, then the system shall give its definition the refusal `A2L-DEF-INDEX-MODE` with the message `<name>: the system cannot read COLUMN_DIR in three dimensions`. |
+| R-A2L-DEF.81 | If | If a refusal of R-A2L-DEF.8 or .11 … .19 applies to the values of an array, curve or map, then the system shall give its definition that refusal. |
+| R-A2L-DEF.82 | If | If a VAL_BLK, curve or map names a record layout the A2L does not declare, then the system shall give its definition the refusal `A2L-DEF-LAYOUT` with the message `<name>: the record layout <layout> is not declared in the A2L`. |
+| R-A2L-DEF.83 | If | If the record layout of a VAL_BLK, curve or map holds no FNC_VALUES component, then the system shall give its definition the refusal `A2L-DEF-LAYOUT-VALUES` with the message `<name>: the record layout <layout> holds no FNC_VALUES`. |
+| R-A2L-DEF.84 | If | If a record layout the system reads for an object holds a line that is neither a component nor a layout keyword, then the system shall give the definition the refusal `A2L-DEF-LAYOUT-PART` with the message `<name>: the record layout <layout> holds <component>, which the system cannot read`. |
+| R-A2L-DEF.85 | If | If a FNC_VALUES component's index mode is not ROW_DIR or COLUMN_DIR, an AXIS_PTS_X or AXIS_PTS_Y component's point order is not INDEX_INCR or INDEX_DECR, or a component's address type is not DIRECT, then the system shall give the definition the refusal `A2L-DEF-LAYOUT-MODE` with the message `<name>: the record layout <layout> stores <component> as <word>, which the system cannot read`. |
+| R-A2L-DEF.86 | If | If a component's datatype is not one CTX-A2L-TAG lists, or the datatype of a NO_AXIS_PTS_X or NO_AXIS_PTS_Y component is not a count datatype, then the system shall give the definition the refusal `A2L-DEF-LAYOUT-DATATYPE` with the message `<name>: the record layout <layout> gives <component> the datatype <word>, which the system cannot read`. |
+| R-A2L-DEF.87 | If | If the position words of the components of a record layout are not distinct whole numbers, then the system shall give the definition the refusal `A2L-DEF-LAYOUT-POSITION` with the message `<name>: the positions of the record layout <layout> do not give one order`. |
+| R-A2L-DEF.88 | When | When the system places the components of a record layout, the system shall place each one after the one before it in the order of their positions, its offset raised to the next multiple of the ALIGNMENT that the record layout declares for its alignment class. |
+| R-A2L-DEF.89 | If | If the MOD_COMMON of an object's module declares an ALIGNMENT for the alignment class of a component of a record layout the system reads for the object, the record layout declares none for that class, and that alignment would place the component at another offset, then the system shall give the definition the refusal `A2L-DEF-ALIGNMENT` with the message `<name>: <component> of the record layout <layout> lies at offset <a>, or at <b> under the MOD_COMMON alignment`. |
+| R-A2L-DEF.90 | When | When a record layout has a FIX_NO_AXIS_PTS_X or FIX_NO_AXIS_PTS_Y line, the system shall take its number as the current count of axis X or Y. |
+| R-A2L-DEF.91 | If | If a curve does not declare one AXIS_DESCR, or a map two, then the system shall give its definition the refusal `A2L-DEF-AXES` with the message `<name>: a <kind> declares <n> AXIS_DESCR and needs <m>`. |
+| R-A2L-DEF.92 | If | If an axis is a RES_AXIS, a CURVE_AXIS, or of a kind CTX-A2L-DEF does not list, then the system shall give the definition the refusal `A2L-DEF-AXIS-KIND` with the message `<axis name>: the system cannot read an axis of the kind <word>`. |
+| R-A2L-DEF.93 | When | When an axis is a STD_AXIS or a FIX_AXIS, the system shall take as its point count the max axis points of its axis header. |
+| R-A2L-DEF.94 | When | When an axis is a COM_AXIS, the system shall take as its point count the max axis points of its axis object's header. |
+| R-A2L-DEF.95 | If | If the max axis points that gives an axis its point count is not a whole number of at least 1, then the system shall give the definition the refusal `A2L-DEF-AXIS-MAX` with the message `<axis name>: the axis declares no point count the system can read`. |
+| R-A2L-DEF.96 | If | If a COM_AXIS has no AXIS_PTS_REF, names an axis object the A2L does not declare, or names one whose address is not a number, then the system shall give the definition the refusal `A2L-DEF-AXIS-REF` with the message `<axis name>: the A2L declares no axis object <ref> with an address`. |
+| R-A2L-DEF.97 | If | If the axis object of a COM_AXIS names a record layout the A2L does not declare, or one with no AXIS_PTS_X component, then the system shall give the definition the refusal `A2L-DEF-AXIS-LAYOUT` with the message `<axis name>: the axis object <ref> has no record layout with AXIS_PTS_X`. |
+| R-A2L-DEF.98 | If | If a FIX_AXIS has no FIX_AXIS_PAR, FIX_AXIS_PAR_DIST or FIX_AXIS_PAR_LIST, then the system shall give the definition the refusal `A2L-DEF-AXIS-FIX` with the message `<axis name>: the fixed axis gives no points`. |
+| R-A2L-DEF.99 | If | If the points a FIX_AXIS gives are not as many as its point count, then the system shall give the definition the refusal `A2L-DEF-AXIS-FIX-COUNT` with the message `<axis name>: the fixed axis gives <k> points and declares <n>`. |
+| R-A2L-DEF.100 | When | When the system builds an axis that is a STD_AXIS and whose object's record layout holds no AXIS_PTS component for its letter, the system shall give the axis no points. |
+| R-A2L-DEF.101 | If | If an object's record layout holds an AXIS_PTS component for an axis that is not a STD_AXIS, then the system shall give the definition the refusal `A2L-DEF-LAYOUT-AXIS` with the message `<name>: the record layout <layout> holds AXIS_PTS_<letter> for an axis of the kind <word>`. |
+| R-A2L-DEF.102 | When | When the system builds an axis, the system shall build the element definition of its points from the conversion method, limits and FORMAT of its axis header and the datatype of its points' component. |
+| R-A2L-DEF.103 | If | If a refusal of R-A2L-DEF.11 … .19 applies to the points of an axis, then the system shall give the definition that refusal with the axis name in place of `<name>`. |
+| R-A2L-DEF.104 | If | If more than one refusal of R-A2L-DEF.4 … .19, .139, .64 … .103, .116.1, .117.1, .141 … .145 and .147 applies to an array, curve or map, then the system shall give its definition the first in the array refusal order. |
+| R-A2L-DEF.105 | U | The system shall give for each element of an array, curve or map, and for each point of its axes, the stored value, value and display text that the rules of S2.7b give its element definition. |
+| R-A2L-DEF.106 | When | When the index mode of an array, curve or map is ROW_DIR, the system shall read the element of index (i,j,k) at the offset of its values plus i + n1·j + n1·n2·k element sizes. |
+| R-A2L-DEF.107 | When | When the index mode of an array, curve or map is COLUMN_DIR, the system shall read the element of index (i,j) at the offset of its values plus j + n2·i element sizes, and of index (i) plus i. |
+| R-A2L-DEF.108 | When | When the point order of an axis's AXIS_PTS component is INDEX_INCR, the system shall read point k at the component's offset plus k point sizes. |
+| R-A2L-DEF.109 | When | When the point order of an axis's AXIS_PTS component is INDEX_DECR, the system shall read point k at the component's offset plus n − 1 − k point sizes, n its point count. |
+| R-A2L-DEF.110 | When | When an axis is a FIX_AXIS with FIX_AXIS_PAR o s n, the system shall take o + k·2^s as its stored point k. |
+| R-A2L-DEF.111 | When | When an axis is a FIX_AXIS with FIX_AXIS_PAR_DIST o d n, the system shall take o + k·d as its stored point k. |
+| R-A2L-DEF.112 | When | When an axis is a FIX_AXIS with a FIX_AXIS_PAR_LIST, the system shall take the numbers of the list in file order as its stored points. |
+| R-A2L-DEF.113 | When | When an axis is a COM_AXIS, the system shall read its points from the AXIS_PTS_X component of its axis object's record, at the axis object's address. |
+| R-A2L-DEF.114 | When | When the system reads the points of a COM_AXIS, the system shall read them in the byte order that R-A2L-024 … 027 give its axis object. |
+| R-A2L-DEF.115 | When | When a record layout has a NO_AXIS_PTS_X or NO_AXIS_PTS_Y component, the system shall take the number that component holds in the image as the current count of axis X or Y. |
+| R-A2L-DEF.116.1 | If | If a record layout the system reads for an axis has a FIX_NO_AXIS_PTS_X or FIX_NO_AXIS_PTS_Y line whose number is 0 or more than the axis's point count, then the system shall give the definition the refusal `A2L-DEF-AXIS-CURRENT` with the message `<axis name>: the record holds <c> points, outside 1 to <n>`. |
+| R-A2L-DEF.116.2 | If | If the NO_AXIS_PTS_X or NO_AXIS_PTS_Y component of an axis's record holds in the image a number below 1 or above the axis's point count, then the system shall give the decode the refusal `A2L-DEF-AXIS-CURRENT` with the message `<axis name>: the record holds <c> points, outside 1 to <n>`. |
+| R-A2L-DEF.117.1 | If | If a record layout the system reads for an axis has a FIX_NO_AXIS_PTS_X or FIX_NO_AXIS_PTS_Y line whose number is at least 1 and less than the axis's point count, then the system shall give the definition the refusal `A2L-DEF-AXIS-PARTIAL` with the message `<axis name>: the record holds <c> of its <n> points — a record with fewer points than its maximum is not supported`. |
+| R-A2L-DEF.117.2 | If | If the NO_AXIS_PTS_X or NO_AXIS_PTS_Y component of an axis's record holds in the image a number of at least 1 and less than the axis's point count, then the system shall give the decode the refusal `A2L-DEF-AXIS-PARTIAL` with the message `<axis name>: the record holds <c> of its <n> points — a record with fewer points than its maximum is not supported`. |
+| R-A2L-DEF.118 | If | If a byte of the record of a COM_AXIS's axis object is not in the image, then the system shall give the refusal `A2L-DEF-AXIS-BYTES` with the message `<axis name>: <k> of the <bytes> bytes of the axis object <ref> are not in the image`. |
+| R-A2L-DEF.119 | If | If the decode of one element or axis point gives a refusal, then the system shall give that refusal in that element's or point's place. |
+| R-A2L-DEF.120 | If | If the system is asked for the single value of an array, curve or map, or to encode one operator text for it, then the system shall give the refusal `A2L-DEF-ELEMENTS` with the message `<name>: it holds <n> values — decode and encode it value by value`. |
+| R-A2L-DEF.121 | U | The system shall name an element by its element name, and an axis point by its axis point name, in every refusal and notice the system gives for that element or point. |
+| R-A2L-DEF.122 | When | When the system encodes an edit of an array, curve or map, the system shall encode each edited element and axis point by the rules of S2.7c for its element definition. |
+| R-A2L-DEF.123 | When | When the system encodes an edit, the system shall give as bytes the object's whole record from its address, each edited element and axis point at the bytes the decode reads it from, and every other byte as the image holds it. |
+| R-A2L-DEF.124 | If | If the decode of the object's record gives a refusal, then the system shall give that refusal when asked to encode an edit of it. |
+| R-A2L-DEF.125 | If | If an edit names a position that is not an element index of the object's shape or a point of one of its axes, then the system shall give the refusal `A2L-DEF-INDEX` with the message `<name>: <position> is not a value or axis point of it`. |
+| R-A2L-DEF.126 | If | If an edit changes a point of a FIX_AXIS, then the system shall give the refusal `A2L-DEF-AXIS-FIXED` with the message `<axis point name>: the points of a fixed axis are not stored in the image`. |
+| R-A2L-DEF.127 | If | If an edit changes a point of a COM_AXIS, then the system shall give the refusal `A2L-DEF-AXIS-SHARED` with the message `<axis point name>: the points of the common axis <ref> are not edited through <name>`. |
+| R-A2L-DEF.128 | If | If an edit changes a point of an axis that has no points, then the system shall give the refusal `A2L-DEF-AXIS-NONE` with the message `<axis point name>: the record layout <layout> holds no points for this axis`. |
+| R-A2L-DEF.129 | If | If an edit changes a point of an axis and the stored points of that axis after the edit do not follow its monotony rule, then the system shall give the refusal `A2L-DEF-MONOTONY` with the message `<axis point name>: <point text> breaks the <rule> order of the axis`, naming the breaking point. |
+| R-A2L-DEF.130 | If | If more than one rule refuses an edit, then the system shall give the refusal of the first in the array encode order. |
+| R-A2L-DEF.131 | U | The system shall give every edit it accepts bytes in which each edited element and axis point decodes to a value that agrees with its operator text at the display precision of its element definition. |
+| R-A2L-DEF.132 | U | The system shall give every edit it accepts bytes in which every element and axis point the edit does not name decodes to the stored value it had before the edit. |
+| R-A2L-DEF.133 | When | When the generator runs the definitions case, the system shall write two CURVE CHARACTERISTICs whose COM_AXIS names one AXIS_PTS object of the case, with that object's strictly increasing points, both curves' values and the object's point-count component in the image. |
+| R-A2L-DEF.134 | When | When the generator runs the definitions case, the system shall write a MAP CHARACTERISTIC whose axis X is a STD_AXIS with its points in the map's record and `MONOTONY STRICT_INCREASE`, whose axis Y is a FIX_AXIS with FIX_AXIS_PAR_DIST, and whose values are COLUMN_DIR, its record in the image. |
+| R-A2L-DEF.135 | When | When the generator runs the definitions case, the system shall write a VAL_BLK CHARACTERISTIC with a MATRIX_DIM of two numbers above 1 that differ, a ROW_DIR record layout, a LINEAR conversion and a FORMAT of one decimal, its values in the image. |
+| R-A2L-DEF.136 | When | When the system describes every object of an A2L file of 13,990 objects, the system shall finish within 2.0 s. |
+| R-A2L-DEF.137 | If | If a word that the system takes from the A2L file or from the operator holds a control character (U+0000–U+001F, U+007F or U+0080–U+009F), then the system shall give U+FFFD in its place in the display text of a decoded value and in every refusal message and notice. |
+| R-A2L-DEF.138 | If | If the bytes an encode would write overlap the span, or the declared address when the byte length cannot be read, of another MEASUREMENT, CHARACTERISTIC, BLOB or INSTANCE of the A2L file whose address the A2L declares, 0x0 included, then the system shall refuse the encode with the refusal `A2L-DEF-OVERLAP` and the message `<name>: its bytes at <address> are shared with <other>`, unless both objects' bit masks were read — their definitions carry no refusal — and select no common bit. |
+| R-A2L-DEF.139 | If | If more than one tag, or more than one MEASUREMENT or CHARACTERISTIC section, has the name, then the system shall give the refusal `A2L-DEF-NAME` with the message `<name>: the A2L declares that name more than once`. |
+| R-A2L-DEF.140 | If | If the bytes an encode would write overlap the record of an AXIS_PTS object of the A2L file whose address the A2L declares, 0x0 included, and whose record the system can place, then the system shall refuse the encode with the refusal `A2L-DEF-OVERLAP` and the message `<name>: its bytes at <address> are shared with <other>`. |
+| R-A2L-DEF.141 | If | If a word of a FIX_AXIS_PAR or FIX_AXIS_PAR_DIST line or a number of a FIX_AXIS_PAR_LIST is not a finite number, or the count of a FIX_AXIS_PAR or FIX_AXIS_PAR_DIST line is not a whole number, then the system shall give the definition the refusal `A2L-DEF-AXIS-FIX` with the message `<axis name>: the fixed axis gives a point the system cannot read`. |
+| R-A2L-DEF.142 | If | If the max axis points that gives an axis its point count is a whole number above 1,048,576, then the system shall give the definition the refusal `A2L-DEF-AXIS-MAX` with the message `<axis name>: the axis declares <n> points, more than 1048576`. |
+| R-A2L-DEF.143 | If | If the record of the axis object of a COM_AXIS is longer than 1,048,576 bytes, its address is negative, or the address of its last byte is above 0xFFFFFFFF, then the system shall give the definition the refusal `A2L-DEF-AXIS-REF` with the message `<axis name>: the record of the axis object <ref> at <address> cannot be read`. |
+| R-A2L-DEF.144 | If | If the MOD_COMMON of an object's module holds an ALIGNMENT_<class> line whose number is not a whole number of at least 1, a component of a record layout the system reads for the object follows that alignment class, and that record layout declares no ALIGNMENT for the class, then the system shall give the definition the refusal `A2L-DEF-ALIGNMENT` with the message `<name>: the MOD_COMMON line ALIGNMENT_<class> <word> cannot be read`. |
+| R-A2L-DEF.145 | If | If a CURVE, MAP or VALUE CHARACTERISTIC has a multi-value MATRIX_DIM line, then the system shall give its definition the refusal `A2L-DEF-MATRIX` with the message `<name>: the system cannot read MATRIX_DIM <dims> on a <kind>`. |
+| R-A2L-DEF.146 | U | The system shall give as the values of a definition of kind number, enum or text exactly one element, its single decode, and no axis. |
+| R-A2L-DEF.147 | If | If the shift of a FIX_AXIS_PAR line is not a whole number of at most 62, or the first or the last point that a FIX_AXIS_PAR or FIX_AXIS_PAR_DIST line gives, computed with no rounding from the numbers its words read as, has a magnitude above 2^53 (9007199254740992), then the system shall give the definition the refusal `A2L-DEF-AXIS-FIX` with the message `<axis name>: the fixed axis gives a point the system cannot compute exactly`. |
+| R-A2L-DEF.148 | U | The system shall describe each object in a time that does not grow with the size of the shared sections that the object names or lies under. |
+| R-A2L-DEF.149 | U | The system shall describe each object in a time that does not grow with the size of the sections that the object names, directly or through its conversion method. |
+| R-A2L-DEF.150 | U | The system shall decode each element in a time and a retained size that do not grow with the size of the conversion table it names. |
+| R-A2L-DEF.151 | U | The system shall write a file word into a refusal message as at most its first 256 characters, each character outside U+0021 … U+007E written as U+FFFD, and an operator text as at most its first 256 characters with every control character replaced by U+FFFD while spaces and all other Unicode characters are preserved, and `…` after either when it is longer, and a number into a refusal message or a kind text in decimal (an address as `0x` and upper-case hexadecimal digits) when its magnitude is at most 2^64 − 1, else as `0x` (`-0x` when negative) and its upper-case hexadecimal digits written as such a file word. |
+| R-A2L-DEF.152 | If | If the A2L payload holds one or more parse errors, then the system shall refuse the encode with the refusal `A2L-DEF-PARSE` and the message `<name>: the A2L cannot be edited while it has parse errors — the first is <error>`. |
+| R-A2L-DEF.153 | When | When the system encodes a definition of kind number, enum or text through `encode_values`, the system shall accept exactly position `(0,)` and apply the scalar encode rules to it, and shall refuse every other position with `A2L-DEF-INDEX`. |
+| R-A2L-DEF.154 | If | If an axis declares a monotony rule the system cannot read, then the system shall refuse an edit of one of its points with `A2L-DEF-MONOTONY` and the message `<axis point name>: the monotony rule <rule> is not supported`. |
+| R-A2L-DEF.155 | If | If the system cannot evaluate a point needed to check an edited axis's monotony, then the system shall give that point's decode refusal or, when the point decodes and breaks the rule, `A2L-DEF-MONOTONY` with its bounded display text. |
+
+
+#### S2.8 · A2L label matching (batch-103 Inc 4)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-A2L-MATCH.1 | When | When the system ranks a name list for a query, the system shall take as the query text the query without its leading and trailing whitespace. |
+| R-A2L-MATCH.2 | If | If the query text holds no letter and no digit, then the system shall return an empty ranked list. |
+| R-A2L-MATCH.3 | When | When the system compares a character of the query text with a character of a name, the system shall treat an uppercase letter and its lowercase letter as the same character. |
+| R-A2L-MATCH.4 | If | If two compared characters are different characters and are not an uppercase letter and its lowercase letter, then the system shall treat them as different characters. |
+| R-A2L-MATCH.5 | U | The system shall count as an `exact` match each name that is the query text. |
+| R-A2L-MATCH.6 | U | The system shall count as a `prefix` match each name that starts with the query text. |
+| R-A2L-MATCH.7 | U | The system shall count as a `substring` match each name that contains the query text. |
+| R-A2L-MATCH.8 | U | The system shall count as a `token` match each name that has, for each query token, a name token that starts with that query token. |
+| R-A2L-MATCH.9 | U | The system shall count as a `subsequence` match each name that holds the key characters in their order. |
+| R-A2L-MATCH.10 | U | The system shall count as a `fuzzy` match each name that has, for each query token, a name token at a prefix distance from that query token no greater than its allowed edits. |
+| R-A2L-MATCH.11 | U | The system shall give 0 allowed edits to a query token of digits or of 1 or 2 letters. |
+| R-A2L-MATCH.12 | U | The system shall give 1 allowed edit to a query token of 3 to 5 letters. |
+| R-A2L-MATCH.13 | U | The system shall give 2 allowed edits to a query token of 6 or more letters. |
+| R-A2L-MATCH.14 | When | When the system ranks a name list for a query, the system shall list each name that is a match of at least one rule. |
+| R-A2L-MATCH.15 | If | If a name is a match of no rule, then the system shall leave it out of the listed names. |
+| R-A2L-MATCH.16 | When | When the system lists a name, the system shall give it the first rule in rank order of which the name is a match. |
+| R-A2L-MATCH.17 | If | If the name list holds a name more than once, then the system shall list that name once. |
+| R-A2L-MATCH.18 | When | When the system ranks a name list for a query with a limit `<n>` of 1 or more, the system shall return the listed names in rank order up to the `<n>`-th. |
+| R-A2L-MATCH.19 | If | If the limit is less than 1, then the system shall return an empty ranked list. |
+| R-A2L-MATCH.20 | When | When the system orders the listed names, the system shall place them by their rule in rank order. |
+| R-A2L-MATCH.21 | When | When the system orders two listed names with the rule `substring`, the system shall place a name in which the query text occurs at a boundary offset before a name in which it occurs at none. |
+| R-A2L-MATCH.22 | When | When the system orders two listed names with the rule `fuzzy`, the system shall place the name with fewer total edits first. |
+| R-A2L-MATCH.23 | When | When the system orders two listed names with the same rule and the same rule key, the system shall place the shorter name first. |
+| R-A2L-MATCH.24 | When | When the system orders two listed names with the same rule, rule key and length, the system shall place a case-exact name before a name that is not case-exact. |
+| R-A2L-MATCH.25 | When | When the system orders two listed names with the same rule, rule key, length and case-exactness, the system shall place them in code-point order. |
+| R-A2L-MATCH.26 | When | When the system lists a name with the rule `exact`, the system shall give it one match span over the whole name. |
+| R-A2L-MATCH.27 | When | When the system lists a name with the rule `prefix`, the system shall give it one match span from offset 0 over the length of the query text. |
+| R-A2L-MATCH.28 | When | When the system lists with the rule `substring` a name in which the query text occurs at a boundary offset, the system shall give it one match span over the leftmost such occurrence. |
+| R-A2L-MATCH.29 | When | When the system lists with the rule `substring` a name in which the query text occurs at no boundary offset, the system shall give it one match span over the leftmost occurrence of the query text. |
+| R-A2L-MATCH.30 | When | When the system lists a name with the rule `token`, the system shall give it, for each query token, a match span from the start of the leftmost name token that starts with that query token, as long as that query token. |
+| R-A2L-MATCH.31 | When | When the system lists a name with the rule `subsequence`, the system shall give it a match span for each key character, at the leftmost offset after the offset of the key character before it. |
+| R-A2L-MATCH.32 | When | When the system lists a name with the rule `fuzzy`, the system shall give it, for each query token, a match span over the leftmost name token at the smallest prefix distance from that query token. |
+| R-A2L-MATCH.33 | When | When the system lists a name with the rule `fuzzy`, the system shall give it its total edits. |
+| R-A2L-MATCH.34 | When | When the system gives a listed name more than one match span, the system shall give them as the fewest spans, in offset order, that cover the same offsets. |
+| R-A2L-MATCH.35 | When | When the system prepares for ranking a name list of 50,000 names that hold at most 2,062,041 characters in all, the system shall finish within 5.0 s. |
+| R-A2L-MATCH.36 | When | When the system ranks a prepared name list of 50,000 names for a query with a limit of 20, the system shall return the ranked list within 200 ms. |
+| R-A2L-MATCH.37 | When | When the system prepares for ranking a name list of 50,000 names that hold at most 2,062,041 characters in all, the system shall hold the prepared list in at most 64 MiB. |
+| R-A2L-MATCH.38 | If | If the query text holds more than 256 characters, then the system shall return an empty ranked list. |
+| R-A2L-MATCH.39 | If | If a name holds more than 1,024 characters, then the system shall leave it out of the prepared name list. |
+| R-A2L-MATCH.40 | When | When the system ranks a prepared name list of 50,000 names that hold at most 2,356,624 characters in all for any query of at most 256 characters with a limit of at most 20, the system shall return the ranked list within 2.0 s. |
+| R-A2L-MATCH.41 | If | If the query text holds more than 20 distinct query tokens, then the system shall count no name as a `fuzzy` match. |
+| R-A2L-MATCH.42 | If | If the node visits of one ranking reach the node budget, then the system shall count as a `fuzzy` match only a name that holds, for each query token, a name token found within the node budget. |
+| R-A2L-MATCH.43 | If | If a name holds a character above U+007F, then the system shall leave it out of the prepared name list. |
+
+
+#### S2.9 · A2L refresh (batch-103 Inc 5)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-A2L-REFRESH.001 | When | When a direct A2L attach is installed, the system shall run the common refresh on the UI thread before showing the successful load outcome. |
+| R-A2L-REFRESH.002 | When | When a primary-image load or reload completes with an A2L attached, the system shall run the common refresh after installing the image and before finalizing the load. |
+| R-A2L-REFRESH.003 | When | When a project containing both a primary image and an A2L is installed, the system shall run the common refresh once against the final installed pair before showing the project-load outcome. |
+| R-A2L-REFRESH.004 | When | When an A2L-only project is installed with no primary image or MAC, the system shall run the common refresh against that A2L-only state before showing the project-load outcome. |
+| R-A2L-REFRESH.005 | When | When the operator unloads `primary`, `mac`, `a2l` or `all`, the system shall run the common refresh after the corresponding clear and before showing the unload outcome. |
+| R-A2L-REFRESH.006 | When | When an A2L transition completes, the system shall show the current enriched tags and A2L summary, or the current empty state, in the A2L Viewer without manual refresh. |
+| R-A2L-REFRESH.007 | When | When an A2L transition completes, the system shall preserve the A2L Viewer filter input's exact text and apply its existing matching semantics to the new state. |
+| R-A2L-REFRESH.008 | When | When an A2L transition completes, the system shall preserve the selected A2L Viewer filter field. |
+| R-A2L-REFRESH.009 | When | When an A2L transition completes, the system shall reset the A2L Viewer filter mode to `all` and mark only `All` active. |
+| R-A2L-REFRESH.010 | When | When an A2L transition completes, the system shall invalidate the previous A2L detail selection, showing `Highlight a tag to inspect its fields.` in the Detail Card until the operator highlights a tag again and closing any open A2L tag-description modal. |
+| R-A2L-REFRESH.011 | When | When an A2L transition completes, the system shall invalidate the previous A2L-tag hex highlight and repaint the A2L hex pane without that span. |
+| R-A2L-REFRESH.012 | When | When an A2L transition completes while the Check Editor is visible, the system shall refresh its parameter prefill from the current enriched tags without requiring screen re-entry. |
+| R-A2L-REFRESH.013 | When | When an A2L transition completes while the Patch Editor is visible, the system shall refresh its A2L parameter prefill from the current enriched tags without requiring screen re-entry. |
+| R-A2L-REFRESH.014 | When | When the operator reloads changed A2L content from the same source path without an intervening clear, the system shall install and publish that content as a new A2L generation. |
+| R-A2L-REFRESH.015 | When | When an A2L transition completes, the system shall refresh Memory Map's A2L symbol names and counts from the current enriched tags. |
+| R-A2L-REFRESH.016 | When | When an A2L transition completes, the system shall refresh Split / Join / Export's A2L segment rows and neutral no-A2L state from the current A2L. |
+| R-A2L-REFRESH.017 | When | When an A2L transition does not replace or unload the primary image or MAC, the system shall preserve those Loaded artifacts while showing the current A2L slot. |
+| R-A2L-REFRESH.018 | When | When an A2L transition does not replace or unload the MAC, the system shall preserve its records and current page while recomputing MAC's A2L-dependent status and coverage. |
+| R-A2L-REFRESH.019 | When | When an A2L transition completes, the system shall preserve the active Issues severity filter while showing issues computed for the current image/MAC/A2L state. |
+| R-A2L-REFRESH.020 | When | When the operator requests an A2L load while the active project contains exactly one A2L, the system shall ask before replacing it with title `Replace project A2L?`, body `Project '<project name>' already has A2L '<current file>'. Load '<new file>' instead?`, and buttons `Yes (y)` and `No (n)`. |
+| R-A2L-REFRESH.021 | When | When the operator answers No, presses `n`, or presses Escape to the project-A2L replacement question, the system shall keep the session, views, generations and project files unchanged and start or cancel no worker. |
+| R-A2L-REFRESH.022 | When | When the operator answers Yes to the project-A2L replacement question, the system shall recheck that no session action is running and that the active project and its listed A2L are the ones named by the question before starting the A2L worker. |
+| R-A2L-REFRESH.023 | When | When the accepted project-A2L replacement still passes the confirmation recheck, the system shall install the candidate through the normal A2L worker/install path and run the common refresh before its success outcome. |
+| R-A2L-REFRESH.024 | If | If an A2L load is requested while a session action runs, then the system shall show `busy: <label> is running — wait for it to finish.`, open no replacement question, change no session state, and start no additional worker. |
+| R-A2L-REFRESH.025 | If | If a session action is running when the operator answers Yes to the project-A2L replacement question, then the system shall show the same busy line, install nothing, and start no additional worker. |
+| R-A2L-REFRESH.026 | When | When A2L copy, parse or precompute work runs on a worker, the system shall confine that worker to data preparation and perform every common-refresh view mutation on the UI thread. |
+| R-A2L-REFRESH.027 | When | When a direct A2L attach or A2L-only project install completes without installing a primary image, the system shall publish a new A2L view generation while keeping the current image generation unchanged. |
+| R-A2L-REFRESH.028 | If | If a worker-prepared A2L enrichment snapshot's expected post-install A2L or image generation differs from its recorded generation, then the system shall discard the whole prepared load before installing any file, A2L, enrichment, MAC or Issues state. |
 
 <a id="s3"></a>
 
@@ -2652,7 +3064,7 @@ Escape: R-DLG.2. Cancel: R-DLG.9. Keys behind the dialog: R-DLG.1. Button keys: 
 | R-LOADDLG.17 | When | When the Load dialog opens and its list holds no project row, the system shall highlight the first loadable row. |
 | R-LOADDLG.18 | U | The system shall show no internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`) in the Load dialog. |
 | R-LOADDLG.19 | If | If a paste or a typed key would make the path box text longer than 4,096 characters, then the system shall leave the path box text unchanged. |
-| R-LOADDLG.20 | If | If a paste or a typed key would put a control character into the path box, then the system shall leave the path box text unchanged. |
+| R-LOADDLG.20 | If | If a paste or a typed key would put a control character into the path box, or a paste would put a lone surrogate or a bidi control into it, then the system shall leave the path box text unchanged. |
 | R-TUI-043.3 | When | When the operator presses Escape or Cancel in the Load dialog, the system shall leave the session unchanged. |
 
 #### S7.2a · Sections and rows (from batch-100 HLR-173)
@@ -2763,10 +3175,10 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 |---|---|---|
 | R-TUI-043.4 | When | When the operator presses Ctrl+V in a single-line box, the system shall insert the first line of the OS clipboard text at the cursor. |
 | R-TUI-043.5 | When | When the system pastes into a text box that holds a selection, the system shall replace the selection with the pasted text. |
-| R-TUI-043.6 | If | If the system cannot read the OS clipboard, then the system shall paste the app clipboard. |
+| R-TUI-043.6 | If | If the system reads no text from the OS clipboard, then the system shall paste the app clipboard. |
 | R-TUI-043.7 | If | If neither clipboard holds text, then the system shall show the paste failure warning. |
 | R-TUI-043.8 | If | If neither clipboard holds text, then the system shall select the whole text of the box. |
-| R-TUI-043.9 | U | The system shall keep the screen responsive while it reads the OS clipboard. |
+| R-TUI-043.9 | While | While the system reads the OS clipboard, the system shall keep the screen responsive. |
 | R-TUI-043.10 | U | The system shall end an OS clipboard read within 1 second. |
 | R-TUI-043.11 | U | The system shall paste characters outside the system code page unchanged. |
 | R-TUI-043.12 | If | If the system cannot read the OS clipboard, then the system shall write a WARNING line to the log. |
@@ -2776,6 +3188,44 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 | R-TUI-044.3 | When | When the operator presses Ctrl+V in a multi-line box, the system shall insert the OS clipboard text at the cursor. |
 | R-TUI-044.4 | When | When the terminal sends a paste into a multi-line box, the system shall insert every line of it. |
 | R-TUI-044.5 | U | The system shall show pasted text as plain text, never as markup. |
+| R-PASTE.1 | When | When the terminal sends a paste into a single-line box, the system shall insert the first line of it at the cursor. |
+| R-PASTE.2 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall put the selected text on the OS clipboard. |
+| R-PASTE.3 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall put the selected text on the app clipboard. |
+| R-PASTE.4 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall leave the text of the box unchanged. |
+| R-PASTE.5 | When | When the operator presses Ctrl+C in a text box that holds no selection, or Ctrl+X in a single-line box that holds no selection, the system shall leave the clipboards unchanged. |
+| R-PASTE.6 | When | When the operator presses Ctrl+X in a text box that holds a selection, the system shall copy the selected text as R-PASTE.2 and R-PASTE.3 state. |
+| R-PASTE.7 | When | When the operator presses Ctrl+X in a text box that holds a selection, the system shall remove the selected text from the box. |
+| R-PASTE.8 | When | When the operator presses Ctrl+X in a multi-line box that holds no selection, the system shall cut the line that holds the cursor as R-PASTE.6 and R-PASTE.7 state for a selection. |
+| R-PASTE.9 | If | If the system cannot write the OS clipboard, then the system shall show the write failure warning. |
+| R-PASTE.10 | If | If the system cannot write the OS clipboard, then the system shall write a WARNING line to the log. |
+| R-PASTE.11 | When | When the operator presses Ctrl+C or Ctrl+X in a text box that holds a selection, the system shall end the copy within the typed-key time plus 100 ms. |
+| R-PASTE.12 | If | If the selected text holds more characters than the paste limit, then the system shall copy only its first 65,536 characters. |
+| R-PASTE.13 | If | If another program holds the OS clipboard when the operator presses Ctrl+C or Ctrl+X, then the system shall end the copy within 2.5 seconds. |
+| R-PASTE.14 | While | While the system writes the OS clipboard, the system shall keep the screen responsive. |
+| R-PASTE.15 | When | When the system copies the text of a text box, the system shall send the text to the terminal as an OSC 52 clipboard request. |
+| R-PASTE.16 | U | The system shall start no PowerShell program other than the system PowerShell. |
+| R-PASTE.17 | If | If the system PowerShell does not exist, then the system shall start no program to read or write the OS clipboard in its place. |
+| R-PASTE.18 | U | The system shall give every multi-line box the paste of R-TUI-043.5 to R-TUI-043.13 and R-TUI-044.2 to R-TUI-044.4. |
+| R-PASTE.19 | U | The system shall give every text box the copy of R-PASTE.2 to R-PASTE.15. |
+| R-PASTE.20 | When | When a push or a pull request changes the clipboard source files, their tests or the clipboard workflow file, or the operator starts the clipboard workflow by hand, the system shall run the OS clipboard tests on a GitHub-hosted Windows runner. |
+| R-PASTE.21 | If | If a test is about to open the OS clipboard outside an isolated clipboard, then the system shall fail that test before it opens the clipboard. |
+| R-PASTE.22 | If | If the hosted runner's OS clipboard fails the clipboard probe, then the system shall skip each OS clipboard test with the reason `runner clipboard unusable: <probe result>`. |
+| R-PASTE.23 | If | If the hosted runner's OS clipboard fails the clipboard probe, then the system shall report the clipboard probe test as failed with the message `runner clipboard unusable: <probe result>`. |
+| R-PASTE.24 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall put the selected text on the OS clipboard. |
+| R-PASTE.25 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall put the selected text on the app clipboard. |
+| R-PASTE.26 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall leave the text and the selection of the box unchanged. |
+| R-PASTE.27 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall end the copy within the typed-key time plus 100 ms. |
+| R-PASTE.28 | If | If another program holds the OS clipboard when the operator right-clicks a text box that shows a selection at the press, then the system shall end the copy within 2.5 seconds. |
+| R-PASTE.29 | When | When the operator right-clicks a single-line box that shows no selection at the press, the system shall insert the first line of the OS clipboard text at the cursor at the press. |
+| R-PASTE.30 | When | When the operator right-clicks a multi-line box that shows no selection at the press, the system shall insert the OS clipboard text at the cursor at the press. |
+| R-PASTE.31 | When | When the operator right-clicks a text box that shows no selection at the press, the system shall end the paste within the typed-key time plus 100 ms. |
+| R-PASTE.32 | If | If another program holds the OS clipboard when the operator right-clicks a text box that shows no selection at the press, then the system shall end the paste within 2.5 seconds. |
+| R-PASTE.33 | U | The system shall give every text box the right-click of R-PASTE.24 to R-PASTE.32. |
+| R-PASTE.34 | If | If a paste into a single-line box other than the Load dialog's path box holds an unsafe paste character, then the system shall insert the first line of the paste without its unsafe paste characters. |
+| R-PASTE.35 | If | If a paste into a multi-line box holds an unsafe paste character, then the system shall insert the paste without its unsafe paste characters. |
+| R-PASTE.36 | If | If a committed text file of the batch-101 or the batch-103 records folder holds a leak form of the redaction gate, then the system shall fail the redaction gate test. |
+| R-TUI-043.10.1 | When | When the operator presses Ctrl+V in a text box, the system shall end the paste within the typed-key time plus 100 ms. |
+| R-TUI-043.10.2 | If | If another program holds the OS clipboard when the operator presses Ctrl+V, then the system shall end the paste within 2.5 seconds. |
 
 #### S7.4 · Window help (CTX-HELP)
 
@@ -3298,14 +3748,16 @@ hex peek window  The 16-byte rows from 6 rows before the row that holds the entr
 ```text
 Check Editor     Rail screen. Header "Check Editor" with the ? chip and the
                  📂 Open checks/ chip. Left, "A2L PARAMETERS": Filter input, the
-                 parameter ledger, the full-name line, Include parameter. Right,
+                 parameter ledger, the full-name line, Include parameter and Add list. Right,
                  "REPORT FIELDS": Fields, JSON and Addendum tabs. Below: the spec row
                  (Spec dropdown, Write as input), the action row (Validate,
                  Write .chk.json, the struck text "APPLY — not available"), the field
                  count, the hint "apply: n/a — check spec" and the legend.
 parameter        An A2L tag with an integer address (S2).
 ledger row       ✓ when included · Parameter · Address 0x<8 hex> · Fmt · Unit
-                 (u<bits>, then the A2L unit when there is one).
+                 (element u/s/f<bits> or text, then the A2L unit; ? when unknown).
+declared length  A positive non-boolean length keyword; the picker's only size source.
+                 Enriched byte_size never supplies or substitutes a length.
 memory row       Address (0x and hex digits, or decimal digits), Label (free text),
                  Size in bytes (1–8; empty means 1).
 field            An included parameter (its address and byte size) or a memory row.
@@ -3463,6 +3915,33 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 
 
+
+#### S9.5 · Shared Check/Patch parameter picker (batch-103 Inc 6)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-PICKER-CORRECT.001 | When | When either editor populates its parameter picker, the system shall store each row's declared length as its size without consulting enriched `byte_size`. |
+| R-PICKER-CORRECT.002 | When | When either editor lists an array, value block, curve/map or text object, the system shall report the object's whole declared byte length. |
+| R-PICKER-CORRECT.003 | When | When either editor paints a parameter's `Fmt · Unit`, the system shall show the definition's element format and unit rather than deriving format from total byte length. |
+| R-PICKER-CORRECT.004 | If | If a listed parameter has no declared length, then the system shall retain its size as missing and shall not substitute one byte or enriched `byte_size`. |
+| R-PICKER-CORRECT.005 | If | If the operator activates `Use parameter` on a row whose length is missing, then the system shall clear Bytes, leave the document unchanged and paint `Parameter has no length — Bytes not prefilled.` |
+| R-PICKER-CORRECT.006 | When | When the operator activates `Use parameter` on a fully mapped multi-byte object, the system shall populate Address and every declared byte in ascending address order without modifying the document. |
+| R-PICKER-CORRECT.007 | If | If any byte of a multi-byte object is unavailable in the current image, then the system shall clear Bytes and paint `Parameter address loaded; image bytes unavailable.` without zero-filling or modifying the document. |
+| R-PICKER-CORRECT.008 | If | If a declared length exceeds `MAX_A2L_DECODE_BYTES`, then the system shall skip byte iteration and paint the existing over-cap status; at exactly the cap it shall attempt the full read. |
+| R-PICKER-CORRECT.009 | When | When a Check spec entry names a loaded parameter, the system shall match it only when both the entry address and entry byte count equal the picker's declared address and full length. |
+| R-PICKER-CORRECT.010 | When | When a changed A2L generation repopulates Check, the system shall apply the existing spec demotion rule using the new full declared length. |
+| R-PICKER-CORRECT.011 | When | When the Patch A2L tab is shown, the system shall present the shared pick-mode selector with include and `Add list` controls and no duplicate Check ids. |
+| R-PICKER-CORRECT.012 | When | When the operator activates Patch `Add list`, the system shall open the shared bulk modal with its multiline area, exact instruction, include action and close action. |
+| R-PICKER-CORRECT.013 | When | When the operator confirms a Patch bulk list, the system shall include each exact case-sensitive source match once in list order while preserving earlier picks and unique-name counts. |
+| R-PICKER-CORRECT.014 | When | When a Patch bulk list completes, the system shall paint the shared exact summary, including the first-missing and no-match alternatives. |
+| R-PICKER-CORRECT.015 | When | When Patch bulk selection changes or its modal closes, the system shall preserve the ledger page and Patch document state. |
+| R-PICKER-CORRECT.016 | When | When the operator uses `Use parameter` after a Patch bulk include, the system shall transfer only the highlighted row using its full declared length. |
+| R-PICKER-CORRECT.017 | When | When the picker paints an A2L/I-2 string on a picker-owned surface, the system shall render it literally with markup off, C0/C1 controls replaced by U+FFFD and long content clipped with an ellipsis. |
+| R-PICKER-CORRECT.018 | When | When A2L population is requested, the system shall preserve the unchanged-signature no-op and describe each changed generation once per picker before painting current lengths/formats. |
+| R-PICKER-CORRECT.019 | When | When a 13,990-object A2L populates a picker, the system shall finish its single batch describe within 2.0 seconds and perform no describes during filter/page rebuilds. |
+| R-PICKER-CORRECT.020 | When | When the Patch A2L tab uses its pick controls, the system shall keep its filter, ledger, status, page, include, bulk and Use surfaces contained at supported widths. |
+| R-PICKER-CORRECT.021 | If | If any included Check parameter has no declared length, then the system shall refuse Validate and Write with `Check Editor: parameter has no length — validate/write refused.` before posting an action or reading image bytes. |
+
 <a id="s10"></a>
 
 ## S10 · Patch Editor
@@ -3478,8 +3957,10 @@ Patch Editor    Rail screen. Header "Patch Editor" with the ? chip and the
                 file row; the document row; the legend.
 identity ribbon <file name> · <kind> for a file-backed document;
                 draft · <kind> for a draft.
-inspector       Tab chips Inspector, JSON and Checks over one pane. Border title:
-                INSPECTOR, JSON or CHECKS, after the shown tab.
+inspector       Tab chips Inspector, JSON, Checks and A2L over one pane. Border title:
+                INSPECTOR, JSON, CHECKS or A2L, after the shown tab.
+  A2L           The shared pick-mode parameter selector: filter, ledger, status,
+                paging, Include parameter, Add list and Use parameter.
   Inspector     The before → after strip (border title BEFORE → AFTER); the entry
                 form (Address, String, Bytes); Add, Edit, Remove, Edit JSON (per
                 entry); the tally.
@@ -3596,10 +4077,10 @@ JSON hues       Keys, strings, numbers and true / false / null each in its own h
 |---|---|---|
 | R-TUI-063.1 | U | The system shall show the Patch Editor as the identity ribbon, the ledger beside the inspector, the file row, the document row and the legend, top to bottom. |
 | R-TUI-063.2 | U | The system shall keep the ledger beside the inspector at every terminal width. |
-| R-TUI-063.3 | U | The system shall give the inspector the tab chips Inspector, JSON and Checks. |
+| R-TUI-063.3 | U | The system shall give the inspector the tab chips Inspector, JSON, Checks and A2L. |
 | R-TUI-063.4 | When | When the Patch Editor is first shown, the system shall show the Inspector tab. |
 | R-TUI-063.5 | When | When the operator activates a tab chip by click, Enter or space, the system shall show that tab's pane. |
-| R-TUI-063.6 | When | When the shown tab changes, the system shall set the inspector border title to INSPECTOR, JSON or CHECKS after the tab. |
+| R-TUI-063.6 | When | When the shown tab changes, the system shall set the inspector border title to INSPECTOR, JSON, CHECKS or A2L after the tab. |
 | R-TUI-063.7 | U | The system shall give the ledger the border title `PATCH SCRIPT`. |
 | R-TUI-063.8 | While | While the JSON tab is shown, the system shall show the inspector subtitle `v2 schema`. |
 | R-TUI-064.1 | While | While the Patch Editor is shown at 118 × 54 or more, the system shall show Validate, Apply loaded changes and Save without scrolling. |
