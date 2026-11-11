@@ -36,7 +36,7 @@ No new spec matching rule is introduced. Existing `(address, size)` equality, de
 
 ## D-6 — Literal I-2 rendering replaces controls; non-applicable carries stay out
 
-Picker-owned A2L/I-2 strings use literal `Text`, markup off, U+FFFD for C0/C1, and existing cell clipping. This deliberately narrows current `safe_text` deletion to the new I-2 consumer obligation. The shared modal remains unchanged and already provides literal, clipped first-missing text.
+Picker-owned A2L/I-2 strings use literal `Text`, markup off, U+FFFD for C0/C1, and existing cell clipping. This deliberately narrows current `safe_text` deletion to the new I-2 consumer obligation. The shared modal remains unchanged: first-missing operator text stays under existing R-B102-BULK-006 literal/control-removal semantics, not this U+FFFD replacement rule.
 
 Inc 6 does not call I-2 encode, stage masked edits, display refusal messages or accept operator values for encoding. E3A-07/E3S-08 (overlay/re-encode) and E3S-11 (long operator `<text>` in encode messages) are recorded for Inc 8/9, not implemented as unrelated new features here. Long picker strings are bounded by the cell clipping required in .017.
 

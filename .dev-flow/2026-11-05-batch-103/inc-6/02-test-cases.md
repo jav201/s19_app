@@ -1,6 +1,6 @@
 # Inc 6 — E2 test-case ledger (ISO/IEC/IEEE 29119-3)
 
-Stage E1/E2 design, 2026-11-10. **Counts: 76 cases = 76 threshold alternatives; 56 `normal`, 20 `robustness`; 20/20 requirements mapped. Tests entries are unassigned, coverage `gap`, results `not_run`.** No execution or verification is claimed.
+Stage E1/E2 design, 2026-11-10. **Counts: 75 cases = 75 threshold alternatives; 56 `normal`, 19 `robustness`; 20/20 requirements mapped. Tests entries are unassigned, coverage `gap`, results `not_run`.** No execution or verification is claimed.
 
 ## Product-route and oracle rules
 
@@ -82,11 +82,10 @@ Stage E1/E2 design, 2026-11-10. **Counts: 76 cases = 76 threshold alternatives; 
 | R-PICKER-CORRECT.016/2 | Verify Use after bulk transfers highlighted VB4 only | normal | Same picks; VB4 highlighted | Use | Exactly `10 11 12 13`; both picks retained; DOC equal. | — | gap | not_run |
 | R-PICKER-CORRECT.017/1 | Verify hostile parameter name is literal and replaced | robustness | Name contains `[red]`, ESC, NUL and C1 | Populate both and read cells/full name | Literal brackets, zero markup spans, U+FFFD for each control, no raw control/exception. | — | gap | not_run |
 | R-PICKER-CORRECT.017/2 | Verify hostile unit is literal and replaced | robustness | UWORD unit contains `[link=e]`, ESC and DEL | Populate both | Literal `u16 [link=e]` with U+FFFD replacements, zero spans/raw controls. | — | gap | not_run |
-| R-PICKER-CORRECT.017/3 | Verify long unknown datatype is bounded | robustness | 400-cell unknown datatype | Populate both at 80 and 118 | No overflow/exception; clipped format carries visible ellipsis and no fabricated width label. | — | gap | not_run |
-| R-PICKER-CORRECT.017/4 | Verify Patch first-missing text stays literal and clipped | robustness | Source Alpha; 400-cell missing token with markup/controls | Bulk include at 80 | Exact counts; literal missing fragment, zero spans/raw controls, visible ellipsis, contained modal. | — | gap | not_run |
+| R-PICKER-CORRECT.017/3 | Verify long UWORD format/unit is bounded on both picker surfaces | robustness | UWORD; 400-cell hostile unit containing `[red]`, ESC, NUL and C1 | Populate both at 80 and 118 columns; read ledger cell and full-name line | At each width, exact literal `u16 ` plus the U+FFFD-normalized unit, clipped to each surface's cell budget with visible `…`, in BOTH the ledger cell and full-name line; zero markup spans/raw controls, no overflow/exception; datatype remains `u16`, never `?`. | — | gap | not_run |
 | R-PICKER-CORRECT.018/1 | Verify equal signature preserves state and avoids describe | normal | Filter/page/picks set; DESCRIBE armed | Populate same signature again | 0 describes; filter/page/picks byte-identical; no rebuild. | — | gap | not_run |
 | R-PICKER-CORRECT.018/2 | Verify changed signature describes once per picker | normal | Generation 1 ARR12; generation 2 length/format changed | Reload A2L with both visible | Exactly 1 describe per picker containing all names; both paint new length/format; no per-row calls. | — | gap | not_run |
-| R-PICKER-CORRECT.018/3 | Verify None signature always repopulates | normal | Rows length 2; DESCRIBE armed | Call twice with signature None | Two real populations and current rows each time; no equal-signature no-op. | — | gap | not_run |
+| R-PICKER-CORRECT.018/3 | Verify None signature always repopulates and resets state | normal | Rows length 2; real A2L data; DESCRIBE armed; non-default filter/page/picks seeded before each call | Call twice with signature=None, reseeding filter/page/picks before each call | Both calls return True; after each call filter/page are at defaults and picks are empty; two real populations paint current rows; one describe per call with all names and actual A2L data; no equal-signature no-op. | — | gap | not_run |
 | R-PICKER-CORRECT.018/4 | Verify Inc 5 reload refreshes both without re-entry | normal | Check/Patch visible throughout; A2L1 ARR12 length 12 | Load A2L2 same name length 8 | Both size 8/current format before outcome, 1 describe each, no manual refresh or editor re-entry. | — | gap | not_run |
 | R-PICKER-CORRECT.019/1 | Verify 13,990-object batch describe budget | normal | software_a-shaped 13,990-object fixture; Linux serial_timing | Populate picker; median 3 | Median ≤2.0 s; one batch call/all names; normalized count 13,990; no timeout. | — | gap | not_run |
 | R-PICKER-CORRECT.019/2 | Verify that filter/page rebuilds never describe | normal | Populated 13,990 rows; DESCRIBE armed | 20 filter/page rebuilds | 0 describes; each mounts ≤200 rows; current formats unchanged. | — | gap | not_run |
@@ -95,6 +94,6 @@ Stage E1/E2 design, 2026-11-10. **Counts: 76 cases = 76 threshold alternatives; 
 
 ## Coverage reconciliation
 
-- Requirement totals: .001=4, .002=4, .003=18, .004=4, .005=5, .006=3, .007=2, .008=2, .009=3, .010=2, .011=3, .012=2, .013=4, .014=3, .015=3, .016=2, .017=4, .018=4, .019=2, .020=2; sum **76**.
-- Robustness: .003/18 (1), .004/1–4 (4), .005/1–5 (5), .007/1–2 (2), .008/1 (1), .014/2 (1), .015/2–3 (2), .017/1–4 (4). The robustness total is **20**, and normal is **56**, matching the header.
+- Requirement totals: .001=4, .002=4, .003=18, .004=4, .005=5, .006=3, .007=2, .008=2, .009=3, .010=2, .011=3, .012=2, .013=4, .014=3, .015=3, .016=2, .017=3, .018=4, .019=2, .020=2; sum **75**.
+- Robustness: .003/18 (1), .004/1–4 (4), .005/1–5 (5), .007/1–2 (2), .008/1 (1), .014/2 (1), .015/2–3 (2), .017/1–3 (3). The robustness total is **19**, and normal is **56**, matching the header.
 - R5 is explicitly additional to the four shapes of .004, making .005 five cases. No expected value is read from enriched output. ARR12 and VB4 distinguish full length from layout element size; non-uniform bytes distinguish truncation and zero-fill.

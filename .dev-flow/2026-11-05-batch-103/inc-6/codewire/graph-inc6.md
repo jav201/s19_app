@@ -1,6 +1,6 @@
 # Code-Wire graph — Inc 6 (Picker correctness), batch-103
 
-Stage E2, 2026-11-10, model Kimi. **Graph only:** no stub, extractor mark or declaration was added to product source. No application, test or runtime probe is claimed. Authority: `../01-requirements.md` (20 rows), `../02-test-cases.md` (76 cases), `../E1-rulings.md`, and `../E1-slice.md`. Code-Wire v3.1.0 (`e436a08`).
+Stage E2, 2026-11-10, model Kimi. **Graph only:** no stub, extractor mark or declaration was added to product source. No application, test or runtime probe is claimed. Authority: `../01-requirements.md` (20 rows), `../02-test-cases.md` (75 cases), `../E1-rulings.md`, and `../E1-slice.md`. Code-Wire v3.1.0 (`e436a08`).
 
 ### 1. Delta, ownership and pinned interfaces
 
@@ -69,6 +69,7 @@ examples: (R-PICKER-CORRECT.001/4) ARR12 `length=12`, `byte_size=2` → repopula
 examples: (R-PICKER-CORRECT.003/15) ARR12 UWORD length 12 → `u16`, never `u96`
 examples: (R-PICKER-CORRECT.004/1) R1 `length=None`, `byte_size=None` → size `None`, never `1`
 examples: (R-PICKER-CORRECT.018/1) equal signature with DESCRIBE armed → `False`, `0` describes and unchanged filter/page/picks
+examples: (R-PICKER-CORRECT.018/3) two signature=`None` calls with real A2L data and filter/page/picks reseeded before each → both return `True`, defaults/empty picks after each, one describe per call
 examples: (R-PICKER-CORRECT.019/1) 13,990 names → one batch call, median ≤ `2.0` seconds and 13,990 normalized rows
 
 _format_parameter
@@ -76,12 +77,13 @@ req: R-PICKER-CORRECT.003, R-PICKER-CORRECT.017
 in: Optional[Definition] definition; dict row
 out: str fmt_unit
 module: s19_app/tui/a2l_parameter_picker.py
-func: **new pure helper.** ASCII kind → `text`. Otherwise map the element datatype to unsigned/signed/float width (`u8`…`u64`, `s8`…`s64`, `f16`…`f64`); BYTE/WORD/LONG are unsigned; unknown → `?`. Append one space and unit when non-empty. Never read total length or enriched `byte_size` to choose format.
+func: **new pure helper.** ASCII kind → `text`. Otherwise map the element datatype to unsigned/signed/float width (`u8`…`u64`, `s8`…`s64`, `f16`…`f64`); BYTE/WORD/LONG are unsigned; unknown → exactly `?`. Append one space and unit when non-empty. Never read total length or enriched `byte_size` to choose format.
 examples: (R-PICKER-CORRECT.003/2) SBYTE → `s8`
 examples: (R-PICKER-CORRECT.003/13) FLOAT32_IEEE → `f32`
 examples: (R-PICKER-CORRECT.003/16) ASCII length 5 → `text`
 examples: (R-PICKER-CORRECT.003/17) UWORD unit `%` → `u16 %`
-examples: (R-PICKER-CORRECT.003/18) unknown datatype length 3 → `?`, never `u24`
+examples: (R-PICKER-CORRECT.003/18) unknown datatype length 3 → exactly `?`, never `u24`
+examples: (R-PICKER-CORRECT.017/3) UWORD + 400-cell hostile unit → `u16 ` + literal unit, never `?`; N4 clips it on both surfaces at 80/118
 
 _literal_parameter_text
 req: R-PICKER-CORRECT.017
@@ -97,9 +99,9 @@ req: R-PICKER-CORRECT.003, R-PICKER-CORRECT.017, R-PICKER-CORRECT.020
 in: str name; PickerLayout layout
 out: tuple cells; full-name Static updated separately
 module: s19_app/tui/a2l_parameter_picker.py
-func: **changed render group.** Keep mark/address/layout behavior. Paint N1's normalized format through N3, with existing `_clip_fmt_unit` and `clip_param`; optional size does not invent `u8`. Full-name line uses the same format/literal rule and existing empty texts.
+func: **changed render group.** Keep mark/address/layout behavior. Paint N1's normalized format through N3, with existing `_clip_fmt_unit` and `clip_param`; optional size does not invent `u8`. For the full-name line, clip format/unit to the remaining full-name cell budget with visible ellipsis before fitting the name; use the same literal rule and existing empty texts.
 examples: (R-PICKER-CORRECT.003/15) ARR12 → fourth cell `u16`; full-name line agrees
-examples: (R-PICKER-CORRECT.017/3) 400-cell unknown datatype → clipped literal with visible `…`, no overflow
+examples: (R-PICKER-CORRECT.017/3) UWORD + 400-cell hostile unit at 80 and 118 → exact literal clipped `u16 ` + unit with visible `…` in BOTH ledger cell and full-name line; no overflow
 examples: (R-PICKER-CORRECT.020/1) 80×24 → every visible ledger/control region remains inside Patch panel
 
 A2LParameterPicker.highlighted_parameter
@@ -196,7 +198,7 @@ req: to trace
 in: A2LParameterPicker picker; operator text/actions
 out: Optional[dict] summary
 module: s19_app/tui/screens.py
-func: unchanged shared capped modal, exact instruction/summaries, literal clipped first-missing and inert cancel/Escape.
+func: unchanged shared capped modal, exact instruction/summaries and inert cancel/Escape. First-missing operator text retains R-B102-BULK-006 literal/control-removal semantics and existing clipping, not N3/.017 U+FFFD replacement.
 examples: (R-PICKER-CORRECT.014/1) Beta,Alpha,Gamma with Alpha picked → `Included 1 · already included 1 · not found 1 — first missing: Gamma`
 
 CheckEditorPanel._named_parameter
@@ -334,13 +336,13 @@ seen: after bulk, only highlighted ARR12/VB4 transfers
 decision: covered by a concrete design example
 
 finding R-PICKER-CORRECT.017
-anchor: N2-N4, C4
-seen: hostile name/unit, long datatype, clipped first missing
+anchor: N2-N4
+seen: hostile name/unit; UWORD + 400-cell hostile unit clipped with visible ellipsis in ledger/full-name at 80/118
 decision: covered by a concrete design example
 
 finding R-PICKER-CORRECT.018
 anchor: N1, N7, N8, C2
-seen: equal 0 describe; changed 1/picker; None; live reload
+seen: equal 0 describe; changed 1/picker; None twice returns True and resets filter/page/picks after each; live reload
 decision: covered by a concrete design example
 
 finding R-PICKER-CORRECT.019
