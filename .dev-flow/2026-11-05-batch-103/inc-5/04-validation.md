@@ -16,7 +16,7 @@
 | Direction-B laws | **184 passed** | `../evidence/inc-5/law-directionb.txt` |
 | Suite hygiene | **64 passed, 2 skipped, 1 inherited redaction failure** | `../evidence/inc-5/law-suite-hygiene.txt` |
 | Official Inc 5 redaction scan | **inc5_redaction_hits=0**, both evidence roots | `../evidence/inc-5/redaction-report.txt`, `../evidence/inc-5/redaction-scan.txt` |
-| Trace | Static US/requirement/test/SLICE check has no gap; committed EVID run pending | `../evidence/inc-5/trace-final.txt` |
+| Trace | **1 US, 28 active requirements, 0 gaps**, including committed EVID and SLICE | `../evidence/inc-5/trace-final.txt` |
 
 The initial mutant table killed 27. M-024 survived because it removed only the redundant method-level guard after the real `^L` action had already refused busy. The corrected M-024 disables the actual `action_load_file` guard and produces four behavioral failures (`../evidence/inc-5/mutant-m024-killed.txt`). The summary reconciles 28 kills on the unchanged product/test tree; baseline and the other 27 controls were not needlessly repeated.
 

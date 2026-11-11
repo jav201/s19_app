@@ -30,7 +30,7 @@ Run `.dev-flow/2026-11-05-batch-103/inc-5/evidence-e5/run_5_mutants.py` with `S1
 - Mutant baseline: **103 passed in 1690.58s**. Final mutants: **28 killed / 0 survived / 0 ERROR / 0 TIMEOUT**; corrected M-024 failed all four busy cases.
 - Laws: **502 passed, 3 skipped, 1 inherited redaction failure** (254+1 skip; 184; 64+2 skips+1 failure).
 - Inc 5 redaction: **inc5_redaction_hits=0** over both evidence roots.
-- Static trace: **1 US, 28 active requirements, no US/requirement/test or SLICE gap**; committed EVID check pending.
+- Committed trace: **1 US, 28 active requirements, 0 gaps**, including EVID and SLICE.
 - Reviews: code/security **PASS**, coverage **PASS-WITH-NOTES**.
 
 ### 5. Risks
