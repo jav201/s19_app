@@ -6,7 +6,8 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[4]
-OUT = ROOT / ".dev-flow" / "2026-11-05-batch-103" / "evidence" / "full-suite"
+OUT = Path(os.environ.get("B103_FULL_SUITE_OUT", "/tmp/b103-full-suite"))
+OUT.mkdir(parents=True, exist_ok=True)
 CHUNKS = 8
 
 files = sorted(str(path.relative_to(ROOT)) for path in (ROOT / "tests").glob("test_*.py"))
