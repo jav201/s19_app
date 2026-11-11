@@ -1,6 +1,6 @@
 # Inc 5 — A2L refresh: validation record (E5)
 
-**Verdict: PASS-WITH-NOTES; merge verification pending.** Product commit `5e8f0454`; final test SHA-256 `d061bafb42d27999e5faec26c46819ba9b612ef6f01e4ef2e9d604e6ac08c8f7`. **28 requirements / 103 cases: all full, covered and verified.** No HIGH/MAJOR review finding is open. The note is the inherited repository redaction-law failure outside Inc 5.
+**Verdict: PASS-WITH-NOTES; Inc 5 closed and integrated.** Product commit `5e8f0454`; final test SHA-256 `d061bafb42d27999e5faec26c46819ba9b612ef6f01e4ef2e9d604e6ac08c8f7`. **28 requirements / 103 cases: all full, covered and verified.** No HIGH/MAJOR review finding is open. The note is the inherited repository redaction-law failure outside Inc 5.
 
 **Platform.** Linux `<runner>`, Python 3.11.18, isolated HOME/XDG/LOCALAPPDATA, stdin closed and bytecode disabled. Every accepted functional/mutant/law transcript prints the imported `s19_app.__file__` from the tested clone. Windows was limited to syntax/static checks and the official redaction scan.
 
@@ -33,4 +33,6 @@ The suite-hygiene failure names only inherited Inc 12 evidence and `inc-2/steps.
 
 ## Not run here
 
-The complete repository suite will be launched after Inc 6. By explicit operator amendment on 2026-11-10 it will not block integration or push to `main`; its findings go to the next batch and must not be reported as a full-suite PASS. Requirements-canon fold and global trace remain separate. Inc 5 merge-clone functional and trace results will be recorded after integration into `batch-103`.
+The complete repository suite will be launched after Inc 6. By explicit operator amendment on 2026-11-10 it will not block integration or push to `main`; its findings go to the next batch and must not be reported as a full-suite PASS. Requirements-canon fold and global trace remain separate.
+
+Integration into `batch-103` is merge `23defa7f98106e80b72f0bdd58ea2547a6527de3`. A detached Linux clone of that exact hash reports **112 passed in 1715.02 s** (`../evidence/inc-5/merge-functional.txt`) and **1 US, 28 active requirements, 0 gaps** (`../evidence/inc-5/merge-trace-initial.txt`). The session handoff is `../HANDOFF-2026-11-10-KIMI-INC5-TO-INC6.md`; no Inc 6 work has started.

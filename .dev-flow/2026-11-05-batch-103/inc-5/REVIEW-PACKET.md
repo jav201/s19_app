@@ -27,6 +27,7 @@ Run `.dev-flow/2026-11-05-batch-103/inc-5/evidence-e5/run_5_mutants.py` with `S1
 
 - Base RED: **88 failed / 15 passed**; corrected `.011` rerun **3 failed / 2 passed**.
 - Final functional family: **112 passed in 1713.14s (0:28:33)** — 103 Inc 5 cases plus 9 historical cases, with import from `/tmp/b103-inc5-e5/s19_app/__init__.py`.
+- Merge `23defa7f` clone: **112 passed in 1715.02s (0:28:35)** and trace **1 US, 28 active requirements, 0 gaps**, with import from `/tmp/b103-inc5-merge/s19_app/__init__.py`.
 - Mutant baseline: **103 passed in 1690.58s**. Final mutants: **28 killed / 0 survived / 0 ERROR / 0 TIMEOUT**; corrected M-024 failed all four busy cases.
 - Laws: **502 passed, 3 skipped, 1 inherited redaction failure** (254+1 skip; 184; 64+2 skips+1 failure).
 - Inc 5 redaction: **inc5_redaction_hits=0** over both evidence roots.
@@ -42,9 +43,9 @@ Run `.dev-flow/2026-11-05-batch-103/inc-5/evidence-e5/run_5_mutants.py` with `S1
 
 ### 6. Pending items
 
-- Complete the committed trace and merge-clone verification, then write the requested session handoff.
-- Integrate into `batch-103`; no push of additional branches is authorized.
+- No Inc 5 implementation or validation work remains. Integrated in `batch-103` as `23defa7f`; continue in a fresh session from `../HANDOFF-2026-11-10-KIMI-INC5-TO-INC6.md`.
+- No push of additional branches is authorized.
 
 ### 7. Suggested next task
 
-**Inc 6 — continue from its existing approved batch-103 artifacts only after Inc 5 is closed and integrated.**
+**Inc 6 — open E1 from `PLAN.md`, the approved prototypes and interfaces I-2/I-4 after Inc 5 is closed and integrated; no `inc-6/` design artifacts exist yet.**
