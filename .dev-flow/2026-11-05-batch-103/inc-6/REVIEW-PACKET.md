@@ -33,14 +33,14 @@ Each runner inserts `.` into `sys.path` and prints `s19_app.__file__` before pyt
 - Law guards: **550 passed, 3 skipped, 1 inherited redaction failure** (`evidence/inc-6/law-guards.txt`). Official Inc 6 redaction scan: **0 hits**; inherited Inc 12 and `inc-2/steps.log` were not changed.
 - Historical first pass: **303 passed / 1 failed**; corrected fixture: **1 passed**; final historical family: **304 passed in 2900.05 s** (`evidence/inc-6/historical-green.txt`). The failure was the stale `u8` oracle, not a product defect.
 - Independent reviews: code PASS, security PASS, coverage PASS-WITH-NOTES.
+- Detached merge clone `c062293b`: **77 passed in 387.08 s** (`evidence/inc-6/merge-functional.txt`); Inc 6 and whole-batch traces both **0 gaps** (`evidence/inc-6/merge-trace.txt`).
 
 ### 5. Risks
 - `.021/1-2` are only `partial`: direct handler behavior is proven, but mounted `run_test` acceptance is not. Mounted attempts stalled; no such acceptance is claimed.
-- Full repository suite is not yet run. By operator amendment its result does not block integration or main push, but it must not be called full-suite PASS.
-- Exact merge-clone verification remains open.
+- The complete repository suite is running in eight sequential chunks on the merge clone, launcher PID 596133. Its result is pending and must not be called full-suite PASS; G3 remains open. By operator amendment this does not block integration or main push.
 
 ### 6. Pending items
-- Write merge-clone evidence, integrate into `batch-103`, then launch the non-blocking full suite and perform the already authorized main push.
+- Collect and redact the full-suite logs and summary, rule any findings into the next batch, then resume with Inc 1b. Do not start Inc 1b in this session.
 
 ### 7. Suggested next task
 Inc 1b — Clipboard: copy from every view, using the approved PLAN row and existing clipboard/Windows conventions. Do not begin it in this session; resume from the handoff after Inc 6 closes.

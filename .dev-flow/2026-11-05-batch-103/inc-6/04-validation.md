@@ -35,4 +35,4 @@ The first historical failure was a stale R-A2L-READ.61/9 fixture that still requ
 
 **Instrument RED-proof:** base RED transcripts, mutant baseline and 21 killed controls demonstrate the instruments can fail. Code-Wire lint reads 20 nodes/3 entities/22 findings with 0 unread lines.
 
-**Not run here:** the complete repository suite. By operator amendment it runs after Inc 6 but does not block integration or push to main; its findings go to the next batch and must not be reported as full-suite PASS. Merge-clone verification is also pending.
+**Integration and batch state:** integration into `batch-103` is `c062293be6c122ecceca5701ea8afd0c6700f008`. A detached Linux clone of that exact hash reports **77 passed in 387.08 s** (`../evidence/inc-6/merge-functional.txt`), Inc 6 trace **1 US / 21 requirements / 0 gaps**, and whole-batch trace **7 US / 381 requirements / 0 gaps** (`../evidence/inc-6/merge-trace.txt`). The complete repository suite is running in eight sequential chunks on that clone, launcher PID 596133; its result is pending, G3 is not PASS, and findings go to the next batch under the operator amendment.
