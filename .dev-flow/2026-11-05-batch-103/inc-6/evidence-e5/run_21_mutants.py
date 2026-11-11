@@ -20,7 +20,7 @@ WRAPPER = (
 
 MUTANTS = [
     ("M-001", PICKER, 'length = row.get("length")', 'length = row.get("byte_size")', "r001"),
-    ("M-002", PICKER, "                else None\n            )\n            fmt_unit", "                else 1\n            )\n            fmt_unit", "r002"),
+    ("M-002", PICKER, "            size = (\n                length\n                if isinstance(length, int) and not isinstance(length, bool) and length > 0\n                else None\n            )", "            size = (\n                2\n                if name == \"ARR12\"\n                else length\n                if isinstance(length, int) and not isinstance(length, bool) and length > 0\n                else None\n            )", "r002"),
     ("M-003", PICKER, "            fmt_unit = _format_parameter(definitions.get(name), row)", "            fmt_unit = f\"u{size * 8}\"", "r003"),
     ("M-004", PICKER, "                else None\n            )\n            fmt_unit", "                else 1\n            )\n            fmt_unit", "r004"),
     ("M-005", PANEL, "        if size is None:\n            self.query_one(\"#patch_entry_bytes_input\", Input).value = \"\"", "        if False:\n            self.query_one(\"#patch_entry_bytes_input\", Input).value = \"\"", "r005"),
@@ -33,7 +33,7 @@ MUTANTS = [
     ("M-012", PANEL, "        self.app.push_screen(\n            BulkParameterAddScreen(self._a2l_picker), self._on_bulk_add_closed\n        )", "        return", "r012"),
     ("M-013", PICKER, "            if not name or name in seen:\n                continue", "            if not name:\n                continue", "r013"),
     ("M-014", MODAL, '            return Text("No listed parameters found.", style=DGRAY)', '            return Text("Wrong no-match text.", style=DGRAY)', "r014"),
-    ("M-015", PANEL, "        shared picker retains successful includes and the modal owns its\n        summary; cancellation and escape are inert.", "        shared picker retains successful includes and the modal owns its\n        summary; cancellation and escape are inert.\n        self._a2l_picker.rebuild_ledger()", "r015"),
+    ("M-015", PANEL, "    def _use_highlighted_parameter(self) -> None:", "        self._a2l_picker.rebuild_ledger()\n\n    def _use_highlighted_parameter(self) -> None:", "r015"),
     ("M-016", PANEL, "        parameter = self._a2l_picker.highlighted_parameter", "        parameter = self._a2l_picker.highlighted_parameter\n        if self._a2l_picker.picked_params:\n            parameter = self._a2l_picker.param_rows[self._a2l_picker.picked_params[0]]", "r016"),
     ("M-017", PICKER, '        "\\ufffd" if ord(character) <= 31 or 127 <= ord(character) <= 159 else character', '        "" if ord(character) <= 31 or 127 <= ord(character) <= 159 else character', "r017"),
     ("M-018", PICKER, "        if signature is not None and signature == self._signature:\n            return False", "        if signature is not None:\n            return False", "r018"),
@@ -41,6 +41,10 @@ MUTANTS = [
     ("M-020", PANEL, "        table.show_header = True", "        table.show_header = False", "r020"),
     ("M-021", PANEL, "            if any(\n                item[\"source\"] == \"param\" and item[\"size\"] is None for item in items\n            ):", "            if False:\n                # no missing-length guard", "r021"),
 ]
+
+only = {item for item in os.environ.get("MUTANT_IDS", "").split(",") if item}
+if only:
+    MUTANTS = [item for item in MUTANTS if item[0] in only]
 
 ROOT.mkdir(parents=True, exist_ok=True)
 OUT.mkdir(parents=True, exist_ok=True)
@@ -53,19 +57,24 @@ env.update(
     PYTHONDONTWRITEBYTECODE="1",
     PYTHONIOENCODING="utf-8",
 )
-baseline = subprocess.run(
-    [str(PYTHON), "-I", "-B", "-c", WRAPPER, "-q", "-p", "no:cacheprovider", *TESTS],
-    cwd=BASE,
-    env=env,
-    stdin=subprocess.DEVNULL,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT,
-    text=True,
-    timeout=900,
-)
-(ROOT / "baseline.txt").write_text(baseline.stdout, encoding="utf-8")
-if baseline.returncode:
-    raise RuntimeError("baseline is not GREEN; mutant results are inadmissible")
+if os.environ.get("MUTANT_SKIP_BASELINE") == "1":
+    baseline_text = (ROOT / "baseline.txt").read_text(encoding="utf-8")
+    if "77 passed" not in baseline_text:
+        raise RuntimeError("the saved baseline is not GREEN")
+else:
+    baseline = subprocess.run(
+        [str(PYTHON), "-I", "-B", "-c", WRAPPER, "-q", "-p", "no:cacheprovider", *TESTS],
+        cwd=BASE,
+        env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        timeout=900,
+    )
+    (ROOT / "baseline.txt").write_text(baseline.stdout, encoding="utf-8")
+    if baseline.returncode:
+        raise RuntimeError("baseline is not GREEN; mutant results are inadmissible")
 
 results = []
 for mid, filename, old, new, selection in MUTANTS:

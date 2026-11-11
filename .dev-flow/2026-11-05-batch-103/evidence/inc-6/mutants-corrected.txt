@@ -1,0 +1,9 @@
+M-002
+  killed
+  FAILED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--]
+M-015
+  killed
+  FAILED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/1]
+  FAILED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/2]
+  FAILED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/3]
+{"killed": 2, "survived": [], "errors": [], "timeouts": [], "bad": []}

@@ -1,6 +1,6 @@
 # Inc 6 — E2 test-case ledger (ISO/IEC/IEEE 29119-3)
 
-Stage E1/E2 design, amended at E5 for the Check missing-length design gap. **Counts: 77 cases = 77 threshold alternatives; 56 `normal`, 21 `robustness`; 21/21 requirements mapped. 75 `full`, 2 `partial`; coverage **75 `covered`, 2 `partial`, 0 `conflict`**, 0 `gap`, 0 `not-testable`; results **77 `verified`**, 0 `not_run`.** No execution or verification is claimed.
+Stage E1/E2 design, amended at E5 for the Check missing-length design gap. **Counts: 77 cases = 77 threshold alternatives; 56 `normal`, 21 `robustness`; 21/21 requirements mapped. 75 `full`, 2 `partial`; coverage **75 `covered`, 2 `partial`, 0 `conflict`**, 0 `gap`, 0 `not-testable`; results **77 `verified`**, 0 `not_run`.** Final verification: **77 passed in 396.51 s** on Linux; import from `/tmp/b103-inc6-final77/s19_app/__init__.py`.
 
 ## Product-route and oracle rules
 

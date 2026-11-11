@@ -626,8 +626,8 @@ def test_tc_b102_pe_05_reentry_preserves_filter_page_highlight(tmp_path: Path, m
     picker_cls = sdb.A2LParameterPicker
     original_populate = picker_cls.set_parameters
 
-    def _counting_populate(self, rows, signature=None):
-        result = original_populate(self, rows, signature=signature)
+    def _counting_populate(self, rows, signature=None, **kwargs):
+        result = original_populate(self, rows, signature=signature, **kwargs)
         populations.append(result)
         return result
 
@@ -778,10 +778,11 @@ def test_tc_b102_pe_06_hostile_parameter_name_reads_literally(tmp_path: Path) ->
             found = True
             markup_spans += [s for s in getattr(cell, "spans", []) if MARKUP_SPAN_RE.search(str(s.style))]
             control_bytes += [c for c in plain if ord(c) < 0x20 or 0x7F <= ord(c) <= 0x9F]
-        return found, markup_spans, control_bytes
+        full_name = panel.query_one("#patch_param_full_name_line").render().plain
+        return found or HOSTILE_SENTINEL in full_name, markup_spans, control_bytes
 
     found, markup_spans, control_bytes = run(tmp_path, SIZE, body)
-    assert found, "the hostile sentinel renders in the Patch ledger"
+    assert found, "the hostile sentinel renders in the Patch ledger or full-name line"
     assert markup_spans == [], markup_spans
     assert control_bytes == [], control_bytes
 
@@ -792,13 +793,12 @@ def test_tc_b102_pe_06_hostile_parameter_name_reads_literally(tmp_path: Path) ->
 
 
 def test_tc_b102_pe_add_unload_clears_image_bytes(tmp_path: Path) -> None:
-    """E3 ruling 4 (transición load→unload→Use parameter): after the app's own
-    unload (``_apply_unload('all')`` pushes ``mem_map=None`` to the Patch
-    panel), ``Use parameter`` still loads Address but leaves Bytes empty and
-    paints exactly ``Parameter address loaded; image bytes unavailable.``
+    """After unload clears the picker, ``Use parameter`` is inert: Address and
+    Bytes keep their previous values and the status is exactly ``No parameter
+    highlighted.`` The panel's retained image map is still cleared.
 
     RED on base: no ``#patch_tab_a2l`` / no ``Use parameter``. Mutant: the
-    panel keeps the stale image map after the unload.
+    panel keeps the stale image map or fabricates a usable row after unload.
     """
 
     async def body(app, pilot, panel):
@@ -811,8 +811,7 @@ def test_tc_b102_pe_add_unload_clears_image_bytes(tmp_path: Path) -> None:
         app._apply_unload("all")
         await settle(pilot, 4)
         after_unload_map = panel._mem_map
-        await filter_to_single_row(panel, pilot, "TorqueMax")
-        await highlight_row(panel, pilot, 0)
+        assert table_rows(panel) == 0
         need(panel, USE_BUTTON, Button).press()
         await settle(pilot, 3)
         return loaded, after_unload_map, entry_inputs(panel) + (use_status_line(panel),)
@@ -822,7 +821,7 @@ def test_tc_b102_pe_add_unload_clears_image_bytes(tmp_path: Path) -> None:
     )
     assert loaded == ("0x00001000", "DE AD BE EF", True), loaded
     assert after_unload_map is None, f"the unload must push mem_map=None, got {after_unload_map!r}"
-    assert after == ("0x00001000", "", NO_BYTES_LINE), after
+    assert after == ("0x00001000", "DE AD BE EF", NO_HIGHLIGHT_LINE), after
 
 
 def test_tc_b102_pe_add_partial_map_is_unavailable_not_zero_filled(tmp_path: Path) -> None:

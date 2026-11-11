@@ -1,0 +1,11 @@
+{
+  "killed": 21,
+  "survived": [],
+  "errors": [],
+  "timeouts": [],
+  "bad": [],
+  "controls": [
+    "initial: 19 killed",
+    "corrected M-002 and M-015: 2 killed"
+  ]
+}

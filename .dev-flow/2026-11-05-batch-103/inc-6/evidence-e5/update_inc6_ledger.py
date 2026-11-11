@@ -78,6 +78,10 @@ text = text.replace(
     "77 Tests entries, all `full`; coverage **77 `covered`, 0 `partial`, 0 `conflict`**, 0 `gap`, 0 `not-testable`; results **77 `verified`**, 0 `not_run`.",
     "75 `full`, 2 `partial`; coverage **75 `covered`, 2 `partial`, 0 `conflict`**, 0 `gap`, 0 `not-testable`; results **77 `verified`**, 0 `not_run`.",
 )
+text = text.replace(
+    "No execution or verification is claimed.",
+    "Final verification: **77 passed in 396.51 s** on Linux; import from `/tmp/b103-inc6-final77/s19_app/__init__.py`.",
+)
 if ".021 is `partial`" not in text:
     text += "- .021 is `partial`: the real Check button handler, exact status, zero actions/reads/writes and preservation of the other included field are verified synchronously; repeated mounted `run_test` attempts stalled before completion, so the mounted acceptance route is not claimed.\n"
 LEDGER.write_text(text, encoding="utf-8", newline="\n")
