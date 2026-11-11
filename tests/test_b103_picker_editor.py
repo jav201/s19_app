@@ -557,6 +557,9 @@ def test_r011_patch_pick_controls_and_id_isolation(tmp_path: Path, case: str, mo
             return
         events = _spy_selections(monkeypatch, picker)
         if case.endswith("/1"):
+            include = _need(panel, "#patch_param_include_button", Button)
+            assert is_displayed(include) and not include.disabled
+            assert include.region.width > 0 and include.region.height > 0
             await _filter_to(panel, pilot, "ARR12")
             table = _need(panel, "#patch_param_table", DataTable)
             await pilot.press("space")
@@ -807,19 +810,20 @@ def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str
 def test_r021_check_validate_write_refuses_missing_length(
     tmp_path: Path, case: str, button_id: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-PICKER-CORRECT.021/1 and .021/2: no action, image read or document write."""
+    """R-PICKER-CORRECT.021/1 and .021/2: direct handler, substituted status label, zero action/read/write."""
     from s19_app.tui.changes import io as changes_io
     from s19_app.tui.models import LoadedFile
     from s19_app.tui.screens_directionb import CheckEditorPanel
 
     app = S19TuiApp(base_dir=tmp_path)
+    coverage = _CoverageReadSpy(0x5000)
     object.__setattr__(
         app,
         "current_file",
         LoadedFile(
             path=tmp_path / "coverage.s19",
             file_type="s19",
-            mem_map=_CoverageReadSpy(0x5000),
+            mem_map=coverage,
             row_bases=[],
             ranges=[],
             range_validity=[],
@@ -830,16 +834,14 @@ def test_r021_check_validate_write_refuses_missing_length(
     )
     panel = CheckEditorPanel()
     panel.set_a2l_parameters(
-        [{
-            "name": "R1",
-            "address": 0x5000,
-            "length": None,
-            "byte_size": None,
-            "datatype": "UWORD",
-        }],
+        [
+            {"name": "R1", "address": 0x5000, "length": None, "byte_size": None, "datatype": "UWORD"},
+            {"name": "ARR12", "address": 0x1000, "length": 12, "byte_size": 2, "datatype": "UWORD"},
+        ],
         ("r021", 1),
     )
-    assert panel._picker.include_names(["R1"])["included"] == 1
+    assert panel._picker.include_names(["R1", "ARR12"])["included"] == 2
+    before = panel._collected_items()
     actions = []
     reads = []
     writes = []
@@ -849,7 +851,10 @@ def test_r021_check_validate_write_refuses_missing_length(
     status = Label()
     monkeypatch.setattr(panel, "query_one", lambda selector, kind=None: status)
     panel.on_button_pressed(Button.Pressed(Button(id=button_id)))
+    after = panel._collected_items()
     assert actions == []
     assert reads == []
     assert writes == []
+    assert coverage.reads == []
+    assert before == after
     assert status.render().plain == "Check Editor: parameter has no length — validate/write refused."

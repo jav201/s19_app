@@ -3,7 +3,7 @@
 =================================== FAILURES ===================================
 ____________ test_r019_2_twenty_filter_page_rebuilds_never_describe ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r019_2_twenty_filter_page0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-704/test_r019_2_twenty_filter_page0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f23c2c21490>
 
     @pytest.mark.serial_timing
@@ -55,7 +55,7 @@ E        +  where 19 = len([A2LParameterPicker(), A2LParameterPicker(), A2LParam
 tests/test_b103_picker_model.py:793: AssertionError
 _ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-] __
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r020_patch_surfaces_fit_r0')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-704/test_r020_patch_surfaces_fit_r0')
 case = 'R-PICKER-CORRECT.020/1', size = (80, 24)
 
     @pytest.mark.parametrize(
@@ -103,13 +103,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_b103_picker_editor.py:226: in _run
     return asyncio.run(drive())
            ^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests/test_b103_picker_editor.py:224: in drive
@@ -156,7 +156,7 @@ E            +    where Region(x=5, y=4, width=74, height=9) = PatchEditorPanel(
 tests/test_b103_picker_editor.py:766: AssertionError
 _ test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-] __
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-704/test_r020_patch_surfaces_fit_r1')
+tmp_path = PosixPath('/tmp/pytest-of-<account>/pytest-704/test_r020_patch_surfaces_fit_r1')
 case = 'R-PICKER-CORRECT.020/2', size = (118, 54)
 
     @pytest.mark.parametrize(
@@ -204,13 +204,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_b103_picker_editor.py:226: in _run
     return asyncio.run(drive())
            ^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests/test_b103_picker_editor.py:224: in drive

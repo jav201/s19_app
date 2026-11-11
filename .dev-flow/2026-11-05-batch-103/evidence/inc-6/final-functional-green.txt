@@ -1,0 +1,86 @@
+/tmp/b103-inc6-final77/s19_app/__init__.py
+........................................................................ [ 93%]
+.....                                                                    [100%]
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+34.2%  1.316 s / 2.000 s  R-PICKER-CORRECT.019 picker describe 13990  tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+QC-TM: 1 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/1---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/2---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/3---]
+PASSED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/4---]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/2--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/3--]
+PASSED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/4--]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/1------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/2------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/3------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/4------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/5------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/6------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/7------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/8------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/9------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/10------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/11------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/12------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/13------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/14------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/15------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/16------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/17------]
+PASSED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/18------]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/1]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/2]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/3]
+PASSED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/4]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/1]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/2]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/3]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/4]
+PASSED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/5]
+PASSED tests/test_b103_picker_model.py::test_r017_1_hostile_parameter_name_is_replaced_literally
+PASSED tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally
+PASSED tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118
+PASSED tests/test_b103_picker_model.py::test_r018_1_equal_signature_is_a_zero_describe_noop
+PASSED tests/test_b103_picker_model.py::test_r018_2_changed_generation_batches_once_per_picker
+PASSED tests/test_b103_picker_model.py::test_r018_3_none_always_repopulates_with_real_a2l_data
+PASSED tests/test_b103_picker_model.py::test_r018_4_live_reload_refreshes_both_without_reentry
+PASSED tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+PASSED tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/1---]
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/2---]
+PASSED tests/test_b103_picker_editor.py::test_r006_use_transfers_whole_object[R-PICKER-CORRECT.006/3---]
+PASSED tests/test_b103_picker_editor.py::test_r007_unavailable_bytes_are_all_or_nothing[R-PICKER-CORRECT.007/1]
+PASSED tests/test_b103_picker_editor.py::test_r007_unavailable_bytes_are_all_or_nothing[R-PICKER-CORRECT.007/2]
+PASSED tests/test_b103_picker_editor.py::test_r008_declared_length_observes_decode_cap[R-PICKER-CORRECT.008/1]
+PASSED tests/test_b103_picker_editor.py::test_r008_declared_length_observes_decode_cap[R-PICKER-CORRECT.008/2]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/1]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/2]
+PASSED tests/test_b103_picker_editor.py::test_r009_check_spec_matches_address_and_full_length[R-PICKER-CORRECT.009/3]
+PASSED tests/test_b103_picker_editor.py::test_r010_new_generation_keeps_or_demotes_full_spec[R-PICKER-CORRECT.010/1]
+PASSED tests/test_b103_picker_editor.py::test_r010_new_generation_keeps_or_demotes_full_spec[R-PICKER-CORRECT.010/2]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/1]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/2]
+PASSED tests/test_b103_picker_editor.py::test_r011_patch_pick_controls_and_id_isolation[R-PICKER-CORRECT.011/3]
+PASSED tests/test_b103_picker_editor.py::test_r012_patch_add_list_opens_shared_modal[R-PICKER-CORRECT.012/1]
+PASSED tests/test_b103_picker_editor.py::test_r012_patch_add_list_opens_shared_modal[R-PICKER-CORRECT.012/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/1]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/3]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.013/4]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/1]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/2]
+PASSED tests/test_b103_picker_editor.py::test_r013_r014_patch_bulk_counts_and_exact_summaries[R-PICKER-CORRECT.014/3]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/1]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/2]
+PASSED tests/test_b103_picker_editor.py::test_r015_patch_bulk_close_preserves_ledger_and_document[R-PICKER-CORRECT.015/3]
+PASSED tests/test_b103_picker_editor.py::test_r016_use_after_bulk_transfers_only_highlight[R-PICKER-CORRECT.016/1]
+PASSED tests/test_b103_picker_editor.py::test_r016_use_after_bulk_transfers_only_highlight[R-PICKER-CORRECT.016/2]
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-]
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-]
+PASSED tests/test_b103_picker_editor.py::test_r021_check_validate_write_refuses_missing_length[R-PICKER-CORRECT.021/1-check_validate_button]
+PASSED tests/test_b103_picker_editor.py::test_r021_check_validate_write_refuses_missing_length[R-PICKER-CORRECT.021/2-check_write_button]
+77 passed in 396.51s (0:06:36)

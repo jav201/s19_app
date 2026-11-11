@@ -748,7 +748,6 @@ def test_r019_1_13990_object_population_has_one_timed_batch_per_generation(tmp_p
 
 
 # R-PICKER-CORRECT.019/2: 20 real filter/page rebuilds never describe and mount <=200.
-@pytest.mark.serial_timing
 def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch):
     """R-PICKER-CORRECT.019/2: zero describes, 20 rebuilds, <=200 rows, formats stable."""
     describes = _describe_spy(monkeypatch)
@@ -756,8 +755,9 @@ def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch
     real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
 
     def counting_rebuild(self):
-        rebuilds.append(self)
-        return real_rebuild(self)
+        result = real_rebuild(self)
+        rebuilds.append(self.query_one(f"#{self._ids.table}", DataTable).row_count)
+        return result
 
     monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
     data = parse_a2l_file(SOFTA)
@@ -792,5 +792,5 @@ def test_r019_2_twenty_filter_page_rebuilds_never_describe(tmp_path, monkeypatch
     mounted, before_formats, after_formats = _run(tmp_path, body, size=MIN_SIZE)
     assert len(rebuilds) == 20
     assert describes == []
-    assert len(mounted) == 10 and all(0 < count <= 200 for count in mounted)
+    assert len(rebuilds) == 20 and all(0 < count <= 200 for count in rebuilds)
     assert after_formats == before_formats
