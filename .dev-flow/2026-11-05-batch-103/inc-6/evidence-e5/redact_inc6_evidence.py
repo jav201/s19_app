@@ -5,15 +5,21 @@ ROOT = Path(__file__).resolve().parents[1]
 ACCOUNT = "javier" + "gr"
 USER = "jjg" + "h8"
 REPLACEMENTS = (
-    ("C:\\Users\\" + USER, "<user-profile>"),
-    ("C:/Users/" + USER, "<user-profile>"),
-    ("/home/" + ACCOUNT + "/miniconda3/envs/s19ci/bin/python", "<runner-python>"),
-    ("/home/" + ACCOUNT, "<runner-home>"),
-    ("pytest-of-" + ACCOUNT, "pytest-of-<account>"),
-    ("192.168.1." + "67", "<runner>"),
-    ("<runner>", "<runner>"),
-    (ACCOUNT, "<account>"),
-    (USER, "<user>"),
+    ("C:\\Users\\" + USER, "<HOME>"),
+    ("C:/Users/" + USER, "<HOME>"),
+    ("/home/" + ACCOUNT + "/miniconda3/envs/s19ci/bin/python", "<HOME>/miniconda3/envs/s19ci/bin/python"),
+    ("/home/" + ACCOUNT, "<HOME>"),
+    ("pytest-of-" + ACCOUNT, "pytest-of-<USER>"),
+    ("192.168.1." + "67", "<HOST>"),
+    ("<HOST>", "<HOST>"),
+    ("<HOME>/miniconda3/envs/s19ci/bin/python", "<HOME>/miniconda3/envs/s19ci/bin/python"),
+    ("<HOME>", "<HOME>"),
+    ("pytest-of-<USER>", "pytest-of-<USER>"),
+    ("<HOME>", "<HOME>"),
+    ("<HOST>", "<HOST>"),
+    ("<USER>", "<USER>"),
+    (ACCOUNT, "<USER>"),
+    (USER, "<USER>"),
 )
 
 changed = []
@@ -38,9 +44,9 @@ for root in roots:
             if count:
                 text = text.replace(old, new)
                 counts.append((new, count))
-        text, count = re.subn(r"pytest-of-[A-Za-z0-9_.-]+", "pytest-of-<account>", text)
+        text, count = re.subn(r"pytest-of-[A-Za-z0-9_.-]+", "pytest-of-<USER>", text)
         if count:
-            counts.append(("pytest-of-<account>", count))
+            counts.append(("pytest-of-<USER>", count))
         if counts:
             path.write_bytes(text.encode("utf-8"))
             changed.append((path.relative_to(ROOT.parent).as_posix(), counts))

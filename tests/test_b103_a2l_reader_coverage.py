@@ -2165,9 +2165,9 @@ def test_cov_read_60_08_picker_lists_only_usable_address(tmp_path: Path) -> None
     projects.run_app(tmp_path / "app", scenario, size=(160, 50))
 
 
-def test_cov_read_61_09_picker_and_check_editor_never_u16(tmp_path: Path) -> None:
-    """R-A2L-READ.61/9 real routes: the Patch picker and Check Editor list each
-    no-length tag as u8 (never u16)."""
+def test_cov_read_61_09_picker_and_check_editor_element_formats(tmp_path: Path) -> None:
+    """R-A2L-READ.61/9 and R-PICKER-CORRECT.003/.004: missing length keeps
+    the declared element format; an unavailable definition gives ?."""
     from textual.widgets import DataTable
 
     from s19_app.tui.app import S19TuiApp
@@ -2191,7 +2191,7 @@ def test_cov_read_61_09_picker_and_check_editor_never_u16(tmp_path: Path) -> Non
             for i in range(table.row_count)
         }
 
-    expected = {f"X{index}": "u8" for index in range(4)}
+    expected = {"X0": "u16", "X1": "u16", "X2": "u16", "X3": "?"}
 
     async def scenario(app: S19TuiApp, pilot, log) -> None:
         app.load_a2l_from_path(a2l)
