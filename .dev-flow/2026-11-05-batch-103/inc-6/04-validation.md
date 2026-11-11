@@ -1,6 +1,6 @@
 # Inc 6 — Picker correctness: validation record (E5)
 
-**Verdict: PENDING historical regression family.** Product is GREEN on 21 requirements and 77 cases. Final coverage is 75 full + 2 partial; 75 covered + 2 partial. Code/security review: PASS. Coverage audit: PASS-WITH-NOTES only for `.021`’s mounted route.
+**Verdict: PASS-WITH-NOTES.** Product is GREEN on 21 requirements and 77 cases, and the historical regression family is GREEN on 304 cases. Final coverage is 75 full + 2 partial; 75 covered + 2 partial. Code/security review: PASS. Coverage audit: PASS-WITH-NOTES only for `.021`’s mounted route.
 
 **Platform.** Linux runner, Python 3.11.18, isolated HOME/XDG/LOCALAPPDATA, closed stdin, bytecode disabled. Accepted transcripts print the tested clone’s `s19_app.__file__`. Windows was used for static checks only.
 
@@ -16,9 +16,13 @@
 | Mutant baseline | 77 passed | `../evidence/inc-6/mutant-baseline-green.txt` |
 | Mutation controls | **21 killed / 0 survived / 0 errors / 0 timeouts / 0 BAD** | `../evidence/inc-6/mutants-initial.txt`, `../evidence/inc-6/mutants-corrected.txt`, `../evidence/inc-6/mutant-summary-final.json` |
 | Project law guards | **550 passed, 3 skipped, 1 inherited redaction failure** | `../evidence/inc-6/law-guards.txt` |
-| Historical regression family | **PENDING** | `../evidence/inc-6/historical-green.txt` (not yet written) |
+| Historical first pass | 303 passed / 1 failed | `evidence-e4/historical-run3.txt` |
+| Corrected historical fixture | **1 passed in 3.86 s** | `evidence-e4/historical-fixture-green.txt` |
+| Historical regression family | **304 passed in 2900.05 s** | `../evidence/inc-6/historical-green.txt` |
 
 The inherited redaction failure is confined to Inc 12 and `inc-2/steps.log`; the official Inc 6 scan has **0 hits**. Those inherited records are unchanged. `test_id_registry`’s bound was deliberately advanced 297→299 for the two new test modules. `.019/1` is the only serial timing arm; `.019/2` is the deterministic rebuild census.
+
+The first historical failure was a stale R-A2L-READ.61/9 fixture that still required the removed `or 1`/`u8` behaviour. Its real-route oracle and ledger now follow R-PICKER-CORRECT.003/.004: declared `RL_U16` elements paint `u16`, an unavailable definition paints `?`, and missing length stays missing. No product code changed for this correction.
 
 ## Reviews and limitations
 
@@ -31,4 +35,4 @@ The inherited redaction failure is confined to Inc 12 and `inc-2/steps.log`; the
 
 **Instrument RED-proof:** base RED transcripts, mutant baseline and 21 killed controls demonstrate the instruments can fail. Code-Wire lint reads 20 nodes/3 entities/22 findings with 0 unread lines.
 
-**Not run here:** the complete repository suite. By operator amendment it runs after Inc 6 but does not block integration or push to main; its findings go to the next batch and must not be reported as full-suite PASS. Trace final and merge-clone verification are also pending.
+**Not run here:** the complete repository suite. By operator amendment it runs after Inc 6 but does not block integration or push to main; its findings go to the next batch and must not be reported as full-suite PASS. Merge-clone verification is also pending.

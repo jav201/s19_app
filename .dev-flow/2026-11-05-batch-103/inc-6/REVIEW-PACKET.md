@@ -9,6 +9,7 @@ The shared Check/Patch A2L picker now uses declared whole-object length and elem
 - `tests/test_b103_picker_model.py` — 44 model/format cases.
 - `tests/test_b103_picker_editor.py` — 33 editor/bulk/geometry cases, including Check’s new refusal.
 - `tests/test_b102_patch_picker.py`, `test_b102_parameter_picker.py`, `test_b102_bulk_add.py`, `test_b101_check_spec_keep.py`, `test_tui_check_editor.py` — historical fixtures and spies updated for the new contract.
+- `tests/test_b103_a2l_reader_coverage.py` and Inc 11’s ledger — the remaining historical format oracle now follows element datatype rather than the removed `or 1` fallback.
 - `tests/test_id_registry.py` — declared test-module bound advanced to 299.
 - `.dev-flow/2026-11-05-batch-103/inc-6/**` and `evidence/inc-6/**` — approved design, test ledger and proof.
 
@@ -30,17 +31,16 @@ Each runner inserts `.` into `sys.path` and prints `s19_app.__file__` before pyt
 - Addendum: **4 passed**; focused geometry: **6 passed**.
 - Mutants: **21 killed / 0 survived / 0 errors / 0 timeouts / 0 BAD** (`evidence/inc-6/mutant-summary-final.json`).
 - Law guards: **550 passed, 3 skipped, 1 inherited redaction failure** (`evidence/inc-6/law-guards.txt`). Official Inc 6 redaction scan: **0 hits**; inherited Inc 12 and `inc-2/steps.log` were not changed.
-- Historical regression family: **PENDING** (`evidence/inc-6/historical-green.txt` not yet written).
+- Historical first pass: **303 passed / 1 failed**; corrected fixture: **1 passed**; final historical family: **304 passed in 2900.05 s** (`evidence/inc-6/historical-green.txt`). The failure was the stale `u8` oracle, not a product defect.
 - Independent reviews: code PASS, security PASS, coverage PASS-WITH-NOTES.
 
 ### 5. Risks
 - `.021/1-2` are only `partial`: direct handler behavior is proven, but mounted `run_test` acceptance is not. Mounted attempts stalled; no such acceptance is claimed.
 - Full repository suite is not yet run. By operator amendment its result does not block integration or main push, but it must not be called full-suite PASS.
-- Historical regression family and exact merge-clone verification remain open.
+- Exact merge-clone verification remains open.
 
 ### 6. Pending items
-- Complete the historical family and record its result.
-- Write final trace/merge-clone evidence, integrate into `batch-103`, then launch the non-blocking full suite and perform the already authorized main push.
+- Write merge-clone evidence, integrate into `batch-103`, then launch the non-blocking full suite and perform the already authorized main push.
 
 ### 7. Suggested next task
 Inc 1b — Clipboard: copy from every view, using the approved PLAN row and existing clipboard/Windows conventions. Do not begin it in this session; resume from the handoff after Inc 6 closes.
