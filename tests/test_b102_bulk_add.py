@@ -172,7 +172,7 @@ def control_bytes(text: str) -> list:
 def named_rows(*names: str) -> list:
     """Parameter dicts for ``names`` the panel's population seam normalizes."""
     return [
-        {"name": name, "address": 0x1000 + i * 2, "byte_size": 2, "compu_method_unit": ""}
+        {"name": name, "address": 0x1000 + i * 2, "length": 2, "byte_size": 2, "compu_method_unit": ""}
         for i, name in enumerate(names)
     ]
 
@@ -183,7 +183,7 @@ def synthetic_rows(count: int, prefix: str = "P") -> list:
         {
             "name": f"{prefix}{i:05d}",
             "address": 0x1000 + i * 2,
-            "byte_size": 2,
+            "length": 2, "byte_size": 2,
             "compu_method_unit": "rpm",
         }
         for i in range(count)

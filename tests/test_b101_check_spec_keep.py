@@ -923,8 +923,8 @@ def test_r_chked_041_3_6_symbol_range_mismatch_memory_row(tmp_path: Path, facts:
     falling back to the address rule -> ``GAMMA`` included -> RED; no
     resolution at all (the base) -> the control item includes nothing -> RED."""
     rows_in = [
-        {"name": "ALPHA", "address": 0x14, "byte_size": 2},
-        {"name": "GAMMA", "address": 0x14, "byte_size": 1},
+        {"name": "ALPHA", "address": 0x14, "length": 2, "byte_size": 2},
+        {"name": "GAMMA", "address": 0x14, "length": 1, "byte_size": 1},
     ]
 
     async def scenario(app, pilot, log):

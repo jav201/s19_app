@@ -64,7 +64,7 @@ from typing import (
 from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 from textual import events
-from textual.app import ComposeResult, NoActiveAppError
+from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.content import Content
 from textual.containers import (
@@ -5387,10 +5387,9 @@ class PatchEditorPanel(ScrollableContainer):
         on the next layout pass. A headless panel or an app without parsed A2L
         data supplies ``None``.
         """
-        try:
-            a2l_data = getattr(self.app, "current_a2l_data", None)
-        except NoActiveAppError:
-            a2l_data = None
+        a2l_data = (
+            getattr(self.app, "current_a2l_data", None) if self.is_mounted else None
+        )
         if not self._a2l_picker.set_parameters(rows, signature, a2l_data=a2l_data):
             return
         self._a2l_layout = None
@@ -7336,10 +7335,9 @@ class CheckEditorPanel(ScrollableContainer):
         panel or an app without parsed A2L data supplies ``None``.
         """
         kept = list(self._picker.picked_params)
-        try:
-            a2l_data = getattr(self.app, "current_a2l_data", None)
-        except NoActiveAppError:
-            a2l_data = None
+        a2l_data = (
+            getattr(self.app, "current_a2l_data", None) if self.is_mounted else None
+        )
         if not self._picker.set_parameters(rows, signature, a2l_data=a2l_data):
             return
         rows_before = len(self._memory_rows)

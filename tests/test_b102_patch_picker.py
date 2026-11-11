@@ -14,11 +14,11 @@ shared picker's ``set_parameters`` seam for the 10 000-row mount arm). No
 
 Contract pinned here (ids the implementer ships):
 - Fourth inspector tab: chip ``#patch_tab_a2l`` / pane ``#patch_pane_a2l``.
-- The shared picker mounted in ``highlight`` mode with ``id_prefix="patch_param"``:
+- The shared picker mounted in ``pick`` mode with ``id_prefix="patch_param"``:
   ``#patch_param_filter``, ``#patch_param_table``, ``#patch_param_status``,
   ``#patch_param_full_name_line``, ``#patch_param_page_prev_button`` /
-  ``#patch_param_page_label`` / ``#patch_param_page_next_button``; the include /
-  bulk controls of pick mode do NOT ship (E3 ruling 2).
+  ``#patch_param_page_label`` / ``#patch_param_page_next_button``; batch-103 Inc 6
+  adds the include / bulk controls for selector parity.
 - Host action button ``#patch_param_use_button`` (``Use parameter``).
 - The single marked status surface of E3 ruling 7: ``#patch_param_use_status``
   paints exactly ``Parameter address loaded; image bytes unavailable.`` and
@@ -177,7 +177,7 @@ def synthetic_rows(count: int, prefix: str = "P") -> list:
         {
             "name": f"{prefix}{i:05d}",
             "address": 0x1000 + i * 2,
-            "byte_size": 2,
+            "length": 2, "byte_size": 2,
             "compu_method_unit": "rpm",
         }
         for i in range(count)
@@ -445,22 +445,20 @@ def test_tc_b102_pe_01_activation_populates_check_population_and_reentry_preserv
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-PE-02 — R-B102-PE-002 — id isolation + highlight mode (E3 ruling 2)
+# TC-B102-PE-02 — R-B102-PE-002 — id isolation + pick mode
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_pe_02_id_isolation_and_highlight_mode(tmp_path: Path) -> None:
-    """TC-B102-PE-02 (R-B102-PE-002, full; E3 rulings 2/3): with both rail
-    panels mounted, the composed tree holds zero duplicate ids; every Patch
-    picker widget is ``patch_param_*``-prefixed and lives inside the Patch
-    panel, and no ``check_param_*`` id leaks into the Patch picker. In
-    ``highlight`` mode the picker composes no include/bulk controls, ``space`` /
-    ``enter`` on the highlighted row mutate no picks and post no
-    ``SelectionChanged``-equivalent state, and ``highlighted_parameter`` is the
-    read model.
+    """TC-B102-PE-02 (R-B102-PE-002, full): with both rail panels mounted,
+    the composed tree holds zero duplicate ids; every Patch picker widget is
+    ``patch_param_*``-prefixed and lives inside the Patch panel, and no
+    ``check_param_*`` id leaks into the Patch picker. Batch-103 Inc 6 enables
+    include/bulk controls; space then enter toggles the row on and off with no
+    net picks, and ``highlighted_parameter`` remains the read model.
 
     RED on base: no ``#patch_tab_a2l`` / no Patch picker. Mutant: reuse a Check
-    id in Patch; leave the include bindings active in highlight mode.
+    id in Patch; hide the parity controls or remove the include bindings.
     """
 
     async def body(app, pilot, panel):
@@ -508,9 +506,9 @@ def test_tc_b102_pe_02_id_isolation_and_highlight_mode(tmp_path: Path) -> None:
     assert leaked == [], f"check_param_* ids leak into the Patch picker: {leaked}"
     assert misplaced == [], f"patch_param_* widgets outside the Patch panel: {misplaced}"
     assert len(set(prefixed)) == len(prefixed), f"duplicate ids inside the patch prefix: {sorted(prefixed)}"
-    assert include == [], "highlight mode composes no include control"
-    assert bulk == [], "highlight mode composes no bulk-add control"
-    assert picked_after_keys == [], f"space/enter mutated the highlight-mode picks: {picked_after_keys}"
+    assert len(include) == 1, "pick mode composes the Patch include control"
+    assert len(bulk) == 1, "pick mode composes the Patch bulk-add control"
+    assert picked_after_keys == [], f"space/enter must toggle on then off with no net picks: {picked_after_keys}"
     assert isinstance(highlighted, dict), f"highlighted_parameter is the read model, got {highlighted!r}"
     assert highlighted.get("name") == "P000", highlighted
     assert highlighted.get("address") == 0x1000, highlighted
@@ -765,7 +763,7 @@ def test_tc_b102_pe_06_hostile_parameter_name_reads_literally(tmp_path: Path) ->
         await show_a2l_tab(panel, pilot)
         picker = patch_picker(panel)
         picker.set_parameters(
-            [{"name": HOSTILE_NAME_B102, "address": 0x2000, "byte_size": 2, "compu_method_unit": ""}],
+            [{"name": HOSTILE_NAME_B102, "address": 0x2000, "length": 2, "byte_size": 2, "compu_method_unit": ""}],
             ("hostile", 1),
         )
         await settle(pilot, 2)
@@ -881,7 +879,7 @@ def test_tc_b102_pe_add_oversize_parameter_skips_prefill(tmp_path: Path) -> None
         await show_a2l_tab(panel, pilot)
         picker = patch_picker(panel)
         picker.set_parameters(
-            [{"name": "HugeParam", "address": 0x1000, "byte_size": MAX_A2L_DECODE_BYTES + 1, "compu_method_unit": ""}],
+            [{"name": "HugeParam", "address": 0x1000, "length": MAX_A2L_DECODE_BYTES + 1, "byte_size": MAX_A2L_DECODE_BYTES + 1, "compu_method_unit": ""}],
             ("huge", 1),
         )
         await settle(pilot, 2)
@@ -919,7 +917,7 @@ def test_tc_b102_pe_add_none_address_row_is_not_usable(tmp_path: Path) -> None:
         await show_a2l_tab(panel, pilot)
         picker = patch_picker(panel)
         picker.set_parameters(
-            [{"name": "NoAddrParam", "address": None, "byte_size": 2, "compu_method_unit": ""}],
+            [{"name": "NoAddrParam", "address": None, "length": 2, "byte_size": 2, "compu_method_unit": ""}],
             ("noadr", 1),
         )
         await settle(pilot, 2)

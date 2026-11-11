@@ -103,7 +103,7 @@ def synthetic_rows(count: int, prefix: str = "P") -> list:
         {
             "name": f"{prefix}{i:05d}",
             "address": 0x1000 + i * 2,
-            "byte_size": 2,
+            "length": 2, "byte_size": 2,
             "compu_method_unit": "rpm",
         }
         for i in range(count)
@@ -509,7 +509,7 @@ def test_tc_b102_sel_07_hostile_parameter_name_reads_literally(tmp_path: Path) -
 
     async def body(app, pilot, panel):
         panel.set_a2l_parameters(
-            [{"name": HOSTILE_NAME_B102, "address": 0x2000, "byte_size": 2, "compu_method_unit": ""}]
+            [{"name": HOSTILE_NAME_B102, "address": 0x2000, "length": 2, "byte_size": 2, "compu_method_unit": ""}]
         )
         await settle(pilot, 2)
         table = panel.query_one("#check_param_table", DataTable)

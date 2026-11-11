@@ -459,7 +459,7 @@ def test_at_b94_13_hostile_symbol_and_file_name(tmp_path: Path) -> None:
             await pilot.pause()
             panel = app.query_one("#check_editor_panel", CheckEditorPanel)
             panel.set_a2l_parameters(
-                [{"name": _HOSTILE, "address": 0x100, "byte_size": 4}]
+                [{"name": _HOSTILE, "address": 0x100, "length": 4, "byte_size": 4}]
             )
             panel.set_spec_files([f"{_HOSTILE}.chk.json", "hotfix.pch.json"])
             await pilot.pause()
