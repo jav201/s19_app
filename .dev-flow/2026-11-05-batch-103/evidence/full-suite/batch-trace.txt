@@ -1,0 +1,1 @@
+trace_check: 7 US, 381 active requirements (2 withdrawn), 0 gap(s)
