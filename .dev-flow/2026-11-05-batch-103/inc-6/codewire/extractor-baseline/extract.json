@@ -1,0 +1,686 @@
+{
+  "marks": [
+    {
+      "name": "describe_definitions",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 610,
+      "def": {
+        "qualname": "describe_definitions",
+        "line": 611,
+        "params": [
+          {
+            "name": "names",
+            "type": "Iterable[str]",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "dict[str, Definition]"
+      }
+    },
+    {
+      "name": "parse_parameter_list",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 75,
+      "def": {
+        "qualname": "parse_parameter_list",
+        "line": 76,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "list"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.highlighted_parameter",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 481,
+      "def": {
+        "qualname": "A2LParameterPicker.highlighted_parameter",
+        "line": 483,
+        "params": [],
+        "returns": "Optional[dict]"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 528,
+      "def": {
+        "qualname": "A2LParameterPicker.set_parameters",
+        "line": 529,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "A2LParameterPicker._row_cells",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 779,
+      "def": {
+        "qualname": "A2LParameterPicker._row_cells",
+        "line": 780,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "layout",
+            "type": "PickerLayout",
+            "default": null
+          }
+        ],
+        "returns": "tuple"
+      }
+    },
+    {
+      "name": "A2LParameterPicker._refresh_full_name",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 835,
+      "def": {
+        "qualname": "A2LParameterPicker._refresh_full_name",
+        "line": 836,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.include_names",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 925,
+      "def": {
+        "qualname": "A2LParameterPicker.include_names",
+        "line": 926,
+        "params": [
+          {
+            "name": "names",
+            "type": "Sequence[str]",
+            "default": null
+          }
+        ],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.__init__",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 4811,
+      "def": {
+        "qualname": "PatchEditorPanel.__init__",
+        "line": 4812,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.set_a2l_parameters",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5376,
+      "def": {
+        "qualname": "PatchEditorPanel.set_a2l_parameters",
+        "line": 5377,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel._use_highlighted_parameter",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5456,
+      "def": {
+        "qualname": "PatchEditorPanel._use_highlighted_parameter",
+        "line": 5457,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 7288,
+      "def": {
+        "qualname": "CheckEditorPanel.set_a2l_parameters",
+        "line": 7289,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CheckEditorPanel._on_a2l_parameter_picker_bulk_add_requested",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 7879,
+      "def": {
+        "qualname": "CheckEditorPanel._on_a2l_parameter_picker_bulk_add_requested",
+        "line": 7880,
+        "params": [
+          {
+            "name": "event",
+            "type": "A2LParameterPicker.BulkAddRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CheckEditorPanel._open_parameter_bulk_add",
+      "reqs": null,
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 7890,
+      "def": {
+        "qualname": "CheckEditorPanel._open_parameter_bulk_add",
+        "line": 7891,
+        "params": [],
+        "returns": "None"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-PICKER-CORRECT.001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "repopulated"
+        ],
+        "raw": "bool repopulated"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) rows and signature → repopulated"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline population contract before the delta",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LParameterPicker._row_cells",
+      "reqs": [
+        "R-PICKER-CORRECT.003"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PickerLayout",
+          "name": "layout",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple",
+        "names": [
+          "cells"
+        ],
+        "raw": "tuple cells"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) name and layout → cells"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline four-cell renderer",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LParameterPicker._refresh_full_name",
+      "reqs": [
+        "R-PICKER-CORRECT.003"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) highlighted row → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline full-name renderer",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LParameterPicker.highlighted_parameter",
+      "reqs": [
+        "R-PICKER-CORRECT.005"
+      ],
+      "in": [],
+      "out": {
+        "type": "Optional[dict]",
+        "names": [
+          "parameter"
+        ],
+        "raw": "Optional[dict] parameter"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) highlighted row → parameter"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": null,
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.__init__",
+      "reqs": [
+        "R-PICKER-CORRECT.011"
+      ],
+      "in": [],
+      "out": {
+        "type": "PatchEditorPanel",
+        "names": [
+          "panel"
+        ],
+        "raw": "PatchEditorPanel panel"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) construct panel → panel"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Patch panel construction",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-PICKER-CORRECT.018"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) rows and signature → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Patch population shim",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-PICKER-CORRECT.018"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) rows and signature → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Check population shim",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel._use_highlighted_parameter",
+      "reqs": [
+        "R-PICKER-CORRECT.005"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) highlighted parameter → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Use parameter route",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "parse_parameter_list",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list",
+        "names": [
+          "tokens"
+        ],
+        "raw": "list tokens"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) text → tokens"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline bulk parser",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LParameterPicker.include_names",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "summary"
+        ],
+        "raw": "dict summary"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) names → summary"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline exact-match bulk include",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CheckEditorPanel._on_a2l_parameter_picker_bulk_add_requested",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "A2LParameterPicker.BulkAddRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) event → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Check bulk host",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CheckEditorPanel._open_parameter_bulk_add",
+      "reqs": [],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(baseline) request → None"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline Check modal opener",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "describe_definitions",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict[str, Definition]",
+        "names": [
+          "definitions"
+        ],
+        "raw": "dict[str, Definition] definitions"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) names and data → definitions"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline one-walk definition producer",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2LParameterPicker.include_names",
+      "callee": "A2LParameterPicker._row_cells",
+      "sites": [
+        "s19_app/tui/a2l_parameter_picker.py:1031"
+      ]
+    },
+    {
+      "caller": "A2LParameterPicker.set_parameters",
+      "callee": "A2LParameterPicker._refresh_full_name",
+      "sites": [
+        "s19_app/tui/a2l_parameter_picker.py:823"
+      ]
+    },
+    {
+      "caller": "A2LParameterPicker.set_parameters",
+      "callee": "A2LParameterPicker._row_cells",
+      "sites": [
+        "s19_app/tui/a2l_parameter_picker.py:822"
+      ]
+    },
+    {
+      "caller": "CheckEditorPanel._on_a2l_parameter_picker_bulk_add_requested",
+      "callee": "CheckEditorPanel._open_parameter_bulk_add",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:7888"
+      ]
+    },
+    {
+      "caller": "CheckEditorPanel.set_a2l_parameters",
+      "callee": "A2LParameterPicker.include_names",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:7312"
+      ]
+    },
+    {
+      "caller": "CheckEditorPanel.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:7307"
+      ]
+    },
+    {
+      "caller": "PatchEditorPanel.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5390"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "describe_definitions": [
+      "s19_app/tui/a2l_definition.py:607"
+    ],
+    "A2LParameterPicker._row_cells": [
+      "s19_app/tui/a2l_parameter_picker.py:590",
+      "s19_app/tui/a2l_parameter_picker.py:917"
+    ],
+    "A2LParameterPicker._refresh_full_name": [
+      "s19_app/tui/a2l_parameter_picker.py:598",
+      "s19_app/tui/a2l_parameter_picker.py:672",
+      "s19_app/tui/a2l_parameter_picker.py:739"
+    ],
+    "PatchEditorPanel.__init__": [
+      "s19_app/tui/app.py:4931"
+    ],
+    "PatchEditorPanel.set_a2l_parameters": [
+      "s19_app/tui/app.py:7914",
+      "s19_app/tui/app.py:7935"
+    ],
+    "CheckEditorPanel.set_a2l_parameters": [
+      "s19_app/tui/app.py:7914",
+      "s19_app/tui/app.py:7935"
+    ],
+    "A2LParameterPicker.include_names": [
+      "s19_app/tui/screens.py:1020",
+      "s19_app/tui/screens_directionb.py:7357"
+    ],
+    "parse_parameter_list": [
+      "s19_app/tui/screens.py:1019"
+    ],
+    "PatchEditorPanel._use_highlighted_parameter": [
+      "s19_app/tui/screens_directionb.py:5929"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}
