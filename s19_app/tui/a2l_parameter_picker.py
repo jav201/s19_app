@@ -1,38 +1,32 @@
-"""Batch-102 Inc 3 — the shared A2L parameter picker (R-B102-SEL-001..007).
+"""The shared Check/Patch A2L parameter picker.
 
-The reusable selector the Check Editor embeds today and the Patch Editor can
-embed at Inc 5: a filter, a paged parameter ledger (at most one 200-row page
-mounted per rebuild), the highlighted row's full-name line, a separate count /
-status line, the include control and the Prev / Next page chips. State is keyed
-by the caller-provided A2L signature so re-entering a screen does not repopulate
-the ledger or lose the operator's picks (R-B102-SEL-004).
+The selector provides a filter, a paged parameter ledger (at most one 200-row
+page mounted per rebuild), the highlighted row's full-name line, a separate
+count/status line, include and bulk controls, and Prev/Next page chips. State
+is keyed by the caller-provided A2L signature so re-entering a screen does not
+repopulate the ledger or lose the operator's picks (R-B102-SEL-004).
 
-Batch-102 Inc 4 adds the bulk-add slice (R-B102-BULK-001..007) on top of the
-same picker: :func:`parse_parameter_list` splits a pasted name list, the
-``Add list`` control (``#check_param_bulk_button``) emits
+:func:`parse_parameter_list` splits a pasted name list, ``Add list`` emits
 :class:`A2LParameterPicker.BulkAddRequested` for the host to push the modal,
 and :meth:`A2LParameterPicker.include_names` includes exact source matches in
-one pass, emitting the same ``SelectionChanged`` contract (E3 ruling 4/5).
+one pass, emitting the same ``SelectionChanged`` contract (R-B102-BULK-001..007).
 
-Every file-derived string reaches the screen as a literal ``Text`` built by
-:func:`s19_app.utils.safe_text` — no markup path exists here (R-B102-SEL-007).
+``id_prefix`` rebuilds every child id and internal event route, while a
+``layout_provider`` carries the host's proportional widths. ``mode="highlight"``
+turns the ledger into a read-only highlighter with no include/bulk controls or
+selection events; either mode exposes the current row through
+:meth:`A2LParameterPicker.highlighted_parameter` (R-B102-PE-002/003).
 
-Batch-102 Inc 5 (US-102-05) parameterizes the component so the Patch Editor
-embeds the same selector beside the Check Editor without id collisions
-(R-B102-PE-002): ``id_prefix`` rebuilds every child id and internal event
-route, a ``layout_provider`` carries the host's proportional widths, and
-``mode="highlight"`` turns the ledger into a read-only highlighter — no
-include/bulk controls, no ``space``/``enter`` include bindings, no
-``SelectionChanged`` — whose current row the host reads through
-:meth:`A2LParameterPicker.highlighted_parameter`. The Check Editor keeps the
-default public ids and pick mode.
+Batch-103 Inc 6 normalizes only declared ``length`` as optional size, obtains
+element datatype/kind from one batched I-2 description per population, and
+renders picker-owned A2L/I-2 names and format/unit strings literally with C0/C1
+controls replaced by U+FFFD. Ledger and full-name surfaces clip to their own
+cell budgets (R-PICKER-CORRECT.001-.004/.017-.019).
 
-The Check Editor cell helpers (:func:`clip_param`, :func:`clip_tail`,
-:func:`_clip_fmt_unit`, :func:`_tail_cells`) moved here with the ledger so
-the picker stays import-cycle-free; :func:`_clip_to_cells` is duplicated
-verbatim from ``screens_directionb`` for the same reason (the house precedent
-of ``S19TuiApp._clip_to``), and ``screens_directionb`` re-imports
-:func:`clip_tail` for its remaining non-ledger painters.
+The cell helpers live here so the picker stays import-cycle-free;
+:func:`_clip_to_cells` mirrors the host's cell clipping without importing the
+panels, and ``screens_directionb`` re-imports :func:`clip_tail` for its
+remaining non-ledger painters.
 """
 
 from __future__ import annotations
@@ -50,7 +44,7 @@ from textual.coordinate import Coordinate
 from textual.message import Message
 from textual.widgets import Button, DataTable, Input, Label, Static
 
-from ..utils import safe_text
+from .a2l_definition import Definition, describe_definitions
 from .insight_style import CYAN, DGRAY, GREEN, VALUE
 from .os_clipboard_input import OsClipboardInput
 
@@ -187,11 +181,62 @@ def clip_tail(text: str, width: int) -> str:
     return "…" + _tail_cells(text, width - 1)
 
 
+_DATATYPE_FORMATS = {
+    "UBYTE": "u8",
+    "BYTE": "u8",
+    "SBYTE": "s8",
+    "UWORD": "u16",
+    "WORD": "u16",
+    "SWORD": "s16",
+    "ULONG": "u32",
+    "LONG": "u32",
+    "SLONG": "s32",
+    "A_UINT64": "u64",
+    "A_INT64": "s64",
+    "FLOAT16_IEEE": "f16",
+    "FLOAT32_IEEE": "f32",
+    "FLOAT64_IEEE": "f64",
+}
+
+
+def _format_parameter(definition: Optional[Definition], row: dict) -> str:
+    """Return the element datatype label followed by its optional unit.
+
+    A definition is authoritative when supplied. Direct rows without one use
+    only their tag ``datatype``/``char_type`` and ``compu_method_unit`` fields.
+    """
+    if definition is not None:
+        datatype = definition.datatype
+        kind = definition.kind
+        unit = definition.unit
+    else:
+        datatype = row.get("datatype")
+        kind = row.get("char_type")
+        unit = row.get("compu_method_unit")
+    datatype_key = str(datatype) if datatype is not None else ""
+    fmt = (
+        "text"
+        if kind in ("text", "ASCII")
+        else _DATATYPE_FORMATS.get(datatype_key, "?")
+    )
+    unit_text = str(unit or "")
+    return fmt + (f" {unit_text}" if unit_text else "")
+
+
+def _literal_parameter_text(value: str, style: str = "") -> Text:
+    """Return literal text with every C0/C1 control replaced by U+FFFD."""
+    transformed = "".join(
+        "\ufffd" if ord(character) <= 31 or 127 <= ord(character) <= 159 else character
+        for character in value
+    )
+    return Text(transformed, style=style)
+
+
 def _clip_fmt_unit(fmt_unit: str, width: int) -> str:
     """Clip a ``u<bits> <unit>`` cell: the unit goes first, the width stays.
 
     When even the ``u<bits>`` token fills the column, the token is painted
-    alone (no room for a ``…``); the full-name line shows the whole text.
+    alone (no room for a ``…``); the full-name line clips to its own budget.
     """
     text = fmt_unit.rstrip()
     if cell_len(text) <= width:
@@ -327,14 +372,13 @@ class A2LParameterPicker(Vertical):
 
     Modes:
 
-    - ``mode="pick"`` (the default, the Check Editor): ``space``/``enter``
+    - ``mode="pick"`` (the default, used by Check and Patch): ``space``/``enter``
       toggle the highlighted row's inclusion; ``SelectionChanged`` carries
       the picked-name tuple; the include and bulk controls paint.
-    - ``mode="highlight"`` (the Patch Editor, batch-102 Inc 5): the ledger
-      is a read-only highlighter — the include/bulk controls, the include
-      bindings and every ``SelectionChanged`` are disabled (E3 ruling 2) —
-      and the host reads the current row through
-      :meth:`highlighted_parameter` (R-B102-PE-003).
+    - ``mode="highlight"``: the ledger is a read-only highlighter — the
+      include/bulk controls, the include bindings and every
+      ``SelectionChanged`` are disabled (E3 ruling 2) — and the host reads
+      the current row through :meth:`highlighted_parameter` (R-B102-PE-003).
 
     Events:
         ``SelectionChanged``: the picked-name tuple changed (one row toggled
@@ -365,9 +409,8 @@ class A2LParameterPicker(Vertical):
 
         The picker stays presentational (C-7 / E3 ruling 5): it composes
         ``#check_param_bulk_button`` but never pushes the modal itself —
-        the host (Check Editor today, Patch Editor at Inc 5) listens and
-        pushes :class:`s19_app.tui.screens.BulkParameterAddScreen` for this
-        picker.
+        the Check or Patch host listens and pushes
+        :class:`s19_app.tui.screens.BulkParameterAddScreen` for this picker.
         """
 
     class ViewChanged(Message, namespace="a2l_parameter_picker"):
@@ -479,17 +522,17 @@ class A2LParameterPicker(Vertical):
 
     @property
     def highlighted_parameter(self) -> Optional[dict]:
-        """The highlighted ledger row's source record (highlight mode).
+        """The highlighted ledger row's source record.
 
         Summary:
-            Batch-102 Inc 5's read model for the Patch Editor's
-            ``Use parameter`` action (R-B102-PE-003): the record under the
-            ledger cursor — ``{"name", "address", "size", "fmt_unit"}`` —
-            or ``None`` when there is no visible row or the cursor is out
-            of range. The ``address`` is the normalized integer the picker
-            stored (``None`` when the source row had no integer address);
-            hosts must treat a non-integer address as a non-usable row and
-            must not format it as ``0x%08X`` (E3 ruling 9).
+            The read model for the Patch Editor's ``Use parameter`` action
+            (R-B102-PE-003): the record under the ledger cursor —
+            ``{"name", "address", "size", "fmt_unit"}`` — or ``None`` when
+            there is no visible row or the cursor is out of range. The
+            ``address`` is the normalized integer the picker stored and
+            ``size`` is the positive declared length, both ``None`` when
+            missing. Hosts must treat a non-integer address as a non-usable
+            row and must not format it as ``0x%08X`` (E3 ruling 9).
 
         Returns:
             Optional[dict]: The highlighted row's record, or ``None``.
@@ -497,7 +540,7 @@ class A2LParameterPicker(Vertical):
         Example:
             >>> picker = A2LParameterPicker()
             >>> picker.set_parameters(
-            ...     [{"name": "TorqueMax", "address": 0x1000, "byte_size": 4}]
+            ...     [{"name": "TorqueMax", "address": 0x1000, "length": 4}]
             ... )
             True
             >>> picker.highlighted_parameter is None  # not mounted
@@ -518,24 +561,37 @@ class A2LParameterPicker(Vertical):
             "fmt_unit": fmt_unit,
         }
 
-
     # ------------------------------------------------------------------
     # Population
     # ------------------------------------------------------------------
 
-    def set_parameters(self, rows: Sequence[dict], signature: object = None) -> bool:
+    def set_parameters(
+        self,
+        rows: Sequence[dict],
+        signature: object = None,
+        *,
+        a2l_data: Optional[dict] = None,
+    ) -> bool:
         """Populate the ledger (R-B102-SEL-001, R-B102-SEL-004, R-B102-SEL-006).
 
-        Normalizes integer-address rows into ``{name: (address, size, fmt_unit)}``.
+        Normalizes rows into ``{name: (address, size, fmt_unit)}``. Only a
+        positive, non-boolean integer ``length`` supplies ``size``; missing or
+        refused lengths stay ``None``. With ``a2l_data``, one batched definition
+        description supplies every row's element datatype/kind and unit. Direct
+        rows without A2L data use their tag datatype/characteristic kind instead.
+
         When ``signature`` is non-``None`` and equals the stored signature,
-        returns ``False`` without touching filter, page, picks or table.
-        Otherwise replaces the source rows, clears the picks, resets the
-        filter/page state, caches ``fmt_longest`` and rebuilds one page.
+        returns ``False`` before describing definitions or touching filter,
+        page, picks or table. Otherwise replaces the source rows, clears the
+        picks, resets the filter/page state, caches ``fmt_longest`` and rebuilds
+        one page.
 
         Args:
             rows (Sequence[dict]): The loaded A2L's measurable parameters.
             signature (object): The caller-provided identity; ``None`` always
                 repopulates.
+            a2l_data (Optional[dict]): The loaded parse payload used for one
+                batched definition description per real population.
 
         Returns:
             bool: ``True`` when the ledger was repopulated, ``False`` on the
@@ -546,20 +602,31 @@ class A2LParameterPicker(Vertical):
         self._signature = signature
         self._param_rows = {}
         self._picked_params = []
-        for row in rows:
-            name = str(row.get("name") or "?")
+        names = [str(row.get("name") or "?") for row in rows]
+        definitions = (
+            describe_definitions(names, a2l_data) if a2l_data is not None else {}
+        )
+        for row, name in zip(rows, names):
             address = row.get("address")
             address = (
                 int(address)
                 if isinstance(address, int) and not isinstance(address, bool)
                 else None
             )
-            size = int(row.get("byte_size") or 1)
-            unit = str(row.get("compu_method_unit") or "")
-            fmt_unit = f"u{size * 8}" + (f" {unit}" if unit else "")
+            length = row.get("length")
+            size = (
+                length
+                if isinstance(length, int) and not isinstance(length, bool) and length > 0
+                else None
+            )
+            fmt_unit = _format_parameter(definitions.get(name), row)
             self._param_rows[name] = (address, size, fmt_unit)
         self._fmt_longest = max(
-            (cell_len(v[2].rstrip()) for v in self._param_rows.values()), default=0
+            (
+                cell_len(_literal_parameter_text(value[2]).plain.rstrip())
+                for value in self._param_rows.values()
+            ),
+            default=0,
         )
         self._filter_text = ""
         self._page = 1
@@ -776,18 +843,18 @@ class A2LParameterPicker(Vertical):
     def _row_cells(self, name: str, layout: PickerLayout) -> tuple:
         """The four ledger cells: mark, Parameter, Address, ``Fmt · Unit``.
 
-        Every cell is a literal ``Text`` (C-17): the file-derived name is
-        scrubbed by ``safe_text`` before clipping — no markup path, no control
-        byte reaches the table (R-B102-SEL-007).
+        A2L/I-2 names and format/unit strings are literal ``Text``: C0/C1
+        controls become U+FFFD before cell clipping, and no markup is parsed.
         """
         address, _size, fmt_unit = self._param_rows[name]
         picked = name in self._picked_params
-        plain = safe_text(name).plain
+        plain_name = _literal_parameter_text(name).plain
+        plain_fmt_unit = _literal_parameter_text(fmt_unit).plain
         return (
             Text("✓", style=GREEN) if picked else Text(" "),
-            safe_text(clip_param(plain, layout.param), VALUE),
-            safe_text(f"0x{address:08X}" if address is not None else "-", CYAN),
-            safe_text(_clip_fmt_unit(fmt_unit, layout.fmt)),
+            _literal_parameter_text(clip_param(plain_name, layout.param), VALUE),
+            Text(f"0x{address:08X}" if address is not None else "-", style=CYAN),
+            _literal_parameter_text(_clip_fmt_unit(plain_fmt_unit, layout.fmt)),
         )
 
     def _rebuild_ledger(self) -> None:
@@ -831,7 +898,8 @@ class A2LParameterPicker(Vertical):
     def _refresh_full_name(self) -> None:
         """Paint the highlighted row's address, ``Fmt · Unit`` and name under
         the ledger (LLR-145.3); the two empty states paint their message here
-        (R-B102-SEL-006), the shipped surface since batch-97.
+        (R-B102-SEL-006). Format/unit clips to the budget remaining after the
+        address, separators and eight name cells, before the name is fitted.
         """
         if not self.is_mounted:
             return
@@ -847,11 +915,15 @@ class A2LParameterPicker(Vertical):
         name = self._visible_params[row]
         address, _size, fmt_unit = self._param_rows[name]
         head = f"0x{address:08X}" if address is not None else "-"
-        fmt_unit = fmt_unit.rstrip()
+        full_name_width = self._layout().full_name
+        plain_fmt_unit = _literal_parameter_text(fmt_unit).plain
+        fmt_room = max(1, full_name_width - cell_len(head) - 12)
+        fmt_unit = _clip_fmt_unit(plain_fmt_unit, fmt_room)
         text = Text(head, style=CYAN)
-        text.append(f"  {fmt_unit}  ", style=DGRAY)
-        room = max(8, self._layout().full_name - cell_len(text.plain))
-        text.append(safe_text(clip_param(safe_text(name).plain, room), VALUE))
+        text.append(_literal_parameter_text(f"  {fmt_unit}  ", DGRAY))
+        room = max(1, full_name_width - cell_len(text.plain))
+        plain_name = _literal_parameter_text(name).plain
+        text.append(_literal_parameter_text(clip_param(plain_name, room), VALUE))
         line.update(text)
 
     def _refresh_status(self) -> None:

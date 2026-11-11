@@ -64,7 +64,7 @@ from typing import (
 from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 from textual import events
-from textual.app import ComposeResult
+from textual.app import ComposeResult, NoActiveAppError
 from textual.binding import Binding
 from textual.content import Content
 from textual.containers import (
@@ -4449,7 +4449,7 @@ class PatchEditorPanel(ScrollableContainer):
 
     #: The inspector's four tabs: (chip id, label, pane id, border title).
     #: The A2L tab (batch-102 Inc 5, US-102-05) embeds the shared parameter
-    #: picker in highlight mode beside the Check Editor's pick-mode one.
+    #: picker in pick mode beside the Check Editor's pick-mode one.
     _TABS = (
         ("patch_tab_inspector", "Inspector", "patch_pane_inspector", "INSPECTOR"),
         ("patch_tab_json", "JSON", "patch_win_json", "JSON"),
@@ -4811,18 +4811,19 @@ class PatchEditorPanel(ScrollableContainer):
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
         #: The A2L parameter picker (batch-102 Inc 5, US-102-05): the shared
-        #: selector in highlight mode, namespaced ``patch_param_*`` so it
-        #: mounts beside the Check Editor's ``check_param_*`` picker without
-        #: duplicate ids (R-B102-PE-002). The panel stays the host: it
-        #: injects the A2L tab's width derivation as ``layout_provider``
-        #: (a one-way call — the provider reads cached scalars, never picker
-        #: entry points) and transfers the highlighted row into the entry
-        #: form on ``Use parameter`` (R-B102-PE-003).
+        #: selector in pick mode with include and bulk controls, namespaced
+        #: ``patch_param_*`` so it mounts beside the Check Editor's
+        #: ``check_param_*`` picker without duplicate ids (R-B102-PE-002).
+        #: The panel stays the host: it injects the A2L tab's width derivation
+        #: as ``layout_provider`` (a one-way call — the provider reads cached
+        #: scalars, never picker entry points), hosts the shared bulk modal
+        #: without document writes, and transfers the highlighted row into the
+        #: entry form on ``Use parameter`` (R-B102-PE-003).
         self._a2l_picker = A2LParameterPicker(
             id_prefix="patch_param",
-            mode="highlight",
-            show_include_button=False,
-            show_bulk_button=False,
+            mode="pick",
+            show_include_button=True,
+            show_bulk_button=True,
             layout_provider=self._a2l_widths,
         )
         #: The last derived A2L-tab widths; ``None`` until the tab is measured.
@@ -5211,7 +5212,7 @@ class PatchEditorPanel(ScrollableContainer):
                                 classes="patch-field-label",
                             )
                     # batch-102 Inc 5 (US-102-05): the A2L tab hosts the shared
-                    # picker in highlight mode; ``Use parameter`` transfers the
+                    # picker in pick mode; ``Use parameter`` transfers the
                     # highlighted row into the entry form without touching the
                     # document (R-B102-PE-003).
                     with Container(id="patch_win_a2l"):
@@ -5369,7 +5370,7 @@ class PatchEditorPanel(ScrollableContainer):
         )
 
     # ------------------------------------------------------------------
-    # A2L tab (batch-102 Inc 5, US-102-05 — the shared picker in highlight mode)
+    # A2L tab (batch-102 Inc 5, US-102-05 — the shared picker in pick mode)
     # ------------------------------------------------------------------
 
     def set_a2l_parameters(
@@ -5377,15 +5378,20 @@ class PatchEditorPanel(ScrollableContainer):
     ) -> None:
         """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005).
 
-        Delegates rows and the app's safe ``_a2l_enriched_key`` signature to
-        the embedded picker: it mounts at most one 200-row page and preserves
-        the filter, the page and the highlight while the signature is
-        unchanged, in which case this shim returns without touching the
-        layout. On a real (re)population the cached ``Fmt · Unit`` width may
-        change, so the derived widths are invalidated and re-derived on the
-        next layout pass.
+        Delegates rows, the app's safe ``_a2l_enriched_key`` signature and its
+        current parsed A2L data to the embedded picker: it mounts at most one
+        200-row page and preserves the filter, page, highlight and picks while
+        the signature is unchanged, in which case this shim returns without
+        touching the layout. On a real (re)population the cached ``Fmt · Unit``
+        width may change, so the derived widths are invalidated and re-derived
+        on the next layout pass. A headless panel or an app without parsed A2L
+        data supplies ``None``.
         """
-        if not self._a2l_picker.set_parameters(rows, signature):
+        try:
+            a2l_data = getattr(self.app, "current_a2l_data", None)
+        except NoActiveAppError:
+            a2l_data = None
+        if not self._a2l_picker.set_parameters(rows, signature, a2l_data=a2l_data):
             return
         self._a2l_layout = None
         self.call_after_refresh(self._apply_a2l_layout)
@@ -5451,33 +5457,62 @@ class PatchEditorPanel(ScrollableContainer):
             table.update_cell(name, keys[3], cells[3])
         self._a2l_picker.refresh_full_name()
 
+    def _on_a2l_parameter_picker_bulk_add_requested(
+        self, event: A2LParameterPicker.BulkAddRequested
+    ) -> None:
+        """The picker's bulk-add control was activated: push the shared bulk
+        modal for this panel's picker. The host owns the screen stack; bulk
+        inclusion never creates a Patch document action."""
+        event.stop()
+        self._open_parameter_bulk_add()
+
+    def _open_parameter_bulk_add(self) -> None:
+        """Push :class:`BulkParameterAddScreen` bound to the Patch picker."""
+        self.app.push_screen(
+            BulkParameterAddScreen(self._a2l_picker), self._on_bulk_add_closed
+        )
+
+    def _on_bulk_add_closed(self, summary: Optional[dict]) -> None:
+        """Bulk modal dismissed without rebuilding the ledger or changing the
+        document, dirty flag, undo/redo history or current selection. The
+        shared picker retains successful includes and the modal owns its
+        summary; cancellation and escape are inert."""
+
     def _use_highlighted_parameter(self) -> None:
         """Transfer the highlighted A2L row into the entry form
         (R-B102-PE-003, R-B102-PE-004; E3 rulings 4/5/6/9).
 
         Reads the picker's ``highlighted_parameter``: with no usable row (or
         a non-integer address, E3 ruling 9) it paints ``No parameter
-        highlighted.`` and touches nothing else. Otherwise it writes the
-        Address input as ``0x%08X`` and the Bytes input with the panel-
-        retained current image bytes for the parameter size — every byte of
+        highlighted.`` and touches nothing else. It writes a valid Address as
+        ``0x%08X``. A missing declared size then clears Bytes and paints
+        ``Parameter has no length — Bytes not prefilled.`` before any image
+        lookup. Otherwise the Bytes input receives the panel-retained current
+        image bytes for the parameter size — every byte of
         ``[address, address + size)`` must be mapped, and the size must not
         exceed ``MAX_A2L_DECODE_BYTES`` (E3 ruling 5: no giant range is
         iterated, no silent truncation); on either miss Bytes is left empty
         and ``Parameter address loaded; image bytes unavailable.`` paints.
-        No document action is posted and the dirty state is unchanged — the
-        document changes only through Add / Edit. Every painted line is an
-        author-fixed string through ``safe_text`` (E3 ruling 7); no parameter
-        name, image byte or path is logged (E3 ruling 10).
+        No document action is posted and the dirty/undo/redo state is unchanged
+        — the document changes only through Add / Edit. Every painted line is
+        an author-fixed string through ``safe_text`` (E3 ruling 7); no
+        parameter name, image byte or path is logged (E3 ruling 10).
         """
         parameter = self._a2l_picker.highlighted_parameter
         address = parameter.get("address") if parameter else None
         if parameter is None or not isinstance(address, int) or address < 0:
             self._paint_a2l_use_status("No parameter highlighted.")
             return
-        size = int(parameter.get("size") or 1)
         self.query_one("#patch_entry_address_input", Input).value = (
             f"0x{address:08X}"
         )
+        size = parameter.get("size")
+        if size is None:
+            self.query_one("#patch_entry_bytes_input", Input).value = ""
+            self._paint_a2l_use_status(
+                "Parameter has no length — Bytes not prefilled."
+            )
+            return
         bytes_text = ""
         status = ""
         if size > MAX_A2L_DECODE_BYTES:
@@ -7287,20 +7322,25 @@ class CheckEditorPanel(ScrollableContainer):
     ) -> None:
         """Populate the A2L parameter ledger (LLR-001.1, LLR-145.1).
 
-        Delegates rows and the signature to the embedded
-        :class:`A2LParameterPicker` (the batch-102 Inc 3 seam): the picker
-        mounts at most one page, preserves filter/page/picks while the
-        signature is unchanged (R-B102-SEL-004) and no-ops on the
+        Delegates rows, the signature and the app's current parsed A2L data to
+        the embedded :class:`A2LParameterPicker` (the batch-102 Inc 3 seam):
+        the picker mounts at most one page, preserves filter/page/picks while
+        the signature is unchanged (R-B102-SEL-004) and no-ops on the
         unchanged-signature re-entry, in which case this shim returns without
         touching the layout or the previews. On a real (re)population it
         re-includes every earlier pick the new ledger lists, demotes a pick
         loaded from a spec that the new ledger no longer lists at its spec
         entry's range into a memory row (R-CHKED-056) and drops the rest
         (R-CHKED-055), then re-derives the widths (the cached longest
-        ``Fmt · Unit`` text is an input of :func:`check_layout`).
+        ``Fmt · Unit`` text is an input of :func:`check_layout`). A headless
+        panel or an app without parsed A2L data supplies ``None``.
         """
         kept = list(self._picker.picked_params)
-        if not self._picker.set_parameters(rows, signature):
+        try:
+            a2l_data = getattr(self.app, "current_a2l_data", None)
+        except NoActiveAppError:
+            a2l_data = None
+        if not self._picker.set_parameters(rows, signature, a2l_data=a2l_data):
             return
         rows_before = len(self._memory_rows)
         kept = self._demote_moved_spec_params(kept)

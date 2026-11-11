@@ -1,0 +1,402 @@
+Batch 103 Inc 6 E4 base RED: picker model/format
+Base commit: 6608b006eff9e0e1ee0e69127d5b7553ab273abf
+Runner: Linux, Python 3.11 (serial_timing cases included)
+Command: python -I -B -m pytest tests/test_b103_picker_model.py -vv --tb=short -ra -s < /dev/null
+Environment: PYTHONDONTWRITEBYTECODE=1; neutral HOME/XDG/LOCALAPPDATA under /tmp; CI unset
+Hostile C0/C1 bytes in failure text are rendered as visible escapes; runner identities and home paths are neutralized.
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- /tmp/b103-inc6-python/bin/python
+cachedir: .pytest_cache
+rootdir: /tmp/b103-inc6-base-model
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... s19_app.__file__ = /tmp/b103-inc6-base-model/s19_app/__init__.py
+collected 44 items
+
+tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/1---] PASSED
+tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/2---] FAILED
+tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/3---] PASSED
+tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/4---] FAILED
+tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--] FAILED
+tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/2--] FAILED
+tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/3--] FAILED
+tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/4--] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/1------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/2------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/3------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/4------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/5------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/6------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/7------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/8------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/9------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/10------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/11------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/12------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/13------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/14------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/15------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/16------] FAILED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/17------] PASSED
+tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/18------] FAILED
+tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/1] FAILED
+tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/2] FAILED
+tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/3] FAILED
+tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/4] FAILED
+tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/1] FAILED
+tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/2] FAILED
+tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/3] FAILED
+tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/4] FAILED
+tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/5] FAILED
+tests/test_b103_picker_model.py::test_r017_1_hostile_parameter_name_is_replaced_literally FAILED
+tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally FAILED
+tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118 FAILED
+tests/test_b103_picker_model.py::test_r018_1_equal_signature_is_a_zero_describe_noop PASSED
+tests/test_b103_picker_model.py::test_r018_2_changed_generation_batches_once_per_picker FAILED
+tests/test_b103_picker_model.py::test_r018_3_none_always_repopulates_with_real_a2l_data FAILED
+tests/test_b103_picker_model.py::test_r018_4_live_reload_refreshes_both_without_reentry FAILED
+tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation FAILED
+tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe FAILED
+
+=================================== FAILURES ===================================
+_ test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/2---] _
+tests/test_b103_picker_model.py:294: in test_r001_declared_length_is_the_only_size_source
+    assert result["size"] == length
+E   assert 2 == 12
+_ test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/4---] _
+tests/test_b103_picker_model.py:294: in test_r001_declared_length_is_the_only_size_source
+    assert result["size"] == length
+E   assert 2 == 12
+_ test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--] _
+tests/test_b103_picker_model.py:332: in test_r002_real_a2l_shapes_report_whole_object_length
+    assert results[editor]["size"] == length, (editor, source, results[editor])
+E   AssertionError: ('check', {'access': None, 'address': 4096, 'axis_meta': [], 'bit_org': None, ...}, {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  ARR12', ...})
+E   assert 2 == 12
+_ test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/2--] _
+tests/test_b103_picker_model.py:332: in test_r002_real_a2l_shapes_report_whole_object_length
+    assert results[editor]["size"] == length, (editor, source, results[editor])
+E   AssertionError: ('check', {'access': None, 'address': 8192, 'axis_meta': [], 'bit_org': None, ...}, {'address': 8192, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00002000  u8  VB4', ...})
+E   assert 1 == 4
+_ test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/3--] _
+tests/test_b103_picker_model.py:332: in test_r002_real_a2l_shapes_report_whole_object_length
+    assert results[editor]["size"] == length, (editor, source, results[editor])
+E   AssertionError: ('check', {'access': None, 'address': 12288, 'axis_meta': [{'external': False, 'header_tokens': ['STD_AXIS', 'NO_INPUT_QUANTITY', 'CM_IDENT', '2', '0', '255'], 'max_axis_points': '2', 'name': 'UNKNOWN'}, {'external': False, 'header_tokens': ['STD_AXIS', 'NO_INPUT_QUANTITY', 'CM_IDENT', '2', '0', '255'], 'max_axis_points': '2', 'name': 'UNKNOWN'}], 'bit_org': None, ...}, {'address': 12288, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00003000  u8  MAP10', ...})
+E   assert 1 == 10
+_ test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/4--] _
+tests/test_b103_picker_model.py:332: in test_r002_real_a2l_shapes_report_whole_object_length
+    assert results[editor]["size"] == length, (editor, source, results[editor])
+E   AssertionError: ('check', {'access': None, 'address': 16384, 'axis_meta': [], 'bit_org': None, ...}, {'address': 16384, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00004000  u8  TXT5', ...})
+E   assert 1 == 5
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/2------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  FMT', ...})
+E   assert 'u8' == 's8'
+E     
+E     - s8
+E     + u8
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/5------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  FMT', ...})
+E   assert 'u16' == 's16'
+E     
+E     - s16
+E     + u16
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/8------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u32', 'fmt_budget': 4, 'full': '0x00001000  u32  FMT', ...})
+E   assert 'u32' == 's32'
+E     
+E     - s32
+E     + u32
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/11------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u64', 'fmt_budget': 4, 'full': '0x00001000  u64  FMT', ...})
+E   assert 'u64' == 's64'
+E     
+E     - s64
+E     + u64
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/12------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  FMT', ...})
+E   assert 'u16' == 'f16'
+E     
+E     - f16
+E     + u16
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/13------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u32', 'fmt_budget': 4, 'full': '0x00001000  u32  FMT', ...})
+E   assert 'u32' == 'f32'
+E     
+E     - f32
+E     + u32
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/14------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u64', 'fmt_budget': 4, 'full': '0x00001000  u64  FMT', ...})
+E   assert 'u64' == 'f64'
+E     
+E     - f64
+E     + u64
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/15------] _
+tests/test_b103_picker_model.py:392: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["size"] == length
+E   assert 2 == 12
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/16------] _
+tests/test_b103_picker_model.py:392: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["size"] == length
+E   assert 1 == 5
+_ test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/18------] _
+tests/test_b103_picker_model.py:393: in test_r003_element_datatype_and_unit_paint_exactly
+    assert result["fmt"] == expected, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u24', 'fmt_budget': 4, 'full': '0x00001000  u24  FMT', ...})
+E   assert 'u24' == '?'
+E     
+E     - ?
+E     + u24
+____ test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/1] _____
+tests/test_b103_picker_model.py:418: in test_r004_reader_refusals_keep_length_missing
+    assert result["size"] is None, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R1', ...})
+E   assert 1 is None
+____ test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/2] _____
+tests/test_b103_picker_model.py:418: in test_r004_reader_refusals_keep_length_missing
+    assert result["size"] is None, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R2', ...})
+E   assert 1 is None
+____ test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/3] _____
+tests/test_b103_picker_model.py:418: in test_r004_reader_refusals_keep_length_missing
+    assert result["size"] is None, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R3', ...})
+E   assert 1 is None
+____ test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/4] _____
+tests/test_b103_picker_model.py:418: in test_r004_reader_refusals_keep_length_missing
+    assert result["size"] is None, (editor, result)
+E   AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R4', ...})
+E   assert 1 is None
+_ test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/1] _
+tests/test_b103_picker_model.py:446: in test_r005_use_parameter_refuses_missing_length_without_reads
+    assert highlighted["size"] is None
+E   assert 1 is None
+_ test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/2] _
+tests/test_b103_picker_model.py:446: in test_r005_use_parameter_refuses_missing_length_without_reads
+    assert highlighted["size"] is None
+E   assert 1 is None
+_ test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/3] _
+tests/test_b103_picker_model.py:446: in test_r005_use_parameter_refuses_missing_length_without_reads
+    assert highlighted["size"] is None
+E   assert 1 is None
+_ test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/4] _
+tests/test_b103_picker_model.py:446: in test_r005_use_parameter_refuses_missing_length_without_reads
+    assert highlighted["size"] is None
+E   assert 1 is None
+_ test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/5] _
+tests/test_b103_picker_model.py:446: in test_r005_use_parameter_refuses_missing_length_without_reads
+    assert highlighted["size"] is None
+E   assert 1 is None
+___________ test_r017_1_hostile_parameter_name_is_replaced_literally ___________
+tests/test_b103_picker_model.py:473: in test_r017_1_hostile_parameter_name_is_replaced_literally
+    _assert_literal_surface(cell, expected)
+tests/test_b103_picker_model.py:228: in _assert_literal_surface
+    assert text.plain == expected
+E   AssertionError: assert 'A[red]Z' == 'A[red]���Z'
+E     
+E     - A[red]���Z
+E     ?       ---
+E     + A[red]Z
+________________ test_r017_2_hostile_unit_is_replaced_literally ________________
+tests/test_b103_picker_model.py:506: in test_r017_2_hostile_unit_is_replaced_literally
+    _assert_literal_surface(cell, expected)
+tests/test_b103_picker_model.py:228: in _assert_literal_surface
+    assert text.plain == expected
+E   AssertionError: assert 'u16 [link=e]%' == 'u16 [link=e]��%'
+E     
+E     - u16 [link=e]��%
+E     ?             --
+E     + u16 [link=e]%
+______ test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118 ______
+tests/test_b103_picker_model.py:551: in test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118
+    _assert_literal_surface(full, expected_full)
+tests/test_b103_picker_model.py:228: in _assert_literal_surface
+    assert text.plain == expected
+E   AssertionError: assert '0x00001000  u16 [red]\\x1b\\x00\\x85xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  LONGUNIT' == '0x00001000  u16…  LONGUNIT'
+E     
+E     - 0x00001000  u16…  LONGUNIT
+E     + 0x00001000  u16 [red]\x1b\x00
+E     
+E     + xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  LONGUNIT
+____________ test_r018_2_changed_generation_batches_once_per_picker ____________
+tests/test_b103_picker_model.py:631: in test_r018_2_changed_generation_batches_once_per_picker
+    assert len(describes) == 2
+E   assert 0 == 2
+E    +  where 0 = len([])
+____________ test_r018_3_none_always_repopulates_with_real_a2l_data ____________
+tests/test_b103_picker_model.py:673: in test_r018_3_none_always_repopulates_with_real_a2l_data
+    outcomes = _run(tmp_path, body)
+               ^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:68: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:66: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:662: in body
+    result = picker.set_parameters(rows, None, a2l_data=data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+____________ test_r018_4_live_reload_refreshes_both_without_reentry ____________
+tests/test_b103_picker_model.py:707: in test_r018_4_live_reload_refreshes_both_without_reentry
+    assert len(describes) == 2
+E   assert 0 == 2
+E    +  where 0 = len([])
+____ test_r019_1_13990_object_population_has_one_timed_batch_per_generation ____
+tests/test_b103_picker_model.py:733: in test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+    counts = _run(tmp_path, body, size=MIN_SIZE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:68: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:66: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:727: in body
+    assert picker.set_parameters(rows, ("software_a", generation), a2l_data=data) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+____________ test_r019_2_twenty_filter_page_rebuilds_never_describe ____________
+tests/test_b103_picker_model.py:777: in test_r019_2_twenty_filter_page_rebuilds_never_describe
+    mounted, before_formats, after_formats = _run(tmp_path, body, size=MIN_SIZE)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:68: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/b103-inc6-python/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:66: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_picker_model.py:762: in body
+    assert picker.set_parameters(rows, ("software_a", "rebuilds"), a2l_data=data) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+=========================== short test summary info ============================
+FAILED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/2---] - assert 2 == 12
+FAILED tests/test_b103_picker_model.py::test_r001_declared_length_is_the_only_size_source[R-PICKER-CORRECT.001/4---] - assert 2 == 12
+FAILED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/1--] - AssertionError: ('check', {'access': None, 'address': 4096, 'axis_meta': [], 'bit_org': None, ...}, {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  ARR12', ...})
+assert 2 == 12
+FAILED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/2--] - AssertionError: ('check', {'access': None, 'address': 8192, 'axis_meta': [], 'bit_org': None, ...}, {'address': 8192, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00002000  u8  VB4', ...})
+assert 1 == 4
+FAILED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/3--] - AssertionError: ('check', {'access': None, 'address': 12288, 'axis_meta': [{'external': False, 'header_tokens': ['STD_AXIS', 'NO_INPUT_QUANTITY', 'CM_IDENT', '2', '0', '255'], 'max_axis_points': '2', 'name': 'UNKNOWN'}, {'external': False, 'header_tokens': ['STD_AXIS', 'NO_INPUT_QUANTITY', 'CM_IDENT', '2', '0', '255'], 'max_axis_points': '2', 'name': 'UNKNOWN'}], 'bit_org': None, ...}, {'address': 12288, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00003000  u8  MAP10', ...})
+assert 1 == 10
+FAILED tests/test_b103_picker_model.py::test_r002_real_a2l_shapes_report_whole_object_length[R-PICKER-CORRECT.002/4--] - AssertionError: ('check', {'access': None, 'address': 16384, 'axis_meta': [], 'bit_org': None, ...}, {'address': 16384, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00004000  u8  TXT5', ...})
+assert 1 == 5
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/2------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  FMT', ...})
+assert 'u8' == 's8'
+  
+  - s8
+  + u8
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/5------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  FMT', ...})
+assert 'u16' == 's16'
+  
+  - s16
+  + u16
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/8------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u32', 'fmt_budget': 4, 'full': '0x00001000  u32  FMT', ...})
+assert 'u32' == 's32'
+  
+  - s32
+  + u32
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/11------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u64', 'fmt_budget': 4, 'full': '0x00001000  u64  FMT', ...})
+assert 'u64' == 's64'
+  
+  - s64
+  + u64
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/12------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u16', 'fmt_budget': 4, 'full': '0x00001000  u16  FMT', ...})
+assert 'u16' == 'f16'
+  
+  - f16
+  + u16
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/13------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u32', 'fmt_budget': 4, 'full': '0x00001000  u32  FMT', ...})
+assert 'u32' == 'f32'
+  
+  - f32
+  + u32
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/14------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u64', 'fmt_budget': 4, 'full': '0x00001000  u64  FMT', ...})
+assert 'u64' == 'f64'
+  
+  - f64
+  + u64
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/15------] - assert 2 == 12
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/16------] - assert 1 == 5
+FAILED tests/test_b103_picker_model.py::test_r003_element_datatype_and_unit_paint_exactly[R-PICKER-CORRECT.003/18------] - AssertionError: ('check', {'address': 4096, 'fmt': 'u24', 'fmt_budget': 4, 'full': '0x00001000  u24  FMT', ...})
+assert 'u24' == '?'
+  
+  - ?
+  + u24
+FAILED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/1] - AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R1', ...})
+assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/2] - AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R2', ...})
+assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/3] - AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R3', ...})
+assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r004_reader_refusals_keep_length_missing[R-PICKER-CORRECT.004/4] - AssertionError: ('check', {'address': 4096, 'fmt': 'u8', 'fmt_budget': 4, 'full': '0x00001000  u8  R4', ...})
+assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/1] - assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/2] - assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/3] - assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/4] - assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r005_use_parameter_refuses_missing_length_without_reads[R-PICKER-CORRECT.005/5] - assert 1 is None
+FAILED tests/test_b103_picker_model.py::test_r017_1_hostile_parameter_name_is_replaced_literally - AssertionError: assert 'A[red]Z' == 'A[red]���Z'
+  
+  - A[red]���Z
+  ?       ---
+  + A[red]Z
+FAILED tests/test_b103_picker_model.py::test_r017_2_hostile_unit_is_replaced_literally - AssertionError: assert 'u16 [link=e]%' == 'u16 [link=e]��%'
+  
+  - u16 [link=e]��%
+  ?             --
+  + u16 [link=e]%
+FAILED tests/test_b103_picker_model.py::test_r017_3_long_hostile_unit_clips_on_both_surfaces_at_80_and_118 - AssertionError: assert '0x00001000  u16 [red]\\x1b\\x00\\x85xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  LONGUNIT' == '0x00001000  u16…  LONGUNIT'
+  
+  - 0x00001000  u16…  LONGUNIT
+  + 0x00001000  u16 [red]\x1b\x00
+  
+  + xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  LONGUNIT
+FAILED tests/test_b103_picker_model.py::test_r018_2_changed_generation_batches_once_per_picker - assert 0 == 2
+ +  where 0 = len([])
+FAILED tests/test_b103_picker_model.py::test_r018_3_none_always_repopulates_with_real_a2l_data - TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+FAILED tests/test_b103_picker_model.py::test_r018_4_live_reload_refreshes_both_without_reentry - assert 0 == 2
+ +  where 0 = len([])
+FAILED tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation - TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+FAILED tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe - TypeError: A2LParameterPicker.set_parameters() got an unexpected keyword argument 'a2l_data'
+================== 33 failed, 11 passed in 212.37s (0:03:32) ===================
