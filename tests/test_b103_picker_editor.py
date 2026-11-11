@@ -1,6 +1,6 @@
 """Batch-103 Inc 6 E4: Patch editor prefill, Check specs and bulk selection.
 
-The 31 parametrized nodes are R-PICKER-CORRECT.006 through .016 and .020 from
+The 33 parametrized nodes are R-PICKER-CORRECT.006 through .016, .020 and .021 from
 ``inc-6/02-test-cases.md``. Expected bytes, statuses, summaries and spec shapes
 are pinned from that ledger. Real A2L/S19 files load through ``S19TuiApp``;
 Textual Pilot drives editor tabs, keys and buttons. The only stand-in is the
@@ -749,12 +749,34 @@ def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str
         assert panel._a2l_picker.picked_params == ["ARR12"]
         await _use(panel, pilot, "ARR12")
         assert _use_status(panel) == NO_BYTES
+        panel.set_a2l_parameters(
+            [{
+                "name": "CAP",
+                "address": 0x1000,
+                "length": MAX_A2L_DECODE_BYTES + 1,
+                "byte_size": MAX_A2L_DECODE_BYTES + 1,
+                "datatype": "UWORD",
+            }],
+            ("r020-cap", 1),
+        )
+        panel._mem_map = _CoverageReadSpy(0x1000)
+        await _use(panel, pilot, "CAP")
+        over_cap = (
+            f"Parameter size {MAX_A2L_DECODE_BYTES + 1} bytes over the "
+            f"{MAX_A2L_DECODE_BYTES}-byte decode cap — Bytes not prefilled."
+        )
+        assert _use_status(panel) == over_cap
+        assert _need(panel, "#patch_param_use_status").region.height >= 3
         selectors = [
             "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
             "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
             "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
             "#patch_param_use_button", "#patch_param_use_status",
         ]
+        assert _need(panel, "#patch_param_table", DataTable).show_header is True
+        assert _need(panel, "#patch_param_use_status").region.y > _need(
+            panel, "#patch_param_use_button", Button
+        ).region.y
         widgets = [_need(panel, selector) for selector in selectors]
         for widget in widgets:
             region = widget.region
@@ -772,3 +794,62 @@ def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str
         await _close_bulk(app, pilot, modal)
 
     _run(tmp_path, body, a2l=a2l, size=size)
+
+
+@pytest.mark.parametrize(
+    "case,button_id",
+    [
+        ("R-PICKER-CORRECT.021/1", "check_validate_button"),
+        ("R-PICKER-CORRECT.021/2", "check_write_button"),
+    ],
+    ids=lambda value: value,
+)
+def test_r021_check_validate_write_refuses_missing_length(
+    tmp_path: Path, case: str, button_id: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-PICKER-CORRECT.021/1 and .021/2: no action, image read or document write."""
+    from s19_app.tui.changes import io as changes_io
+    from s19_app.tui.models import LoadedFile
+    from s19_app.tui.screens_directionb import CheckEditorPanel
+
+    app = S19TuiApp(base_dir=tmp_path)
+    object.__setattr__(
+        app,
+        "current_file",
+        LoadedFile(
+            path=tmp_path / "coverage.s19",
+            file_type="s19",
+            mem_map=_CoverageReadSpy(0x5000),
+            row_bases=[],
+            ranges=[],
+            range_validity=[],
+            errors=[],
+            a2l_path=None,
+            a2l_data=None,
+        ),
+    )
+    panel = CheckEditorPanel()
+    panel.set_a2l_parameters(
+        [{
+            "name": "R1",
+            "address": 0x5000,
+            "length": None,
+            "byte_size": None,
+            "datatype": "UWORD",
+        }],
+        ("r021", 1),
+    )
+    assert panel._picker.include_names(["R1"])["included"] == 1
+    actions = []
+    reads = []
+    writes = []
+    monkeypatch.setattr(panel, "post_message", lambda message: actions.append(message) or None)
+    monkeypatch.setattr(app, "_check_items_to_document", lambda items: reads.append(items) or None)
+    monkeypatch.setattr(changes_io, "write_change_document", lambda *args, **kwargs: writes.append((args, kwargs)))
+    status = Label()
+    monkeypatch.setattr(panel, "query_one", lambda selector, kind=None: status)
+    panel.on_button_pressed(Button.Pressed(Button(id=button_id)))
+    assert actions == []
+    assert reads == []
+    assert writes == []
+    assert status.render().plain == "Check Editor: parameter has no length — validate/write refused."

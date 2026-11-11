@@ -5226,14 +5226,16 @@ class PatchEditorPanel(ScrollableContainer):
                                 id="patch_param_use_button",
                                 classes="patch-chip",
                             )
-                            use_status = Static(
-                                "",
-                                id="patch_param_use_status",
-                                classes="patch-field-label",
-                                markup=False,
-                            )
-                            use_status.display = False
-                            yield use_status
+                        use_status = Static(
+                            "",
+                            id="patch_param_use_status",
+                            classes="patch-field-label",
+                            markup=False,
+                        )
+                        use_status.styles.height = 3
+                        use_status.styles.text_wrap = "wrap"
+                        use_status.display = False
+                        yield use_status
         with Horizontal(id="patch_doc_file_row", classes="patch-docked-row"):
             yield Label("File", classes="pe-label")
             with Horizontal(id="patch_doc_file_line1"):
@@ -5428,18 +5430,20 @@ class PatchEditorPanel(ScrollableContainer):
         knows. An unchanged layout repaints nothing. Otherwise it sets each
         column's width and rewrites the Parameter and ``Fmt · Unit`` cells
         with ``update_cell`` (the public repaint path, D21/PC-8); it never
-        adds a column. At no more than 12 panel rows the ledger shows one
-        data row without its header and the picker sizes to its content;
-        taller panels keep the flexible table and header. The Use button and
-        its status share one docked row. The ledger rows belong to the picker.
+        adds a column. At no more than 12 panel rows the ledger keeps its
+        header and one data row, the picker sizes to its content, and the panel
+        grows to 13 rows so the full Use status wraps on its own row. Taller
+        panels keep the flexible table and panel height. The ledger rows belong
+        to the picker.
         """
         table = self.query_one("#patch_param_table", DataTable)
         if table.content_region.width == 0:
             return
-        compact = self.region.height <= 12
-        table.styles.height = 1 if compact else "1fr"
-        table.show_header = not compact
+        compact = self.region.height <= 13
+        table.styles.height = 2 if compact else "1fr"
+        table.show_header = True
         self._a2l_picker.styles.height = "auto"
+        self.styles.height = 13 if compact else "1fr"
         layout = check_layout(
             table.content_region.width,
             self.query_one("#patch_inspector").content_region.width,
@@ -7982,13 +7986,21 @@ class CheckEditorPanel(ScrollableContainer):
         action = actions.get(button_id)
         if action is not None:
             event.stop()
+            items = self._collected_items()
+            if any(
+                item["source"] == "param" and item["size"] is None for item in items
+            ):
+                self.query_one("#check_status", Label).update(
+                    "Check Editor: parameter has no length — validate/write refused."
+                )
+                return
             self.post_message(
                 self.ActionRequested(
                     action=action,
                     file_name_text=self.query_one(
                         "#check_file_name_input", Input
                     ).value,
-                    items=self._collected_items(),
+                    items=items,
                 )
             )
 

@@ -1,15 +1,15 @@
 # Code-Wire graph — Inc 6 (Picker correctness), batch-103
 
-Stage E2, 2026-11-10, model Kimi. **Graph only:** no stub, extractor mark or declaration was added to product source. No application, test or runtime probe is claimed. Authority: `../01-requirements.md` (20 rows), `../02-test-cases.md` (75 cases), `../E1-rulings.md`, and `../E1-slice.md`. Code-Wire v3.1.0 (`e436a08`).
+Stage E2, amended at E5 for the Check missing-length design gap. **Graph only:** no stub, extractor mark or declaration was added to product source. No application, test or runtime probe is claimed. Authority: `../01-requirements.md` (21 rows), `../02-test-cases.md` (77 cases), `../E1-rulings.md`, and `../E1-slice.md`. Code-Wire v3.1.0 (`e436a08`).
 
 ### 1. Delta, ownership and pinned interfaces
 
-**11 implementation nodes (7 changed + 4 new) + 8 unchanged context groups = 19 nodes**, across the two permitted product files. No deviation from E1's source boundary. Future tests are independent of product implementation and derive expected values from the requirement fixtures.
+**12 implementation nodes (8 changed + 4 new) + 8 unchanged context groups = 20 nodes**, across the two permitted product files. No deviation from E1's source boundary. Future tests are independent of product implementation and derive expected values from the requirement fixtures.
 
 | Group | Files | Owns |
 |---|---|---|
 | G1 picker | `s19_app/tui/a2l_parameter_picker.py` | N1-N5; declared length, one-batch I-2 describe, format/literal normalization |
-| G2 panels | `s19_app/tui/screens_directionb.py` | N6-N11; Patch pick/bulk host, panel A2L-data handoff, Use guard |
+| G2 panels | `s19_app/tui/screens_directionb.py` | N6-N12; Patch pick/bulk host, panel A2L-data handoff, Use and Check missing-length guards |
 | Read-only producers | `a2l_definition.py`, `app.py`, `a2l.py`, `screens.py`, `utils.py` | C1-C8; no edits |
 
 ### I-2 — definition model (CONSUMED, unchanged)
@@ -168,6 +168,15 @@ module: s19_app/tui/screens_directionb.py
 func: **new.** No ledger rebuild, preview substitution, document/dirty/undo/redo write or selection change on cancel. Successful C3 selection remains; C4 owns the summary before dismissal.
 examples: (R-PICKER-CORRECT.015/1) successful Beta include then close → Beta remains picked, REBUILD `0`, DOC unchanged
 examples: (R-PICKER-CORRECT.015/3) Escape after typing Beta → picks unchanged, REBUILD `0`, DOC unchanged
+
+CheckEditorPanel.on_button_pressed
+req: R-PICKER-CORRECT.021
+in: Button.Pressed event
+out: None; refusal status or existing ActionRequested
+module: s19_app/tui/screens_directionb.py
+func: **changed at E5 design-gap review.** Collect current items before Validate/Write. If any `source="param"` item has `size is None`, paint exactly `Check Editor: parameter has no length — validate/write refused.` and return before ActionRequested, image reads or document writes. All other actions retain their existing route.
+examples: (R-PICKER-CORRECT.021/1) R1 included with full image → Validate gives exact refusal, 0 actions/reads/writes, no one-byte item
+examples: (R-PICKER-CORRECT.021/2) R1 included with full image → Write gives exact refusal, 0 actions/reads/writes
 
 describe_definitions
 req: to trace
@@ -355,7 +364,12 @@ anchor: N4, N6, C6
 seen: actual 80×24 and 118×54 containment/operability
 decision: covered by a concrete design example
 
+finding R-PICKER-CORRECT.021
+anchor: N12
+seen: R1 included with full image → Validate and Write each refuse exactly, 0 actions/reads/writes, no one-byte item
+decision: covered by a concrete design example
+
 finding COVERAGE
-anchor: 20 requirements and 19 nodes
-seen: 20/20 requirements have concrete examples; no product/source stubs
+anchor: 21 requirements and 20 nodes
+seen: 21/21 requirements have concrete examples; no product/source stubs
 decision: no split required

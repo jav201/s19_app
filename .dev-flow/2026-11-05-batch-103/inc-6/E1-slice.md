@@ -7,10 +7,10 @@ Date 2026-11-10; model Kimi. Base: static worktree `802c3ee0`. No product/test f
 | File | Planned change | Implementation nodes |
 |---|---|---:|
 | `s19_app/tui/a2l_parameter_picker.py` | 2 existing functions changed, 1 property type adjusted, 2 private helpers new | 5 |
-| `s19_app/tui/screens_directionb.py` | 3 existing functions changed, Patch constructor adjusted, 2 new Patch host groups (3 functions) | 6 |
+| `s19_app/tui/screens_directionb.py` | 4 existing functions changed, Patch constructor adjusted, 2 new Patch host groups (3 functions) | 7 |
 | Every other source file | Read-only reuse; no edit authorized | 0 |
 
-**Total: 2 source files, 11 implementation nodes, including two new Patch host groups (three functions); plus 8 unchanged context nodes = 19 graph nodes.** This is below the 40-node cap and preserves PLAN's two-file limit.
+**Total after E5 design-gap closure: 2 source files, 12 implementation nodes, including two new Patch host groups (three functions); plus 8 unchanged context nodes = 20 graph nodes.** This is below the 40-node cap and preserves PLAN's two-file limit.
 
 ## 2. Implementation map
 
@@ -27,6 +27,8 @@ Date 2026-11-10; model Kimi. Base: static worktree `802c3ee0`. No product/test f
 | 9 | `PatchEditorPanel._use_highlighted_parameter` — `:5454-5508` | Refuse missing size with exact text before byte reads; retain full-length all-or-nothing transfer and over-cap boundary. | .004-.008, .016 |
 | 10 | `PatchEditorPanel._on_a2l_parameter_picker_bulk_add_requested` / `_open_parameter_bulk_add` — **new host group**, mirroring Check at `:7875-7889` | Stop event and open shared modal bound to Patch picker; no document action. | .012-.015 |
 | 11 | `PatchEditorPanel._on_bulk_add_closed` — **new**, mirroring Check `:7891-7903` without Check preview | No ledger rebuild or document/dirty/history mutation; successful selection remains in picker, cancellation inert. | .013-.016 |
+
+| 12 | `CheckEditorPanel.on_button_pressed` — `screens_directionb.py:7950-7993` | **E5 design-gap closure:** before Validate/Write posts, refuse any included parameter with `size is None` using exact `Check Editor: parameter has no length — validate/write refused.`; 0 actions, reads and writes. No app.py edit. | .021 |
 
 ## 3. Unchanged context and reuse points
 

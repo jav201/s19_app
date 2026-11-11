@@ -1,0 +1,9 @@
+/tmp/b103-inc6-green-a43b/s19_app/__init__.py
+....                                                                     [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/1-]
+PASSED tests/test_b103_picker_editor.py::test_r020_patch_surfaces_fit_real_terminal_regions[R-PICKER-CORRECT.020/2-]
+PASSED tests/test_b103_picker_editor.py::test_r021_check_validate_write_refuses_missing_length[R-PICKER-CORRECT.021/1-check_validate_button]
+PASSED tests/test_b103_picker_editor.py::test_r021_check_validate_write_refuses_missing_length[R-PICKER-CORRECT.021/2-check_write_button]
+4 passed, 29 deselected in 9.73s

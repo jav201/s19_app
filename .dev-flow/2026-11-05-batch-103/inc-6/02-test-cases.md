@@ -1,6 +1,6 @@
 # Inc 6 — E2 test-case ledger (ISO/IEC/IEEE 29119-3)
 
-Stage E1/E2 design, 2026-11-10. **Counts: 75 cases = 75 threshold alternatives; 56 `normal`, 19 `robustness`; 20/20 requirements mapped. Tests entries are unassigned, coverage `gap`, results `not_run`.** No execution or verification is claimed.
+Stage E1/E2 design, amended at E5 for the Check missing-length design gap. **Counts: 77 cases = 77 threshold alternatives; 56 `normal`, 21 `robustness`; 21/21 requirements mapped. Tests entries are unassigned, coverage `gap`, results `not_run`.** No execution or verification is claimed.
 
 ## Product-route and oracle rules
 
@@ -91,9 +91,11 @@ Stage E1/E2 design, 2026-11-10. **Counts: 75 cases = 75 threshold alternatives; 
 | R-PICKER-CORRECT.019/2 | Verify that filter/page rebuilds never describe | normal | Populated 13,990 rows; DESCRIBE armed | 20 filter/page rebuilds | 0 describes; each mounts ≤200 rows; current formats unchanged. | — | gap | not_run |
 | R-PICKER-CORRECT.020/1 | Verify Patch controls fit and operate at 80×24 | normal | Patch A2L tab at 80×24 | Measure regions; toggle include; open/close bulk | Every named visible surface non-zero and inside panel; no horizontal overflow; both actions work. | — | gap | not_run |
 | R-PICKER-CORRECT.020/2 | Verify Patch controls fit and operate at 118×54 | normal | Patch A2L tab at 118×54 | Same geometry/actions | Same containment/operability; no regression of Use/status/page controls. | — | gap | not_run |
+| R-PICKER-CORRECT.021/1 | Verify that Validate refuses an included missing length before any action | robustness | R1 included with full image coverage; ActionRequested, image-read and document-write spies armed | Press Validate | Exact `Check Editor: parameter has no length — validate/write refused.`; 0 actions, 0 reads and 0 writes; no one-byte substitution. | — | gap | not_run |
+| R-PICKER-CORRECT.021/2 | Verify that Write refuses an included missing length before any action | robustness | Same as .021/1 | Press Write | Same exact refusal and zero action/read/write; existing included fields remain unchanged and no one-byte document is emitted. | — | gap | not_run |
 
 ## Coverage reconciliation
 
-- Requirement totals: .001=4, .002=4, .003=18, .004=4, .005=5, .006=3, .007=2, .008=2, .009=3, .010=2, .011=3, .012=2, .013=4, .014=3, .015=3, .016=2, .017=3, .018=4, .019=2, .020=2; sum **75**.
-- Robustness: .003/18 (1), .004/1–4 (4), .005/1–5 (5), .007/1–2 (2), .008/1 (1), .014/2 (1), .015/2–3 (2), .017/1–3 (3). The robustness total is **19**, and normal is **56**, matching the header.
+- Requirement totals: .001=4, .002=4, .003=18, .004=4, .005=5, .006=3, .007=2, .008=2, .009=3, .010=2, .011=3, .012=2, .013=4, .014=3, .015=3, .016=2, .017=3, .018=4, .019=2, .020=2, .021=2; sum **77**.
+- Robustness: .003/18 (1), .004/1–4 (4), .005/1–5 (5), .007/1–2 (2), .008/1 (1), .014/2 (1), .015/2–3 (2), .017/1–3 (3), .021/1–2 (2). The robustness total is **21**, and normal is **56**, matching the header.
 - R5 is explicitly additional to the four shapes of .004, making .005 five cases. No expected value is read from enriched output. ARR12 and VB4 distinguish full length from layout element size; non-uniform bytes distinguish truncation and zero-fill.

@@ -21,3 +21,11 @@ Architect: E3A-01…03 and downstream consistency. Security: E3S-01…03, especi
 ## E3 closure
 
 Both independent round-2 re-reviews returned **PASS**. No MAJOR, HIGH or other blocking finding remains open. Final design: 20 requirements, 75 cases (56 normal, 19 robustness), 11 implementation + 8 context = 19 nodes, exactly two product files. E4 is authorized against this corrected graph; no earlier version is approved.
+
+## E5 design-gap addendum
+
+E5 code review found a remaining Check action fallback outside the approved rows. R-PICKER-CORRECT.021 and N12 now require an exact Validate/Write refusal before any ActionRequested/image read/document write. This is a design-gap correction, not a third-file change: the guard lives in Check's existing button route. E1 records and graph now total 21 requirements, 77 cases and 20 nodes. Independent architecture/security re-review of the addendum and compact-layout corrections is required before final E5 closure.
+
+## E5 addendum re-review — PASS
+
+Architecture and security independently returned PASS on the corrected integration worktree. `.021` closes the Check missing-length fallback with exact zero-action evidence. The compact layout preserves header and hint, and cap+1 is fully visible in three wrapped rows at 80 and 118. Final contract: 21 requirements, 77 cases, 20 graph nodes, exactly two product files.

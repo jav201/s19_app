@@ -727,7 +727,7 @@ class A2LParameterPicker(Vertical):
                     compact=compact,
                 )
             if self._mode == "pick" and not compact:
-                yield Static("space toggles ✓", classes="ce-hint")
+                yield Static("space also toggles ✓ on the highlighted row", classes="ce-hint")
 
         yield status
         with Horizontal(

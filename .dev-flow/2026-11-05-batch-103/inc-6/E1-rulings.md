@@ -49,3 +49,7 @@ Reuse the shipped ledger, docked chip row, focus order, modal, colors and static
 The new R-PICKER-CORRECT rows refine R-B102-SEL-001/007, R-B102-PE-001/003/006 and the Patch application of R-B102-BULK-001…007. They supersede the old `byte_size` normalization and Patch highlight-only mode. Canon is untouched at E1; batch-end folding must remove that contradiction and record the optional `a2l_data` keyword plus `size: Optional[int]` interface.
 
 No new AT/TC registry ids are allocated in E1. Tests will use requirement-keyed cases and batch-scoped acceptance ids only if the tester needs them.
+
+## D-9 — E5 design-gap closure: Check also refuses missing length
+
+E5 code review found that `app.py` still normalizes an action item's missing size with `or 1`. Before Check posts Validate or Write, its panel must collect the current items and refuse if any `source="param"` item has `size is None`: exact `Check Editor: parameter has no length — validate/write refused.`, zero ActionRequested, zero image reads and zero document writes. No `app.py` edit or picker fallback is introduced. R-PICKER-CORRECT.021 and its two robustness cases are the authoritative new contract; graph node N12 owns the preflight.
