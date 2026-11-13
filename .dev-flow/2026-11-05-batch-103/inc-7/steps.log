@@ -4,3 +4,4 @@
 2026-11-13T12:46-0600 E1/E2 rulings | orchestrator claude-opus-5-5 | D-0/1/5/13/14/15 A decided; I-1 hook and I-7 pinned; visible D-2..D-12 provisional A pending CV-1..CV-11 (DF-09); D-4 conflict to operator; E3 due
 2026-11-13T12:47:37-06:00 E3 start — Inc 7 architecture + security, one reviewer one pass (DF-03), HEAD 8e98ea87; Opus 5.5 (architect)
 2026-11-13T13:29:53-06:00 E3 done — architect FAIL (1 HIGH, 8 MAJOR, 3 MEDIUM, 3 MINOR, 2 INFO), security FAIL (1 MAJOR, 3 MEDIUM, 1 MINOR, 1 LOW, 3 INFO); probes A/B on <runner> (hook + L11 stand-in: 13 of 343 clipboard nodes RED, all Box A); scratch deleted; Opus 5.5 (architect)
+2026-11-13T13:30-0600 E3 rulings | orchestrator claude-opus-5-5 | E3 FAIL (1 HIGH, 9 MAJOR) accepted; E3A-01 Box A retarget is Inc 7 E4 work, E4 starts after b103-inc1b final; E3A-05 R-COPY.26 guard family; E3R1 next
