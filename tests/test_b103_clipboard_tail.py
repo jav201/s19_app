@@ -2370,8 +2370,12 @@ async def _wait_sleep_only(predicate, timeout: float) -> None:
 
 
 def _responsive_copy(
-    tmp_path, monkeypatch, source: str, *, control: bool = False, sleep_poll: bool = False
+    tmp_path, monkeypatch, source: str, *, control: bool = False, freeze_gc: bool = True
 ):
+    """The wait loop is always the sleep-poll loop (no ``pilot.pause()``, P-001 round 4).
+    ``freeze_gc`` moves the heap built before the gesture out of GC's reach for
+    the window: a gen-2 collection in the pytest process costs 0.33-0.36 s on
+    WinCI and is harness cost, not the writer. C2 keeps it off."""
     diag: dict = {"ticks": [], "spans": [], "messages": [], "callbacks": [], "gc": [], "armed": False}
 
     def message_hook(message) -> None:
@@ -2425,6 +2429,9 @@ def _responsive_copy(
             monkeypatch.setattr(clipboard_module, "write_os_clipboard", marked_writer)
             held = None if control else _hold_clipboard()
             gc_hook = _gc_hook(diag["gc"], loop_ident)
+            if freeze_gc:
+                gc.collect()
+                gc.freeze()
             gc.callbacks.append(gc_hook)
             diag["armed"] = True
             try:
@@ -2438,14 +2445,13 @@ def _responsive_copy(
                         await _right_click(app, pilot, widget, (4, widget.header_height + 2))
                     def done() -> bool:
                         return marker["ended"] and bool(ledger.tail_done)
-                    if sleep_poll:
-                        await _wait_sleep_only(done, timeout=10.0)
-                    else:
-                        await _wait(pilot, done, timeout=10.0)
+                    await _wait_sleep_only(done, timeout=10.0)
                     await _settle(pilot)
                     break
             finally:
                 gc.callbacks.remove(gc_hook)
+                if freeze_gc:
+                    gc.unfreeze()
                 sampler.stop.set()
                 if sampler.thread.ident is not None:
                     sampler.thread.join(1.0)
@@ -2513,7 +2519,7 @@ def test_r_paste_14_c2_sleep_poll_control_full_app(tmp_path, monkeypatch) -> Non
     _winci_ready_or_skip()
     other_program_write(SEED_OS)
     marker, lateness, obs, diag = _responsive_copy(
-        tmp_path, monkeypatch, "key", control=True, sleep_poll=True
+        tmp_path, monkeypatch, "key", control=True, freeze_gc=False
     )
     _assert_responsive(marker, lateness, obs, "r_paste_14_c2_key", diag)
 
