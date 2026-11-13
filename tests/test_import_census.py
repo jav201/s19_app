@@ -61,7 +61,9 @@ SERVICES_DIR = PRODUCT_ROOT / "tui" / "services"
 #: and ``s19_app/tui/screens_directionb.py`` became packages, so the set
 #: names each importing submodule (``s19_app.tui.app.<m>`` /
 #: ``s19_app.tui.screens_directionb.<m>``) plus the package ``__init__``
-#: itself; the a2l parameter picker never actually imported the name (a
+#: itself. The P3a split of ``patch_editor.py`` into a package adds its
+#: ``__init__`` re-export and the four consumer modules (a2l_picker, checks,
+#: layout, panel); the a2l parameter picker never actually imported the name (a
 #: pre-existing stale entry at 4f721985) and is dropped.
 MEASURED_SAFE_TEXT_CONSUMERS = {
     "s19_app.tui.app",
@@ -86,6 +88,10 @@ MEASURED_SAFE_TEXT_CONSUMERS = {
     "s19_app.tui.screens_directionb.map_parts",
     "s19_app.tui.screens_directionb.memory_map",
     "s19_app.tui.screens_directionb.patch_editor",
+    "s19_app.tui.screens_directionb.patch_editor.a2l_picker",
+    "s19_app.tui.screens_directionb.patch_editor.checks",
+    "s19_app.tui.screens_directionb.patch_editor.layout",
+    "s19_app.tui.screens_directionb.patch_editor.panel",
     "s19_app.tui.segment_split_view",
 }
 

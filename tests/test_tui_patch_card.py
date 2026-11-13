@@ -746,8 +746,13 @@ def test_tc080_2_c7_purity_probe() -> None:
     0 ``self.app``, 0 service imports. AST-walked over the real class source, so
     it cannot be satisfied by a comment claiming purity.
     """
-    source = inspect.getsource(PatchEditorPanel)
-    tree = ast.parse(source.lstrip())
+    from tests.support import package_source as ps
+
+    tree = ps.mro_class_tree(
+        PatchEditorPanel,
+        "s19_app.tui.screens_directionb.patch_editor",
+        ps.MIN_PATCH_EDITOR_CLASSES,
+    )
 
     app_reaches = [
         node
@@ -1066,8 +1071,12 @@ def test_writer_census_panel_selfcall_supplies_none() -> None:
     look consistent, it would CLEAR a retained map on every mount, which is the
     MJ-1 defect wearing a tidy shirt.
     """
-    tree = ast.parse(
-        Path(inspect.getfile(PatchEditorPanel)).read_text(encoding="utf-8")
+    from tests.support import package_source as ps
+
+    tree = ps.mro_class_tree(
+        PatchEditorPanel,
+        "s19_app.tui.screens_directionb.patch_editor",
+        ps.MIN_PATCH_EDITOR_CLASSES,
     )
     selfcalls = [
         node
@@ -1085,7 +1094,7 @@ def test_writer_census_panel_selfcall_supplies_none() -> None:
     )
     passed = {kw.arg for kw in selfcalls[0].keywords}
     assert "mem_map" not in passed, (
-        f"patch_editor.py:{selfcalls[0].lineno} — the panel self-call "
+        f"patch_editor package, class-relative line {selfcalls[0].lineno} — the panel self-call "
         "now passes mem_map. The panel cannot know one (C-7); if it passes "
         "None it CLEARS a retained map on every mount."
     )

@@ -555,7 +555,13 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
     # C-7 purity probe over the panel's own AST — 0 `self.app`, 0 service
     # imports. Scoped by inspect, not pinned line numbers (which drift: this
     # batch's spec coordinates were ~160 lines stale).
-    panel_tree = ast.parse(inspect.getsource(PatchEditorPanel))
+    from tests.support import package_source as ps
+
+    panel_tree = ps.mro_class_tree(
+        PatchEditorPanel,
+        "s19_app.tui.screens_directionb.patch_editor",
+        ps.MIN_PATCH_EDITOR_CLASSES,
+    )
     self_app = [
         node
         for node in ast.walk(panel_tree)

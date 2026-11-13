@@ -526,7 +526,13 @@ def test_tc081_2_strip(tmp_path: Path) -> None:
     # AST, not `"self.app" not in source`: a substring probe matches the phrase
     # inside this batch's own docstrings and reports on prose, not code (the
     # Inc-4 finding, three oracles deep).
-    panel_tree = ast.parse(inspect.getsource(PatchEditorPanel))
+    from tests.support import package_source as ps
+
+    panel_tree = ps.mro_class_tree(
+        PatchEditorPanel,
+        "s19_app.tui.screens_directionb.patch_editor",
+        ps.MIN_PATCH_EDITOR_CLASSES,
+    )
     self_app = [
         node
         for node in ast.walk(panel_tree)

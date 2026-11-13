@@ -23,6 +23,8 @@ Summary:
 from __future__ import annotations
 
 import ast
+import inspect
+import textwrap
 from pathlib import Path
 
 #: Repository root, two levels above ``tests/support/package_source.py``.
@@ -31,8 +33,14 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 #: The two packages this helper reads.
 _PACKAGES = ("app", "screens_directionb")
 
-#: Minimum number of ``.py`` files per package (H-12 floors).
-_MIN_FILES = {"app": 23, "screens_directionb": 9}
+#: Minimum number of ``.py`` files per package (H-12 floors), counted
+#: recursively. ``screens_directionb`` is 8 top-level files plus the 9 files
+#: of its ``patch_editor/`` subpackage (the P3a split of ``patch_editor.py``).
+_MIN_FILES = {"app": 23, "screens_directionb": 17}
+
+#: Floor for :func:`mro_class_tree` on ``PatchEditorPanel``: the thin panel
+#: class plus its six zone mixins.
+MIN_PATCH_EDITOR_CLASSES = 7
 
 #: MERGED-CLASS floors: minimum FunctionDef/AsyncFunctionDef in the merged
 #: body, and minimum contributing classes (S19TuiApp + its 18 mixins).
@@ -70,6 +78,9 @@ def tui_dir(root: Path | None = None) -> Path:
 def package_modules(pkg: str, root: Path | None = None) -> list[tuple[Path, ast.Module]]:
     """Summary: parse every ``.py`` of ``s19_app/tui/<pkg>/`` separately.
 
+    Subpackages are read too (recursive), so a class moved from a module into
+    a nested package stays in the scan.
+
     Args:
         pkg: one of ``"app"`` or ``"screens_directionb"``.
         root: repository root to read from; defaults to the repo containing
@@ -77,7 +88,7 @@ def package_modules(pkg: str, root: Path | None = None) -> list[tuple[Path, ast.
 
     Returns:
         list[tuple[Path, ast.Module]]: ``(file path, parsed module)`` pairs
-        sorted by file name.  Each module is parsed on its own — files are
+        sorted by path relative to the package.  Each module is parsed on its own — files are
         never concatenated before ``ast.parse``.
 
     Raises:
@@ -87,7 +98,10 @@ def package_modules(pkg: str, root: Path | None = None) -> list[tuple[Path, ast.
     if pkg not in _PACKAGES:
         raise AssertionError(f"unknown package {pkg!r}; expected one of {_PACKAGES}")
     pkg_dir = tui_dir(root) / pkg
-    files = sorted(pkg_dir.glob("*.py"), key=lambda path: path.name)
+    files = sorted(
+        (p for p in pkg_dir.rglob("*.py") if "__pycache__" not in p.parts),
+        key=lambda path: path.relative_to(pkg_dir).as_posix(),
+    )
     if len(files) < _MIN_FILES[pkg]:
         raise AssertionError(
             f"package {pkg!r} has {len(files)} .py files; "
@@ -253,4 +267,39 @@ def package_tree(pkg: str, root: Path | None = None) -> ast.Module:
     body: list[ast.stmt] = []
     for _, mod in package_modules(pkg, root=root):
         body.extend(mod.body)
+    return ast.Module(body=body, type_ignores=[])
+
+
+def mro_class_tree(
+    cls: type, module_prefix: str, min_classes: int
+) -> ast.Module:
+    """Summary: one synthetic Module over the source of a class and its mixins.
+
+    ``inspect.getsource(cls)`` returns only the class body written in its own
+    file; once a class is split into zone mixins, a whole-class scan must read
+    every in-package class of its MRO.
+
+    Args:
+        cls: the class to read, e.g. ``PatchEditorPanel``.
+        module_prefix: only MRO classes whose ``__module__`` starts with this
+            are read (the in-package mixins; never Textual or stdlib bases).
+        min_classes: floor on how many classes contribute, so a scan cannot
+            quietly shrink back to the thin core class.
+
+    Returns:
+        ast.Module: a new module whose ``body`` is one ``ClassDef`` per
+        contributing class, in MRO order.
+
+    Raises:
+        AssertionError: fewer than ``min_classes`` classes matched.
+    """
+    body: list[ast.stmt] = []
+    for klass in cls.__mro__:
+        if klass.__module__.startswith(module_prefix):
+            body.extend(ast.parse(textwrap.dedent(inspect.getsource(klass))).body)
+    if len(body) < min_classes:
+        raise AssertionError(
+            f"{cls.__name__} MRO has {len(body)} classes under "
+            f"{module_prefix!r}; expected at least {min_classes}"
+        )
     return ast.Module(body=body, type_ignores=[])

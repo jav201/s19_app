@@ -39,7 +39,10 @@ def test_package_modules_floors_hold_on_the_real_tree() -> None:
     assert all(isinstance(mod, ast.Module) for _, mod in app)
 
     sdb = ps.package_modules("screens_directionb")
-    assert len(sdb) >= 9
+    assert len(sdb) >= 17
+    assert {"panel.py", "actions.py"} <= {
+        path.name for path, _ in sdb if path.parent.name == "patch_editor"
+    }, "the patch_editor subpackage must be part of the scan"
     assert all(isinstance(mod, ast.Module) for _, mod in sdb)
 
 
@@ -93,6 +96,24 @@ def test_too_small_package_trips_the_floor(tmp_path: Path) -> None:
     (dst / "shell.py").unlink()
     with pytest.raises(AssertionError, match="core.py|expected at least 23"):
         ps.package_modules("app", root=tmp_path)
+
+
+def test_screens_package_without_patch_editor_trips_the_floor(tmp_path: Path) -> None:
+    src = ps.tui_dir() / "screens_directionb"
+    dst = tmp_path / "s19_app" / "tui" / "screens_directionb"
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dst)
+    shutil.rmtree(dst / "patch_editor")
+    with pytest.raises(AssertionError, match="expected at least 17"):
+        ps.package_modules("screens_directionb", root=tmp_path)
+
+
+def test_mro_class_tree_refuses_a_thin_class() -> None:
+    class Thin:
+        pass
+
+    with pytest.raises(AssertionError, match="expected at least 2"):
+        ps.mro_class_tree(Thin, "tests.", 2)
 
 
 def test_unknown_package_is_refused() -> None:
