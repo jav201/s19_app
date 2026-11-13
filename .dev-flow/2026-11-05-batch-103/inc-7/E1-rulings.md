@@ -9,6 +9,8 @@ Base `2dbd7d5a` (branch `b103-inc7`). Rows: `01-requirements.md`. Slice: `E1-sli
 | `i7e1-pilot.py`, `-transcript.txt` (P1) | <runner>, Python 3.11.18, textual 8.2.8, the exact clone of `b103-inc7` (`s19_app.__file__` printed first), isolated `HOME` `…/runner_iso`, no clipboard. §1 case 08 (462 names); §2 the dropdown rankings of the G2 scenes with the shipped I-3 (`0017` → 5, `cuvre_00` → 20 at limit 20 and 60 unlimited, `0042 val` → 2); §3 the G2 list resolved (12 pasted, 9 found, 2 missing, 1 duplicate); §4 closest names (`MAP_0024`, `CURVE_0071` → none; `VALUE_002` → 3); §5 a 65,536-character paste (4,906 / 2,048 names; parse + resolve 1.1–1.2 ms; 10 closest-name rankings 24.0 ms over 13,990 names); §6 Textual's parser: `ESC p` → `alt+p`, `ESC a` → `alt+a`, **`ESC f` → `ctrl+right`**, the kitty forms `CSI 112;3u` / `102;3u` / `97;3u` → `alt+p` / `alt+f` / `alt+a`; §7 a box-level tab binding runs before the app's focus move |
 | `i7e1-app-pilot.py`, `-transcript.txt` (P2) | the real app headless on case 08 at 118×54 and 220×60: text-mode columns (`Address`, `Length`, `Tag`, …; `fixed_columns = 2`), the shipped cells of the 9 found names, mode counts (`all` 462, `invalid` 0, `inmem` 402), pane widths (hex view 42 columns at 118, 78 at 220: **every hex row wraps in two at both widths**, the hex row is 81 characters), and a two-line value in the filter box (kept as one substring) |
 | `i7e1-run.sh` | the runner wrapper (HT-02 environment, `timeout 900`, closed stdin) |
+| `i7e3r1-layout-pilot.py`, `-transcript.txt` (P3, E3R1) | <runner>, the exact clone of `b103-inc7` at `1d47d12f` (product tree = `2dbd7d5a`), `HOME` …`/runner_iso`, `uptime` before and after (load 7.4–8.1 on 16 cores: sizes only, no timing). The A2L Explorer body and the tags-pane children at 80×24 (74×9; table region 1 row = header, **0 body rows on base**), 120×30 (96×15; 5 rows), 80×54 (74×39), 118×54 (112×39) and 160×40 (136×25; 15 rows); the tags pane spends 9 lines beside the table. Sizes the E3A-10 rows. Runner: `i7e3r1-run.sh` |
+| `trace_check-e3r1.txt` (E3R1) | the skill's `trace_check.py` on the corrected records, run on <runner> |
 | `i7e1-id-census.txt` (C) | `R-A2L-LIST`, `CTX-A2L-LIST`, `AT-B103-I7`, `BL-I7-` unused in the tree, the s19w review folder and 60 s19_app worktrees |
 
 Scripts on the host and here are byte-identical (sha256 `e6da3f7e…` pilot, `1dbcded5…` app pilot, `3b35b87f…` runner).
@@ -30,10 +32,11 @@ Scripts on the host and here are byte-identical (sha256 `e6da3f7e…` pilot, `1d
 |---|---|---|
 | R-A2L-007.1, .6, .7, .8 | scoped to text mode (`… while the viewer is in text mode …`) | In list mode a filter mode marks a found row hidden instead of removing it (R-A2L-LIST.005: the scene's `◐ hidden` status), and the text is a list, not a substring. Unchanged behaviour in text mode. |
 | R-A2L-007.2 | scoped to text mode | D-3 A: in field `all` a text with two or more names is a list text, as the scene's code decides. |
-| R-PASTE.1, R-TUI-043.4, R-PASTE.29 | an exception for the A2L Explorer filter box when the paste holds two or more names | D-5 A: the approved scene turns a multi-line paste into a list (`scn_av.py` scene av-list); today every paste route keeps only the first line (`os_clipboard_input.py:943`, `:1094`), which is exactly the "today" figure the operator compared against (G2 page Fig. 2.11). |
+| R-PASTE.1, R-TUI-043.4, R-PASTE.29 | an exception for the A2L Explorer filter box when the paste holds two or more names (E3R1: "a single line with a space counts", and only while the filter field is `name` or `all` — E3A-01 (4), E3A-12) | D-5 A: the approved scene turns a multi-line paste into a list (`scn_av.py` scene av-list); today every paste route keeps only the first line (`os_clipboard_input.py:943`, `:1094`), which is exactly the "today" figure the operator compared against (G2 page Fig. 2.11). |
 | R-TUI-042a.4 | scoped to text mode | D-4 A: list mode shows `#`, `Tag`, `Status`, … (the scene's table), whose fixed columns are `#` and `Tag` (R-A2L-LIST.010). |
-| R-TUI-037.1, .2 | retired | D-2 A: replaced by the approved layout (R-A2L-LIST.080, .081). |
-| R-TUI-069.6 | changed: 8 lines above the hex view at 180 columns or more | D-2 A: the scene's wide card has `max-height: 8`; below 180 columns the card sits left of the hex box (R-A2L-LIST.080). |
+| R-TUI-037.1, .2 | ~~retired~~ **changed at E3R1**: scoped to the *short body* (less than 180 columns wide, and less than 110 wide or less than 32 rows high) | D-2 A replaces them at 118×54 (stacked body, R-A2L-LIST.080) and 220×60 (R-A2L-LIST.081). E3A-10: below 118×54 the stacked layout leaves the table no row (P3: 160×40 → a 25-row body, hex pane 14 → 0 table rows), so the short body keeps the pre-Inc-7 split; the tc019 tests run at short bodies and stay valid (`E1-slice.md` §5.3). |
+| R-TUI-069.6 | changed: 8 lines above the hex view at 180 columns or more | D-2 A: the scene's wide card has `max-height: 8`; in the stacked body the card sits left of the hex box (R-A2L-LIST.080); in the short body it keeps its old 5 lines (R-A2L-LIST.082, E3R1). |
+| R-TUI-069.7 | changed (E3R1, E3A-11): "longer than 5 lines" → "longer than the detail card's height" | the 5-line figure is wrong in the wide body (8 lines) and the stacked body (14 rows high). |
 | R-B102-A2L-003 (cited, not restated) | its empty summary `No A2L tags match '<filter>'.` stays, except for R-A2L-LIST.025's case (mode ≠ All with matches under All) | the scene's code paints that summary; the fold at batch end adds the exception sentence. |
 
 Notes, not decisions:
@@ -66,27 +69,27 @@ Notes, not decisions:
 
 | Id | State | Form | Producer → consumers |
 |---|---|---|---|
-| I-1 | **PROPOSED additive change** (D-5 A) | `OsClipboardInput._take_paste(self, text: str) -> bool`: the paste routes call it with the text after the 65,536-character cap and before the first-line cut; `True` means the box took the paste and nothing more is inserted; the default returns `False` (every other box unchanged). | Inc 1a → Inc 7 (G-L's `ListAwareFilterInput`) |
+| I-1 | **pinned additive change** (D-5 A, §9); **placement re-pinned at E3R1** (E3S-03, E3A-16) | `OsClipboardInput._take_paste(self, text: str) -> bool`: both paste routes call it after the 65,536-character cap (in `action_paste` also after the empty-text check `:1075-1093`) and before the first-line cut, **only when `self.restrict` is not set**, with `_strip_paste_controls(text, multiline=True)` of the capped text; `True` means the box took the paste and nothing more is inserted; the default returns `False` (every other box unchanged). | Inc 1a → Inc 7 (G-L's `ListAwareFilterInput`); Inc 8/9 inherit the placement |
 | I-3 | consumed, unchanged | `build_label_index(names) -> LabelIndex`, `rank(query, index, limit) -> list[LabelMatch]` (`inc-4/codewire/graph-inc4.md`); limit 20 for the dropdown, 3 for closest names | Inc 4 → Inc 7 |
 | I-4 | consumed, unchanged | `_a2l_view_generation` is the key of the prepared name list; the common refresh calls `update_a2l_view` | Inc 5 → Inc 7 |
 | I-5 | consumed, unchanged | `parse_parameter_list(text) -> list` | existing → Inc 7 |
-| I-7 | **PROPOSED, new, inside the increment** (G-L ↔ G-V; the orchestrator pins it in `interfaces.md` before E4) | the names, types and messages of `codewire/graph-inc7.md` §Interfaces: `resolve_label_list`, `LabelListResolution`, `LabelRanker`, the widgets and their ids, the message `LabelListApplied` | G-L → G-V |
+| I-7 | **pinned (§9), re-pinned at E3R1** (E3A-03), new, inside the increment (G-L ↔ G-V; the orchestrator copies it to `interfaces.md` before E4) | the whole code block of `codewire/graph-inc7.md` §Interfaces: constants (incl. `TEXT_CELL_LABELS`, `PREVIEW_MAX`, the body thresholds), `resolve_label_list` and `LabelListResolution.rows` (no back-reference), the keyed `LabelRanker` and its worker rules, `LabelSuggestBox`, `ListAwareFilterInput`'s constructor and actions, the `LabelListHost` protocol (`a2l_open_label_list`), `LabelListPasteModal` (dismiss callback), `A2LExplorerBody`'s constructor and child ids. ~~the message `LabelListApplied`~~ — struck at E3R1 (E3A-03 (c)): the graph never defined it; the dismiss callback is the one route back | G-L → G-V |
 
 ## 5. Capture verdicts needed (operator, real Windows Terminal captures; batched with Inc 8 and Inc 9)
 
 | CV | Element | Rows | What the capture must show (118×54 and 220×60 unless named) |
 |---|---|---|---|
-| CV-1 | the pane layout (D-2) | .080, .081, R-TUI-069.6 | list mode with a hex jump; every hex row on one line |
+| CV-1 | the pane layout (D-2), and below the reference sizes (E3R1, E3A-10) | .080–.083, R-TUI-037.1/.2, R-TUI-069.6/.7 | list mode with a hex jump; every hex row on one line. **Plus 80×24, 120×30, 160×40 and 80×54** (the short body: the pre-Inc-7 split kept, the card ≤ 5 lines, table rows shown). At the **80×24 floor** the body is 9 rows and base already shows 0 table rows (P3: the table region is its header); Inc 7 adds 2–4 chips lines, so the table has no row there in either mode: the operator rules whether that floor is accepted or the chips must fold (a new design, not in E3R1) |
 | CV-2 | field `all` with a two-word text (D-3) | .006/3, R-A2L-007.2 | `synthetic demo` in field `all` → list mode, 2 missing |
 | CV-3 | the list-mode table: columns, glyphs, status words, fixed `#`/`Tag` (D-4) | .009–.016 | the G2 list; also 80×54 scrolled right |
 | CV-4 | the filter box's dropdown: rows, spans, rule tags, title `8 of 20+ similar names`, key lines (D-6) | .060, .063–.067 | `cuvre_00`; `0017`; `zzzz` (empty form) |
 | CV-5 | the chips lines and mode line (text and list mode), missing line, the empty-with-mode summary | .017–.025 | G2 list; `VALUE` text; mode Invalid with `VALUE_0002` |
-| CV-6 | the paste window: title, add line, label, preview (5 and 7 columns), note, buttons, prefill in list mode (D-7) | .040–.048, .053 | alt+p from list mode |
+| CV-6 | the paste window: title, add line, label, preview (5 and 7 columns), note, buttons, prefill in list mode (D-7); the preview's more line (E3R1, E3S-01) | .040–.048, .053, .078 | alt+p from list mode; a 4,906-name paste → 200 rows + `  +4706 more names (the counts above cover all 4906)` |
 | CV-7 | the similar lines and the 10-name cut line (D-8, D-10) | .049–.051 | the G2 list; a list with 11 missing names |
 | CV-8 | the missing line's ` +<k>` cut (D-9) | .024 | 25 missing names |
 | CV-9 | the detail card of missing, duplicate and hidden rows (D-12) | .027–.030 | `MAP_0024`, #10, mode Invalid |
 | CV-10 | the add line's dropdown and enter → append | .061, .057 | `0042 val` |
-| CV-11 | hostile names painted literally | .076, .077 | a fixture A2L with `[red]` + controls; a 300-character missing name |
+| CV-11 | hostile names painted literally; long operator texts cut (E3R1, E3S-02/-06/-09) | .076, .077, .019, .025, .066 | a fixture A2L with `[red]` + controls and a bidi control; a 300-character missing name; a 1,024-character tag in the dropdown; a 300-character filter text in field `unit` |
 
 Plus the real-terminal key pilot **P-1** (D-11): alt+p, alt+f, alt+a, tab, Esc and ↑/↓ reach the app in Windows Terminal with the dropdown open and with the paste window open (isolated `LOCALAPPDATA`, no clipboard write; every window closed after).
 
@@ -102,7 +105,9 @@ Plus the real-terminal key pilot **P-1** (D-11): alt+p, alt+f, alt+a, tab, Esc a
 - **BL-I7-1** — Inc 12's E3A-05 (a horizontally scrolled cell cut on its left with no mark) remains in PLAN backlog 5; the approved layout does not touch it.
 - **BL-I7-2** — `none (digits must match exactly)` is imprecise for a missing name without a digit (D-10 B is the fix).
 - **BL-I7-3** — archive round 2 of the b103 prototypes next to round 1 (outside the repository).
-- **BL-I7-4** — a filter-box paste is capped at 65,536 characters by I-1; a longer list is cut silently at the cap (I-1's existing behaviour). A visible notice belongs with PLAN backlog 4's "64 KiB bulk notice".
+- **BL-I7-4** — a filter-box paste is capped at 65,536 characters by I-1; a longer list is cut silently at the cap (I-1's existing behaviour). A visible notice belongs with PLAN backlog 4's "64 KiB bulk notice". E3R1 (E3S-05): the joined box value may then exceed the cap (65,535 characters of one-character names → 98,302); accepted and stated in R-A2L-LIST.033/5, since every text derived from it is capped or paged.
+- **BL-I7-5** (E3R1, E3A-15) — `_refresh_a2l_dependent_views` refreshes the paste window only when it is the top screen; a screen pushed above it (a notice) skips the refresh. Fix: refresh every `LabelListPasteModal` in `app.screen_stack`. The orchestrator copies it to PENDING.
+- **BL-I7-6** (E3R1, E3A-10) — at the 80×24 floor the table shows no row in either mode (base already none, P3); folding the chips lines there is a new design, for the operator's CV-1 verdict.
 
 ## 8. What E1 could not check
 
@@ -126,7 +131,7 @@ Orchestrator claude-opus-5-5, 2026-11-13T12:46-0600 (from `date`). These rulings
 | D-14 | A | One new module. P3 is deferred (DF-05). |
 | D-15 | A | Canon home S2.5. |
 
-**Interfaces:** I-7 is pinned as written in `codewire/graph-inc7.md` §Interfaces. I-3, I-4 and I-5 are unchanged.
+**Interfaces:** I-7 is pinned as written in `codewire/graph-inc7.md` §Interfaces (re-pinned at E3R1, `E3-rulings.md` E3A-03; I-1's placement re-pinned at E3R1, E3S-03). I-3, I-4 and I-5 are unchanged.
 
 **Visible to the operator (provisional, DF-09):** D-2, D-3, D-4, D-6, D-7, D-8, D-9, D-10, D-11 and D-12 are **provisional on option A**. E3 and E4 proceed on these options. Each one is only final after the operator's real-capture verdict (CV-1 … CV-11).
 - **D-4 is a conflict between two operator approvals:** Inc 12's R-TUI-042a.4 (Address and Length first) and the later G2 list table. Option A takes the later one (rule 7). The operator rules on CV-3 with both shown.

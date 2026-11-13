@@ -22,12 +22,19 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.033/3 | X033.3 | `test_r_a2l_list_033_3` | full |
 | R-A2L-LIST.034/1 | X034.1 | `test_r_a2l_list_034_1` | full |
 | R-A2L-LIST.034/2 | X034.2 | `test_r_a2l_list_034_2` | full |
+| R-A2L-LIST.033/4 | X033.4 (E3R1, E3A-12: field `source` → stock first line) | `test_r_a2l_list_033_4` | full |
+| R-A2L-LIST.033/5 | X033.5 (E3R1, E3S-05: 32,768 names → 98,302-character value, not cut) | `test_r_a2l_list_033_5` | full |
+| R-A2L-LIST.034/3 | X034.3 (E3R1, E3S-03: the hook receives the stripped text) | `test_r_a2l_list_034_3` | full |
 | R-PASTE.1/1 | X(R-PASTE.1).1 | `test_r_paste_1_1` | full |
 | R-PASTE.1/2 | X(R-PASTE.1).2 | `test_r_paste_1_2` | full |
+| R-PASTE.1/3 | X(R-PASTE.1).3 (E3R1, E3A-01 (2): `P_CTRL` into the filter box, terminal route) | `test_r_paste_1_3` | full |
+| R-PASTE.1/4 | X(R-PASTE.1).4 (E3R1, E3S-03: a `restrict` box never calls the hook) | `test_r_paste_1_4` | full |
 | R-TUI-043.4/1 | X(R-TUI-043.4).1 | `test_r_tui_043_4_1` | full |
 | R-TUI-043.4/2 | X(R-TUI-043.4).2 | `test_r_tui_043_4_2` | full |
+| R-TUI-043.4/3 | X(R-TUI-043.4).3 (E3R1, E3A-01 (2): `P_CTRL`, Ctrl+V route) | `test_r_tui_043_4_3` | full |
 | R-PASTE.29/1 | X(R-PASTE.29).1 | `test_r_paste_29_1` | full |
 | R-PASTE.29/2 | X(R-PASTE.29).2 | `test_r_paste_29_2` | full |
+| R-PASTE.29/3 | X(R-PASTE.29).3 (E3R1, E3A-01 (2): `P_CTRL`, right-click route) | `test_r_paste_29_3` | full |
 | R-A2L-LIST.042/1 | X042.1 | `test_r_a2l_list_042_1` | full |
 | R-A2L-LIST.043/1 | X043.1 | `test_r_a2l_list_043_1` | full |
 | R-A2L-LIST.044/1 | X044.1 | `test_r_a2l_list_044_1` | full |
@@ -36,6 +43,7 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.046/2 | X046.2 | `test_r_a2l_list_046_2` | full |
 | R-A2L-LIST.047/1 | X047.1 | `test_r_a2l_list_047_1` | full |
 | R-A2L-LIST.047/2 | X047.2 | `test_r_a2l_list_047_2` | full |
+| R-A2L-LIST.047/3 | X047.3 (E3R1, E3A-14: columns fixed at open) | `test_r_a2l_list_047_3` | full |
 | R-A2L-LIST.048/1 | X048.1 | `test_r_a2l_list_048_1` | full |
 | R-A2L-LIST.049/1 | X049.1 | `test_r_a2l_list_049_1` | full |
 | R-A2L-LIST.049/2 | X049.2 | `test_r_a2l_list_049_2` | full |
@@ -49,6 +57,9 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.057/2 | X057.2 | `test_r_a2l_list_057_2` | full |
 | R-A2L-LIST.058/1 | X058.1 | `test_r_a2l_list_058_1` | full |
 | R-A2L-LIST.059/1 | X059.1 | `test_r_a2l_list_059_1` | full |
+| R-A2L-LIST.078/1 | X078.1 (E3R1, E3S-01: 4,906 names → 200 rows + the more line) | `test_r_a2l_list_078_1` | full |
+| R-A2L-LIST.078/2 | X078.2 (E3R1, E3S-01: 32,768 names → 200 rows + the more line) | `test_r_a2l_list_078_2` | full |
+| R-A2L-LIST.078/3 | X078.3 (E3R1, E3S-01: one rebuild ≤ 0.25 s; `@pytest.mark.serial_timing`, `uptime` printed) | `test_r_a2l_list_078_3` | full |
 | R-A2L-LIST.061/1 | X061.1 | `test_r_a2l_list_061_1` | full |
 | R-A2L-LIST.063/1 | X063.1 | `test_r_a2l_list_063_1` | full |
 | R-A2L-LIST.063/2 | X063.2 | `test_r_a2l_list_063_2` | full |
@@ -57,7 +68,8 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.065/1 | X065.1 | `test_r_a2l_list_065_1` | full |
 | R-A2L-LIST.065/2 | X065.2 | `test_r_a2l_list_065_2` | full |
 | R-A2L-LIST.066/1 | X066.1 | `test_r_a2l_list_066_1` | full |
-| R-A2L-LIST.066/2 | X066.2 | `test_r_a2l_list_066_2` | full |
+| R-A2L-LIST.066/2 | X066.2 (E3R1: the echo is now the 64-character short text) | `test_r_a2l_list_066_2` | full |
+| R-A2L-LIST.066/3 | X066.3 (E3R1, E3S-02: 300 characters with NUL and ESC) | `test_r_a2l_list_066_3` | full |
 | R-A2L-LIST.067/1 | X067.1 | `test_r_a2l_list_067_1` | full |
 | R-A2L-LIST.067/2 | X067.2 | `test_r_a2l_list_067_2` | full |
 | R-A2L-LIST.068/1 | X068.1 | `test_r_a2l_list_068_1` | full |
@@ -71,13 +83,29 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.071/2 | X071.2 | `test_r_a2l_list_071_2` | full |
 | R-A2L-LIST.073/1 | X073.1 | `test_r_a2l_list_073_1` | full |
 | R-A2L-LIST.073/2 | X073.2 | `test_r_a2l_list_073_2` | full |
+| R-A2L-LIST.075/1 | X075.1 (E3R1, E3A-06: held + 5 keystrokes → 2 `rank` calls) | `test_r_a2l_list_075_1` | full |
+| R-A2L-LIST.075/2 | X075.2 (E3R1, E3S-04: 11 missing, held, 3 edits → ≤ 2 calls per slot) | `test_r_a2l_list_075_2` | full |
+| R-A2L-LIST.084/1 | X084.1 (E3R1, E3A-05: held preparation released after teardown) | `test_r_a2l_list_084_1` | full |
+| R-A2L-LIST.084/2 | X084.2 (E3R1, E3A-05: `build_label_index` raising) | `test_r_a2l_list_084_2` | full |
+| R-A2L-LIST.084/3 | X084.3 (E3R1, E3A-05: positive arm, released while running) | `test_r_a2l_list_084_3` | full |
+| R-A2L-LIST.085/1 | X085.1 (E3R1, E3A-05: filter ranking released after teardown) | `test_r_a2l_list_085_1` | full |
+| R-A2L-LIST.085/3 | X085.3 (E3R1, E3A-05: similar ranking released after teardown) | `test_r_a2l_list_085_3` | full |
+| R-A2L-LIST.085/4 | X085.4 (E3R1, E3A-05: window dismissed, its ranking released) | `test_r_a2l_list_085_4` | full |
+| R-A2L-LIST.085/5 | X085.5 (E3R1, E3A-05: `rank` raising) | `test_r_a2l_list_085_5` | full |
+| R-A2L-LIST.085/6 | X085.6 (E3R1, E3A-05: positive arm for the filter box and the similar line) | `test_r_a2l_list_085_6` | full |
+| R-A2L-LIST.086/1 | X086.1 (E3R1, E3A-05: preview due after the window closed) | `test_r_a2l_list_086_1` | full |
+| R-A2L-LIST.086/2 | X086.2 (E3R1, E3A-05: preview due after teardown) | `test_r_a2l_list_086_2` | full |
+| R-A2L-LIST.086/3 | X086.3 (E3R1, E3A-05: positive arm, window open) | `test_r_a2l_list_086_3` | full |
 | R-A2L-LIST.076/1 | X076.1 | `test_r_a2l_list_076_1` | full |
 | R-A2L-LIST.076/2 | X076.2 | `test_r_a2l_list_076_2` | full |
 | R-A2L-LIST.076/3 | X076.3 | `test_r_a2l_list_076_3` | full |
 | R-A2L-LIST.076/4 | X076.4 | `test_r_a2l_list_076_4` | full |
 | R-A2L-LIST.076/5 | X076.5 | `test_r_a2l_list_076_5` | full |
 | R-A2L-LIST.076/6 | X076.6 | `test_r_a2l_list_076_6` | full |
+| R-A2L-LIST.076/7 | X076.7 (E3R1, E3S-06: U+202E and U+2066 → U+FFFD) | `test_r_a2l_list_076_7` | full |
 | R-A2L-LIST.077/1 | X077.1 | `test_r_a2l_list_077_1` | full |
 | R-A2L-LIST.077/2 | X077.2 | `test_r_a2l_list_077_2` | full |
+| R-A2L-LIST.077/3 | X077.3 (E3R1, E3S-09: a 1,024-character dropdown row) | `test_r_a2l_list_077_3` | full |
+| R-A2L-LIST.077/4 | X077.4 (E3R1, E3S-09: the card's `✗` line of a 300-character missing name) | `test_r_a2l_list_077_4` | full |
 
-75 cases over 37 requirements.
+**After E3R1: 103 cases over 42 requirements** (E1: 75 over 37). E3R1 added 28: .033/4–/5, .034/3, R-PASTE.1/3–/4, R-TUI-043.4/3, R-PASTE.29/3, .047/3, .066/3, .075/1–/2, .076/7, .077/3–/4, .078/1–/3, .084/1–/3, .085/1, /3–/6 (.085/2, the card, is G-V's), .086/1–/3. The robustness cases (.084–.086) follow R-COPY.26/1's form (`01-requirements.md` §Deferred work after teardown): each captures the deferred work and runs it once live (it paints) and once after its target is gone (no exception, nothing painted).

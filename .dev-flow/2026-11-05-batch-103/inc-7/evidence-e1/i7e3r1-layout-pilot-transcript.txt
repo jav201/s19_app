@@ -1,0 +1,91 @@
+uptime before:  13:36:48 up 22:25,  3 users,  load average: 7.41, 7.53, 7.99
+s19_app.__file__ = ~/work/zq-e3r1-7/repo/s19_app/__init__.py
+repo HEAD = 1d47d12f
+make_release_case rc = 0
+
+######## size 80x24
+=== 1. body
+   #a2l_panes: region=(5, 4, 74, 9)
+   #a2l_tags_pane: region=(5, 4, 42, 9)
+   #a2l_hex_pane: region=(47, 4, 32, 9)
+   #a2l_detail_card: region=(49, 6, 28, 3)
+   #alt_hex_scroll: region=(49, 15, 28, 5)
+=== 2. children of #a2l_tags_pane (id, class, region height)
+   a2l_tags_title Label display=True outer_h=1
+   a2l_tags_filters Container display=True outer_h=4
+   a2l_filter_menu Container display=False outer_h=0
+   a2l_tags_list A2LTagTable display=True outer_h=1
+   a2l_tags_summary Label display=True outer_h=1
+   fixed lines (non-table children, outer) = 6; pane outer height = 9
+=== 3. table
+   region=(7, 11, 38, 1) header=1 body rows shown=0 row_count=200
+
+######## size 120x30
+=== 1. body
+   #a2l_panes: region=(23, 4, 96, 15)
+   #a2l_tags_pane: region=(23, 4, 54, 15)
+   #a2l_hex_pane: region=(77, 4, 42, 15)
+   #a2l_detail_card: region=(79, 6, 38, 3)
+   #alt_hex_scroll: region=(79, 15, 38, 11)
+=== 2. children of #a2l_tags_pane (id, class, region height)
+   a2l_tags_title Label display=True outer_h=1
+   a2l_tags_filters Container display=True outer_h=4
+   a2l_filter_menu Container display=False outer_h=0
+   a2l_tags_list A2LTagTable display=True outer_h=6
+   a2l_tags_summary Label display=True outer_h=1
+   fixed lines (non-table children, outer) = 6; pane outer height = 15
+=== 3. table
+   region=(25, 11, 50, 6) header=1 body rows shown=5 row_count=200
+
+######## size 80x54
+=== 1. body
+   #a2l_panes: region=(5, 4, 74, 39)
+   #a2l_tags_pane: region=(5, 4, 42, 39)
+   #a2l_hex_pane: region=(47, 4, 32, 39)
+   #a2l_detail_card: region=(49, 6, 28, 3)
+   #alt_hex_scroll: region=(49, 15, 28, 35)
+=== 2. children of #a2l_tags_pane (id, class, region height)
+   a2l_tags_title Label display=True outer_h=1
+   a2l_tags_filters Container display=True outer_h=4
+   a2l_filter_menu Container display=False outer_h=0
+   a2l_tags_list A2LTagTable display=True outer_h=30
+   a2l_tags_summary Label display=True outer_h=1
+   fixed lines (non-table children, outer) = 6; pane outer height = 39
+=== 3. table
+   region=(7, 11, 38, 30) header=1 body rows shown=29 row_count=200
+
+######## size 118x54
+=== 1. body
+   #a2l_panes: region=(5, 4, 112, 39)
+   #a2l_tags_pane: region=(5, 4, 64, 39)
+   #a2l_hex_pane: region=(69, 4, 48, 39)
+   #a2l_detail_card: region=(71, 6, 44, 2)
+   #alt_hex_scroll: region=(71, 14, 44, 35)
+=== 2. children of #a2l_tags_pane (id, class, region height)
+   a2l_tags_title Label display=True outer_h=1
+   a2l_tags_filters Container display=True outer_h=4
+   a2l_filter_menu Container display=False outer_h=0
+   a2l_tags_list A2LTagTable display=True outer_h=30
+   a2l_tags_summary Label display=True outer_h=1
+   fixed lines (non-table children, outer) = 6; pane outer height = 39
+=== 3. table
+   region=(7, 11, 60, 30) header=1 body rows shown=29 row_count=200
+
+######## size 160x40
+=== 1. body
+   #a2l_panes: region=(23, 4, 136, 25)
+   #a2l_tags_pane: region=(23, 4, 77, 25)
+   #a2l_hex_pane: region=(100, 4, 59, 25)
+   #a2l_detail_card: region=(102, 6, 55, 2)
+   #alt_hex_scroll: region=(102, 14, 55, 21)
+=== 2. children of #a2l_tags_pane (id, class, region height)
+   a2l_tags_title Label display=True outer_h=1
+   a2l_tags_filters Container display=True outer_h=4
+   a2l_filter_menu Container display=False outer_h=0
+   a2l_tags_list A2LTagTable display=True outer_h=16
+   a2l_tags_summary Label display=True outer_h=1
+   fixed lines (non-table children, outer) = 6; pane outer height = 25
+=== 3. table
+   region=(25, 11, 73, 16) header=1 body rows shown=15 row_count=200
+rc=0
+uptime after:  13:44:44 up 22:33,  3 users,  load average: 8.10, 7.85, 7.97

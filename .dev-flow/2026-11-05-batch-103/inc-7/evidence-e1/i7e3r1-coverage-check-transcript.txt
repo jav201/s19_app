@@ -1,0 +1,3 @@
+# i7e2-coverage-check.py (unchanged), run 2026-11-13T14:09:36-06:00 on <runner> from the inc-7 folder of the exact clone + the E3R1 records
+95 active requirements, 212 example lines, 0 gap(s)
+rc=0
