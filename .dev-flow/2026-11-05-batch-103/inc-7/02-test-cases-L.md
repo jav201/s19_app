@@ -96,16 +96,18 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.086/1 | X086.1 (E3R1, E3A-05: preview due after the window closed) | `test_r_a2l_list_086_1` | full |
 | R-A2L-LIST.086/2 | X086.2 (E3R1, E3A-05: preview due after teardown) | `test_r_a2l_list_086_2` | full |
 | R-A2L-LIST.086/3 | X086.3 (E3R1, E3A-05: positive arm, window open) | `test_r_a2l_list_086_3` | full |
+| R-A2L-LIST.087/1 | X087.1 (E3R2, E3A-R4: the build fails once, the next request rebuilds, the dropdown opens) | `test_r_a2l_list_087_1` | full |
+| R-A2L-LIST.087/2 | X087.2 (E3R2, E3A-R4: the build always fails → exactly 2 builds) | `test_r_a2l_list_087_2` | full |
 | R-A2L-LIST.076/1 | X076.1 | `test_r_a2l_list_076_1` | full |
 | R-A2L-LIST.076/2 | X076.2 | `test_r_a2l_list_076_2` | full |
 | R-A2L-LIST.076/3 | X076.3 | `test_r_a2l_list_076_3` | full |
 | R-A2L-LIST.076/4 | X076.4 | `test_r_a2l_list_076_4` | full |
 | R-A2L-LIST.076/5 | X076.5 | `test_r_a2l_list_076_5` | full |
 | R-A2L-LIST.076/6 | X076.6 | `test_r_a2l_list_076_6` | full |
-| R-A2L-LIST.076/7 | X076.7 (E3R1, E3S-06: U+202E and U+2066 → U+FFFD) | `test_r_a2l_list_076_7` | full |
+| R-A2L-LIST.076/7 | X076.7 (E3R1, E3S-06: U+202E and U+2066 → U+FFFD; E3R2, E3S-R1: also U+200B and U+FEFF) | `test_r_a2l_list_076_7` | full |
 | R-A2L-LIST.077/1 | X077.1 | `test_r_a2l_list_077_1` | full |
 | R-A2L-LIST.077/2 | X077.2 | `test_r_a2l_list_077_2` | full |
 | R-A2L-LIST.077/3 | X077.3 (E3R1, E3S-09: a 1,024-character dropdown row) | `test_r_a2l_list_077_3` | full |
 | R-A2L-LIST.077/4 | X077.4 (E3R1, E3S-09: the card's `✗` line of a 300-character missing name) | `test_r_a2l_list_077_4` | full |
 
-**After E3R1: 103 cases over 42 requirements** (E1: 75 over 37). E3R1 added 28: .033/4–/5, .034/3, R-PASTE.1/3–/4, R-TUI-043.4/3, R-PASTE.29/3, .047/3, .066/3, .075/1–/2, .076/7, .077/3–/4, .078/1–/3, .084/1–/3, .085/1, /3–/6 (.085/2, the card, is G-V's), .086/1–/3. The robustness cases (.084–.086) follow R-COPY.26/1's form (`01-requirements.md` §Deferred work after teardown): each captures the deferred work and runs it once live (it paints) and once after its target is gone (no exception, nothing painted).
+**After E3R2: 105 cases over 43 requirements** (E3R2 added .087/1–/2 and widened .076/7's text). After E3R1: 103 cases over 42 requirements (E1: 75 over 37). E3R1 added 28: .033/4–/5, .034/3, R-PASTE.1/3–/4, R-TUI-043.4/3, R-PASTE.29/3, .047/3, .066/3, .075/1–/2, .076/7, .077/3–/4, .078/1–/3, .084/1–/3, .085/1, /3–/6 (.085/2, the card, is G-V's), .086/1–/3. The robustness cases (.084–.086) follow R-COPY.26/1's form (`01-requirements.md` §Deferred work after teardown): each captures the deferred work and runs it once live (it paints) and once after its target is gone (no exception, nothing painted).

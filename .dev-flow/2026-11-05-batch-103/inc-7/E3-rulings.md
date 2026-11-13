@@ -70,3 +70,18 @@ Not done or deviations, for the orchestrator:
 - The extractor resolved no call in `core.py`, `patch.py` or `navigation.py:1374/1483/1497` (35 ambiguous names); `git grep` filled them (S:89-102).
 - On this PC I ran `--help` of `codewire_marks.py` and `codewire_extract.py` and a read-only `json.load` of the E1 extractor output (`python -I -B`; nothing written); on <runner> one temporary listing was written to `/tmp` and deleted in the same command. Neither is a test or a timing.
 - Decisions E3R1 made inside the rulings (DF-02): the write route is kept by V4/V8, not by editing `patch.py` (G-V stays at 3 files); the short-body thresholds 110 columns and 32 rows; the E3A-05 rows folded to one per entry point (3) to stay at 95 rows.
+
+## E3R2 corrections
+
+Correction worker claude-opus-5-5 (architect), after the re-review (`e5bf4432`); records only; time in `steps.log`. Paths as in §E3R1 corrections. Size after E3R2: **96 active rows** (83 new, 13 changed; was 95), **231 cases** (L 105, V 116, AT 10), **44 graph nodes** (unchanged) — under the ceiling of about 98. Checks on <runner>: `evidence-e1/trace_check-e3r2.txt` (US 0, CASE 0, SLICE 0; 92 TEST gaps and the EVID line, expected before E4/E5); `codewire/i7e2-coverage-check.py` 96 rows, 218 example lines, 0 gaps (printed, not kept); `evidence-e1/i7e3r2-layout-pilot-transcript.txt` (P4).
+
+| Finding | What changed | Where |
+|---|---|---|
+| E3A-R1 MAJOR | Option (a): the find box and its three buttons stay in base's filter row; no second toolbar row. The chips and missing lines are one screen line each (cut with `…`), because wrapped chips cost rows at short bodies (P4). .083's thresholds are now measured (P4, list mode): **≥ 1 at 120×30, ≥ 11 at 160×40, ≥ 11 at 118×54** (text mode 3, 13, 13). CV-1 records the provisional choice and that the approved scene differs from base (two compact one-line rows, a separate find row, the title as a border title); CV-5 records the cut chips lines | R:213; CV:120-122; G:528, G:707-711; E1R:84, E1R:88, E1R:14 |
+| E3A-R2 MINOR | `_box_a` lives in `test_b103_clipboard_core.py:92` and `test_b103_clipboard_windows.py:97`, not in `tests/support/b103_clipboard.py`. Listed the inline sites, including the 14 WinCI-only sites of `test_b103_clipboard_windows.py`; the re-review counted 10, `git grep` finds 14 | S:117 |
+| E3A-R3 MINOR | R-TUI-037.1/.2 say "of the A2L Explorer body width" | R:147-148 |
+| E3A-R4 MINOR | New row .087: a failed preparation is retried once, at the next ranking request, so the dropdown recovers on the next keystroke; cases .087/1–/2; the ranker keeps `_names` and `_retry` | R:224; CL:99-100; G:248, G:253, G:263, G:688 |
+| E3S-R1 LOW | Display text also replaces U+200B–U+200D, U+2060 and U+FEFF; case .076/7 widened (case text) | R:55, R:203; CL:107; G:164 |
+| E3S-R2 LOW | The kept text-mode empty summary of R-B102-A2L-003 echoes the short text; case .025/3 widened (case text) | R:121; CV:60; G:567; E1R:42 |
+
+Notes: P4 is a run-time stand-in in the real app, because no Inc 7 code exists yet. It mounted the pinned rows with the rows' texts and changed no file, so E4 still measures the built tree against these thresholds. On this PC a stray `python -` with no input was started and stopped through TaskStop; it read nothing and wrote nothing. The <runner> scratch `~/work/zq-e3r2-7/` is deleted.

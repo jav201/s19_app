@@ -161,9 +161,9 @@ req: R-A2L-LIST.076, R-A2L-LIST.077, R-A2L-LIST.019, R-A2L-LIST.025, R-A2L-LIST.
 in: str name; int? cap = None
 out: str shown
 module: s19_app/tui/a2l_label_list.py
-func: new; E3R1 (E3S-06, E3S-02). Replace each character U+0000–U+001F, U+007F–U+009F, U+061C, U+200E, U+200F, U+202A–U+202E and U+2066–U+2069 with U+FFFD, one for one (offsets kept, so match spans still index it); then, when `cap` is given and the result is longer than `cap` characters, keep its first `cap - 1` characters and `…`. `display_text(x, 64)` is the *short text* of the definitions, for a name and for an operator text alike. Callers paint the result as `Text(shown)` — never markup.
+func: new; E3R1 (E3S-06, E3S-02). Replace each character U+0000–U+001F, U+007F–U+009F, U+061C, U+200B–U+200F, U+202A–U+202E, U+2060, U+2066–U+2069 and U+FEFF (zero-width ones E3R2, E3S-R1) with U+FFFD, one for one (offsets kept, so match spans still index it); then, when `cap` is given and the result is longer than `cap` characters, keep its first `cap - 1` characters and `…`. `display_text(x, 64)` is the *short text* of the definitions, for a name and for an operator text alike. Callers paint the result as `Text(shown)` — never markup.
 examples: (R-A2L-LIST.076/1) `A[red]` + U+001B + `B` + U+0000 + U+0085 → `A[red]\ufffdB\ufffd\ufffd` (length 10 kept)
-examples: (R-A2L-LIST.076/7) `A` + U+202E + `B` + U+2066 + `C` → `A` + U+FFFD + `B` + U+FFFD + `C` (length 5 kept) [E3R1, E3S-06]
+examples: (R-A2L-LIST.076/7) `A` + U+202E + `B` + U+2066 + `C` + U+200B + `D` + U+FEFF → `A`, U+FFFD, `B`, U+FFFD, `C`, U+FFFD, `D`, U+FFFD (length 8 kept) [E3R1, E3S-06; E3R2, E3S-R1]
 examples: (R-A2L-LIST.066/3) a 300-character text with NUL at index 10 and ESC at index 20, cap `64` → 64 characters: the first 63, with U+FFFD at indexes 10 and 20, then `…` [E3R1, E3S-02]
 examples: (R-A2L-LIST.077/1) a 300-character name, cap `64` → its first 63 characters + `…` (64 characters)
 examples: (R-A2L-LIST.077/2) a 64-character name, cap `64` → the name, whole
@@ -228,7 +228,7 @@ examples: (R-A2L-LIST.029/1) DUPLICATE #10 → `duplicate of pasted #1`; (R-A2L-
 examples: (R-A2L-LIST.077/4) MISSING #1, a 300-character name, closest `None` → line 1 plain = `✗ ` + its first 63 characters + `…` + `  not in this A2L` [E3R1, E3S-09]
 
 LabelRanker.prepare
-req: R-A2L-LIST.072, R-A2L-LIST.074, R-A2L-LIST.084
+req: R-A2L-LIST.072, R-A2L-LIST.074, R-A2L-LIST.084, R-A2L-LIST.087
 in: Sequence[str] names; int generation
 out: None
 module: s19_app/tui/a2l_label_list.py
@@ -240,25 +240,27 @@ examples: (derived) the same names and generation twice → one build only
 examples: (R-A2L-LIST.084/2) a spy on `app.run_worker` → called once with `thread=True`, `exit_on_error=False` [E3R1, E3A-05]
 
 LabelRanker._install
-req: R-A2L-LIST.072, R-A2L-LIST.074, R-A2L-LIST.084
+req: R-A2L-LIST.072, R-A2L-LIST.074, R-A2L-LIST.084, R-A2L-LIST.087
 in: int generation; LabelIndex? index
 out: None
 module: s19_app/tui/a2l_label_list.py
 modify: [Data: LabelRanker] (replace)
-func: new; E3R1 (E3A-05, E3A-04). UI thread. First `if not self._app.is_running: return` (the index and every held request are dropped with the ranker). `index` `None` (the build raised, L30) → drop it and every held request; `ready` stays `False`. If `generation` is not the latest prepared generation, drop the index (a newer A2L won). Else keep it, set `ready`, and re-issue, through `request`'s ready path, the one held request per key whose token is still that key's latest (R-A2L-LIST.074).
+func: new; E3R1 (E3A-05, E3A-04). UI thread. First `if not self._app.is_running: return` (the index and every held request are dropped with the ranker). `index` `None` (the build raised, L30) → drop it and every held request; `ready` stays `False`; if this generation's build has not been retried, mark it retry-pending (E3R2, E3A-R4: the next `request` starts the build once more from the names `prepare` kept; a second failure leaves the ranker not ready until the next A2L load). If `generation` is not the latest prepared generation, drop the index (a newer A2L won). Else keep it, set `ready`, and re-issue, through `request`'s ready path, the one held request per key whose token is still that key's latest (R-A2L-LIST.074).
 examples: (R-A2L-LIST.074/1) build held; `0017` requested for key "filter" (held); build released → the held request runs and delivers 5 matches (P1 §2)
 examples: (R-A2L-LIST.084/3) the same, positive arm of the teardown case → 5 rows painted
 examples: (R-A2L-LIST.084/1) build held, `0017` held for "filter"; `run_test` closes the app; build released → `_work`'s `call_from_thread` raises `RuntimeError` inside `except RuntimeError: return` (or `_install` runs and returns at `is_running`): 0 exceptions, `rank` never called, nothing painted [E3R1]
 examples: (R-A2L-LIST.084/2) `build_label_index` stand-in raising `ValueError` → `_install(gen, None)`: `ready` `False`, held request dropped, `app.is_running` `True`, no unhandled exception [E3R1]
+examples: (R-A2L-LIST.087/1) the stand-in raising on its first call only; `001` requested (dropped with the failed build); `0017` requested → a second build on a worker, then `0017` delivers 5 matches (P1 §2) [E3R2, E3A-R4]
+examples: (R-A2L-LIST.087/2) the stand-in raising on every call; 5 requests → `build_label_index` called 2 times, `ready` `False`, `app.is_running` `True` [E3R2]
 examples: (derived) generation 1 built after generation 2 was requested → index of 1 dropped, `ready` stays `False`
 
 LabelRanker.request
-req: R-A2L-LIST.071, R-A2L-LIST.073, R-A2L-LIST.075, R-A2L-LIST.050
+req: R-A2L-LIST.071, R-A2L-LIST.073, R-A2L-LIST.075, R-A2L-LIST.050, R-A2L-LIST.087
 in: str key; str query; int limit; (Callable) list->None deliver; (Callable) ->bool current
 out: None
 module: s19_app/tui/a2l_label_list.py
 modify: [Data: LabelRanker] (replace)
-func: new; E3R1 (E3A-04, E3A-06, E3S-04). UI thread. Give the *key* a new token (the latest token per key wins; keys of I-7: `filter`, `add`, `card`, `similar:1` … `similar:10`). Not ready → hold `(token, query, limit, deliver, current)` for `_install`, one per key (a newer request replaces it). Ready and a ranking for this key running → keep the request as the key's one waiting request (replacing any earlier one); no worker starts. Ready and none running → mark the key running and start one thread worker (`app.run_worker(work, thread=True, exit_on_error=False, group="a2l_label_list")`) whose body is `_work` running `rank(query, index, min(limit, 20))` and handing the result to `_deliver` with the key, the token and the generation. `rank` never runs on the UI thread.
+func: new; E3R1 (E3A-04, E3A-06, E3S-04). UI thread. Give the *key* a new token (the latest token per key wins; keys of I-7: `filter`, `add`, `card`, `similar:1` … `similar:10`). Not ready and the build of this generation retry-pending (E3R2, E3A-R4) → clear the mark and start that build once more, as `prepare` does, from the kept names; then hold. Not ready → hold `(token, query, limit, deliver, current)` for `_install`, one per key (a newer request replaces it). Ready and a ranking for this key running → keep the request as the key's one waiting request (replacing any earlier one); no worker starts. Ready and none running → mark the key running and start one thread worker (`app.run_worker(work, thread=True, exit_on_error=False, group="a2l_label_list")`) whose body is `_work` running `rank(query, index, min(limit, 20))` and handing the result to `_deliver` with the key, the token and the generation. `rank` never runs on the UI thread.
 examples: (R-A2L-LIST.073/1) "filter", `cuvre_00`, 20 → `rank` called on a worker thread (thread id ≠ UI thread); `deliver` receives 20 matches, first `CURVE_0001` fuzzy `e1` (P1 §2)
 examples: (R-A2L-LIST.073/2) "similar:1", `MAP_0024`, 3 → `rank` on a worker thread; `deliver` receives `[]` (P1 §4)
 examples: (I-3 obligation 6) limit `100` → `rank` called with `20`
@@ -519,11 +521,11 @@ examples: (R-TUI-043.4/3) Ctrl+V in the filter box, the seam returning `P_CTRL` 
 examples: (derived, E3A-16) the seam failing (no text) → the read-failure warning as on base; the hook not called
 
 ComposeScreensMixin._compose_screen_a2l
-req: R-A2L-LIST.007, R-A2L-LIST.008, R-A2L-LIST.010, R-A2L-LIST.033, R-A2L-LIST.040, R-A2L-LIST.080, R-A2L-LIST.081
+req: R-A2L-LIST.007, R-A2L-LIST.008, R-A2L-LIST.010, R-A2L-LIST.033, R-A2L-LIST.040, R-A2L-LIST.080, R-A2L-LIST.081, R-A2L-LIST.083
 in: (none)
 out: Container section
 module: s19_app/tui/app/compose_screens.py
-func: changed; E3R1 (E3A-03). The scene's composition, every shipped id kept. The dropdown is built first, `suggest = LabelSuggestBox(accept="tab complete", id="a2l_filter_suggest")`, and handed to the box: `ListAwareFilterInput(suggest=suggest, list_enabled=lambda: self.a2l_tags_filter_field in ("name", "all"), placeholder=…, id="a2l_tags_filter_input")` [D-3]. The filter row = mode tag `Label` (`#a2l_filter_mode_tag`), that `ListAwareFilterInput` (placeholder `type part of a name — or paste a list (new line , ; space)`), `Button("Paste list…  alt+p", id="a2l_paste_list_button")`, `Field: name`, `All`, `Invalid`, `In-Memory`; `suggest` (composed here, under the filter row); the find row (find box, `Find next`, `Page Prev`, `Page Next` — shipped ids and labels); `#a2l_filter_menu`; `Static` `#a2l_list_chips`; `Static` `#a2l_list_missing` (hidden); the `A2LTagTable` (`fixed_columns=2`, unchanged); the summary. Tags pane: a `Vertical` `#a2l_tags_pane` holding the above. Hex pane: a `Container` `#a2l_hex_pane` holding `ListAwareDetailCard` (`#a2l_detail_card`) and a `Container` `#a2l_hexbox` with the hex controls and `#alt_hex_scroll`. Body: `A2LExplorerBody(tags_pane, hex_pane, id="a2l_panes")` (I-7).
+func: changed; E3R1 (E3A-03). The scene's composition, every shipped id kept. The dropdown is built first, `suggest = LabelSuggestBox(accept="tab complete", id="a2l_filter_suggest")`, and handed to the box: `ListAwareFilterInput(suggest=suggest, list_enabled=lambda: self.a2l_tags_filter_field in ("name", "all"), placeholder=…, id="a2l_tags_filter_input")` [D-3]. The filter row = mode tag `Label` (`#a2l_filter_mode_tag`), that `ListAwareFilterInput` (placeholder `type part of a name — or paste a list (new line , ; space)`), `Button("Paste list…  alt+p", id="a2l_paste_list_button")`, `Field: name`, `All`, `Invalid`, `In-Memory`, then — as base does, in the same row (E3R2, E3A-R1 option (a), provisional: CV-1) — the find box, `Find next`, `Page Prev`, `Page Next` (shipped ids and labels; base `compose_screens.py:672-687`, one `#a2l_tags_filters` row, 4 lines); there is **no second toolbar row**; `suggest` (composed here, under the filter row; an overlay, no height); `#a2l_filter_menu`; `Static` `#a2l_list_chips`; `Static` `#a2l_list_missing` (hidden in text mode) — both written one screen line per text line, never wrapped (E3R2: a wrapped chips line costs table rows, P4); the `A2LTagTable` (`fixed_columns=2`, unchanged); the summary. Tags pane: a `Vertical` `#a2l_tags_pane` holding the above. Hex pane: a `Container` `#a2l_hex_pane` holding `ListAwareDetailCard` (`#a2l_detail_card`) and a `Container` `#a2l_hexbox` with the hex controls and `#alt_hex_scroll`. Body: `A2LExplorerBody(tags_pane, hex_pane, id="a2l_panes")` (I-7).
 examples: (R-A2L-LIST.008/1) mounted, empty filter → `#a2l_filter_mode_tag` plain `FILTER`
 examples: (R-A2L-LIST.040/2) `#a2l_paste_list_button` label `Paste list…  alt+p`; a click → the paste window
 examples: (R-A2L-LIST.010/1) list mode at 80×54 scrolled fully right → the `#` and `Tag` cells at their unscrolled x (fixed columns 2 of `LIST_COLUMNS`)
@@ -562,7 +564,7 @@ req: R-A2L-LIST.025, R-A2L-LIST.019, R-A2L-LIST.006, R-A2L-LIST.036
 in: bool preserve_anchor
 out: None
 module: s19_app/tui/app/a2l_view.py
-func: changed; E3R1 (E3A-07, E3S-02). **List mode with `preserve_anchor=True`** (the in-place write route's fallback, `patch.py:1847`, its only `True` caller — `E1-slice.md` §3): call `_repaint_a2l_tag_cells()` (V8: it re-resolves over the new enriched tags and writes the page in place, no clear) and `_paint_a2l_filter_chips()`; return. Every other call as today (filter, anchor, `update_a2l_tags_view`), then `_paint_a2l_filter_chips()`. In text mode with no row, a non-empty text and a mode other than `all`: when the text matches at least one tag under `all`, pass the empty message `No tag matches '<display_text(text, 64)>' with mode <mode label> — <n> match with mode All alt+a` (else today's `No A2L tags match '<text>'.`).
+func: changed; E3R1 (E3A-07, E3S-02). **List mode with `preserve_anchor=True`** (the in-place write route's fallback, `patch.py:1847`, its only `True` caller — `E1-slice.md` §3): call `_repaint_a2l_tag_cells()` (V8: it re-resolves over the new enriched tags and writes the page in place, no clear) and `_paint_a2l_filter_chips()`; return. Every other call as today (filter, anchor, `update_a2l_tags_view`), then `_paint_a2l_filter_chips()`. In text mode with no row, a non-empty text and a mode other than `all`: when the text matches at least one tag under `all`, pass the empty message `No tag matches '<display_text(text, 64)>' with mode <mode label> — <n> match with mode All alt+a` (else the kept `No A2L tags match '<display_text(text, 64)>'.` — R-B102-A2L-003's text with the short text, E3R2, E3S-R2).
 examples: (R-A2L-LIST.025/1) A2L only, mode `inmem`, `VALUE_0002` → summary `No tag matches 'VALUE_0002' with mode In-memory — 1 match with mode All alt+a`
 examples: (R-A2L-LIST.025/2) the same with `VALUE` → `… — 208 match with mode All alt+a` (derived: C08 has 208 VALUE names, P1 §1)
 examples: (R-A2L-LIST.025/3) a fixture tag (A2L only) named by a 300-character text holding NUL and ESC, that text, mode `inmem` → `No tag matches '` + 63 characters (U+FFFD for NUL and ESC) + `…' with mode In-memory — 1 match with mode All alt+a` [E3R1, E3S-02]
@@ -683,7 +685,7 @@ desc: new (I-7). Frozen slots dataclass: `pos`, `name`, `status`, `tag`, `first_
 desc: new (I-7). `entries: tuple[LabelListEntry, ...]`, `rows: tuple[dict, ...]` (E3R1, E3A-02/E3A-07: same order; the tag object itself, or `{"name", "_list_pos"}` for MISSING), `count(status)`. The viewer keeps the last one in `[Data: A2lViewMixin._a2l_list_resolution]` (`None` in text mode); the paste window keeps its own.
 
 [Data: LabelRanker]
-desc: new (I-7). `_app`, `_generation: int | None`, `_index: LabelIndex | None`, and per request key (E3R1, E3A-04/E3A-06): `_tokens: dict[str, int]`, `_held: dict[str, tuple]` (one request held until ready), `_running: set[str]`, `_waiting: dict[str, tuple]` (one request waiting for the running one). Written only on the UI thread (`prepare`, `_install`, `request`, `_deliver`); a worker (`_work`) reads only the `LabelIndex` it was handed (read-only after its build, I-3) and the query.
+desc: new (I-7). `_app`, `_generation: int | None`, `_index: LabelIndex | None`, `_names: tuple[str, ...]` and `_retry: bool` (E3R2, E3A-R4: the kept names and the one retry of a failed build), and per request key (E3R1, E3A-04/E3A-06): `_tokens: dict[str, int]`, `_held: dict[str, tuple]` (one request held until ready), `_running: set[str]`, `_waiting: dict[str, tuple]` (one request waiting for the running one). Written only on the UI thread (`prepare`, `_install`, `request`, `_deliver`); a worker (`_work`) reads only the `LabelIndex` it was handed (read-only after its build, I-3) and the query.
 
 [Data: LabelSuggestBox.rows]
 desc: new. The shown matches (≤ 8), the choice index, `is_open`.
@@ -702,7 +704,11 @@ examples: (R-TUI-069.6/1) 220×60 → `#a2l_detail_card` height ≤ 8, its botto
 examples: (R-TUI-037.1/2) 120×30 → `#a2l_tags_pane` width 54 of a 96-column body, `#a2l_hex_pane` 42, right of it (P3: base widths, kept) [E3R1, E3A-10]
 examples: (R-TUI-037.2/1) 80×24 → `#a2l_hex_pane` 32 of 74 (P3) [E3R1]
 examples: (R-A2L-LIST.082/1) 120×30 → `#a2l_detail_card` height ≤ 5, above `#alt_hex_scroll` [E3R1]
-examples: (R-A2L-LIST.083/2) 160×40 (short: 136×25), the G2 list → the tags pane 25 rows; 9 base lines + 4 list-mode lines leave the table 12 rows: ≥ 11 body rows (derived from P3; E4 measures) [E3R1]
+examples: (R-A2L-LIST.083/1) 120×30 (short: 96×15), the G2 list, the find box kept in the filter row (`#a2l_tags_filters` 4 lines), chips 3 lines + missing 1 line, one screen line each → 10 fixed lines, table region 2 → 1 body row (P4, measured) [E3R2, E3A-R1]
+examples: (R-A2L-LIST.083/2) 160×40 (short: 136×25), the same → 10 fixed lines, table region 12 → 11 body rows (P4); text mode → 13 (P4) [E3R2]
+examples: (R-A2L-LIST.083/3) 118×54 (stacked: tags pane 112×25), the same → 11 body rows; text mode 13 (P4) [E3R2]
+examples: (R-A2L-LIST.083, control) the chips lines left to wrap → 120×30: 0 rows, 160×40: 9 (P4); the find box in a second row → 0, 7, 7 (E3 Probe C) [E3R2]
+examples: (R-A2L-LIST.083, the rule E3R2 adds) `#a2l_list_chips, #a2l_list_missing { height: auto; text-wrap: nowrap; text-overflow: ellipsis; overflow-x: hidden; }` (one screen line per text line, the cut marked `…`)
 examples: (R-TUI-069.7/2) 118×54 (stacked), a card whose content is 4 lines longer than its 14-row region → `max_scroll_y` ≥ 1, one scroll step changes its first shown line [E3R1, E3A-11]
 
 [Interface: A2L Explorer filter]
@@ -864,10 +870,11 @@ An example `.nnn/k` is `R-A2L-LIST.nnn/k` in the nodes above.
 | R-A2L-LIST.080 | [Config: styles.tcss A2L panes], A2LExplorerBody.on_resize | .080/1 |
 | R-A2L-LIST.081 | [Config: styles.tcss A2L panes], A2LExplorerBody.on_resize | .081/1 |
 | R-A2L-LIST.082 | [Config: styles.tcss A2L panes], A2LExplorerBody.on_resize | .082/1, .082/2 (E3R1, new) |
-| R-A2L-LIST.083 | [Config: styles.tcss A2L panes], A2LExplorerBody.on_resize | .083/2 (E3R1, new; /1, /3 measured the same way) |
+| R-A2L-LIST.083 | [Config: styles.tcss A2L panes], A2LExplorerBody.on_resize, _compose_screen_a2l | .083/1–/3 (E3R1, new; measured at E3R2, P4) |
 | R-A2L-LIST.084 | LabelRanker.prepare, ._install, ._work | .084/1–/3 (E3R1, new) |
 | R-A2L-LIST.085 | LabelRanker._work, ._deliver, _schedule_a2l_filter_refresh, ListAwareDetailCard.show_tag | .085/1, .085/2, .085/4–/6 (E3R1, new; /3 as /1 for key `similar:1`) |
 | R-A2L-LIST.086 | LabelListPasteModal._preview | .086/1–/3 (E3R1, new) |
+| R-A2L-LIST.087 | LabelRanker._install, .request, .prepare | .087/1–/2 (E3R2, new) |
 | R-A2L-007.1 | _filter_a2l_tags | R-A2L-007.1/2 |
 | R-A2L-007.2 | _a2l_list_names | R-A2L-007.2/1 |
 | R-A2L-007.6 | _filter_a2l_tags (text mode unchanged) | R-A2L-007.6/1 |

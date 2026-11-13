@@ -57,7 +57,7 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.024/2 | X024.2 | `test_r_a2l_list_024_2` | full |
 | R-A2L-LIST.025/1 | X025.1 | `test_r_a2l_list_025_1` | full |
 | R-A2L-LIST.025/2 | X025.2 | `test_r_a2l_list_025_2` | full |
-| R-A2L-LIST.025/3 | X025.3 (E3R1, E3S-02: a fixture tag with a 300-character name holding NUL and ESC) | `test_r_a2l_list_025_3` | full |
+| R-A2L-LIST.025/3 | X025.3 (E3R1, E3S-02: a fixture tag with a 300-character name holding NUL and ESC; E3R2, E3S-R2: also the kept mode-All summary as a short text) | `test_r_a2l_list_025_3` | full |
 | R-A2L-LIST.026/1 | X026.1 | `test_r_a2l_list_026_1` | full |
 | R-A2L-LIST.026/2 | X026.2 | `test_r_a2l_list_026_2` | full |
 | R-A2L-LIST.027/1 | X027.1 | `test_r_a2l_list_027_1` | full |
@@ -117,8 +117,8 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.081/1 | X081.1 | `test_r_a2l_list_081_1` | full |
 | R-A2L-LIST.082/1 | X082.1 (E3R1, E3A-10: 120×30, card ≤ 5 lines above the hex view) | `test_r_a2l_list_082_1` | full |
 | R-A2L-LIST.082/2 | X082.2 (E3R1, E3A-10: 80×54) | `test_r_a2l_list_082_2` | full |
-| R-A2L-LIST.083/1 | X083.1 (E3R1, E3A-10: 120×30 list mode → ≥ 1 table row) | `test_r_a2l_list_083_1` | full |
-| R-A2L-LIST.083/2 | X083.2 (E3R1, E3A-10: 160×40 → ≥ 11 rows) | `test_r_a2l_list_083_2` | full |
-| R-A2L-LIST.083/3 | X083.3 (E3R1, E3A-10: 118×54 → ≥ 10 rows) | `test_r_a2l_list_083_3` | full |
+| R-A2L-LIST.083/1 | X083.1 (E3R1, E3A-10: 120×30 list mode → ≥ 1 table row; measured P4, E3R2) | `test_r_a2l_list_083_1` | full |
+| R-A2L-LIST.083/2 | X083.2 (E3R1, E3A-10: 160×40 → ≥ 11 rows; measured P4, E3R2) | `test_r_a2l_list_083_2` | full |
+| R-A2L-LIST.083/3 | X083.3 (E3R1, E3A-10: 118×54 → ≥ 11 rows; measured P4, E3R2, was ≥ 10 derived) | `test_r_a2l_list_083_3` | full |
 
 **After E3R1: 116 cases over 54 requirements** (E1: 94 over 48; R-A2L-LIST.085 is shared with G-L, which holds its other five cases). E3R1 added 22: .008/3, .019/3, .023/2, .025/3, .031/4, .036/4–/5, .085/2, R-TUI-069.7/1–/3, R-TUI-037.1/1–/3, R-TUI-037.2/1–/3, .082/1–/2, .083/1–/3, and re-pointed .036/3 (a list with a missing and a duplicate row). The tc019 tests (`tests/test_tui_directionb.py:1373`, `:1415`, `:1451`) stay as they are and keep passing under R-TUI-037.1/.2 as changed: they run at short bodies (`E1-slice.md` §5).
