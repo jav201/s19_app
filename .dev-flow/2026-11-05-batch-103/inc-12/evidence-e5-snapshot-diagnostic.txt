@@ -4,7 +4,7 @@
 ____________ test_tc016s_density_layout_snapshot[a2l-compact-80x24] ____________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b258fba0>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna6')
 screen = 'a2l', density = 'compact', size_key = '80x24'
 
@@ -51,13 +51,13 @@ screen = 'a2l', density = 'compact', size_key = '80x24'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b258fba0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b51adc60>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b51adc60> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b51adc60> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 ___________ test_tc016s_density_layout_snapshot[a2l-compact-120x30] ____________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b3c4fe20>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna7')
 screen = 'a2l', density = 'compact', size_key = '120x30'
 
@@ -104,13 +104,13 @@ screen = 'a2l', density = 'compact', size_key = '120x30'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b3c4fe20>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b2dfff60>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b2dfff60> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b2dfff60> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 ___________ test_tc016s_density_layout_snapshot[a2l-compact-160x40] ____________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b2e85f80>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna8')
 screen = 'a2l', density = 'compact', size_key = '160x40'
 
@@ -157,13 +157,13 @@ screen = 'a2l', density = 'compact', size_key = '160x40'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b2e85f80>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b48996c0>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b48996c0> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b48996c0> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 __________ test_tc016s_density_layout_snapshot[a2l-comfortable-80x24] __________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b3611620>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna9')
 screen = 'a2l', density = 'comfortable', size_key = '80x24'
 
@@ -210,13 +210,13 @@ screen = 'a2l', density = 'comfortable', size_key = '80x24'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b3611620>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b47caa20>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b47caa20> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b47caa20> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 _________ test_tc016s_density_layout_snapshot[a2l-comfortable-120x30] __________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b4a64ea0>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna10')
 screen = 'a2l', density = 'comfortable', size_key = '120x30'
 
@@ -263,13 +263,13 @@ screen = 'a2l', density = 'comfortable', size_key = '120x30'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b4a64ea0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b4a66340>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b4a66340> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b4a66340> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 _________ test_tc016s_density_layout_snapshot[a2l-comfortable-160x40] __________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b4a15440>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna11')
 screen = 'a2l', density = 'comfortable', size_key = '160x40'
 
@@ -316,13 +316,13 @@ screen = 'a2l', density = 'comfortable', size_key = '160x40'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b4a15440>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b2ea2a20>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b2ea2a20> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b2ea2a20> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 _________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b4a16980>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna26')
 screen = 'patch', density = 'comfortable', size_key = '80x24'
 
@@ -369,13 +369,13 @@ screen = 'patch', density = 'comfortable', size_key = '80x24'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b4a16980>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b1cd62a0>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b1cd62a0> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b1cd62a0> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 ________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] _________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f41b450f920>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-207/test_tc016s_density_layout_sna27')
 screen = 'patch', density = 'comfortable', size_key = '120x30'
 
@@ -422,7 +422,7 @@ screen = 'patch', density = 'comfortable', size_key = '120x30'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f41b450f920>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f41b0b0aa20>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b0b0aa20> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f41b0b0aa20> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-207/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-207/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 [1;31mTextual Snapshot Report[0m

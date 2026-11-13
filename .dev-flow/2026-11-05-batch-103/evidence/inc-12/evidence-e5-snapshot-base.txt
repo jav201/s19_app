@@ -4,7 +4,7 @@
 _________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f938f438f40>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-208/test_tc016s_density_layout_sna26')
 screen = 'patch', density = 'comfortable', size_key = '80x24'
 
@@ -51,13 +51,13 @@ screen = 'patch', density = 'comfortable', size_key = '80x24'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f938f438f40>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f938e12e2a0>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f938e12e2a0> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f938e12e2a0> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 ________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] _________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x7f938cb0cfe0>
-public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')}
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')}
 tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-208/test_tc016s_density_layout_sna27')
 screen = 'patch', density = 'comfortable', size_key = '120x30'
 
@@ -104,7 +104,7 @@ screen = 'patch', density = 'comfortable', size_key = '120x30'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x7f938cb0cfe0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f938eb79f80>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f938eb79f80> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f938eb79f80> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-<user>...test-208/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-208/snapshot_public0/snap.s19')})
 
 tests/test_tui_snapshot.py:1220: AssertionError
 [1;31mTextual Snapshot Report[0m
