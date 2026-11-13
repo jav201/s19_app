@@ -1,0 +1,21 @@
+E4 CLIPBOARD/TAIL base identity
+
+Required unmodified base:
+e2e935482646553a34242e524af5ac5bc57af82b
+
+Linux shared-clone HEAD:
+c062293be6c122ecceca5701ea8afd0c6700f008
+
+The remote shared object store did not contain e2e93548, so the literal remote checkout of that abbreviation failed during the smoke run. The brief explicitly states that c062293b product/tests match e2e93548. The final run therefore checks out c062293b explicitly; no DeepSeek worktree or product change is used.
+
+Verification run in <LOCAL_HOME>/Github/s19_app-b103-inc1b-tests at e2e93548:
+
+$ git diff --exit-code e2e93548 c062293b -- s19_app tests
+PRODUCT_TESTS_DIFF_STATUS=0
+
+No output from git diff; exit status 0. The broader diff between those commits changes .dev-flow artifacts only, not product or tests.
+
+$ git rev-parse HEAD
+e2e935482646553a34242e524af5ac5bc57af82b
+
+Final RED scratch and its complete transcript are identified in RED-REPORT.md.

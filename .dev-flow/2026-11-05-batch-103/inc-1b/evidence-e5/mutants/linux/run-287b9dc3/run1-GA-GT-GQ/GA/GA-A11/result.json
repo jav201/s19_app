@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GA",
+  "id": "GA-A11",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/post/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 24.55,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/pre/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 23.661,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/pre/pytest.txt"
+  },
+  "reason": "all selected nodes passed",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/restored/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 22.526,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/app.py",
+  "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "source_sha256_mutated": "df69660bf0d4848fa8ad318b932c69025f29fb18c57570c7e61ef3b8ba8d5646",
+  "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+    "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "SURVIVED"
+}

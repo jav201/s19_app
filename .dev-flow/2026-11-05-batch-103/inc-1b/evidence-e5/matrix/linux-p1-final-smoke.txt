@@ -1,0 +1,13 @@
+s19_app.__file__ = [HOME]/work/b103-e5-matrix-0d4d4e7c/src-lf/s19_app/__init__.py
+textual.__version__ = 8.2.8
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.2.0, pluggy-1.7.0 -- [HOME]/work/b103-e5-matrix-0d4d4e7c/venv/bin/python
+rootdir: [HOME]/work/b103-e5-matrix-0d4d4e7c/src-lf
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5
+collecting ... collected 1 item
+
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] PASSED [100%]
+
+============================== 1 passed in 11.53s ==============================
+PYTEST_EXIT=0

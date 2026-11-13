@@ -1,0 +1,40 @@
+# Inc 1b E2 baseline AST marks (throwaway only)
+# run 2026-11-12T11:53:51Z
+# product HEAD 59d467ff7390844455e80b367db9beb4957b23c5
+# code-wire v3.1.0 e436a0812325e85a78ca2bdeaaf0fbfe39e8b4c5
+# python Python 3.12.7
+# source sha256
+b7970106a6c69f52932c136dff5036de128ed2709c52f4923453a73f83d91b31 *C:/Users/<user>/Github/s19_app-b103/s19_app/tui/app.py
+0c6b8b468910ad36ef3f4b3a38d9016fb28ae98cf168615215451221ca3b3f1f *C:/Users/<user>/Github/s19_app-b103/s19_app/tui/os_clipboard_input.py
+5212a36388fe336cf14e0b34b31dcff07bf5b5e59886604bd95832f51a57fb59 *C:/Users/<user>/Github/s19_app-b103/s19_app/tui/capped_text_area.py
+# marked copy
+s19_app/tui/app.py: marks=19 lines=23088 (unchanged)
+s19_app/tui/os_clipboard_input.py: marks=4 lines=1020 (unchanged)
+s19_app/tui/capped_text_area.py: marks=2 lines=335 (unchanged)
+mark A2LTagTable._highlight_row -> s19_app/tui/app.py:1485 (def 1486)
+mark A2LTagTable.on_resize -> s19_app/tui/app.py:1491 (def 1492)
+mark S19TuiApp.compose -> s19_app/tui/app.py:3535 (def 3536)
+mark S19TuiApp._compose_screen_a2l -> s19_app/tui/app.py:8700 (def 8701)
+mark S19TuiApp._compose_screen_mac -> s19_app/tui/app.py:8815 (def 8816)
+mark S19TuiApp.on_data_table_row_selected -> s19_app/tui/app.py:17088 (def 17089)
+mark S19TuiApp.on_data_table_row_highlighted -> s19_app/tui/app.py:17133 (def 17134)
+mark S19TuiApp._invalidate_a2l_view_cache -> s19_app/tui/app.py:21091 (def 21092)
+mark S19TuiApp.update_a2l_tags_view -> s19_app/tui/app.py:21413 (def 21414)
+mark S19TuiApp._fit_a2l_tag_cells -> s19_app/tui/app.py:21576 (def 21577)
+mark S19TuiApp.on_a2l_tag_table_measured -> s19_app/tui/app.py:21632 (def 21633)
+mark S19TuiApp._repaint_a2l_tag_cells -> s19_app/tui/app.py:21659 (def 21660)
+mark S19TuiApp._build_a2l_table_cells -> s19_app/tui/app.py:21748 (def 21749)
+mark S19TuiApp.end_busy -> s19_app/tui/app.py:22851 (def 22852)
+mark S19TuiApp._running_session_action -> s19_app/tui/app.py:22967 (def 22968)
+mark S19TuiApp._refuse_if_busy -> s19_app/tui/app.py:22992 (def 22993)
+mark S19TuiApp.action_quit -> s19_app/tui/app.py:23016 (def 23017)
+mark S19TuiApp._answer_quit -> s19_app/tui/app.py:23036 (def 23037)
+mark S19TuiApp._exit_if_quit_pending -> s19_app/tui/app.py:23041 (def 23042)
+mark CappedTextArea.action_copy -> s19_app/tui/capped_text_area.py:241 (def 242)
+mark CappedTextArea.action_cut -> s19_app/tui/capped_text_area.py:271 (def 272)
+mark write_os_clipboard -> s19_app/tui/os_clipboard_input.py:637 (def 638)
+mark _mirror_and_write_os_clipboard -> s19_app/tui/os_clipboard_input.py:697 (def 698)
+mark OsClipboardInput.action_copy -> s19_app/tui/os_clipboard_input.py:890 (def 891)
+mark OsClipboardInput.action_cut -> s19_app/tui/os_clipboard_input.py:917 (def 918)
+TOTAL marks=25
+exit=0

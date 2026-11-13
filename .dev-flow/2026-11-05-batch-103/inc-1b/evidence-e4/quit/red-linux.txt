@@ -1,0 +1,988 @@
+s19_app.__file__ = <HOME>/work/b103-e4-quit-final-CBcgBm/tree/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/b103-e4-quit-final-CBcgBm/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 28 items
+
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection FAILED [  3%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused FAILED [  7%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection FAILED [ 10%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input FAILED [ 14%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection FAILED [ 17%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection FAILED [ 21%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second FAILED [ 25%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit FAILED [ 28%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit FAILED  [ 32%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis FAILED [ 35%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question FAILED [ 39%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection FAILED [ 42%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top PASSED [ 46%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single FAILED [ 50%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top FAILED [ 53%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection FAILED [ 57%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single FAILED [ 60%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately PASSED [ 64%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately PASSED [ 67%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog FAILED [ 71%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay FAILED [ 75%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay FAILED [ 78%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state FAILED [ 82%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys FAILED [ 85%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay FAILED [ 89%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit FAILED [ 92%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener FAILED [ 96%]
+tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load FAILED [100%]
+
+=================================== FAILURES ===================================
+___________ test_r_copy_16_1_button_and_materialized_empty_selection ___________
+tests/test_b103_copy_quit_dialog.py:456: in test_r_copy_16_1_button_and_materialized_empty_selection
+    assert failures == [], "\n".join(failures)
+E   AssertionError: size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E     assert 0 == 1
+E      +  where 0 = len([])
+E     size=(118, 54), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+E     assert [] == ['']
+E       
+E       Right contains one more item: ''
+E       
+E       Full diff:
+E       + []
+E       - [
+E       -     '',
+E       - ]
+E     size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E     assert 0 == 1
+E      +  where 0 = len([])
+E     size=(220, 60), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+E     assert [] == ['']
+E       
+E       Right contains one more item: ''
+E       
+E       Full diff:
+E       + []
+E       - [
+E       -     '',
+E       - ]
+E   assert ["size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])", "size=(118, 54), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}\nassert [] == ['']\n  \n  Right contains one more item: ''\n  \n  Full diff:\n  + []\n  - [\n  -     '',\n  - ]", "size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])", "size=(220, 60), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}\nassert [] == ['']\n  \n  Right contains one more item: ''\n  \n  Full diff:\n  + []\n  - [\n  -     '',\n  - ]"] == []
+E     
+E     Left contains 4 more items, first extra item: "size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])"
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     "size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to "
+E     +     "quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': "
+E     +     "True, 'stack': ['Screen']}\n"
+E     +     'assert 0 == 1\n'
+E     +     ' +  where 0 = len([])',
+E     +     "size=(118, 54), materialized=True: {'entries': [''], 'note': "
+E     +     "'materialized empty text must raise textual.actions.SkipAction', 'skips': "
+E     +     '[]}\n'
+E     +     "assert [] == ['']\n"
+E     +     '  \n'
+E     +     "  Right contains one more item: ''\n"
+E     +     '  \n'
+E     +     '  Full diff:\n'
+E     +     '  + []\n'
+E     +     '  - [\n'
+E     +     "  -     '',\n"
+E     +     '  - ]',
+E     +     "size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to "
+E     +     "quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': "
+E     +     "True, 'stack': ['Screen']}\n"
+E     +     'assert 0 == 1\n'
+E     +     ' +  where 0 = len([])',
+E     +     "size=(220, 60), materialized=True: {'entries': [''], 'note': "
+E     +     "'materialized empty text must raise textual.actions.SkipAction', 'skips': "
+E     +     '[]}\n'
+E     +     "assert [] == ['']\n"
+E     +     '  \n'
+E     +     "  Right contains one more item: ''\n"
+E     +     '  \n'
+E     +     '  Full diff:\n'
+E     +     '  + []\n'
+E     +     '  - [\n'
+E     +     "  -     '',\n"
+E     +     '  - ]',
+E     + ]
+______________________ test_r_copy_16_2_no_widget_focused ______________________
+tests/test_b103_copy_quit_dialog.py:469: in test_r_copy_16_2_no_widget_focused
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:466: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+___________ test_r_copy_16_3_highlighted_table_row_is_not_selection ____________
+tests/test_b103_copy_quit_dialog.py:486: in test_r_copy_16_3_highlighted_table_row_is_not_selection
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:483: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+___________________ test_r_copy_16_4_empty_single_line_input ___________________
+tests/test_b103_copy_quit_dialog.py:504: in test_r_copy_16_4_empty_single_line_input
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:501: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+____________________ test_r_copy_16_5_empty_json_selection _____________________
+tests/test_b103_copy_quit_dialog.py:521: in test_r_copy_16_5_empty_json_selection
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:518: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+______________ test_r_copy_16_6_multiline_text_without_selection _______________
+tests/test_b103_copy_quit_dialog.py:541: in test_r_copy_16_6_multiline_text_without_selection
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:538: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+__________________ test_r_copy_17_1_y_quits_within_one_second __________________
+tests/test_b103_copy_quit_dialog.py:554: in test_r_copy_17_1_y_quits_within_one_second
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:551: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+______________________ test_r_copy_17_2_tab_enter_on_quit ______________________
+tests/test_b103_copy_quit_dialog.py:568: in test_r_copy_17_2_tab_enter_on_quit
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:561: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_________________________ test_r_copy_17_3_click_quit __________________________
+tests/test_b103_copy_quit_dialog.py:585: in test_r_copy_17_3_click_quit
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:575: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+__________________ test_r_copy_18_1_stay_has_confirm_emphasis __________________
+tests/test_b103_copy_quit_dialog.py:598: in test_r_copy_18_1_stay_has_confirm_emphasis
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:592: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_______________ test_r_copy_19_1_busy_ctrl_c_opens_busy_question _______________
+tests/test_b103_copy_quit_dialog.py:622: in test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:615: in scenario
+    _assert_busy_quit_dialog(app, label)
+tests/test_b103_copy_quit_dialog.py:272: in _assert_busy_quit_dialog
+    assert len(screens) == 1, {"stack": _stack(app), "notes": _notes(app)}
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+______ test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection _______
+tests/test_b103_copy_quit_dialog.py:649: in test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+    _run(tmp_path / f"app-{materialized}", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:645: in scenario
+    _assert_no_copy_effects(app, clipboard, empty_skip=materialized)
+tests/test_b103_copy_quit_dialog.py:288: in _assert_no_copy_effects
+    assert recorder.skips == [""], {
+E   AssertionError: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+E   assert [] == ['']
+E     
+E     Right contains one more item: ''
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '',
+E     - ]
+_______________ test_r_copy_20_3_existing_copy_quit_stays_single _______________
+tests/test_b103_copy_quit_dialog.py:688: in test_r_copy_20_3_existing_copy_quit_stays_single
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:679: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+___________________ test_r_copy_20_4_busy_question_stays_top ___________________
+tests/test_b103_copy_quit_dialog.py:715: in test_r_copy_20_4_busy_question_stays_top
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:702: in scenario
+    original = _assert_busy_quit_dialog(app, label)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:272: in _assert_busy_quit_dialog
+    assert len(screens) == 1, {"stack": _stack(app), "notes": _notes(app)}
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+________________ test_r_copy_23_1_idle_q_asks_without_selection ________________
+tests/test_b103_copy_quit_dialog.py:737: in test_r_copy_23_1_idle_q_asks_without_selection
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:731: in scenario
+    _assert_copy_quit_dialog(app)
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [], 'running': False, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_________ test_r_copy_23_2_q_with_selection_and_second_q_stays_single __________
+tests/test_b103_copy_quit_dialog.py:767: in test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:755: in scenario
+    _assert_copy_quit_dialog(app)
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [], 'running': False, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+____________ test_r_dlg_1_101_window_keys_do_not_act_behind_dialog _____________
+tests/test_b103_copy_quit_dialog.py:827: in test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:814: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_____________________ test_r_dlg_2_101_escape_answers_stay _____________________
+tests/test_b103_copy_quit_dialog.py:839: in test_r_dlg_2_101_escape_answers_stay
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:835: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+____________________ test_r_dlg_6_101_initial_focus_is_stay ____________________
+tests/test_b103_copy_quit_dialog.py:849: in test_r_dlg_6_101_initial_focus_is_stay
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:846: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+________ test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state _________
+tests/test_b103_copy_quit_dialog.py:870: in test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:859: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_________________ test_r_dlg_11_101_buttons_expose_exact_keys __________________
+tests/test_b103_copy_quit_dialog.py:881: in test_r_dlg_11_101_buttons_expose_exact_keys
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:877: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_______________________ test_r_dlg_12_101_n_presses_stay _______________________
+tests/test_b103_copy_quit_dialog.py:894: in test_r_dlg_12_101_n_presses_stay
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:889: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+_______________________ test_r_dlg_12_102_y_presses_quit _______________________
+tests/test_b103_copy_quit_dialog.py:904: in test_r_dlg_12_102_y_presses_quit
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:901: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:253: in _assert_copy_quit_dialog
+    assert len(screens) == 1, {
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+___________ test_r_dlg_14_101_copy_quit_has_reachable_shared_opener ____________
+tests/test_b103_copy_quit_dialog.py:913: in test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+    assert len(census.dialogs) == 22, sorted(census.dialogs)
+E   AssertionError: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'ConfirmDiscardScreen', 'ConfirmQuestionScreen', 'ConfirmWriteScreen', 'CurveDescriptionScreen', ...]
+E   assert 21 == 22
+E    +  where 21 = len({'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'})
+E    +    where {'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'} = Census(dialogs={'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'}, dialogs_without_opener=[], actions={'CurveDescriptionScreen.action_close_curve_description': {'string'}, 'IncludeTable.action_toggle_include': {'string'}, 'S19TuiApp.action_patch_undo': {'string'}, 'S19TuiApp.action_patch_redo': {'string'}, 'S19TuiApp.action_before_after_report': {'string'}, 'S19TuiApp.action_view_reports': {'string'}, 'S19TuiApp.action_refresh_files': {'string'}, 'S19TuiApp.action_load_file': {'string'}, 'S19TuiApp.action_open_workarea': {'string'}, 'S19TuiApp.action_save_project': {'string'}, 'S19TuiApp.action_load_project': {'string'}, 'S19TuiApp.action_select_variant': {'string'}, 'S19TuiApp.action_operations_view': {'string'}, 'S19TuiApp.action_dump_a2l_json': {'string'}, 'S19TuiApp.action_a2l_describe_tag': {'string'}, 'S19TuiApp.action_show_screen': {'string'}, 'S19TuiApp.action_confirm_attention': {'string'}, 'S19TuiApp.action_open_split_join_export': {'string'}, 'S19TuiApp.action_show_help_panel': {'string'}, 'S19TuiApp.action_show_legend': {'string'}, 'S19TuiApp.action_focus_palette': {'string'}, 'S19TuiApp.action_focus_find': {'string'}, 'S19TuiApp.action_focus_goto': {'string'}, 'S19TuiApp.action_open_settings_menu': {'string'}, 'S19TuiApp.action_cycle_density': {'string'}, 'S19TuiApp.action_page_next_context': {'string'}, 'S19TuiApp.action_page_prev_context': {'string'}, 'S19TuiApp.action_page_down_context': {'string'}, 'S19TuiApp.action_page_up_context': {'string'}, 'S19TuiApp.action_hex_page_next': {'string'}, 'S19TuiApp.action_hex_page_prev': {'string'}, 'S19TuiApp.action_a2l_tags_page_next': {'reached'}, 'S19TuiApp.action_a2l_tags_page_prev': {'reached'}, 'S19TuiApp.action_mac_records_page_next': {'reached'}, 'S19TuiApp.action_mac_records_page_prev': {'reached'}, 'S19TuiApp.action_validation_issues_page_next': {'string'}, 'S19TuiApp.action_validation_issues_page_prev': {'string'}, 'S19TuiApp.action_unload_all': {'string'}, 'S19TuiApp.action_quit': {'string', 'toolkit'}, 'CappedTextArea.action_paste': {'toolkit'}, 'CappedTextArea.action_copy': {'toolkit'}, 'CappedTextArea.action_cut': {'toolkit'}, 'OsClipboardInput.action_copy': {'toolkit'}, 'OsClipboardInput.action_cut': {'toolkit'}, 'OsClipboardInput.action_paste': {'toolkit'}, 'LoadDialog.action_load': {'string'}, 'LoadDialog.action_cancel': {'string'}, 'ChangeSetJsonScreen.action_cancel': {'string'}, 'BulkParameterAddScreen.action_cancel': {'string'}, 'SaveProjectScreen.action_save': {'string'}, 'SaveProjectScreen.action_cancel': {'string'}, 'FileRefChooserScreen.action_cancel': {'string'}, 'FlowBlockEditScreen.action_cancel': {'string'}, 'ConfirmQuestionScreen.action_answer': {'string'}, 'LoadResultScreen.action_close_result': {'string'}, 'LoadResultScreen.action_select_variant': {'string'}, 'LegendScreen.action_close_legend': {'string'}, 'ReportViewerScreen.action_show_window_usage_help': {'string'}, 'ReportViewerScreen.action_close_reports': {'string'}, 'LoadGuardScreen.action_cancel': {'string'}, 'AbDiffPanel.action_toggle_run_overlay': {'string'}, 'AbDiffPanel.action_close_run_overlay': {'string'}, 'AbDiffPanel.action_page_window_down': {'string'}, 'AbDiffPanel.action_page_window_up': {'string'}, '_SegTable.action_cursor_move': {'string'}, 'SplitJoinWindow.action_move': {'string'}, 'SplitJoinWindow.action_toggle_row': {'string'}, 'SplitJoinWindow.action_select_all': {'string'}, 'SplitJoinWindow.action_select_none': {'string'}, 'SplitJoinWindow.action_cycle_tab': {'string'}, 'SplitJoinWindow.action_toggle_mode': {'string'}, 'SplitJoinWindow.action_cycle_gap': {'string'}, 'SplitJoinWindow.action_cycle_format': {'string'}, 'SplitJoinWindow.action_cycle_pad': {'string'}, 'SplitJoinWindow.action_cycle_dest': {'string'}, 'SplitJoinWindow.action_export': {'string'}, 'SplitJoinWindow.action_close_window': {'string'}, 'WindowHelpScreen.action_scroll_help': {'string'}, 'WindowHelpScreen.action_close_window_help': {'string'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=[]).dialogs
+_____________ test_r_quit_8_101_confirmed_busy_quit_waits_for_load _____________
+tests/test_b103_copy_quit_dialog.py:963: in test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+    _run(tmp_path / "app", scenario, clipboard)
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:953: in scenario
+    _assert_busy_quit_dialog(app, label)
+tests/test_b103_copy_quit_dialog.py:272: in _assert_busy_quit_dialog
+    assert len(screens) == 1, {"stack": _stack(app), "notes": _notes(app)}
+E   AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+E   assert 0 == 1
+E    +  where 0 = len([])
+============================== slowest durations ===============================
+29.90s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+15.70s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+10.79s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+10.44s call     tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+10.18s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+10.11s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+10.00s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+9.81s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+9.79s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+9.78s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+9.55s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+8.46s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+8.35s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+8.23s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+8.21s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+8.19s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+8.07s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+8.00s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+7.98s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+7.93s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+7.90s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+7.85s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+7.80s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+7.74s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+7.73s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+7.71s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+7.70s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+2.28s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection - AssertionError: size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+  assert 0 == 1
+   +  where 0 = len([])
+  size=(118, 54), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+  assert [] == ['']
+    
+    Right contains one more item: ''
+    
+    Full diff:
+    + []
+    - [
+    -     '',
+    - ]
+  size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+  assert 0 == 1
+   +  where 0 = len([])
+  size=(220, 60), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+  assert [] == ['']
+    
+    Right contains one more item: ''
+    
+    Full diff:
+    + []
+    - [
+    -     '',
+    - ]
+assert ["size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])", "size=(118, 54), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}\nassert [] == ['']\n  \n  Right contains one more item: ''\n  \n  Full diff:\n  + []\n  - [\n  -     '',\n  - ]", "size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])", "size=(220, 60), materialized=True: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}\nassert [] == ['']\n  \n  Right contains one more item: ''\n  \n  Full diff:\n  + []\n  - [\n  -     '',\n  - ]"] == []
+  
+  Left contains 4 more items, first extra item: "size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}\nassert 0 == 1\n +  where 0 = len([])"
+  
+  Full diff:
+  - []
+  + [
+  +     "size=(118, 54), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to "
+  +     "quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': "
+  +     "True, 'stack': ['Screen']}\n"
+  +     'assert 0 == 1\n'
+  +     ' +  where 0 = len([])',
+  +     "size=(118, 54), materialized=True: {'entries': [''], 'note': "
+  +     "'materialized empty text must raise textual.actions.SkipAction', 'skips': "
+  +     '[]}\n'
+  +     "assert [] == ['']\n"
+  +     '  \n'
+  +     "  Right contains one more item: ''\n"
+  +     '  \n'
+  +     '  Full diff:\n'
+  +     '  + []\n'
+  +     '  - [\n'
+  +     "  -     '',\n"
+  +     '  - ]',
+  +     "size=(220, 60), materialized=False: {'notes': [('Press [b]ctrl+q[/b] to "
+  +     "quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': "
+  +     "True, 'stack': ['Screen']}\n"
+  +     'assert 0 == 1\n'
+  +     ' +  where 0 = len([])',
+  +     "size=(220, 60), materialized=True: {'entries': [''], 'note': "
+  +     "'materialized empty text must raise textual.actions.SkipAction', 'skips': "
+  +     '[]}\n'
+  +     "assert [] == ['']\n"
+  +     '  \n'
+  +     "  Right contains one more item: ''\n"
+  +     '  \n'
+  +     '  Full diff:\n'
+  +     '  + []\n'
+  +     '  - [\n'
+  +     "  -     '',\n"
+  +     '  - ]',
+  + ]
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection - AssertionError: {'entries': [''], 'note': 'materialized empty text must raise textual.actions.SkipAction', 'skips': []}
+assert [] == ['']
+  
+  Right contains one more item: ''
+  
+  Full diff:
+  + []
+  - [
+  -     '',
+  - ]
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection - AssertionError: {'notes': [], 'running': False, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single - AssertionError: {'notes': [], 'running': False, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'running': True, 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener - AssertionError: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'ConfirmDiscardScreen', 'ConfirmQuestionScreen', 'ConfirmWriteScreen', 'CurveDescriptionScreen', ...]
+assert 21 == 22
+ +  where 21 = len({'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'})
+ +    where {'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'} = Census(dialogs={'ReportViewerScreen', 'SaveFlowScreen', 'LoadGuardScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'ConfirmWriteScreen', 'OperationsScreen', '_QuitQuestionScreen', 'FlowBlockEditScreen', 'LoadResultScreen', 'LoadDialog', 'BulkParameterAddScreen', 'LoadFlowScreen', 'ConfirmQuestionScreen', 'SaveProjectScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'CurveDescriptionScreen', 'WindowHelpScreen', 'SelectVariantScreen', 'LegendScreen'}, dialogs_without_opener=[], actions={'CurveDescriptionScreen.action_close_curve_description': {'string'}, 'IncludeTable.action_toggle_include': {'string'}, 'S19TuiApp.action_patch_undo': {'string'}, 'S19TuiApp.action_patch_redo': {'string'}, 'S19TuiApp.action_before_after_report': {'string'}, 'S19TuiApp.action_view_reports': {'string'}, 'S19TuiApp.action_refresh_files': {'string'}, 'S19TuiApp.action_load_file': {'string'}, 'S19TuiApp.action_open_workarea': {'string'}, 'S19TuiApp.action_save_project': {'string'}, 'S19TuiApp.action_load_project': {'string'}, 'S19TuiApp.action_select_variant': {'string'}, 'S19TuiApp.action_operations_view': {'string'}, 'S19TuiApp.action_dump_a2l_json': {'string'}, 'S19TuiApp.action_a2l_describe_tag': {'string'}, 'S19TuiApp.action_show_screen': {'string'}, 'S19TuiApp.action_confirm_attention': {'string'}, 'S19TuiApp.action_open_split_join_export': {'string'}, 'S19TuiApp.action_show_help_panel': {'string'}, 'S19TuiApp.action_show_legend': {'string'}, 'S19TuiApp.action_focus_palette': {'string'}, 'S19TuiApp.action_focus_find': {'string'}, 'S19TuiApp.action_focus_goto': {'string'}, 'S19TuiApp.action_open_settings_menu': {'string'}, 'S19TuiApp.action_cycle_density': {'string'}, 'S19TuiApp.action_page_next_context': {'string'}, 'S19TuiApp.action_page_prev_context': {'string'}, 'S19TuiApp.action_page_down_context': {'string'}, 'S19TuiApp.action_page_up_context': {'string'}, 'S19TuiApp.action_hex_page_next': {'string'}, 'S19TuiApp.action_hex_page_prev': {'string'}, 'S19TuiApp.action_a2l_tags_page_next': {'reached'}, 'S19TuiApp.action_a2l_tags_page_prev': {'reached'}, 'S19TuiApp.action_mac_records_page_next': {'reached'}, 'S19TuiApp.action_mac_records_page_prev': {'reached'}, 'S19TuiApp.action_validation_issues_page_next': {'string'}, 'S19TuiApp.action_validation_issues_page_prev': {'string'}, 'S19TuiApp.action_unload_all': {'string'}, 'S19TuiApp.action_quit': {'string', 'toolkit'}, 'CappedTextArea.action_paste': {'toolkit'}, 'CappedTextArea.action_copy': {'toolkit'}, 'CappedTextArea.action_cut': {'toolkit'}, 'OsClipboardInput.action_copy': {'toolkit'}, 'OsClipboardInput.action_cut': {'toolkit'}, 'OsClipboardInput.action_paste': {'toolkit'}, 'LoadDialog.action_load': {'string'}, 'LoadDialog.action_cancel': {'string'}, 'ChangeSetJsonScreen.action_cancel': {'string'}, 'BulkParameterAddScreen.action_cancel': {'string'}, 'SaveProjectScreen.action_save': {'string'}, 'SaveProjectScreen.action_cancel': {'string'}, 'FileRefChooserScreen.action_cancel': {'string'}, 'FlowBlockEditScreen.action_cancel': {'string'}, 'ConfirmQuestionScreen.action_answer': {'string'}, 'LoadResultScreen.action_close_result': {'string'}, 'LoadResultScreen.action_select_variant': {'string'}, 'LegendScreen.action_close_legend': {'string'}, 'ReportViewerScreen.action_show_window_usage_help': {'string'}, 'ReportViewerScreen.action_close_reports': {'string'}, 'LoadGuardScreen.action_cancel': {'string'}, 'AbDiffPanel.action_toggle_run_overlay': {'string'}, 'AbDiffPanel.action_close_run_overlay': {'string'}, 'AbDiffPanel.action_page_window_down': {'string'}, 'AbDiffPanel.action_page_window_up': {'string'}, '_SegTable.action_cursor_move': {'string'}, 'SplitJoinWindow.action_move': {'string'}, 'SplitJoinWindow.action_toggle_row': {'string'}, 'SplitJoinWindow.action_select_all': {'string'}, 'SplitJoinWindow.action_select_none': {'string'}, 'SplitJoinWindow.action_cycle_tab': {'string'}, 'SplitJoinWindow.action_toggle_mode': {'string'}, 'SplitJoinWindow.action_cycle_gap': {'string'}, 'SplitJoinWindow.action_cycle_format': {'string'}, 'SplitJoinWindow.action_cycle_pad': {'string'}, 'SplitJoinWindow.action_cycle_dest': {'string'}, 'SplitJoinWindow.action_export': {'string'}, 'SplitJoinWindow.action_close_window': {'string'}, 'WindowHelpScreen.action_scroll_help': {'string'}, 'WindowHelpScreen.action_close_window_help': {'string'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=[]).dialogs
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load - AssertionError: {'notes': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?', 5.0)], 'stack': ['Screen']}
+assert 0 == 1
+ +  where 0 = len([])
+=================== 25 failed, 3 passed in 268.83s (0:04:28) ===================

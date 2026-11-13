@@ -1,0 +1,14 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GT",
+  "id": "GT-T08",
+  "reason": "group baseline BAD; mutant never applied",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality",
+    "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+    "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]",
+    "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+  ],
+  "verdict": "BAD"
+}

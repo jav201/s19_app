@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="19" tests="142" time="4100.681" timestamp="2026-11-13T02:04:51.172926-06:00" hostname="<HOST>"><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1]" time="28.688" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2]" time="32.643" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3]" time="31.556" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4]" time="18.319" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5]" time="13.311" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6]" time="9.062" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_2_app_clipboard[R-COPY.2/1]" time="11.312" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_2_app_clipboard[R-COPY.2/2]" time="14.529" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_2_app_clipboard[R-COPY.2/3]" time="12.588" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_2_app_clipboard[R-COPY.2/4]" time="30.658"><failure message="AssertionError: assert [] == [('Clipboard ...', 'warning')]&#10;  &#10;  Right contains one more item: ('Clipboard write failed — copied inside the app only.', 'warning')&#10;  Use -v to get more diff">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3')
+clipboard = ClipboardLedger(entry=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], tail=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT....SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], writes=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], result=False)
+case = 4
+
+    @pytest.mark.parametrize("case", [1, 2, 3, 4], ids=[f"R-COPY.2/{i}" for i in range(1, 5)])
+    def test_r_copy_2_app_clipboard(tmp_path: Path, clipboard, case: int) -&gt; None:
+        if case == 4 and sys.platform == "win32":
+            pytest.skip("Linux-only existing failing-writer arm")
+    
+        async def drive():
+            needs = ("a2l",) if case &gt;= 3 else ("s19",)
+            async with _session(tmp_path, clipboard, needs) as session:
+                if case == 1:
+                    expected = await _make_view_selection(session, "hex")
+                    _arm(session)
+                    await session.pilot.press("ctrl+c")
+                elif case == 2:
+                    expected = await _make_view_selection(session, "hex")
+                    _arm(session)
+                    await _right_click(session, session.app.query_one("#hex_view"), (10, 2))
+                else:
+                    await _activate(session, "a2l")
+                    table = _table(session, "#a2l_tags_list")
+                    assert _a2l_name(session.app, 2) == A2L_ROW_3
+                    expected = A2L_ROW_3
+                    clipboard.result = case != 4
+                    _arm(session)
+                    await _right_click(
+                        session,
+                        table,
+                        _row_offset(table, 2),
+                        out_of_bounds=False,
+                        expected_row=2,
+                    )
+                await _settle(session.pilot)
+                assert session.app.clipboard == expected
+                assert session.clipboard.base == [expected]
+                assert session.osc52 == [expected]
+                assert session.clipboard.writes == [expected]
+                if case == 4:
+                    assert _notices(session.app) == [(WRITE_FAILED, "warning")]
+    
+&gt;       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:524: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        needs = ("a2l",) if case &gt;= 3 else ("s19",)
+        async with _session(tmp_path, clipboard, needs) as session:
+            if case == 1:
+                expected = await _make_view_selection(session, "hex")
+                _arm(session)
+                await session.pilot.press("ctrl+c")
+            elif case == 2:
+                expected = await _make_view_selection(session, "hex")
+                _arm(session)
+                await _right_click(session, session.app.query_one("#hex_view"), (10, 2))
+            else:
+                await _activate(session, "a2l")
+                table = _table(session, "#a2l_tags_list")
+                assert _a2l_name(session.app, 2) == A2L_ROW_3
+                expected = A2L_ROW_3
+                clipboard.result = case != 4
+                _arm(session)
+                await _right_click(
+                    session,
+                    table,
+                    _row_offset(table, 2),
+                    out_of_bounds=False,
+                    expected_row=2,
+                )
+            await _settle(session.pilot)
+            assert session.app.clipboard == expected
+            assert session.clipboard.base == [expected]
+            assert session.osc52 == [expected]
+            assert session.clipboard.writes == [expected]
+            if case == 4:
+&gt;               assert _notices(session.app) == [(WRITE_FAILED, "warning")]
+E               AssertionError: assert [] == [('Clipboard ...', 'warning')]
+E                 
+E                 Right contains one more item: ('Clipboard write failed — copied inside the app only.', 'warning')
+E                 Use -v to get more diff
+
+tests/test_b103_copy_views.py:522: AssertionError</failure></testcase><testcase classname="tests.test_b103_copy_views" name="test_r_copy_4_full_row_names[R-COPY.4/1]" time="60.940" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_4_full_row_names[R-COPY.4/2]" time="60.557" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_4_full_row_names[R-COPY.4/3]" time="64.479" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_10_one_osc52_request[R-COPY.10/1]" time="56.493" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_10_one_osc52_request[R-COPY.10/2]" time="63.838" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_10_one_osc52_request[R-COPY.10/3]" time="70.257" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/1]" time="50.825" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/2]" time="65.851" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/3]" time="47.385" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4]" time="52.691" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]" time="48.139" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/1]" time="45.118" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/2]" time="37.537" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/3]" time="46.068" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/4]" time="21.959" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/5]" time="13.037" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_right_click_selection[R-COPY.12/6]" time="16.260" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_7_back_to_back_and_reentry" time="30.631" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_12_8_positive_bounds_and_cardinality" time="48.008" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/1]" time="16.735" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/2]" time="23.836" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/3]" time="20.678" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]" time="29.343" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/5]" time="27.551" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/6]" time="17.202" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]" time="35.430" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]" time="38.582" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]" time="43.882" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/1]" time="19.600" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/2]" time="20.517" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/3]" time="16.863" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]" time="34.199" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/5]" time="29.073" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/6]" time="23.396" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/7]" time="30.543" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]" time="27.129" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9]" time="37.163" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_15_right_click_clears_selection[R-COPY.15/1]" time="35.918" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_15_right_click_clears_selection[R-COPY.15/2]" time="54.337"><failure message="AssertionError: []&#10;assert 0 == 1&#10; +  where 0 = len([])">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1')
+clipboard = ClipboardLedger(entry=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], tail=['C... · Entry'], writes=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], result=True)
+source = 'stats'
+
+    @pytest.mark.parametrize("source", ["hex", "stats", "json"], ids=[f"R-COPY.15/{i}" for i in range(1, 4)])
+    def test_r_copy_15_right_click_clears_selection(tmp_path: Path, clipboard, source: str) -&gt; None:
+        async def drive():
+            async with _session(tmp_path, clipboard, ("s19",)) as session:
+                expected = await _make_view_selection(session, source)
+                selector, offset = _right_target(source)
+                _arm(session)
+                await _right_click(session, session.app.screen.query_one(selector), offset)
+                _assert_single_copy(session, expected)
+                if source == "json":
+                    assert session.app.query_one("#patch_json_view", TextArea).selected_text == ""
+                else:
+                    assert not session.app.screen.get_selected_text()
+    
+&gt;       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:871: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:865: in drive
+    _assert_single_copy(session, expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = Session(app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), pilot=&lt;Pilot a...· Entry'], writes=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], result=True))
+expected = 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+notice = True
+
+    def _assert_single_copy(session: Session, expected: str, *, notice: bool = True) -&gt; None:
+        assert session.clipboard.entry == [expected]
+        assert session.clipboard.tail == [expected]
+        assert session.clipboard.base == [expected]
+        assert session.clipboard.writes == [expected]
+        assert session.osc52 == [expected]
+        assert session.app.clipboard == expected
+        _assert_os(expected)
+        if notice:
+            copy_notices = [m for m, _ in _notices(session.app) if m.startswith("Copied")]
+&gt;           assert len(copy_notices) == 1, copy_notices
+E           AssertionError: []
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+tests/test_b103_copy_views.py:251: AssertionError</failure></testcase><testcase classname="tests.test_b103_copy_views" name="test_r_copy_15_right_click_clears_selection[R-COPY.15/3]" time="55.002" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]" time="56.412" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]" time="53.127" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]" time="57.427" /><testcase classname="tests.test_b103_copy_views" name="test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]" time="64.073" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_06_1_button_keeps_seeds" time="30.376" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_06_2_no_focus_keeps_seeds" time="28.528" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_06_3_highlighted_row_is_not_a_selection" time="42.833" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_06_4_empty_input_keeps_seeds" time="36.682" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_06_5_empty_json_selection_keeps_seeds" time="45.464" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_1_row_notice_once" time="41.687" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_2_stats_right_click_notice" time="48.478"><failure message="AssertionError: success notice sequence differed">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f00641ed5d0&gt;
+
+    def test_r_copy_07_2_stats_right_click_notice(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.7/2: five selected stats lines produce one notice."""
+        obs = _view_observation(tmp_path, monkeypatch, "stats", "right")
+&gt;       _success(obs, obs["expected"], "Copied 5 lines to the clipboard.", view=True)
+
+tests/test_b103_clipboard_tail.py:758: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:340: in _success
+    _require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'success notice sequence differed'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: success notice sequence differed
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_3_hex_key_notice" time="47.377"><failure message="AssertionError: success notice sequence differed">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f005bd5f310&gt;
+
+    def test_r_copy_07_3_hex_key_notice(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.7/3: three selected hex lines produce one notice."""
+        obs = _view_observation(tmp_path, monkeypatch, "hex", "key")
+&gt;       _success(obs, obs["expected"], "Copied 3 lines to the clipboard.", view=True)
+
+tests/test_b103_clipboard_tail.py:764: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:340: in _success
+    _require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'success notice sequence differed'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: success notice sequence differed
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_4_direct_input_copy_notice" time="30.179" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_5_direct_textarea_copy_and_final_lf" time="89.100"><failure message="AssertionError: clipboard arm failures: no-final-lf">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f005aedfc90&gt;
+
+    def test_r_copy_07_5_direct_textarea_copy_and_final_lf(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.7/5: three lines, with or without a final LF."""
+        def arm(text):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, "textarea", "copy", text)
+                _success(obs, text, "Copied 3 lines to the clipboard.", view=False)
+                _require(obs["after_text"] == text, "direct textarea copy changed its text")
+            return check
+&gt;       _run_arms(monkeypatch, [
+            ("no-final-lf", arm("L1\nL2\nL3")),
+            ("final-lf", arm("L1\nL2\nL3\n")),
+        ])
+
+tests/test_b103_clipboard_tail.py:783: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: no-final-lf'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: no-final-lf
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_6_direct_cut_notices_and_cap" time="217.223"><failure message="AssertionError: clipboard arm failures: input, textarea, input-over-cap, textarea-over-cap">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0059b1b7d0&gt;
+
+    def test_r_copy_07_6_direct_cut_notices_and_cap(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.7/6: direct cuts in both classes, including line cut and cap."""
+        def cut(kind, text, notice):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "cut", text)
+                _success(obs, text, notice, view=False)
+                _require(obs["after_text"] == "", "direct cut did not empty its box")
+            return check
+        def line_cut():
+            obs = _line_cut_observation(tmp_path, monkeypatch)
+            _counts(obs, override=0, tail=1, base=1, writer=1, osc=1, helper=1)
+            payloads = obs["tail_payloads"] + obs["base_payloads"] + obs["writer_payloads"] + obs["osc"] + [obs["app"], obs["os"]]
+            _require(all(payload in {"line_to_cut", "line_to_cut\n"} for payload in payloads), "line-cut payload escaped its exact alternatives")
+            _require(len({payload for payload in payloads}) == 1, "line-cut sinks disagreed on the payload")
+            _require(obs["helper_payloads"] == payloads[:1], "line-cut notice-helper payload differed")
+            _require([(row[0], row[1]) for row in obs["notices"] if row[0].startswith("Copied")] == [
+                ("Copied 1 line to the clipboard.", "information")
+            ], "line-cut success notice sequence differed")
+            _require(obs["after_text"] == "first\nthird", "line cut left unexpected box text")
+&gt;       _run_arms(monkeypatch, [
+            ("input", cut("input", "abc", "Copied 1 line to the clipboard.")),
+            ("textarea", cut("textarea", "L1\nL2\nL3", "Copied 3 lines to the clipboard.")),
+            ("textarea-line-cut", line_cut),
+            ("input-over-cap", cut("input", P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).")),
+            ("textarea-over-cap", cut("textarea", P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).")),
+        ])
+
+tests/test_b103_clipboard_tail.py:808: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'clipboard arm failures: input, textarea, input-over-cap, textarea-over-cap'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: input, textarea, input-over-cap, textarea-over-cap
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_7_direct_right_click_notice_once" time="162.313"><failure message="AssertionError: clipboard arm failures: e3a-24c-unrelated-view">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f005a1b2cd0&gt;
+
+    def test_r_copy_07_7_direct_right_click_notice_once(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.7/7: direct right-click and E3A-24(c) exclusion."""
+        def arm(kind, text, notice):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "right", text)
+                _success(obs, text, notice, view=False)
+                _require(obs["after_text"] == text, "direct right-click copy changed its text")
+            return check
+        def unrelated_view():
+            obs = _unrelated_view_box_observation(tmp_path, monkeypatch)
+            _success(obs, "abc", "Copied 1 line to the clipboard.", view=False)
+            _require(obs["after_text"] == "abc", "unrelated-view copy changed its box text")
+            _require(obs["unrelated"] not in obs["app"], "unrelated view text reached the application clipboard")
+            _require(all(obs["unrelated"] not in payload for payload in obs["osc"] + obs["writer_payloads"]), "unrelated view text reached a copy sink")
+&gt;       _run_arms(monkeypatch, [
+            ("input", arm("input", "abc", "Copied 1 line to the clipboard.")),
+            ("textarea", arm("textarea", "L1\nL2\nL3", "Copied 3 lines to the clipboard.")),
+            ("e3a-24c-unrelated-view", unrelated_view),
+        ])
+
+tests/test_b103_clipboard_tail.py:831: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: e3a-24c-unrelated-view'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: e3a-24c-unrelated-view
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_07_8_failed_write_has_no_success_notice" time="37.691" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_08_1_key_caps_json_and_direct_boxes" time="139.385"><failure message="AssertionError: clipboard arm failures: input-key">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f005a754ed0&gt;
+
+    def test_r_copy_08_1_key_caps_json_and_direct_boxes(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.8/1 plus R-PASTE.12/1 regression: cap before every sink."""
+        def json_arm():
+            obs = _view_observation(tmp_path, monkeypatch, "json", "key", text=J75210)
+            _success(obs, J75210, "Copied the first 65,536 characters to the clipboard (75,210 in all).", view=True)
+        def box_arm(kind):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "copy", P70000)
+                _success(obs, P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).", view=False)
+            return check
+&gt;       _run_arms(monkeypatch, [
+            ("json-key", json_arm),
+            ("input-key", box_arm("input")),
+            ("textarea-key", box_arm("textarea")),
+        ])
+
+tests/test_b103_clipboard_tail.py:856: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: input-key'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: input-key
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_08_2_right_click_caps_json_and_direct_boxes" time="121.664" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_09_1_cut_notice_original_n_and_boundaries" time="146.253"><failure message="AssertionError: clipboard arm failures: original-75210, after-65537">tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f005b2f6e90&gt;
+
+    def test_r_copy_09_1_cut_notice_original_n_and_boundaries(tmp_path, monkeypatch) -&gt; None:
+        """R-COPY.9/1: original N, exact cap boundary, and no cut on failure."""
+        def over_cap():
+            obs = _view_observation(tmp_path, monkeypatch, "json", "key", text=J75210)
+            _success(obs, J75210, "Copied the first 65,536 characters to the clipboard (75,210 in all).", view=True)
+        def exact_cap():
+            obs = _box_observation(tmp_path, monkeypatch, "input", "copy", P65536)
+            _success(obs, P65536, "Copied 1 line to the clipboard.", view=False)
+        def one_over():
+            obs = _box_observation(tmp_path, monkeypatch, "input", "copy", P65537)
+            _success(obs, P65537, "Copied the first 65,536 characters to the clipboard (65,537 in all).", view=False)
+        def failure():
+            obs = _view_observation(
+                tmp_path,
+                monkeypatch,
+                "json",
+                "key",
+                text=J75210,
+                writer_result=None,
+                held=True,
+            )
+            _failure(obs, J75210, view=True)
+&gt;       _run_arms(monkeypatch, [
+            ("original-75210", over_cap),
+            ("exact-65536", exact_cap),
+            ("after-65537", one_over),
+            ("failed-over-cap-write", failure),
+        ])
+
+tests/test_b103_clipboard_tail.py:902: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'clipboard arm failures: original-75210, after-65537'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: original-75210, after-65537
+
+tests/test_b103_clipboard_tail.py:281: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_09_2_right_click_cut_notice_original_n" time="38.169" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_25_1_view_and_row_nul_fail_closed" time="76.918" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_25_2_every_direct_box_route_nul_fail_closed" time="44.701" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_copy_25_3_nul_only_after_cap_is_allowed" time="23.938" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_09_101_view_key_failure_warning" time="9.860" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_09_102_view_right_failure_warning" time="10.531" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_09_103_row_right_failure_warning" time="7.105" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_10_101_exact_tail_warning_without_payload" time="6.043" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs" time="32.438" /><testcase classname="tests.test_b103_clipboard_tail" name="test_e5_powershell_preserves_lf_and_emits_bom_free_readers" time="0.050" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs" time="30.725" /><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_13_101_held_row_copy_warns_within_bound" time="0.001"><skipped type="pytest.skip" message="WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux</skipped></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_101_view_key_write_stays_responsive" time="0.001"><skipped type="pytest.skip" message="WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux</skipped></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_102_view_right_write_stays_responsive" time="0.001"><skipped type="pytest.skip" message="WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux</skipped></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_103_row_right_write_stays_responsive" time="0.001"><skipped type="pytest.skip" message="WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux</skipped></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_1_button_and_materialized_empty_selection" time="38.330" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_2_no_widget_focused" time="10.303" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_3_highlighted_table_row_is_not_selection" time="12.072" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_4_empty_single_line_input" time="11.016" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_5_empty_json_selection" time="12.136" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_16_6_multiline_text_without_selection" time="12.444" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_17_1_y_quits_within_one_second" time="8.956"><properties><property name="qc_tm" value="test_r_copy_17_1_y_quits_within_one_second|0.143|1.000|85.7" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_17_2_tab_enter_on_quit" time="9.313"><properties><property name="qc_tm" value="test_r_copy_17_2_tab_enter_on_quit|0.143|1.000|85.7" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_17_3_click_quit" time="8.341"><properties><property name="qc_tm" value="test_r_copy_17_3_click_quit|0.135|1.000|86.5" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_18_1_stay_has_confirm_emphasis" time="8.410" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_19_1_busy_ctrl_c_opens_busy_question" time="11.921" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection" time="18.166" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_20_2_load_dialog_stays_top" time="9.029" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_20_3_existing_copy_quit_stays_single" time="9.048" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_20_4_busy_question_stays_top" time="12.287" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_23_1_idle_q_asks_without_selection" time="9.768" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_23_2_q_with_selection_and_second_q_stays_single" time="12.506" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_24_1_ctrl_q_quits_immediately" time="8.273"><properties><property name="qc_tm" value="test_r_copy_24_1_ctrl_q_quits_immediately|0.121|1.000|87.9" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_copy_24_2_palette_quit_quits_immediately" time="11.186"><properties><property name="qc_tm" value="test_r_copy_24_2_palette_quit_quits_immediately|0.150|1.000|85.0" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_1_101_window_keys_do_not_act_behind_dialog" time="9.657" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_2_101_escape_answers_stay" time="9.771" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_6_101_initial_focus_is_stay" time="8.086" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state" time="9.609" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_11_101_buttons_expose_exact_keys" time="8.107" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_12_101_n_presses_stay" time="9.644" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_12_102_y_presses_quit" time="8.814"><properties><property name="qc_tm" value="test_r_dlg_12_102_y_presses_quit|0.153|1.000|84.7" /></properties></testcase><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_dlg_14_101_copy_quit_has_reachable_shared_opener" time="2.483" /><testcase classname="tests.test_b103_copy_quit_dialog" name="test_r_quit_8_101_confirmed_busy_quit_waits_for_load" time="10.663" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]" time="18.298" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]" time="19.412" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]" time="18.243" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]" time="19.424" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]" time="18.279" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]" time="20.097" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]" time="16.658" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]" time="18.832" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]" time="17.393" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]" time="0.002"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]" time="18.426" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]" time="20.431" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]" time="21.296" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]" time="19.835" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]" time="20.938" /><testcase classname="tests.test_b103_copy_paste_matrix" name="test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]" time="0.001"><skipped type="pytest.skip" message="not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy-&gt;separate OS read artifact on isolated WinCI; Linux has no permitted OS read</skipped></testcase><testcase classname="tests.test_b103_copy_paste_matrix" name="test_manual_windows_terminal_operator_acceptance" time="0.001"><skipped type="pytest.skip" message="AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access"><HOME>/work/zq-mut2/out-GN/GN/pristine/tests/test_b103_copy_paste_matrix.py:437: AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access</skipped></testcase></testsuite></testsuites>

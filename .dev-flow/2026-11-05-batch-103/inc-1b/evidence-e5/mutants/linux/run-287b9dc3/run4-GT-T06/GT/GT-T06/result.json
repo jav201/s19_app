@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GT",
+  "id": "GT-T06",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-t06/out/GT/GT-T06/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-t06/out/GT/GT-T06/post/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 1,
+      "passed": 1,
+      "skipped": 0
+    },
+    "elapsed_seconds": 23.361,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]": "failed",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-t06/out/GT/GT-T06/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-t06/out/GT/GT-T06/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-t06/out/GT/GT-T06/pre/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 22.888,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-t06/out/GT/GT-T06/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-t06/out/GT/GT-T06/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-t06/out/GT/GT-T06/restored/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 23.198,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-t06/out/GT/GT-T06/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/app.py",
+  "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "source_sha256_mutated": "4e5e795e47bb1fc902e6612e4938a64ec9d4c3f683bc8e08415edb2645d5b22f",
+  "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]",
+    "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

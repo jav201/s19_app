@@ -1,0 +1,14 @@
+BASE_HEAD=0d4d4e7c800b27040769a1a10117e62884cc7326
+PASS external_read_preserves_payload
+PASS external_read_checks_returncode
+PASS matrix_uses_system_resolver
+PASS matrix_census_is_28
+PASS matrix_waits_before_read_and_paste
+PASS workflow_contract
+CONTRACT_FAILURES=0
+CONTRACT_EXIT=0
+POST_RUN_STATUS:
+ M .github/workflows/clipboard-windows.yml
+ M tests/support/b103_clipboard.py
+ M tests/test_b103_copy_paste_matrix.py
+POST_RUN_DIFF_CHECK:

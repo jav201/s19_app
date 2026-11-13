@@ -1,0 +1,4 @@
+AST parse: OK
+tail_done barriers before _observe: 3/3
+git diff --check: OK
+cf597223d2c119cdbfe43d3a8bd8276e7375a324d96ffaee5cc678994ec2b5d9 *tests/test_b103_clipboard_tail.py

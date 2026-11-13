@@ -1,0 +1,2017 @@
+<HOME>/work/b103-inc1b-green-29ce/s19_app/__init__.py
+...........................FF........................................... [ 51%]
+.......FssssFFFFFFFFFF...F.FF..FFFFFFF..Fs.sFs.sFs.sFs.sFs.sFs.sFs.ss    [100%]
+=================================== FAILURES ===================================
+__________________ test_r_copy_12_7_back_to_back_and_reentry ___________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_12_7_back_to_back_0')
+clipboard = ClipboardLedger(entry=['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0 ...F FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '], result=True)
+
+    def test_r_copy_12_7_back_to_back_and_reentry(tmp_path: Path, clipboard) -> None:
+        """R-COPY.12/7, including the graph's replacement/replay control."""
+        async def drive():
+            async with _session(tmp_path, clipboard, ("s19",)) as session:
+                expected = await _make_view_selection(session, "hex")
+                view = session.app.query_one("#hex_view")
+                _arm(session)
+                session.app.post_message(_mouse(session, events.MouseDown, view, (5, 1)))
+                session.app.post_message(_mouse(session, events.MouseDown, view, (10, 2)))
+                session.app.post_message(_mouse(session, events.MouseUp, view, (5, 1)))
+                await _settle(session.pilot)
+                _assert_no_copy(session)
+    
+                assert await _make_view_selection(session, "hex") == expected
+                _arm(session)
+                await _right_click(session, view, (10, 2))
+                _assert_single_copy(session, expected)
+                writes = list(clipboard.writes)
+                osc52 = list(session.osc52)
+                session.app.post_message(_mouse(session, events.MouseUp, view, (10, 2)))
+                await _settle(session.pilot)
+                assert clipboard.writes == writes
+                assert session.osc52 == osc52
+    
+>       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:652: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:644: in drive
+    _assert_single_copy(session, expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = Session(app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), pilot=<Pilot a... FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '], result=True))
+expected = '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+
+    def _assert_single_copy(session: Session, expected: str, *, notice: bool = True) -> None:
+        assert session.clipboard.entry == [expected]
+>       assert session.clipboard.tail == [expected]
+E       AssertionError: assert [] == ['0x000017E0 ...EC 19    CC ']
+E         
+E         Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E         Use -v to get more diff
+
+tests/test_b103_copy_views.py:227: AssertionError
+_______________ test_r_copy_12_8_positive_bounds_and_cardinality _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_12_8_positive_boun0')
+clipboard = ClipboardLedger(entry=['0x00000000                                                   |                |\n  0x000017E0 ...                 01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '], result=True)
+
+    def test_r_copy_12_8_positive_bounds_and_cardinality(tmp_path: Path, clipboard) -> None:
+        """R-COPY.12/8: hex, A2L and MAC positive out_of_bounds controls."""
+        async def drive():
+            async with _session(tmp_path, clipboard, ("all",)) as session:
+                expected = await _make_view_selection(session, "hex")
+                _arm(session)
+                await _right_click(
+                    session,
+                    session.app.query_one("#hex_view"),
+                    (10, 2),
+                    out_of_bounds=False,
+                )
+                _assert_single_copy(session, expected)
+    
+                for key, selector, wanted in (
+                    ("a2l", "#a2l_tags_list", A2L_ROW_3),
+                    ("mac", "#mac_records_list", MAC_ROW_3),
+                ):
+                    await _activate(session, key)
+                    table = _table(session, selector)
+                    selected = _record_row_selected(session.app)
+                    _arm(session)
+                    await _right_click(
+                        session,
+                        table,
+                        _row_offset(table, 2),
+                        out_of_bounds=False,
+                        expected_row=2,
+                    )
+                    _assert_single_copy(session, wanted)
+                    assert table.cursor_row == 2
+                    assert selected == []
+    
+>       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:688: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:667: in drive
+    _assert_single_copy(session, expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = Session(app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), pilot=<Pilot a...                01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '], result=True))
+expected = '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+
+    def _assert_single_copy(session: Session, expected: str, *, notice: bool = True) -> None:
+        assert session.clipboard.entry == [expected]
+>       assert session.clipboard.tail == [expected]
+E       AssertionError: assert [] == ['0x00000000 ...FF FF AA 0E ']
+E         
+E         Right contains one more item: '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+E         Use -v to get more diff
+
+tests/test_b103_copy_views.py:227: AssertionError
+________ test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs ________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_tui_043_13_102_hostile_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4597c37750>
+
+    def test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs(tmp_path, monkeypatch) -> None:
+        """R-TUI-043.13/102: raw hostile model text, one sink each, stdin only."""
+        assert HOSTILE_NAME.count("\n") == 1
+        assert "\x00" not in HOSTILE_NAME
+        obs, records = _with_logs(lambda: _hostile_powershell_observation(tmp_path, monkeypatch))
+>       _success(obs, HOSTILE_NAME, "Copied 2 lines to the clipboard.", view=True)
+
+tests/test_b103_clipboard_tail.py:940: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:235: in _success
+    _counts(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+obs = {'app': '[red]\x1b\x07\x1b]52;c;U0VFRF9PU0M=\x07\nSUFFIX', 'base_payloads': ['[red]\x1b\x07\x1b]52;c;U0VFRF9PU0M=\x07\... 1, 'helper': 0, 'override': 1, 'process': 0, ...}, 'expected': '[red]\x1b\x07\x1b]52;c;U0VFRF9PU0M=\x07\nSUFFIX', ...}
+
+    def _counts(obs: dict, *, override: int, tail: int, base: int, writer: int, osc: int, helper: int | None = None) -> None:
+        actual = obs["counts"]
+        expected = {"override": override, "tail": tail, "base": base, "writer": writer}
+        for key, value in expected.items():
+            assert actual[key] == value, (key, actual, obs)
+        assert len(obs["osc"]) == osc, obs["osc"]
+        assert len(obs["osc_requests"]) == osc, obs["osc_requests"]
+        if helper is not None:
+>           assert actual["helper"] == helper, actual
+E           AssertionError: {'base': 1, 'helper': 0, 'override': 1, 'process': 0, ...}
+E           assert 0 == 1
+
+tests/test_b103_clipboard_tail.py:230: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+___________ test_r_copy_16_1_button_and_materialized_empty_selection ___________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_1_button_and_ma0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_1_button_and_materialized_empty_selection(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/1; mutation: return normally for "" instead of SkipAction."""
+        failures = []
+        for size in (SIZE, WIDE):
+            for materialized in (False, True):
+                async def scenario(app, pilot):
+                    _focus_search(app)
+                    await _settle(app, pilot, 3)
+                    await _open_empty_copy_dialog(
+                        app, pilot, clipboard, materialized=materialized, geometry=True
+                    )
+                    await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+                try:
+>                   _run(
+                        tmp_path / f"{size[0]}-{materialized}",
+                        scenario,
+                        clipboard,
+                        size=size,
+                    )
+
+tests/test_b103_copy_quit_dialog.py:448: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:442: in scenario
+    await _open_empty_copy_dialog(
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+______________________ test_r_copy_16_2_no_widget_focused ______________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_2_no_widget_foc0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_2_no_widget_focused(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/2; mutation: require a focused widget for the fallback."""
+        async def scenario(app, pilot):
+            app.screen.set_focus(None)
+            app.screen.clear_selection()
+            await _settle(app, pilot, 3)
+            assert app.focused is None
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:466: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+___________ test_r_copy_16_3_highlighted_table_row_is_not_selection ____________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_3_highlighted_t0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_3_highlighted_table_row_is_not_selection(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/3; mutation: treat the highlighted A2L row as a copy selection."""
+        async def scenario(app, pilot):
+            await pilot.press("2")
+            await _settle(app, pilot, 4)
+            table = app.query_one("#a2l_tags_list")
+            table.focus()
+            await pilot.press("down", "down")
+            await _settle(app, pilot, 3)
+            assert table.cursor_row == 2, table.cursor_row
+            app.screen.clear_selection()
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:486: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:483: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+___________________ test_r_copy_16_4_empty_single_line_input ___________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_4_empty_single_0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_4_empty_single_line_input(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/4; mutation: copy an empty string or swallow the input SkipAction."""
+        async def scenario(app, pilot):
+            await pilot.press("2")
+            await _settle(app, pilot, 4)
+            await pilot.press("/")
+            await _settle(app, pilot, 4)
+            field = app.query_one("#a2l_tags_filter_input")
+            field.focus()
+            await _settle(app, pilot, 2)
+            assert app.focused is field and field.value == ""
+            app.screen.clear_selection()
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:504: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:501: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+____________________ test_r_copy_16_5_empty_json_selection _____________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_5_empty_json_se0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_5_empty_json_selection(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/5; mutation: let an empty JSON selection suppress the fallback."""
+        async def scenario(app, pilot):
+            app.action_show_screen("patch")
+            await _settle(app, pilot, 3)
+            await pilot.click("#patch_tab_json")
+            await pilot.click("#patch_json_view")
+            await _settle(app, pilot, 3)
+            view = app.query_one("#patch_json_view")
+            assert app.focused is view and view.selected_text == ""
+            app.screen.clear_selection()
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:521: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:518: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+______________ test_r_copy_16_6_multiline_text_without_selection _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_16_6_multiline_tex0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_16_6_multiline_text_without_selection(tmp_path: Path, clipboard) -> None:
+        """R-COPY.16/6; mutation: confuse non-empty document text with a selection."""
+        async def scenario(app, pilot):
+            app.action_show_screen("patch")
+            await _settle(app, pilot, 3)
+            await pilot.click("#patch_tab_json")
+            await _settle(app, pilot, 2)
+            view = app.query_one("#patch_paste_text")
+            view.load_text("L1")
+            view.cursor_location = view.document.end
+            view.focus()
+            await _settle(app, pilot, 3)
+            assert view.text == "L1" and view.selected_text == ""
+            app.screen.clear_selection()
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:541: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:538: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+__________________ test_r_copy_17_1_y_quits_within_one_second __________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_17_1_y_quits_withi0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_17_1_y_quits_within_one_second(tmp_path: Path, clipboard) -> None:
+        """R-COPY.17/1; mutation: dismiss True but keep the app running."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _answer_and_time(pilot, app, lambda: pilot.press("y"))
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:551: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+______________________ test_r_copy_17_2_tab_enter_on_quit ______________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_17_2_tab_enter_on_0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_17_2_tab_enter_on_quit(tmp_path: Path, clipboard) -> None:
+        """R-COPY.17/2; mutation: Tab does not move Stay -> Quit before Enter."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            assert getattr(app.focused, "id", None) == "confirm_no"
+            await pilot.press("tab")
+            await _settle(app, pilot, 2)
+            assert getattr(app.focused, "id", None) == "confirm_yes", app.focused
+            await _answer_and_time(pilot, app, lambda: pilot.press("enter"))
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:568: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:561: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_________________________ test_r_copy_17_3_click_quit __________________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_17_3_click_quit0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_17_3_click_quit(tmp_path: Path, clipboard) -> None:
+        """R-COPY.17/3; mutation: the Quit button paints but does not answer True."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            hit = False
+    
+            async def click():
+                nonlocal hit
+                hit = await pilot.click("#confirm_yes")
+    
+            await _answer_and_time(pilot, app, click)
+            assert hit is True
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:585: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:575: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+__________________ test_r_copy_18_1_stay_has_confirm_emphasis __________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_18_1_stay_has_conf0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_18_1_stay_has_confirm_emphasis(tmp_path: Path, clipboard) -> None:
+        """R-COPY.18/1; mutation: put modal-confirm on destructive Quit."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+            yes = screen.query_one("#confirm_yes")
+            no = screen.query_one("#confirm_no")
+            assert "modal-confirm" in no.classes, no.classes
+            assert "modal-confirm" not in yes.classes, yes.classes
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:598: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:592: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_______________ test_r_copy_20_3_existing_copy_quit_stays_single _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_20_3_existing_copy0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_20_3_existing_copy_quit_stays_single(tmp_path: Path, clipboard) -> None:
+        """R-COPY.20/3; mutation: Ctrl+C stacks a second _CopyQuitScreen."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+            original_stack = list(app.screen_stack)
+            await pilot.press("ctrl+c")
+            await _settle(app, pilot)
+            assert app.screen is screen, _stack(app)
+            assert list(app.screen_stack) == original_stack, _stack(app)
+            assert len(_copy_screens(app)) == 1, _stack(app)
+            _assert_no_copy_effects(app, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:688: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:679: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+________________ test_r_copy_23_1_idle_q_asks_without_selection ________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_23_1_idle_q_asks_w0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_23_1_idle_q_asks_without_selection(tmp_path: Path, clipboard) -> None:
+        """R-COPY.23/1; mutation: retain q -> quit and exit before confirmation."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _settle(app, pilot, 3)
+            assert app._running_session_action() is None
+            clipboard.reset()
+            app._notifications.clear()
+            await pilot.press("q")
+            await _settle(app, pilot)
+            _assert_copy_quit_dialog(app)
+            assert _running(app), app.return_code
+            assert _busy_screens(app) == [], _stack(app)
+            _assert_no_copy_effects(app, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:737: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:731: in scenario
+    _assert_copy_quit_dialog(app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_________ test_r_copy_23_2_q_with_selection_and_second_q_stays_single __________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_copy_23_2_q_with_select0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_copy_23_2_q_with_selection_and_second_q_stays_single(tmp_path: Path, clipboard) -> None:
+        """R-COPY.23/2; mutations: copy on q, quit on q, or stack on second q."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _settle(app, pilot, 3)
+            await pilot.mouse_down("#hex_view", offset=(2, 1))
+            await pilot.hover("#hex_view", offset=(40, 3))
+            await pilot.mouse_up("#hex_view", offset=(40, 3))
+            await _settle(app, pilot, 4)
+            selected = app.screen.get_selected_text()
+            assert selected is not None and len(selected.splitlines()) == 3, selected
+            clipboard.reset()
+            app._notifications.clear()
+            await pilot.press("q")
+            await _settle(app, pilot)
+            _assert_copy_quit_dialog(app)
+            assert _running(app), app.return_code
+            if app.is_running:
+                await pilot.press("q")
+                await _settle(app, pilot)
+            _assert_copy_quit_dialog(app)
+            assert _running(app), app.return_code
+            assert len(_copy_screens(app)) == 1, _stack(app)
+            _assert_no_copy_effects(app, clipboard)
+            assert clipboard.entries == [], clipboard.entries
+            await _close_and_assert_unchanged(app, pilot, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:767: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:755: in scenario
+    _assert_copy_quit_dialog(app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+____________ test_r_dlg_1_101_window_keys_do_not_act_behind_dialog _____________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_1_101_window_keys_d0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_1_101_window_keys_do_not_act_behind_dialog(tmp_path: Path, clipboard) -> None:
+        """R-DLG.1/101; mutation: let 1/2/slash/q reach the Workspace behind N9."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            shown = app._active_screen_key
+            depth = len(app.screen_stack)
+            for key in ("1", "2", "/", "q"):
+                if app.is_running:
+                    await pilot.press(key)
+                    await _settle(app, pilot, 3)
+                _assert_copy_quit_dialog(app)
+                assert _running(app), (key, app.return_code)
+                assert app._active_screen_key == shown, (key, app._active_screen_key)
+                assert len(app.screen_stack) == depth, (key, _stack(app))
+            _assert_no_copy_effects(app, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:827: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:814: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_____________________ test_r_dlg_2_101_escape_answers_stay _____________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_2_101_escape_answer0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_2_101_escape_answers_stay(tmp_path: Path, clipboard) -> None:
+        """R-DLG.2/101; mutation: Escape exits or fails to restore search-button focus."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _settle(app, pilot, 3)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard, key="escape")
+            assert app.focused is app.query_one("#search_button"), app.focused
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:839: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:835: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+____________________ test_r_dlg_6_101_initial_focus_is_stay ____________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_6_101_initial_focus0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_6_101_initial_focus_is_stay(tmp_path: Path, clipboard) -> None:
+        """R-DLG.6/101; mutation: AUTO_FOCUS targets confirm_yes."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            assert getattr(app.focused, "id", None) == "confirm_no", app.focused
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:849: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:846: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+________ test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state _________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_9_101_click_stay_pr0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state(tmp_path: Path, clipboard) -> None:
+        """R-DLG.9/101; mutation: Stay changes window, scroll or pending quit."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _settle(app, pilot, 3)
+            shown = app._active_screen_key
+            scroll = app.query_one("#hex_scroll").scroll_offset
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            assert await pilot.click("#confirm_no") is True
+            await _settle(app, pilot)
+            assert _running(app), app.return_code
+            assert len(app.screen_stack) == 1, _stack(app)
+            assert app._active_screen_key == shown, app._active_screen_key
+            assert app.query_one("#hex_scroll").scroll_offset == scroll, scroll
+            assert app.focused is app.query_one("#search_button"), app.focused
+            assert getattr(app, "_quit_pending", None) is False, app._quit_pending
+            _assert_no_copy_effects(app, clipboard)
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:870: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:859: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_________________ test_r_dlg_11_101_buttons_expose_exact_keys __________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_11_101_buttons_expo0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_11_101_buttons_expose_exact_keys(tmp_path: Path, clipboard) -> None:
+        """R-DLG.11/101; mutation: hide/rename the y/n key labels or add markup."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+            labels = [screen.query_one(selector).label.plain for selector in ("#confirm_yes", "#confirm_no")]
+            assert labels == ["Quit (y)", "Stay (n)"], labels
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:881: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:877: in scenario
+    screen = await _open_empty_copy_dialog(app, pilot, clipboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_______________________ test_r_dlg_12_101_n_presses_stay _______________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_12_101_n_presses_st0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_12_101_n_presses_stay(tmp_path: Path, clipboard) -> None:
+        """R-DLG.12/101; mutation: n quits or leaves pending quit behind."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _settle(app, pilot, 3)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _close_and_assert_unchanged(app, pilot, clipboard, key="n")
+            assert app.focused is app.query_one("#search_button"), app.focused
+            assert getattr(app, "_quit_pending", None) is False, app._quit_pending
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:894: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:889: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+_______________________ test_r_dlg_12_102_y_presses_quit _______________________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_r_dlg_12_102_y_presses_qu0')
+clipboard = _ClipboardRecorder(os_value='SEED-1b', writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=['_CopyQuitScreen'])
+
+    def test_r_dlg_12_102_y_presses_quit(tmp_path: Path, clipboard) -> None:
+        """R-DLG.12/102; mutation: y answers Stay instead of Quit."""
+        async def scenario(app, pilot):
+            _focus_search(app)
+            await _open_empty_copy_dialog(app, pilot, clipboard)
+            await _answer_and_time(pilot, app, lambda: pilot.press("y"))
+    
+>       _run(tmp_path / "app", scenario, clipboard)
+
+tests/test_b103_copy_quit_dialog.py:904: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_copy_quit_dialog.py:219: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:217: in drive
+    return await scenario(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_copy_quit_dialog.py:901: in scenario
+    await _open_empty_copy_dialog(app, pilot, clipboard)
+tests/test_b103_copy_quit_dialog.py:356: in _open_empty_copy_dialog
+    screen = _assert_copy_quit_dialog(app)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    def _assert_copy_quit_dialog(app):
+        screens = _copy_screens(app)
+        assert len(screens) == 1, {
+            "stack": _stack(app),
+            "notes": _notes(app),
+            "running": _running(app),
+        }
+        screen = screens[0]
+        assert app.screen is screen, _stack(app)
+        assert _question_texts(screen) == QUIT_TEXTS, _question_texts(screen)
+        for selector in ("#confirm_title", "#confirm_body"):
+            widget = screen.query_one(selector)
+>           assert widget.markup is False, (selector, widget.markup)
+                   ^^^^^^^^^^^^^
+E           AttributeError: 'Label' object has no attribute 'markup'
+
+tests/test_b103_copy_quit_dialog.py:263: AttributeError
+______________ test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel0')
+source = 1, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel4')
+source = 2, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel8')
+source = 3, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel12')
+source = 4, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel16')
+source = 5, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel20')
+source = 6, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+______________ test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-green-29ce-run/tmp/pytest-of-<USER>/pytest-0/test_copy_paste_acceptance_cel24')
+source = 7, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_paste_matrix.py:396: in _run_cell
+    target_widget = await _prepare_target(app, pilot, target)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+target = 'T1'
+
+    async def _prepare_target(app, pilot, target: str):
+        if target == "T1":
+            await pilot.press("2")
+            await _settle(pilot)
+            await pilot.press("/")
+            await _settle(pilot)
+            widget = app.query_one("#a2l_tags_filter_input")
+            assert widget.value == ""
+>           assert app.focused is widget
+E           AssertionError: assert OsClipboardInput(id='alt_search_input') is OsClipboardInput(id='a2l_tags_filter_input')
+E            +  where OsClipboardInput(id='alt_search_input') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+
+tests/test_b103_copy_paste_matrix.py:351: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:691 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:834 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality
+FAILED tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit - Att...
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+30 failed, 92 passed, 19 skipped in 1217.98s (0:20:17)

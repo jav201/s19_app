@@ -1,0 +1,8 @@
+TAIL Linux run 1 — transport/setup failure, not a pytest result
+Source HEAD: 0d4d4e7c (full source hash recorded in the successful transcript)
+The remote inline python -c command was quoted incorrectly.
+Observed exit: non-zero before pytest collection or execution.
+Observed output:
+/usr/bin/bash: -c: line 16: syntax error near unexpected token `0,'
+No test count, RED, GREEN, skip, or coverage is claimed from this attempt.
+The scratch directory was removed by the command trap.

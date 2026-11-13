@@ -1,0 +1,1770 @@
+s19_app.__file__ = <HOME>/work/b103-e4-views-JP7rJz/tree/s19_app/__init__.py
+BASE_HEAD = e2e935482646553a34242e524af5ac5bc57af82b
+ISOLATION = {'TMPDIR': '<HOME>/work/b103-e4-views-JP7rJz/tmp', 'HOME': '<HOME>/work/b103-e4-views-JP7rJz/home', 'XDG_CONFIG_HOME': '<HOME>/work/b103-e4-views-JP7rJz/xdg-config', 'XDG_DATA_HOME': '<HOME>/work/b103-e4-views-JP7rJz/xdg-data', 'XDG_CACHE_HOME': '<HOME>/work/b103-e4-views-JP7rJz/xdg-cache', 'LOCALAPPDATA': '<HOME>/work/b103-e4-views-JP7rJz/localappdata', 'DISPLAY': None, 'WAYLAND_DISPLAY': None, 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONIOENCODING': 'utf-8'}
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/b103-e4-views-JP7rJz/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 54 items
+
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1] FAILED [  1%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2] FAILED [  3%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3] FAILED [  5%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4] FAILED [  7%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5] FAILED [  9%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6] FAILED [ 11%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/1] FAILED [ 12%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/2] FAILED [ 14%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/3] FAILED [ 16%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/4] FAILED [ 18%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1] FAILED [ 20%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2] FAILED [ 22%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3] FAILED [ 24%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/1] PASSED [ 25%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/2] FAILED [ 27%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/3] FAILED [ 29%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/1] PASSED [ 31%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/2] PASSED [ 33%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/3] PASSED [ 35%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4] PASSED [ 37%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5] PASSED [ 38%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1] FAILED [ 40%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/2] FAILED [ 42%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/3] FAILED [ 44%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/4] FAILED [ 46%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/5] FAILED [ 48%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/6] FAILED [ 50%]
+tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry FAILED [ 51%]
+tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality FAILED [ 53%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/1] PASSED [ 55%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/2] PASSED [ 57%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/3] PASSED [ 59%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4] PASSED [ 61%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/5] PASSED [ 62%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/6] PASSED [ 64%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7] PASSED [ 66%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8] PASSED [ 68%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9] FAILED [ 70%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/1] PASSED [ 72%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/2] PASSED [ 74%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/3] PASSED [ 75%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4] PASSED [ 77%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/5] PASSED [ 79%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/6] PASSED [ 81%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/7] PASSED [ 83%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8] PASSED [ 85%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9] PASSED [ 87%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1] PASSED [ 88%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2] PASSED [ 90%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3] PASSED [ 92%]
+tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1] PASSED [ 94%]
+tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2] PASSED [ 96%]
+tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1] FAILED [ 98%]
+tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2] PASSED [100%]
+
+=================================== FAILURES ===================================
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+E     
+E     Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC ',
+E     - ]
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry']
+E     
+E     Right contains one more item: 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'Coverage: 6.68%\n'
+E     -     'Ranges: 11\n'
+E     -     'Errors: 0\n'
+E     -     'Warnings: 0\n'
+E     -     'Loader 0 err · ⚠4 OOO · Entry',
+E     - ]
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image']
+E     
+E     Right contains one more item: 'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in '
+E     -     'image',
+E     - ]
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement']
+E     
+E     Right contains one more item: 'name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'name ASAM.M.SCALAR.UBYTE.IDENTICAL\n'
+E     -     'desc Scalar measurement',
+E     - ]
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   assert [] == ['{\n  "format": "s19app-changeset",\n']
+E     
+E     Right contains one more item: '{\n  "format": "s19app-changeset",\n'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '{\n'
+E     -     '  "format": "s19app-changeset",\n',
+E     - ]
+______________ test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6] _______________
+tests/test_b103_copy_views.py:455: in test_r_copy_1_ctrl_c_writes_each_view
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:451: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.']
+E     
+E     Right contains one more item: '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded '
+E     -     'artifacts appear in the Loaded panel with their diagnostics.\n'
+E     -     '\n'
+E     -     '2. Save a project (`^S` / `s`) to gather the loaded files into one '
+E     -     'project folder; load one back with `p`.',
+E     - ]
+___________________ test_r_copy_2_app_clipboard[R-COPY.2/1] ____________________
+tests/test_b103_copy_views.py:496: in test_r_copy_2_app_clipboard
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:490: in drive
+    assert session.clipboard.base == [expected]
+E   AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+E     
+E     Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC ',
+E     - ]
+___________________ test_r_copy_2_app_clipboard[R-COPY.2/2] ____________________
+tests/test_b103_copy_views.py:496: in test_r_copy_2_app_clipboard
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:489: in drive
+    assert session.app.clipboard == expected
+E   AssertionError: assert 'SEED-1b' == '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     + SEED-1b
+E     - 0x000017E0  11                      01 3A                    |.       .:      |
+E     -   0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |
+E     -   0x0000EB00  20 59       CC EC 19    CC
+___________________ test_r_copy_2_app_clipboard[R-COPY.2/3] ____________________
+tests/test_b103_copy_views.py:496: in test_r_copy_2_app_clipboard
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:489: in drive
+    assert session.app.clipboard == expected
+E   AssertionError: assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E     
+E     - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+E     + SEED-1b
+___________________ test_r_copy_2_app_clipboard[R-COPY.2/4] ____________________
+tests/test_b103_copy_views.py:496: in test_r_copy_2_app_clipboard
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:489: in drive
+    assert session.app.clipboard == expected
+E   AssertionError: assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E     
+E     - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+E     + SEED-1b
+___________________ test_r_copy_4_full_row_names[R-COPY.4/1] ___________________
+tests/test_b103_copy_views.py:538: in test_r_copy_4_full_row_names
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:511: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING']
+E     
+E     Right contains one more item: 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING',
+E     - ]
+___________________ test_r_copy_4_full_row_names[R-COPY.4/2] ___________________
+tests/test_b103_copy_views.py:538: in test_r_copy_4_full_row_names
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:529: in drive
+    _assert_writer(session, MAC_ROW_3)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['Curve_ExternalAxis']
+E     
+E     Right contains one more item: 'Curve_ExternalAxis'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'Curve_ExternalAxis',
+E     - ]
+___________________ test_r_copy_4_full_row_names[R-COPY.4/3] ___________________
+tests/test_b103_copy_views.py:538: in test_r_copy_4_full_row_names
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:521: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.HYPERBOLIC']
+E     
+E     Right contains one more item: 'ASAM.M.SCALAR.UBYTE.HYPERBOLIC'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'ASAM.M.SCALAR.UBYTE.HYPERBOLIC',
+E     - ]
+________________ test_r_copy_10_one_osc52_request[R-COPY.10/2] _________________
+tests/test_b103_copy_views.py:562: in test_r_copy_10_one_osc52_request
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:560: in drive
+    assert session.osc52 == [expected]
+E   AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+E     
+E     Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC ',
+E     - ]
+________________ test_r_copy_10_one_osc52_request[R-COPY.10/3] _________________
+tests/test_b103_copy_views.py:562: in test_r_copy_10_one_osc52_request
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:560: in drive
+    assert session.osc52 == [expected]
+E   AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING']
+E     
+E     Right contains one more item: 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/1] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+E     
+E     Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC ',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/2] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry']
+E     
+E     Right contains one more item: 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'Coverage: 6.68%\n'
+E     -     'Ranges: 11\n'
+E     -     'Errors: 0\n'
+E     -     'Warnings: 0\n'
+E     -     'Loader 0 err · ⚠4 OOO · Entry',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/3] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement']
+E     
+E     Right contains one more item: 'name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'name ASAM.M.SCALAR.UBYTE.IDENTICAL\n'
+E     -     'desc Scalar measurement',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/4] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   assert [] == ['{\n  "format": "s19app-changeset",\n']
+E     
+E     Right contains one more item: '{\n  "format": "s19app-changeset",\n'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '{\n'
+E     -     '  "format": "s19app-changeset",\n',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/5] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   AssertionError: assert [] == ['1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.']
+E     
+E     Right contains one more item: '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded '
+E     -     'artifacts appear in the Loaded panel with their diagnostics.\n'
+E     -     '\n'
+E     -     '2. Save a project (`^S` / `s`) to gather the loaded files into one '
+E     -     'project folder; load one back with `p`.',
+E     - ]
+______________ test_r_copy_12_right_click_selection[R-COPY.12/6] _______________
+tests/test_b103_copy_views.py:625: in test_r_copy_12_right_click_selection
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:623: in drive
+    _assert_writer(session, expected)
+tests/test_b103_copy_views.py:239: in _assert_writer
+    assert session.clipboard.writes == [expected]
+E   assert [] == ['prg.s19\n... window limited to 200 rows ...\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC F3 BB 20 49 44 3D 00  | Y  ... ... ID=.|\n  0x0000EB10  20 41 70 70 6C 69 63 61 74 69 6F 6E 20 69 73 20  | Application is |\n  0x0000EB20  73 74 61 72 74 69 6E 67 2E 0A 00 20 41 70 70 6C  |starting... Appl|\n  0x0000EB30  69 63 61 74 69 6F 6E 20 69 73 20 6E 6F 74 20 66  |ication is not f|\n  0x0000EB40  6F 75 6E 64 2E 20 53 74 61 79 20 69 6E 20 42 6F  |ound. Stay in Bo|\n  0x0000EB50  6F 74 4C 6F 61 64 65 72 2E 0A 00 87 A6 55 C7 18  |otLoader.....U..|\n  0x0000EB60  00 43 C7 18 00 86 81 6E 26 49 03 4B FD 6E B8 48  |.C.....n&I.K.n.H|\n  0x0000EB70  08 4B FD B6 4B A4 0C A1 08 26 F8 6E 88 48 6E 44  |.K..K....&.n.HnD|\n  0x0000EB80  4C 0B 4B FD 0D 4B FD 1D 48 1F 48 07 4B FD 05 4B  |L.K..K..H.H.K..K|\n  0x0000EB90  FA 81 9E FE 09 F6 9E FE 07 F7 9E FE 05 AF FF 9E  |................|\n  0x0000EBA0  FF 05 27 12 9E FE 09 AF 01 9E FF 09 9E FE 07 AF  |..\'.............|\n  0x0000EBB0  01 9E FF 07 20 DC 4F 81 8B 86 A0 14 87 9F 88 54  |.... .O........T|\n  0x0000EBC0  46 54 46 54 46 AA 80 81 4A 8C AE 03 52 81 9E FE  |FTFTF...J...R...|\n  0x0000EBD0  03 26 03 CC EC 83 65 00 08 23 03 A6 60 81 9E FE  |.&....e..#..`...|\n  0x0000EBE0  05 AD D5 B7 8B 9E E6 06 9E EB 04 97 9E E6 05 9E  |................|\n  0x0000EBF0  E9 03 87 8A AF FF AD C0 B1 8B 26 03 CC EC 83 A6  |..........&.....|\n  0x0000EC00  B0 81 9E FE 03 65 03 00 23 03 A6 3C 81 9E FE 03  |.....e..#..<....|\n  0x0000EC10  26 03 A6 50 81 CD EB 92 81 3F 8C 9E E6 05 A1 18  |&..P.....?......|\n  0x0000EC20  27 E0 A1 14 27 A8 A1 15 27 A4 A1 16 27 A0 A1 17  |\'...\'...\'...\'...|\n  0x0000EC30  27 9C A1 10 25 CC 22 05 9E 6D 06 2A C5 AD 89 B7  |\'...%."..m.*....|\n  0x0000EC40  8B A1 4F 25 07 A1 53 22 03 A6 A0 81 A1 54 26 0E  |..O%..S".....T&.|\n  0x0000EC50  12 8C 9E E6 04 9E EA 03 26 04 10 8C 13 8C 9E E6  |........&.......|\n  0x0000EC60  04 9E EA 03 27 1D 9E E6 06 9E EB 04 97 9E E6 05  |....\'...........|\n  0x0000EC70  9E E9 03 87 8A AF FF 8B 86 CD EB C8 B1 8B 27 03  |..............\'.|\n  0x0000EC80  A6 B0 81 9E FE 03 65 03 00 23 03 A6 60 81 9E E6  |......e..#..`...|\n  0x0000EC90  03 9E EA 04 26 09 A6 40 B7 8A 9E 6C 04 20 16 9E  |....&..@...l. ..|\n  0x0000ECA0  E6 03 26 0D 9E E6 04 A1 01 26 06 A6 20 B7 8A 20  |..&......&.. .. |\n  0x0000ECB0  04 A6 25 B7 8A 9B CD 10 20 01 8C 45 45 00 02 9E  |..%..... ..EE...|\n  0x0000ECC0  FF 03 45 FF FE 9E FF 05 45 F9 2C 96 0F 00 45 0F  |..E.....E.,...E.|\n  0x0000ECD0  00 9E FF 07 A6 25 B7 8A CD 10 20 45 00 03 9E FF  |.....%.... E....|\n  0x0000ECE0  03 45 FF BD 9E FF 05 A6 FF C7 0F 00 C7 0F 01 A6  |.E..............|\n  0x0000ECF0  E2 C7 0F 02 45 0F 00 9E FF 07 A6 25 B7 8A CD 10  |....E......%....|\n  0x0000ED00  20 9A 81 A6 30 C7 18 25 C6 18 25 A5 80 27 F9 9E  | ...0..%..%..\'..|\n  0x0000ED10  FE 09 F6 9E FE 07 03 8C 07 65 FF FE 25 02 AF A2  |.........e..%...|\n  0x0000ED20  F7 B6 8A C7 18 26 A6 80 C7 18 25 9E E6 0B C6 18  |.....&....%.....|\n  0x0000ED30  25 A5 30 26 24 9E FE 05 AF FF 9E FF 05 27 12 9E  |%.0&$........\'..|\n  0x0000ED40  FE 09 AF 01 9E FF 09 9E FE 07 AF 01 9E FF 07 20  |............... |\n  0x0000ED50  B7 C6 18 25 A5 40 27 F9 4F 81 A6 30 C7 18 25 A6  |...%.@\'.O..0..%.|\n  0x0000ED60  4F C7 18 20 8C AE 58 D6 ED 02 D7 10 1F 5B F8 81  |O.. ..X......[..|\n  0x0000ED70  30 31 32 33 34 35 36 37 38 39 41 42 43 44 45 46  |0123456789ABCDEF|\n  0x0000ED80  3F 3A 6E 0C 3B 3F 3E 3F 38 C6 17 E0 A1 FF 26 02  |?:n.;?>?8.....&.|\n  0x0000ED90  A6 11 B7 39 81 3F 3A 3F 38 6E 04 39 3F 3B 3F 3D  |...9.?:?8n.9?;?=|\n  0x0000EDA0  3F 3E 3F 3F 81 8B 89 87 62 A4 0F 97 8C D6 ED 70  |?>??....b......p|\n  0x0000EDB0  AD 38 9E E6 01 A4 0F 97 8C D6 ED 70 AD 2C 86 88  |.8.........p.,..|\n  0x0000EDC0  8A 81 AD E1 AD 0A 81 89 8B 86 AD D9 86 AD F3 81  |................|\n  0x0000EDD0  87 A6 0A AD 15 86 81 0B 3C 04 B6 3F 99 81 98 81  |........<..?....|\n  0x0000EDE0  F6 27 06 AD 05 AF 01 20 F7 81 AD 11 0F 3C FB B7  |.\'..... .....<..|\n  0x0000EDF0  3F 81 6E 02 6C 3F 6E 3F 8D 81 3F 6C 81 CD EB 5B  |?.n.l?n?..?l...[|\n  0x0000EE00  0F 6C 08 3D 8D 27 02 3A 8D 1E 6C 3D 8D 81 20 50  |.l.=.\'.:..l=.. P|\n  0x0000EE10  75 73 68 20 74 20 62 75 74 74 6F 6E 20 66 6F 72  |ush t button for|\n  0x0000EE20  20 74 65 72 6D 69 6E 61 6C 21 0A 00 0A 57 61 72  | terminal!...War|\n  0x0000EE30  6E 69 6E 67 21 20 48 61 6C 66 20 62 79 74 65 20  |ning! Half byte |\n  0x0000EE40  67 69 76 65 64 20 61 73 20 6C 61 73 74 20 62 79  |gived as last by|\n  0x0000EE50  74 65 2C 20 6D 69 73 73 69 6E 67 20 34 20 62 69  |te, missing 4 bi|\n  0x0000EE60  74 73 20 66 6F 72 63 65 64 20 74 6F 20 30 2E 0A  |ts forced to 0..|\n  0x0000EE70  00 0A 53 65 72 69 61 6C 20 74 65 72 6D 69 6E 61  |..Serial termina|\n  0x0000EE80  6C 2E 20 48 65 72 65 20 69 73 20 73 6F 6D 65 20  |l. Here is some |\n  0x0000EE90  68 65 6C 70 3A 0A 3F 20 3A 20 54 68 69 73 20 68  |help:.? : This h|\n  0x0000EEA0  65 6C 70 2E 0A 69 20 3A 20 50 72 69 6E 74 20 4D  |elp..i : Print M|\n  0x0000EEB0  43 55 20 49 44 2E 0A 64 41 41 41 41 20 3A 20 44  |CU ID..dAAAA : D|\n  0x0000EEC0  75 6D 70 20 66 72 6F 6D 20 61 64 64 72 65 73 73  |ump from address|\n  0x0000EED0  20 41 41 41 41 68 20 28 44 65 66 61 75 6C 74 20  | AAAAh (Default |\n  0x0000EEE0  30 30 30 30 68 29 2E 0A 6E 20 3A 20 4E 65 78 74  |0000h)..n : Next|\n  0x0000EEF0  20 28 44 75 6D 70 29 2E 0A 62 20 3A 20 42 61 63  | (Dump)..b : Bac|\n  0x0000EF00  6B 20 28 44 75 6D 70 29 2E 0A 61 20 3A 20 41 67  |k (Dump)..a : Ag|\n  0x0000EF10  61 69 6E 20 28 44 75 6D 70 29 2E 0A 65 41 41 41  |ain (Dump)..eAAA|\n  0x0000EF20  41 20 3A 20 45 72 61 73 65 20 70 61 67 65 20 66  |A : Erase page f|\n  0x0000EF30  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom address AAAA|\n  0x0000EF40  68 20 28 31 32 38 20 62 79 74 65 73 29 2E 0A 68  |h (128 bytes)..h|\n  0x0000EF50  41 41 41 41 31 31 32 32 33 33 34 34 20 5B 45 4E  |AAAA11223344 [EN|\n  0x0000EF60  54 45 52 5D 20 3A 20 48 65 78 61 20 77 72 69 74  |TER] : Hexa writ|\n  0x0000EF70  65 20 66 72 6F 6D 20 61 64 64 72 65 73 73 20 41  |e from address A|\n  0x0000EF80  41 41 41 68 2C 0A 73 41 41 41 41 77 77 77 2E 62  |AAAh,.sAAAAwww.b|\n  0x0000EF90  75 74 79 69 2E 68 75 20 5B 45 4E 54 45 52 5D 20  |utyi.hu [ENTER] |\n  0x0000EFA0  3A 20 53 74 72 69 6E 67 20 77 72 69 74 65 20 66  |: String write f|\n  0x0000EFB0  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom address AAAA|\n  0x0000EFC0  68 2C 0A 72 20 6F 72 20 78 20 3A 20 52 65 73 65  |h,.r or x : Rese|\n  0x0000EFD0  74 20 28 45 78 69 74 29 2E 0A 00 4F 4B 00 45 72  |t (Exit)...OK.Er|\n  0x0000EFE0  72 6F 72 21 20 41 63 63 65 73 73 20 65 72 72 6F  |ror! Access erro|\n  0x0000EFF0  00 45 72 72 6F 72 21 20 50 72 6F 74 65 63 74 69  |.Error! Protecti|\n  0x0000F000  6F 6E 20 76 69 6F 6C 61 74 69 6F 6E 00 45 72 72  |on violation.Err|\n  0x0000F010  6F 72 21 20 4C 65 6E 67 74 68 20 7A 65 72 6F 00  |or! Length zero.|\n  0x0000F020  45 72 72 6F 72 21 20 4C 65 6E 67 74 68 20 68 69  |Error! Length hi|\n  0x0000F030  67 68 00 45 72 72 6F 72 21 20 42 6F 6F 74 6C 6F  |gh.Error! Bootlo|\n  0x0000F040  61 64 65 72 20 61 72 65 61 00 45 72 72 6F 72 21  |ader area.Error!|\n  0x0000F050  20 42 6F 75 6E 64 61 72 79 20 76 69 6F 6C 61 74  | Boundary violat|\n  0x0000F060  69 6F 6E 00 45 EE 0E CD ED E0 81 CD ED FD 3D 8D  |ion.E.........=.|\n  0x0000F070  26 02 20 73 CD ED D7 24 F2 6E FA 8D A1 0D 27 0B  |&. s...$.n....\'.|\n  0x0000F080  A1 0A 26 04 A6 0D 20 03 CD ED EA 4D 81 C6 FF AC  |..&... ....M....|\n  0x0000F090  A4 01 26 03 CC F9 CE 6E FA 8D 45 EE 71 CD ED E0  |..&....n..E.q...|\n  0x0000F0A0  A6 0A CD ED EA CD FA 22 AD C1 CD FA 16 A1 78 27  |......."......x\'|\n  0x0000F0B0  36 A1 72 27 32 A1 64 27 36 A1 6E 27 35 A1 61 27  |6.r\'2.d\'6.n\'5.a\'|\n  0x0000F0C0  2A A1 62 27 24 A1 3F 27 D1 A1 73 26 03 CC F1 B8  |*.b\'$.?\'..s&....|\n  0x0000F0D0  A1 68 26 03 CC F1 BE A1 65 26 03 CC F2 35 A1 69  |.h&.....e&...5.i|\n  0x0000F0E0  26 03 CC F2 7E 20 BE 9A 8D 3A 81 3A 81 20 03 CD  |&...~ ...:.:. ..|\n  0x0000F0F0  F2 AB 3F 82 55 81 AD 10 A6 0A CD ED EA AD 09 A6  |..?.U...........|\n  0x0000F100  0A CD ED EA 35 81 20 98 A6 08 87 AD 0F 86 4B FA  |....5. .......K.|\n  0x0000F110  81 87 F6 CD ED A5 AF 01 86 4B F6 81 A6 0A CD ED  |.........K......|\n  0x0000F120  EA 8B 86 CD ED A5 9F CD ED A5 A6 3A CD ED EA A6  |...........:....|\n  0x0000F130  20 CD ED EA A6 04 AD D9 A6 20 CD ED EA A6 04 AD  | ........ ......|\n  0x0000F140  D0 A6 20 CD ED EA A6 20 CD ED EA A6 04 AD C2 A6  |.. .... ........|\n  0x0000F150  20 CD ED EA A6 04 AD B9 A6 20 CD ED EA A6 7C CD  | ........ ....|.|\n  0x0000F160  ED EA A6 20 CD ED EA AF F0 A6 08 AD 0A A6 20 CD  |... .......... .|\n  0x0000F170  ED EA A6 08 AD 01 81 87 F6 A1 20 25 06 A1 7F 22  |.......... %..."|\n  0x0000F180  02 20 02 A6 2E CD ED EA AF 01 86 4B EA 81 BE 80  |. .........K....|\n  0x0000F190  A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 02 20  |..&....k..&.... |\n  0x0000F1A0  ED 55 83 F7 3C 80 55 83 AF 01 35 83 81 3F 80 45  |.U..<.U...5..?.E|\n  0x0000F1B0  0F 00 35 83 CD F2 AB 81 AD F3 AD D2 20 05 AD ED  |..5......... ...|\n  0x0000F1C0  CD F2 4F BE 80 26 03 CC F0 A0 45 0F 00 89 8B 55  |..O..&....E....U|\n  0x0000F1D0  81 89 8B BE 80 89 8C 8B CD EC 19 A7 06 AD 03 CC  |................|\n  0x0000F1E0  F0 F2 87 A6 0A CD ED EA 86 4D 26 07 45 EF DB CD  |.........M&.E...|\n  0x0000F1F0  ED E0 81 A1 10 26 07 45 EF DE CD ED E0 81 A1 20  |.....&.E....... |\n  0x0000F200  26 07 45 EF F1 CD ED E0 81 A1 50 26 07 45 F0 0D  |&.E.......P&.E..|\n  0x0000F210  CD ED E0 81 A1 60 26 07 45 F0 20 CD ED E0 81 A1  |.....`&.E. .....|\n  0x0000F220  A0 26 07 45 F0 33 CD ED E0 81 A1 B0 26 06 45 F0  |.&.E.3......&.E.|\n  0x0000F230  4A CD ED E0 81 AD 74 45 00 00 89 8B 55 81 89 8B  |J.....tE....U...|\n  0x0000F240  45 00 00 89 8B CD EC 19 A7 06 AD 96 CC F0 F2 BE  |E...............|\n  0x0000F250  80 A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 27  |...&....k..&...\'|\n  0x0000F260  62 87 CD F0 6B A1 0D 26 09 45 EE 2C CD ED E0 4F  |b...k..&.E.,...O|\n  0x0000F270  20 02 AD 13 9E EA 01 A7 01 CD F1 A1 20 D1 C6 17  | ........... ...|\n  0x0000F280  F8 CD ED A5 CC F0 A0 A0 30 2B 1C A1 0A 25 19 A0  |........0+...%..|\n  0x0000F290  07 2B 14 A1 0A 25 10 A1 10 25 0D A0 20 2B 08 A1  |.+...%...%.. +..|\n  0x0000F2A0  0A 25 04 A1 10 25 01 4F A4 0F 81 CD F0 6B AD D7  |.%...%.O.....k..|\n  0x0000F2B0  62 B7 81 CD F0 6B AD CF BA 81 B7 81 CD F0 6B AD  |b....k........k.|\n  0x0000F2C0  C6 62 B7 82 CD F0 6B AD BE BA 82 B7 82 81 A6 C0  |.b....k.........|\n  0x0000F2D0  C7 18 81 CD F3 89 A7 FE 5F C6 17 E8 9E E7 01 43  |........_......C|\n  0x0000F2E0  26 01 5C C6 17 E9 9E E7 02 43 26 01 5C 5D 27 0A  |&.\\......C&.\\]\'.|\n  0x0000F2F0  A6 01 9E E7 01 A6 3A 9E E7 02 26 E7 4F 9E E6 01  |......:...&.O...|\n  0x0000F300  C7 18 82 9E E6 02 C7 18 83 A7 02 4F C7 18 8B A7  |...........O....|\n  0x0000F310  FC A6 9C 9E E7 01 A6 DA 9E E7 02 C6 17 F8 9E E7  |................|\n  0x0000F320  03 9E 6F 04 CD F3 BB 8A 88 96 18 90 8A 88 96 18  |..o.............|\n  0x0000F330  92 A7 FC A6 8C 9E E7 01 A6 DA 9E E7 02 A6 FF 9E  |................|\n  0x0000F340  E7 03 9E 6F 04 AD 74 8A 88 96 18 98 8A 88 96 18  |...o..t.........|\n  0x0000F350  9A 4F C7 18 94 C7 18 95 C7 18 9C C7 18 9D A6 01  |.O..............|\n  0x0000F360  C7 18 96 C7 18 9E A6 FE C7 18 97 C7 18 9F 3F 8E  |..............?.|\n  0x0000F370  A6 01 43 C4 18 80 C7 18 80 C6 18 81 A4 01 26 F9  |..C...........&.|\n  0x0000F380  81 C6 18 80 AA 01 C7 18 80 C6 18 81 A4 01 27 F9  |..............\'.|\n  0x0000F390  81 AD EE A6 01 C7 18 80 A6 07 C7 18 86 C7 18 8A  |................|\n  0x0000F3A0  4F C7 18 82 C7 18 83 C7 18 84 C7 18 85 C7 18 87  |O...............|\n  0x0000F3B0  C7 18 88 C7 18 8B C7 18 8D 20 B5 9E E6 03 2B 21  |......... ....+!|\n  0x0000F3C0  9E E6 05 62 48 A4 E0 9E E7 03 9E E6 06 44 44 44  |...bH........DDD|\n  0x0000F3D0  9E EA 03 9E E7 03 9E E6 06 62 48 A4 E0 9E E7 04  |.........bH.....|\n  0x0000F3E0  81 48 48 48 A4 F8 9E E7 03 9E E6 04 62 44 A4 07  |.HHH........bD..|\n  0x0000F3F0  9E EA 03 9E E7 03 9E E6 04 48 97 48 48 A4 E0 9E  |.........H.HH...|\n  0x0000F400  E7 04 9F A4 06 9E EA 04 9E E7 04 9E E6 05 49 49  |..............II|\n  0x0000F410  A4 01 9E EA 04 AA 18 9E E7 04 9E E6 05 48 A4 FE  |.............H..|\n  0x0000F420  9E E7 05 9E E6 06 49 49 A4 01 9E EA 05 9E E7 05  |......II........|\n  0x0000F430  9E E6 06 48 9E E7 06 81 C6 18 A2 46 C6 18 A3 46  |...H.......F...F|\n  0x0000F440  B7 87 C6 18 8B A4 07 27 03 CC F6 65 C6 18 AC A4  |.......\'...e....|\n  0x0000F450  0F 27 20 A1 01 27 20 A1 02 27 31 A1 03 26 03 CC  |.\' ..\' ..\'1..&..|\n  0x0000F460  F5 74 A1 04 27 3C A1 06 26 03 CC F6 F6 A6 07 CD  |.t..\'<..&.......|\n  0x0000F470  F6 15 81 CD F6 09 81 C6 18 A4 A1 52 26 03 CC F9  |...........R&...|\n  0x0000F480  87 A1 11 26 01 AC A6 08 CD F6 15 81 CD F5 ED 3F  |...&...........?|\n  0x0000F490  83 CD F9 FB CD F6 15 81 A6 06 20 02 A6 05 CD F6  |.......... .....|\n  0x0000F4A0  15 81 3F 8F 3F 90 CD F5 ED C6 18 A6 27 EE 2B E8  |..?.?.......\'.+.|\n  0x0000F4B0  B7 83 87 4C B7 8E 86 CD F9 F6 3F 91 CD F6 00 6E  |...L......?....n|\n  0x0000F4C0  1E 8D 45 0F 00 A6 01 C7 0F 00 4C C7 0F 01 CD ED  |..E.......L.....|\n  0x0000F4D0  FD 27 61 C6 18 84 A4 01 27 F4 6E 1E 8D C6 18 AC  |.\'a.....\'.n.....|\n  0x0000F4E0  A4 0F A1 08 26 5A C6 18 A4 AD 5B C6 18 A5 AD 56  |....&Z....[....V|\n  0x0000F4F0  C6 18 A6 AD 51 C6 18 A7 AD 4C C6 18 A8 AD 47 C6  |....Q....L....G.|\n  0x0000F500  18 A9 AD 42 C6 18 AA AD 3D C6 18 AB AD 38 3C 91  |...B....=....8<.|\n  0x0000F510  B6 85 B8 91 B7 85 CD F6 00 B6 8E 27 02 20 AF 3D  |...........\'. .=|\n  0x0000F520  8F 26 0B 3D 90 26 13 CD F9 FB CD F6 15 81 A6 0C  |.&.=.&..........|\n  0x0000F530  CD F6 15 81 A6 0E CD F6 15 81 A6 0D CD F6 15 81  |................|\n  0x0000F540  A6 02 CD F6 15 81 87 B6 8E 27 1C A1 01 27 0D 9E  |.........\'...\'..|\n  0x0000F550  E6 01 F7 CD F9 F6 AF 01 3A 8E 20 15 9E E6 01 B0  |........:. .....|\n  0x0000F560  85 B7 8F 3A 8E 20 0A 9E E6 01 A1 FB 27 03 6E 01  |...:. ......\'.n.|\n  0x0000F570  90 A7 01 81 AD 77 C6 18 A6 CD F6 00 26 03 CC F4  |.....w......&...|\n  0x0000F580  9C 2A 03 CC F4 98 87 4C B7 8E 86 CD F9 F6 3F 91  |.*.....L......?.|\n  0x0000F590  55 81 AD 1F 3D 8E 26 FA 81 B6 8E 27 0E A1 01 27  |U...=.&....\'...\'|\n  0x0000F5A0  0D 3A 8E F6 CD F9 F6 F6 AF 01 81 A6 FB 81 3A 8E  |.:............:.|\n  0x0000F5B0  B6 85 81 AD 71 AD E2 C7 18 B4 AD DD C7 18 B5 AD  |....q...........|\n  0x0000F5C0  D8 C7 18 B6 AD D3 C7 18 B7 AD CE C7 18 B8 AD C9  |................|\n  0x0000F5D0  C7 18 B9 AD C4 C7 18 BA AD BF C7 18 BB 3C 91 B6  |.............<..|\n  0x0000F5E0  85 B8 91 B7 85 A6 08 C7 18 BC AD 68 81 3F 85 C6  |...........h.?..|\n  0x0000F5F0  18 A4 B7 81 CD F9 F6 C6 18 A5 B7 82 CD F9 F6 81  |................|\n  0x0000F600  87 A6 01 C7 18 84 86 4D 81 AD F5 AD 19 4F C7 18  |.......M.....O..|\n  0x0000F610  BC AD 41 81 4F 87 AD E8 AD 0C 86 C7 18 B4 A6 01  |..A.O...........|\n  0x0000F620  C7 18 BC AD 2F 81 89 8B A6 01 C7 18 8A A7 FC A6  |..../...........|\n  0x0000F630  9C 9E E7 01 A6 DA 9E E7 02 B6 87 9E E7 03 C6 17  |................|\n  0x0000F640  F8 9E E7 04 CD F3 BB 8A 88 96 18 B0 8A 88 96 18  |................|\n  0x0000F650  B2 8A 88 81 C6 18 8A C7 18 86 CD ED FD C6 18 86  |................|\n  0x0000F660  A4 01 27 F6 81 C6 18 AC A4 0F A1 07 27 38 A1 01  |..\'.........\'8..|\n  0x0000F670  27 03 CC F4 6D C6 18 A4 A1 22 27 03 CC F4 86 CD  |\'...m...."\'.....|\n  0x0000F680  F6 00 AD A2 6E 06 80 8C 5F D6 FC F8 D7 18 B4 AF  |....n..._.......|\n  0x0000F690  01 3B 80 F5 C6 17 F8 C7 18 BA A6 07 C7 18 BC AD  |.;..............|\n  0x0000F6A0  B3 81 CD F6 00 81 6E 06 80 8C 5F D6 18 A4 D1 FC  |......n..._.....|\n  0x0000F6B0  F8 26 EF AF 01 3B 80 F3 C6 18 AA C7 0F 00 CD F6  |.&...;..........|\n  0x0000F6C0  00 C6 17 F9 4C C7 0F 01 6E 06 80 8C 5F D6 17 F0  |....L...n..._...|\n  0x0000F6D0  D7 0F 02 AF 01 3B 80 F5 45 17 F8 35 81 3F 83 CD  |.....;..E..5.?..|\n  0x0000F6E0  FA 02 26 0B 45 17 F8 35 81 6E 08 83 CD FA 02 CD  |..&.E..5.n......|\n  0x0000F6F0  F6 15 CD F2 CE 81 3F 89 6E 06 80 8C 5F D6 18 A4  |......?.n..._...|\n  0x0000F700  D7 0F 00 BB 89 B7 89 AF 01 3B 80 F1 C6 17 F6 4C  |.........;.....L|\n  0x0000F710  C7 0F 06 BB 89 B7 89 B6 89 C7 0F 07 45 17 F0 35  |............E..5|\n  0x0000F720  81 3F 83 CD FA 02 26 0B 45 17 F0 35 81 6E 08 83  |.?....&.E..5.n..|\n  0x0000F730  CD FA 02 26 03 6E 01 88 CD F6 15 81 CD F7 C8 CD  |...&.n..........|\n  0x0000F740  F8 24 27 1E B7 80 CD F9 F6 55 81 CD F8 36 F6 CD  |.$\'......U...6..|\n  0x0000F750  ED EA CD F9 F6 AF 01 3B 80 F4 B6 85 CD ED EA CC  |.......;........|\nCoverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry 0x00000000\nContext\nNo A2L loaded.']
+E     
+E     Right contains one more item: 'prg.s19\n... window limited to 200 rows ...\n  0x000017E0  11                      01 3A                    |.       ...Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry 0x00000000\nContext\nNo A2L loaded.'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'prg.s19\n'
+E     -     '... window limited to 200 rows ...\n'
+E     -     '  0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC F3 BB 20 49 44 3D 00  | Y  ... '
+E     -     '... ID=.|\n'
+E     -     '  0x0000EB10  20 41 70 70 6C 69 63 61 74 69 6F 6E 20 69 73 20  | '
+E     -     'Application is |\n'
+E     -     '  0x0000EB20  73 74 61 72 74 69 6E 67 2E 0A 00 20 41 70 70 6C  '
+E     -     '|starting... Appl|\n'
+E     -     '  0x0000EB30  69 63 61 74 69 6F 6E 20 69 73 20 6E 6F 74 20 66  |ication '
+E     -     'is not f|\n'
+E     -     '  0x0000EB40  6F 75 6E 64 2E 20 53 74 61 79 20 69 6E 20 42 6F  |ound. '
+E     -     'Stay in Bo|\n'
+E     -     '  0x0000EB50  6F 74 4C 6F 61 64 65 72 2E 0A 00 87 A6 55 C7 18  '
+E     -     '|otLoader.....U..|\n'
+E     -     '  0x0000EB60  00 43 C7 18 00 86 81 6E 26 49 03 4B FD 6E B8 48  '
+E     -     '|.C.....n&I.K.n.H|\n'
+E     -     '  0x0000EB70  08 4B FD B6 4B A4 0C A1 08 26 F8 6E 88 48 6E 44  '
+E     -     '|.K..K....&.n.HnD|\n'
+E     -     '  0x0000EB80  4C 0B 4B FD 0D 4B FD 1D 48 1F 48 07 4B FD 05 4B  '
+E     -     '|L.K..K..H.H.K..K|\n'
+E     -     '  0x0000EB90  FA 81 9E FE 09 F6 9E FE 07 F7 9E FE 05 AF FF 9E  '
+E     -     '|................|\n'
+E     -     '  0x0000EBA0  FF 05 27 12 9E FE 09 AF 01 9E FF 09 9E FE 07 AF  '
+E     -     "|..'.............|\n"
+E     -     '  0x0000EBB0  01 9E FF 07 20 DC 4F 81 8B 86 A0 14 87 9F 88 54  |.... '
+E     -     '.O........T|\n'
+E     -     '  0x0000EBC0  46 54 46 54 46 AA 80 81 4A 8C AE 03 52 81 9E FE  '
+E     -     '|FTFTF...J...R...|\n'
+E     -     '  0x0000EBD0  03 26 03 CC EC 83 65 00 08 23 03 A6 60 81 9E FE  '
+E     -     '|.&....e..#..`...|\n'
+E     -     '  0x0000EBE0  05 AD D5 B7 8B 9E E6 06 9E EB 04 97 9E E6 05 9E  '
+E     -     '|................|\n'
+E     -     '  0x0000EBF0  E9 03 87 8A AF FF AD C0 B1 8B 26 03 CC EC 83 A6  '
+E     -     '|..........&.....|\n'
+E     -     '  0x0000EC00  B0 81 9E FE 03 65 03 00 23 03 A6 3C 81 9E FE 03  '
+E     -     '|.....e..#..<....|\n'
+E     -     '  0x0000EC10  26 03 A6 50 81 CD EB 92 81 3F 8C 9E E6 05 A1 18  '
+E     -     '|&..P.....?......|\n'
+E     -     '  0x0000EC20  27 E0 A1 14 27 A8 A1 15 27 A4 A1 16 27 A0 A1 17  '
+E     -     "|'...'...'...'...|\n"
+E     -     '  0x0000EC30  27 9C A1 10 25 CC 22 05 9E 6D 06 2A C5 AD 89 B7  '
+E     -     '|\'...%."..m.*....|\n'
+E     -     '  0x0000EC40  8B A1 4F 25 07 A1 53 22 03 A6 A0 81 A1 54 26 0E  '
+E     -     '|..O%..S".....T&.|\n'
+E     -     '  0x0000EC50  12 8C 9E E6 04 9E EA 03 26 04 10 8C 13 8C 9E E6  '
+E     -     '|........&.......|\n'
+E     -     '  0x0000EC60  04 9E EA 03 27 1D 9E E6 06 9E EB 04 97 9E E6 05  '
+E     -     "|....'...........|\n"
+E     -     '  0x0000EC70  9E E9 03 87 8A AF FF 8B 86 CD EB C8 B1 8B 27 03  '
+E     -     "|..............'.|\n"
+E     -     '  0x0000EC80  A6 B0 81 9E FE 03 65 03 00 23 03 A6 60 81 9E E6  '
+E     -     '|......e..#..`...|\n'
+E     -     '  0x0000EC90  03 9E EA 04 26 09 A6 40 B7 8A 9E 6C 04 20 16 9E  '
+E     -     '|....&..@...l. ..|\n'
+E     -     '  0x0000ECA0  E6 03 26 0D 9E E6 04 A1 01 26 06 A6 20 B7 8A 20  '
+E     -     '|..&......&.. .. |\n'
+E     -     '  0x0000ECB0  04 A6 25 B7 8A 9B CD 10 20 01 8C 45 45 00 02 9E  |..%..... '
+E     -     '..EE...|\n'
+E     -     '  0x0000ECC0  FF 03 45 FF FE 9E FF 05 45 F9 2C 96 0F 00 45 0F  '
+E     -     '|..E.....E.,...E.|\n'
+E     -     '  0x0000ECD0  00 9E FF 07 A6 25 B7 8A CD 10 20 45 00 03 9E FF  '
+E     -     '|.....%.... E....|\n'
+E     -     '  0x0000ECE0  03 45 FF BD 9E FF 05 A6 FF C7 0F 00 C7 0F 01 A6  '
+E     -     '|.E..............|\n'
+E     -     '  0x0000ECF0  E2 C7 0F 02 45 0F 00 9E FF 07 A6 25 B7 8A CD 10  '
+E     -     '|....E......%....|\n'
+E     -     '  0x0000ED00  20 9A 81 A6 30 C7 18 25 C6 18 25 A5 80 27 F9 9E  | '
+E     -     "...0..%..%..'..|\n"
+E     -     '  0x0000ED10  FE 09 F6 9E FE 07 03 8C 07 65 FF FE 25 02 AF A2  '
+E     -     '|.........e..%...|\n'
+E     -     '  0x0000ED20  F7 B6 8A C7 18 26 A6 80 C7 18 25 9E E6 0B C6 18  '
+E     -     '|.....&....%.....|\n'
+E     -     '  0x0000ED30  25 A5 30 26 24 9E FE 05 AF FF 9E FF 05 27 12 9E  '
+E     -     "|%.0&$........'..|\n"
+E     -     '  0x0000ED40  FE 09 AF 01 9E FF 09 9E FE 07 AF 01 9E FF 07 20  '
+E     -     '|............... |\n'
+E     -     '  0x0000ED50  B7 C6 18 25 A5 40 27 F9 4F 81 A6 30 C7 18 25 A6  '
+E     -     "|...%.@'.O..0..%.|\n"
+E     -     '  0x0000ED60  4F C7 18 20 8C AE 58 D6 ED 02 D7 10 1F 5B F8 81  |O.. '
+E     -     '..X......[..|\n'
+E     -     '  0x0000ED70  30 31 32 33 34 35 36 37 38 39 41 42 43 44 45 46  '
+E     -     '|0123456789ABCDEF|\n'
+E     -     '  0x0000ED80  3F 3A 6E 0C 3B 3F 3E 3F 38 C6 17 E0 A1 FF 26 02  '
+E     -     '|?:n.;?>?8.....&.|\n'
+E     -     '  0x0000ED90  A6 11 B7 39 81 3F 3A 3F 38 6E 04 39 3F 3B 3F 3D  '
+E     -     '|...9.?:?8n.9?;?=|\n'
+E     -     '  0x0000EDA0  3F 3E 3F 3F 81 8B 89 87 62 A4 0F 97 8C D6 ED 70  '
+E     -     '|?>??....b......p|\n'
+E     -     '  0x0000EDB0  AD 38 9E E6 01 A4 0F 97 8C D6 ED 70 AD 2C 86 88  '
+E     -     '|.8.........p.,..|\n'
+E     -     '  0x0000EDC0  8A 81 AD E1 AD 0A 81 89 8B 86 AD D9 86 AD F3 81  '
+E     -     '|................|\n'
+E     -     '  0x0000EDD0  87 A6 0A AD 15 86 81 0B 3C 04 B6 3F 99 81 98 81  '
+E     -     '|........<..?....|\n'
+E     -     "  0x0000EDE0  F6 27 06 AD 05 AF 01 20 F7 81 AD 11 0F 3C FB B7  |.'..... "
+E     -     '.....<..|\n'
+E     -     '  0x0000EDF0  3F 81 6E 02 6C 3F 6E 3F 8D 81 3F 6C 81 CD EB 5B  '
+E     -     '|?.n.l?n?..?l...[|\n'
+E     -     '  0x0000EE00  0F 6C 08 3D 8D 27 02 3A 8D 1E 6C 3D 8D 81 20 50  '
+E     -     "|.l.=.'.:..l=.. P|\n"
+E     -     '  0x0000EE10  75 73 68 20 74 20 62 75 74 74 6F 6E 20 66 6F 72  |ush t '
+E     -     'button for|\n'
+E     -     '  0x0000EE20  20 74 65 72 6D 69 6E 61 6C 21 0A 00 0A 57 61 72  | '
+E     -     'terminal!...War|\n'
+E     -     '  0x0000EE30  6E 69 6E 67 21 20 48 61 6C 66 20 62 79 74 65 20  |ning! '
+E     -     'Half byte |\n'
+E     -     '  0x0000EE40  67 69 76 65 64 20 61 73 20 6C 61 73 74 20 62 79  |gived as '
+E     -     'last by|\n'
+E     -     '  0x0000EE50  74 65 2C 20 6D 69 73 73 69 6E 67 20 34 20 62 69  |te, '
+E     -     'missing 4 bi|\n'
+E     -     '  0x0000EE60  74 73 20 66 6F 72 63 65 64 20 74 6F 20 30 2E 0A  |ts forced '
+E     -     'to 0..|\n'
+E     -     '  0x0000EE70  00 0A 53 65 72 69 61 6C 20 74 65 72 6D 69 6E 61  |..Serial '
+E     -     'termina|\n'
+E     -     '  0x0000EE80  6C 2E 20 48 65 72 65 20 69 73 20 73 6F 6D 65 20  |l. Here '
+E     -     'is some |\n'
+E     -     '  0x0000EE90  68 65 6C 70 3A 0A 3F 20 3A 20 54 68 69 73 20 68  |help:.? : '
+E     -     'This h|\n'
+E     -     '  0x0000EEA0  65 6C 70 2E 0A 69 20 3A 20 50 72 69 6E 74 20 4D  |elp..i : '
+E     -     'Print M|\n'
+E     -     '  0x0000EEB0  43 55 20 49 44 2E 0A 64 41 41 41 41 20 3A 20 44  |CU '
+E     -     'ID..dAAAA : D|\n'
+E     -     '  0x0000EEC0  75 6D 70 20 66 72 6F 6D 20 61 64 64 72 65 73 73  |ump from '
+E     -     'address|\n'
+E     -     '  0x0000EED0  20 41 41 41 41 68 20 28 44 65 66 61 75 6C 74 20  | AAAAh '
+E     -     '(Default |\n'
+E     -     '  0x0000EEE0  30 30 30 30 68 29 2E 0A 6E 20 3A 20 4E 65 78 74  |0000h)..n '
+E     -     ': Next|\n'
+E     -     '  0x0000EEF0  20 28 44 75 6D 70 29 2E 0A 62 20 3A 20 42 61 63  | '
+E     -     '(Dump)..b : Bac|\n'
+E     -     '  0x0000EF00  6B 20 28 44 75 6D 70 29 2E 0A 61 20 3A 20 41 67  |k '
+E     -     '(Dump)..a : Ag|\n'
+E     -     '  0x0000EF10  61 69 6E 20 28 44 75 6D 70 29 2E 0A 65 41 41 41  |ain '
+E     -     '(Dump)..eAAA|\n'
+E     -     '  0x0000EF20  41 20 3A 20 45 72 61 73 65 20 70 61 67 65 20 66  |A : Erase '
+E     -     'page f|\n'
+E     -     '  0x0000EF30  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom '
+E     -     'address AAAA|\n'
+E     -     '  0x0000EF40  68 20 28 31 32 38 20 62 79 74 65 73 29 2E 0A 68  |h (128 '
+E     -     'bytes)..h|\n'
+E     -     '  0x0000EF50  41 41 41 41 31 31 32 32 33 33 34 34 20 5B 45 4E  '
+E     -     '|AAAA11223344 [EN|\n'
+E     -     '  0x0000EF60  54 45 52 5D 20 3A 20 48 65 78 61 20 77 72 69 74  |TER] : '
+E     -     'Hexa writ|\n'
+E     -     '  0x0000EF70  65 20 66 72 6F 6D 20 61 64 64 72 65 73 73 20 41  |e from '
+E     -     'address A|\n'
+E     -     '  0x0000EF80  41 41 41 68 2C 0A 73 41 41 41 41 77 77 77 2E 62  '
+E     -     '|AAAh,.sAAAAwww.b|\n'
+E     -     '  0x0000EF90  75 74 79 69 2E 68 75 20 5B 45 4E 54 45 52 5D 20  |utyi.hu '
+E     -     '[ENTER] |\n'
+E     -     '  0x0000EFA0  3A 20 53 74 72 69 6E 67 20 77 72 69 74 65 20 66  |: String '
+E     -     'write f|\n'
+E     -     '  0x0000EFB0  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom '
+E     -     'address AAAA|\n'
+E     -     '  0x0000EFC0  68 2C 0A 72 20 6F 72 20 78 20 3A 20 52 65 73 65  |h,.r or x '
+E     -     ': Rese|\n'
+E     -     '  0x0000EFD0  74 20 28 45 78 69 74 29 2E 0A 00 4F 4B 00 45 72  |t '
+E     -     '(Exit)...OK.Er|\n'
+E     -     '  0x0000EFE0  72 6F 72 21 20 41 63 63 65 73 73 20 65 72 72 6F  |ror! '
+E     -     'Access erro|\n'
+E     -     '  0x0000EFF0  00 45 72 72 6F 72 21 20 50 72 6F 74 65 63 74 69  |.Error! '
+E     -     'Protecti|\n'
+E     -     '  0x0000F000  6F 6E 20 76 69 6F 6C 61 74 69 6F 6E 00 45 72 72  |on '
+E     -     'violation.Err|\n'
+E     -     '  0x0000F010  6F 72 21 20 4C 65 6E 67 74 68 20 7A 65 72 6F 00  |or! '
+E     -     'Length zero.|\n'
+E     -     '  0x0000F020  45 72 72 6F 72 21 20 4C 65 6E 67 74 68 20 68 69  |Error! '
+E     -     'Length hi|\n'
+E     -     '  0x0000F030  67 68 00 45 72 72 6F 72 21 20 42 6F 6F 74 6C 6F  |gh.Error! '
+E     -     'Bootlo|\n'
+E     -     '  0x0000F040  61 64 65 72 20 61 72 65 61 00 45 72 72 6F 72 21  |ader '
+E     -     'area.Error!|\n'
+E     -     '  0x0000F050  20 42 6F 75 6E 64 61 72 79 20 76 69 6F 6C 61 74  | Boundary '
+E     -     'violat|\n'
+E     -     '  0x0000F060  69 6F 6E 00 45 EE 0E CD ED E0 81 CD ED FD 3D 8D  '
+E     -     '|ion.E.........=.|\n'
+E     -     '  0x0000F070  26 02 20 73 CD ED D7 24 F2 6E FA 8D A1 0D 27 0B  |&. '
+E     -     "s...$.n....'.|\n"
+E     -     '  0x0000F080  A1 0A 26 04 A6 0D 20 03 CD ED EA 4D 81 C6 FF AC  |..&... '
+E     -     '....M....|\n'
+E     -     '  0x0000F090  A4 01 26 03 CC F9 CE 6E FA 8D 45 EE 71 CD ED E0  '
+E     -     '|..&....n..E.q...|\n'
+E     -     '  0x0000F0A0  A6 0A CD ED EA CD FA 22 AD C1 CD FA 16 A1 78 27  '
+E     -     '|......."......x\'|\n'
+E     -     '  0x0000F0B0  36 A1 72 27 32 A1 64 27 36 A1 6E 27 35 A1 61 27  '
+E     -     "|6.r'2.d'6.n'5.a'|\n"
+E     -     '  0x0000F0C0  2A A1 62 27 24 A1 3F 27 D1 A1 73 26 03 CC F1 B8  '
+E     -     "|*.b'$.?'..s&....|\n"
+E     -     '  0x0000F0D0  A1 68 26 03 CC F1 BE A1 65 26 03 CC F2 35 A1 69  '
+E     -     '|.h&.....e&...5.i|\n'
+E     -     '  0x0000F0E0  26 03 CC F2 7E 20 BE 9A 8D 3A 81 3A 81 20 03 CD  |&...~ '
+E     -     '...:.:. ..|\n'
+E     -     '  0x0000F0F0  F2 AB 3F 82 55 81 AD 10 A6 0A CD ED EA AD 09 A6  '
+E     -     '|..?.U...........|\n'
+E     -     '  0x0000F100  0A CD ED EA 35 81 20 98 A6 08 87 AD 0F 86 4B FA  |....5. '
+E     -     '.......K.|\n'
+E     -     '  0x0000F110  81 87 F6 CD ED A5 AF 01 86 4B F6 81 A6 0A CD ED  '
+E     -     '|.........K......|\n'
+E     -     '  0x0000F120  EA 8B 86 CD ED A5 9F CD ED A5 A6 3A CD ED EA A6  '
+E     -     '|...........:....|\n'
+E     -     '  0x0000F130  20 CD ED EA A6 04 AD D9 A6 20 CD ED EA A6 04 AD  | ........ '
+E     -     '......|\n'
+E     -     '  0x0000F140  D0 A6 20 CD ED EA A6 20 CD ED EA A6 04 AD C2 A6  |.. .... '
+E     -     '........|\n'
+E     -     '  0x0000F150  20 CD ED EA A6 04 AD B9 A6 20 CD ED EA A6 7C CD  | ........ '
+E     -     '....|.|\n'
+E     -     '  0x0000F160  ED EA A6 20 CD ED EA AF F0 A6 08 AD 0A A6 20 CD  |... '
+E     -     '.......... .|\n'
+E     -     '  0x0000F170  ED EA A6 08 AD 01 81 87 F6 A1 20 25 06 A1 7F 22  '
+E     -     '|.......... %..."|\n'
+E     -     '  0x0000F180  02 20 02 A6 2E CD ED EA AF 01 86 4B EA 81 BE 80  |. '
+E     -     '.........K....|\n'
+E     -     '  0x0000F190  A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 02 20  '
+E     -     '|..&....k..&.... |\n'
+E     -     '  0x0000F1A0  ED 55 83 F7 3C 80 55 83 AF 01 35 83 81 3F 80 45  '
+E     -     '|.U..<.U...5..?.E|\n'
+E     -     '  0x0000F1B0  0F 00 35 83 CD F2 AB 81 AD F3 AD D2 20 05 AD ED  '
+E     -     '|..5......... ...|\n'
+E     -     '  0x0000F1C0  CD F2 4F BE 80 26 03 CC F0 A0 45 0F 00 89 8B 55  '
+E     -     '|..O..&....E....U|\n'
+E     -     '  0x0000F1D0  81 89 8B BE 80 89 8C 8B CD EC 19 A7 06 AD 03 CC  '
+E     -     '|................|\n'
+E     -     '  0x0000F1E0  F0 F2 87 A6 0A CD ED EA 86 4D 26 07 45 EF DB CD  '
+E     -     '|.........M&.E...|\n'
+E     -     '  0x0000F1F0  ED E0 81 A1 10 26 07 45 EF DE CD ED E0 81 A1 20  '
+E     -     '|.....&.E....... |\n'
+E     -     '  0x0000F200  26 07 45 EF F1 CD ED E0 81 A1 50 26 07 45 F0 0D  '
+E     -     '|&.E.......P&.E..|\n'
+E     -     '  0x0000F210  CD ED E0 81 A1 60 26 07 45 F0 20 CD ED E0 81 A1  '
+E     -     '|.....`&.E. .....|\n'
+E     -     '  0x0000F220  A0 26 07 45 F0 33 CD ED E0 81 A1 B0 26 06 45 F0  '
+E     -     '|.&.E.3......&.E.|\n'
+E     -     '  0x0000F230  4A CD ED E0 81 AD 74 45 00 00 89 8B 55 81 89 8B  '
+E     -     '|J.....tE....U...|\n'
+E     -     '  0x0000F240  45 00 00 89 8B CD EC 19 A7 06 AD 96 CC F0 F2 BE  '
+E     -     '|E...............|\n'
+E     -     '  0x0000F250  80 A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 27  '
+E     -     "|...&....k..&...'|\n"
+E     -     '  0x0000F260  62 87 CD F0 6B A1 0D 26 09 45 EE 2C CD ED E0 4F  '
+E     -     '|b...k..&.E.,...O|\n'
+E     -     '  0x0000F270  20 02 AD 13 9E EA 01 A7 01 CD F1 A1 20 D1 C6 17  | '
+E     -     '........... ...|\n'
+E     -     '  0x0000F280  F8 CD ED A5 CC F0 A0 A0 30 2B 1C A1 0A 25 19 A0  '
+E     -     '|........0+...%..|\n'
+E     -     '  0x0000F290  07 2B 14 A1 0A 25 10 A1 10 25 0D A0 20 2B 08 A1  '
+E     -     '|.+...%...%.. +..|\n'
+E     -     '  0x0000F2A0  0A 25 04 A1 10 25 01 4F A4 0F 81 CD F0 6B AD D7  '
+E     -     '|.%...%.O.....k..|\n'
+E     -     '  0x0000F2B0  62 B7 81 CD F0 6B AD CF BA 81 B7 81 CD F0 6B AD  '
+E     -     '|b....k........k.|\n'
+E     -     '  0x0000F2C0  C6 62 B7 82 CD F0 6B AD BE BA 82 B7 82 81 A6 C0  '
+E     -     '|.b....k.........|\n'
+E     -     '  0x0000F2D0  C7 18 81 CD F3 89 A7 FE 5F C6 17 E8 9E E7 01 43  '
+E     -     '|........_......C|\n'
+E     -     '  0x0000F2E0  26 01 5C C6 17 E9 9E E7 02 43 26 01 5C 5D 27 0A  '
+E     -     "|&.\\......C&.\\]'.|\n"
+E     -     '  0x0000F2F0  A6 01 9E E7 01 A6 3A 9E E7 02 26 E7 4F 9E E6 01  '
+E     -     '|......:...&.O...|\n'
+E     -     '  0x0000F300  C7 18 82 9E E6 02 C7 18 83 A7 02 4F C7 18 8B A7  '
+E     -     '|...........O....|\n'
+E     -     '  0x0000F310  FC A6 9C 9E E7 01 A6 DA 9E E7 02 C6 17 F8 9E E7  '
+E     -     '|................|\n'
+E     -     '  0x0000F320  03 9E 6F 04 CD F3 BB 8A 88 96 18 90 8A 88 96 18  '
+E     -     '|..o.............|\n'
+E     -     '  0x0000F330  92 A7 FC A6 8C 9E E7 01 A6 DA 9E E7 02 A6 FF 9E  '
+E     -     '|................|\n'
+E     -     '  0x0000F340  E7 03 9E 6F 04 AD 74 8A 88 96 18 98 8A 88 96 18  '
+E     -     '|...o..t.........|\n'
+E     -     '  0x0000F350  9A 4F C7 18 94 C7 18 95 C7 18 9C C7 18 9D A6 01  '
+E     -     '|.O..............|\n'
+E     -     '  0x0000F360  C7 18 96 C7 18 9E A6 FE C7 18 97 C7 18 9F 3F 8E  '
+E     -     '|..............?.|\n'
+E     -     '  0x0000F370  A6 01 43 C4 18 80 C7 18 80 C6 18 81 A4 01 26 F9  '
+E     -     '|..C...........&.|\n'
+E     -     '  0x0000F380  81 C6 18 80 AA 01 C7 18 80 C6 18 81 A4 01 27 F9  '
+E     -     "|..............'.|\n"
+E     -     '  0x0000F390  81 AD EE A6 01 C7 18 80 A6 07 C7 18 86 C7 18 8A  '
+E     -     '|................|\n'
+E     -     '  0x0000F3A0  4F C7 18 82 C7 18 83 C7 18 84 C7 18 85 C7 18 87  '
+E     -     '|O...............|\n'
+E     -     '  0x0000F3B0  C7 18 88 C7 18 8B C7 18 8D 20 B5 9E E6 03 2B 21  |......... '
+E     -     '....+!|\n'
+E     -     '  0x0000F3C0  9E E6 05 62 48 A4 E0 9E E7 03 9E E6 06 44 44 44  '
+E     -     '|...bH........DDD|\n'
+E     -     '  0x0000F3D0  9E EA 03 9E E7 03 9E E6 06 62 48 A4 E0 9E E7 04  '
+E     -     '|.........bH.....|\n'
+E     -     '  0x0000F3E0  81 48 48 48 A4 F8 9E E7 03 9E E6 04 62 44 A4 07  '
+E     -     '|.HHH........bD..|\n'
+E     -     '  0x0000F3F0  9E EA 03 9E E7 03 9E E6 04 48 97 48 48 A4 E0 9E  '
+E     -     '|.........H.HH...|\n'
+E     -     '  0x0000F400  E7 04 9F A4 06 9E EA 04 9E E7 04 9E E6 05 49 49  '
+E     -     '|..............II|\n'
+E     -     '  0x0000F410  A4 01 9E EA 04 AA 18 9E E7 04 9E E6 05 48 A4 FE  '
+E     -     '|.............H..|\n'
+E     -     '  0x0000F420  9E E7 05 9E E6 06 49 49 A4 01 9E EA 05 9E E7 05  '
+E     -     '|......II........|\n'
+E     -     '  0x0000F430  9E E6 06 48 9E E7 06 81 C6 18 A2 46 C6 18 A3 46  '
+E     -     '|...H.......F...F|\n'
+E     -     '  0x0000F440  B7 87 C6 18 8B A4 07 27 03 CC F6 65 C6 18 AC A4  '
+E     -     "|.......'...e....|\n"
+E     -     "  0x0000F450  0F 27 20 A1 01 27 20 A1 02 27 31 A1 03 26 03 CC  |.' ..' "
+E     -     "..'1..&..|\n"
+E     -     '  0x0000F460  F5 74 A1 04 27 3C A1 06 26 03 CC F6 F6 A6 07 CD  '
+E     -     "|.t..'<..&.......|\n"
+E     -     '  0x0000F470  F6 15 81 CD F6 09 81 C6 18 A4 A1 52 26 03 CC F9  '
+E     -     '|...........R&...|\n'
+E     -     '  0x0000F480  87 A1 11 26 01 AC A6 08 CD F6 15 81 CD F5 ED 3F  '
+E     -     '|...&...........?|\n'
+E     -     '  0x0000F490  83 CD F9 FB CD F6 15 81 A6 06 20 02 A6 05 CD F6  '
+E     -     '|.......... .....|\n'
+E     -     '  0x0000F4A0  15 81 3F 8F 3F 90 CD F5 ED C6 18 A6 27 EE 2B E8  '
+E     -     "|..?.?.......'.+.|\n"
+E     -     '  0x0000F4B0  B7 83 87 4C B7 8E 86 CD F9 F6 3F 91 CD F6 00 6E  '
+E     -     '|...L......?....n|\n'
+E     -     '  0x0000F4C0  1E 8D 45 0F 00 A6 01 C7 0F 00 4C C7 0F 01 CD ED  '
+E     -     '|..E.......L.....|\n'
+E     -     '  0x0000F4D0  FD 27 61 C6 18 84 A4 01 27 F4 6E 1E 8D C6 18 AC  '
+E     -     "|.'a.....'.n.....|\n"
+E     -     '  0x0000F4E0  A4 0F A1 08 26 5A C6 18 A4 AD 5B C6 18 A5 AD 56  '
+E     -     '|....&Z....[....V|\n'
+E     -     '  0x0000F4F0  C6 18 A6 AD 51 C6 18 A7 AD 4C C6 18 A8 AD 47 C6  '
+E     -     '|....Q....L....G.|\n'
+E     -     '  0x0000F500  18 A9 AD 42 C6 18 AA AD 3D C6 18 AB AD 38 3C 91  '
+E     -     '|...B....=....8<.|\n'
+E     -     '  0x0000F510  B6 85 B8 91 B7 85 CD F6 00 B6 8E 27 02 20 AF 3D  '
+E     -     "|...........'. .=|\n"
+E     -     '  0x0000F520  8F 26 0B 3D 90 26 13 CD F9 FB CD F6 15 81 A6 0C  '
+E     -     '|.&.=.&..........|\n'
+E     -     '  0x0000F530  CD F6 15 81 A6 0E CD F6 15 81 A6 0D CD F6 15 81  '
+E     -     '|................|\n'
+E     -     '  0x0000F540  A6 02 CD F6 15 81 87 B6 8E 27 1C A1 01 27 0D 9E  '
+E     -     "|.........'...'..|\n"
+E     -     '  0x0000F550  E6 01 F7 CD F9 F6 AF 01 3A 8E 20 15 9E E6 01 B0  '
+E     -     '|........:. .....|\n'
+E     -     '  0x0000F560  85 B7 8F 3A 8E 20 0A 9E E6 01 A1 FB 27 03 6E 01  |...:. '
+E     -     "......'.n.|\n"
+E     -     '  0x0000F570  90 A7 01 81 AD 77 C6 18 A6 CD F6 00 26 03 CC F4  '
+E     -     '|.....w......&...|\n'
+E     -     '  0x0000F580  9C 2A 03 CC F4 98 87 4C B7 8E 86 CD F9 F6 3F 91  '
+E     -     '|.*.....L......?.|\n'
+E     -     '  0x0000F590  55 81 AD 1F 3D 8E 26 FA 81 B6 8E 27 0E A1 01 27  '
+E     -     "|U...=.&....'...'|\n"
+E     -     '  0x0000F5A0  0D 3A 8E F6 CD F9 F6 F6 AF 01 81 A6 FB 81 3A 8E  '
+E     -     '|.:............:.|\n'
+E     -     '  0x0000F5B0  B6 85 81 AD 71 AD E2 C7 18 B4 AD DD C7 18 B5 AD  '
+E     -     '|....q...........|\n'
+E     -     '  0x0000F5C0  D8 C7 18 B6 AD D3 C7 18 B7 AD CE C7 18 B8 AD C9  '
+E     -     '|................|\n'
+E     -     '  0x0000F5D0  C7 18 B9 AD C4 C7 18 BA AD BF C7 18 BB 3C 91 B6  '
+E     -     '|.............<..|\n'
+E     -     '  0x0000F5E0  85 B8 91 B7 85 A6 08 C7 18 BC AD 68 81 3F 85 C6  '
+E     -     '|...........h.?..|\n'
+E     -     '  0x0000F5F0  18 A4 B7 81 CD F9 F6 C6 18 A5 B7 82 CD F9 F6 81  '
+E     -     '|................|\n'
+E     -     '  0x0000F600  87 A6 01 C7 18 84 86 4D 81 AD F5 AD 19 4F C7 18  '
+E     -     '|.......M.....O..|\n'
+E     -     '  0x0000F610  BC AD 41 81 4F 87 AD E8 AD 0C 86 C7 18 B4 A6 01  '
+E     -     '|..A.O...........|\n'
+E     -     '  0x0000F620  C7 18 BC AD 2F 81 89 8B A6 01 C7 18 8A A7 FC A6  '
+E     -     '|..../...........|\n'
+E     -     '  0x0000F630  9C 9E E7 01 A6 DA 9E E7 02 B6 87 9E E7 03 C6 17  '
+E     -     '|................|\n'
+E     -     '  0x0000F640  F8 9E E7 04 CD F3 BB 8A 88 96 18 B0 8A 88 96 18  '
+E     -     '|................|\n'
+E     -     '  0x0000F650  B2 8A 88 81 C6 18 8A C7 18 86 CD ED FD C6 18 86  '
+E     -     '|................|\n'
+E     -     '  0x0000F660  A4 01 27 F6 81 C6 18 AC A4 0F A1 07 27 38 A1 01  '
+E     -     "|..'.........'8..|\n"
+E     -     '  0x0000F670  27 03 CC F4 6D C6 18 A4 A1 22 27 03 CC F4 86 CD  '
+E     -     '|\'...m...."\'.....|\n'
+E     -     '  0x0000F680  F6 00 AD A2 6E 06 80 8C 5F D6 FC F8 D7 18 B4 AF  '
+E     -     '|....n..._.......|\n'
+E     -     '  0x0000F690  01 3B 80 F5 C6 17 F8 C7 18 BA A6 07 C7 18 BC AD  '
+E     -     '|.;..............|\n'
+E     -     '  0x0000F6A0  B3 81 CD F6 00 81 6E 06 80 8C 5F D6 18 A4 D1 FC  '
+E     -     '|......n..._.....|\n'
+E     -     '  0x0000F6B0  F8 26 EF AF 01 3B 80 F3 C6 18 AA C7 0F 00 CD F6  '
+E     -     '|.&...;..........|\n'
+E     -     '  0x0000F6C0  00 C6 17 F9 4C C7 0F 01 6E 06 80 8C 5F D6 17 F0  '
+E     -     '|....L...n..._...|\n'
+E     -     '  0x0000F6D0  D7 0F 02 AF 01 3B 80 F5 45 17 F8 35 81 3F 83 CD  '
+E     -     '|.....;..E..5.?..|\n'
+E     -     '  0x0000F6E0  FA 02 26 0B 45 17 F8 35 81 6E 08 83 CD FA 02 CD  '
+E     -     '|..&.E..5.n......|\n'
+E     -     '  0x0000F6F0  F6 15 CD F2 CE 81 3F 89 6E 06 80 8C 5F D6 18 A4  '
+E     -     '|......?.n..._...|\n'
+E     -     '  0x0000F700  D7 0F 00 BB 89 B7 89 AF 01 3B 80 F1 C6 17 F6 4C  '
+E     -     '|.........;.....L|\n'
+E     -     '  0x0000F710  C7 0F 06 BB 89 B7 89 B6 89 C7 0F 07 45 17 F0 35  '
+E     -     '|............E..5|\n'
+E     -     '  0x0000F720  81 3F 83 CD FA 02 26 0B 45 17 F0 35 81 6E 08 83  '
+E     -     '|.?....&.E..5.n..|\n'
+E     -     '  0x0000F730  CD FA 02 26 03 6E 01 88 CD F6 15 81 CD F7 C8 CD  '
+E     -     '|...&.n..........|\n'
+E     -     '  0x0000F740  F8 24 27 1E B7 80 CD F9 F6 55 81 CD F8 36 F6 CD  '
+E     -     "|.$'......U...6..|\n"
+E     -     '  0x0000F750  ED EA CD F9 F6 AF 01 3B 80 F4 B6 85 CD ED EA CC  '
+E     -     '|.......;........|\n'
+E     -     'Coverage: 6.68%\n'
+E     -     'Ranges: 11\n'
+E     -     'Errors: 0\n'
+E     -     'Warnings: 0\n'
+E     -     'Loader 0 err · ⚠4 OOO · Entry 0x00000000\n'
+E     -     'Context\n'
+E     -     'No A2L loaded.',
+E     - ]
+__________________ test_r_copy_12_7_back_to_back_and_reentry ___________________
+tests/test_b103_copy_views.py:652: in test_r_copy_12_7_back_to_back_and_reentry
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:644: in drive
+    _assert_single_copy(session, expected)
+tests/test_b103_copy_views.py:226: in _assert_single_copy
+    assert session.clipboard.entry == [expected]
+E   AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+E     
+E     Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+E     -     '|..........      |\n'
+E     -     '  0x0000EB00  20 59       CC EC 19    CC ',
+E     - ]
+_______________ test_r_copy_12_8_positive_bounds_and_cardinality _______________
+tests/test_b103_copy_views.py:688: in test_r_copy_12_8_positive_bounds_and_cardinality
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:667: in drive
+    _assert_single_copy(session, expected)
+tests/test_b103_copy_views.py:226: in _assert_single_copy
+    assert session.clipboard.entry == [expected]
+E   AssertionError: assert [] == ['0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E ']
+E     
+E     Right contains one more item: '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     '0x00000000                                                   '
+E     -     '|                |\n'
+E     -     '  0x000017E0  11                      01 3A                    |.       '
+E     -     '.:      |\n'
+E     -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E ',
+E     - ]
+___________ test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9] ___________
+tests/test_b103_copy_views.py:793: in test_r_copy_13_empty_and_cancelled_gestures
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:787: in drive
+    assert table.cursor_row == cursor
+E   AssertionError: assert 2 == 0
+E    +  where 2 = A2LTagTable(id='a2l_tags_list').cursor_row
+__________ test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1] ___________
+tests/test_b103_copy_views.py:862: in test_r_copy_22_right_click_does_not_jump_hex
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:859: in drive
+    assert tuple(_first_line(session.app, item) for item in hex_selectors) == before
+E   AssertionError: assert ('... window limited to 200 rows ...', '... showing from 0x0000FFB0 (context preserved) ...') == ('... window limited to 200 rows ...', '... window limited to 200 rows ...')
+E     
+E     At index 1 diff: '... showing from 0x0000FFB0 (context preserved) ...' != '... window limited to 200 rows ...'
+E     
+E     Full diff:
+E       (
+E           '... window limited to 200 rows ...',
+E     -     '... window limited to 200 rows ...',
+E     +     '... showing from 0x0000FFB0 (context preserved) ...',
+E       )
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1] - AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+  
+  Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2] - AssertionError: assert [] == ['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry']
+  
+  Right contains one more item: 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+  
+  Full diff:
+  + []
+  - [
+  -     'Coverage: 6.68%\n'
+  -     'Ranges: 11\n'
+  -     'Errors: 0\n'
+  -     'Warnings: 0\n'
+  -     'Loader 0 err · ⚠4 OOO · Entry',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3] - AssertionError: assert [] == ['Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image']
+  
+  Right contains one more item: 'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image'
+  
+  Full diff:
+  + []
+  - [
+  -     'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in '
+  -     'image',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4] - AssertionError: assert [] == ['name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement']
+  
+  Right contains one more item: 'name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement'
+  
+  Full diff:
+  + []
+  - [
+  -     'name ASAM.M.SCALAR.UBYTE.IDENTICAL\n'
+  -     'desc Scalar measurement',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5] - assert [] == ['{\n  "format": "s19app-changeset",\n']
+  
+  Right contains one more item: '{\n  "format": "s19app-changeset",\n'
+  
+  Full diff:
+  + []
+  - [
+  -     '{\n'
+  -     '  "format": "s19app-changeset",\n',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6] - AssertionError: assert [] == ['1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.']
+  
+  Right contains one more item: '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.'
+  
+  Full diff:
+  + []
+  - [
+  -     '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded '
+  -     'artifacts appear in the Loaded panel with their diagnostics.\n'
+  -     '\n'
+  -     '2. Save a project (`^S` / `s`) to gather the loaded files into one '
+  -     'project folder; load one back with `p`.',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/1] - AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+  
+  Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/2] - AssertionError: assert 'SEED-1b' == '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  + SEED-1b
+  - 0x000017E0  11                      01 3A                    |.       .:      |
+  -   0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |
+  -   0x0000EB00  20 59       CC EC 19    CC
+FAILED tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/3] - AssertionError: assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+  + SEED-1b
+FAILED tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/4] - AssertionError: assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+  + SEED-1b
+FAILED tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1] - AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING']
+  
+  Right contains one more item: 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  Full diff:
+  + []
+  - [
+  -     'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2] - AssertionError: assert [] == ['Curve_ExternalAxis']
+  
+  Right contains one more item: 'Curve_ExternalAxis'
+  
+  Full diff:
+  + []
+  - [
+  -     'Curve_ExternalAxis',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3] - AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.HYPERBOLIC']
+  
+  Right contains one more item: 'ASAM.M.SCALAR.UBYTE.HYPERBOLIC'
+  
+  Full diff:
+  + []
+  - [
+  -     'ASAM.M.SCALAR.UBYTE.HYPERBOLIC',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/2] - AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+  
+  Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/3] - AssertionError: assert [] == ['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING']
+  
+  Right contains one more item: 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  Full diff:
+  + []
+  - [
+  -     'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1] - AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+  
+  Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/2] - AssertionError: assert [] == ['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry']
+  
+  Right contains one more item: 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+  
+  Full diff:
+  + []
+  - [
+  -     'Coverage: 6.68%\n'
+  -     'Ranges: 11\n'
+  -     'Errors: 0\n'
+  -     'Warnings: 0\n'
+  -     'Loader 0 err · ⚠4 OOO · Entry',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/3] - AssertionError: assert [] == ['name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement']
+  
+  Right contains one more item: 'name ASAM.M.SCALAR.UBYTE.IDENTICAL\ndesc Scalar measurement'
+  
+  Full diff:
+  + []
+  - [
+  -     'name ASAM.M.SCALAR.UBYTE.IDENTICAL\n'
+  -     'desc Scalar measurement',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/4] - assert [] == ['{\n  "format": "s19app-changeset",\n']
+  
+  Right contains one more item: '{\n  "format": "s19app-changeset",\n'
+  
+  Full diff:
+  + []
+  - [
+  -     '{\n'
+  -     '  "format": "s19app-changeset",\n',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/5] - AssertionError: assert [] == ['1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.']
+  
+  Right contains one more item: '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`.'
+  
+  Full diff:
+  + []
+  - [
+  -     '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded '
+  -     'artifacts appear in the Loaded panel with their diagnostics.\n'
+  -     '\n'
+  -     '2. Save a project (`^S` / `s`) to gather the loaded files into one '
+  -     'project folder; load one back with `p`.',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/6] - assert [] == ['prg.s19\n... window limited to 200 rows ...\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC F3 BB 20 49 44 3D 00  | Y  ... ... ID=.|\n  0x0000EB10  20 41 70 70 6C 69 63 61 74 69 6F 6E 20 69 73 20  | Application is |\n  0x0000EB20  73 74 61 72 74 69 6E 67 2E 0A 00 20 41 70 70 6C  |starting... Appl|\n  0x0000EB30  69 63 61 74 69 6F 6E 20 69 73 20 6E 6F 74 20 66  |ication is not f|\n  0x0000EB40  6F 75 6E 64 2E 20 53 74 61 79 20 69 6E 20 42 6F  |ound. Stay in Bo|\n  0x0000EB50  6F 74 4C 6F 61 64 65 72 2E 0A 00 87 A6 55 C7 18  |otLoader.....U..|\n  0x0000EB60  00 43 C7 18 00 86 81 6E 26 49 03 4B FD 6E B8 48  |.C.....n&I.K.n.H|\n  0x0000EB70  08 4B FD B6 4B A4 0C A1 08 26 F8 6E 88 48 6E 44  |.K..K....&.n.HnD|\n  0x0000EB80  4C 0B 4B FD 0D 4B FD 1D 48 1F 48 07 4B FD 05 4B  |L.K..K..H.H.K..K|\n  0x0000EB90  FA 81 9E FE 09 F6 9E FE 07 F7 9E FE 05 AF FF 9E  |................|\n  0x0000EBA0  FF 05 27 12 9E FE 09 AF 01 9E FF 09 9E FE 07 AF  |..\'.............|\n  0x0000EBB0  01 9E FF 07 20 DC 4F 81 8B 86 A0 14 87 9F 88 54  |.... .O........T|\n  0x0000EBC0  46 54 46 54 46 AA 80 81 4A 8C AE 03 52 81 9E FE  |FTFTF...J...R...|\n  0x0000EBD0  03 26 03 CC EC 83 65 00 08 23 03 A6 60 81 9E FE  |.&....e..#..`...|\n  0x0000EBE0  05 AD D5 B7 8B 9E E6 06 9E EB 04 97 9E E6 05 9E  |................|\n  0x0000EBF0  E9 03 87 8A AF FF AD C0 B1 8B 26 03 CC EC 83 A6  |..........&.....|\n  0x0000EC00  B0 81 9E FE 03 65 03 00 23 03 A6 3C 81 9E FE 03  |.....e..#..<....|\n  0x0000EC10  26 03 A6 50 81 CD EB 92 81 3F 8C 9E E6 05 A1 18  |&..P.....?......|\n  0x0000EC20  27 E0 A1 14 27 A8 A1 15 27 A4 A1 16 27 A0 A1 17  |\'...\'...\'...\'...|\n  0x0000EC30  27 9C A1 10 25 CC 22 05 9E 6D 06 2A C5 AD 89 B7  |\'...%."..m.*....|\n  0x0000EC40  8B A1 4F 25 07 A1 53 22 03 A6 A0 81 A1 54 26 0E  |..O%..S".....T&.|\n  0x0000EC50  12 8C 9E E6 04 9E EA 03 26 04 10 8C 13 8C 9E E6  |........&.......|\n  0x0000EC60  04 9E EA 03 27 1D 9E E6 06 9E EB 04 97 9E E6 05  |....\'...........|\n  0x0000EC70  9E E9 03 87 8A AF FF 8B 86 CD EB C8 B1 8B 27 03  |..............\'.|\n  0x0000EC80  A6 B0 81 9E FE 03 65 03 00 23 03 A6 60 81 9E E6  |......e..#..`...|\n  0x0000EC90  03 9E EA 04 26 09 A6 40 B7 8A 9E 6C 04 20 16 9E  |....&..@...l. ..|\n  0x0000ECA0  E6 03 26 0D 9E E6 04 A1 01 26 06 A6 20 B7 8A 20  |..&......&.. .. |\n  0x0000ECB0  04 A6 25 B7 8A 9B CD 10 20 01 8C 45 45 00 02 9E  |..%..... ..EE...|\n  0x0000ECC0  FF 03 45 FF FE 9E FF 05 45 F9 2C 96 0F 00 45 0F  |..E.....E.,...E.|\n  0x0000ECD0  00 9E FF 07 A6 25 B7 8A CD 10 20 45 00 03 9E FF  |.....%.... E....|\n  0x0000ECE0  03 45 FF BD 9E FF 05 A6 FF C7 0F 00 C7 0F 01 A6  |.E..............|\n  0x0000ECF0  E2 C7 0F 02 45 0F 00 9E FF 07 A6 25 B7 8A CD 10  |....E......%....|\n  0x0000ED00  20 9A 81 A6 30 C7 18 25 C6 18 25 A5 80 27 F9 9E  | ...0..%..%..\'..|\n  0x0000ED10  FE 09 F6 9E FE 07 03 8C 07 65 FF FE 25 02 AF A2  |.........e..%...|\n  0x0000ED20  F7 B6 8A C7 18 26 A6 80 C7 18 25 9E E6 0B C6 18  |.....&....%.....|\n  0x0000ED30  25 A5 30 26 24 9E FE 05 AF FF 9E FF 05 27 12 9E  |%.0&$........\'..|\n  0x0000ED40  FE 09 AF 01 9E FF 09 9E FE 07 AF 01 9E FF 07 20  |............... |\n  0x0000ED50  B7 C6 18 25 A5 40 27 F9 4F 81 A6 30 C7 18 25 A6  |...%.@\'.O..0..%.|\n  0x0000ED60  4F C7 18 20 8C AE 58 D6 ED 02 D7 10 1F 5B F8 81  |O.. ..X......[..|\n  0x0000ED70  30 31 32 33 34 35 36 37 38 39 41 42 43 44 45 46  |0123456789ABCDEF|\n  0x0000ED80  3F 3A 6E 0C 3B 3F 3E 3F 38 C6 17 E0 A1 FF 26 02  |?:n.;?>?8.....&.|\n  0x0000ED90  A6 11 B7 39 81 3F 3A 3F 38 6E 04 39 3F 3B 3F 3D  |...9.?:?8n.9?;?=|\n  0x0000EDA0  3F 3E 3F 3F 81 8B 89 87 62 A4 0F 97 8C D6 ED 70  |?>??....b......p|\n  0x0000EDB0  AD 38 9E E6 01 A4 0F 97 8C D6 ED 70 AD 2C 86 88  |.8.........p.,..|\n  0x0000EDC0  8A 81 AD E1 AD 0A 81 89 8B 86 AD D9 86 AD F3 81  |................|\n  0x0000EDD0  87 A6 0A AD 15 86 81 0B 3C 04 B6 3F 99 81 98 81  |........<..?....|\n  0x0000EDE0  F6 27 06 AD 05 AF 01 20 F7 81 AD 11 0F 3C FB B7  |.\'..... .....<..|\n  0x0000EDF0  3F 81 6E 02 6C 3F 6E 3F 8D 81 3F 6C 81 CD EB 5B  |?.n.l?n?..?l...[|\n  0x0000EE00  0F 6C 08 3D 8D 27 02 3A 8D 1E 6C 3D 8D 81 20 50  |.l.=.\'.:..l=.. P|\n  0x0000EE10  75 73 68 20 74 20 62 75 74 74 6F 6E 20 66 6F 72  |ush t button for|\n  0x0000EE20  20 74 65 72 6D 69 6E 61 6C 21 0A 00 0A 57 61 72  | terminal!...War|\n  0x0000EE30  6E 69 6E 67 21 20 48 61 6C 66 20 62 79 74 65 20  |ning! Half byte |\n  0x0000EE40  67 69 76 65 64 20 61 73 20 6C 61 73 74 20 62 79  |gived as last by|\n  0x0000EE50  74 65 2C 20 6D 69 73 73 69 6E 67 20 34 20 62 69  |te, missing 4 bi|\n  0x0000EE60  74 73 20 66 6F 72 63 65 64 20 74 6F 20 30 2E 0A  |ts forced to 0..|\n  0x0000EE70  00 0A 53 65 72 69 61 6C 20 74 65 72 6D 69 6E 61  |..Serial termina|\n  0x0000EE80  6C 2E 20 48 65 72 65 20 69 73 20 73 6F 6D 65 20  |l. Here is some |\n  0x0000EE90  68 65 6C 70 3A 0A 3F 20 3A 20 54 68 69 73 20 68  |help:.? : This h|\n  0x0000EEA0  65 6C 70 2E 0A 69 20 3A 20 50 72 69 6E 74 20 4D  |elp..i : Print M|\n  0x0000EEB0  43 55 20 49 44 2E 0A 64 41 41 41 41 20 3A 20 44  |CU ID..dAAAA : D|\n  0x0000EEC0  75 6D 70 20 66 72 6F 6D 20 61 64 64 72 65 73 73  |ump from address|\n  0x0000EED0  20 41 41 41 41 68 20 28 44 65 66 61 75 6C 74 20  | AAAAh (Default |\n  0x0000EEE0  30 30 30 30 68 29 2E 0A 6E 20 3A 20 4E 65 78 74  |0000h)..n : Next|\n  0x0000EEF0  20 28 44 75 6D 70 29 2E 0A 62 20 3A 20 42 61 63  | (Dump)..b : Bac|\n  0x0000EF00  6B 20 28 44 75 6D 70 29 2E 0A 61 20 3A 20 41 67  |k (Dump)..a : Ag|\n  0x0000EF10  61 69 6E 20 28 44 75 6D 70 29 2E 0A 65 41 41 41  |ain (Dump)..eAAA|\n  0x0000EF20  41 20 3A 20 45 72 61 73 65 20 70 61 67 65 20 66  |A : Erase page f|\n  0x0000EF30  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom address AAAA|\n  0x0000EF40  68 20 28 31 32 38 20 62 79 74 65 73 29 2E 0A 68  |h (128 bytes)..h|\n  0x0000EF50  41 41 41 41 31 31 32 32 33 33 34 34 20 5B 45 4E  |AAAA11223344 [EN|\n  0x0000EF60  54 45 52 5D 20 3A 20 48 65 78 61 20 77 72 69 74  |TER] : Hexa writ|\n  0x0000EF70  65 20 66 72 6F 6D 20 61 64 64 72 65 73 73 20 41  |e from address A|\n  0x0000EF80  41 41 41 68 2C 0A 73 41 41 41 41 77 77 77 2E 62  |AAAh,.sAAAAwww.b|\n  0x0000EF90  75 74 79 69 2E 68 75 20 5B 45 4E 54 45 52 5D 20  |utyi.hu [ENTER] |\n  0x0000EFA0  3A 20 53 74 72 69 6E 67 20 77 72 69 74 65 20 66  |: String write f|\n  0x0000EFB0  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom address AAAA|\n  0x0000EFC0  68 2C 0A 72 20 6F 72 20 78 20 3A 20 52 65 73 65  |h,.r or x : Rese|\n  0x0000EFD0  74 20 28 45 78 69 74 29 2E 0A 00 4F 4B 00 45 72  |t (Exit)...OK.Er|\n  0x0000EFE0  72 6F 72 21 20 41 63 63 65 73 73 20 65 72 72 6F  |ror! Access erro|\n  0x0000EFF0  00 45 72 72 6F 72 21 20 50 72 6F 74 65 63 74 69  |.Error! Protecti|\n  0x0000F000  6F 6E 20 76 69 6F 6C 61 74 69 6F 6E 00 45 72 72  |on violation.Err|\n  0x0000F010  6F 72 21 20 4C 65 6E 67 74 68 20 7A 65 72 6F 00  |or! Length zero.|\n  0x0000F020  45 72 72 6F 72 21 20 4C 65 6E 67 74 68 20 68 69  |Error! Length hi|\n  0x0000F030  67 68 00 45 72 72 6F 72 21 20 42 6F 6F 74 6C 6F  |gh.Error! Bootlo|\n  0x0000F040  61 64 65 72 20 61 72 65 61 00 45 72 72 6F 72 21  |ader area.Error!|\n  0x0000F050  20 42 6F 75 6E 64 61 72 79 20 76 69 6F 6C 61 74  | Boundary violat|\n  0x0000F060  69 6F 6E 00 45 EE 0E CD ED E0 81 CD ED FD 3D 8D  |ion.E.........=.|\n  0x0000F070  26 02 20 73 CD ED D7 24 F2 6E FA 8D A1 0D 27 0B  |&. s...$.n....\'.|\n  0x0000F080  A1 0A 26 04 A6 0D 20 03 CD ED EA 4D 81 C6 FF AC  |..&... ....M....|\n  0x0000F090  A4 01 26 03 CC F9 CE 6E FA 8D 45 EE 71 CD ED E0  |..&....n..E.q...|\n  0x0000F0A0  A6 0A CD ED EA CD FA 22 AD C1 CD FA 16 A1 78 27  |......."......x\'|\n  0x0000F0B0  36 A1 72 27 32 A1 64 27 36 A1 6E 27 35 A1 61 27  |6.r\'2.d\'6.n\'5.a\'|\n  0x0000F0C0  2A A1 62 27 24 A1 3F 27 D1 A1 73 26 03 CC F1 B8  |*.b\'$.?\'..s&....|\n  0x0000F0D0  A1 68 26 03 CC F1 BE A1 65 26 03 CC F2 35 A1 69  |.h&.....e&...5.i|\n  0x0000F0E0  26 03 CC F2 7E 20 BE 9A 8D 3A 81 3A 81 20 03 CD  |&...~ ...:.:. ..|\n  0x0000F0F0  F2 AB 3F 82 55 81 AD 10 A6 0A CD ED EA AD 09 A6  |..?.U...........|\n  0x0000F100  0A CD ED EA 35 81 20 98 A6 08 87 AD 0F 86 4B FA  |....5. .......K.|\n  0x0000F110  81 87 F6 CD ED A5 AF 01 86 4B F6 81 A6 0A CD ED  |.........K......|\n  0x0000F120  EA 8B 86 CD ED A5 9F CD ED A5 A6 3A CD ED EA A6  |...........:....|\n  0x0000F130  20 CD ED EA A6 04 AD D9 A6 20 CD ED EA A6 04 AD  | ........ ......|\n  0x0000F140  D0 A6 20 CD ED EA A6 20 CD ED EA A6 04 AD C2 A6  |.. .... ........|\n  0x0000F150  20 CD ED EA A6 04 AD B9 A6 20 CD ED EA A6 7C CD  | ........ ....|.|\n  0x0000F160  ED EA A6 20 CD ED EA AF F0 A6 08 AD 0A A6 20 CD  |... .......... .|\n  0x0000F170  ED EA A6 08 AD 01 81 87 F6 A1 20 25 06 A1 7F 22  |.......... %..."|\n  0x0000F180  02 20 02 A6 2E CD ED EA AF 01 86 4B EA 81 BE 80  |. .........K....|\n  0x0000F190  A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 02 20  |..&....k..&.... |\n  0x0000F1A0  ED 55 83 F7 3C 80 55 83 AF 01 35 83 81 3F 80 45  |.U..<.U...5..?.E|\n  0x0000F1B0  0F 00 35 83 CD F2 AB 81 AD F3 AD D2 20 05 AD ED  |..5......... ...|\n  0x0000F1C0  CD F2 4F BE 80 26 03 CC F0 A0 45 0F 00 89 8B 55  |..O..&....E....U|\n  0x0000F1D0  81 89 8B BE 80 89 8C 8B CD EC 19 A7 06 AD 03 CC  |................|\n  0x0000F1E0  F0 F2 87 A6 0A CD ED EA 86 4D 26 07 45 EF DB CD  |.........M&.E...|\n  0x0000F1F0  ED E0 81 A1 10 26 07 45 EF DE CD ED E0 81 A1 20  |.....&.E....... |\n  0x0000F200  26 07 45 EF F1 CD ED E0 81 A1 50 26 07 45 F0 0D  |&.E.......P&.E..|\n  0x0000F210  CD ED E0 81 A1 60 26 07 45 F0 20 CD ED E0 81 A1  |.....`&.E. .....|\n  0x0000F220  A0 26 07 45 F0 33 CD ED E0 81 A1 B0 26 06 45 F0  |.&.E.3......&.E.|\n  0x0000F230  4A CD ED E0 81 AD 74 45 00 00 89 8B 55 81 89 8B  |J.....tE....U...|\n  0x0000F240  45 00 00 89 8B CD EC 19 A7 06 AD 96 CC F0 F2 BE  |E...............|\n  0x0000F250  80 A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 27  |...&....k..&...\'|\n  0x0000F260  62 87 CD F0 6B A1 0D 26 09 45 EE 2C CD ED E0 4F  |b...k..&.E.,...O|\n  0x0000F270  20 02 AD 13 9E EA 01 A7 01 CD F1 A1 20 D1 C6 17  | ........... ...|\n  0x0000F280  F8 CD ED A5 CC F0 A0 A0 30 2B 1C A1 0A 25 19 A0  |........0+...%..|\n  0x0000F290  07 2B 14 A1 0A 25 10 A1 10 25 0D A0 20 2B 08 A1  |.+...%...%.. +..|\n  0x0000F2A0  0A 25 04 A1 10 25 01 4F A4 0F 81 CD F0 6B AD D7  |.%...%.O.....k..|\n  0x0000F2B0  62 B7 81 CD F0 6B AD CF BA 81 B7 81 CD F0 6B AD  |b....k........k.|\n  0x0000F2C0  C6 62 B7 82 CD F0 6B AD BE BA 82 B7 82 81 A6 C0  |.b....k.........|\n  0x0000F2D0  C7 18 81 CD F3 89 A7 FE 5F C6 17 E8 9E E7 01 43  |........_......C|\n  0x0000F2E0  26 01 5C C6 17 E9 9E E7 02 43 26 01 5C 5D 27 0A  |&.\\......C&.\\]\'.|\n  0x0000F2F0  A6 01 9E E7 01 A6 3A 9E E7 02 26 E7 4F 9E E6 01  |......:...&.O...|\n  0x0000F300  C7 18 82 9E E6 02 C7 18 83 A7 02 4F C7 18 8B A7  |...........O....|\n  0x0000F310  FC A6 9C 9E E7 01 A6 DA 9E E7 02 C6 17 F8 9E E7  |................|\n  0x0000F320  03 9E 6F 04 CD F3 BB 8A 88 96 18 90 8A 88 96 18  |..o.............|\n  0x0000F330  92 A7 FC A6 8C 9E E7 01 A6 DA 9E E7 02 A6 FF 9E  |................|\n  0x0000F340  E7 03 9E 6F 04 AD 74 8A 88 96 18 98 8A 88 96 18  |...o..t.........|\n  0x0000F350  9A 4F C7 18 94 C7 18 95 C7 18 9C C7 18 9D A6 01  |.O..............|\n  0x0000F360  C7 18 96 C7 18 9E A6 FE C7 18 97 C7 18 9F 3F 8E  |..............?.|\n  0x0000F370  A6 01 43 C4 18 80 C7 18 80 C6 18 81 A4 01 26 F9  |..C...........&.|\n  0x0000F380  81 C6 18 80 AA 01 C7 18 80 C6 18 81 A4 01 27 F9  |..............\'.|\n  0x0000F390  81 AD EE A6 01 C7 18 80 A6 07 C7 18 86 C7 18 8A  |................|\n  0x0000F3A0  4F C7 18 82 C7 18 83 C7 18 84 C7 18 85 C7 18 87  |O...............|\n  0x0000F3B0  C7 18 88 C7 18 8B C7 18 8D 20 B5 9E E6 03 2B 21  |......... ....+!|\n  0x0000F3C0  9E E6 05 62 48 A4 E0 9E E7 03 9E E6 06 44 44 44  |...bH........DDD|\n  0x0000F3D0  9E EA 03 9E E7 03 9E E6 06 62 48 A4 E0 9E E7 04  |.........bH.....|\n  0x0000F3E0  81 48 48 48 A4 F8 9E E7 03 9E E6 04 62 44 A4 07  |.HHH........bD..|\n  0x0000F3F0  9E EA 03 9E E7 03 9E E6 04 48 97 48 48 A4 E0 9E  |.........H.HH...|\n  0x0000F400  E7 04 9F A4 06 9E EA 04 9E E7 04 9E E6 05 49 49  |..............II|\n  0x0000F410  A4 01 9E EA 04 AA 18 9E E7 04 9E E6 05 48 A4 FE  |.............H..|\n  0x0000F420  9E E7 05 9E E6 06 49 49 A4 01 9E EA 05 9E E7 05  |......II........|\n  0x0000F430  9E E6 06 48 9E E7 06 81 C6 18 A2 46 C6 18 A3 46  |...H.......F...F|\n  0x0000F440  B7 87 C6 18 8B A4 07 27 03 CC F6 65 C6 18 AC A4  |.......\'...e....|\n  0x0000F450  0F 27 20 A1 01 27 20 A1 02 27 31 A1 03 26 03 CC  |.\' ..\' ..\'1..&..|\n  0x0000F460  F5 74 A1 04 27 3C A1 06 26 03 CC F6 F6 A6 07 CD  |.t..\'<..&.......|\n  0x0000F470  F6 15 81 CD F6 09 81 C6 18 A4 A1 52 26 03 CC F9  |...........R&...|\n  0x0000F480  87 A1 11 26 01 AC A6 08 CD F6 15 81 CD F5 ED 3F  |...&...........?|\n  0x0000F490  83 CD F9 FB CD F6 15 81 A6 06 20 02 A6 05 CD F6  |.......... .....|\n  0x0000F4A0  15 81 3F 8F 3F 90 CD F5 ED C6 18 A6 27 EE 2B E8  |..?.?.......\'.+.|\n  0x0000F4B0  B7 83 87 4C B7 8E 86 CD F9 F6 3F 91 CD F6 00 6E  |...L......?....n|\n  0x0000F4C0  1E 8D 45 0F 00 A6 01 C7 0F 00 4C C7 0F 01 CD ED  |..E.......L.....|\n  0x0000F4D0  FD 27 61 C6 18 84 A4 01 27 F4 6E 1E 8D C6 18 AC  |.\'a.....\'.n.....|\n  0x0000F4E0  A4 0F A1 08 26 5A C6 18 A4 AD 5B C6 18 A5 AD 56  |....&Z....[....V|\n  0x0000F4F0  C6 18 A6 AD 51 C6 18 A7 AD 4C C6 18 A8 AD 47 C6  |....Q....L....G.|\n  0x0000F500  18 A9 AD 42 C6 18 AA AD 3D C6 18 AB AD 38 3C 91  |...B....=....8<.|\n  0x0000F510  B6 85 B8 91 B7 85 CD F6 00 B6 8E 27 02 20 AF 3D  |...........\'. .=|\n  0x0000F520  8F 26 0B 3D 90 26 13 CD F9 FB CD F6 15 81 A6 0C  |.&.=.&..........|\n  0x0000F530  CD F6 15 81 A6 0E CD F6 15 81 A6 0D CD F6 15 81  |................|\n  0x0000F540  A6 02 CD F6 15 81 87 B6 8E 27 1C A1 01 27 0D 9E  |.........\'...\'..|\n  0x0000F550  E6 01 F7 CD F9 F6 AF 01 3A 8E 20 15 9E E6 01 B0  |........:. .....|\n  0x0000F560  85 B7 8F 3A 8E 20 0A 9E E6 01 A1 FB 27 03 6E 01  |...:. ......\'.n.|\n  0x0000F570  90 A7 01 81 AD 77 C6 18 A6 CD F6 00 26 03 CC F4  |.....w......&...|\n  0x0000F580  9C 2A 03 CC F4 98 87 4C B7 8E 86 CD F9 F6 3F 91  |.*.....L......?.|\n  0x0000F590  55 81 AD 1F 3D 8E 26 FA 81 B6 8E 27 0E A1 01 27  |U...=.&....\'...\'|\n  0x0000F5A0  0D 3A 8E F6 CD F9 F6 F6 AF 01 81 A6 FB 81 3A 8E  |.:............:.|\n  0x0000F5B0  B6 85 81 AD 71 AD E2 C7 18 B4 AD DD C7 18 B5 AD  |....q...........|\n  0x0000F5C0  D8 C7 18 B6 AD D3 C7 18 B7 AD CE C7 18 B8 AD C9  |................|\n  0x0000F5D0  C7 18 B9 AD C4 C7 18 BA AD BF C7 18 BB 3C 91 B6  |.............<..|\n  0x0000F5E0  85 B8 91 B7 85 A6 08 C7 18 BC AD 68 81 3F 85 C6  |...........h.?..|\n  0x0000F5F0  18 A4 B7 81 CD F9 F6 C6 18 A5 B7 82 CD F9 F6 81  |................|\n  0x0000F600  87 A6 01 C7 18 84 86 4D 81 AD F5 AD 19 4F C7 18  |.......M.....O..|\n  0x0000F610  BC AD 41 81 4F 87 AD E8 AD 0C 86 C7 18 B4 A6 01  |..A.O...........|\n  0x0000F620  C7 18 BC AD 2F 81 89 8B A6 01 C7 18 8A A7 FC A6  |..../...........|\n  0x0000F630  9C 9E E7 01 A6 DA 9E E7 02 B6 87 9E E7 03 C6 17  |................|\n  0x0000F640  F8 9E E7 04 CD F3 BB 8A 88 96 18 B0 8A 88 96 18  |................|\n  0x0000F650  B2 8A 88 81 C6 18 8A C7 18 86 CD ED FD C6 18 86  |................|\n  0x0000F660  A4 01 27 F6 81 C6 18 AC A4 0F A1 07 27 38 A1 01  |..\'.........\'8..|\n  0x0000F670  27 03 CC F4 6D C6 18 A4 A1 22 27 03 CC F4 86 CD  |\'...m...."\'.....|\n  0x0000F680  F6 00 AD A2 6E 06 80 8C 5F D6 FC F8 D7 18 B4 AF  |....n..._.......|\n  0x0000F690  01 3B 80 F5 C6 17 F8 C7 18 BA A6 07 C7 18 BC AD  |.;..............|\n  0x0000F6A0  B3 81 CD F6 00 81 6E 06 80 8C 5F D6 18 A4 D1 FC  |......n..._.....|\n  0x0000F6B0  F8 26 EF AF 01 3B 80 F3 C6 18 AA C7 0F 00 CD F6  |.&...;..........|\n  0x0000F6C0  00 C6 17 F9 4C C7 0F 01 6E 06 80 8C 5F D6 17 F0  |....L...n..._...|\n  0x0000F6D0  D7 0F 02 AF 01 3B 80 F5 45 17 F8 35 81 3F 83 CD  |.....;..E..5.?..|\n  0x0000F6E0  FA 02 26 0B 45 17 F8 35 81 6E 08 83 CD FA 02 CD  |..&.E..5.n......|\n  0x0000F6F0  F6 15 CD F2 CE 81 3F 89 6E 06 80 8C 5F D6 18 A4  |......?.n..._...|\n  0x0000F700  D7 0F 00 BB 89 B7 89 AF 01 3B 80 F1 C6 17 F6 4C  |.........;.....L|\n  0x0000F710  C7 0F 06 BB 89 B7 89 B6 89 C7 0F 07 45 17 F0 35  |............E..5|\n  0x0000F720  81 3F 83 CD FA 02 26 0B 45 17 F0 35 81 6E 08 83  |.?....&.E..5.n..|\n  0x0000F730  CD FA 02 26 03 6E 01 88 CD F6 15 81 CD F7 C8 CD  |...&.n..........|\n  0x0000F740  F8 24 27 1E B7 80 CD F9 F6 55 81 CD F8 36 F6 CD  |.$\'......U...6..|\n  0x0000F750  ED EA CD F9 F6 AF 01 3B 80 F4 B6 85 CD ED EA CC  |.......;........|\nCoverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry 0x00000000\nContext\nNo A2L loaded.']
+  
+  Right contains one more item: 'prg.s19\n... window limited to 200 rows ...\n  0x000017E0  11                      01 3A                    |.       ...Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry 0x00000000\nContext\nNo A2L loaded.'
+  
+  Full diff:
+  + []
+  - [
+  -     'prg.s19\n'
+  -     '... window limited to 200 rows ...\n'
+  -     '  0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC F3 BB 20 49 44 3D 00  | Y  ... '
+  -     '... ID=.|\n'
+  -     '  0x0000EB10  20 41 70 70 6C 69 63 61 74 69 6F 6E 20 69 73 20  | '
+  -     'Application is |\n'
+  -     '  0x0000EB20  73 74 61 72 74 69 6E 67 2E 0A 00 20 41 70 70 6C  '
+  -     '|starting... Appl|\n'
+  -     '  0x0000EB30  69 63 61 74 69 6F 6E 20 69 73 20 6E 6F 74 20 66  |ication '
+  -     'is not f|\n'
+  -     '  0x0000EB40  6F 75 6E 64 2E 20 53 74 61 79 20 69 6E 20 42 6F  |ound. '
+  -     'Stay in Bo|\n'
+  -     '  0x0000EB50  6F 74 4C 6F 61 64 65 72 2E 0A 00 87 A6 55 C7 18  '
+  -     '|otLoader.....U..|\n'
+  -     '  0x0000EB60  00 43 C7 18 00 86 81 6E 26 49 03 4B FD 6E B8 48  '
+  -     '|.C.....n&I.K.n.H|\n'
+  -     '  0x0000EB70  08 4B FD B6 4B A4 0C A1 08 26 F8 6E 88 48 6E 44  '
+  -     '|.K..K....&.n.HnD|\n'
+  -     '  0x0000EB80  4C 0B 4B FD 0D 4B FD 1D 48 1F 48 07 4B FD 05 4B  '
+  -     '|L.K..K..H.H.K..K|\n'
+  -     '  0x0000EB90  FA 81 9E FE 09 F6 9E FE 07 F7 9E FE 05 AF FF 9E  '
+  -     '|................|\n'
+  -     '  0x0000EBA0  FF 05 27 12 9E FE 09 AF 01 9E FF 09 9E FE 07 AF  '
+  -     "|..'.............|\n"
+  -     '  0x0000EBB0  01 9E FF 07 20 DC 4F 81 8B 86 A0 14 87 9F 88 54  |.... '
+  -     '.O........T|\n'
+  -     '  0x0000EBC0  46 54 46 54 46 AA 80 81 4A 8C AE 03 52 81 9E FE  '
+  -     '|FTFTF...J...R...|\n'
+  -     '  0x0000EBD0  03 26 03 CC EC 83 65 00 08 23 03 A6 60 81 9E FE  '
+  -     '|.&....e..#..`...|\n'
+  -     '  0x0000EBE0  05 AD D5 B7 8B 9E E6 06 9E EB 04 97 9E E6 05 9E  '
+  -     '|................|\n'
+  -     '  0x0000EBF0  E9 03 87 8A AF FF AD C0 B1 8B 26 03 CC EC 83 A6  '
+  -     '|..........&.....|\n'
+  -     '  0x0000EC00  B0 81 9E FE 03 65 03 00 23 03 A6 3C 81 9E FE 03  '
+  -     '|.....e..#..<....|\n'
+  -     '  0x0000EC10  26 03 A6 50 81 CD EB 92 81 3F 8C 9E E6 05 A1 18  '
+  -     '|&..P.....?......|\n'
+  -     '  0x0000EC20  27 E0 A1 14 27 A8 A1 15 27 A4 A1 16 27 A0 A1 17  '
+  -     "|'...'...'...'...|\n"
+  -     '  0x0000EC30  27 9C A1 10 25 CC 22 05 9E 6D 06 2A C5 AD 89 B7  '
+  -     '|\'...%."..m.*....|\n'
+  -     '  0x0000EC40  8B A1 4F 25 07 A1 53 22 03 A6 A0 81 A1 54 26 0E  '
+  -     '|..O%..S".....T&.|\n'
+  -     '  0x0000EC50  12 8C 9E E6 04 9E EA 03 26 04 10 8C 13 8C 9E E6  '
+  -     '|........&.......|\n'
+  -     '  0x0000EC60  04 9E EA 03 27 1D 9E E6 06 9E EB 04 97 9E E6 05  '
+  -     "|....'...........|\n"
+  -     '  0x0000EC70  9E E9 03 87 8A AF FF 8B 86 CD EB C8 B1 8B 27 03  '
+  -     "|..............'.|\n"
+  -     '  0x0000EC80  A6 B0 81 9E FE 03 65 03 00 23 03 A6 60 81 9E E6  '
+  -     '|......e..#..`...|\n'
+  -     '  0x0000EC90  03 9E EA 04 26 09 A6 40 B7 8A 9E 6C 04 20 16 9E  '
+  -     '|....&..@...l. ..|\n'
+  -     '  0x0000ECA0  E6 03 26 0D 9E E6 04 A1 01 26 06 A6 20 B7 8A 20  '
+  -     '|..&......&.. .. |\n'
+  -     '  0x0000ECB0  04 A6 25 B7 8A 9B CD 10 20 01 8C 45 45 00 02 9E  |..%..... '
+  -     '..EE...|\n'
+  -     '  0x0000ECC0  FF 03 45 FF FE 9E FF 05 45 F9 2C 96 0F 00 45 0F  '
+  -     '|..E.....E.,...E.|\n'
+  -     '  0x0000ECD0  00 9E FF 07 A6 25 B7 8A CD 10 20 45 00 03 9E FF  '
+  -     '|.....%.... E....|\n'
+  -     '  0x0000ECE0  03 45 FF BD 9E FF 05 A6 FF C7 0F 00 C7 0F 01 A6  '
+  -     '|.E..............|\n'
+  -     '  0x0000ECF0  E2 C7 0F 02 45 0F 00 9E FF 07 A6 25 B7 8A CD 10  '
+  -     '|....E......%....|\n'
+  -     '  0x0000ED00  20 9A 81 A6 30 C7 18 25 C6 18 25 A5 80 27 F9 9E  | '
+  -     "...0..%..%..'..|\n"
+  -     '  0x0000ED10  FE 09 F6 9E FE 07 03 8C 07 65 FF FE 25 02 AF A2  '
+  -     '|.........e..%...|\n'
+  -     '  0x0000ED20  F7 B6 8A C7 18 26 A6 80 C7 18 25 9E E6 0B C6 18  '
+  -     '|.....&....%.....|\n'
+  -     '  0x0000ED30  25 A5 30 26 24 9E FE 05 AF FF 9E FF 05 27 12 9E  '
+  -     "|%.0&$........'..|\n"
+  -     '  0x0000ED40  FE 09 AF 01 9E FF 09 9E FE 07 AF 01 9E FF 07 20  '
+  -     '|............... |\n'
+  -     '  0x0000ED50  B7 C6 18 25 A5 40 27 F9 4F 81 A6 30 C7 18 25 A6  '
+  -     "|...%.@'.O..0..%.|\n"
+  -     '  0x0000ED60  4F C7 18 20 8C AE 58 D6 ED 02 D7 10 1F 5B F8 81  |O.. '
+  -     '..X......[..|\n'
+  -     '  0x0000ED70  30 31 32 33 34 35 36 37 38 39 41 42 43 44 45 46  '
+  -     '|0123456789ABCDEF|\n'
+  -     '  0x0000ED80  3F 3A 6E 0C 3B 3F 3E 3F 38 C6 17 E0 A1 FF 26 02  '
+  -     '|?:n.;?>?8.....&.|\n'
+  -     '  0x0000ED90  A6 11 B7 39 81 3F 3A 3F 38 6E 04 39 3F 3B 3F 3D  '
+  -     '|...9.?:?8n.9?;?=|\n'
+  -     '  0x0000EDA0  3F 3E 3F 3F 81 8B 89 87 62 A4 0F 97 8C D6 ED 70  '
+  -     '|?>??....b......p|\n'
+  -     '  0x0000EDB0  AD 38 9E E6 01 A4 0F 97 8C D6 ED 70 AD 2C 86 88  '
+  -     '|.8.........p.,..|\n'
+  -     '  0x0000EDC0  8A 81 AD E1 AD 0A 81 89 8B 86 AD D9 86 AD F3 81  '
+  -     '|................|\n'
+  -     '  0x0000EDD0  87 A6 0A AD 15 86 81 0B 3C 04 B6 3F 99 81 98 81  '
+  -     '|........<..?....|\n'
+  -     "  0x0000EDE0  F6 27 06 AD 05 AF 01 20 F7 81 AD 11 0F 3C FB B7  |.'..... "
+  -     '.....<..|\n'
+  -     '  0x0000EDF0  3F 81 6E 02 6C 3F 6E 3F 8D 81 3F 6C 81 CD EB 5B  '
+  -     '|?.n.l?n?..?l...[|\n'
+  -     '  0x0000EE00  0F 6C 08 3D 8D 27 02 3A 8D 1E 6C 3D 8D 81 20 50  '
+  -     "|.l.=.'.:..l=.. P|\n"
+  -     '  0x0000EE10  75 73 68 20 74 20 62 75 74 74 6F 6E 20 66 6F 72  |ush t '
+  -     'button for|\n'
+  -     '  0x0000EE20  20 74 65 72 6D 69 6E 61 6C 21 0A 00 0A 57 61 72  | '
+  -     'terminal!...War|\n'
+  -     '  0x0000EE30  6E 69 6E 67 21 20 48 61 6C 66 20 62 79 74 65 20  |ning! '
+  -     'Half byte |\n'
+  -     '  0x0000EE40  67 69 76 65 64 20 61 73 20 6C 61 73 74 20 62 79  |gived as '
+  -     'last by|\n'
+  -     '  0x0000EE50  74 65 2C 20 6D 69 73 73 69 6E 67 20 34 20 62 69  |te, '
+  -     'missing 4 bi|\n'
+  -     '  0x0000EE60  74 73 20 66 6F 72 63 65 64 20 74 6F 20 30 2E 0A  |ts forced '
+  -     'to 0..|\n'
+  -     '  0x0000EE70  00 0A 53 65 72 69 61 6C 20 74 65 72 6D 69 6E 61  |..Serial '
+  -     'termina|\n'
+  -     '  0x0000EE80  6C 2E 20 48 65 72 65 20 69 73 20 73 6F 6D 65 20  |l. Here '
+  -     'is some |\n'
+  -     '  0x0000EE90  68 65 6C 70 3A 0A 3F 20 3A 20 54 68 69 73 20 68  |help:.? : '
+  -     'This h|\n'
+  -     '  0x0000EEA0  65 6C 70 2E 0A 69 20 3A 20 50 72 69 6E 74 20 4D  |elp..i : '
+  -     'Print M|\n'
+  -     '  0x0000EEB0  43 55 20 49 44 2E 0A 64 41 41 41 41 20 3A 20 44  |CU '
+  -     'ID..dAAAA : D|\n'
+  -     '  0x0000EEC0  75 6D 70 20 66 72 6F 6D 20 61 64 64 72 65 73 73  |ump from '
+  -     'address|\n'
+  -     '  0x0000EED0  20 41 41 41 41 68 20 28 44 65 66 61 75 6C 74 20  | AAAAh '
+  -     '(Default |\n'
+  -     '  0x0000EEE0  30 30 30 30 68 29 2E 0A 6E 20 3A 20 4E 65 78 74  |0000h)..n '
+  -     ': Next|\n'
+  -     '  0x0000EEF0  20 28 44 75 6D 70 29 2E 0A 62 20 3A 20 42 61 63  | '
+  -     '(Dump)..b : Bac|\n'
+  -     '  0x0000EF00  6B 20 28 44 75 6D 70 29 2E 0A 61 20 3A 20 41 67  |k '
+  -     '(Dump)..a : Ag|\n'
+  -     '  0x0000EF10  61 69 6E 20 28 44 75 6D 70 29 2E 0A 65 41 41 41  |ain '
+  -     '(Dump)..eAAA|\n'
+  -     '  0x0000EF20  41 20 3A 20 45 72 61 73 65 20 70 61 67 65 20 66  |A : Erase '
+  -     'page f|\n'
+  -     '  0x0000EF30  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom '
+  -     'address AAAA|\n'
+  -     '  0x0000EF40  68 20 28 31 32 38 20 62 79 74 65 73 29 2E 0A 68  |h (128 '
+  -     'bytes)..h|\n'
+  -     '  0x0000EF50  41 41 41 41 31 31 32 32 33 33 34 34 20 5B 45 4E  '
+  -     '|AAAA11223344 [EN|\n'
+  -     '  0x0000EF60  54 45 52 5D 20 3A 20 48 65 78 61 20 77 72 69 74  |TER] : '
+  -     'Hexa writ|\n'
+  -     '  0x0000EF70  65 20 66 72 6F 6D 20 61 64 64 72 65 73 73 20 41  |e from '
+  -     'address A|\n'
+  -     '  0x0000EF80  41 41 41 68 2C 0A 73 41 41 41 41 77 77 77 2E 62  '
+  -     '|AAAh,.sAAAAwww.b|\n'
+  -     '  0x0000EF90  75 74 79 69 2E 68 75 20 5B 45 4E 54 45 52 5D 20  |utyi.hu '
+  -     '[ENTER] |\n'
+  -     '  0x0000EFA0  3A 20 53 74 72 69 6E 67 20 77 72 69 74 65 20 66  |: String '
+  -     'write f|\n'
+  -     '  0x0000EFB0  72 6F 6D 20 61 64 64 72 65 73 73 20 41 41 41 41  |rom '
+  -     'address AAAA|\n'
+  -     '  0x0000EFC0  68 2C 0A 72 20 6F 72 20 78 20 3A 20 52 65 73 65  |h,.r or x '
+  -     ': Rese|\n'
+  -     '  0x0000EFD0  74 20 28 45 78 69 74 29 2E 0A 00 4F 4B 00 45 72  |t '
+  -     '(Exit)...OK.Er|\n'
+  -     '  0x0000EFE0  72 6F 72 21 20 41 63 63 65 73 73 20 65 72 72 6F  |ror! '
+  -     'Access erro|\n'
+  -     '  0x0000EFF0  00 45 72 72 6F 72 21 20 50 72 6F 74 65 63 74 69  |.Error! '
+  -     'Protecti|\n'
+  -     '  0x0000F000  6F 6E 20 76 69 6F 6C 61 74 69 6F 6E 00 45 72 72  |on '
+  -     'violation.Err|\n'
+  -     '  0x0000F010  6F 72 21 20 4C 65 6E 67 74 68 20 7A 65 72 6F 00  |or! '
+  -     'Length zero.|\n'
+  -     '  0x0000F020  45 72 72 6F 72 21 20 4C 65 6E 67 74 68 20 68 69  |Error! '
+  -     'Length hi|\n'
+  -     '  0x0000F030  67 68 00 45 72 72 6F 72 21 20 42 6F 6F 74 6C 6F  |gh.Error! '
+  -     'Bootlo|\n'
+  -     '  0x0000F040  61 64 65 72 20 61 72 65 61 00 45 72 72 6F 72 21  |ader '
+  -     'area.Error!|\n'
+  -     '  0x0000F050  20 42 6F 75 6E 64 61 72 79 20 76 69 6F 6C 61 74  | Boundary '
+  -     'violat|\n'
+  -     '  0x0000F060  69 6F 6E 00 45 EE 0E CD ED E0 81 CD ED FD 3D 8D  '
+  -     '|ion.E.........=.|\n'
+  -     '  0x0000F070  26 02 20 73 CD ED D7 24 F2 6E FA 8D A1 0D 27 0B  |&. '
+  -     "s...$.n....'.|\n"
+  -     '  0x0000F080  A1 0A 26 04 A6 0D 20 03 CD ED EA 4D 81 C6 FF AC  |..&... '
+  -     '....M....|\n'
+  -     '  0x0000F090  A4 01 26 03 CC F9 CE 6E FA 8D 45 EE 71 CD ED E0  '
+  -     '|..&....n..E.q...|\n'
+  -     '  0x0000F0A0  A6 0A CD ED EA CD FA 22 AD C1 CD FA 16 A1 78 27  '
+  -     '|......."......x\'|\n'
+  -     '  0x0000F0B0  36 A1 72 27 32 A1 64 27 36 A1 6E 27 35 A1 61 27  '
+  -     "|6.r'2.d'6.n'5.a'|\n"
+  -     '  0x0000F0C0  2A A1 62 27 24 A1 3F 27 D1 A1 73 26 03 CC F1 B8  '
+  -     "|*.b'$.?'..s&....|\n"
+  -     '  0x0000F0D0  A1 68 26 03 CC F1 BE A1 65 26 03 CC F2 35 A1 69  '
+  -     '|.h&.....e&...5.i|\n'
+  -     '  0x0000F0E0  26 03 CC F2 7E 20 BE 9A 8D 3A 81 3A 81 20 03 CD  |&...~ '
+  -     '...:.:. ..|\n'
+  -     '  0x0000F0F0  F2 AB 3F 82 55 81 AD 10 A6 0A CD ED EA AD 09 A6  '
+  -     '|..?.U...........|\n'
+  -     '  0x0000F100  0A CD ED EA 35 81 20 98 A6 08 87 AD 0F 86 4B FA  |....5. '
+  -     '.......K.|\n'
+  -     '  0x0000F110  81 87 F6 CD ED A5 AF 01 86 4B F6 81 A6 0A CD ED  '
+  -     '|.........K......|\n'
+  -     '  0x0000F120  EA 8B 86 CD ED A5 9F CD ED A5 A6 3A CD ED EA A6  '
+  -     '|...........:....|\n'
+  -     '  0x0000F130  20 CD ED EA A6 04 AD D9 A6 20 CD ED EA A6 04 AD  | ........ '
+  -     '......|\n'
+  -     '  0x0000F140  D0 A6 20 CD ED EA A6 20 CD ED EA A6 04 AD C2 A6  |.. .... '
+  -     '........|\n'
+  -     '  0x0000F150  20 CD ED EA A6 04 AD B9 A6 20 CD ED EA A6 7C CD  | ........ '
+  -     '....|.|\n'
+  -     '  0x0000F160  ED EA A6 20 CD ED EA AF F0 A6 08 AD 0A A6 20 CD  |... '
+  -     '.......... .|\n'
+  -     '  0x0000F170  ED EA A6 08 AD 01 81 87 F6 A1 20 25 06 A1 7F 22  '
+  -     '|.......... %..."|\n'
+  -     '  0x0000F180  02 20 02 A6 2E CD ED EA AF 01 86 4B EA 81 BE 80  |. '
+  -     '.........K....|\n'
+  -     '  0x0000F190  A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 02 20  '
+  -     '|..&....k..&.... |\n'
+  -     '  0x0000F1A0  ED 55 83 F7 3C 80 55 83 AF 01 35 83 81 3F 80 45  '
+  -     '|.U..<.U...5..?.E|\n'
+  -     '  0x0000F1B0  0F 00 35 83 CD F2 AB 81 AD F3 AD D2 20 05 AD ED  '
+  -     '|..5......... ...|\n'
+  -     '  0x0000F1C0  CD F2 4F BE 80 26 03 CC F0 A0 45 0F 00 89 8B 55  '
+  -     '|..O..&....E....U|\n'
+  -     '  0x0000F1D0  81 89 8B BE 80 89 8C 8B CD EC 19 A7 06 AD 03 CC  '
+  -     '|................|\n'
+  -     '  0x0000F1E0  F0 F2 87 A6 0A CD ED EA 86 4D 26 07 45 EF DB CD  '
+  -     '|.........M&.E...|\n'
+  -     '  0x0000F1F0  ED E0 81 A1 10 26 07 45 EF DE CD ED E0 81 A1 20  '
+  -     '|.....&.E....... |\n'
+  -     '  0x0000F200  26 07 45 EF F1 CD ED E0 81 A1 50 26 07 45 F0 0D  '
+  -     '|&.E.......P&.E..|\n'
+  -     '  0x0000F210  CD ED E0 81 A1 60 26 07 45 F0 20 CD ED E0 81 A1  '
+  -     '|.....`&.E. .....|\n'
+  -     '  0x0000F220  A0 26 07 45 F0 33 CD ED E0 81 A1 B0 26 06 45 F0  '
+  -     '|.&.E.3......&.E.|\n'
+  -     '  0x0000F230  4A CD ED E0 81 AD 74 45 00 00 89 8B 55 81 89 8B  '
+  -     '|J.....tE....U...|\n'
+  -     '  0x0000F240  45 00 00 89 8B CD EC 19 A7 06 AD 96 CC F0 F2 BE  '
+  -     '|E...............|\n'
+  -     '  0x0000F250  80 A3 7F 26 01 81 CD F0 6B A1 0D 26 01 81 AD 27  '
+  -     "|...&....k..&...'|\n"
+  -     '  0x0000F260  62 87 CD F0 6B A1 0D 26 09 45 EE 2C CD ED E0 4F  '
+  -     '|b...k..&.E.,...O|\n'
+  -     '  0x0000F270  20 02 AD 13 9E EA 01 A7 01 CD F1 A1 20 D1 C6 17  | '
+  -     '........... ...|\n'
+  -     '  0x0000F280  F8 CD ED A5 CC F0 A0 A0 30 2B 1C A1 0A 25 19 A0  '
+  -     '|........0+...%..|\n'
+  -     '  0x0000F290  07 2B 14 A1 0A 25 10 A1 10 25 0D A0 20 2B 08 A1  '
+  -     '|.+...%...%.. +..|\n'
+  -     '  0x0000F2A0  0A 25 04 A1 10 25 01 4F A4 0F 81 CD F0 6B AD D7  '
+  -     '|.%...%.O.....k..|\n'
+  -     '  0x0000F2B0  62 B7 81 CD F0 6B AD CF BA 81 B7 81 CD F0 6B AD  '
+  -     '|b....k........k.|\n'
+  -     '  0x0000F2C0  C6 62 B7 82 CD F0 6B AD BE BA 82 B7 82 81 A6 C0  '
+  -     '|.b....k.........|\n'
+  -     '  0x0000F2D0  C7 18 81 CD F3 89 A7 FE 5F C6 17 E8 9E E7 01 43  '
+  -     '|........_......C|\n'
+  -     '  0x0000F2E0  26 01 5C C6 17 E9 9E E7 02 43 26 01 5C 5D 27 0A  '
+  -     "|&.\\......C&.\\]'.|\n"
+  -     '  0x0000F2F0  A6 01 9E E7 01 A6 3A 9E E7 02 26 E7 4F 9E E6 01  '
+  -     '|......:...&.O...|\n'
+  -     '  0x0000F300  C7 18 82 9E E6 02 C7 18 83 A7 02 4F C7 18 8B A7  '
+  -     '|...........O....|\n'
+  -     '  0x0000F310  FC A6 9C 9E E7 01 A6 DA 9E E7 02 C6 17 F8 9E E7  '
+  -     '|................|\n'
+  -     '  0x0000F320  03 9E 6F 04 CD F3 BB 8A 88 96 18 90 8A 88 96 18  '
+  -     '|..o.............|\n'
+  -     '  0x0000F330  92 A7 FC A6 8C 9E E7 01 A6 DA 9E E7 02 A6 FF 9E  '
+  -     '|................|\n'
+  -     '  0x0000F340  E7 03 9E 6F 04 AD 74 8A 88 96 18 98 8A 88 96 18  '
+  -     '|...o..t.........|\n'
+  -     '  0x0000F350  9A 4F C7 18 94 C7 18 95 C7 18 9C C7 18 9D A6 01  '
+  -     '|.O..............|\n'
+  -     '  0x0000F360  C7 18 96 C7 18 9E A6 FE C7 18 97 C7 18 9F 3F 8E  '
+  -     '|..............?.|\n'
+  -     '  0x0000F370  A6 01 43 C4 18 80 C7 18 80 C6 18 81 A4 01 26 F9  '
+  -     '|..C...........&.|\n'
+  -     '  0x0000F380  81 C6 18 80 AA 01 C7 18 80 C6 18 81 A4 01 27 F9  '
+  -     "|..............'.|\n"
+  -     '  0x0000F390  81 AD EE A6 01 C7 18 80 A6 07 C7 18 86 C7 18 8A  '
+  -     '|................|\n'
+  -     '  0x0000F3A0  4F C7 18 82 C7 18 83 C7 18 84 C7 18 85 C7 18 87  '
+  -     '|O...............|\n'
+  -     '  0x0000F3B0  C7 18 88 C7 18 8B C7 18 8D 20 B5 9E E6 03 2B 21  |......... '
+  -     '....+!|\n'
+  -     '  0x0000F3C0  9E E6 05 62 48 A4 E0 9E E7 03 9E E6 06 44 44 44  '
+  -     '|...bH........DDD|\n'
+  -     '  0x0000F3D0  9E EA 03 9E E7 03 9E E6 06 62 48 A4 E0 9E E7 04  '
+  -     '|.........bH.....|\n'
+  -     '  0x0000F3E0  81 48 48 48 A4 F8 9E E7 03 9E E6 04 62 44 A4 07  '
+  -     '|.HHH........bD..|\n'
+  -     '  0x0000F3F0  9E EA 03 9E E7 03 9E E6 04 48 97 48 48 A4 E0 9E  '
+  -     '|.........H.HH...|\n'
+  -     '  0x0000F400  E7 04 9F A4 06 9E EA 04 9E E7 04 9E E6 05 49 49  '
+  -     '|..............II|\n'
+  -     '  0x0000F410  A4 01 9E EA 04 AA 18 9E E7 04 9E E6 05 48 A4 FE  '
+  -     '|.............H..|\n'
+  -     '  0x0000F420  9E E7 05 9E E6 06 49 49 A4 01 9E EA 05 9E E7 05  '
+  -     '|......II........|\n'
+  -     '  0x0000F430  9E E6 06 48 9E E7 06 81 C6 18 A2 46 C6 18 A3 46  '
+  -     '|...H.......F...F|\n'
+  -     '  0x0000F440  B7 87 C6 18 8B A4 07 27 03 CC F6 65 C6 18 AC A4  '
+  -     "|.......'...e....|\n"
+  -     "  0x0000F450  0F 27 20 A1 01 27 20 A1 02 27 31 A1 03 26 03 CC  |.' ..' "
+  -     "..'1..&..|\n"
+  -     '  0x0000F460  F5 74 A1 04 27 3C A1 06 26 03 CC F6 F6 A6 07 CD  '
+  -     "|.t..'<..&.......|\n"
+  -     '  0x0000F470  F6 15 81 CD F6 09 81 C6 18 A4 A1 52 26 03 CC F9  '
+  -     '|...........R&...|\n'
+  -     '  0x0000F480  87 A1 11 26 01 AC A6 08 CD F6 15 81 CD F5 ED 3F  '
+  -     '|...&...........?|\n'
+  -     '  0x0000F490  83 CD F9 FB CD F6 15 81 A6 06 20 02 A6 05 CD F6  '
+  -     '|.......... .....|\n'
+  -     '  0x0000F4A0  15 81 3F 8F 3F 90 CD F5 ED C6 18 A6 27 EE 2B E8  '
+  -     "|..?.?.......'.+.|\n"
+  -     '  0x0000F4B0  B7 83 87 4C B7 8E 86 CD F9 F6 3F 91 CD F6 00 6E  '
+  -     '|...L......?....n|\n'
+  -     '  0x0000F4C0  1E 8D 45 0F 00 A6 01 C7 0F 00 4C C7 0F 01 CD ED  '
+  -     '|..E.......L.....|\n'
+  -     '  0x0000F4D0  FD 27 61 C6 18 84 A4 01 27 F4 6E 1E 8D C6 18 AC  '
+  -     "|.'a.....'.n.....|\n"
+  -     '  0x0000F4E0  A4 0F A1 08 26 5A C6 18 A4 AD 5B C6 18 A5 AD 56  '
+  -     '|....&Z....[....V|\n'
+  -     '  0x0000F4F0  C6 18 A6 AD 51 C6 18 A7 AD 4C C6 18 A8 AD 47 C6  '
+  -     '|....Q....L....G.|\n'
+  -     '  0x0000F500  18 A9 AD 42 C6 18 AA AD 3D C6 18 AB AD 38 3C 91  '
+  -     '|...B....=....8<.|\n'
+  -     '  0x0000F510  B6 85 B8 91 B7 85 CD F6 00 B6 8E 27 02 20 AF 3D  '
+  -     "|...........'. .=|\n"
+  -     '  0x0000F520  8F 26 0B 3D 90 26 13 CD F9 FB CD F6 15 81 A6 0C  '
+  -     '|.&.=.&..........|\n'
+  -     '  0x0000F530  CD F6 15 81 A6 0E CD F6 15 81 A6 0D CD F6 15 81  '
+  -     '|................|\n'
+  -     '  0x0000F540  A6 02 CD F6 15 81 87 B6 8E 27 1C A1 01 27 0D 9E  '
+  -     "|.........'...'..|\n"
+  -     '  0x0000F550  E6 01 F7 CD F9 F6 AF 01 3A 8E 20 15 9E E6 01 B0  '
+  -     '|........:. .....|\n'
+  -     '  0x0000F560  85 B7 8F 3A 8E 20 0A 9E E6 01 A1 FB 27 03 6E 01  |...:. '
+  -     "......'.n.|\n"
+  -     '  0x0000F570  90 A7 01 81 AD 77 C6 18 A6 CD F6 00 26 03 CC F4  '
+  -     '|.....w......&...|\n'
+  -     '  0x0000F580  9C 2A 03 CC F4 98 87 4C B7 8E 86 CD F9 F6 3F 91  '
+  -     '|.*.....L......?.|\n'
+  -     '  0x0000F590  55 81 AD 1F 3D 8E 26 FA 81 B6 8E 27 0E A1 01 27  '
+  -     "|U...=.&....'...'|\n"
+  -     '  0x0000F5A0  0D 3A 8E F6 CD F9 F6 F6 AF 01 81 A6 FB 81 3A 8E  '
+  -     '|.:............:.|\n'
+  -     '  0x0000F5B0  B6 85 81 AD 71 AD E2 C7 18 B4 AD DD C7 18 B5 AD  '
+  -     '|....q...........|\n'
+  -     '  0x0000F5C0  D8 C7 18 B6 AD D3 C7 18 B7 AD CE C7 18 B8 AD C9  '
+  -     '|................|\n'
+  -     '  0x0000F5D0  C7 18 B9 AD C4 C7 18 BA AD BF C7 18 BB 3C 91 B6  '
+  -     '|.............<..|\n'
+  -     '  0x0000F5E0  85 B8 91 B7 85 A6 08 C7 18 BC AD 68 81 3F 85 C6  '
+  -     '|...........h.?..|\n'
+  -     '  0x0000F5F0  18 A4 B7 81 CD F9 F6 C6 18 A5 B7 82 CD F9 F6 81  '
+  -     '|................|\n'
+  -     '  0x0000F600  87 A6 01 C7 18 84 86 4D 81 AD F5 AD 19 4F C7 18  '
+  -     '|.......M.....O..|\n'
+  -     '  0x0000F610  BC AD 41 81 4F 87 AD E8 AD 0C 86 C7 18 B4 A6 01  '
+  -     '|..A.O...........|\n'
+  -     '  0x0000F620  C7 18 BC AD 2F 81 89 8B A6 01 C7 18 8A A7 FC A6  '
+  -     '|..../...........|\n'
+  -     '  0x0000F630  9C 9E E7 01 A6 DA 9E E7 02 B6 87 9E E7 03 C6 17  '
+  -     '|................|\n'
+  -     '  0x0000F640  F8 9E E7 04 CD F3 BB 8A 88 96 18 B0 8A 88 96 18  '
+  -     '|................|\n'
+  -     '  0x0000F650  B2 8A 88 81 C6 18 8A C7 18 86 CD ED FD C6 18 86  '
+  -     '|................|\n'
+  -     '  0x0000F660  A4 01 27 F6 81 C6 18 AC A4 0F A1 07 27 38 A1 01  '
+  -     "|..'.........'8..|\n"
+  -     '  0x0000F670  27 03 CC F4 6D C6 18 A4 A1 22 27 03 CC F4 86 CD  '
+  -     '|\'...m...."\'.....|\n'
+  -     '  0x0000F680  F6 00 AD A2 6E 06 80 8C 5F D6 FC F8 D7 18 B4 AF  '
+  -     '|....n..._.......|\n'
+  -     '  0x0000F690  01 3B 80 F5 C6 17 F8 C7 18 BA A6 07 C7 18 BC AD  '
+  -     '|.;..............|\n'
+  -     '  0x0000F6A0  B3 81 CD F6 00 81 6E 06 80 8C 5F D6 18 A4 D1 FC  '
+  -     '|......n..._.....|\n'
+  -     '  0x0000F6B0  F8 26 EF AF 01 3B 80 F3 C6 18 AA C7 0F 00 CD F6  '
+  -     '|.&...;..........|\n'
+  -     '  0x0000F6C0  00 C6 17 F9 4C C7 0F 01 6E 06 80 8C 5F D6 17 F0  '
+  -     '|....L...n..._...|\n'
+  -     '  0x0000F6D0  D7 0F 02 AF 01 3B 80 F5 45 17 F8 35 81 3F 83 CD  '
+  -     '|.....;..E..5.?..|\n'
+  -     '  0x0000F6E0  FA 02 26 0B 45 17 F8 35 81 6E 08 83 CD FA 02 CD  '
+  -     '|..&.E..5.n......|\n'
+  -     '  0x0000F6F0  F6 15 CD F2 CE 81 3F 89 6E 06 80 8C 5F D6 18 A4  '
+  -     '|......?.n..._...|\n'
+  -     '  0x0000F700  D7 0F 00 BB 89 B7 89 AF 01 3B 80 F1 C6 17 F6 4C  '
+  -     '|.........;.....L|\n'
+  -     '  0x0000F710  C7 0F 06 BB 89 B7 89 B6 89 C7 0F 07 45 17 F0 35  '
+  -     '|............E..5|\n'
+  -     '  0x0000F720  81 3F 83 CD FA 02 26 0B 45 17 F0 35 81 6E 08 83  '
+  -     '|.?....&.E..5.n..|\n'
+  -     '  0x0000F730  CD FA 02 26 03 6E 01 88 CD F6 15 81 CD F7 C8 CD  '
+  -     '|...&.n..........|\n'
+  -     '  0x0000F740  F8 24 27 1E B7 80 CD F9 F6 55 81 CD F8 36 F6 CD  '
+  -     "|.$'......U...6..|\n"
+  -     '  0x0000F750  ED EA CD F9 F6 AF 01 3B 80 F4 B6 85 CD ED EA CC  '
+  -     '|.......;........|\n'
+  -     'Coverage: 6.68%\n'
+  -     'Ranges: 11\n'
+  -     'Errors: 0\n'
+  -     'Warnings: 0\n'
+  -     'Loader 0 err · ⚠4 OOO · Entry 0x00000000\n'
+  -     'Context\n'
+  -     'No A2L loaded.',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry - AssertionError: assert [] == ['0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC ']
+  
+  Right contains one more item: '0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |\n  0x0000EB00  20 59       CC EC 19    CC '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    '
+  -     '|..........      |\n'
+  -     '  0x0000EB00  20 59       CC EC 19    CC ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality - AssertionError: assert [] == ['0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E ']
+  
+  Right contains one more item: '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+  
+  Full diff:
+  + []
+  - [
+  -     '0x00000000                                                   '
+  -     '|                |\n'
+  -     '  0x000017E0  11                      01 3A                    |.       '
+  -     '.:      |\n'
+  -     '  0x000017F0  FF FF FF FF FF FF FF AA 0E ',
+  - ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9] - AssertionError: assert 2 == 0
+ +  where 2 = A2LTagTable(id='a2l_tags_list').cursor_row
+FAILED tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1] - AssertionError: assert ('... window limited to 200 rows ...', '... showing from 0x0000FFB0 (context preserved) ...') == ('... window limited to 200 rows ...', '... window limited to 200 rows ...')
+  
+  At index 1 diff: '... showing from 0x0000FFB0 (context preserved) ...' != '... window limited to 200 rows ...'
+  
+  Full diff:
+    (
+        '... window limited to 200 rows ...',
+  -     '... window limited to 200 rows ...',
+  +     '... showing from 0x0000FFB0 (context preserved) ...',
+    )
+================== 25 failed, 29 passed in 431.61s (0:07:11) ===================

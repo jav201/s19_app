@@ -1,0 +1,19 @@
+{
+  "round": "b103_ux_r2",
+  "gate": "G2",
+  "base": "e07fb00",
+  "exported_at": "2026-11-12T11:43:28.859Z",
+  "answers": {
+    "q1_pe": "approve",
+    "q2_av": "approve",
+    "q2_order": "reads_right",
+    "q3_body": "B",
+    "q4_q": "B",
+    "q5_ctrlc_sel": "approve",
+    "q6_notices": "approve",
+    "q7_export": "A",
+    "q7_default": "same_as_source"
+  },
+  "notes": {},
+  "general_note": ""
+}

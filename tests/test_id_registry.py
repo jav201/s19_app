@@ -208,7 +208,10 @@ from tools.id_registry import (
 # (tests/test_b103_a2l_definition_arrays_fix_cap.py); 293 -> 294.
 # batch-103 Inc 3b E4: 295 -> 296 (tests/test_b103_a2l_definition_arrays_write.py).
 # batch-103 Inc 5 E4: 296 -> 297 (tests/test_b103_a2l_refresh.py).
-EXPECTED_SCANNED_TEST_FILES = 299
+# batch-103 Inc 1b E5: HEAD 305e5892 had 303; +4: tests/test_b103_e5_safety.py,
+# tests/test_b103_winci_gate.py, tests/support/b103_winci_gate.py and
+# tests/support/b103_artifact_safety.py (the JSON does not count); 303 -> 307.
+EXPECTED_SCANNED_TEST_FILES = 307
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

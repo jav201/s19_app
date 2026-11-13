@@ -1749,7 +1749,13 @@ def test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests() -> None:
     assert "tests/test_b103_clipboard_matrix.py" in text
     assert _script_injections(text) == []
     assert "secrets." not in text
-    assert "upload-artifact" not in text
+    # E5 Inc 1b addendum: audited evidence may be uploaded only after scanning.
+    scanner = "tests/support/b103_artifact_safety.py"
+    upload = "uses: actions/upload-artifact@v4"
+    assert text.count(upload) == 1
+    assert 0 <= text.find(scanner) < text.find(upload)
+    assert "if: always() && steps.artifact_safety.outcome == 'success'" in text
+    assert "if-no-files-found: error" in text
     assert "pull_request_target" not in text
     assert "workflow_run" not in text
     assert "cache:" not in text

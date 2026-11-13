@@ -1,0 +1,30 @@
+Done. All graph contracts implemented literally in `s19_app/tui/app.py` only — no deviation file needed.
+
+## Change summary
+
+**Imports**
+- `from textual.actions import SkipAction`, `from textual.geometry import Offset`, `from textual.screen import Screen`
+- `from .capped_text_area import CappedTextArea`
+- `from .os_clipboard_input import OsClipboardInput, _mirror_and_write_os_clipboard`
+
+**N1 `S19TuiApp.copy_to_clipboard`** — sync override: `raise SkipAction` before any coroutine/worker on `text == ""`; otherwise `self.run_worker(_mirror_and_write_os_clipboard(self, text))` once. No `super()`, no writer, no notify, no slicing.
+
+**N2 `S19TuiApp._right_click_text`** — read-only: `get_widget_at`/`get_style_at`, text-box/ancestor exclusion (`OsClipboardInput`/`CappedTextArea`) first, `#patch_json_view` `selected_text`, A2L `coordinate_to_cell_key((row,0))`→`_a2l_row_key_to_tag` full name, MAC `.plain`/`str` with one known glyph+space prefix removal via `_MAC_COPY_GLYPHS`, `out_of_bounds`/header/absent-meta → `None`.
+
+**N3 `S19TuiApp.on_event`** — async override; one `_RightGesture` candidate (5 fields: `text`, `screen_offset`, `screen`, `widget`, `valid`). MouseDown clears then snapshots (button 3 only, no copy on press); changed-offset MouseMove permanently clears `valid` via `replace`; MouseUp consumes/clears before a single copy on valid same-offset/screen/widget release; every path ends with exactly one `await super().on_event(event)`.
+
+**N4/N5 `_CopyRowTable(DataTable)` + `on_click`** — defined before `A2LTagTable`; `out_of_bounds=True` → `prevent_default()`+return; in-bounds left click untouched; other buttons → `move_cursor(...animate=True)` then `prevent_default()` (no `RowSelected`, no hex jump).
+
+**N6 `A2LTagTable(_CopyRowTable)`**, **N7 MAC** → `_CopyRowTable(...)` (a2l composition unchanged).
+
+**N8/N9** — `action_help_quit` (busy → `_QuitQuestionScreen`, idle → `_CopyQuitScreen` body B, both `_answer_quit`); `_CopyQuitScreen(_QuitQuestionScreen)` with no methods; `_COPY_QUIT_BODY = "Quit the app? Nothing is selected to copy."`.
+
+**N10** — `("q", "help_quit", "Quit")`; palette projection maps `help_quit` → `PaletteEntry("Quit", "quit")` (no duplicate, no `help_quit` leak); `_build_palette_entries` docstring updated.
+
+## Static checks (Windows, no import/pytest per brief)
+
+- `python -m py_compile s19_app/tui/app.py` → **OK**
+- AST census confirms: all new/changed symbols present (`_CopyRowTable`, `A2LTagTable(_CopyRowTable)`, `_CopyQuitScreen(_QuitQuestionScreen)`, `_RightGesture`, the 4 methods, `_right_gesture` AnnAssign in `__init__`, `_MAC_COPY_GLYPHS`, q binding `['q','help_quit','Quit']`, MAC table = `_CopyRowTable(...)`).
+- `git status`: only `s19_app/tui/app.py` changed by this run. `s19_app/tui/os_clipboard_input.py` shows `M` as a **pre-existing** group-B edit in the working tree (its `_copy_notice_text` + NUL-guard tail was already present) — I did not touch it. Nothing committed.
+
+No runtime behavior claimed (no pytest/app/probe run).

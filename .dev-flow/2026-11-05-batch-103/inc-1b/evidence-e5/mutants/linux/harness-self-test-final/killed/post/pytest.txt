@@ -1,0 +1,14 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________________ test_value __________________________________
+
+    def test_value():
+>       assert sample.VALUE == 1
+E       assert 2 == 1
+E        +  where 2 = sample.VALUE
+
+test_sample.py:4: AssertionError
+- generated xml file: <SCRATCH>/harness-self-test-final/killed/post/junit.xml -
+=========================== short test summary info ============================
+FAILED test_sample.py::test_value - assert 2 == 1
+1 failed in 0.03s

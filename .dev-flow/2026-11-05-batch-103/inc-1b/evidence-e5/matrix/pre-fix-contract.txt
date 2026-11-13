@@ -1,0 +1,45 @@
+BASE_HEAD=0d4d4e7c800b27040769a1a10117e62884cc7326
+Linux
+Python 3.11.18
+Traceback (most recent call last):
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 24, in check
+    function()
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 84, in external_read_checks_returncode
+    raise AssertionError("PowerShell failure was returned as clipboard data")
+AssertionError: PowerShell failure was returned as clipboard data
+Traceback (most recent call last):
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 24, in check
+    function()
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 89, in matrix_uses_system_resolver
+    assert original is not None, "matrix does not reuse the system resolver"
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: matrix does not reuse the system resolver
+Traceback (most recent call last):
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 24, in check
+    function()
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 100, in matrix_census_is_28
+    cells = matrix.AT_CELLS
+            ^^^^^^^^^^^^^^^
+AttributeError: module 'tests.test_b103_copy_paste_matrix' has no attribute 'AT_CELLS'
+Traceback (most recent call last):
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 24, in check
+    function()
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 111, in matrix_waits_before_read_and_paste
+    body = source[source.index("async def _run_cell") : source.index("AT_CELLS =")]
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: substring not found
+Traceback (most recent call last):
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 24, in check
+    function()
+  File "/tmp/b103-e5-matrix-pre-B9KGmj/contract_probe.py", line 122, in workflow_contract
+    assert "textual==8.2.8" in text
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+PASS external_read_preserves_payload
+FAIL external_read_checks_returncode
+FAIL matrix_uses_system_resolver
+FAIL matrix_census_is_28
+FAIL matrix_waits_before_read_and_paste
+FAIL workflow_contract
+CONTRACT_FAILURES=5
+CONTRACT_EXIT=1

@@ -44,9 +44,12 @@ a **layered write cascade**:
        ownership passes to the system on success, so the write is
        delivered immediately and survives app exit.
     2. ``subprocess`` shelling out to the system PowerShell's
-       ``Set-Clipboard`` with the payload passed through stdin as UTF-8 —
-       a fresh isolated process, and the copied text is never interpolated
-       into the command line.
+       ``[Windows.Clipboard]::SetText()`` — the command is STATIC, loads
+       PresentationCore, sets a UTF-8 no-BOM input encoding, receives
+       explicitly encoded bytes through binary stdin, reads the payload in
+       one shot via ``[Console]::In.ReadToEnd()`` and writes it verbatim
+       (CR, CRLF and LF preserved exactly). The payload is never
+       interpolated into the command line.
 
 Every OS access runs in an executor off the UI event loop, and every
 clipboard payload — read or written, OS or the Textual internal mirror —
@@ -88,7 +91,8 @@ logger = logging.getLogger(__name__)
 # Layer retry budgets. The Win32 read/write retry loops stay short; the
 # PowerShell rescue gets 2.0 s per subprocess (E3 ruling, finding
 # F-B102-1: a cold Windows PowerShell start can exceed the old 500 ms cap
-# before Get-Clipboard / Set-Clipboard even runs). Every OS access runs in
+# before the Get-Clipboard read / [Windows.Clipboard]::SetText write even
+# runs). Every OS access runs in
 # an executor, so the 2.0 s worst case never blocks the UI event loop.
 #   ctypes     : 5 retries × 20 ms = 100 ms
 #   powershell : one attempt, 2.0 s subprocess wall-clock
@@ -117,17 +121,22 @@ _WRITE_FAIL_NOTIFICATION = (
 # processes (E3 addendum 4).
 _POWERSHELL_SUBPROCESS_LOCK = threading.Lock()
 
-# Static PowerShell write command (E3 ruling): the payload travels through
-# stdin (``$input | Set-Clipboard``), never interpolated into ``-Command``,
-# so copied text cannot break out of the command line. The program itself
-# is resolved at call time by :func:`_system_powershell` (R-PASTE.16), so
-# this tuple holds the arguments only.
+# Static PowerShell write command (E3 ruling): UTF-8 bytes travel through
+# binary stdin, are read in one shot via ``[Console]::In.ReadToEnd()`` into
+# a variable and written with ``[Windows.Clipboard]::SetText()`` — never
+# interpolated into ``-Command``, so copied text cannot break out of the
+# command line and its CR, CRLF and LF endings survive exactly. The program
+# itself is resolved at
+# call time by :func:`_system_powershell` (R-PASTE.16), so this tuple holds
+# the arguments only.
 _POWERSHELL_WRITE_COMMAND = (
     "-NoProfile",
     "-Command",
     "$ErrorActionPreference='Stop';"
-    "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;"
-    "$input | Set-Clipboard",
+    "Add-Type -AssemblyName PresentationCore;"
+    "[Console]::InputEncoding=[System.Text.UTF8Encoding]::new($false);"
+    "$text=[Console]::In.ReadToEnd();"
+    "[Windows.Clipboard]::SetText($text)",
 )
 
 # The one definition of the CTX-PASTE term *unsafe paste character*: every
@@ -280,11 +289,13 @@ def _read_via_powershell() -> Optional[str]:
     platform, when the system PowerShell is missing, or when the child
     fails, times out or exits non-zero.
 
-    Encoding: ``utf-8`` explicit with ``errors='replace'`` so unicode
-    paths (``Ñoño``, cyrillic, CJK, emoji) survive the round-trip
-    instead of being corrupted by ``locale.getpreferredencoding()``
-    (typically ``cp1252`` on Windows). We ask PowerShell itself to emit
-    UTF-8 via ``[Console]::OutputEncoding``.
+    Stdout stays binary and is decoded explicitly as UTF-8 with
+    ``errors='replace'``, so unicode paths (``Ñoño``, cyrillic, CJK,
+    emoji) survive without locale-dependent decoding or universal-newline
+    translation of CR and CRLF. We ask PowerShell itself to emit the
+    clipboard text through ``[Console]::Out.Write((Get-Clipboard -Raw))``
+    with ``[Console]::OutputEncoding`` set to a UTF-8 no-BOM encoding
+    (``UTF8Encoding($false)``), so no BOM or trailing newline is added.
     """
     if sys.platform != "win32":
         return None
@@ -295,9 +306,6 @@ def _read_via_powershell() -> Optional[str]:
     try:
         kwargs: dict = {
             "capture_output": True,
-            "text": True,
-            "encoding": "utf-8",
-            "errors": "replace",
             "timeout": _POWERSHELL_TIMEOUT_S,
             "shell": False,
         }
@@ -309,8 +317,8 @@ def _read_via_powershell() -> Optional[str]:
                     "-NoProfile",
                     "-NonInteractive",
                     "-Command",
-                    "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
-                    "Get-Clipboard -Raw",
+                    "[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false);"
+                    "[Console]::Out.Write((Get-Clipboard -Raw))",
                 ],
                 cwd=_system_directory(),
                 **kwargs,
@@ -328,7 +336,7 @@ def _read_via_powershell() -> Optional[str]:
             len(result.stderr),
         )
         return None
-    text = result.stdout.rstrip("\r\n")
+    text = result.stdout.decode("utf-8", errors="replace")
     return text if text else None
 
 
@@ -413,24 +421,29 @@ def _write_via_ctypes(text: str) -> bool:
 
 
 def _write_via_powershell(text: str) -> bool:
-    """Write layer 2 — subprocess ``Set-Clipboard`` rescue, system path only.
+    """Write layer 2 — subprocess WPF ``[Windows.Clipboard]::SetText()``
+    rescue, system path only.
 
     A fresh, isolated process writes the clipboard — impervious to any
     in-process clipboard grab state. The program is the system PowerShell's
     absolute path (:func:`_system_powershell`). The command is STATIC
-    (``_POWERSHELL_WRITE_COMMAND``): the payload travels through stdin as
-    UTF-8 (``$input | Set-Clipboard``), never interpolated into
-    ``-Command``, so copied text cannot break out of the command line.
-    ``shell=False`` is explicit and a hidden console window is requested
-    via ``creationflags``. Serialized with the read layer through
-    ``_POWERSHELL_SUBPROCESS_LOCK`` so key spam cannot spawn concurrent
-    PowerShell processes. Returns ``True`` only for exit code 0; ``False``
-    off Windows, on timeout (``_POWERSHELL_TIMEOUT_S``), on missing
-    PowerShell, on any non-zero exit or on any stderr output (a held
-    clipboard makes PowerShell 5.1 ``Set-Clipboard`` emit a non-terminating
-    error and still exit 0, so ``$ErrorActionPreference='Stop'`` promotes
-    it to a terminating error and any remaining stderr is treated as
-    failure).
+    (``_POWERSHELL_WRITE_COMMAND``): it loads PresentationCore, sets the
+    console input encoding to UTF-8 without a BOM. The payload is encoded
+    explicitly as UTF-8 with ``errors='replace'`` and sent through binary
+    stdin, avoiding text-mode newline translation. PowerShell reads it in
+    one shot into ``$text`` via ``[Console]::In.ReadToEnd()`` and writes it
+    with ``[Windows.Clipboard]::SetText($text)`` — never interpolated into
+    ``-Command``, so copied text cannot break out of the command line and
+    its CR, CRLF and LF endings are preserved exactly. ``shell=False`` is
+    explicit and a hidden console window is requested via ``creationflags``.
+    Serialized with the read layer through ``_POWERSHELL_SUBPROCESS_LOCK``
+    so key spam cannot spawn concurrent PowerShell processes. Returns
+    ``True`` only for exit code 0; ``False`` off Windows, on timeout
+    (``_POWERSHELL_TIMEOUT_S``), on missing PowerShell, on any non-zero
+    exit or on any stderr output (a held clipboard makes WPF
+    ``[Windows.Clipboard]::SetText`` throw, and
+    ``$ErrorActionPreference='Stop'`` promotes any such error to a
+    terminating error; any stderr is treated as failure).
     """
     if sys.platform != "win32":
         return False
@@ -439,11 +452,8 @@ def _write_via_powershell(text: str) -> bool:
         logger.debug("_write_via_powershell: system PowerShell not found")
         return False
     kwargs: dict = {
-        "input": text,
+        "input": text.encode("utf-8", errors="replace"),
         "capture_output": True,
-        "text": True,
-        "encoding": "utf-8",
-        "errors": "replace",
         "timeout": _POWERSHELL_TIMEOUT_S,
         "shell": False,
     }
@@ -695,51 +705,133 @@ def write_os_clipboard(
     return False
 
 
+def _copy_notice_text(text: str) -> str:
+    """
+    Summary:
+        Build the single information notice for a successful copy, using
+        the original uncapped text so an over-cap copy reports the true
+        character count while a short copy reports its line count.
+
+    Args:
+        text (str): The original, uncapped text being copied.
+
+    Returns:
+        str: Exactly one of three notices: ``Copied 1 line to the
+        clipboard.``, ``Copied <n> lines to the clipboard.`` (``<n>`` is
+        ``text.count("\\n") + 1``, minus one when ``text`` ends with a
+        line feed), or ``Copied the first 65,536 characters to the
+        clipboard (<N> in all).`` (``<N>`` is the original grouped length)
+        when ``len(text) > _CLIPBOARD_CAP_CHARS``.
+
+    Data Flow:
+        - The over-cap branch takes precedence over line counting.
+        - Never slices ``text``: ``<N>`` is always ``len(text)``, never a
+          capped length.
+
+    Dependencies:
+        Uses:
+            - ``_CLIPBOARD_CAP_CHARS``
+        Used by:
+            - :func:`_mirror_and_write_os_clipboard`
+    """
+    if len(text) > _CLIPBOARD_CAP_CHARS:
+        return (
+            f"Copied the first {_CLIPBOARD_CAP_CHARS:,} characters to the "
+            f"clipboard ({len(text):,} in all)."
+        )
+    lines = text.count("\n") + 1
+    if text.endswith("\n"):
+        lines -= 1
+    if lines == 1:
+        return "Copied 1 line to the clipboard."
+    return f"Copied {lines} lines to the clipboard."
+
+
 async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
     """
     Summary:
-        Shared copy/cut tail for :class:`OsClipboardInput` and
-        ``CappedTextArea``: truncate ``text`` to the cap, mirror it to
-        Textual's internal clipboard through the toolkit base
-        ``App.copy_to_clipboard`` (cheap, synchronous, and retained even
-        if every OS layer fails), then run the write cascade in the
-        executor. On total OS failure the internal mirror is kept and the
-        exact write warning ``_WRITE_FAIL_NOTIFICATION`` is painted.
+        Shared copy/cut tail for :class:`OsClipboardInput`,
+        ``CappedTextArea`` and the app-level copy override: preserve the
+        original text, derive one capped payload, fail closed on a NUL in
+        that payload, otherwise mirror the capped payload to Textual's
+        internal clipboard through the unbound toolkit base
+        ``App.copy_to_clipboard``, run the write cascade in the executor,
+        and emit exactly one result notice on success or the existing
+        write-failure warning.
 
     Args:
         app: The running app — mirror target and notification surface.
-        text (str): The selected text being copied/cut.
+        text (str): The original selected text being copied/cut.
 
     Returns:
         None.
 
     Data Flow:
-        - ``text[:_CLIPBOARD_CAP_CHARS]`` →
-          ``App.copy_to_clipboard(app, text)`` (the toolkit base, never an
-          app override, so the app clipboard and one OSC 52 request are
-          written exactly once per copy) →
-          :func:`write_os_clipboard` in the executor →
-          ``app.notify(_WRITE_FAIL_NOTIFICATION, severity="warning")``
-          when the cascade returns ``False``.
+        - ``original_text = text`` is kept for the whole call, including
+          across the await, so the success notice reports the original
+          length. ``capped_text = original_text[:_CLIPBOARD_CAP_CHARS]``
+          is derived once.
+        - NUL refusal (R-COPY.25): if ``"\\x00" in capped_text``, make zero
+          base/writer/OSC 52/process/helper calls, emit exactly one
+          6-second warning ``Clipboard copy refused — NUL cannot be
+          represented in the Windows text clipboard.`` and one fixed
+          WARNING ``OS clipboard copy refused; payload contains NUL``,
+          leave both clipboards unchanged, and return. Only ``capped_text``
+          is tested, so NUL solely beyond the cap takes the normal path.
+        - Non-NUL path: exactly one unbound toolkit base
+          ``App.copy_to_clipboard(app, capped_text)`` (never an app
+          override) writes the app clipboard and one OSC 52 request, then
+          exactly one :func:`write_os_clipboard` runs in the default
+          executor.
+        - On ``True``, exactly one information notice from
+          :func:`_copy_notice_text(original_text)` is emitted (the over-cap
+          helper substitutes the cut notice). On ``False``, the existing
+          6-second ``_WRITE_FAIL_NOTIFICATION`` warning and its WARNING log
+          are emitted and no success/cut notice is emitted.
 
     Dependencies:
         Uses:
-            - ``_CLIPBOARD_CAP_CHARS``, :func:`write_os_clipboard`,
-              ``_WRITE_FAIL_NOTIFICATION``, ``textual.app.App``
+            - ``_CLIPBOARD_CAP_CHARS``
+            - :func:`write_os_clipboard`
+            - :func:`_copy_notice_text`
+            - ``_WRITE_FAIL_NOTIFICATION``
+            - ``textual.app.App`` (unbound toolkit base)
         Used by:
             - :meth:`OsClipboardInput.action_copy`
             - :meth:`OsClipboardInput.action_cut`
             - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_copy`
             - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_cut`
+            - ``S19TuiApp.copy_to_clipboard`` (group-A override, schedules
+              once)
     """
-    text = text[:_CLIPBOARD_CAP_CHARS]
+    original_text = text
+    capped_text = original_text[:_CLIPBOARD_CAP_CHARS]
+    if "\x00" in capped_text:
+        try:
+            app.notify(
+                "Clipboard copy refused — NUL cannot be represented in the "
+                "Windows text clipboard.",
+                severity="warning",
+                timeout=6.0,
+            )
+        except Exception:  # pragma: no cover — notify is best-effort.
+            pass
+        logger.warning("OS clipboard copy refused; payload contains NUL")
+        return
     try:
-        App.copy_to_clipboard(app, text)
+        App.copy_to_clipboard(app, capped_text)
     except Exception:  # pragma: no cover — mirror is best-effort.
         logger.debug("internal clipboard mirror failed", exc_info=True)
     loop = asyncio.get_event_loop()
-    written = await loop.run_in_executor(None, write_os_clipboard, text)
+    written = await loop.run_in_executor(None, write_os_clipboard, capped_text)
     if written:
+        try:
+            app.notify(
+                _copy_notice_text(original_text),
+                severity="information",
+            )
+        except Exception:  # pragma: no cover — notify is best-effort.
+            pass
         return
     try:
         app.notify(

@@ -42,6 +42,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
+import ntpath
 import os
 import re
 import subprocess
@@ -182,6 +183,33 @@ def require_isolated_clipboard(
 # The hosted-runner clipboard probe (R-PASTE.22, .23)
 # ---------------------------------------------------------------------------
 
+class _ProbeDetail(str):
+    """String-compatible, redacted probe detail with structured metadata."""
+
+    stage: str
+    metadata: dict
+
+    def __new__(
+        cls,
+        text: str,
+        *,
+        stage: str,
+        expected_chars: Optional[int] = None,
+        actual_chars: Optional[int] = None,
+        error_type: Optional[str] = None,
+    ) -> _ProbeDetail:
+        detail = super().__new__(cls, text)
+        detail.stage = stage
+        detail.metadata = {
+            "stage": stage,
+            "expected_chars": expected_chars,
+            "actual_chars": actual_chars,
+            "error_type": error_type,
+            "result_chars": len(text),
+        }
+        return detail
+
+
 #: One-shot body of the probe, replaced by a stand-in in the LinuxH
 #: pytester runs (E3A-28). Returns ``(usable: bool, result: str)``.
 def _probe_once() -> tuple:
@@ -193,22 +221,44 @@ def _probe_once() -> tuple:
     # product under test), then read back with a separate PowerShell.
     written = _own_write(nonce)
     if not written:
-        return False, "win32 write failed"
+        return False, _ProbeDetail(
+            "win32 write failed",
+            stage="win32-write",
+            expected_chars=len(nonce),
+        )
     try:
         read_back = other_program_read()
     except Exception as exc:  # pragma: no cover - the layers report themselves
-        return False, f"PowerShell read raised {exc!r}"
+        error_type = type(exc).__name__
+        return False, _ProbeDetail(
+            f"PowerShell read raised {error_type}",
+            stage="powershell-read-exception",
+            expected_chars=len(nonce),
+            error_type=error_type,
+        )
     if read_back == nonce:
-        return True, f"win32 write ok, PowerShell read {nonce!r}"
-    return False, f"win32 write ok, PowerShell read {read_back!r}"
+        return True, _ProbeDetail(
+            f"win32 write ok; PowerShell read matched; chars={len(nonce)}",
+            stage="round-trip-ok",
+            expected_chars=len(nonce),
+            actual_chars=len(read_back),
+        )
+    return False, _ProbeDetail(
+        "win32 write ok, PowerShell read mismatch; "
+        f"expected_chars={len(nonce)}; actual_chars={len(read_back)}",
+        stage="round-trip-mismatch",
+        expected_chars=len(nonce),
+        actual_chars=len(read_back),
+    )
 
 
 _probe_cache: Optional[tuple] = None
 
 
 def clipboard_probe() -> tuple:
-    """The cached clipboard probe; ``(usable, result)``, once per session."""
+    """The guarded cached clipboard probe; ``(usable, result)``, once per session."""
     global _probe_cache
+    require_isolated_clipboard("windows")
     if _probe_cache is None:
         _probe_cache = _probe_once()
     return _probe_cache
@@ -394,7 +444,8 @@ def install_process_spy(module) -> list:
         A pass-through wrapper on process creation that records each program
         path (argv[0]) and then starts it unchanged. The spy belongs on the
         module whose ``subprocess.run`` the product under test uses
-        (``s19_app.tui.os_clipboard_input``).
+        (``s19_app.tui.os_clipboard_input``). The isolation guard runs before
+        every delegated launch, including direct uses of the wrapped function.
 
     Returns:
         list: Each started program's argv[0], in order.
@@ -403,6 +454,7 @@ def install_process_spy(module) -> list:
     started: list = []
 
     def _spy(argv, **kwargs):
+        require_isolated_clipboard("windows")
         started.append(list(argv)[0] if argv else None)
         return original(argv, **kwargs)
 
@@ -432,14 +484,14 @@ def install_notice_capture(app: App) -> list:
 
 
 class _LogCapture(logging.Handler):
-    """A DEBUG handler on the ``s19_app`` logger recording (logger, level, message)."""
+    """Record ``(logger, level, formatted message)``, including exceptions and stacks."""
 
     def __init__(self, records: list) -> None:
         super().__init__(level=logging.DEBUG)
         self.records = records
 
     def emit(self, record: logging.LogRecord) -> None:
-        self.records.append((record.name, record.levelname, record.getMessage()))
+        self.records.append((record.name, record.levelname, self.format(record)))
 
 
 def install_log_capture() -> list:
@@ -502,6 +554,12 @@ async def _poll_until(pilot, predicate: Callable[[], bool], timeout: float = 10.
     raise AssertionError("poll predicate not satisfied within timeout")
 
 
+async def wait_for_copy_tail(pilot, marker: dict, timeout: float = 10.0) -> None:
+    """Wait for an instrumented copy tail to start and finish."""
+    await _poll_until(pilot, lambda: bool(marker.get("started")), timeout)
+    await _poll_until(pilot, lambda: bool(marker.get("ended")), timeout)
+
+
 async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
     """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
 
@@ -541,64 +599,115 @@ def _require_windows() -> None:
 
 
 def _system_powershell_path() -> str:
-    """The system PowerShell path from the module under test (Windows only)."""
+    """Resolve system PowerShell only after the Windows isolation guard passes."""
+    _require_windows()
+    require_isolated_clipboard("windows")
     from s19_app.tui import os_clipboard_input as mod
 
     path = mod._system_powershell()
     if not path:
-        pytest.skip("system PowerShell not found on this host")
+        pytest.fail("system PowerShell not found on isolated WinCI")
+    if not ntpath.isabs(path):
+        raise AssertionError("system PowerShell path is not absolute")
     return path
 
 
-def other_program_write(text: str) -> None:
-    """Write the clipboard for the "other program" role via :func:`_own_write`.
-
-    Summary:
-        Run-3 triage C6: the previous PowerShell UTF-16LE stdin pipe decoded
-        to a one-character payload (an embedded NUL after every char). This
-        now delegates to :func:`_own_write` (ctypes ``CF_UNICODETEXT``,
-        UTF-16LE, no PowerShell encoding trick) — the path the probe already
-        proves round-trips through :func:`other_program_read` and the
-        product's readers — and then self-checks the round-trip so a future
-        encoding regression fails here instead of in 21 downstream tests.
-
-    Args:
-        text (str): The payload to write to the clipboard.
-
-    Raises:
-        AssertionError: When the Win32 write fails, or the value reads back
-            different from ``text``.
-    """
+def _run_system_powershell(
+    command: str, *, input_text: Optional[str] = None
+) -> subprocess.CompletedProcess:
+    """Run guarded PowerShell with UTF-8 stdin bytes and binary captured streams."""
     _require_windows()
-    if not _own_write(text):
-        raise AssertionError("other_program_write: CF_UNICODETEXT write failed")
-    read_back = own_read()
-    if read_back != text:
-        shown = read_back[:20] if read_back is not None else None
+    require_isolated_clipboard("windows")
+    path = _system_powershell_path()
+    kwargs = {
+        "capture_output": True,
+        "timeout": 10.0,
+        "shell": False,
+        "creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    }
+    if input_text is None:
+        kwargs["stdin"] = subprocess.DEVNULL
+    else:
+        kwargs["input"] = input_text.encode("utf-8")
+    try:
+        return subprocess.run(
+            [
+                path,
+                "-NoLogo",
+                "-NoProfile",
+                "-NonInteractive",
+                "-Command",
+                command,
+            ],
+            **kwargs,
+        )
+    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
         raise AssertionError(
-            "other_program_write round-trip failed: "
-            f"wrote {text[:20]!r}, read back {shown!r}"
+            f"system PowerShell invocation failed: {type(exc).__name__}"
+        ) from None
+
+
+def other_program_write(text: str) -> None:
+    """Write exact text in an external PowerShell and verify a separate read."""
+    _require_windows()
+    require_isolated_clipboard("windows")
+    encoded = base64.b64encode(
+        text.encode("utf-16-le", "surrogatepass")
+    ).decode("ascii")
+    command = (
+        "$ErrorActionPreference='Stop'; "
+        "$encoded=[Console]::In.ReadToEnd(); "
+        "$text=[Text.Encoding]::Unicode.GetString("
+        "[Convert]::FromBase64String($encoded)); "
+        "Add-Type -AssemblyName PresentationCore; "
+        "[Windows.Clipboard]::SetText($text)"
+    )
+    result = _run_system_powershell(command, input_text=encoded)
+    if result.returncode:
+        raise AssertionError(
+            "other_program_write: PowerShell exit "
+            f"{result.returncode}; stderr_chars={len(result.stderr or b'')}"
+        )
+    read_back = other_program_read()
+    if read_back != text:
+        raise AssertionError(
+            "other_program_write round-trip mismatch: "
+            f"expected_chars={len(text)}; actual_chars={len(read_back)}"
         )
 
 
 def other_program_read() -> str:
-    """A separate system PowerShell ``Get-Clipboard -Raw`` (UTF-8 output)."""
+    """Read exact clipboard text from binary Base64 PowerShell output."""
     _require_windows()
-    path = _system_powershell_path()
-    result = subprocess.run(
-        [path, "-NoProfile", "-NonInteractive", "-Command",
-         "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;Get-Clipboard -Raw"],
-        capture_output=True, text=True, encoding="utf-8",
-        errors="replace", timeout=10.0, shell=False,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    require_isolated_clipboard("windows")
+    command = (
+        "$ErrorActionPreference='Stop'; "
+        "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); "
+        "$text=[string](Get-Clipboard -Raw); "
+        "[Console]::Out.Write([Convert]::ToBase64String("
+        "[Text.Encoding]::UTF8.GetBytes($text)))"
     )
-    return result.stdout.rstrip("\r\n")
+    result = _run_system_powershell(command)
+    if result.returncode:
+        raise AssertionError(
+            "other_program_read: PowerShell exit "
+            f"{result.returncode}; stderr_chars={len(result.stderr or b'')}"
+        )
+    try:
+        return base64.b64decode(
+            b"".join(result.stdout.split()), validate=True
+        ).decode("utf-8")
+    except (ValueError, UnicodeError) as exc:
+        raise AssertionError(
+            "other_program_read: PowerShell output was not Base64 UTF-8"
+        ) from None
 
 
 def _own_write(text: str) -> bool:
     """Write a ``CF_UNICODETEXT`` with the test's own Win32 code (UTF-16), so
     a lone surrogate survives; ``True`` on success."""
     _require_windows()
+    require_isolated_clipboard("windows")
     import ctypes
     from ctypes import wintypes
 
@@ -637,6 +746,7 @@ def _own_write(text: str) -> bool:
 def own_read() -> str:
     """Read the clipboard with the test's own Win32 code (one read)."""
     _require_windows()
+    require_isolated_clipboard("windows")
     import ctypes
     from ctypes import wintypes
 
@@ -671,6 +781,7 @@ def own_read() -> str:
 def clipboard_sequence_number() -> int:
     """``GetClipboardSequenceNumber()`` (Own-read detection of a copy's end)."""
     _require_windows()
+    require_isolated_clipboard("windows")
     import ctypes
 
     return int(ctypes.windll.user32.GetClipboardSequenceNumber())

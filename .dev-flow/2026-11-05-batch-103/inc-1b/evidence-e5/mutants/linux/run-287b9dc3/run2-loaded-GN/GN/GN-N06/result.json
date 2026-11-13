@@ -1,0 +1,12 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GN",
+  "id": "GN-N06",
+  "reason": "group baseline BAD; mutant never applied",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+  ],
+  "verdict": "BAD"
+}

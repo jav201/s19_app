@@ -1,0 +1,253 @@
+s19_app.__file__ = [HOME]/work/b103-e5-matrix-0d4d4e7c/src-lf/s19_app/__init__.py
+textual.__version__ = 8.2.8
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.2.0, pluggy-1.7.0 -- [HOME]/work/b103-e5-matrix-0d4d4e7c/venv/bin/python
+rootdir: [HOME]/work/b103-e5-matrix-0d4d4e7c/src-lf
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5
+collecting ... collected 142 items
+
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1] PASSED [  0%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2] PASSED [  1%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3] PASSED [  2%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4] PASSED [  2%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5] PASSED [  3%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6] PASSED [  4%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/1] PASSED [  4%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/2] PASSED [  5%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/3] PASSED [  6%]
+tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/4] PASSED [  7%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1] PASSED [  7%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2] PASSED [  8%]
+tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3] PASSED [  9%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/1] PASSED [  9%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/2] PASSED [ 10%]
+tests/test_b103_copy_views.py::test_r_copy_10_one_osc52_request[R-COPY.10/3] PASSED [ 11%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/1] PASSED [ 11%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/2] PASSED [ 12%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/3] PASSED [ 13%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4] PASSED [ 14%]
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5] PASSED [ 14%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1] PASSED [ 15%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/2] PASSED [ 16%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/3] PASSED [ 16%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/4] PASSED [ 17%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/5] PASSED [ 18%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/6] PASSED [ 19%]
+tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry PASSED [ 19%]
+tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality PASSED [ 20%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/1] PASSED [ 21%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/2] PASSED [ 21%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/3] PASSED [ 22%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4] PASSED [ 23%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/5] PASSED [ 23%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/6] PASSED [ 24%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7] PASSED [ 25%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8] PASSED [ 26%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9] PASSED [ 26%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/1] PASSED [ 27%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/2] PASSED [ 28%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/3] PASSED [ 28%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4] PASSED [ 29%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/5] PASSED [ 30%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/6] PASSED [ 30%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/7] PASSED [ 31%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8] PASSED [ 32%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9] PASSED [ 33%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1] PASSED [ 33%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2] PASSED [ 34%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3] PASSED [ 35%]
+tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1] PASSED [ 35%]
+tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2] PASSED [ 36%]
+tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1] PASSED [ 37%]
+tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2] PASSED [ 38%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_1_button_keeps_seeds PASSED [ 38%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_2_no_focus_keeps_seeds PASSED [ 39%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_3_highlighted_row_is_not_a_selection PASSED [ 40%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_4_empty_input_keeps_seeds PASSED [ 40%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_5_empty_json_selection_keeps_seeds PASSED [ 41%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_1_row_notice_once PASSED [ 42%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_2_stats_right_click_notice PASSED [ 42%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_3_hex_key_notice PASSED [ 43%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_4_direct_input_copy_notice PASSED [ 44%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_5_direct_textarea_copy_and_final_lf PASSED [ 45%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_6_direct_cut_notices_and_cap PASSED [ 45%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once PASSED [ 46%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice PASSED [ 47%]
+tests/test_b103_clipboard_tail.py::test_r_copy_08_1_key_caps_json_and_direct_boxes PASSED [ 47%]
+tests/test_b103_clipboard_tail.py::test_r_copy_08_2_right_click_caps_json_and_direct_boxes PASSED [ 48%]
+tests/test_b103_clipboard_tail.py::test_r_copy_09_1_cut_notice_original_n_and_boundaries PASSED [ 49%]
+tests/test_b103_clipboard_tail.py::test_r_copy_09_2_right_click_cut_notice_original_n PASSED [ 50%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed PASSED [ 50%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed PASSED [ 51%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_3_nul_only_after_cap_is_allowed PASSED [ 52%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning PASSED [ 52%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_102_view_right_failure_warning PASSED [ 53%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_103_row_right_failure_warning PASSED [ 54%]
+tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload PASSED [ 54%]
+tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs PASSED [ 55%]
+tests/test_b103_clipboard_tail.py::test_e5_powershell_preserves_lf_and_emits_bom_free_readers FAILED [ 56%]
+tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs PASSED [ 57%]
+tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound SKIPPEDun on Linux) [ 57%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive SKIPPEDun on Linux) [ 58%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive SKIPPEDun on Linux) [ 59%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive SKIPPEDun on Linux) [ 59%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection PASSED [ 60%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused PASSED [ 61%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection PASSED [ 61%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input PASSED [ 62%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection PASSED [ 63%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection PASSED [ 64%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second PASSED [ 64%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit PASSED [ 65%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit PASSED  [ 66%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis PASSED [ 66%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question PASSED [ 67%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection PASSED [ 68%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top PASSED [ 69%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single PASSED [ 69%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top PASSED [ 70%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection PASSED [ 71%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single PASSED [ 71%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately PASSED [ 72%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately PASSED [ 73%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog PASSED [ 73%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay PASSED [ 74%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay PASSED [ 75%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state PASSED [ 76%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys PASSED [ 76%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay PASSED [ 77%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit PASSED [ 78%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener PASSED [ 78%]
+tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load PASSED [ 79%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] PASSED [ 80%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 80%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] PASSED [ 81%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 82%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] PASSED [ 83%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 83%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] PASSED [ 84%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 85%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] PASSED [ 85%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 86%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] PASSED [ 87%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 88%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] PASSED [ 88%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 89%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] PASSED [ 90%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 90%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] PASSED [ 91%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 92%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] PASSED [ 92%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 93%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] PASSED [ 94%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 95%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] PASSED [ 95%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 96%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] PASSED [ 97%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 97%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] PASSED [ 98%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 99%]
+tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance SKIPPEDminal steps and choose to use his own clipboard;
+no agent access)                                                         [100%]
+
+=================================== FAILURES ===================================
+__________ test_e5_powershell_preserves_lf_and_emits_bom_free_readers __________
+
+    def test_e5_powershell_preserves_lf_and_emits_bom_free_readers() -> None:
+        """Static E5 oracle: exact LF transport and stdout without a UTF-8 BOM."""
+        failures = []
+        write_command = "".join(clipboard_module._POWERSHELL_WRITE_COMMAND)
+        if "[Console]::In.ReadToEnd()" not in write_command:
+            failures.append("writer must read stdin once with [Console]::In.ReadToEnd()")
+        if "[Windows.Clipboard]::SetText($text)" not in write_command:
+            failures.append("writer must call .NET [Windows.Clipboard]::SetText($text)")
+        if "Set-Clipboard" in write_command:
+            failures.append("writer must not rebuild lines with Set-Clipboard")
+    
+        utf8_without_bom = re.compile(
+            r"UTF8Encoding\s*(?:::\s*new\s*)?\(\s*\$false\s*\)"
+        )
+        readers = (
+            (Path(clipboard_module.__file__), "_read_via_powershell"),
+            (Path(__file__), "other_program_read"),
+        )
+        for path, function_name in readers:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            function = next(
+                node
+                for node in tree.body
+                if isinstance(node, ast.FunctionDef) and node.name == function_name
+            )
+            literals = "".join(
+                node.value
+                for node in ast.walk(function)
+                if isinstance(node, ast.Constant) and isinstance(node.value, str)
+            )
+            output_encodings = re.findall(
+                r"\[Console\]::OutputEncoding\s*=\s*([^;]+)", literals
+            )
+            if len(output_encodings) != 1 or not all(
+                utf8_without_bom.search(encoding) for encoding in output_encodings
+            ):
+                failures.append(f"{function_name} must use UTF8Encoding($false) for stdout")
+    
+>       assert not failures, "\n".join(failures)
+E       AssertionError: writer must read stdin once with [Console]::In.ReadToEnd()
+E         writer must call .NET [Windows.Clipboard]::SetText($text)
+E         writer must not rebuild lines with Set-Clipboard
+E         _read_via_powershell must use UTF8Encoding($false) for stdout
+E         other_program_read must use UTF8Encoding($false) for stdout
+E       assert not ['writer must read stdin once with [Console]::In.ReadToEnd()', 'writer must call .NET [Windows.Clipboard]::SetText($text)', 'writer must not rebuild lines with Set-Clipboard', '_read_via_powershell must use UTF8Encoding($false) for stdout', 'other_program_read must use UTF8Encoding($false) for stdout']
+
+tests/test_b103_clipboard_tail.py:1150: AssertionError
+- generated xml file: [LOCAL_HOME]/Github/s19_app-b103-inc1b-integration/.dev-flow/2026-11-05-batch-103/inc-1b/evidence-e5/matrix/linux-inc1b-e5-fix-junit.xml -
+============================= QC-TM timing margins =============================
+87.6%  0.124 s / 1.000 s  test_r_copy_17_3_click_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+89.2%  0.108 s / 1.000 s  test_r_copy_17_2_tab_enter_on_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+89.4%  0.106 s / 1.000 s  test_r_copy_24_2_palette_quit_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+89.9%  0.101 s / 1.000 s  test_r_copy_17_1_y_quits_within_one_second  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+90.0%  0.100 s / 1.000 s  test_r_dlg_12_102_y_presses_quit  tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+91.5%  0.085 s / 1.000 s  test_r_copy_24_1_ctrl_q_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+QC-TM: 6 bounds, 0 under 20 % margin
+============================= slowest 20 durations =============================
+29.95s call     tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed
+28.28s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+27.03s call     tests/test_b103_clipboard_tail.py::test_r_copy_07_6_direct_cut_notices_and_cap
+22.71s call     tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs
+20.99s call     tests/test_b103_clipboard_tail.py::test_r_copy_09_1_cut_notice_original_n_and_boundaries
+20.04s call     tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once
+16.80s call     tests/test_b103_clipboard_tail.py::test_r_copy_08_2_right_click_caps_json_and_direct_boxes
+16.59s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]
+16.22s call     tests/test_b103_clipboard_tail.py::test_r_copy_25_3_nul_only_after_cap_is_allowed
+16.18s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+16.04s call     tests/test_b103_clipboard_tail.py::test_r_copy_08_1_key_caps_json_and_direct_boxes
+15.89s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]
+15.78s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+15.50s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]
+15.28s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]
+14.99s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]
+14.76s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]
+14.61s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]
+14.47s call     tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed
+14.20s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+=========================== short test summary info ============================
+SKIPPED [4] tests/test_b103_clipboard_tail.py:1201: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+SKIPPED [14] tests/test_b103_copy_paste_matrix.py:36: not_run: terminal paste requires the real copy->separate OS read artifact on isolated WinCI; Linux has no permitted OS read
+SKIPPED [1] tests/test_b103_copy_paste_matrix.py:437: AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access
+============ 1 failed, 122 passed, 19 skipped in 1094.03s (0:18:14) ============
+PYTEST_EXIT=1

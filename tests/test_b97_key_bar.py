@@ -1237,18 +1237,20 @@ def test_tc_b97_72_hit_ranges_are_the_painted_cells(tmp_path: Path) -> None:
 def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkeypatch) -> None:
     """TC-B97-72 (LLR-150.7): with a text ``Input`` focused (the command
     palette's) a click on ``9 Checks`` shows Checks and a click on ``q`` calls
-    ``action_quit`` once, the input staying empty; with the focus inside the
-    Patch Editor a click on ``? Help`` opens the stock help panel, not the
-    window help; a click on the dimmed ``^z Undo`` (file-backed document)
-    changes nothing and rings one bell; a click on the tag changes nothing.
+    ``action_help_quit`` once without calling ``action_quit``, the input staying
+    empty; with the focus inside the Patch Editor a click on ``? Help`` opens
+    the stock help panel, not the window help; a click on the dimmed ``^z Undo``
+    (file-backed document) changes nothing and rings one bell; a click on the
+    tag changes nothing.
 
-    Mutation: the click as ``app.simulate_key`` (types ``q`` / ``9`` into the
-    input); dimmed tokens clickable."""
+    Mutation: project the click to ``action_quit`` or ``app.simulate_key``
+    (types ``q`` / ``9`` into the input); dimmed tokens clickable."""
     from textual.widgets import HelpPanel, Input
 
     from s19_app.tui.window_help import WindowHelpScreen
 
-    quits, bells = [], []
+    help_quits, quits, bells = [], [], []
+    monkeypatch.setattr(S19TuiApp, "action_help_quit", lambda self: help_quits.append(1))
     monkeypatch.setattr(S19TuiApp, "action_quit", lambda self: quits.append(1))
 
     async def _drive():
@@ -1289,7 +1291,12 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
             await settled(pilot, lambda: app._active_screen_key == "checks", "Checks shown")
             await click_bar(pilot, _token_offset(app, 0, "q Quit"))
             await settle(pilot, 2)
-            out["typed"] = (app._active_screen_key, field.value, len(quits))
+            out["typed"] = (
+                app._active_screen_key,
+                field.value,
+                len(help_quits),
+                len(quits),
+            )
         return out
 
     out = asyncio.run(_drive())
@@ -1297,7 +1304,7 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
     assert out["undo"] == ("patch", True, 1), out
     assert out["help"] == (True, False), out
     assert out["focused"], "the palette input held the focus"
-    assert out["typed"] == ("checks", "", 1), out
+    assert out["typed"] == ("checks", "", 1, 0), out
 
 
 def test_tc_b97_72_owner_click_runs_on_its_widget_not_the_focus(tmp_path: Path) -> None:
