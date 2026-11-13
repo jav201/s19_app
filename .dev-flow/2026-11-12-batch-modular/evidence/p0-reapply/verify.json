@@ -1,0 +1,32 @@
+{
+ "base": "4f721985",
+ "stats": {
+  "units_old": 626,
+  "units_new": 626,
+  "missing": 0,
+  "duplicate": 0,
+  "extra": 0,
+  "body_diff": 0,
+  "unlisted_rewrite": 0,
+  "d1_new": 222,
+  "d1_old": 222,
+  "relimports": 18,
+  "css": 1,
+  "bare_d1": 0,
+  "pins_ok": 12,
+  "pins_total": 12,
+  "reexports_missing": 0,
+  "fresh_ok": 32,
+  "fresh_total": 32,
+  "cycles": 0,
+  "caps_over": 0,
+  "old_files": 0,
+  "placement": 0,
+  "header": 0,
+  "css_fail": 0,
+  "equiv": 0,
+  "names": 0,
+  "tc_shape": 0
+ },
+ "failures": []
+}

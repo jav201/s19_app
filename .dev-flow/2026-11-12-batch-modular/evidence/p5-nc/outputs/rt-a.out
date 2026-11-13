@@ -1,0 +1,6 @@
+RETARGET NOTE accepted-refusal R1 tests/test_b103_copy_views.py:111         monkeypatch.setitem(original_entry.__globals__, "_mirror_and_write_os_clipboard", tail)
+RETARGET NOTE dynamic-read tests/test_b100_load_question.py:3149
+RETARGET NOTE dynamic-read tests/test_b100_workers.py:1310
+RETARGET files_scanned=309 files_changed=27 T1=133 T2=6 T3=12 T4=64 T5=2 T6=29 refused=0 accepted=1
+RETARGET CHECK remaining=0
+RETARGET OK

@@ -1,0 +1,4 @@
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge] b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date b1:P a1:P b2:P a2:P b3:P a3:P
+SERIES_DONE

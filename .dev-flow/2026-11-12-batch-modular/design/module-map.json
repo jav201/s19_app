@@ -1,0 +1,9136 @@
+{
+ "base": "4f721985",
+ "caps_this_pass": {
+  "module_lines": 2000,
+  "largest_class_plus": 300
+ },
+ "app": {
+  "package": "s19_app.tui.app",
+  "mixin_order": [
+   "compose_screens",
+   "flow",
+   "save_commit",
+   "reports",
+   "patch",
+   "checks_diff",
+   "save_plan",
+   "project_load",
+   "file_load",
+   "loaded_state",
+   "workspace_view",
+   "projects",
+   "navigation",
+   "a2l_view",
+   "mac_view",
+   "issues_checks",
+   "hex_view",
+   "shell"
+  ],
+  "class_header": "class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, PatchMixin, ChecksDiffMixin, SavePlanMixin, ProjectLoadMixin, FileLoadMixin, LoadedStateMixin, WorkspaceViewMixin, ProjectsMixin, NavigationMixin, A2lViewMixin, MacViewMixin, IssuesChecksMixin, HexViewMixin, ShellMixin, App):",
+  "d1_names": [
+   "IntelHexFile",
+   "Label",
+   "ListItem",
+   "_SAVE_FULL_PATH_LIMIT",
+   "_file_digest",
+   "_image_map",
+   "_is_reparse_point",
+   "_mirror_and_write_os_clipboard",
+   "_plan_without_document_key",
+   "_private_stage_dir",
+   "build_loaded_s19",
+   "check_project_files",
+   "compare_images",
+   "compose_before_after_report",
+   "compose_load_announcement",
+   "copy_into_workarea",
+   "datetime",
+   "find_string_in_mem",
+   "gather_project_artifacts",
+   "generate_diff_report",
+   "generate_diff_report_html",
+   "generate_project_report",
+   "inventory_project_tree",
+   "open",
+   "os",
+   "parse_a2l_cached",
+   "parse_a2l_file",
+   "place_into_workarea",
+   "plan_project_save",
+   "read_project_manifest",
+   "recorded_document_state",
+   "render_hex_view_text",
+   "render_patched_image",
+   "resolve_input_path",
+   "save_patched_image",
+   "validate_project_files",
+   "verify_written_image",
+   "verify_written_manifest",
+   "write_change_document",
+   "write_project_manifest"
+  ],
+  "deps_defined": [
+   "_SAVE_FULL_PATH_LIMIT",
+   "_file_digest",
+   "_image_map",
+   "_is_link_stat",
+   "_plan_without_document_key",
+   "parse_a2l_cached",
+   "recorded_document_state"
+  ],
+  "reexports": [
+   "Counter",
+   "deque",
+   "dataclass",
+   "field",
+   "replace",
+   "copy",
+   "hashlib",
+   "json",
+   "logging",
+   "os",
+   "re",
+   "Path",
+   "PurePath",
+   "PurePosixPath",
+   "PureWindowsPath",
+   "shutil",
+   "stat",
+   "time",
+   "datetime",
+   "timezone",
+   "Any",
+   "Callable",
+   "List",
+   "Literal",
+   "Mapping",
+   "Optional",
+   "Sequence",
+   "Tuple",
+   "events",
+   "work",
+   "SkipAction",
+   "App",
+   "ComposeResult",
+   "Offset",
+   "Message",
+   "Binding",
+   "Screen",
+   "Container",
+   "Horizontal",
+   "ScrollableContainer",
+   "Timer",
+   "reactive",
+   "Widget",
+   "Button",
+   "DataTable",
+   "Header",
+   "HelpPanel",
+   "Input",
+   "Label",
+   "ListItem",
+   "ListView",
+   "ProgressBar",
+   "RichLog",
+   "Select",
+   "Static",
+   "TextArea",
+   "cell_len",
+   "set_cell_size",
+   "Text",
+   "DIFF_KIND_DOMAIN",
+   "S19File",
+   "S19_INTEGRITY_NOTICE_CODES",
+   "load_notice_code",
+   "HEX_INTEGRITY_NOTICE_CODES",
+   "IntelHexFile",
+   "parse_a2l_file",
+   "STATUS_VERIFIED",
+   "VerifyResult",
+   "verify_written_image",
+   "address_in_sorted_ranges",
+   "build_sorted_range_index",
+   "build_row_bases",
+   "find_string_in_mem",
+   "hex_row_bases",
+   "render_hex_view_text",
+   "safe_text",
+   "render_patched_image",
+   "save_patched_image",
+   "run_check_document",
+   "CHG_ENCODING_UNKNOWN",
+   "CHG_FORMAT",
+   "CHG_KIND_UNKNOWN",
+   "CHG_V1_FORMAT",
+   "CHG_VALUE_MODE_UNKNOWN",
+   "DUMMY_CHANGESET_TEXT",
+   "MF_BAD_STRUCTURE",
+   "MF_JSON_PARSE",
+   "SYMBOL_NO_A2L_CONTEXT_TEXT",
+   "list_change_documents",
+   "parse_change_document",
+   "read_change_document",
+   "serialize_change_document",
+   "write_change_document",
+   "DISPOSITION_APPLIED",
+   "DISPOSITION_BLOCKED",
+   "ChangeDocument",
+   "ChangeEntry",
+   "ChangeSummary",
+   "CommandBar",
+   "PaletteEntry",
+   "parse_mac_file",
+   "LoadedFile",
+   "ProjectVariantSet",
+   "VariantDescriptor",
+   "get_operation",
+   "list_operation_ids",
+   "OsClipboardInput",
+   "_mirror_and_write_os_clipboard",
+   "CappedTextArea",
+   "Rail",
+   "RailEntry",
+   "RailItem",
+   "RAIL_ENTRIES",
+   "ChangeSetJsonScreen",
+   "ConfirmDiscardScreen",
+   "ConfirmQuestionScreen",
+   "EntryJsonScreen",
+   "FileRefCandidate",
+   "FileRefChoice",
+   "FileRefChooserScreen",
+   "FlowBlockEditScreen",
+   "LegendScreen",
+   "LOAD_RESULT_SELECT_VARIANT",
+   "LoadChoice",
+   "LoadDialog",
+   "LoadFlowScreen",
+   "LoadResultScreen",
+   "OperationsScreen",
+   "ReportViewerScreen",
+   "SaveFlowScreen",
+   "SavePreview",
+   "SaveProjectPayload",
+   "SaveProjectScreen",
+   "SelectVariantScreen",
+   "BrowseRequested",
+   "FlowBuilderPanel",
+   "FlowExecutionPanel",
+   "FlowRefContext",
+   "fx_run_error_line",
+   "AbDiffPanel",
+   "CheckEditorPanel",
+   "CoverageStats",
+   "EmptyStatePanel",
+   "LoadedArtifactsPanel",
+   "LoadGuardScreen",
+   "MemoryMapPanel",
+   "PatchDocumentView",
+   "PatchEditorPanel",
+   "bytes_per_cell",
+   "cell_count_for_geometry",
+   "cell_status",
+   "coverage_stats",
+   "derive_image_span",
+   "status_to_css_class",
+   "CrcDesignerPanel",
+   "css_class_for_severity",
+   "band_style",
+   "CYAN",
+   "DGRAY",
+   "GREEN",
+   "LABEL",
+   "RED",
+   "VALUE",
+   "YELLOW",
+   "human_bytes",
+   "microbar",
+   "EntropyWindow",
+   "_GROUP_DISPLAY_MAX",
+   "GroupedIssuesPanel",
+   "IssueRow",
+   "SEVERITY_ORDER",
+   "build_issues_severity_strip",
+   "CHECK_GROUP_ORDER",
+   "CheckRow",
+   "GroupedChecksPanel",
+   "build_checks_aggregate_strip",
+   "ValidationIssue",
+   "ValidationReport",
+   "ValidationSeverity",
+   "enrich_tags_and_render",
+   "compose_before_after_report",
+   "ChangeActionResult",
+   "ChangeService",
+   "save_back_status_suffix",
+   "SOURCE_EXTERNAL",
+   "SOURCE_PROJECT_VARIANT",
+   "ImageSource",
+   "compare_images",
+   "flow_change_attribution",
+   "generate_diff_report",
+   "generate_diff_report_html",
+   "build_loaded_hex",
+   "build_loaded_s19",
+   "DeclaredRegion",
+   "ReportFilterMatcher",
+   "parse_report_filter",
+   "read_report_filter_text",
+   "resolve_report_filter",
+   "EXECUTION_SCOPE_TO_REPORT_MODE",
+   "REPORT_SOURCE_DEFAULT",
+   "REPORT_SOURCE_MANIFEST",
+   "ReportOptions",
+   "generate_project_report",
+   "list_project_reports",
+   "ManifestVerifyResult",
+   "MANIFEST_VERIFIED",
+   "check_project_files",
+   "derive_record",
+   "project_file_records",
+   "serialize_manifest",
+   "verify_written_manifest",
+   "write_project_manifest",
+   "GATHER_DOCUMENT_NOT_RECORDED",
+   "PLAN_ACTION_KEEP",
+   "PLAN_ACTION_NEW",
+   "PLAN_ROLE_CARRIED",
+   "PLAN_ROLE_DOCUMENT",
+   "PLAN_ROLE_MANIFEST",
+   "PLAN_TARGET_MERGE",
+   "PLAN_TARGET_NEW",
+   "PLAN_TARGET_OPEN",
+   "PROJECT_CHECKS_DIR",
+   "PROJECT_HOME_NAMES",
+   "PROJECT_PATCHES_DIR",
+   "InventoryFile",
+   "PlannedFile",
+   "ProjectInventory",
+   "SavePlan",
+   "SavePlanRow",
+   "classify_active_document",
+   "document_home_for_kind",
+   "gather_project_artifacts",
+   "inventory_project_tree",
+   "PAINTED_NAME_LIMIT",
+   "painted_names",
+   "plan_project_save",
+   "scoped_home",
+   "scoped_home_target",
+   "folder_open_service",
+   "workspace",
+   "OpenFolderChip",
+   "titled_header",
+   "KeyBar",
+   "WindowHelpChip",
+   "WindowSection",
+   "CurveDescriptionScreen",
+   "A2LProgress",
+   "describe_curve_tag",
+   "SplitJoinWindow",
+   "build_mac_coverage_strip",
+   "build_validation_report",
+   "DOCUMENT_NEXT_STEP",
+   "DOCUMENT_REASON_IO_ERROR",
+   "DOCUMENT_REASON_LINK",
+   "DOCUMENT_REASON_TOO_LARGE",
+   "DOCUMENT_REASON_UNREADABLE",
+   "EXECUTION_SCOPES",
+   "PROBLEM_NOT_READABLE",
+   "PROJECT_MANIFEST_NAME",
+   "SCOPE_ACTIVE",
+   "STEP_CHECK_THEN_LOAD",
+   "STEP_OPEN_FROM_EDITOR",
+   "STEP_REPLACE_A2L",
+   "_ISSUE_ENTRY",
+   "_ISSUE_KEY",
+   "_KEY_ACTIVE_DOCUMENT",
+   "DerivedFrom",
+   "FileRecord",
+   "LoadAnnouncement",
+   "ProjectFileProblem",
+   "ProjectManifest",
+   "VariantExecutionResult",
+   "compose_load_announcement",
+   "document_problem_file",
+   "execute_project_variants",
+   "is_active_document_form",
+   "manifest_is_damaged",
+   "manifest_keep_reason",
+   "manifest_rewrite_refusal",
+   "read_project_manifest",
+   "_guarded_destination",
+   "_is_reparse_point",
+   "_path_traverses_reparse_point",
+   "_private_stage_dir",
+   "A2L_EXTENSIONS",
+   "HEX_EXTENSIONS",
+   "MAC_EXTENSIONS",
+   "PROJECT_DATA_EXTENSIONS",
+   "PROJECT_PRIMARY_DATA_EXTENSIONS",
+   "PROJECT_NAME_MAX_CHARS",
+   "PlacementResult",
+   "RESERVED_WORKAREA_HOMES",
+   "S19_EXTENSIONS",
+   "SUPPORTED_EXTENSIONS",
+   "WORKAREA_DIRNAME",
+   "WORKAREA_PATCHES",
+   "WORKAREA_TEMP",
+   "WORKAREA_TEMPLATES",
+   "WorkareaContainmentError",
+   "WorkareaPlacementError",
+   "build_variant_set",
+   "contained_in_workarea",
+   "copy_into_workarea",
+   "ensure_workarea",
+   "is_windows_device_name",
+   "list_workarea_files",
+   "place_into_workarea",
+   "RECENT_PROBLEM_TOO_LARGE",
+   "RECENT_PROBLEM_UNREADABLE",
+   "record_recent_source",
+   "read_recent_sources",
+   "recent_kind",
+   "resolve_input_path",
+   "sanitize_project_name",
+   "setup_logging",
+   "validate_project_files",
+   "_TYPED_REFUSAL_TOKENS",
+   "_RECENT_PROBLEM_STEPS",
+   "_LOAD_DIALOG_INERT_ACTIONS",
+   "QuestionKind",
+   "UnsavedItem",
+   "BusyKey",
+   "_BusyAction",
+   "_BUSY_FRAMES",
+   "_BUSY_TICK_SECONDS",
+   "_BUSY_ACTIONS",
+   "_BusyRun",
+   "_BusyState",
+   "SESSION_ACTION_KEYS",
+   "_BUSY_LINE",
+   "_QUIT_TITLE",
+   "_QUIT_BODY",
+   "_QUIT_YES",
+   "_QUIT_NO",
+   "_COPY_QUIT_BODY",
+   "_QuitQuestionScreen",
+   "_CopyQuitScreen",
+   "_RightGesture",
+   "ProjectLoadRequest",
+   "PreparedProjectLoad",
+   "SaveImageInput",
+   "SaveRequest",
+   "SaveOutcome",
+   "A2LAttachRequest",
+   "A2LAttachResult",
+   "_save_failure_outcome",
+   "PATCH_ACTIONS_V2",
+   "RAIL_ENTRIES_B94",
+   "CHECK_EDITOR_ACTIONS",
+   "_SAVEBACK_S0_MAX_BYTES",
+   "_synth_s0_header_from_filename",
+   "_a2l_tag_in_memory_display",
+   "_a2l_tag_unit_display",
+   "_A2L_ISSUE_SEVERITY_RANK",
+   "_ISSUE_DISPLAY_RANK",
+   "_a2l_issue_severity_map",
+   "_a2l_tag_row_severity",
+   "MAX_SECTIONS_OUT_OF_RANGE",
+   "REPORT_FILTERS_DIR_NAME",
+   "MAX_SECTIONS_PRIMARY_RANGES",
+   "A2LCacheEntry",
+   "_LOG",
+   "parse_a2l_cached",
+   "PreparedLoad",
+   "format_report_log_line",
+   "_build_a2l_name_index",
+   "_mac_record_ui_state",
+   "_MAC_COLUMN_HEADERS",
+   "_SEVERITY_TO_RICH_STYLE",
+   "_severity_style",
+   "_MAC_GLYPH_PARSE_ERROR",
+   "_MAC_GLYPH_OUT_OF_IMAGE",
+   "_MAC_GLYPH_IN_IMAGE",
+   "_MAC_GLYPH_UNCHECKED",
+   "_mac_status_glyph",
+   "_MAC_COPY_GLYPHS",
+   "SECTIONS_COVERAGE_BAR_WIDTH",
+   "WORKSPACE_MEMSTRIP_DEFAULT_COLS",
+   "_STRIP_CELL_GLYPH",
+   "_STRIP_GAP_GLYPH",
+   "_A2L_CARD_HINT",
+   "_card_value_text",
+   "_card_field",
+   "_shorten_tag_name",
+   "_a2l_detail_card_text",
+   "_CopyRowTable",
+   "A2LTagTable",
+   "A2LDetailCard",
+   "dominant_band_label",
+   "_integrity_notice_codes",
+   "_INTEGRITY_NOTICE_CODES",
+   "build_loader_facts_text",
+   "build_workspace_stats_text",
+   "precompute_mac_datatable_payload",
+   "_has_primary",
+   "_has_mac",
+   "_has_a2l",
+   "_unload_a2l",
+   "_unload_mac",
+   "_unload_primary",
+   "_SAVE_REPORT_SUFFIX_CHARS",
+   "_SAVE_FULL_PATH_LIMIT",
+   "_save_manifest_keys",
+   "_image_map",
+   "InstallSet",
+   "choose_install_set",
+   "_ProjectImageStep",
+   "_SAVE_KIND_WORDS",
+   "_SAVE_ROW_LABELS",
+   "_SAVE_SUMMARY_CHANGED",
+   "_SAVE_REFUSAL_PREFIX",
+   "_UNSET",
+   "_DOCUMENT_UNREADABLE_KEY",
+   "_unreadable_text",
+   "_SaveSession",
+   "_PreparedSave",
+   "_file_digest",
+   "_PlacedFiles",
+   "_plan_row_mismatch",
+   "REOPEN_MAX_BYTES",
+   "REOPEN_MAX_ENTRIES",
+   "DOCUMENT_OK",
+   "DOCUMENT_MISSING",
+   "DOCUMENT_LINK",
+   "DOCUMENT_TOO_LARGE",
+   "DOCUMENT_UNREADABLE",
+   "DOCUMENT_IO_ERROR",
+   "_DOCUMENT_IN_HOME",
+   "_PLACED_DOCUMENT_CLASSES",
+   "_DOCUMENT_DROP_OUTCOMES",
+   "_DOCUMENT_FILE_FAULT_CODES",
+   "_DOCUMENT_PARSE_ERRORS",
+   "_DOCUMENT_REASON",
+   "_DOCUMENT_STEP",
+   "_plan_without_document_key",
+   "_DOCUMENT_DROP_REASON",
+   "RecordedDocumentState",
+   "_is_link_stat",
+   "recorded_document_state",
+   "_save_clears_panel_flag",
+   "_SESSION_SNAPSHOT_NAMES",
+   "S19TuiApp",
+   "main"
+  ],
+  "sizes": {
+   "a2l_view": 1551,
+   "checks_diff": 763,
+   "compose_screens": 857,
+   "core": 1281,
+   "deps": 234,
+   "file_load": 1603,
+   "flow": 684,
+   "hex_view": 615,
+   "issues_checks": 515,
+   "loaded_state": 911,
+   "mac_view": 1017,
+   "navigation": 1480,
+   "patch": 1812,
+   "project_load": 1641,
+   "projects": 1268,
+   "reports": 1519,
+   "save_commit": 1521,
+   "save_plan": 1545,
+   "shared": 936,
+   "shared_io": 26,
+   "shell": 558,
+   "workspace_view": 828
+  },
+  "graph": {
+   "a2l_view": [
+    "deps",
+    "shared"
+   ],
+   "checks_diff": [
+    "deps"
+   ],
+   "compose_screens": [
+    "deps",
+    "shared"
+   ],
+   "core": [
+    "a2l_view",
+    "checks_diff",
+    "compose_screens",
+    "deps",
+    "file_load",
+    "flow",
+    "hex_view",
+    "issues_checks",
+    "loaded_state",
+    "mac_view",
+    "navigation",
+    "patch",
+    "project_load",
+    "projects",
+    "reports",
+    "save_commit",
+    "save_plan",
+    "shared",
+    "shell",
+    "workspace_view"
+   ],
+   "deps": [
+    "shared"
+   ],
+   "file_load": [
+    "deps",
+    "shared"
+   ],
+   "flow": [
+    "deps"
+   ],
+   "hex_view": [
+    "deps"
+   ],
+   "issues_checks": [
+    "deps"
+   ],
+   "loaded_state": [
+    "shared"
+   ],
+   "mac_view": [
+    "deps",
+    "shared"
+   ],
+   "navigation": [
+    "deps",
+    "shared"
+   ],
+   "patch": [
+    "deps",
+    "shared"
+   ],
+   "project_load": [
+    "deps",
+    "shared"
+   ],
+   "projects": [
+    "deps",
+    "shared",
+    "shared_io"
+   ],
+   "reports": [
+    "deps",
+    "shared"
+   ],
+   "save_commit": [
+    "deps",
+    "shared",
+    "shared_io"
+   ],
+   "save_plan": [
+    "deps",
+    "shared"
+   ],
+   "shared_io": [
+    "deps"
+   ],
+   "shell": [
+    "deps",
+    "shared"
+   ],
+   "workspace_view": [
+    "deps"
+   ]
+  },
+  "methods": [
+   {
+    "name": "__init__",
+    "line": 3151,
+    "span": [
+     3150,
+     3343
+    ],
+    "module": "core",
+    "how": "core: pinned (constructor / compose / mount)"
+   },
+   {
+    "name": "_flush_logger",
+    "line": 3345,
+    "span": [
+     3344,
+     3371
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_get_window_bounds",
+    "line": 3373,
+    "span": [
+     3372,
+     3401
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_a2l_clamp_page_start",
+    "line": 3403,
+    "span": [
+     3402,
+     3428
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_mac_clamp_page_start",
+    "line": 3430,
+    "span": [
+     3429,
+     3455
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_clamp_viewer_page_size",
+    "line": 3457,
+    "span": [
+     3456,
+     3476
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_issues_page_size",
+    "line": 3478,
+    "span": [
+     3477,
+     3507
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_is_layout_visible",
+    "line": 3509,
+    "span": [
+     3508,
+     3511
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_active_view_name",
+    "line": 3513,
+    "span": [
+     3512,
+     3540
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_active_project_dir",
+    "line": 3542,
+    "span": [
+     3541,
+     3576
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "active_project_dir",
+    "line": 3578,
+    "span": [
+     3577,
+     3601
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "record_template_load",
+    "line": 3603,
+    "span": [
+     3602,
+     3628
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_shift_window_for_index",
+    "line": 3630,
+    "span": [
+     3629,
+     3667
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "compose",
+    "line": 3669,
+    "span": [
+     3668,
+     3794
+    ],
+    "module": "core",
+    "how": "core: pinned (constructor / compose / mount)"
+   },
+   {
+    "name": "_compose_screen_workspace",
+    "line": 3796,
+    "span": [
+     3795,
+     3909
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_issues",
+    "line": 3911,
+    "span": [
+     3910,
+     3982
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_checks",
+    "line": 3984,
+    "span": [
+     3983,
+     4045
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_map",
+    "line": 4047,
+    "span": [
+     4046,
+     4103
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_flow",
+    "line": 4105,
+    "span": [
+     4104,
+     4140
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_flow_builder_panel",
+    "line": 4142,
+    "span": [
+     4141,
+     4157
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_flow_execution",
+    "line": 4159,
+    "span": [
+     4158,
+     4195
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_crc_designer",
+    "line": 4197,
+    "span": [
+     4196,
+     4235
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_split_join",
+    "line": 4237,
+    "span": [
+     4236,
+     4269
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "on_flow_builder_panel_run_requested",
+    "line": 4271,
+    "span": [
+     4270,
+     4326
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_flow_no_project_error",
+    "line": 4328,
+    "span": [
+     4327,
+     4337
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_builder_panel_save_requested",
+    "line": 4339,
+    "span": [
+     4338,
+     4384
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_builder_panel_load_requested",
+    "line": 4386,
+    "span": [
+     4385,
+     4434
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_builder_panel_edit_requested",
+    "line": 4436,
+    "span": [
+     4435,
+     4473
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_builder_panel_remove_requested",
+    "line": 4475,
+    "span": [
+     4474,
+     4508
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_flow_project_file_names",
+    "line": 4512,
+    "span": [
+     4509,
+     4535
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_loaded_artifact_paths",
+    "line": 4537,
+    "span": [
+     4536,
+     4551
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_flow_ref_context",
+    "line": 4553,
+    "span": [
+     4552,
+     4569
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_flow_ref_candidates",
+    "line": 4571,
+    "span": [
+     4570,
+     4625
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_browse_requested",
+    "line": 4627,
+    "span": [
+     4626,
+     4631
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_open_file_ref_chooser",
+    "line": 4633,
+    "span": [
+     4632,
+     4646
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_apply_flow_ref_choice",
+    "line": 4648,
+    "span": [
+     4647,
+     4663
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_prefill_flow_execution_sets",
+    "line": 4667,
+    "span": [
+     4664,
+     4675
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_execution_panel_import_requested",
+    "line": 4677,
+    "span": [
+     4676,
+     4721
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_flow_issue",
+    "line": 4724,
+    "span": [
+     4722,
+     4732
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_execution_panel_run_requested",
+    "line": 4734,
+    "span": [
+     4733,
+     4796
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_execution_panel_external_step_confirmed",
+    "line": 4798,
+    "span": [
+     4797,
+     4892
+    ],
+    "module": "core",
+    "how": "core: Textual handler a test patches on the class (double dispatch if moved)"
+   },
+   {
+    "name": "on_flow_execution_panel_save_requested",
+    "line": 4894,
+    "span": [
+     4893,
+     4951
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "on_flow_execution_panel_load_set_requested",
+    "line": 4953,
+    "span": [
+     4952,
+     5025
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_compose_screen_patch",
+    "line": 5027,
+    "span": [
+     5026,
+     5067
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_check_editor",
+    "line": 5069,
+    "span": [
+     5068,
+     5110
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "on_patch_editor_panel_action_requested",
+    "line": 5112,
+    "span": [
+     5111,
+     5334
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_save_back_decision",
+    "line": 5336,
+    "span": [
+     5335,
+     5474
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_before_after_report_requested",
+    "line": 5476,
+    "span": [
+     5475,
+     5509
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_refresh_patch_checks_tab",
+    "line": 5511,
+    "span": [
+     5510,
+     5549
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_hide_replaced_document_controls",
+    "line": 5551,
+    "span": [
+     5550,
+     5580
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_refresh_patch_history_view",
+    "line": 5582,
+    "span": [
+     5581,
+     5656
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_undo_requested",
+    "line": 5658,
+    "span": [
+     5657,
+     5686
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_redo_requested",
+    "line": 5688,
+    "span": [
+     5687,
+     5713
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_patch_history_action_allowed",
+    "line": 5715,
+    "span": [
+     5714,
+     5743
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "action_patch_undo",
+    "line": 5745,
+    "span": [
+     5744,
+     5778
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "action_patch_redo",
+    "line": 5780,
+    "span": [
+     5779,
+     5813
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_edit_json_requested",
+    "line": 5815,
+    "span": [
+     5814,
+     5860
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_apply_changeset_json_edit",
+    "line": 5862,
+    "span": [
+     5861,
+     5931
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_entry_edit_json_requested",
+    "line": 5933,
+    "span": [
+     5932,
+     5988
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_apply_entry_json_edit",
+    "line": 5990,
+    "span": [
+     5989,
+     6052
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_strip_source_map",
+    "line": 6054,
+    "span": [
+     6053,
+     6087
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_surface_verify_result",
+    "line": 6089,
+    "span": [
+     6088,
+     6175
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "action_before_after_report",
+    "line": 6177,
+    "span": [
+     6176,
+     6277
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_start_before_after_worker",
+    "line": 6280,
+    "span": [
+     6278,
+     6393
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_verify_mismatch_summary",
+    "line": 6396,
+    "span": [
+     6394,
+     6424
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_report_change_result",
+    "line": 6426,
+    "span": [
+     6425,
+     6455
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_trigger_execute_scope",
+    "line": 6457,
+    "span": [
+     6456,
+     6511
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_start_execute_scope_worker",
+    "line": 6514,
+    "span": [
+     6512,
+     6586
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_report_execution_results",
+    "line": 6588,
+    "span": [
+     6587,
+     6653
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "action_view_reports",
+    "line": 6655,
+    "span": [
+     6654,
+     6721
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "on_report_viewer_screen_filter_selected",
+    "line": 6723,
+    "span": [
+     6722,
+     6770
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "on_report_viewer_screen_filter_path_typed",
+    "line": 6772,
+    "span": [
+     6771,
+     6820
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_confirm_filter_selection",
+    "line": 6822,
+    "span": [
+     6821,
+     6847
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "on_report_viewer_screen_generate_requested",
+    "line": 6849,
+    "span": [
+     6848,
+     6884
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_trigger_generate_report",
+    "line": 6886,
+    "span": [
+     6885,
+     6996
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_start_generate_report_worker",
+    "line": 6999,
+    "span": [
+     6997,
+     7156
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_log_report_event",
+    "line": 7158,
+    "span": [
+     7157,
+     7205
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_finish_generate_report",
+    "line": 7207,
+    "span": [
+     7206,
+     7232
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_compose_screen_diff",
+    "line": 7234,
+    "span": [
+     7233,
+     7273
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_prefill_diff_variants",
+    "line": 7275,
+    "span": [
+     7274,
+     7305
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_prefill_diff_check_files",
+    "line": 7307,
+    "span": [
+     7306,
+     7321
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_patches_dir",
+    "line": 7323,
+    "span": [
+     7322,
+     7345
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_change_doc_save_home",
+    "line": 7347,
+    "span": [
+     7346,
+     7387
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_check_home",
+    "line": 7389,
+    "span": [
+     7388,
+     7421
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_change_homes",
+    "line": 7423,
+    "span": [
+     7422,
+     7459
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_spec_homes",
+    "line": 7461,
+    "span": [
+     7460,
+     7497
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_scan_patch_change_files",
+    "line": 7499,
+    "span": [
+     7498,
+     7541
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_scan_spec_files",
+    "line": 7543,
+    "span": [
+     7542,
+     7575
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_resolve_listed_file",
+    "line": 7577,
+    "span": [
+     7576,
+     7659
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_report_filters_dir",
+    "line": 7661,
+    "span": [
+     7660,
+     7691
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_scan_report_filter_files",
+    "line": 7693,
+    "span": [
+     7692,
+     7735
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_prefill_patch_change_files",
+    "line": 7737,
+    "span": [
+     7736,
+     7771
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_refill_document_lists",
+    "line": 7773,
+    "span": [
+     7772,
+     7813
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "on_patch_editor_panel_change_file_selected",
+    "line": 7815,
+    "span": [
+     7814,
+     7905
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_patch_editor_load",
+    "line": 7907,
+    "span": [
+     7906,
+     7930
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_patch_document_view",
+    "line": 7932,
+    "span": [
+     7931,
+     7947
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_patch_editor_load_tail",
+    "line": 7949,
+    "span": [
+     7948,
+     7985
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "on_patch_editor_panel_dirty_load_requested",
+    "line": 7987,
+    "span": [
+     7986,
+     8019
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_prefill_check_editor",
+    "line": 8025,
+    "span": [
+     8020,
+     8047
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_prefill_patch_editor",
+    "line": 8049,
+    "span": [
+     8048,
+     8068
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_check_items_to_document",
+    "line": 8070,
+    "span": [
+     8069,
+     8137
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_check_editor_panel_action_requested",
+    "line": 8139,
+    "span": [
+     8138,
+     8252
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_check_editor_panel_spec_file_selected",
+    "line": 8254,
+    "span": [
+     8253,
+     8313
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_diff_image_source",
+    "line": 8315,
+    "span": [
+     8314,
+     8337
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_diff_sources_identical",
+    "line": 8339,
+    "span": [
+     8338,
+     8396
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_ab_diff_panel_compare_requested",
+    "line": 8398,
+    "span": [
+     8397,
+     8419
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_apply_compare_request",
+    "line": 8421,
+    "span": [
+     8420,
+     8509
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_diff_load_maps",
+    "line": 8511,
+    "span": [
+     8510,
+     8575
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_ab_diff_panel_check_file_selected",
+    "line": 8577,
+    "span": [
+     8576,
+     8643
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_ab_diff_panel_report_requested",
+    "line": 8645,
+    "span": [
+     8644,
+     8723
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "_start_diff_report_worker",
+    "line": 8726,
+    "span": [
+     8724,
+     8832
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "_compose_screen_a2l",
+    "line": 8834,
+    "span": [
+     8833,
+     8947
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "_compose_screen_mac",
+    "line": 8949,
+    "span": [
+     8948,
+     9027
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "on_mount",
+    "line": 9029,
+    "span": [
+     9028,
+     9066
+    ],
+    "module": "core",
+    "how": "core: pinned (constructor / compose / mount)"
+   },
+   {
+    "name": "_focus_activity_rail",
+    "line": 9068,
+    "span": [
+     9067,
+     9077
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_setup_datatable_columns",
+    "line": 9079,
+    "span": [
+     9078,
+     9138
+    ],
+    "module": "compose_screens",
+    "how": "rule compose_screens"
+   },
+   {
+    "name": "refresh_files",
+    "line": 9140,
+    "span": [
+     9139,
+     9166
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "action_refresh_files",
+    "line": 9168,
+    "span": [
+     9167,
+     9169
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "action_load_file",
+    "line": 9171,
+    "span": [
+     9170,
+     9185
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "action_open_workarea",
+    "line": 9187,
+    "span": [
+     9186,
+     9206
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "action_save_project",
+    "line": 9208,
+    "span": [
+     9207,
+     9271
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_assignment_candidate_files",
+    "line": 9273,
+    "span": [
+     9272,
+     9307
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "action_load_project",
+    "line": 9309,
+    "span": [
+     9308,
+     9323
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_confirm_then_load",
+    "line": 9325,
+    "span": [
+     9324,
+     9394
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_load_would_lose",
+    "line": 9396,
+    "span": [
+     9395,
+     9450
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_load_question_text",
+    "line": 9452,
+    "span": [
+     9451,
+     9520
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_route_load_project",
+    "line": 9522,
+    "span": [
+     9521,
+     9554
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_load_dialog_rows",
+    "line": 9556,
+    "span": [
+     9555,
+     9640
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_load_dialog_verdict",
+    "line": 9642,
+    "span": [
+     9641,
+     9679
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_load_dialog_preview",
+    "line": 9681,
+    "span": [
+     9680,
+     9808
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_file_preview_marks",
+    "line": 9810,
+    "span": [
+     9809,
+     9871
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_handle_load_result",
+    "line": 9873,
+    "span": [
+     9872,
+     9896
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "action_select_variant",
+    "line": 9898,
+    "span": [
+     9897,
+     9947
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_handle_select_variant",
+    "line": 9949,
+    "span": [
+     9948,
+     10012
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "action_operations_view",
+    "line": 10014,
+    "span": [
+     10013,
+     10055
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_variant_display_options",
+    "line": 10057,
+    "span": [
+     10056,
+     10091
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "action_dump_a2l_json",
+    "line": 10093,
+    "span": [
+     10092,
+     10109
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "action_a2l_describe_tag",
+    "line": 10111,
+    "span": [
+     10110,
+     10163
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_build_palette_entries",
+    "line": 10326,
+    "span": [
+     10325,
+     10376
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_show_screen",
+    "line": 10378,
+    "span": [
+     10377,
+     10492
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "check_action",
+    "line": 10494,
+    "span": [
+     10493,
+     10532
+    ],
+    "module": "core",
+    "how": "core: zero-argument super()"
+   },
+   {
+    "name": "key_condition",
+    "line": 10534,
+    "span": [
+     10533,
+     10543
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_variant_set",
+    "line": 10546,
+    "span": [
+     10544,
+     10548
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_variant_set",
+    "line": 10551,
+    "span": [
+     10549,
+     10555
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "action_confirm_attention",
+    "line": 10557,
+    "span": [
+     10556,
+     10562
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_open_split_join_export",
+    "line": 10564,
+    "span": [
+     10563,
+     10609
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_show_help_panel",
+    "line": 10611,
+    "span": [
+     10610,
+     10640
+    ],
+    "module": "core",
+    "how": "core: zero-argument super()"
+   },
+   {
+    "name": "action_show_legend",
+    "line": 10642,
+    "span": [
+     10641,
+     10672
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_apply_empty_state",
+    "line": 10684,
+    "span": [
+     10683,
+     10724
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_rail_selected",
+    "line": 10726,
+    "span": [
+     10725,
+     10749
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_focus_palette",
+    "line": 10751,
+    "span": [
+     10750,
+     10753
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_focus_find",
+    "line": 10755,
+    "span": [
+     10754,
+     10757
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_focus_goto",
+    "line": 10759,
+    "span": [
+     10758,
+     10761
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_focus_local_input",
+    "line": 10763,
+    "span": [
+     10762,
+     10812
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_focus_needs_rehome",
+    "line": 10814,
+    "span": [
+     10813,
+     10867
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_fallback_focus_target",
+    "line": 10869,
+    "span": [
+     10868,
+     10933
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_resolve_focus_target",
+    "line": 10935,
+    "span": [
+     10934,
+     10970
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_rehome_focus_after_load",
+    "line": 10972,
+    "span": [
+     10971,
+     11046
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_note_focus_landing",
+    "line": 11048,
+    "span": [
+     11047,
+     11076
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_rehome_placeholder_focus_after_load",
+    "line": 11078,
+    "span": [
+     11077,
+     11146
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_load_tree_gone",
+    "line": 11148,
+    "span": [
+     11147,
+     11181
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_land_focus",
+    "line": 11183,
+    "span": [
+     11182,
+     11291
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_open_settings_menu",
+    "line": 11293,
+    "span": [
+     11292,
+     11298
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_command_bar_palette_action",
+    "line": 11300,
+    "span": [
+     11299,
+     11326
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_command_bar_input_focused",
+    "line": 11328,
+    "span": [
+     11327,
+     11353
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_key",
+    "line": 11373,
+    "span": [
+     11372,
+     11448
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_cycle_density",
+    "line": 11450,
+    "span": [
+     11449,
+     11485
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_apply_width_regime",
+    "line": 11487,
+    "span": [
+     11486,
+     11520
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_apply_diff_regime",
+    "line": 11522,
+    "span": [
+     11521,
+     11547
+    ],
+    "module": "checks_diff",
+    "how": "rule checks_diff"
+   },
+   {
+    "name": "on_resize",
+    "line": 11549,
+    "span": [
+     11548,
+     11578
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_page_next_context",
+    "line": 11580,
+    "span": [
+     11579,
+     11605
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_page_prev_context",
+    "line": 11607,
+    "span": [
+     11606,
+     11632
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_page_down_context",
+    "line": 11634,
+    "span": [
+     11633,
+     11664
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_page_up_context",
+    "line": 11666,
+    "span": [
+     11665,
+     11695
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "action_hex_page_next",
+    "line": 11697,
+    "span": [
+     11696,
+     11728
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "action_hex_page_prev",
+    "line": 11730,
+    "span": [
+     11729,
+     11759
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "action_a2l_tags_page_next",
+    "line": 11761,
+    "span": [
+     11760,
+     11787
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "action_a2l_tags_page_prev",
+    "line": 11789,
+    "span": [
+     11788,
+     11813
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "action_mac_records_page_next",
+    "line": 11815,
+    "span": [
+     11814,
+     11844
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "action_mac_records_page_prev",
+    "line": 11846,
+    "span": [
+     11845,
+     11873
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_abort_save",
+    "line": 11875,
+    "span": [
+     11874,
+     12000
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_restore_manifest",
+    "line": 12002,
+    "span": [
+     12001,
+     12081
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_keep_previous_manifest",
+    "line": 12083,
+    "span": [
+     12082,
+     12136
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_handle_save_dialog",
+    "line": 12138,
+    "span": [
+     12137,
+     12226
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_prepare_project_save",
+    "line": 12228,
+    "span": [
+     12227,
+     12643
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_save_session_inputs",
+    "line": 12645,
+    "span": [
+     12644,
+     12727
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_current_save_session",
+    "line": 12729,
+    "span": [
+     12728,
+     12737
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_save_dialog_preview",
+    "line": 12739,
+    "span": [
+     12738,
+     12773
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_compose_save_preview",
+    "line": 12775,
+    "span": [
+     12774,
+     12890
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_confirm_project_save",
+    "line": 12892,
+    "span": [
+     12891,
+     12948
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_commit_project_save",
+    "line": 12950,
+    "span": [
+     12949,
+     13028
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_save_project_worker",
+    "line": 13031,
+    "span": [
+     13029,
+     13048
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_save_project_files",
+    "line": 13050,
+    "span": [
+     13049,
+     13674
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_on_project_saved",
+    "line": 13676,
+    "span": [
+     13675,
+     13818
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_write_manifest_for_save",
+    "line": 13820,
+    "span": [
+     13819,
+     13873
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_decide_project_image",
+    "line": 13875,
+    "span": [
+     13874,
+     13981
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_plan_project_save",
+    "line": 13983,
+    "span": [
+     13982,
+     14305
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_unrecorded_document_lines",
+    "line": 14307,
+    "span": [
+     14306,
+     14387
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_document_home_contained",
+    "line": 14389,
+    "span": [
+     14388,
+     14403
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_write_and_verify_manifest",
+    "line": 14405,
+    "span": [
+     14404,
+     14477
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_surface_manifest_verify_result",
+    "line": 14480,
+    "span": [
+     14478,
+     14530
+    ],
+    "module": "save_commit",
+    "how": "rule save_commit"
+   },
+   {
+    "name": "_publish_flow_session_dir",
+    "line": 14532,
+    "span": [
+     14531,
+     14554
+    ],
+    "module": "flow",
+    "how": "rule flow"
+   },
+   {
+    "name": "_reset_project_session",
+    "line": 14556,
+    "span": [
+     14555,
+     14718
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_session_snapshot",
+    "line": 14720,
+    "span": [
+     14719,
+     14864
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_handle_load_project",
+    "line": 14866,
+    "span": [
+     14865,
+     15060
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_project_load_worker",
+    "line": 15063,
+    "span": [
+     15061,
+     15075
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_prepare_project_load",
+    "line": 15077,
+    "span": [
+     15076,
+     15217
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_on_project_loaded",
+    "line": 15219,
+    "span": [
+     15218,
+     15227
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_install_prepared_project",
+    "line": 15229,
+    "span": [
+     15228,
+     15361
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_on_project_load_failed",
+    "line": 15363,
+    "span": [
+     15362,
+     15378
+    ],
+    "module": "project_load",
+    "how": "rule project_load"
+   },
+   {
+    "name": "_parse_data_file",
+    "line": 15380,
+    "span": [
+     15379,
+     15466
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_reopen_active_document",
+    "line": 15468,
+    "span": [
+     15467,
+     15499
+    ],
+    "module": "reports",
+    "how": "rule reports"
+   },
+   {
+    "name": "list_projects",
+    "line": 15501,
+    "span": [
+     15500,
+     15552
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_listed_project_name",
+    "line": 15554,
+    "span": [
+     15553,
+     15582
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_manifest_is_link",
+    "line": 15585,
+    "span": [
+     15583,
+     15596
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_save_as_source_for",
+    "line": 15598,
+    "span": [
+     15597,
+     15609
+    ],
+    "module": "save_plan",
+    "how": "rule save_plan"
+   },
+   {
+    "name": "_project_folder_refusal",
+    "line": 15611,
+    "span": [
+     15610,
+     15657
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_folder_holds_project",
+    "line": 15659,
+    "span": [
+     15658,
+     15708
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_list_project_files",
+    "line": 15710,
+    "span": [
+     15709,
+     15776
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_a2l_admission",
+    "line": 15778,
+    "span": [
+     15777,
+     15815
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_copy_project_subfolders",
+    "line": 15817,
+    "span": [
+     15816,
+     15970
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_manifest_carry",
+    "line": 15972,
+    "span": [
+     15971,
+     16036
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_rewrite_project_manifest",
+    "line": 16038,
+    "span": [
+     16037,
+     16111
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_derived_record",
+    "line": 16113,
+    "span": [
+     16112,
+     16147
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_activate_project_file",
+    "line": 16149,
+    "span": [
+     16148,
+     16202
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_sync_loaded_file_to_project",
+    "line": 16204,
+    "span": [
+     16203,
+     16353
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_sync_loaded_a2l_to_project",
+    "line": 16355,
+    "span": [
+     16354,
+     16397
+    ],
+    "module": "projects",
+    "how": "rule projects"
+   },
+   {
+    "name": "_typed_load_route",
+    "line": 16399,
+    "span": [
+     16398,
+     16545
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_load_path_from_user_input",
+    "line": 16547,
+    "span": [
+     16546,
+     16645
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_handle_load_dialog",
+    "line": 16647,
+    "span": [
+     16646,
+     16698
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "load_from_path",
+    "line": 16700,
+    "span": [
+     16699,
+     16813
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "load_a2l_from_path",
+    "line": 16815,
+    "span": [
+     16814,
+     16887
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_confirm_project_a2l_replacement",
+    "line": 16889,
+    "span": [
+     16888,
+     16988
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_start_a2l_load",
+    "line": 16990,
+    "span": [
+     16989,
+     17066
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_a2l_attach_worker",
+    "line": 17069,
+    "span": [
+     17067,
+     17103
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_on_a2l_attached",
+    "line": 17105,
+    "span": [
+     17104,
+     17108
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_install_attached_a2l",
+    "line": 17110,
+    "span": [
+     17109,
+     17178
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_on_a2l_attach_failed",
+    "line": 17180,
+    "span": [
+     17179,
+     17197
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "on_list_view_selected",
+    "line": 17199,
+    "span": [
+     17198,
+     17228
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_data_table_row_selected",
+    "line": 17233,
+    "span": [
+     17229,
+     17276
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_data_table_row_highlighted",
+    "line": 17278,
+    "span": [
+     17277,
+     17322
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "on_list_view_highlighted",
+    "line": 17324,
+    "span": [
+     17323,
+     17343
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_load_from_item",
+    "line": 17345,
+    "span": [
+     17344,
+     17351
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_load_workarea_file",
+    "line": 17353,
+    "span": [
+     17352,
+     17446
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_jump_to_section",
+    "line": 17448,
+    "span": [
+     17447,
+     17452
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "_a2l_tag_byte_length_for_hex_highlight",
+    "line": 17454,
+    "span": [
+     17453,
+     17477
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_jump_to_tag",
+    "line": 17479,
+    "span": [
+     17478,
+     17501
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_jump_to_tag_by_data",
+    "line": 17503,
+    "span": [
+     17502,
+     17536
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_focus_a2l_tag_absolute_index",
+    "line": 17538,
+    "span": [
+     17537,
+     17575
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_a2l_tag_find_haystack",
+    "line": 17577,
+    "span": [
+     17576,
+     17602
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_a2l_tag_matches_find_query",
+    "line": 17604,
+    "span": [
+     17603,
+     17607
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_handle_a2l_tag_find_next",
+    "line": 17609,
+    "span": [
+     17608,
+     17665
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_jump_to_mac_record",
+    "line": 17667,
+    "span": [
+     17666,
+     17674
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_jump_to_mac_address",
+    "line": 17676,
+    "span": [
+     17675,
+     17698
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_update_issues_hex_pane",
+    "line": 17700,
+    "span": [
+     17699,
+     17746
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_deduplicate_issues",
+    "line": 17748,
+    "span": [
+     17747,
+     17766
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_filtered_validation_issues",
+    "line": 17768,
+    "span": [
+     17767,
+     17781
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_update_issues_severity_strip",
+    "line": 17783,
+    "span": [
+     17782,
+     17818
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "update_checks_view",
+    "line": 17820,
+    "span": [
+     17819,
+     17883
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "update_validation_issues_view",
+    "line": 17885,
+    "span": [
+     17884,
+     17985
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_render_validation_issues_groups",
+    "line": 17987,
+    "span": [
+     17986,
+     18047
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "on_issue_row_selected",
+    "line": 18049,
+    "span": [
+     18048,
+     18070
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "on_check_row_selected",
+    "line": 18072,
+    "span": [
+     18071,
+     18094
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_update_checks_hex_pane",
+    "line": 18096,
+    "span": [
+     18095,
+     18147
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "action_validation_issues_page_next",
+    "line": 18149,
+    "span": [
+     18148,
+     18159
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "action_validation_issues_page_prev",
+    "line": 18161,
+    "span": [
+     18160,
+     18169
+    ],
+    "module": "issues_checks",
+    "how": "rule issues_checks"
+   },
+   {
+    "name": "_load_mac_file",
+    "line": 18171,
+    "span": [
+     18170,
+     18277
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_get_range_index",
+    "line": 18279,
+    "span": [
+     18278,
+     18318
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_mac_address_in_ranges",
+    "line": 18320,
+    "span": [
+     18319,
+     18345
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_collect_mac_out_of_range_addresses",
+    "line": 18347,
+    "span": [
+     18346,
+     18387
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_collect_mac_highlight_addresses",
+    "line": 18389,
+    "span": [
+     18388,
+     18398
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_merge_primary_with_existing_mac",
+    "line": 18400,
+    "span": [
+     18399,
+     18449
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_merge_mac_with_existing_primary",
+    "line": 18451,
+    "span": [
+     18450,
+     18498
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_apply_unload",
+    "line": 18500,
+    "span": [
+     18499,
+     18635
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_refresh_loaded_panel",
+    "line": 18637,
+    "span": [
+     18636,
+     18694
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "on_loaded_artifacts_panel_unload_requested",
+    "line": 18696,
+    "span": [
+     18695,
+     18728
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "action_unload_all",
+    "line": 18730,
+    "span": [
+     18729,
+     18755
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_invalidate_mac_view_cache",
+    "line": 18757,
+    "span": [
+     18756,
+     18784
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_mac_view_cache_key_for",
+    "line": 18786,
+    "span": [
+     18785,
+     18837
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_refresh_no_mac_validation",
+    "line": 18839,
+    "span": [
+     18838,
+     18884
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_compute_mac_view_payload",
+    "line": 18886,
+    "span": [
+     18885,
+     19063
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_build_mac_view_cache",
+    "line": 19065,
+    "span": [
+     19064,
+     19109
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "load_selected_file",
+    "line": 19111,
+    "span": [
+     19110,
+     19164
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_parse_loaded_file",
+    "line": 19166,
+    "span": [
+     19165,
+     19211
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_apply_loaded_file",
+    "line": 19213,
+    "span": [
+     19212,
+     19238
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_note_image_bytes_written",
+    "line": 19240,
+    "span": [
+     19239,
+     19320
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_refresh_hex_views_after_write",
+    "line": 19322,
+    "span": [
+     19321,
+     19378
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "_refresh_a2l_values_after_write",
+    "line": 19380,
+    "span": [
+     19379,
+     19480
+    ],
+    "module": "patch",
+    "how": "rule patch"
+   },
+   {
+    "name": "watch_current_file",
+    "line": 19482,
+    "span": [
+     19481,
+     19516
+    ],
+    "module": "core",
+    "how": "core: reactive watcher/compute/validate"
+   },
+   {
+    "name": "_apply_prepared_load",
+    "line": 19518,
+    "span": [
+     19517,
+     19799
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_format_coexistence_status",
+    "line": 19801,
+    "span": [
+     19800,
+     19845
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "_prepare_load_payload",
+    "line": 19847,
+    "span": [
+     19846,
+     20008
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_start_load_worker",
+    "line": 20011,
+    "span": [
+     20009,
+     20125
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_complete_prepared_load",
+    "line": 20127,
+    "span": [
+     20126,
+     20181
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_handle_load_error",
+    "line": 20183,
+    "span": [
+     20182,
+     20215
+    ],
+    "module": "file_load",
+    "how": "rule file_load"
+   },
+   {
+    "name": "_a2l_cache_entry",
+    "line": 20217,
+    "span": [
+     20216,
+     20234
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_store_a2l_cache",
+    "line": 20236,
+    "span": [
+     20235,
+     20238
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_log_a2l_parse_summary",
+    "line": 20240,
+    "span": [
+     20239,
+     20286
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_log_loaded_file_summary",
+    "line": 20288,
+    "span": [
+     20287,
+     20338
+    ],
+    "module": "loaded_state",
+    "how": "rule loaded_state"
+   },
+   {
+    "name": "update_sections",
+    "line": 20340,
+    "span": [
+     20339,
+     20456
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "update_workspace_stats",
+    "line": 20458,
+    "span": [
+     20457,
+     20527
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "update_memory_strip",
+    "line": 20529,
+    "span": [
+     20528,
+     20632
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "update_memory_map",
+    "line": 20634,
+    "span": [
+     20633,
+     20679
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "on_memory_map_panel_open_in_hex_requested",
+    "line": 20681,
+    "span": [
+     20680,
+     20708
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "_snapped_focus_row_index",
+    "line": 20710,
+    "span": [
+     20709,
+     20747
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_hex_view_rows",
+    "line": 20749,
+    "span": [
+     20748,
+     20800
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "update_hex_view",
+    "line": 20802,
+    "span": [
+     20801,
+     20838
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_row_start_for_near_top_focus",
+    "line": 20840,
+    "span": [
+     20839,
+     20856
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_reset_scroll_to_top",
+    "line": 20858,
+    "span": [
+     20857,
+     20872
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "update_alt_hex_view",
+    "line": 20874,
+    "span": [
+     20873,
+     20955
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "update_mac_hex_view",
+    "line": 20957,
+    "span": [
+     20956,
+     21009
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "update_mac_view",
+    "line": 21011,
+    "span": [
+     21010,
+     21116
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_update_mac_coverage_strip",
+    "line": 21118,
+    "span": [
+     21117,
+     21158
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_populate_mac_datatable",
+    "line": 21160,
+    "span": [
+     21159,
+     21234
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_invalidate_a2l_view_cache",
+    "line": 21236,
+    "span": [
+     21235,
+     21262
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_replace_current_a2l",
+    "line": 21264,
+    "span": [
+     21263,
+     21301
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_compute_a2l_enriched_tags",
+    "line": 21303,
+    "span": [
+     21302,
+     21350
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_update_a2l_summary_buffer",
+    "line": 21352,
+    "span": [
+     21351,
+     21383
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_refresh_a2l_filtered_tags",
+    "line": 21385,
+    "span": [
+     21384,
+     21427
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_refresh_a2l_dependent_views",
+    "line": 21429,
+    "span": [
+     21428,
+     21494
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "update_a2l_view",
+    "line": 21496,
+    "span": [
+     21495,
+     21556
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "update_a2l_tags_view",
+    "line": 21558,
+    "span": [
+     21557,
+     21671
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_a2l_tag_name_width",
+    "line": 21673,
+    "span": [
+     21672,
+     21719
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_fit_a2l_tag_cells",
+    "line": 21721,
+    "span": [
+     21720,
+     21775
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "on_a2l_tag_table_measured",
+    "line": 21777,
+    "span": [
+     21776,
+     21802
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_repaint_a2l_tag_cells",
+    "line": 21804,
+    "span": [
+     21803,
+     21891
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_build_a2l_table_cells",
+    "line": 21893,
+    "span": [
+     21892,
+     21993
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_filter_a2l_tags",
+    "line": 21995,
+    "span": [
+     21994,
+     22012
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_tag_matches_filter",
+    "line": 22014,
+    "span": [
+     22013,
+     22076
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_toggle_a2l_filter_menu",
+    "line": 22078,
+    "span": [
+     22077,
+     22084
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_toggle_settings_menu",
+    "line": 22086,
+    "span": [
+     22085,
+     22093
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_update_settings_menu",
+    "line": 22095,
+    "span": [
+     22094,
+     22112
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_apply_viewer_setting",
+    "line": 22114,
+    "span": [
+     22113,
+     22134
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_update_a2l_filter_menu",
+    "line": 22136,
+    "span": [
+     22135,
+     22143
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_set_a2l_filter_field",
+    "line": 22145,
+    "span": [
+     22144,
+     22154
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "_schedule_a2l_filter_refresh",
+    "line": 22156,
+    "span": [
+     22155,
+     22187
+    ],
+    "module": "a2l_view",
+    "how": "rule a2l_view"
+   },
+   {
+    "name": "update_project_labels",
+    "line": 22189,
+    "span": [
+     22188,
+     22302
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "_clip_to",
+    "line": 22349,
+    "span": [
+     22347,
+     22373
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "_compose_context_line",
+    "line": 22375,
+    "span": [
+     22374,
+     22450
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "_compose_project_label",
+    "line": 22452,
+    "span": [
+     22451,
+     22497
+    ],
+    "module": "workspace_view",
+    "how": "rule workspace_view"
+   },
+   {
+    "name": "on_button_pressed",
+    "line": 22499,
+    "span": [
+     22498,
+     22556
+    ],
+    "module": "core",
+    "how": "core: Textual handler a test patches on the class (double dispatch if moved)"
+   },
+   {
+    "name": "on_input_changed",
+    "line": 22558,
+    "span": [
+     22557,
+     22563
+    ],
+    "module": "navigation",
+    "how": "rule navigation"
+   },
+   {
+    "name": "_first_visible_hex_address",
+    "line": 22565,
+    "span": [
+     22564,
+     22587
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_handle_search",
+    "line": 22589,
+    "span": [
+     22588,
+     22616
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_apply_goto",
+    "line": 22618,
+    "span": [
+     22617,
+     22657
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_handle_goto",
+    "line": 22659,
+    "span": [
+     22658,
+     22684
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_handle_search_alt",
+    "line": 22686,
+    "span": [
+     22685,
+     22714
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_handle_goto_alt",
+    "line": 22716,
+    "span": [
+     22715,
+     22736
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "_handle_search_mac",
+    "line": 22738,
+    "span": [
+     22737,
+     22765
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_handle_goto_mac",
+    "line": 22767,
+    "span": [
+     22766,
+     22786
+    ],
+    "module": "mac_view",
+    "how": "rule mac_view"
+   },
+   {
+    "name": "_clear_goto_marker_keeping_window",
+    "line": 22788,
+    "span": [
+     22787,
+     22827
+    ],
+    "module": "hex_view",
+    "how": "rule hex_view"
+   },
+   {
+    "name": "set_status",
+    "line": 22829,
+    "span": [
+     22828,
+     22830
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "set_file_status",
+    "line": 22832,
+    "span": [
+     22831,
+     22856
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_append_log_line",
+    "line": 22858,
+    "span": [
+     22857,
+     22872
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_render_log_lines",
+    "line": 22874,
+    "span": [
+     22873,
+     22881
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "set_progress",
+    "line": 22883,
+    "span": [
+     22882,
+     22887
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_paint_status_text",
+    "line": 22889,
+    "span": [
+     22888,
+     22908
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "begin_busy",
+    "line": 22910,
+    "span": [
+     22909,
+     22944
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "step_busy",
+    "line": 22946,
+    "span": [
+     22945,
+     22994
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "end_busy",
+    "line": 22996,
+    "span": [
+     22995,
+     23052
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_busy_tick",
+    "line": 23054,
+    "span": [
+     23053,
+     23066
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_busy_line",
+    "line": 23068,
+    "span": [
+     23067,
+     23076
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_busy_begin_action",
+    "line": 23078,
+    "span": [
+     23077,
+     23103
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_busy_fail",
+    "line": 23105,
+    "span": [
+     23104,
+     23110
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_running_session_action",
+    "line": 23112,
+    "span": [
+     23111,
+     23135
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_refuse_if_busy",
+    "line": 23137,
+    "span": [
+     23136,
+     23159
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "copy_to_clipboard",
+    "line": 23161,
+    "span": [
+     23160,
+     23200
+    ],
+    "module": "core",
+    "how": "core: overrides a Textual App member (reach laws label it S19TuiApp.<name>, reason toolkit)"
+   },
+   {
+    "name": "_right_click_text",
+    "line": 23202,
+    "span": [
+     23201,
+     23294
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "on_event",
+    "line": 23296,
+    "span": [
+     23295,
+     23368
+    ],
+    "module": "core",
+    "how": "core: zero-argument super()"
+   },
+   {
+    "name": "action_help_quit",
+    "line": 23370,
+    "span": [
+     23369,
+     23415
+    ],
+    "module": "core",
+    "how": "core: overrides a Textual App member (reach laws label it S19TuiApp.<name>, reason toolkit)"
+   },
+   {
+    "name": "action_quit",
+    "line": 23417,
+    "span": [
+     23416,
+     23435
+    ],
+    "module": "core",
+    "how": "core: overrides a Textual App member (reach laws label it S19TuiApp.<name>, reason toolkit)"
+   },
+   {
+    "name": "_answer_quit",
+    "line": 23437,
+    "span": [
+     23436,
+     23440
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_exit_if_quit_pending",
+    "line": 23442,
+    "span": [
+     23441,
+     23445
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   },
+   {
+    "name": "_progress_forwarder",
+    "line": 23447,
+    "span": [
+     23446,
+     23477
+    ],
+    "module": "shell",
+    "how": "rule shell"
+   }
+  ],
+  "class_statements": [
+   {
+    "name": "docstring",
+    "line": 3004,
+    "span": [
+     3004,
+     3004
+    ],
+    "module": "core"
+   },
+   {
+    "name": "TITLE",
+    "line": 3006,
+    "span": [
+     3005,
+     3006
+    ],
+    "module": "core"
+   },
+   {
+    "name": "CSS_PATH",
+    "line": 3007,
+    "span": [
+     3007,
+     3007
+    ],
+    "module": "core"
+   },
+   {
+    "name": "BINDINGS",
+    "line": 3023,
+    "span": [
+     3008,
+     3094
+    ],
+    "module": "core"
+   },
+   {
+    "name": "workarea",
+    "line": 3096,
+    "span": [
+     3095,
+     3096
+    ],
+    "module": "core"
+   },
+   {
+    "name": "current_file",
+    "line": 3097,
+    "span": [
+     3097,
+     3097
+    ],
+    "module": "core"
+   },
+   {
+    "name": "current_project",
+    "line": 3098,
+    "span": [
+     3098,
+     3098
+    ],
+    "module": "core"
+   },
+   {
+    "name": "current_a2l_path",
+    "line": 3099,
+    "span": [
+     3099,
+     3099
+    ],
+    "module": "core"
+   },
+   {
+    "name": "current_a2l_data",
+    "line": 3100,
+    "span": [
+     3100,
+     3100
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_a2l_view_generation",
+    "line": 3110,
+    "span": [
+     3101,
+     3110
+    ],
+    "module": "core"
+   },
+   {
+    "name": "last_search_text",
+    "line": 3111,
+    "span": [
+     3111,
+     3111
+    ],
+    "module": "core"
+   },
+   {
+    "name": "last_search_address",
+    "line": 3112,
+    "span": [
+     3112,
+     3112
+    ],
+    "module": "core"
+   },
+   {
+    "name": "log_lines",
+    "line": 3113,
+    "span": [
+     3113,
+     3113
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tags_filter_mode",
+    "line": 3114,
+    "span": [
+     3114,
+     3114
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tags_filter_text",
+    "line": 3115,
+    "span": [
+     3115,
+     3115
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tags_filter_field",
+    "line": 3116,
+    "span": [
+     3116,
+     3116
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tags_filter_fields",
+    "line": 3117,
+    "span": [
+     3117,
+     3136
+    ],
+    "module": "core"
+   },
+   {
+    "name": "large_a2l_warn_bytes",
+    "line": 3137,
+    "span": [
+     3137,
+     3137
+    ],
+    "module": "core"
+   },
+   {
+    "name": "slow_parse_warn_seconds",
+    "line": 3138,
+    "span": [
+     3138,
+     3138
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_window_size",
+    "line": 3139,
+    "span": [
+     3139,
+     3139
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_window_overscan",
+    "line": 3140,
+    "span": [
+     3140,
+     3140
+    ],
+    "module": "core"
+   },
+   {
+    "name": "viewer_page_size_max",
+    "line": 3141,
+    "span": [
+     3141,
+     3141
+    ],
+    "module": "core"
+   },
+   {
+    "name": "viewer_page_size_options",
+    "line": 3142,
+    "span": [
+     3142,
+     3142
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tags_page_size",
+    "line": 3143,
+    "span": [
+     3143,
+     3143
+    ],
+    "module": "core"
+   },
+   {
+    "name": "mac_records_page_size",
+    "line": 3144,
+    "span": [
+     3144,
+     3144
+    ],
+    "module": "core"
+   },
+   {
+    "name": "hex_rows_page_size",
+    "line": 3145,
+    "span": [
+     3145,
+     3145
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_summary_window_size",
+    "line": 3146,
+    "span": [
+     3146,
+     3146
+    ],
+    "module": "core"
+   },
+   {
+    "name": "a2l_tag_hex_highlight_max_bytes",
+    "line": 3147,
+    "span": [
+     3147,
+     3147
+    ],
+    "module": "core"
+   },
+   {
+    "name": "validation_issue_filter_mode",
+    "line": 3148,
+    "span": [
+     3148,
+     3148
+    ],
+    "module": "core"
+   },
+   {
+    "name": "validation_issues_page_size",
+    "line": 3149,
+    "span": [
+     3149,
+     3149
+    ],
+    "module": "core"
+   },
+   {
+    "name": "SCREEN_CONTAINER_IDS",
+    "line": 10170,
+    "span": [
+     10164,
+     10183
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_FIND_GOTO_INPUTS",
+    "line": 10212,
+    "span": [
+     10184,
+     10225
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_FIND_GOTO_INPUT_IDS",
+    "line": 10231,
+    "span": [
+     10226,
+     10236
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_SCREEN_LEGEND_SECTIONS",
+    "line": 10244,
+    "span": [
+     10237,
+     10257
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_FOCUS_TARGETS",
+    "line": 10276,
+    "span": [
+     10258,
+     10290
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_SWITCH_LANDING_TARGETS",
+    "line": 10301,
+    "span": [
+     10291,
+     10304
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_WINDOW_CONTAINER_IDS",
+    "line": 10311,
+    "span": [
+     10305,
+     10313
+    ],
+    "module": "core"
+   },
+   {
+    "name": "EXTRA_PALETTE_ENTRIES",
+    "line": 10321,
+    "span": [
+     10314,
+     10324
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_EMPTY_STATE_SCREENS",
+    "line": 10677,
+    "span": [
+     10673,
+     10682
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_COMMAND_BAR_SUPPRESSED_KEYS",
+    "line": 11363,
+    "span": [
+     11354,
+     11371
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_CONTEXT_SEPARATOR",
+    "line": 22305,
+    "span": [
+     22303,
+     22305
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_CONTEXT_MAX_SHARE",
+    "line": 22313,
+    "span": [
+     22306,
+     22313
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_CONTEXT_FALLBACK_BUDGET",
+    "line": 22330,
+    "span": [
+     22314,
+     22330
+    ],
+    "module": "core"
+   },
+   {
+    "name": "_CONTEXT_BAR_INSET",
+    "line": 22346,
+    "span": [
+     22331,
+     22346
+    ],
+    "module": "core"
+   }
+  ],
+  "top": [
+   {
+    "key": "annotations",
+    "kind": "ImportFrom",
+    "names": [
+     "annotations"
+    ],
+    "span": [
+     1,
+     1
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Counter",
+    "kind": "ImportFrom",
+    "names": [
+     "Counter",
+     "deque"
+    ],
+    "span": [
+     2,
+     3
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "dataclass",
+    "kind": "ImportFrom",
+    "names": [
+     "dataclass",
+     "field",
+     "replace"
+    ],
+    "span": [
+     4,
+     4
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "copy",
+    "kind": "Import",
+    "names": [
+     "copy"
+    ],
+    "span": [
+     5,
+     5
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "hashlib",
+    "kind": "Import",
+    "names": [
+     "hashlib"
+    ],
+    "span": [
+     6,
+     6
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "json",
+    "kind": "Import",
+    "names": [
+     "json"
+    ],
+    "span": [
+     7,
+     7
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "logging",
+    "kind": "Import",
+    "names": [
+     "logging"
+    ],
+    "span": [
+     8,
+     8
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "os",
+    "kind": "Import",
+    "names": [
+     "os"
+    ],
+    "span": [
+     9,
+     9
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "re",
+    "kind": "Import",
+    "names": [
+     "re"
+    ],
+    "span": [
+     10,
+     10
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Path",
+    "kind": "ImportFrom",
+    "names": [
+     "Path",
+     "PurePath",
+     "PurePosixPath",
+     "PureWindowsPath"
+    ],
+    "span": [
+     11,
+     11
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "shutil",
+    "kind": "Import",
+    "names": [
+     "shutil"
+    ],
+    "span": [
+     12,
+     12
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "stat",
+    "kind": "Import",
+    "names": [
+     "stat"
+    ],
+    "span": [
+     13,
+     13
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "time",
+    "kind": "Import",
+    "names": [
+     "time"
+    ],
+    "span": [
+     14,
+     14
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "datetime",
+    "kind": "ImportFrom",
+    "names": [
+     "datetime",
+     "timezone"
+    ],
+    "span": [
+     15,
+     15
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Any",
+    "kind": "ImportFrom",
+    "names": [
+     "Any",
+     "Callable",
+     "List",
+     "Literal",
+     "Mapping",
+     "Optional",
+     "Sequence",
+     "Tuple"
+    ],
+    "span": [
+     16,
+     16
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "events",
+    "kind": "ImportFrom",
+    "names": [
+     "events",
+     "work"
+    ],
+    "span": [
+     17,
+     18
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "SkipAction",
+    "kind": "ImportFrom",
+    "names": [
+     "SkipAction"
+    ],
+    "span": [
+     19,
+     19
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "App",
+    "kind": "ImportFrom",
+    "names": [
+     "App",
+     "ComposeResult"
+    ],
+    "span": [
+     20,
+     20
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Offset",
+    "kind": "ImportFrom",
+    "names": [
+     "Offset"
+    ],
+    "span": [
+     21,
+     21
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Message",
+    "kind": "ImportFrom",
+    "names": [
+     "Message"
+    ],
+    "span": [
+     22,
+     22
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Binding",
+    "kind": "ImportFrom",
+    "names": [
+     "Binding"
+    ],
+    "span": [
+     23,
+     23
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Screen",
+    "kind": "ImportFrom",
+    "names": [
+     "Screen"
+    ],
+    "span": [
+     24,
+     24
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Container",
+    "kind": "ImportFrom",
+    "names": [
+     "Container",
+     "Horizontal",
+     "ScrollableContainer"
+    ],
+    "span": [
+     25,
+     25
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Timer",
+    "kind": "ImportFrom",
+    "names": [
+     "Timer"
+    ],
+    "span": [
+     26,
+     26
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "reactive",
+    "kind": "ImportFrom",
+    "names": [
+     "reactive"
+    ],
+    "span": [
+     27,
+     27
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Widget",
+    "kind": "ImportFrom",
+    "names": [
+     "Widget"
+    ],
+    "span": [
+     28,
+     28
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Button",
+    "kind": "ImportFrom",
+    "names": [
+     "Button",
+     "DataTable",
+     "Header",
+     "HelpPanel",
+     "Input",
+     "Label",
+     "ListItem",
+     "ListView",
+     "ProgressBar",
+     "RichLog",
+     "Select",
+     "Static",
+     "TextArea"
+    ],
+    "span": [
+     29,
+     43
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "cell_len",
+    "kind": "ImportFrom",
+    "names": [
+     "cell_len",
+     "set_cell_size"
+    ],
+    "span": [
+     44,
+     44
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Text",
+    "kind": "ImportFrom",
+    "names": [
+     "Text"
+    ],
+    "span": [
+     45,
+     45
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "DIFF_KIND_DOMAIN",
+    "kind": "ImportFrom",
+    "names": [
+     "DIFF_KIND_DOMAIN"
+    ],
+    "span": [
+     46,
+     47
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "S19File",
+    "kind": "ImportFrom",
+    "names": [
+     "S19File",
+     "S19_INTEGRITY_NOTICE_CODES",
+     "load_notice_code"
+    ],
+    "span": [
+     48,
+     48
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "HEX_INTEGRITY_NOTICE_CODES",
+    "kind": "ImportFrom",
+    "names": [
+     "HEX_INTEGRITY_NOTICE_CODES",
+     "IntelHexFile"
+    ],
+    "span": [
+     49,
+     49
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "parse_a2l_file",
+    "kind": "ImportFrom",
+    "names": [
+     "parse_a2l_file"
+    ],
+    "span": [
+     50,
+     50
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "STATUS_VERIFIED",
+    "kind": "ImportFrom",
+    "names": [
+     "STATUS_VERIFIED",
+     "VerifyResult"
+    ],
+    "span": [
+     51,
+     51
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "verify_written_image",
+    "kind": "ImportFrom",
+    "names": [
+     "verify_written_image"
+    ],
+    "span": [
+     52,
+     52
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "address_in_sorted_ranges",
+    "kind": "ImportFrom",
+    "names": [
+     "address_in_sorted_ranges",
+     "build_sorted_range_index"
+    ],
+    "span": [
+     53,
+     53
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "build_row_bases",
+    "kind": "ImportFrom",
+    "names": [
+     "build_row_bases",
+     "find_string_in_mem",
+     "hex_row_bases",
+     "render_hex_view_text"
+    ],
+    "span": [
+     54,
+     59
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "safe_text",
+    "kind": "ImportFrom",
+    "names": [
+     "safe_text"
+    ],
+    "span": [
+     60,
+     60
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "render_patched_image",
+    "kind": "ImportFrom",
+    "names": [
+     "render_patched_image",
+     "save_patched_image"
+    ],
+    "span": [
+     61,
+     61
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "run_check_document",
+    "kind": "ImportFrom",
+    "names": [
+     "run_check_document"
+    ],
+    "span": [
+     62,
+     62
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CHG_ENCODING_UNKNOWN",
+    "kind": "ImportFrom",
+    "names": [
+     "CHG_ENCODING_UNKNOWN",
+     "CHG_FORMAT",
+     "CHG_KIND_UNKNOWN",
+     "CHG_V1_FORMAT",
+     "CHG_VALUE_MODE_UNKNOWN",
+     "DUMMY_CHANGESET_TEXT",
+     "MF_BAD_STRUCTURE",
+     "MF_JSON_PARSE",
+     "SYMBOL_NO_A2L_CONTEXT_TEXT",
+     "list_change_documents",
+     "parse_change_document",
+     "read_change_document",
+     "serialize_change_document",
+     "write_change_document"
+    ],
+    "span": [
+     63,
+     78
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "DISPOSITION_APPLIED",
+    "kind": "ImportFrom",
+    "names": [
+     "DISPOSITION_APPLIED",
+     "DISPOSITION_BLOCKED",
+     "ChangeDocument",
+     "ChangeEntry",
+     "ChangeSummary"
+    ],
+    "span": [
+     79,
+     85
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CommandBar",
+    "kind": "ImportFrom",
+    "names": [
+     "CommandBar",
+     "PaletteEntry"
+    ],
+    "span": [
+     86,
+     86
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "parse_mac_file",
+    "kind": "ImportFrom",
+    "names": [
+     "parse_mac_file"
+    ],
+    "span": [
+     87,
+     87
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "LoadedFile",
+    "kind": "ImportFrom",
+    "names": [
+     "LoadedFile",
+     "ProjectVariantSet",
+     "VariantDescriptor"
+    ],
+    "span": [
+     88,
+     88
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "get_operation",
+    "kind": "ImportFrom",
+    "names": [
+     "get_operation",
+     "list_operation_ids"
+    ],
+    "span": [
+     89,
+     89
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "OsClipboardInput",
+    "kind": "ImportFrom",
+    "names": [
+     "OsClipboardInput",
+     "_mirror_and_write_os_clipboard"
+    ],
+    "span": [
+     90,
+     90
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CappedTextArea",
+    "kind": "ImportFrom",
+    "names": [
+     "CappedTextArea"
+    ],
+    "span": [
+     91,
+     91
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Rail",
+    "kind": "ImportFrom",
+    "names": [
+     "Rail",
+     "RailEntry",
+     "RailItem",
+     "RAIL_ENTRIES"
+    ],
+    "span": [
+     92,
+     92
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ChangeSetJsonScreen",
+    "kind": "ImportFrom",
+    "names": [
+     "ChangeSetJsonScreen",
+     "ConfirmDiscardScreen",
+     "ConfirmQuestionScreen",
+     "EntryJsonScreen",
+     "FileRefCandidate",
+     "FileRefChoice",
+     "FileRefChooserScreen",
+     "FlowBlockEditScreen",
+     "LegendScreen",
+     "LOAD_RESULT_SELECT_VARIANT",
+     "LoadChoice",
+     "LoadDialog",
+     "LoadFlowScreen",
+     "LoadResultScreen",
+     "OperationsScreen",
+     "ReportViewerScreen",
+     "SaveFlowScreen",
+     "SavePreview",
+     "SaveProjectPayload",
+     "SaveProjectScreen",
+     "SelectVariantScreen"
+    ],
+    "span": [
+     93,
+     115
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "BrowseRequested",
+    "kind": "ImportFrom",
+    "names": [
+     "BrowseRequested",
+     "FlowBuilderPanel",
+     "FlowExecutionPanel",
+     "FlowRefContext",
+     "fx_run_error_line"
+    ],
+    "span": [
+     116,
+     122
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "AbDiffPanel",
+    "kind": "ImportFrom",
+    "names": [
+     "AbDiffPanel",
+     "CheckEditorPanel",
+     "CoverageStats",
+     "EmptyStatePanel",
+     "LoadedArtifactsPanel",
+     "LoadGuardScreen",
+     "MemoryMapPanel",
+     "PatchDocumentView",
+     "PatchEditorPanel",
+     "bytes_per_cell",
+     "cell_count_for_geometry",
+     "cell_status",
+     "coverage_stats",
+     "derive_image_span",
+     "status_to_css_class"
+    ],
+    "span": [
+     123,
+     139
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CrcDesignerPanel",
+    "kind": "ImportFrom",
+    "names": [
+     "CrcDesignerPanel"
+    ],
+    "span": [
+     140,
+     140
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "css_class_for_severity",
+    "kind": "ImportFrom",
+    "names": [
+     "css_class_for_severity"
+    ],
+    "span": [
+     141,
+     141
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "band_style",
+    "kind": "ImportFrom",
+    "names": [
+     "band_style"
+    ],
+    "span": [
+     142,
+     142
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CYAN",
+    "kind": "ImportFrom",
+    "names": [
+     "CYAN",
+     "DGRAY",
+     "GREEN",
+     "LABEL",
+     "RED",
+     "VALUE",
+     "YELLOW",
+     "human_bytes",
+     "microbar"
+    ],
+    "span": [
+     143,
+     153
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "EntropyWindow",
+    "kind": "ImportFrom",
+    "names": [
+     "EntropyWindow"
+    ],
+    "span": [
+     154,
+     154
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "_GROUP_DISPLAY_MAX",
+    "kind": "ImportFrom",
+    "names": [
+     "_GROUP_DISPLAY_MAX",
+     "GroupedIssuesPanel",
+     "IssueRow",
+     "SEVERITY_ORDER",
+     "build_issues_severity_strip"
+    ],
+    "span": [
+     155,
+     161
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CHECK_GROUP_ORDER",
+    "kind": "ImportFrom",
+    "names": [
+     "CHECK_GROUP_ORDER",
+     "CheckRow",
+     "GroupedChecksPanel",
+     "build_checks_aggregate_strip"
+    ],
+    "span": [
+     162,
+     167
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ValidationIssue",
+    "kind": "ImportFrom",
+    "names": [
+     "ValidationIssue",
+     "ValidationReport",
+     "ValidationSeverity"
+    ],
+    "span": [
+     168,
+     168
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "enrich_tags_and_render",
+    "kind": "ImportFrom",
+    "names": [
+     "enrich_tags_and_render"
+    ],
+    "span": [
+     169,
+     169
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "compose_before_after_report",
+    "kind": "ImportFrom",
+    "names": [
+     "compose_before_after_report"
+    ],
+    "span": [
+     170,
+     170
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ChangeActionResult",
+    "kind": "ImportFrom",
+    "names": [
+     "ChangeActionResult",
+     "ChangeService",
+     "save_back_status_suffix"
+    ],
+    "span": [
+     171,
+     175
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "SOURCE_EXTERNAL",
+    "kind": "ImportFrom",
+    "names": [
+     "SOURCE_EXTERNAL",
+     "SOURCE_PROJECT_VARIANT",
+     "ImageSource",
+     "compare_images"
+    ],
+    "span": [
+     176,
+     181
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "flow_change_attribution",
+    "kind": "ImportFrom",
+    "names": [
+     "flow_change_attribution",
+     "generate_diff_report",
+     "generate_diff_report_html"
+    ],
+    "span": [
+     182,
+     186
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "build_loaded_hex",
+    "kind": "ImportFrom",
+    "names": [
+     "build_loaded_hex",
+     "build_loaded_s19"
+    ],
+    "span": [
+     187,
+     187
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "DeclaredRegion",
+    "kind": "ImportFrom",
+    "names": [
+     "DeclaredRegion"
+    ],
+    "span": [
+     188,
+     188
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ReportFilterMatcher",
+    "kind": "ImportFrom",
+    "names": [
+     "ReportFilterMatcher",
+     "parse_report_filter",
+     "read_report_filter_text",
+     "resolve_report_filter"
+    ],
+    "span": [
+     189,
+     194
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "EXECUTION_SCOPE_TO_REPORT_MODE",
+    "kind": "ImportFrom",
+    "names": [
+     "EXECUTION_SCOPE_TO_REPORT_MODE",
+     "REPORT_SOURCE_DEFAULT",
+     "REPORT_SOURCE_MANIFEST",
+     "ReportOptions",
+     "generate_project_report",
+     "list_project_reports"
+    ],
+    "span": [
+     195,
+     202
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ManifestVerifyResult",
+    "kind": "ImportFrom",
+    "names": [
+     "ManifestVerifyResult",
+     "MANIFEST_VERIFIED",
+     "check_project_files",
+     "derive_record",
+     "project_file_records",
+     "serialize_manifest",
+     "verify_written_manifest",
+     "write_project_manifest"
+    ],
+    "span": [
+     203,
+     212
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "GATHER_DOCUMENT_NOT_RECORDED",
+    "kind": "ImportFrom",
+    "names": [
+     "GATHER_DOCUMENT_NOT_RECORDED",
+     "PLAN_ACTION_KEEP",
+     "PLAN_ACTION_NEW",
+     "PLAN_ROLE_CARRIED",
+     "PLAN_ROLE_DOCUMENT",
+     "PLAN_ROLE_MANIFEST",
+     "PLAN_TARGET_MERGE",
+     "PLAN_TARGET_NEW",
+     "PLAN_TARGET_OPEN",
+     "PROJECT_CHECKS_DIR",
+     "PROJECT_HOME_NAMES",
+     "PROJECT_PATCHES_DIR",
+     "InventoryFile",
+     "PlannedFile",
+     "ProjectInventory",
+     "SavePlan",
+     "SavePlanRow",
+     "classify_active_document",
+     "document_home_for_kind",
+     "gather_project_artifacts",
+     "inventory_project_tree",
+     "PAINTED_NAME_LIMIT",
+     "painted_names",
+     "plan_project_save",
+     "scoped_home",
+     "scoped_home_target"
+    ],
+    "span": [
+     213,
+     240
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "folder_open_service",
+    "kind": "ImportFrom",
+    "names": [
+     "folder_open_service"
+    ],
+    "span": [
+     241,
+     241
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "workspace",
+    "kind": "ImportFrom",
+    "names": [
+     "workspace"
+    ],
+    "span": [
+     242,
+     242
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "OpenFolderChip",
+    "kind": "ImportFrom",
+    "names": [
+     "OpenFolderChip",
+     "titled_header"
+    ],
+    "span": [
+     243,
+     243
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "KeyBar",
+    "kind": "ImportFrom",
+    "names": [
+     "KeyBar",
+     "WindowHelpChip",
+     "WindowSection"
+    ],
+    "span": [
+     244,
+     244
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CurveDescriptionScreen",
+    "kind": "ImportFrom",
+    "names": [
+     "CurveDescriptionScreen"
+    ],
+    "span": [
+     245,
+     245
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "A2LProgress",
+    "kind": "ImportFrom",
+    "names": [
+     "A2LProgress",
+     "describe_curve_tag"
+    ],
+    "span": [
+     246,
+     246
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "SplitJoinWindow",
+    "kind": "ImportFrom",
+    "names": [
+     "SplitJoinWindow"
+    ],
+    "span": [
+     247,
+     247
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "build_mac_coverage_strip",
+    "kind": "ImportFrom",
+    "names": [
+     "build_mac_coverage_strip",
+     "build_validation_report"
+    ],
+    "span": [
+     248,
+     251
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "DOCUMENT_NEXT_STEP",
+    "kind": "ImportFrom",
+    "names": [
+     "DOCUMENT_NEXT_STEP",
+     "DOCUMENT_REASON_IO_ERROR",
+     "DOCUMENT_REASON_LINK",
+     "DOCUMENT_REASON_TOO_LARGE",
+     "DOCUMENT_REASON_UNREADABLE",
+     "EXECUTION_SCOPES",
+     "PROBLEM_NOT_READABLE",
+     "PROJECT_MANIFEST_NAME",
+     "SCOPE_ACTIVE",
+     "STEP_CHECK_THEN_LOAD",
+     "STEP_OPEN_FROM_EDITOR",
+     "STEP_REPLACE_A2L",
+     "_ISSUE_ENTRY",
+     "_ISSUE_KEY",
+     "_KEY_ACTIVE_DOCUMENT",
+     "DerivedFrom",
+     "FileRecord",
+     "LoadAnnouncement",
+     "ProjectFileProblem",
+     "ProjectManifest",
+     "VariantExecutionResult",
+     "compose_load_announcement",
+     "document_problem_file",
+     "execute_project_variants",
+     "is_active_document_form",
+     "manifest_is_damaged",
+     "manifest_keep_reason",
+     "manifest_rewrite_refusal",
+     "read_project_manifest"
+    ],
+    "span": [
+     252,
+     282
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "_guarded_destination",
+    "kind": "ImportFrom",
+    "names": [
+     "_guarded_destination",
+     "_is_reparse_point",
+     "_path_traverses_reparse_point",
+     "_private_stage_dir",
+     "A2L_EXTENSIONS",
+     "HEX_EXTENSIONS",
+     "MAC_EXTENSIONS",
+     "PROJECT_DATA_EXTENSIONS",
+     "PROJECT_PRIMARY_DATA_EXTENSIONS",
+     "PROJECT_NAME_MAX_CHARS",
+     "PlacementResult",
+     "RESERVED_WORKAREA_HOMES",
+     "S19_EXTENSIONS",
+     "SUPPORTED_EXTENSIONS",
+     "WORKAREA_DIRNAME",
+     "WORKAREA_PATCHES",
+     "WORKAREA_TEMP",
+     "WORKAREA_TEMPLATES",
+     "WorkareaContainmentError",
+     "WorkareaPlacementError",
+     "build_variant_set",
+     "contained_in_workarea",
+     "copy_into_workarea",
+     "ensure_workarea",
+     "is_windows_device_name",
+     "list_workarea_files",
+     "place_into_workarea",
+     "RECENT_PROBLEM_TOO_LARGE",
+     "RECENT_PROBLEM_UNREADABLE",
+     "record_recent_source",
+     "read_recent_sources",
+     "recent_kind",
+     "resolve_input_path",
+     "sanitize_project_name",
+     "setup_logging",
+     "validate_project_files"
+    ],
+    "span": [
+     283,
+     320
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "_TYPED_REFUSAL_TOKENS",
+    "kind": "AnnAssign",
+    "names": [
+     "_TYPED_REFUSAL_TOKENS"
+    ],
+    "span": [
+     321,
+     340
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_RECENT_PROBLEM_STEPS",
+    "kind": "AnnAssign",
+    "names": [
+     "_RECENT_PROBLEM_STEPS"
+    ],
+    "span": [
+     341,
+     347
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "_LOAD_DIALOG_INERT_ACTIONS",
+    "kind": "AnnAssign",
+    "names": [
+     "_LOAD_DIALOG_INERT_ACTIONS"
+    ],
+    "span": [
+     348,
+     354
+    ],
+    "module": "core"
+   },
+   {
+    "key": "QuestionKind",
+    "kind": "Assign",
+    "names": [
+     "QuestionKind"
+    ],
+    "span": [
+     355,
+     358
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "UnsavedItem",
+    "kind": "Assign",
+    "names": [
+     "UnsavedItem"
+    ],
+    "span": [
+     359,
+     361
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "BusyKey",
+    "kind": "Assign",
+    "names": [
+     "BusyKey"
+    ],
+    "span": [
+     362,
+     376
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_BusyAction",
+    "kind": "ClassDef",
+    "names": [
+     "_BusyAction"
+    ],
+    "span": [
+     377,
+     384
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_BUSY_FRAMES",
+    "kind": "Assign",
+    "names": [
+     "_BUSY_FRAMES"
+    ],
+    "span": [
+     385,
+     387
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "_BUSY_TICK_SECONDS",
+    "kind": "Assign",
+    "names": [
+     "_BUSY_TICK_SECONDS"
+    ],
+    "span": [
+     388,
+     388
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "_BUSY_ACTIONS",
+    "kind": "AnnAssign",
+    "names": [
+     "_BUSY_ACTIONS"
+    ],
+    "span": [
+     389,
+     424
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "_BusyRun",
+    "kind": "ClassDef",
+    "names": [
+     "_BusyRun"
+    ],
+    "span": [
+     425,
+     436
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_BusyState",
+    "kind": "ClassDef",
+    "names": [
+     "_BusyState"
+    ],
+    "span": [
+     437,
+     447
+    ],
+    "module": "core"
+   },
+   {
+    "key": "SESSION_ACTION_KEYS",
+    "kind": "AnnAssign",
+    "names": [
+     "SESSION_ACTION_KEYS"
+    ],
+    "span": [
+     448,
+     455
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "_BUSY_LINE",
+    "kind": "Assign",
+    "names": [
+     "_BUSY_LINE"
+    ],
+    "span": [
+     456,
+     458
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "_QUIT_TITLE",
+    "kind": "Assign",
+    "names": [
+     "_QUIT_TITLE"
+    ],
+    "span": [
+     459,
+     461
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_QUIT_BODY",
+    "kind": "Assign",
+    "names": [
+     "_QUIT_BODY"
+    ],
+    "span": [
+     462,
+     462
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_QUIT_YES",
+    "kind": "Assign",
+    "names": [
+     "_QUIT_YES",
+     "_QUIT_NO"
+    ],
+    "span": [
+     463,
+     463
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_COPY_QUIT_BODY",
+    "kind": "Assign",
+    "names": [
+     "_COPY_QUIT_BODY"
+    ],
+    "span": [
+     464,
+     468
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_QuitQuestionScreen",
+    "kind": "ClassDef",
+    "names": [
+     "_QuitQuestionScreen"
+    ],
+    "span": [
+     469,
+     479
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_CopyQuitScreen",
+    "kind": "ClassDef",
+    "names": [
+     "_CopyQuitScreen"
+    ],
+    "span": [
+     480,
+     491
+    ],
+    "module": "core"
+   },
+   {
+    "key": "_RightGesture",
+    "kind": "ClassDef",
+    "names": [
+     "_RightGesture"
+    ],
+    "span": [
+     492,
+     507
+    ],
+    "module": "core"
+   },
+   {
+    "key": "ProjectLoadRequest",
+    "kind": "ClassDef",
+    "names": [
+     "ProjectLoadRequest"
+    ],
+    "span": [
+     508,
+     522
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "PreparedProjectLoad",
+    "kind": "ClassDef",
+    "names": [
+     "PreparedProjectLoad"
+    ],
+    "span": [
+     523,
+     540
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "SaveImageInput",
+    "kind": "ClassDef",
+    "names": [
+     "SaveImageInput"
+    ],
+    "span": [
+     541,
+     555
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "SaveRequest",
+    "kind": "ClassDef",
+    "names": [
+     "SaveRequest"
+    ],
+    "span": [
+     556,
+     573
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "SaveOutcome",
+    "kind": "ClassDef",
+    "names": [
+     "SaveOutcome"
+    ],
+    "span": [
+     574,
+     597
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "A2LAttachRequest",
+    "kind": "ClassDef",
+    "names": [
+     "A2LAttachRequest"
+    ],
+    "span": [
+     598,
+     611
+    ],
+    "module": "file_load"
+   },
+   {
+    "key": "A2LAttachResult",
+    "kind": "ClassDef",
+    "names": [
+     "A2LAttachResult"
+    ],
+    "span": [
+     612,
+     622
+    ],
+    "module": "file_load"
+   },
+   {
+    "key": "_save_failure_outcome",
+    "kind": "FunctionDef",
+    "names": [
+     "_save_failure_outcome"
+    ],
+    "span": [
+     623,
+     650
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "PATCH_ACTIONS_V2",
+    "kind": "AnnAssign",
+    "names": [
+     "PATCH_ACTIONS_V2"
+    ],
+    "span": [
+     651,
+     672
+    ],
+    "module": "patch"
+   },
+   {
+    "key": "RAIL_ENTRIES_B94",
+    "kind": "AnnAssign",
+    "names": [
+     "RAIL_ENTRIES_B94"
+    ],
+    "span": [
+     673,
+     692
+    ],
+    "module": "core"
+   },
+   {
+    "key": "CHECK_EDITOR_ACTIONS",
+    "kind": "AnnAssign",
+    "names": [
+     "CHECK_EDITOR_ACTIONS"
+    ],
+    "span": [
+     693,
+     697
+    ],
+    "module": "checks_diff"
+   },
+   {
+    "key": "_SAVEBACK_S0_MAX_BYTES",
+    "kind": "Assign",
+    "names": [
+     "_SAVEBACK_S0_MAX_BYTES"
+    ],
+    "span": [
+     698,
+     705
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_synth_s0_header_from_filename",
+    "kind": "FunctionDef",
+    "names": [
+     "_synth_s0_header_from_filename"
+    ],
+    "span": [
+     706,
+     736
+    ],
+    "module": "patch"
+   },
+   {
+    "key": "_a2l_tag_in_memory_display",
+    "kind": "FunctionDef",
+    "names": [
+     "_a2l_tag_in_memory_display"
+    ],
+    "span": [
+     737,
+     744
+    ],
+    "module": "a2l_view"
+   },
+   {
+    "key": "_a2l_tag_unit_display",
+    "kind": "FunctionDef",
+    "names": [
+     "_a2l_tag_unit_display"
+    ],
+    "span": [
+     745,
+     778
+    ],
+    "module": "a2l_view"
+   },
+   {
+    "key": "_A2L_ISSUE_SEVERITY_RANK",
+    "kind": "AnnAssign",
+    "names": [
+     "_A2L_ISSUE_SEVERITY_RANK"
+    ],
+    "span": [
+     779,
+     788
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_ISSUE_DISPLAY_RANK",
+    "kind": "AnnAssign",
+    "names": [
+     "_ISSUE_DISPLAY_RANK"
+    ],
+    "span": [
+     789,
+     801
+    ],
+    "module": "issues_checks"
+   },
+   {
+    "key": "_a2l_issue_severity_map",
+    "kind": "FunctionDef",
+    "names": [
+     "_a2l_issue_severity_map"
+    ],
+    "span": [
+     802,
+     862
+    ],
+    "module": "a2l_view"
+   },
+   {
+    "key": "_a2l_tag_row_severity",
+    "kind": "FunctionDef",
+    "names": [
+     "_a2l_tag_row_severity"
+    ],
+    "span": [
+     863,
+     920
+    ],
+    "module": "a2l_view"
+   },
+   {
+    "key": "MAX_SECTIONS_OUT_OF_RANGE",
+    "kind": "Assign",
+    "names": [
+     "MAX_SECTIONS_OUT_OF_RANGE"
+    ],
+    "span": [
+     921,
+     924
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "REPORT_FILTERS_DIR_NAME",
+    "kind": "Assign",
+    "names": [
+     "REPORT_FILTERS_DIR_NAME"
+    ],
+    "span": [
+     925,
+     930
+    ],
+    "module": "reports"
+   },
+   {
+    "key": "MAX_SECTIONS_PRIMARY_RANGES",
+    "kind": "Assign",
+    "names": [
+     "MAX_SECTIONS_PRIMARY_RANGES"
+    ],
+    "span": [
+     931,
+     939
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "A2LCacheEntry",
+    "kind": "Assign",
+    "names": [
+     "A2LCacheEntry"
+    ],
+    "span": [
+     940,
+     945
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_LOG",
+    "kind": "Assign",
+    "names": [
+     "_LOG"
+    ],
+    "span": [
+     946,
+     949
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "parse_a2l_cached",
+    "kind": "FunctionDef",
+    "names": [
+     "parse_a2l_cached"
+    ],
+    "span": [
+     950,
+     998
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "PreparedLoad",
+    "kind": "ClassDef",
+    "names": [
+     "PreparedLoad"
+    ],
+    "span": [
+     999,
+     1068
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "format_report_log_line",
+    "kind": "FunctionDef",
+    "names": [
+     "format_report_log_line"
+    ],
+    "span": [
+     1069,
+     1115
+    ],
+    "module": "reports"
+   },
+   {
+    "key": "_build_a2l_name_index",
+    "kind": "FunctionDef",
+    "names": [
+     "_build_a2l_name_index"
+    ],
+    "span": [
+     1116,
+     1128
+    ],
+    "module": "mac_view"
+   },
+   {
+    "key": "_mac_record_ui_state",
+    "kind": "FunctionDef",
+    "names": [
+     "_mac_record_ui_state"
+    ],
+    "span": [
+     1129,
+     1181
+    ],
+    "module": "mac_view"
+   },
+   {
+    "key": "_MAC_COLUMN_HEADERS",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_COLUMN_HEADERS"
+    ],
+    "span": [
+     1182,
+     1193
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_SEVERITY_TO_RICH_STYLE",
+    "kind": "AnnAssign",
+    "names": [
+     "_SEVERITY_TO_RICH_STYLE"
+    ],
+    "span": [
+     1194,
+     1202
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_severity_style",
+    "kind": "FunctionDef",
+    "names": [
+     "_severity_style"
+    ],
+    "span": [
+     1203,
+     1221
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_MAC_GLYPH_PARSE_ERROR",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_GLYPH_PARSE_ERROR"
+    ],
+    "span": [
+     1222,
+     1231
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_MAC_GLYPH_OUT_OF_IMAGE",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_GLYPH_OUT_OF_IMAGE"
+    ],
+    "span": [
+     1232,
+     1232
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_MAC_GLYPH_IN_IMAGE",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_GLYPH_IN_IMAGE"
+    ],
+    "span": [
+     1233,
+     1233
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_MAC_GLYPH_UNCHECKED",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_GLYPH_UNCHECKED"
+    ],
+    "span": [
+     1234,
+     1234
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_mac_status_glyph",
+    "kind": "FunctionDef",
+    "names": [
+     "_mac_status_glyph"
+    ],
+    "span": [
+     1235,
+     1261
+    ],
+    "module": "mac_view"
+   },
+   {
+    "key": "_MAC_COPY_GLYPHS",
+    "kind": "AnnAssign",
+    "names": [
+     "_MAC_COPY_GLYPHS"
+    ],
+    "span": [
+     1262,
+     1272
+    ],
+    "module": "shell"
+   },
+   {
+    "key": "SECTIONS_COVERAGE_BAR_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "SECTIONS_COVERAGE_BAR_WIDTH"
+    ],
+    "span": [
+     1273,
+     1278
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "WORKSPACE_MEMSTRIP_DEFAULT_COLS",
+    "kind": "Assign",
+    "names": [
+     "WORKSPACE_MEMSTRIP_DEFAULT_COLS"
+    ],
+    "span": [
+     1279,
+     1284
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "_STRIP_CELL_GLYPH",
+    "kind": "Assign",
+    "names": [
+     "_STRIP_CELL_GLYPH"
+    ],
+    "span": [
+     1285,
+     1288
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "_STRIP_GAP_GLYPH",
+    "kind": "Assign",
+    "names": [
+     "_STRIP_GAP_GLYPH"
+    ],
+    "span": [
+     1289,
+     1293
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "_A2L_CARD_HINT",
+    "kind": "Assign",
+    "names": [
+     "_A2L_CARD_HINT"
+    ],
+    "span": [
+     1294,
+     1297
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_card_value_text",
+    "kind": "FunctionDef",
+    "names": [
+     "_card_value_text"
+    ],
+    "span": [
+     1298,
+     1336
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_card_field",
+    "kind": "FunctionDef",
+    "names": [
+     "_card_field"
+    ],
+    "span": [
+     1337,
+     1373
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_shorten_tag_name",
+    "kind": "FunctionDef",
+    "names": [
+     "_shorten_tag_name"
+    ],
+    "span": [
+     1374,
+     1423
+    ],
+    "module": "a2l_view"
+   },
+   {
+    "key": "_a2l_detail_card_text",
+    "kind": "FunctionDef",
+    "names": [
+     "_a2l_detail_card_text"
+    ],
+    "span": [
+     1424,
+     1501
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_CopyRowTable",
+    "kind": "ClassDef",
+    "names": [
+     "_CopyRowTable"
+    ],
+    "span": [
+     1502,
+     1581
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "A2LTagTable",
+    "kind": "ClassDef",
+    "names": [
+     "A2LTagTable"
+    ],
+    "span": [
+     1582,
+     1643
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "A2LDetailCard",
+    "kind": "ClassDef",
+    "names": [
+     "A2LDetailCard"
+    ],
+    "span": [
+     1644,
+     1730
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "dominant_band_label",
+    "kind": "FunctionDef",
+    "names": [
+     "dominant_band_label"
+    ],
+    "span": [
+     1731,
+     1787
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "_integrity_notice_codes",
+    "kind": "FunctionDef",
+    "names": [
+     "_integrity_notice_codes"
+    ],
+    "span": [
+     1788,
+     1811
+    ],
+    "module": "loaded_state"
+   },
+   {
+    "key": "_INTEGRITY_NOTICE_CODES",
+    "kind": "Assign",
+    "names": [
+     "_INTEGRITY_NOTICE_CODES"
+    ],
+    "span": [
+     1812,
+     1817
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "build_loader_facts_text",
+    "kind": "FunctionDef",
+    "names": [
+     "build_loader_facts_text"
+    ],
+    "span": [
+     1818,
+     1871
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "build_workspace_stats_text",
+    "kind": "FunctionDef",
+    "names": [
+     "build_workspace_stats_text"
+    ],
+    "span": [
+     1872,
+     1912
+    ],
+    "module": "workspace_view"
+   },
+   {
+    "key": "precompute_mac_datatable_payload",
+    "kind": "FunctionDef",
+    "names": [
+     "precompute_mac_datatable_payload"
+    ],
+    "span": [
+     1913,
+     1974
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_has_primary",
+    "kind": "FunctionDef",
+    "names": [
+     "_has_primary"
+    ],
+    "span": [
+     1975,
+     2007
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_has_mac",
+    "kind": "FunctionDef",
+    "names": [
+     "_has_mac"
+    ],
+    "span": [
+     2008,
+     2041
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_has_a2l",
+    "kind": "FunctionDef",
+    "names": [
+     "_has_a2l"
+    ],
+    "span": [
+     2042,
+     2074
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_unload_a2l",
+    "kind": "FunctionDef",
+    "names": [
+     "_unload_a2l"
+    ],
+    "span": [
+     2075,
+     2114
+    ],
+    "module": "loaded_state"
+   },
+   {
+    "key": "_unload_mac",
+    "kind": "FunctionDef",
+    "names": [
+     "_unload_mac"
+    ],
+    "span": [
+     2115,
+     2157
+    ],
+    "module": "loaded_state"
+   },
+   {
+    "key": "_unload_primary",
+    "kind": "FunctionDef",
+    "names": [
+     "_unload_primary"
+    ],
+    "span": [
+     2158,
+     2223
+    ],
+    "module": "loaded_state"
+   },
+   {
+    "key": "_SAVE_REPORT_SUFFIX_CHARS",
+    "kind": "Assign",
+    "names": [
+     "_SAVE_REPORT_SUFFIX_CHARS"
+    ],
+    "span": [
+     2224,
+     2229
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_SAVE_FULL_PATH_LIMIT",
+    "kind": "Assign",
+    "names": [
+     "_SAVE_FULL_PATH_LIMIT"
+    ],
+    "span": [
+     2230,
+     2233
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "_save_manifest_keys",
+    "kind": "FunctionDef",
+    "names": [
+     "_save_manifest_keys"
+    ],
+    "span": [
+     2234,
+     2289
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_image_map",
+    "kind": "FunctionDef",
+    "names": [
+     "_image_map"
+    ],
+    "span": [
+     2290,
+     2313
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "InstallSet",
+    "kind": "ClassDef",
+    "names": [
+     "InstallSet"
+    ],
+    "span": [
+     2314,
+     2332
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "choose_install_set",
+    "kind": "FunctionDef",
+    "names": [
+     "choose_install_set"
+    ],
+    "span": [
+     2333,
+     2390
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "_ProjectImageStep",
+    "kind": "ClassDef",
+    "names": [
+     "_ProjectImageStep"
+    ],
+    "span": [
+     2391,
+     2419
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_SAVE_KIND_WORDS",
+    "kind": "AnnAssign",
+    "names": [
+     "_SAVE_KIND_WORDS"
+    ],
+    "span": [
+     2420,
+     2430
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_SAVE_ROW_LABELS",
+    "kind": "AnnAssign",
+    "names": [
+     "_SAVE_ROW_LABELS"
+    ],
+    "span": [
+     2431,
+     2439
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_SAVE_SUMMARY_CHANGED",
+    "kind": "Assign",
+    "names": [
+     "_SAVE_SUMMARY_CHANGED"
+    ],
+    "span": [
+     2440,
+     2443
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "_SAVE_REFUSAL_PREFIX",
+    "kind": "Assign",
+    "names": [
+     "_SAVE_REFUSAL_PREFIX"
+    ],
+    "span": [
+     2444,
+     2447
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_UNSET",
+    "kind": "Assign",
+    "names": [
+     "_UNSET"
+    ],
+    "span": [
+     2448,
+     2451
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_DOCUMENT_UNREADABLE_KEY",
+    "kind": "Assign",
+    "names": [
+     "_DOCUMENT_UNREADABLE_KEY"
+    ],
+    "span": [
+     2452,
+     2458
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_unreadable_text",
+    "kind": "FunctionDef",
+    "names": [
+     "_unreadable_text"
+    ],
+    "span": [
+     2459,
+     2492
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_SaveSession",
+    "kind": "ClassDef",
+    "names": [
+     "_SaveSession"
+    ],
+    "span": [
+     2493,
+     2529
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_PreparedSave",
+    "kind": "ClassDef",
+    "names": [
+     "_PreparedSave"
+    ],
+    "span": [
+     2530,
+     2580
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_file_digest",
+    "kind": "FunctionDef",
+    "names": [
+     "_file_digest"
+    ],
+    "span": [
+     2581,
+     2612
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "_PlacedFiles",
+    "kind": "ClassDef",
+    "names": [
+     "_PlacedFiles"
+    ],
+    "span": [
+     2613,
+     2635
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "_plan_row_mismatch",
+    "kind": "FunctionDef",
+    "names": [
+     "_plan_row_mismatch"
+    ],
+    "span": [
+     2636,
+     2661
+    ],
+    "module": "shared_io"
+   },
+   {
+    "key": "REOPEN_MAX_BYTES",
+    "kind": "Assign",
+    "names": [
+     "REOPEN_MAX_BYTES"
+    ],
+    "span": [
+     2662,
+     2667
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "REOPEN_MAX_ENTRIES",
+    "kind": "Assign",
+    "names": [
+     "REOPEN_MAX_ENTRIES"
+    ],
+    "span": [
+     2668,
+     2668
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_OK",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_OK"
+    ],
+    "span": [
+     2669,
+     2671
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_MISSING",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_MISSING"
+    ],
+    "span": [
+     2672,
+     2672
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_LINK",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_LINK"
+    ],
+    "span": [
+     2673,
+     2673
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_TOO_LARGE",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_TOO_LARGE"
+    ],
+    "span": [
+     2674,
+     2674
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_UNREADABLE",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_UNREADABLE"
+    ],
+    "span": [
+     2675,
+     2675
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "DOCUMENT_IO_ERROR",
+    "kind": "Assign",
+    "names": [
+     "DOCUMENT_IO_ERROR"
+    ],
+    "span": [
+     2676,
+     2676
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_DOCUMENT_IN_HOME",
+    "kind": "Assign",
+    "names": [
+     "_DOCUMENT_IN_HOME"
+    ],
+    "span": [
+     2677,
+     2680
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_PLACED_DOCUMENT_CLASSES",
+    "kind": "Assign",
+    "names": [
+     "_PLACED_DOCUMENT_CLASSES"
+    ],
+    "span": [
+     2681,
+     2681
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_DOCUMENT_DROP_OUTCOMES",
+    "kind": "Assign",
+    "names": [
+     "_DOCUMENT_DROP_OUTCOMES"
+    ],
+    "span": [
+     2682,
+     2688
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "_DOCUMENT_FILE_FAULT_CODES",
+    "kind": "Assign",
+    "names": [
+     "_DOCUMENT_FILE_FAULT_CODES"
+    ],
+    "span": [
+     2689,
+     2702
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_DOCUMENT_PARSE_ERRORS",
+    "kind": "Assign",
+    "names": [
+     "_DOCUMENT_PARSE_ERRORS"
+    ],
+    "span": [
+     2703,
+     2707
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_DOCUMENT_REASON",
+    "kind": "AnnAssign",
+    "names": [
+     "_DOCUMENT_REASON"
+    ],
+    "span": [
+     2708,
+     2717
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "_DOCUMENT_STEP",
+    "kind": "AnnAssign",
+    "names": [
+     "_DOCUMENT_STEP"
+    ],
+    "span": [
+     2718,
+     2723
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "_plan_without_document_key",
+    "kind": "FunctionDef",
+    "names": [
+     "_plan_without_document_key"
+    ],
+    "span": [
+     2724,
+     2736
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "_DOCUMENT_DROP_REASON",
+    "kind": "AnnAssign",
+    "names": [
+     "_DOCUMENT_DROP_REASON"
+    ],
+    "span": [
+     2737,
+     2744
+    ],
+    "module": "save_plan"
+   },
+   {
+    "key": "RecordedDocumentState",
+    "kind": "ClassDef",
+    "names": [
+     "RecordedDocumentState"
+    ],
+    "span": [
+     2745,
+     2764
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_is_link_stat",
+    "kind": "FunctionDef",
+    "names": [
+     "_is_link_stat"
+    ],
+    "span": [
+     2765,
+     2773
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "recorded_document_state",
+    "kind": "FunctionDef",
+    "names": [
+     "recorded_document_state"
+    ],
+    "span": [
+     2774,
+     2876
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "_save_clears_panel_flag",
+    "kind": "FunctionDef",
+    "names": [
+     "_save_clears_panel_flag"
+    ],
+    "span": [
+     2877,
+     2912
+    ],
+    "module": "save_commit"
+   },
+   {
+    "key": "_SESSION_SNAPSHOT_NAMES",
+    "kind": "AnnAssign",
+    "names": [
+     "_SESSION_SNAPSHOT_NAMES"
+    ],
+    "span": [
+     2913,
+     3000
+    ],
+    "module": "project_load"
+   },
+   {
+    "key": "S19TuiApp",
+    "kind": "ClassDef",
+    "names": [
+     "S19TuiApp"
+    ],
+    "span": [
+     3001,
+     23477
+    ],
+    "module": "core"
+   },
+   {
+    "key": "main",
+    "kind": "FunctionDef",
+    "names": [
+     "main"
+    ],
+    "span": [
+     23478,
+     23488
+    ],
+    "module": "core"
+   }
+  ]
+ },
+ "screens_directionb": {
+  "package": "s19_app.tui.screens_directionb",
+  "d1_names": [
+   "_json_clock"
+  ],
+  "deps_defined": [
+   "_json_clock"
+  ],
+  "reexports": [
+   "bisect",
+   "json",
+   "dataclass",
+   "datetime",
+   "ceil",
+   "TYPE_CHECKING",
+   "Any",
+   "Dict",
+   "List",
+   "Mapping",
+   "NamedTuple",
+   "Optional",
+   "Sequence",
+   "Tuple",
+   "Union",
+   "cell_len",
+   "set_cell_size",
+   "Text",
+   "events",
+   "ComposeResult",
+   "Binding",
+   "Content",
+   "Container",
+   "Horizontal",
+   "ScrollableContainer",
+   "Vertical",
+   "VerticalScroll",
+   "Message",
+   "Widget",
+   "Button",
+   "ContentSwitcher",
+   "DataTable",
+   "Input",
+   "Label",
+   "ListItem",
+   "ListView",
+   "Select",
+   "Static",
+   "TextArea",
+   "MAX_A2L_DECODE_BYTES",
+   "A2LParameterPicker",
+   "IncludeTable",
+   "_clip_fmt_unit",
+   "clip_param",
+   "clip_tail",
+   "BulkParameterAddScreen",
+   "DUMMY_CHANGESET_TEXT",
+   "is_check_spec_name",
+   "css_class_for_severity",
+   "ENTROPY_BAND_LABELS",
+   "band_style",
+   "CYAN",
+   "DGRAY",
+   "GREEN",
+   "LABEL",
+   "PURPLE",
+   "RED",
+   "VALUE",
+   "YELLOW",
+   "cap_gauge_style",
+   "human_bytes",
+   "label_value",
+   "microbar",
+   "JsonHighlightTextArea",
+   "_CLIPBOARD_READ_CAP_CHARS",
+   "OsClipboardInput",
+   "address_in_sorted_ranges",
+   "build_sorted_range_index",
+   "ModalScreen",
+   "EntropyWindow",
+   "ValidationIssue",
+   "ValidationSeverity",
+   "EmptyStatePanel",
+   "ScreenScaffold",
+   "_BAND_GAP_FOLD",
+   "_RULER_LABEL_WIDTH",
+   "_RULER_TICK_PITCH",
+   "_ENTROPY_BAR_RAMP",
+   "_SPARKLINE_WIDTH",
+   "_REGION_MICROBAR_WIDTH",
+   "_BAND_SHORT_LABELS",
+   "_STATS_FULL_MIN_WIDTH",
+   "_REGION_ROW_MICROBAR_MIN_WIDTH",
+   "_MAP_PANEL_TO_ROWS_INSET",
+   "_MAP_PANEL_TO_ROWS_INSET_STACKED",
+   "_MAP_PANEL_WIDE_FALLBACK",
+   "_MAP_STACK_MIN_WIDTH",
+   "_INSPECTOR_BODY_FALLBACK_WIDTH",
+   "_INSPECTOR_SCROLLBAR_GUTTER",
+   "_PEEK_BYTES_PER_ROW",
+   "_PEEK_UNMAPPED_CELL",
+   "_INSPECTOR_FIELD_ROWS",
+   "_INSPECTOR_LABEL_WIDTH",
+   "_MAP_GAP_HATCH",
+   "_OPEN_IN_HEX_GLYPH",
+   "_PEEK_ROWS_FALLBACK",
+   "entropy_ramp_glyph",
+   "band_histogram",
+   "sparkline_glyphs",
+   "_sparkline_segments",
+   "_merge_band_runs",
+   "_allocate_band_widths",
+   "_retained_tick_addresses",
+   "derive_image_span",
+   "cell_count_for_geometry",
+   "bytes_per_cell",
+   "cell_status",
+   "status_to_css_class",
+   "safe_text",
+   "issues_in_window",
+   "covering_range",
+   "_clip_to_cells",
+   "_tag_address",
+   "symbols_in_window",
+   "symbol_list_text",
+   "CoverageStats",
+   "coverage_stats",
+   "RegionRow",
+   "BandSegment",
+   "BandBar",
+   "MapRuler",
+   "LoadedArtifactsPanel",
+   "MemoryMapPanel",
+   "_Unset",
+   "_UNSET",
+   "CARD_NO_ENTRIES",
+   "CARD_NO_SELECTION",
+   "CARD_NO_IMAGE",
+   "CARD_UNMAPPED_TOKEN",
+   "PATCH_TEAL",
+   "STRIP_ROW_CAP",
+   "STRIP_ROW_BYTES",
+   "_STRIP_LABEL_CELLS",
+   "before_after_card_text",
+   "BeforeAfterCard",
+   "LoadGuardScreen",
+   "PatchEditorPanel",
+   "JSON_TAB_LINE_CAP",
+   "CHECK_GLYPHS",
+   "cap_json_lines",
+   "PATCH_GLYPHS",
+   "PatchDocumentView",
+   "_json_clock",
+   "json_stamp_text",
+   "PatchLayout",
+   "patch_layout",
+   "_count",
+   "CheckLayout",
+   "check_layout",
+   "TabChip",
+   "CheckEditorPanel",
+   "_DIFF_WIDE_MIN",
+   "_DIFF_MIN_W",
+   "_DIFF_MIN_H",
+   "AbDiffPanel"
+  ],
+  "sizes": {
+   "ab_diff": 1194,
+   "check_editor": 953,
+   "deps": 5,
+   "loaded_artifacts": 429,
+   "map_parts": 1241,
+   "memory_map": 1857,
+   "patch_editor": 2755,
+   "shared": 732
+  },
+  "graph": {
+   "check_editor": [
+    "shared"
+   ],
+   "map_parts": [
+    "shared"
+   ],
+   "memory_map": [
+    "map_parts",
+    "shared"
+   ],
+   "patch_editor": [
+    "deps",
+    "shared"
+   ]
+  },
+  "top": [
+   {
+    "key": "Expr@1",
+    "kind": "Expr",
+    "names": [],
+    "span": [
+     1,
+     42
+    ],
+    "module": "__init__"
+   },
+   {
+    "key": "annotations",
+    "kind": "ImportFrom",
+    "names": [
+     "annotations"
+    ],
+    "span": [
+     43,
+     44
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "bisect",
+    "kind": "Import",
+    "names": [
+     "bisect"
+    ],
+    "span": [
+     45,
+     46
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "json",
+    "kind": "Import",
+    "names": [
+     "json"
+    ],
+    "span": [
+     47,
+     47
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "dataclass",
+    "kind": "ImportFrom",
+    "names": [
+     "dataclass"
+    ],
+    "span": [
+     48,
+     48
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "datetime",
+    "kind": "ImportFrom",
+    "names": [
+     "datetime"
+    ],
+    "span": [
+     49,
+     49
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ceil",
+    "kind": "ImportFrom",
+    "names": [
+     "ceil"
+    ],
+    "span": [
+     50,
+     50
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "TYPE_CHECKING",
+    "kind": "ImportFrom",
+    "names": [
+     "TYPE_CHECKING",
+     "Any",
+     "Dict",
+     "List",
+     "Mapping",
+     "NamedTuple",
+     "Optional",
+     "Sequence",
+     "Tuple",
+     "Union"
+    ],
+    "span": [
+     51,
+     62
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "cell_len",
+    "kind": "ImportFrom",
+    "names": [
+     "cell_len",
+     "set_cell_size"
+    ],
+    "span": [
+     63,
+     64
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Text",
+    "kind": "ImportFrom",
+    "names": [
+     "Text"
+    ],
+    "span": [
+     65,
+     65
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "events",
+    "kind": "ImportFrom",
+    "names": [
+     "events"
+    ],
+    "span": [
+     66,
+     66
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ComposeResult",
+    "kind": "ImportFrom",
+    "names": [
+     "ComposeResult"
+    ],
+    "span": [
+     67,
+     67
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Binding",
+    "kind": "ImportFrom",
+    "names": [
+     "Binding"
+    ],
+    "span": [
+     68,
+     68
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Content",
+    "kind": "ImportFrom",
+    "names": [
+     "Content"
+    ],
+    "span": [
+     69,
+     69
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Container",
+    "kind": "ImportFrom",
+    "names": [
+     "Container",
+     "Horizontal",
+     "ScrollableContainer",
+     "Vertical",
+     "VerticalScroll"
+    ],
+    "span": [
+     70,
+     76
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Message",
+    "kind": "ImportFrom",
+    "names": [
+     "Message"
+    ],
+    "span": [
+     77,
+     77
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Widget",
+    "kind": "ImportFrom",
+    "names": [
+     "Widget"
+    ],
+    "span": [
+     78,
+     78
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "Button",
+    "kind": "ImportFrom",
+    "names": [
+     "Button",
+     "ContentSwitcher",
+     "DataTable",
+     "Input",
+     "Label",
+     "ListItem",
+     "ListView",
+     "Select",
+     "Static",
+     "TextArea"
+    ],
+    "span": [
+     79,
+     90
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "MAX_A2L_DECODE_BYTES",
+    "kind": "ImportFrom",
+    "names": [
+     "MAX_A2L_DECODE_BYTES"
+    ],
+    "span": [
+     91,
+     92
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "A2LParameterPicker",
+    "kind": "ImportFrom",
+    "names": [
+     "A2LParameterPicker",
+     "IncludeTable",
+     "_clip_fmt_unit",
+     "clip_param",
+     "clip_tail"
+    ],
+    "span": [
+     93,
+     99
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "BulkParameterAddScreen",
+    "kind": "ImportFrom",
+    "names": [
+     "BulkParameterAddScreen"
+    ],
+    "span": [
+     100,
+     100
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "DUMMY_CHANGESET_TEXT",
+    "kind": "ImportFrom",
+    "names": [
+     "DUMMY_CHANGESET_TEXT",
+     "is_check_spec_name"
+    ],
+    "span": [
+     101,
+     101
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "css_class_for_severity",
+    "kind": "ImportFrom",
+    "names": [
+     "css_class_for_severity"
+    ],
+    "span": [
+     102,
+     102
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ENTROPY_BAND_LABELS",
+    "kind": "ImportFrom",
+    "names": [
+     "ENTROPY_BAND_LABELS",
+     "band_style"
+    ],
+    "span": [
+     103,
+     103
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "CYAN",
+    "kind": "ImportFrom",
+    "names": [
+     "CYAN",
+     "DGRAY",
+     "GREEN",
+     "LABEL",
+     "PURPLE",
+     "RED",
+     "VALUE",
+     "YELLOW",
+     "cap_gauge_style",
+     "human_bytes",
+     "label_value",
+     "microbar"
+    ],
+    "span": [
+     104,
+     117
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "JsonHighlightTextArea",
+    "kind": "ImportFrom",
+    "names": [
+     "JsonHighlightTextArea"
+    ],
+    "span": [
+     118,
+     118
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "_CLIPBOARD_READ_CAP_CHARS",
+    "kind": "ImportFrom",
+    "names": [
+     "_CLIPBOARD_READ_CAP_CHARS"
+    ],
+    "span": [
+     119,
+     119
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "OsClipboardInput",
+    "kind": "ImportFrom",
+    "names": [
+     "OsClipboardInput"
+    ],
+    "span": [
+     120,
+     120
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "address_in_sorted_ranges",
+    "kind": "ImportFrom",
+    "names": [
+     "address_in_sorted_ranges",
+     "build_sorted_range_index"
+    ],
+    "span": [
+     121,
+     121
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ModalScreen",
+    "kind": "ImportFrom",
+    "names": [
+     "ModalScreen"
+    ],
+    "span": [
+     122,
+     122
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "EntropyWindow",
+    "kind": "ImportFrom",
+    "names": [
+     "EntropyWindow"
+    ],
+    "span": [
+     123,
+     123
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "ValidationIssue",
+    "kind": "ImportFrom",
+    "names": [
+     "ValidationIssue",
+     "ValidationSeverity"
+    ],
+    "span": [
+     124,
+     124
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "If@126",
+    "kind": "If",
+    "names": [],
+    "span": [
+     125,
+     127
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "EmptyStatePanel",
+    "kind": "ClassDef",
+    "names": [
+     "EmptyStatePanel"
+    ],
+    "span": [
+     128,
+     165
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "ScreenScaffold",
+    "kind": "ClassDef",
+    "names": [
+     "ScreenScaffold"
+    ],
+    "span": [
+     166,
+     212
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_BAND_GAP_FOLD",
+    "kind": "Assign",
+    "names": [
+     "_BAND_GAP_FOLD"
+    ],
+    "span": [
+     213,
+     220
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_RULER_LABEL_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_RULER_LABEL_WIDTH"
+    ],
+    "span": [
+     221,
+     224
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_RULER_TICK_PITCH",
+    "kind": "Assign",
+    "names": [
+     "_RULER_TICK_PITCH"
+    ],
+    "span": [
+     225,
+     232
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_ENTROPY_BAR_RAMP",
+    "kind": "Assign",
+    "names": [
+     "_ENTROPY_BAR_RAMP"
+    ],
+    "span": [
+     233,
+     237
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_SPARKLINE_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_SPARKLINE_WIDTH"
+    ],
+    "span": [
+     238,
+     244
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_REGION_MICROBAR_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_REGION_MICROBAR_WIDTH"
+    ],
+    "span": [
+     245,
+     248
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_BAND_SHORT_LABELS",
+    "kind": "AnnAssign",
+    "names": [
+     "_BAND_SHORT_LABELS"
+    ],
+    "span": [
+     249,
+     258
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_STATS_FULL_MIN_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_STATS_FULL_MIN_WIDTH"
+    ],
+    "span": [
+     259,
+     269
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_REGION_ROW_MICROBAR_MIN_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_REGION_ROW_MICROBAR_MIN_WIDTH"
+    ],
+    "span": [
+     270,
+     281
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_MAP_PANEL_TO_ROWS_INSET",
+    "kind": "Assign",
+    "names": [
+     "_MAP_PANEL_TO_ROWS_INSET"
+    ],
+    "span": [
+     282,
+     297
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_MAP_PANEL_TO_ROWS_INSET_STACKED",
+    "kind": "Assign",
+    "names": [
+     "_MAP_PANEL_TO_ROWS_INSET_STACKED"
+    ],
+    "span": [
+     298,
+     298
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_MAP_PANEL_WIDE_FALLBACK",
+    "kind": "Assign",
+    "names": [
+     "_MAP_PANEL_WIDE_FALLBACK"
+    ],
+    "span": [
+     299,
+     299
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_MAP_STACK_MIN_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_MAP_STACK_MIN_WIDTH"
+    ],
+    "span": [
+     300,
+     317
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_INSPECTOR_BODY_FALLBACK_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_INSPECTOR_BODY_FALLBACK_WIDTH"
+    ],
+    "span": [
+     318,
+     324
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_INSPECTOR_SCROLLBAR_GUTTER",
+    "kind": "Assign",
+    "names": [
+     "_INSPECTOR_SCROLLBAR_GUTTER"
+    ],
+    "span": [
+     325,
+     333
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_PEEK_BYTES_PER_ROW",
+    "kind": "Assign",
+    "names": [
+     "_PEEK_BYTES_PER_ROW"
+    ],
+    "span": [
+     334,
+     340
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_PEEK_UNMAPPED_CELL",
+    "kind": "Assign",
+    "names": [
+     "_PEEK_UNMAPPED_CELL"
+    ],
+    "span": [
+     341,
+     343
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_INSPECTOR_FIELD_ROWS",
+    "kind": "Assign",
+    "names": [
+     "_INSPECTOR_FIELD_ROWS"
+    ],
+    "span": [
+     344,
+     346
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_INSPECTOR_LABEL_WIDTH",
+    "kind": "Assign",
+    "names": [
+     "_INSPECTOR_LABEL_WIDTH"
+    ],
+    "span": [
+     347,
+     350
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_MAP_GAP_HATCH",
+    "kind": "Assign",
+    "names": [
+     "_MAP_GAP_HATCH"
+    ],
+    "span": [
+     351,
+     355
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_OPEN_IN_HEX_GLYPH",
+    "kind": "Assign",
+    "names": [
+     "_OPEN_IN_HEX_GLYPH"
+    ],
+    "span": [
+     356,
+     359
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_PEEK_ROWS_FALLBACK",
+    "kind": "Assign",
+    "names": [
+     "_PEEK_ROWS_FALLBACK"
+    ],
+    "span": [
+     360,
+     368
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "entropy_ramp_glyph",
+    "kind": "FunctionDef",
+    "names": [
+     "entropy_ramp_glyph"
+    ],
+    "span": [
+     369,
+     402
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "band_histogram",
+    "kind": "FunctionDef",
+    "names": [
+     "band_histogram"
+    ],
+    "span": [
+     403,
+     453
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "sparkline_glyphs",
+    "kind": "FunctionDef",
+    "names": [
+     "sparkline_glyphs"
+    ],
+    "span": [
+     454,
+     491
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_sparkline_segments",
+    "kind": "FunctionDef",
+    "names": [
+     "_sparkline_segments"
+    ],
+    "span": [
+     492,
+     536
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_merge_band_runs",
+    "kind": "FunctionDef",
+    "names": [
+     "_merge_band_runs"
+    ],
+    "span": [
+     537,
+     592
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_allocate_band_widths",
+    "kind": "FunctionDef",
+    "names": [
+     "_allocate_band_widths"
+    ],
+    "span": [
+     593,
+     691
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_retained_tick_addresses",
+    "kind": "FunctionDef",
+    "names": [
+     "_retained_tick_addresses"
+    ],
+    "span": [
+     692,
+     757
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "derive_image_span",
+    "kind": "FunctionDef",
+    "names": [
+     "derive_image_span"
+    ],
+    "span": [
+     758,
+     795
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "cell_count_for_geometry",
+    "kind": "FunctionDef",
+    "names": [
+     "cell_count_for_geometry"
+    ],
+    "span": [
+     796,
+     835
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "bytes_per_cell",
+    "kind": "FunctionDef",
+    "names": [
+     "bytes_per_cell"
+    ],
+    "span": [
+     836,
+     869
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "cell_status",
+    "kind": "FunctionDef",
+    "names": [
+     "cell_status"
+    ],
+    "span": [
+     870,
+     917
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "status_to_css_class",
+    "kind": "FunctionDef",
+    "names": [
+     "status_to_css_class"
+    ],
+    "span": [
+     918,
+     954
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "safe_text",
+    "kind": "ImportFrom",
+    "names": [
+     "safe_text"
+    ],
+    "span": [
+     955,
+     957
+    ],
+    "module": "imports"
+   },
+   {
+    "key": "issues_in_window",
+    "kind": "FunctionDef",
+    "names": [
+     "issues_in_window"
+    ],
+    "span": [
+     958,
+     1006
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "covering_range",
+    "kind": "FunctionDef",
+    "names": [
+     "covering_range"
+    ],
+    "span": [
+     1007,
+     1055
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "_clip_to_cells",
+    "kind": "FunctionDef",
+    "names": [
+     "_clip_to_cells"
+    ],
+    "span": [
+     1056,
+     1093
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_tag_address",
+    "kind": "FunctionDef",
+    "names": [
+     "_tag_address"
+    ],
+    "span": [
+     1094,
+     1132
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "symbols_in_window",
+    "kind": "FunctionDef",
+    "names": [
+     "symbols_in_window"
+    ],
+    "span": [
+     1133,
+     1197
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "symbol_list_text",
+    "kind": "FunctionDef",
+    "names": [
+     "symbol_list_text"
+    ],
+    "span": [
+     1198,
+     1237
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "CoverageStats",
+    "kind": "ClassDef",
+    "names": [
+     "CoverageStats"
+    ],
+    "span": [
+     1238,
+     1272
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "coverage_stats",
+    "kind": "FunctionDef",
+    "names": [
+     "coverage_stats"
+    ],
+    "span": [
+     1273,
+     1360
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "RegionRow",
+    "kind": "ClassDef",
+    "names": [
+     "RegionRow"
+    ],
+    "span": [
+     1361,
+     1504
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "BandSegment",
+    "kind": "ClassDef",
+    "names": [
+     "BandSegment"
+    ],
+    "span": [
+     1505,
+     1572
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "BandBar",
+    "kind": "ClassDef",
+    "names": [
+     "BandBar"
+    ],
+    "span": [
+     1573,
+     1647
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "MapRuler",
+    "kind": "ClassDef",
+    "names": [
+     "MapRuler"
+    ],
+    "span": [
+     1648,
+     1797
+    ],
+    "module": "map_parts"
+   },
+   {
+    "key": "LoadedArtifactsPanel",
+    "kind": "ClassDef",
+    "names": [
+     "LoadedArtifactsPanel"
+    ],
+    "span": [
+     1798,
+     2226
+    ],
+    "module": "loaded_artifacts"
+   },
+   {
+    "key": "MemoryMapPanel",
+    "kind": "ClassDef",
+    "names": [
+     "MemoryMapPanel"
+    ],
+    "span": [
+     2227,
+     4083
+    ],
+    "module": "memory_map"
+   },
+   {
+    "key": "_Unset",
+    "kind": "ClassDef",
+    "names": [
+     "_Unset"
+    ],
+    "span": [
+     4084,
+     4096
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "_UNSET",
+    "kind": "Assign",
+    "names": [
+     "_UNSET"
+    ],
+    "span": [
+     4097,
+     4099
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "CARD_NO_ENTRIES",
+    "kind": "Assign",
+    "names": [
+     "CARD_NO_ENTRIES"
+    ],
+    "span": [
+     4100,
+     4105
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "CARD_NO_SELECTION",
+    "kind": "Assign",
+    "names": [
+     "CARD_NO_SELECTION"
+    ],
+    "span": [
+     4106,
+     4106
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "CARD_NO_IMAGE",
+    "kind": "Assign",
+    "names": [
+     "CARD_NO_IMAGE"
+    ],
+    "span": [
+     4107,
+     4107
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "CARD_UNMAPPED_TOKEN",
+    "kind": "Assign",
+    "names": [
+     "CARD_UNMAPPED_TOKEN"
+    ],
+    "span": [
+     4108,
+     4111
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "PATCH_TEAL",
+    "kind": "Assign",
+    "names": [
+     "PATCH_TEAL"
+    ],
+    "span": [
+     4112,
+     4115
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "STRIP_ROW_CAP",
+    "kind": "Assign",
+    "names": [
+     "STRIP_ROW_CAP"
+    ],
+    "span": [
+     4116,
+     4118
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "STRIP_ROW_BYTES",
+    "kind": "Assign",
+    "names": [
+     "STRIP_ROW_BYTES"
+    ],
+    "span": [
+     4119,
+     4121
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_STRIP_LABEL_CELLS",
+    "kind": "Assign",
+    "names": [
+     "_STRIP_LABEL_CELLS"
+    ],
+    "span": [
+     4122,
+     4124
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "before_after_card_text",
+    "kind": "FunctionDef",
+    "names": [
+     "before_after_card_text"
+    ],
+    "span": [
+     4125,
+     4242
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "BeforeAfterCard",
+    "kind": "ClassDef",
+    "names": [
+     "BeforeAfterCard"
+    ],
+    "span": [
+     4243,
+     4291
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "LoadGuardScreen",
+    "kind": "ClassDef",
+    "names": [
+     "LoadGuardScreen"
+    ],
+    "span": [
+     4292,
+     4371
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "PatchEditorPanel",
+    "kind": "ClassDef",
+    "names": [
+     "PatchEditorPanel"
+    ],
+    "span": [
+     4372,
+     6983
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "JSON_TAB_LINE_CAP",
+    "kind": "Assign",
+    "names": [
+     "JSON_TAB_LINE_CAP"
+    ],
+    "span": [
+     6984,
+     6988
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "CHECK_GLYPHS",
+    "kind": "AnnAssign",
+    "names": [
+     "CHECK_GLYPHS"
+    ],
+    "span": [
+     6989,
+     7000
+    ],
+    "module": "check_editor"
+   },
+   {
+    "key": "cap_json_lines",
+    "kind": "FunctionDef",
+    "names": [
+     "cap_json_lines"
+    ],
+    "span": [
+     7001,
+     7013
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "PATCH_GLYPHS",
+    "kind": "AnnAssign",
+    "names": [
+     "PATCH_GLYPHS"
+    ],
+    "span": [
+     7014,
+     7026
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "PatchDocumentView",
+    "kind": "ClassDef",
+    "names": [
+     "PatchDocumentView"
+    ],
+    "span": [
+     7027,
+     7048
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "_json_clock",
+    "kind": "FunctionDef",
+    "names": [
+     "_json_clock"
+    ],
+    "span": [
+     7049,
+     7053
+    ],
+    "module": "deps"
+   },
+   {
+    "key": "json_stamp_text",
+    "kind": "FunctionDef",
+    "names": [
+     "json_stamp_text"
+    ],
+    "span": [
+     7054,
+     7068
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "PatchLayout",
+    "kind": "ClassDef",
+    "names": [
+     "PatchLayout"
+    ],
+    "span": [
+     7069,
+     7080
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "patch_layout",
+    "kind": "FunctionDef",
+    "names": [
+     "patch_layout"
+    ],
+    "span": [
+     7081,
+     7112
+    ],
+    "module": "patch_editor"
+   },
+   {
+    "key": "_count",
+    "kind": "FunctionDef",
+    "names": [
+     "_count"
+    ],
+    "span": [
+     7113,
+     7117
+    ],
+    "module": "check_editor"
+   },
+   {
+    "key": "CheckLayout",
+    "kind": "ClassDef",
+    "names": [
+     "CheckLayout"
+    ],
+    "span": [
+     7118,
+     7128
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "check_layout",
+    "kind": "FunctionDef",
+    "names": [
+     "check_layout"
+    ],
+    "span": [
+     7129,
+     7160
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "TabChip",
+    "kind": "ClassDef",
+    "names": [
+     "TabChip"
+    ],
+    "span": [
+     7161,
+     7166
+    ],
+    "module": "shared"
+   },
+   {
+    "key": "CheckEditorPanel",
+    "kind": "ClassDef",
+    "names": [
+     "CheckEditorPanel"
+    ],
+    "span": [
+     7167,
+     8102
+    ],
+    "module": "check_editor"
+   },
+   {
+    "key": "_DIFF_WIDE_MIN",
+    "kind": "Assign",
+    "names": [
+     "_DIFF_WIDE_MIN"
+    ],
+    "span": [
+     8103,
+     8117
+    ],
+    "module": "ab_diff"
+   },
+   {
+    "key": "_DIFF_MIN_W",
+    "kind": "Assign",
+    "names": [
+     "_DIFF_MIN_W"
+    ],
+    "span": [
+     8118,
+     8120
+    ],
+    "module": "ab_diff"
+   },
+   {
+    "key": "_DIFF_MIN_H",
+    "kind": "Assign",
+    "names": [
+     "_DIFF_MIN_H"
+    ],
+    "span": [
+     8121,
+     8155
+    ],
+    "module": "ab_diff"
+   },
+   {
+    "key": "AbDiffPanel",
+    "kind": "ClassDef",
+    "names": [
+     "AbDiffPanel"
+    ],
+    "span": [
+     8156,
+     9296
+    ],
+    "module": "ab_diff"
+   }
+  ]
+ }
+}

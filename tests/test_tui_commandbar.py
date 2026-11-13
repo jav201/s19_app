@@ -40,6 +40,8 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.command_bar import CommandBar
 from s19_app.tui.models import LoadedFile
 
+from tests.support import package_source as ps
+
 _COMMAND_BAR_SOURCE = Path("s19_app/tui/command_bar.py")
 
 # batch-79 Inc-11 (HLR-121): the `CommandBar.Find` / `.Goto` messages and their
@@ -2759,7 +2761,6 @@ _B79_DELETED_APP_ADAPTERS = ("on_command_bar_find", "on_command_bar_goto")
 _B79_SURVIVING_ON_COMMAND_BAR = ("visible_palette_actions",)
 _B79_SURVIVING_APP_ACTIONS = ("action_focus_find", "action_focus_goto")
 
-_B79_APP_SOURCE = Path("s19_app/tui/app.py")
 _B79_STYLES_SOURCE = Path("s19_app/tui/styles.tcss")
 _B79_REGISTRY_SOURCE = Path("AT-TC-REGISTRY.jsonl")
 
@@ -2785,6 +2786,35 @@ def _b79_class_methods(tree: ast.Module, class_name: str) -> tuple[set[str], set
                 elif isinstance(child, ast.ClassDef):
                     nested.add(child.name)
     return methods, nested
+
+
+def _class_members(node: ast.ClassDef) -> set[str]:
+    """Direct class-body members UNION every ``self.X`` attribute target.
+
+    Instance attributes like ``_validation_issues`` and ``log_lines`` live
+    only as ``self.X = ...`` in ``__init__``, so a class-level ``hasattr`` is
+    insufficient; this is the resolver shared by the command-bar anchor guard
+    and used on the MERGED-CLASS ``S19TuiApp`` (core body + every in-package
+    mixin body).
+    """
+    out: set[str] = set()
+    for child in node.body:
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            out.add(child.name)
+        elif isinstance(child, ast.Assign):
+            for tgt in child.targets:
+                if isinstance(tgt, ast.Name):
+                    out.add(tgt.id)
+        elif isinstance(child, ast.AnnAssign) and isinstance(child.target, ast.Name):
+            out.add(child.target.id)
+    for sub in ast.walk(node):
+        if (
+            isinstance(sub, ast.Attribute)
+            and isinstance(sub.value, ast.Name)
+            and sub.value.id == "self"
+        ):
+            out.add(sub.attr)
+    return out
 
 
 def _b79_tcss_without_comments(source: str) -> str:
@@ -2898,10 +2928,14 @@ def test_at_b78_13_the_seven_symbols_and_six_selectors_are_gone() -> None:
     two surviving App actions, and read a non-empty stylesheet.
     """
     bar_tree = ast.parse(_COMMAND_BAR_SOURCE.read_text(encoding="utf-8"))
-    app_tree = ast.parse(_B79_APP_SOURCE.read_text(encoding="utf-8"))
+    merged = ps.merged_class()
 
     bar_methods, bar_nested = _b79_class_methods(bar_tree, "CommandBar")
-    app_methods, _ = _b79_class_methods(app_tree, "S19TuiApp")
+    app_methods = {
+        child.name
+        for child in merged.body
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
 
     # --- co-assertions: the census swept something real -------------------
     assert bar_methods or bar_nested, (
@@ -3046,14 +3080,22 @@ def test_at_b78_14_no_live_registry_row_names_a_missing_node() -> None:
 #: Files whose prose this batch authored or edited. The guard below is scoped to
 #: these deliberately: it is a batch-79 control, not a repo-wide sweep, and
 #: claiming the wider corpus would be the "a figure is only as honest as the
-#: corpus it names" defect this batch hit three times.
-_B79_ANCHOR_CORPUS = (
+#: corpus it names" defect this batch hit three times. batch-modular: the two
+#: product paths are now packages, so the corpus is every file of both
+#: packages (via ``package_modules``, whose floor fails loudly) plus the three
+#: test files.
+_B79_ANCHOR_TEST_FILES = (
     "tests/test_tui_commandbar.py",
     "tests/test_tui_diff_screen.py",
     "tests/test_tui_directionb.py",
-    "s19_app/tui/screens_directionb.py",
-    "s19_app/tui/app.py",
 )
+
+
+def _b79_anchor_corpus() -> tuple[str, ...]:
+    """The corpus files: every file of both split packages + the 3 test files."""
+    files = [str(path) for path, _ in ps.package_modules("app")]
+    files += [str(path) for path, _ in ps.package_modules("screens_directionb")]
+    return tuple(files) + _B79_ANCHOR_TEST_FILES
 
 #: Anchors cited in EXPLICITLY NEGATIVE context — the sentence's point is that
 #: the symbol is GONE (`HLR-121` deleted them) or never existed. They must NOT
@@ -3139,42 +3181,18 @@ def test_tc_b79_05_every_cited_symbol_anchor_resolves(tmp_path: Path) -> None:
         class-qualified names of its own.*
         """
         tree = ast.parse(path.read_text(encoding="utf-8"))
-        out: set[str] = set()
         for node in ast.walk(tree):
-            if not (isinstance(node, ast.ClassDef) and node.name == cls_name):
-                continue
-            # Direct class-body members only: methods, nested classes, and
-            # class-level assignments.
-            for child in node.body:
-                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                    out.add(child.name)
-                elif isinstance(child, ast.Assign):
-                    for tgt in child.targets:
-                        if isinstance(tgt, ast.Name):
-                            out.add(tgt.id)
-                elif isinstance(child, ast.AnnAssign) and isinstance(
-                    child.target, ast.Name
-                ):
-                    out.add(child.target.id)
-            # Instance attributes: `self.X` anywhere inside the class. Cited
-            # attributes like `_validation_issues` and `log_lines` live only
-            # here, which is why a class-level `hasattr` was insufficient.
-            for sub in ast.walk(node):
-                if (
-                    isinstance(sub, ast.Attribute)
-                    and isinstance(sub.value, ast.Name)
-                    and sub.value.id == "self"
-                ):
-                    out.add(sub.attr)
-        return out
+            if isinstance(node, ast.ClassDef) and node.name == cls_name:
+                return _class_members(node)
+        return set()
 
     tables = {
-        "S19TuiApp": _members(Path("s19_app/tui/app.py"), "S19TuiApp"),
+        "S19TuiApp": _class_members(ps.merged_class()),
         "CommandBar": _members(Path("s19_app/tui/command_bar.py"), "CommandBar"),
     }
 
     resolved: dict[str, bool] = {}
-    for rel in _B79_ANCHOR_CORPUS:
+    for rel in _b79_anchor_corpus():
         text = Path(rel).read_text(encoding="utf-8", errors="replace")
         for cls_name, member in _B79_ANCHOR_RE.findall(text):
             resolved[f"{cls_name}.{member}"] = member in tables[cls_name]

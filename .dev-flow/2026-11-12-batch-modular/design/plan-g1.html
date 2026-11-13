@@ -1,0 +1,186 @@
+<title>s19 · Modularización app.py</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; tables and diagram scroll inside their own boxes. */
+:root{
+  --bg:#f6f7f8; --panel:#ffffff; --fg:#1b2026; --muted:#5b6672; --line:#d9dee4;
+  --accent:#1f6f8b; --warn:#a86400; --ok:#2f7d4f; --bad:#b03a2e; --bar:#9fc3d1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161a; --panel:#1a2026; --fg:#e3e8ed; --muted:#9aa6b2; --line:#2c353e;
+  --accent:#5cb3cf; --warn:#e0a24a; --ok:#6cc290; --bad:#e2766a; --bar:#2f5d6e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161a; --panel:#1a2026; --fg:#e3e8ed; --muted:#9aa6b2; --line:#2c353e;
+  --accent:#5cb3cf; --warn:#e0a24a; --ok:#6cc290; --bad:#e2766a; --bar:#2f5d6e; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+main{max-width:880px;margin:0 auto;display:grid;gap:28px}
+h1{font-size:1.7rem;margin:0;font-weight:600;text-wrap:balance}
+h2{font-size:1.15rem;margin:0 0 10px;font-weight:600;text-wrap:balance}
+p{margin:0 0 8px;max-width:68ch}
+.eyebrow{font:500 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.02rem}
+section{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px 20px;min-width:0}
+code,.mono{font-family:var(--mono);font-size:.86em}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.8rem}
+td.n{font-variant-numeric:tabular-nums;text-align:right;font-family:var(--mono)}
+.bars{display:grid;gap:4px;font-family:var(--mono);font-size:.8rem}
+.bar{display:grid;grid-template-columns:150px 1fr 64px;gap:8px;align-items:center}
+.bar span.b{height:12px;background:var(--bar);border-radius:2px}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.pill{display:inline-block;font:500 .72rem/1.6 var(--mono);padding:0 7px;border-radius:9px;border:1px solid currentColor}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .acc{color:var(--accent)}
+ul{margin:0;padding-left:20px} li{margin:3px 0}
+.dec{border-top:1px solid var(--line);padding-top:12px;margin-top:12px;display:grid;gap:6px}
+.dec:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.dec label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.dec label input{margin-top:5px}
+textarea{width:100%;box-sizing:border-box;font:inherit;font-size:.9rem;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-height:38px}
+button{font:500 .9rem var(--sans);background:var(--accent);color:var(--panel);border:0;border-radius:4px;padding:8px 14px;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+pre#out{white-space:pre-wrap;font:.78rem/1.4 var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px;max-height:220px;overflow:auto}
+@media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">s19_app · plan de batch · 2026-11-12</div>
+  <h1>Modularizar app.py y screens_directionb.py</h1>
+  <p class="lead">Partir los dos god files en módulos por dominio, sin cambiar comportamiento, para que luego varios workers trabajen en paralelo sin chocar. Los movimientos los hace un script AST; la prueba de equivalencia es mecánica.</p>
+</header>
+
+<section>
+  <h2>Lo que mide el censo (árbol <code>287b9dc3</code>)</h2>
+  <div class="scroll"><table>
+    <tr><th>Archivo</th><th>Líneas</th><th>Detalle</th></tr>
+    <tr><td><code>app.py</code></td><td class="n">23,488</td><td><code>S19TuiApp</code> 20,475 líneas · 374 métodos · 171 de más de 40 líneas · el mayor 624 (<code>_save_project_files</code>) · 3 clases pequeñas + 38 funciones de módulo</td></tr>
+    <tr><td><code>screens_directionb.py</code></td><td class="n">9,296</td><td>Ya separado por clase: <code>PatchEditorPanel</code> 2,609 · <code>MemoryMapPanel</code> 1,854 · <code>AbDiffPanel</code> 1,138 · <code>CheckEditorPanel</code> 933 · <code>LoadedArtifactsPanel</code> 426 + 14 clases pequeñas</td></tr>
+  </table></div>
+  <p style="margin-top:12px"><b>Métodos de S19TuiApp por dominio</b> (por nombre; «otros» se asigna por grafo de llamadas en E2):</p>
+  <div class="bars" role="img" aria-label="Líneas por dominio">
+    <div class="bar"><span>proyecto+guardado+manifest</span><span class="b" style="width:100%"></span><span class="v">4,766</span></div>
+    <div class="bar"><span>carga</span><span class="b" style="width:58%"></span><span class="v">2,773</span></div>
+    <div class="bar"><span>otros</span><span class="b" style="width:55%"></span><span class="v">2,620</span></div>
+    <div class="bar"><span>patch+check+diff+report</span><span class="b" style="width:56%"></span><span class="v">2,642</span></div>
+    <div class="bar"><span>A2L+tags+MAC</span><span class="b" style="width:52%"></span><span class="v">2,494</span></div>
+    <div class="bar"><span>shell (foco, teclas, quit…)</span><span class="b" style="width:34%"></span><span class="v">1,612</span></div>
+    <div class="bar"><span>hex+mapa+goto+búsqueda</span><span class="b" style="width:22%"></span><span class="v">1,026</span></div>
+    <div class="bar"><span>flows+variantes</span><span class="b" style="width:15%"></span><span class="v">706</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>El riesgo central: tests acoplados al módulo</h2>
+  <ul>
+    <li><b>168 imports</b> de <code>S19TuiApp</code> desde <code>s19_app.tui.app</code>: se conservan con re-exports; cero cambios.</li>
+    <li><b>39 nombres parcheados</b> vía <code>app_module.X</code> (<code>SaveProjectPayload</code>, <code>parse_a2l_cached</code>, <code>write_project_manifest</code>, <code>os</code>…). Si el método que usa <code>X</code> se muda de módulo, parchear <code>app_module.X</code> deja de afectarlo: el test falla o, peor, pasa sin probar nada. <span class="pill bad">D1</span></li>
+    <li><b>~30 tests leen el texto fuente</b> de <code>app.py</code> (leyes estructurales, censos AST) y 11 el de <code>screens_directionb.py</code>. Hay que apuntarlos al paquete y probar que siguen pudiendo fallar.</li>
+    <li>Constantes de <code>screens_directionb</code> parcheadas por alias (<code>CHECK_GLYPHS</code> 24 usos, <code>A2LParameterPicker</code> 10): mismo problema que D1.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Prueba de equivalencia (sin modelo)</h2>
+  <ul>
+    <li><b>Identidad de cuerpos:</b> cada método y función del archivo viejo existe exactamente una vez en el paquete nuevo, con AST idéntico salvo las referencias reescritas por D1. El MRO de <code>S19TuiApp</code> resuelve cada nombre al mismo cuerpo.</li>
+    <li><b>Suite completa antes/después</b> en el mismo runner: el conjunto de nodeids passed/failed/skipped es idéntico (los 5 fallos heredados incluidos).</li>
+    <li><b>Controles negativos:</b> el verificador rechaza un método perdido, uno duplicado y un cuerpo alterado.</li>
+    <li>El script es re-ejecutable: si Inc 1b cambia algo después, se vuelve a correr sobre la base nueva en lugar de resolver conflictos a mano.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Mapa de módulos propuesto (primera pasada)</h2>
+  <div class="scroll"><table>
+    <tr><th>Paquete <code>s19_app/tui/app/</code></th><th>Contenido</th><th>≈ líneas</th></tr>
+    <tr><td><code>__init__.py</code></td><td>Re-exports de todo lo que importan los tests</td><td class="n">60</td></tr>
+    <tr><td><code>core.py</code></td><td><code>class S19TuiApp(…mixins, App)</code>: BINDINGS, CSS, <code>__init__</code>, compose, on_mount</td><td class="n">900</td></tr>
+    <tr><td><code>deps.py</code></td><td>Colaboradores que los tests parchean (si D1 = A)</td><td class="n">120</td></tr>
+    <tr><td><code>widgets.py</code></td><td>PreparedLoad, _CopyRowTable, A2LDetailCard, helpers de módulo</td><td class="n">700</td></tr>
+    <tr><td><code>save_plan.py · save_write.py · project_open.py</code></td><td>Proyecto, guardado, manifest</td><td class="n">4,800</td></tr>
+    <tr><td><code>load_dialog.py · load_apply.py</code></td><td>Carga</td><td class="n">2,800</td></tr>
+    <tr><td><code>a2l_views.py · mac_view.py</code></td><td>A2L, tags, MAC</td><td class="n">2,500</td></tr>
+    <tr><td><code>patch_editor.py · check_diff.py · reports.py</code></td><td>Patch, check, diff, reportes</td><td class="n">2,650</td></tr>
+    <tr><td><code>hex_views.py · flows.py · shell.py</code></td><td>Hex/mapa; flows/variantes; foco, teclas, paleta, quit, status</td><td class="n">3,350</td></tr>
+    <tr><td colspan="3">Paquete <code>screens_directionb/</code>: un módulo por panel (5) + <code>shared.py</code> + <code>__init__.py</code> con re-exports.</td></tr>
+  </table></div>
+  <p style="margin-top:8px">Quedan módulos de hasta ~2k líneas. La regla de ≤300 líneas por módulo y ≤40 por función se cumple en la fase 3, un worker por módulo en paralelo.</p>
+</section>
+
+<section>
+  <h2>Fases y carriles</h2>
+<pre class="mermaid">
+flowchart LR
+  P0["P0 · script de movimiento + verificador de identidad<br/>DeepSeek v4 Pro implementa · Opus revisa"] --> P1a["P1a · screens_directionb → paquete"]
+  P0 --> P1b["P1b · app.py → paquete de mixins"]
+  P1a --> T["P1c · adaptar ~40 tests que leen fuente<br/>4 workers DeepSeek en paralelo"]
+  P1b --> T
+  T --> S["P2 · suite completa antes/después<br/>laptop ∥ rtx"]
+  S --> P3["P3 · partir métodos > 40 líneas<br/>un worker por módulo, en paralelo"]
+  S --> I10["Inc 10 E4 sobre la estructura nueva"]
+  S --> B104["batch-104 flows"]
+</pre>
+</section>
+
+<section>
+  <h2>Decisiones</h2>
+  <form id="f" onsubmit="event.preventDefault()">
+    <div class="dec"><b>D1 · Nombres que los tests parchean</b>
+      <label><input type="radio" name="d1" id="d1a" value="A" checked> A (recomendada) · Módulo <code>deps.py</code>; los mixins llaman <code>deps.X</code>; un script reescribe los ~39 targets de los tests a <code>deps</code>. Explícito y verificable; toca ~30 archivos de test.</label>
+      <label><input type="radio" name="d1" id="d1b" value="B"> B · Los mixins buscan <code>X</code> en el paquete <code>app</code> en tiempo de llamada. Cero cambios en tests, pero acoplamiento oculto.</label>
+      <textarea id="d1n" placeholder="Nota (opcional)"></textarea></div>
+    <div class="dec"><b>D2 · Granularidad de la primera pasada</b>
+      <label><input type="radio" name="d2" id="d2a" value="A" checked> A (recomendada) · ~16 módulos por dominio ahora; ≤300 / ≤40 en P3, en paralelo y por módulo.</label>
+      <label><input type="radio" name="d2" id="d2b" value="B"> B · Directo a ≤300 líneas (~80 módulos) en una sola pasada.</label>
+      <textarea id="d2n" placeholder="Nota (opcional)"></textarea></div>
+    <div class="dec"><b>D3 · Orden respecto a Inc 1b</b>
+      <label><input type="radio" name="d3" id="d3a" value="A" checked> A (recomendada) · Base <code>287b9dc3</code> ya; si WinCI o los mutantes de 1b obligan a cambiar producto, se re-corre el script sobre la base nueva.</label>
+      <label><input type="radio" name="d3" id="d3b" value="B"> B · Esperar a que 1b cierre (WinCI incluido) y se fusione.</label>
+      <textarea id="d3n" placeholder="Nota (opcional)"></textarea></div>
+    <div class="dec"><b>D4 · Peso de dev-flow</b>
+      <label><input type="radio" name="d4" id="d4a" value="A" checked> A (recomendada) · Ligero: E1 = requisitos estructurales (comportamiento idéntico, mapa de módulos, tamaños); E2 = mapa como grafo; sin E3 (no hay E/S nueva); E5 = identidad + suite.</label>
+      <label><input type="radio" name="d4" id="d4b" value="B"> B · Completo, con E3 de diseño.</label>
+      <textarea id="d4n" placeholder="Nota (opcional)"></textarea></div>
+    <div class="dec"><b>Nota general / peticiones nuevas</b>
+      <textarea id="gen" placeholder="Lo que quieras agregar"></textarea></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+      <button type="button" id="copy">Copiar veredicto (JSON)</button><span id="msg" class="eyebrow"></span></div>
+    <pre id="out" hidden></pre>
+  </form>
+</section>
+
+<section>
+  <h2>Backlog abierto (no se pierde)</h2>
+  <ul>
+    <li><b>Inc 1b E5:</b> medición B97-69 (head 20/20 pasa; base en curso) · 73 mutantes L corriendo en la laptop · push a WinCI <span class="pill warn">pide tu OK</span> · luego ledger, canon, capturas, 04-validation, review packet.</li>
+    <li><b>Inc 10:</b> E3 FAIL (2 MAJOR) fallado; corrección Opus en curso; E4 se hace sobre la estructura nueva; O-1…O-6 te los pregunto al terminar la modularización.</li>
+    <li><b>Backlog E3 del Inc 10:</b> E3-8 <span class="pill bad">alta</span> el encabezado S0 puede filtrar el nombre de la cuenta; E3-4, E3-7, E3-9, E3-10.</li>
+    <li>5 fallos de leyes heredados (higiene de evidencia, canon, census de selectores, reach b101 ×2).</li>
+    <li>G3 de batch-103 (suite completa, canon, página de cierre) · batch-104 flows.</li>
+  </ul>
+</section>
+</main>
+
+<script>
+(function(){
+  const q=id=>document.getElementById(id);
+  function verdict(){
+    const v=n=>(document.querySelector('input[name="'+n+'"]:checked')||{}).value||null;
+    return {round:"s19-modular-plan",gate:"G1",base:"287b9dc3",exported_at:new Date().toISOString(),
+      answers:{d1:v("d1"),d2:v("d2"),d3:v("d3"),d4:v("d4")},
+      notes:{d1:q("d1n").value,d2:q("d2n").value,d3:q("d3n").value,d4:q("d4n").value},
+      general_note:q("gen").value};
+  }
+  q("copy").addEventListener("click",function(){
+    const txt=JSON.stringify(verdict(),null,1); const out=q("out"); out.textContent=txt; out.hidden=false;
+    try{navigator.clipboard.writeText(txt).then(()=>{q("msg").textContent="Copiado"},()=>{sel(out)});}catch(e){sel(out)}
+  });
+  function sel(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);q("msg").textContent="Selecciona y copia";}
+})();
+</script>

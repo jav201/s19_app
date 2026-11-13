@@ -98,7 +98,7 @@ A left activity rail switches between twelve windows, one key each. Split / Join
 | `0` | CRC Designer — parametric CRC authoring + known-answer proof |
 
 The global keys (the full set lives in `S19TuiApp.BINDINGS`,
-`s19_app/tui/app.py`; `Ctrl+Q` and `Ctrl+P` come from Textual):
+`s19_app/tui/app/core.py`; `Ctrl+Q` and `Ctrl+P` come from Textual):
 
 | Key | Action |
 |-----|--------|

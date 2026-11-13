@@ -211,7 +211,12 @@ from tools.id_registry import (
 # batch-103 Inc 1b E5: HEAD 305e5892 had 303; +4: tests/test_b103_e5_safety.py,
 # tests/test_b103_winci_gate.py, tests/support/b103_winci_gate.py and
 # tests/support/b103_artifact_safety.py (the JSON does not count); 303 -> 307.
-EXPECTED_SCANNED_TEST_FILES = 307
+# batch-modular P1c helper: +2 (tests/support/package_source.py,
+# tests/test_package_source_helper.py); 307 -> 309.
+# batch-modular E5 F2 seam law: +1 (tests/test_deps_seam_law.py); 309 -> 310.
+# Squash onto main: main's tests/test_no_private_tokens.py (efeb69f2) was added
+# without a bump; 310 -> 311.
+EXPECTED_SCANNED_TEST_FILES = 311
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

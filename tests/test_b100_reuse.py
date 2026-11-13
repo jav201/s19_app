@@ -31,6 +31,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from textual.widgets import Label
@@ -58,6 +59,7 @@ from tests.support.independent_reader import read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support.b100_workers import settle_workers
+from tests.support.package_source import package_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -538,7 +540,7 @@ def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
         # Inc 7 corrective pass 2 (SEC7-R2-4): not a reuse rule — the
         # rollback compares project.json with the previous bytes to decide
         # whether the kept project.json.previous-<UTC> copy may go.
-        ("s19_app/tui/app.py", "_abort_save"),
+        ("s19_app/tui/app/save_commit.py", "_abort_save"),
     }
     found: set = set()
     for path in sorted(package.rglob("*.py")):
@@ -782,15 +784,23 @@ def _nested_anchor_home(tmp_path: Path, sub: str = "x"):
     return this_root, destination, victim_home
 
 
+def _callee_name(func: ast.expr) -> Optional[str]:
+    """The called name for a bare ``Name`` or ``<qualifier>.<attr>`` func."""
+    if isinstance(func, ast.Name):
+        return func.id
+    if isinstance(func, ast.Attribute):
+        return func.attr
+    return None
+
+
 def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     """LLR-163.1 / LLR-171.4 (LED .50), security finding SEC-1 — the AST
-    census: EVERY placement call in ``app.py`` names ``workarea_root``
-    explicitly, so the guard's containment authority is always THIS app's
-    work area (B100-I14), never one the destination's own text names.
-    Dropping the root from any single call turns this RED (transcript
-    ``mut-census-root.txt``)."""
-    source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    census: EVERY placement call in the ``s19_app/tui/app/`` package names
+    ``workarea_root`` explicitly, so the guard's containment authority is
+    always THIS app's work area (B100-I14), never one the destination's
+    own text names. Dropping the root from any single call turns this RED
+    (transcript ``mut-census-root.txt``)."""
+    tree = package_tree("app")
     placements = (
         "place_into_workarea",
         "copy_into_workarea",
@@ -800,8 +810,7 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id in placements
+        and _callee_name(node.func) in placements
     ]
     # batch-100 Inc 5 re-pin (LLR-167.6): Save project's three placement
     # calls (image, MAC, A2L) became ONE call inside the plan-row loop, so
@@ -815,7 +824,7 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     # more placement, in ``_copy_project_subfolders``, so 8 -> 9; it names
     # the root like the rest (asserted for every call below).
     assert len(calls) == 9, (
-        f"expected the 9 app.py placement calls (LED .50), found {len(calls)}"
+        f"expected the 9 app-package placement calls (LED .50), found {len(calls)}"
     )
     copier = next(
         node
@@ -826,14 +835,13 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         node
         for node in ast.walk(copier)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id in placements
+        and _callee_name(node.func) in placements
     ]
     assert len(copier_calls) == 1, [call.lineno for call in copier_calls]
     # Inc 12b re-pin (E3 S12b-05): ``_write_editor_document`` is retired; the
     # Save worker's ``_save_project_files`` hands the pasted document to the
     # unchanged ``write_change_document`` with a ``copy_fn`` closure, and that
-    # closure is the document's ONE placement in ``app.py`` (it names the root).
+    # closure is the document's ONE placement in the app package (it names the root).
     files_worker = next(
         node
         for node in ast.walk(tree)
@@ -843,8 +851,7 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         node
         for node in ast.walk(files_worker)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "write_change_document"
+        and _callee_name(node.func) == "write_change_document"
     ]
     assert len(document_writes) == 1, [call.lineno for call in document_writes]
     copy_fn = next(
@@ -861,8 +868,7 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         node
         for node in ast.walk(document_writer)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id in placements
+        and _callee_name(node.func) in placements
     ]
     assert len(document_calls) == 1, [call.lineno for call in document_calls]
     assert any(keyword.arg == "workarea_root" for keyword in document_calls[0].keywords)
@@ -873,18 +879,15 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and (
-            (isinstance(node.func, ast.Attribute) and node.func.attr == "save_patched")
-            or (isinstance(node.func, ast.Name) and node.func.id == "save_patched_image")
-        )
+        and _callee_name(node.func) in ("save_patched", "save_patched_image")
     ]
     assert len(emit_calls) == 2, (
-        f"expected the 2 app.py emit calls (LED .56), found {len(emit_calls)}"
+        f"expected the 2 app-package emit calls (LED .56), found {len(emit_calls)}"
     )
     for call in calls + emit_calls:
         name = getattr(call.func, "id", None) or call.func.attr
         assert any(keyword.arg == "workarea_root" for keyword in call.keywords), (
-            f"app.py call {name} at line {call.lineno} must pass "
+            f"app-package call {name} at line {call.lineno} must pass "
             "workarea_root explicitly (LED .50, SEC-1, SEC-4)"
         )
 

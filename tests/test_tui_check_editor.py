@@ -81,7 +81,7 @@ def _write_calls() -> tuple[list, object]:
     seam).
     """
     calls: list = []
-    original = app_module.write_change_document
+    original = app_module.deps.write_change_document
 
     # batch-101 Inc 6: the spy takes the writer's whole signature; the Check
     # Editor Write now passes ``dest_dir`` (the check home, R-CHKED-031).
@@ -89,7 +89,7 @@ def _write_calls() -> tuple[list, object]:
         calls.append((document, file_name))
         return original(document, base_dir, file_name, copy_fn, dest_dir=dest_dir)
 
-    app_module.write_change_document = _spy
+    app_module.deps.write_change_document = _spy
     return calls, original
 
 
@@ -213,7 +213,7 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
                 await pilot.press("enter")
                 await pilot.pause()
             finally:
-                app_module.write_change_document = original
+                app_module.deps.write_change_document = original
             return (
                 len(panels),
                 len(patch_panels),

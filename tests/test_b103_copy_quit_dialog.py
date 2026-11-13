@@ -1016,7 +1016,7 @@ def test_r_dlg_14_101_copy_quit_has_reachable_shared_opener(clipboard) -> None:
     assert {"string", "toolkit"} <= census.reasons(action), census.reasons(action)
     assert action not in census.actions_without_reach
 
-    module = ast.parse(tree["s19_app/tui/app.py"])
+    module = ast.parse(tree["s19_app/tui/app/core.py"])
     app_class = next(node for node in module.body if isinstance(node, ast.ClassDef) and node.name == "S19TuiApp")
     opener = next(
         (

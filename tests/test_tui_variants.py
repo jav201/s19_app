@@ -49,6 +49,7 @@ import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import SelectVariantScreen
 from s19_app.tui.screens_directionb import LoadedArtifactsPanel
+from tests.support import package_source as ps
 from tests.support.b100_workers import settle_workers
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
@@ -204,8 +205,7 @@ def test_no_new_parse_loaded_file_call_sites() -> None:
     the pre-existing synchronous ``load_selected_file`` path. Any additional
     call site would mean a new parse on the UI thread and must fail here.
     """
-    source = Path(app_module.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    tree = ps.package_tree("app")
     call_sites: dict[str, list[str]] = {"_parse_loaded_file": [], "_parse_data_file": []}
 
     def _walk(node: ast.AST, enclosing: str) -> None:

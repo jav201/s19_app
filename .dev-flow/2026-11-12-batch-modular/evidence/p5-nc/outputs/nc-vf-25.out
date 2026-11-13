@@ -1,0 +1,5 @@
+VERIFY base=4f721985 units_old=626 units_new=626 missing=0 duplicate=0 extra=0 body_diff=1 unlisted_rewrite=0
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=0 pins=12/12 reexports_missing=0 fresh_imports=32/32 cycles=0 caps_over=0 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=1 names=0 tc_shape=0
+VERIFY FAIL V4: S19TuiApp._is_layout_visible (navigation.py:24): first diff old=None new='@on(Button.Pressed)'
+VERIFY FAIL V17: s19_app.tui.app.navigation.on: the old module binds no such name
+VERIFY FAIL

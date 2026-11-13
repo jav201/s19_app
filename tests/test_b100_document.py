@@ -146,14 +146,14 @@ async def _add_through_the_panel(pilot, app, address: str, run: str, entries_aft
 def _capture_plans(monkeypatch: pytest.MonkeyPatch) -> list:
     """Every SavePlan the app computes (the shipped planner, spied)."""
     plans: list = []
-    original = app_module.plan_project_save
+    original = app_module.deps.plan_project_save
 
     def _spy(*args, **kwargs):
         plan = original(*args, **kwargs)
         plans.append(plan)
         return plan
 
-    monkeypatch.setattr(app_module, "plan_project_save", _spy)
+    monkeypatch.setattr(app_module.deps, "plan_project_save", _spy)
     return plans
 
 
@@ -770,7 +770,7 @@ def _forced_write_failure(monkeypatch: pytest.MonkeyPatch) -> None:
         ]
 
     monkeypatch.setattr(changes_io, "write_change_document", _refuse)
-    monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+    monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
 
 
 def test_tc_b100_29_forced_write_failure_saves_without_the_document(
@@ -1732,16 +1732,16 @@ def test_tc_b100_29_cp1_failed_document_write_drops_the_key_from_the_plan(
             )
         ]
 
-    monkeypatch.setattr(app_module, "write_change_document", _refuse)
+    monkeypatch.setattr(app_module.deps, "write_change_document", _refuse)
     plans = _capture_plans(monkeypatch)
-    settle = app_module._plan_without_document_key
+    settle = app_module.deps._plan_without_document_key
 
     def _settled(plan):
         settled = settle(plan)
         plans.append(settled)
         return settled
 
-    monkeypatch.setattr(app_module, "_plan_without_document_key", _settled)
+    monkeypatch.setattr(app_module.deps, "_plan_without_document_key", _settled)
     src = _source(tmp_path)
 
     async def scenario(app, pilot, log):

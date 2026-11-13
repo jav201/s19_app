@@ -195,7 +195,7 @@ def _capture_focus_kwarg(app: S19TuiApp, monkeypatch) -> list[object]:
         from s19_app.render.hexview import render_hex_view_text as real
         return real(*args, **kwargs)
 
-    monkeypatch.setattr("s19_app.tui.app.render_hex_view_text", _spy)
+    monkeypatch.setattr("s19_app.tui.app.deps.render_hex_view_text", _spy)
     return captured
 
 

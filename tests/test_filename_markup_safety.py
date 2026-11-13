@@ -37,7 +37,7 @@ from textual.widgets import Label
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.models import LoadedFile
 
-import s19_app.tui.app as app_module
+from tests.support import package_source as ps
 
 
 def _make_loaded(path: Path) -> LoadedFile:
@@ -106,7 +106,7 @@ def test_at_s3_status_text_renders_hostile_filename_literally(tmp_path: Path) ->
 
 
 def test_at_s3_dynamic_notify_sites_pass_markup_false() -> None:
-    """AC-3.2 — every dynamic-message ``self.notify`` in ``app.py`` passes ``markup=False``.
+    """AC-3.2 — every dynamic-message ``self.notify`` in the app package passes ``markup=False``.
 
     Consumer-contract invariant (drift-proof vs line shifts): a ``self.notify``
     whose first positional argument is a constant string literal is
@@ -117,8 +117,7 @@ def test_at_s3_dynamic_notify_sites_pass_markup_false() -> None:
     verify drift/messages) without pinning line numbers, and leaves the two
     static-string notifies free.
     """
-    source = Path(app_module.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    tree = ps.package_tree("app")
 
     offenders: list[str] = []
     dynamic_sites = 0

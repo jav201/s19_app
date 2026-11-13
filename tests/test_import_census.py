@@ -36,6 +36,8 @@ import s19_app
 import s19_app.render.format as render_format
 import s19_app.tui.insight_style as insight_style
 
+from tests.support import package_source as ps
+
 PRODUCT_ROOT = Path(s19_app.__file__).resolve().parent
 TESTS_ROOT = Path(__file__).resolve().parent
 
@@ -55,17 +57,35 @@ SERVICES_DIR = PRODUCT_ROOT / "tui" / "services"
 #: refusal messages in ``segment_split_view.py``) imports the NAME at its
 #: module top; measured in. batch-100 (Inc 6, LLR-178.3, the Load-result
 #: panel rendering every name read from disk in ``screens.py``) imports the
-#: NAME at its module top; measured in. batch-102 (the shared A2L parameter
-#: picker rendering names read from the A2L in ``a2l_parameter_picker.py``)
-#: imports the NAME at its module top; measured in.
+#: NAME at its module top; measured in. batch-modular: ``s19_app/tui/app.py``
+#: and ``s19_app/tui/screens_directionb.py`` became packages, so the set
+#: names each importing submodule (``s19_app.tui.app.<m>`` /
+#: ``s19_app.tui.screens_directionb.<m>``) plus the package ``__init__``
+#: itself; the a2l parameter picker never actually imported the name (a
+#: pre-existing stale entry at 4f721985) and is dropped.
 MEASURED_SAFE_TEXT_CONSUMERS = {
-    "s19_app.tui.a2l_parameter_picker",
     "s19_app.tui.app",
+    "s19_app.tui.app.a2l_view",
+    "s19_app.tui.app.file_load",
+    "s19_app.tui.app.flow",
+    "s19_app.tui.app.project_load",
+    "s19_app.tui.app.projects",
+    "s19_app.tui.app.save_commit",
+    "s19_app.tui.app.save_plan",
+    "s19_app.tui.app.shared",
+    "s19_app.tui.app.shell",
+    "s19_app.tui.app.workspace_view",
     "s19_app.tui.checks_view",
     "s19_app.tui.flow_screens",
     "s19_app.tui.issues_view",
     "s19_app.tui.screens",
     "s19_app.tui.screens_directionb",
+    "s19_app.tui.screens_directionb.ab_diff",
+    "s19_app.tui.screens_directionb.check_editor",
+    "s19_app.tui.screens_directionb.loaded_artifacts",
+    "s19_app.tui.screens_directionb.map_parts",
+    "s19_app.tui.screens_directionb.memory_map",
+    "s19_app.tui.screens_directionb.patch_editor",
     "s19_app.tui.segment_split_view",
 }
 
@@ -251,16 +271,16 @@ def test_tc653_safe_text_import_census() -> None:
     )
 
     # screens_directionb references safe_text only as its own import (the
-    # ~80 internal call sites became consumer references).
-    screens_path = PRODUCT_ROOT / "tui" / "screens_directionb.py"
-    screens_src = screens_path.read_text(encoding="utf-8")
+    # ~80 internal call sites became consumer references); every package
+    # file imports the name from s19_app.utils, none defines it.
+    screens_src = ps.package_text("screens_directionb")
     assert "def safe_text" not in screens_src, (
         "screens_directionb must no longer define safe_text"
     )
     assert "_CONTROL_SCRUB" not in screens_src, (
         "screens_directionb must no longer define _CONTROL_SCRUB"
     )
-    assert "from ..utils import safe_text" in screens_src
+    assert "from ...utils import safe_text" in screens_src
 
     # Tests-side: the 3 measured old-address test importers read s19_app.utils
     # now; no test imports safe_text from the screens module anymore.

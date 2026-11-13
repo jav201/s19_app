@@ -106,6 +106,7 @@ import ast
 import asyncio
 import inspect
 import subprocess
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -588,9 +589,9 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
     ``refresh_entries`` sites and missed a mount-time fourth. Found by AT-081b's
     empty arm failing with ``''`` — the boundary case earning its keep.
 
-    The census arm walks ``app.py``'s AST rather than grepping: a grep matches
-    the method name inside docstrings (this file's own prose names it), and an
-    oracle keyed to prose certifies documentation.
+    The census arm walks the app package's AST rather than grepping: a grep
+    matches the method name inside docstrings (this file's own prose names it),
+    and an oracle keyed to prose certifies documentation.
 
     The behavioural arm is the A-01 boundary: a FILE-BACKED document disables
     both buttons, and the strip must render the disabled state rather than
@@ -598,16 +599,19 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
     (``_patch_history_action_allowed``), so a hint there is a wrong answer, not
     decoration.
     """
+    from tests.support import package_source as ps
+
     call_sites = [
         node
-        for node in ast.walk(ast.parse(Path("s19_app/tui/app.py").read_text(encoding="utf-8")))
+        for node in ast.walk(ps.package_tree("app"))
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "set_undo_redo_enabled"
     ]
     assert len(call_sites) == 4, (
-        f"expected the 4 writer sites in app.py — the 3 action sites the LLR "
-        f"names PLUS the on_mount initial render; found {len(call_sites)}. "
+        f"expected the 4 writer sites in the app package — the 3 action sites "
+        f"the LLR names PLUS the on_mount initial render; found "
+        f"{len(call_sites)}. "
         "A NEW site is not a failure to silence — it is a site that must also "
         "push the depths, or the strip and the buttons will disagree there."
     )
@@ -616,9 +620,10 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
             kw.arg == "depths" for kw in site.keywords
         )
         assert passes_depths, (
-            f"app.py:{site.lineno}: this site updates the buttons without "
-            "pushing the depths — the strip would freeze at its previous "
-            "numbers while the buttons moved around it (LLR-081.3)"
+            f"{ps.source_file_of(site).name}:{site.lineno}: this site updates "
+            "the buttons without pushing the depths — the strip would freeze "
+            "at its previous numbers while the buttons moved around it "
+            "(LLR-081.3)"
         )
 
     # A-01 behavioural arm: a file-backed document -> buttons disabled AND the
@@ -676,10 +681,23 @@ def test_tc081_4_no_binding_diff() -> None:
 
     The ``ctrl+z`` / ``ctrl+y`` bindings already exist (batch-40 S2); this
     increment DISPLAYS them and does not touch them.
+
+    After the modularization the App bindings moved from ``app.py`` into the
+    ``app/`` package, so the diff is taken over BOTH paths and judged as the
+    NET multiset of ``Binding(` lines (added minus removed, compared as
+    stripped text): a binding moved verbatim from ``app.py`` into the package
+    nets to zero; a new or changed one does not.
     """
     try:
         completed = subprocess.run(
-            ["git", "diff", "main", "--", "s19_app/tui/app.py"],
+            [
+                "git",
+                "diff",
+                "main",
+                "--",
+                "s19_app/tui/app.py",
+                "s19_app/tui/app/",
+            ],
             cwd=_repo_root(),
             capture_output=True,
             text=True,
@@ -687,7 +705,7 @@ def test_tc081_4_no_binding_diff() -> None:
             # fix rather than tidiness. `text=True` alone decodes with
             # `locale.getpreferredencoding()` -- **cp1252** on this Windows
             # host -- so any non-cp1252 codepoint anywhere in the diff of
-            # `app.py` raises `UnicodeDecodeError` on a subprocess reader
+            # the app paths raises `UnicodeDecodeError` on a subprocess reader
             # thread, `completed.stdout` comes back `None`, and this guard dies
             # with `AttributeError: 'NoneType' object has no attribute
             # 'splitlines'` instead of reporting a binding change.
@@ -767,18 +785,24 @@ def test_tc081_4_no_binding_diff() -> None:
         '"l", "load_file"',
         '"p", "load_project"',
     )
+    net = Counter()
+    for line in completed.stdout.splitlines():
+        if not line.startswith(("+", "-")) or line.startswith(("+++", "---")):
+            continue
+        if "Binding(" not in line:
+            continue
+        stripped = line[1:].strip()
+        net[stripped] += 1 if line.startswith("+") else -1
     changed = [
-        line
-        for line in completed.stdout.splitlines()
-        if line.startswith(("+", "-"))
-        and not line.startswith(("+++", "---"))
-        and "Binding(" in line
-        and not any(marker in line for marker in _SANCTIONED_BINDING_MARKERS)
+        f"{count:+d} {binding}"
+        for binding, count in sorted(net.items())
+        if count != 0
+        and not any(marker in binding for marker in _SANCTIONED_BINDING_MARKERS)
     ]
     assert not changed, (
         "this batch must add no UNSANCTIONED App-level Binding — a shared-chrome "
         "binding drifts every screen's snapshot (C-28), so any addition must be "
-        "paired with a snapshot drift-mark. Changed lines:\n"
+        "paired with a snapshot drift-mark. Net Binding( changes:\n"
         + "\n".join(changed)
     )
 

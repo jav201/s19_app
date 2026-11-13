@@ -49,6 +49,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
 from tests.support.b100_workers import settle_workers
+from tests.support.package_source import merged_class
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 CASE01_DIR = EXAMPLES_DIR / "case_01_basic_valid"
@@ -67,18 +68,11 @@ P2_NAME = "P2"
 def _source_census() -> set[str]:
     """Every name ``S19TuiApp``'s own source assigns via ``self.<name> =``.
 
-    Derived by an AST census of the live module file (C-31) — the same
-    derivation the contract's ARQ §2.1 used, re-run here so the domain can
-    never drift from the source it claims to cover.
+    Derived by an AST census of the merged app package class (C-31) — the
+    same derivation the contract's ARQ §2.1 used, re-run here so the domain
+    can never drift from the source it claims to cover.
     """
-    import s19_app.tui.app as app_module
-
-    tree = ast.parse(Path(app_module.__file__).read_text(encoding="utf-8"))
-    cls = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.ClassDef) and node.name == "S19TuiApp"
-    )
+    cls = merged_class("S19TuiApp")
     names: set[str] = set()
     for node in ast.walk(cls):
         targets = []
@@ -294,8 +288,8 @@ def test_tc_b100_08_loose_file_load_performs_no_reset(tmp_path: Path) -> None:
 
 def test_tc_b100_08_call_site_census() -> None:
     """Exactly one ``_reset_project_session`` call site in ``s19_app/`` —
-    inside ``_handle_load_project`` (an AST census over every product
-    module, so a second caller cannot hide in another file)."""
+    inside the project-load install handler (an AST census over every
+    product module, so a second caller cannot hide in another file)."""
 
     import s19_app
 
@@ -312,7 +306,7 @@ def test_tc_b100_08_call_site_census() -> None:
                 and func.attr == "_reset_project_session"
             ):
                 callers.append(source.relative_to(product_root).as_posix())
-    assert callers == ["tui/app.py"], callers
+    assert callers == ["tui/app/project_load.py"], callers
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,32 @@
+COMPARE before=8455 after=8493 missing=0 new=8 outcome_diff=17 flaky_excused=0
+COMPARE FAIL
+B1 tests/test_package_source_helper.py::test_merged_class_contains_core_and_mixin_methods (absent) -> passed
+B1 tests/test_package_source_helper.py::test_merged_class_meets_its_floors (absent) -> passed
+B1 tests/test_package_source_helper.py::test_package_modules_floors_hold_on_the_real_tree (absent) -> passed
+B1 tests/test_package_source_helper.py::test_package_text_marks_every_file (absent) -> passed
+B1 tests/test_package_source_helper.py::test_package_tree_walks_all_files (absent) -> passed
+B1 tests/test_package_source_helper.py::test_too_small_package_trips_the_floor (absent) -> passed
+B1 tests/test_package_source_helper.py::test_tui_dir_resolves_and_exists (absent) -> passed
+B1 tests/test_package_source_helper.py::test_unknown_package_is_refused (absent) -> passed
+B2 tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel passed -> failed
+B2 tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1] passed -> failed
+B2 tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad] failed -> passed
+B2 tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap] failed -> passed
+B2 tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second failed -> passed
+B2 tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second passed -> failed
+B2 tests/test_b100_save_image.py::test_tc_b100_59_pending_patch_in_the_open_project failed -> passed
+B2 tests/test_b101_designer_recompute.py::test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits skipped -> passed
+B2 tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time passed -> failed
+B2 tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single] passed -> failed
+B2 tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6 failed -> passed
+B2 tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled failed -> passed
+B2 tests/test_import_census.py::test_tc653_safe_text_import_census failed -> passed
+B2 tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials skipped -> passed
+B2 tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms passed -> failed
+B2 tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else skipped -> passed
+B2 tests/test_tui_legend.py::test_legend_data_not_in_frozen_color_policy skipped -> passed
+
+FAILED tests/test_a2l_f841_cleanup.py::test_at094_demo_parse_stable_after_dead_store_removal
+FAILED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+81 failed, 8123 passed, 285 skipped, 4 xfailed in 4788.03s (1:19:48)
+1

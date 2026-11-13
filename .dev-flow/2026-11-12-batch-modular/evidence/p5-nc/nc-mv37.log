@@ -1,0 +1,5 @@
+on_button_pressed -> navigation
+mover rc=0: MOVE OK
+TC-MOD-37(mover) FAIL expected-refused got MOVE OK rc=0 (the mover has no error code for a moved core-pinned handler)
+VERIFY FAIL V9: S19TuiApp.__dict__ has no on_button_pressed
+TC-MOD-37(verifier) PASS V9 V9 rc=1

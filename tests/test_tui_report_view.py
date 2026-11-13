@@ -379,7 +379,7 @@ def test_generate_trigger_calls_service_and_drops_results(
                 return fake_path
 
             monkeypatch.setattr(
-                app_module, "generate_project_report", _fake_generate
+                app_module.deps, "generate_project_report", _fake_generate
             )
             app.action_view_reports()
             await _flush(pilot)

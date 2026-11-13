@@ -1,0 +1,582 @@
+{
+ "s19_app.tui.app": {
+  "module_patches": {
+   "IntelHexFile": [
+    "tests/test_tui_app.py:736:monkeypatch.setattr:string"
+   ],
+   "Label": [
+    "tests/test_tui_app.py:1164:monkeypatch.setattr",
+    "tests/test_tui_app.py:1498:monkeypatch.setattr"
+   ],
+   "ListItem": [
+    "tests/test_tui_app.py:1165:monkeypatch.setattr",
+    "tests/test_tui_app.py:1499:monkeypatch.setattr"
+   ],
+   "_SAVE_FULL_PATH_LIMIT": [
+    "tests/test_b100_save_dialog.py:962:monkeypatch.setattr"
+   ],
+   "_file_digest": [
+    "tests/test_b100_save_dialog.py:749:monkeypatch.setattr",
+    "tests/test_b100_save_dialog.py:3388:monkeypatch.setattr",
+    "tests/test_b100_save_dialog.py:750:monkeypatch.setattr"
+   ],
+   "_image_map": [
+    "tests/test_b100_save_image.py:1317:monkeypatch.setattr"
+   ],
+   "_is_reparse_point": [
+    "tests/test_b100_load_dialog.py:2058:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:3530:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:1147:monkeypatch.setattr",
+    "tests/test_b100_recents.py:4052:monkeypatch.setattr"
+   ],
+   "_mirror_and_write_os_clipboard": [
+    "tests/test_b103_clipboard_tail.py:206:monkeypatch.setattr",
+    "tests/test_b103_copy_paste_matrix.py:347:monkeypatch.setattr"
+   ],
+   "_plan_without_document_key": [
+    "tests/test_b100_document.py:1744:monkeypatch.setattr"
+   ],
+   "_private_stage_dir": [
+    "tests/test_b100_save_guards.py:1682:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2024:monkeypatch.setattr"
+   ],
+   "build_loaded_s19": [
+    "tests/test_b100_workers.py:538:Spy"
+   ],
+   "check_project_files": [
+    "tests/test_b100_workers.py:538:Spy"
+   ],
+   "compare_images": [
+    "tests/test_b100_busy.py:907:monkeypatch.setattr",
+    "tests/test_diff_report_service.py:1944:monkeypatch.setattr",
+    "tests/test_diff_same_path_guard.py:95:monkeypatch.setattr",
+    "tests/test_diff_same_path_guard.py:142:monkeypatch.setattr",
+    "tests/test_report_off_ui_thread.py:168:monkeypatch.setattr",
+    "tests/test_tui_diff_screen.py:303:monkey.setattr",
+    "tests/test_tui_diff_screen.py:387:monkey.setattr",
+    "tests/test_tui_diff_screen.py:458:monkey.setattr",
+    "tests/test_tui_diff_screen.py:513:monkey.setattr",
+    "tests/test_tui_diff_screen.py:561:monkey.setattr",
+    "tests/test_tui_diff_screen.py:1670:monkey.setattr",
+    "tests/test_tui_diff_screen.py:2601:monkey.setattr"
+   ],
+   "compose_before_after_report": [
+    "tests/test_b100_busy.py:949:monkeypatch.setattr"
+   ],
+   "compose_load_announcement": [
+    "tests/test_b100_busy.py:3195:monkeypatch.setattr"
+   ],
+   "copy_into_workarea": [
+    "tests/test_b100_busy.py:1348:monkeypatch.setattr",
+    "tests/test_b100_busy.py:1795:monkeypatch.setattr",
+    "tests/test_b100_busy.py:1863:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:612:monkeypatch.setattr",
+    "tests/test_b100_workers.py:661:Spy",
+    "tests/test_b100_workers.py:731:Spy",
+    "tests/test_b100_workers.py:3753:Spy",
+    "tests/test_b100_workers.py:3989:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2898:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2900:monkeypatch.setattr"
+   ],
+   "datetime": [
+    "tests/test_b100_save_guards.py:1845:monkeypatch.setattr"
+   ],
+   "find_string_in_mem": [
+    "tests/test_tui_search_pagination.py:102:monkeypatch.setattr:string",
+    "tests/test_tui_search_pagination.py:148:monkeypatch.setattr:string",
+    "tests/test_tui_search_pagination.py:187:monkeypatch.setattr:string"
+   ],
+   "gather_project_artifacts": [
+    "tests/test_b100_busy.py:1523:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:637:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:1776:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:1972:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:2396:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1334:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:863:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2815:monkeypatch.setattr"
+   ],
+   "generate_diff_report": [
+    "tests/test_b100_busy.py:908:monkeypatch.setattr",
+    "tests/test_report_off_ui_thread.py:169:monkeypatch.setattr",
+    "tests/test_tui_diff_screen.py:514:monkey.setattr",
+    "tests/test_tui_diff_screen.py:562:monkey.setattr"
+   ],
+   "generate_diff_report_html": [
+    "tests/test_b100_busy.py:909:monkeypatch.setattr",
+    "tests/test_diff_report_service.py:1945:monkeypatch.setattr",
+    "tests/test_report_off_ui_thread.py:170:monkeypatch.setattr",
+    "tests/test_tui_diff_screen.py:515:monkey.setattr"
+   ],
+   "generate_project_report": [
+    "tests/test_b100_busy.py:2176:monkeypatch.setattr",
+    "tests/test_report_progress.py:97:monkeypatch.setattr:string",
+    "tests/test_tui_report_attribution.py:147:monkeypatch.setattr",
+    "tests/test_tui_report_attribution.py:201:monkeypatch.setattr",
+    "tests/test_tui_report_attribution.py:230:monkeypatch.setattr",
+    "tests/test_tui_report_attribution.py:259:monkeypatch.setattr",
+    "tests/test_tui_report_view.py:381:monkeypatch.setattr"
+   ],
+   "inventory_project_tree": [
+    "tests/test_b100_save_dialog.py:3617:monkeypatch.setattr"
+   ],
+   "open": [
+    "tests/test_b100_save_image.py:942:monkeypatch.setattr"
+   ],
+   "os": [
+    "tests/test_b100_recents.py:2592:patch.setattr",
+    "tests/test_b100_recents.py:3309:patch.setattr"
+   ],
+   "parse_a2l_cached": [
+    "tests/test_b100_project_homes.py:2035:monkeypatch.setattr",
+    "tests/test_b103_a2l_refresh.py:976:monkeypatch.setattr",
+    "tests/test_b103_a2l_refresh.py:1544:monkeypatch.setattr"
+   ],
+   "parse_a2l_file": [
+    "tests/test_b100_busy.py:1455:monkeypatch.setattr",
+    "tests/test_b100_busy.py:1970:patch.setattr",
+    "tests/test_b100_load_question.py:1349:assign",
+    "tests/test_b100_load_question.py:3086:monkeypatch.setattr",
+    "tests/test_b100_load_question.py:1354:assign",
+    "tests/test_b100_project_check.py:719:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:2036:monkeypatch.setattr",
+    "tests/test_b100_workers.py:660:Spy",
+    "tests/test_b100_workers.py:2100:Hold",
+    "tests/test_b100_workers.py:3646:Spy",
+    "tests/test_b100_workers.py:3752:Hold",
+    "tests/test_b100_workers.py:538:Spy",
+    "tests/test_b100_workers.py:2618:Hold",
+    "tests/test_b100_workers.py:3601:Hold",
+    "tests/test_b100_workers.py:1191:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2047:monkeypatch.setattr",
+    "tests/test_b100_workers.py:3858:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2896:monkeypatch.setattr",
+    "tests/test_tui_app.py:440:monkeypatch.setattr",
+    "tests/test_tui_app.py:483:monkeypatch.setattr"
+   ],
+   "place_into_workarea": [
+    "tests/test_b100_busy.py:2109:monkeypatch.setattr",
+    "tests/test_b100_busy.py:3301:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:259:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:852:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:2567:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:857:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2147:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2813:monkeypatch.setattr",
+    "tests/test_b100_workers.py:402:Hold",
+    "tests/test_b100_workers.py:592:Spy",
+    "tests/test_b100_workers.py:2613:Hold",
+    "tests/test_b100_workers.py:3084:Hold",
+    "tests/test_b100_workers.py:3436:monkeypatch.setattr"
+   ],
+   "plan_project_save": [
+    "tests/test_b100_document.py:156:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:1142:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:1447:monkeypatch.setattr"
+   ],
+   "read_project_manifest": [
+    "tests/test_b100_load_dialog.py:3228:monkeypatch.setattr",
+    "tests/test_b100_workers.py:1442:Hold",
+    "tests/test_b100_workers.py:1668:Hold",
+    "tests/test_b100_workers.py:1728:Hold",
+    "tests/test_b100_workers.py:1764:Hold",
+    "tests/test_b100_workers.py:1990:Hold",
+    "tests/test_b100_workers.py:2196:Hold",
+    "tests/test_b100_workers.py:2198:Hold",
+    "tests/test_b100_workers.py:2502:Hold",
+    "tests/test_b100_workers.py:3805:Hold",
+    "tests/test_b100_workers.py:538:Spy",
+    "tests/test_b100_workers.py:2616:Hold",
+    "tests/test_b100_workers.py:3594:Hold",
+    "tests/test_b100_workers.py:1190:monkeypatch.setattr",
+    "tests/test_b100_workers.py:1406:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2046:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2786:monkeypatch.setattr"
+   ],
+   "recorded_document_state": [
+    "tests/test_b100_save_guards.py:2674:monkeypatch.setattr",
+    "tests/test_b100_workers.py:538:Spy"
+   ],
+   "render_hex_view_text": [
+    "tests/test_tui_goto_marker.py:198:monkeypatch.setattr:string"
+   ],
+   "render_patched_image": [
+    "tests/test_b100_workers.py:1498:Spy"
+   ],
+   "resolve_input_path": [
+    "tests/test_b100_busy.py:3015:monkeypatch.setattr",
+    "tests/test_b100_busy.py:3068:monkeypatch.setattr",
+    "tests/test_b100_busy.py:3359:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:2876:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2101:Spy"
+   ],
+   "save_patched_image": [
+    "tests/test_b100_save_image.py:756:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:2697:monkeypatch.setattr",
+    "tests/test_b100_workers.py:593:Spy"
+   ],
+   "validate_project_files": [
+    "tests/test_b100_busy.py:2898:monkeypatch.setattr",
+    "tests/test_b100_busy.py:3240:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:852:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:859:monkeypatch.setattr",
+    "tests/test_b100_workers.py:3348:monkeypatch.setattr"
+   ],
+   "verify_written_image": [
+    "tests/test_b100_save_image.py:783:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:813:monkeypatch.setattr",
+    "tests/test_b100_workers.py:2832:monkeypatch.setattr",
+    "tests/test_b100_workers.py:1209:monkeypatch.setattr"
+   ],
+   "verify_written_manifest": [
+    "tests/test_b100_busy.py:2061:monkeypatch.setattr",
+    "tests/test_b100_project_check.py:264:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1206:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1577:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1629:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1680:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1781:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2022:monkeypatch.setattr",
+    "tests/test_tui_manifest_save.py:667:assign",
+    "tests/test_tui_manifest_save.py:679:assign"
+   ],
+   "write_change_document": [
+    "tests/test_b100_document.py:773:monkeypatch.setattr",
+    "tests/test_b100_document.py:1735:monkeypatch.setattr",
+    "tests/test_b100_project_homes.py:1775:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2573:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:1950:monkeypatch.setattr",
+    "tests/test_tui_check_editor.py:92:assign",
+    "tests/test_tui_check_editor.py:216:assign"
+   ],
+   "write_project_manifest": [
+    "tests/test_b100_project_homes.py:1777:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1106:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:1158:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2817:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:865:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:867:monkeypatch.setattr",
+    "tests/test_b100_workers.py:594:Spy",
+    "tests/test_tui_manifest_save.py:666:assign",
+    "tests/test_tui_manifest_save.py:182:assign",
+    "tests/test_tui_manifest_save.py:253:assign",
+    "tests/test_tui_manifest_save.py:678:assign",
+    "tests/test_tui_manifest_save.py:195:assign",
+    "tests/test_tui_manifest_save.py:271:assign"
+   ]
+  },
+  "class_patches": {
+   "BINDINGS": [
+    "tests/test_b97_key_bar.py:207:monkeypatch.setattr"
+   ],
+   "ENABLE_COMMAND_PALETTE": [
+    "tests/test_docs_canon.py:93:monkeypatch.setattr"
+   ],
+   "_abort_save": [
+    "tests/test_b100_busy.py:3241:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:2281:monkeypatch.setattr"
+   ],
+   "_apply_loaded_file": [
+    "tests/test_b100_a2l_progress.py:338:monkeypatch.setattr",
+    "tests/test_b100_busy.py:1490:monkeypatch.setattr"
+   ],
+   "_apply_prepared_load": [
+    "tests/test_b100_busy.py:1408:monkeypatch.setattr"
+   ],
+   "_busy_fail": [
+    "tests/test_b100_busy.py:2491:monkeypatch.setattr"
+   ],
+   "_busy_tick": [
+    "tests/test_b100_busy.py:548:monkeypatch.setattr"
+   ],
+   "_copy_project_subfolders": [
+    "tests/test_b100_project_homes.py:2637:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2799:monkeypatch.setattr"
+   ],
+   "_format_coexistence_status": [
+    "tests/test_b100_busy.py:1140:monkeypatch.setattr"
+   ],
+   "_install_prepared_project": [
+    "tests/test_b100_a2l_progress.py:330:monkeypatch.setattr",
+    "tests/test_b100_project_check.py:918:monkeypatch.setattr"
+   ],
+   "_keep_previous_manifest": [
+    "tests/test_b100_save_guards.py:1941:monkeypatch.setattr",
+    "tests/test_b100_save_guards.py:2009:monkeypatch.setattr"
+   ],
+   "_list_project_files": [
+    "tests/test_b100_load_dialog.py:852:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:3222:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:2696:monkeypatch.setattr",
+    "tests/test_b100_recents.py:2697:patch.setattr"
+   ],
+   "_log_report_event": [
+    "tests/test_b100_busy.py:1417:monkeypatch.setattr",
+    "tests/test_tui_report_attribution.py:221:monkeypatch.setattr"
+   ],
+   "_parse_data_file": [
+    "tests/test_b103_copy_quit_dialog.py:483:monkeypatch.setattr"
+   ],
+   "_parse_loaded_file": [
+    "tests/test_b100_busy.py:1762:monkeypatch.setattr",
+    "tests/test_b100_recents.py:3677:monkeypatch.setattr"
+   ],
+   "_reset_project_session": [
+    "tests/test_b100_project_homes.py:931:monkeypatch.setattr",
+    "tests/test_b100_recents.py:423:monkeypatch.setattr"
+   ],
+   "_surface_manifest_verify_result": [
+    "tests/test_b100_busy.py:3112:monkeypatch.setattr"
+   ],
+   "_trigger_generate_report": [
+    "tests/test_b100_workers.py:3381:monkeypatch.setattr"
+   ],
+   "_write_manifest_for_save": [
+    "tests/test_b100_document.py:820:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:855:monkeypatch.setattr",
+    "tests/test_b100_workers.py:1557:monkeypatch.setattr"
+   ],
+   "action_help_quit": [
+    "tests/test_b97_key_bar.py:1253:monkeypatch.setattr"
+   ],
+   "action_quit": [
+    "tests/test_b97_key_bar.py:1254:monkeypatch.setattr"
+   ],
+   "begin_busy": [
+    "tests/test_b100_busy.py:193:monkeypatch.setattr"
+   ],
+   "call_from_thread": [
+    "tests/test_b100_workers.py:911:monkeypatch.setattr"
+   ],
+   "copy_to_clipboard": [
+    "tests/test_b103_copy_views.py:107:monkeypatch.setattr"
+   ],
+   "end_busy": [
+    "tests/test_b100_announce.py:521:monkeypatch.setattr",
+    "tests/test_b100_busy.py:214:monkeypatch.setattr"
+   ],
+   "exit": [
+    "tests/test_b100_workers.py:2607:monkeypatch.setattr",
+    "tests/test_b100_workers.py:3804:monkeypatch.setattr"
+   ],
+   "list_projects": [
+    "tests/test_b100_load_dialog.py:2499:monkeypatch.setattr",
+    "tests/test_b100_load_dialog.py:2694:monkeypatch.setattr",
+    "tests/test_b100_recents.py:2699:patch.setattr"
+   ],
+   "load_a2l_from_path": [
+    "tests/test_b100_recents.py:3460:monkeypatch.setattr",
+    "tests/test_b100_recents.py:3899:monkeypatch.setattr"
+   ],
+   "load_from_path": [
+    "tests/test_b100_project_check.py:920:monkeypatch.setattr",
+    "tests/test_b100_recents.py:3459:monkeypatch.setattr"
+   ],
+   "on_button_pressed": [
+    "tests/test_b100_load_question.py:1098:monkeypatch.setattr"
+   ],
+   "on_flow_execution_panel_external_step_confirmed": [
+    "tests/test_b97_flow_execution.py:393:monkeypatch.setattr"
+   ],
+   "push_screen": [
+    "tests/test_b100_project_check.py:919:monkeypatch.setattr"
+   ],
+   "set_progress": [
+    "tests/test_b100_busy.py:181:monkeypatch.setattr",
+    "tests/test_b100_workers.py:860:monkeypatch.setattr",
+    "tests/test_report_off_ui_thread.py:179:monkeypatch.setattr",
+    "tests/test_report_off_ui_thread.py:269:monkeypatch.setattr",
+    "tests/test_report_progress.py:65:monkeypatch.setattr"
+   ],
+   "set_status": [
+    "tests/b97_probes.py:66:monkeypatch.setattr",
+    "tests/test_b100_project_check.py:921:monkeypatch.setattr",
+    "tests/test_b100_save_image.py:1457:monkeypatch.setattr",
+    "tests/test_open_folder_chips.py:474:monkeypatch.setattr"
+   ],
+   "step_busy": [
+    "tests/test_b100_a2l_progress.py:261:monkeypatch.setattr",
+    "tests/test_b100_busy.py:200:monkeypatch.setattr",
+    "tests/test_b100_workers.py:854:monkeypatch.setattr"
+   ],
+   "update_a2l_view": [
+    "tests/test_b100_a2l_progress.py:286:monkeypatch.setattr",
+    "tests/test_b100_busy.py:2515:monkeypatch.setattr"
+   ],
+   "update_project_labels": [
+    "tests/test_b100_busy.py:3302:monkeypatch.setattr"
+   ]
+  }
+ },
+ "s19_app.tui.screens_directionb": {
+  "module_patches": {
+   "_json_clock": [
+    "tests/test_b97_patch_editor.py:580:monkeypatch.setattr"
+   ]
+  },
+  "class_patches": {}
+ },
+ "source_readers": {
+  "tests/test_b100_a2l_progress.py": [
+   "215:literal 'app.py'"
+  ],
+  "tests/test_b100_busy.py": [
+   "52:s19_app.tui.app.__file__"
+  ],
+  "tests/test_b100_load_dialog.py": [
+   "766:literal 'app.py'"
+  ],
+  "tests/test_b100_load_question.py": [
+   "799:literal 'screens_directionb.py'",
+   "1965:s19_app.tui.app.__file__",
+   "2366:s19_app.tui.app.__file__",
+   "2432:s19_app.tui.app.__file__",
+   "796:s19_app.tui.app.__file__",
+   "1810:s19_app.tui.app.__file__"
+  ],
+  "tests/test_b100_recents.py": [
+   "3235:s19_app.tui.app.__file__"
+  ],
+  "tests/test_b100_reuse.py": [
+   "541:literal 's19_app/tui/app.py'",
+   "792:literal 'app.py'"
+  ],
+  "tests/test_b100_save_dialog.py": [
+   "1346:literal 'app.py'",
+   "2741:literal 'app.py'",
+   "3584:literal 'app.py'"
+  ],
+  "tests/test_b100_save_guards.py": [
+   "766:literal 'app.py'"
+  ],
+  "tests/test_b100_session_reset.py": [
+   "315:literal 'tui/app.py'",
+   "76:s19_app.tui.app.__file__"
+  ],
+  "tests/test_b100_workers.py": [
+   "70:s19_app.tui.app.__file__",
+   "1133:s19_app.tui.app.__file__"
+  ],
+  "tests/test_b101_doc_hygiene.py": [
+   "765:literal 's19_app/tui/app.py'",
+   "773:literal 's19_app/tui/app.py'"
+  ],
+  "tests/test_b102_flow_block_edit.py": [
+   "830:inspect.getsource"
+  ],
+  "tests/test_b103_copy_quit_dialog.py": [
+   "1019:literal 's19_app/tui/app.py'"
+  ],
+  "tests/test_b97_key_bar.py": [
+   "572:literal 's19_app/tui/app.py'",
+   "572:literal 's19_app/tui/screens_directionb.py'",
+   "637:inspect.getsource"
+  ],
+  "tests/test_b97_patch_editor.py": [
+   "319:s19_app.tui.screens_directionb.__file__",
+   "311:literal 'app.py'",
+   "311:s19_app.tui.screens_directionb.__file__"
+  ],
+  "tests/test_b99_staging.py": [
+   "2135:literal 's19_app/tui/app.py'"
+  ],
+  "tests/test_before_after_report.py": [
+   "724:inspect.getsource"
+  ],
+  "tests/test_diff_report_service.py": [
+   "469:inspect.getsource",
+   "577:inspect.getsource"
+  ],
+  "tests/test_filename_markup_safety.py": [
+   "120:s19_app.tui.app.__file__"
+  ],
+  "tests/test_flow_builder_render.py": [
+   "438:inspect.getsource"
+  ],
+  "tests/test_flow_report_fusion.py": [
+   "308:inspect.getsource",
+   "310:inspect.getsource"
+  ],
+  "tests/test_import_census.py": [
+   "255:literal 'screens_directionb.py'"
+  ],
+  "tests/test_legend_two_pane.py": [
+   "787:inspect.getsource"
+  ],
+  "tests/test_render_format.py": [
+   "89:inspect.getsource",
+   "90:inspect.getsource"
+  ],
+  "tests/test_render_hexview.py": [
+   "271:inspect.getsource",
+   "295:literal 'app.py'"
+  ],
+  "tests/test_report_addendum_bound.py": [
+   "2020:inspect.getsource",
+   "2359:inspect.getsource"
+  ],
+  "tests/test_report_document_bound.py": [
+   "755:inspect.getsource"
+  ],
+  "tests/test_report_length_cell.py": [
+   "271:inspect.getsource"
+  ],
+  "tests/test_report_producer_bound.py": [
+   "1114:inspect.getsource",
+   "1145:inspect.getsource"
+  ],
+  "tests/test_tui_commandbar.py": [
+   "2762:literal 's19_app/tui/app.py'",
+   "3054:literal 's19_app/tui/screens_directionb.py'",
+   "3055:literal 's19_app/tui/app.py'",
+   "3172:literal 's19_app/tui/app.py'"
+  ],
+  "tests/test_tui_crc_surface.py": [
+   "192:inspect.getsource",
+   "199:inspect.getsource"
+  ],
+  "tests/test_tui_directionb.py": [
+   "5963:inspect.getsource",
+   "6085:inspect.getsource",
+   "6409:inspect.getsource",
+   "6453:inspect.getsource",
+   "8952:inspect.getsource",
+   "8997:literal 'app.py'",
+   "5889:s19_app.tui.screens_directionb.__file__",
+   "6323:s19_app.tui.screens_directionb.__file__",
+   "8312:s19_app.tui.screens_directionb.__file__"
+  ],
+  "tests/test_tui_hexview.py": [
+   "355:s19_app.tui.app.__file__"
+  ],
+  "tests/test_tui_insight_style.py": [
+   "255:inspect.getsource"
+  ],
+  "tests/test_tui_patch_card.py": [
+   "749:inspect.getsource",
+   "993:inspect.getsource",
+   "1032:inspect.getfile",
+   "261:inspect.getsource",
+   "1072:inspect.getfile"
+  ],
+  "tests/test_tui_patch_checks_strip.py": [
+   "558:inspect.getsource",
+   "639:inspect.getsource"
+  ],
+  "tests/test_tui_patch_history_strip.py": [
+   "528:inspect.getsource",
+   "682:literal 's19_app/tui/app.py'",
+   "603:literal 's19_app/tui/app.py'"
+  ],
+  "tests/test_tui_report_attribution.py": [
+   "320:inspect.getsource",
+   "354:inspect.getsource"
+  ],
+  "tests/test_tui_snapshot.py": [
+   "1280:inspect.getsource"
+  ],
+  "tests/test_tui_variants.py": [
+   "207:s19_app.tui.app.__file__"
+  ]
+ }
+}

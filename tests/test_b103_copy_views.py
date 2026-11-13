@@ -26,6 +26,7 @@ from textual.widgets import DataTable, TextArea
 from textual.widgets.text_area import Selection
 
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.app import deps as app_deps
 from s19_app.tui import os_clipboard_input as clipboard_module
 from tests.support.b103_clipboard import (
     clipboard_probe,
@@ -107,8 +108,8 @@ def clipboard(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(S19TuiApp, "copy_to_clipboard", entry)
     monkeypatch.setattr(App, "copy_to_clipboard", base)
     monkeypatch.setattr(clipboard_module, "_mirror_and_write_os_clipboard", tail)
-    if original_entry.__globals__.get("_mirror_and_write_os_clipboard") is original_tail:
-        monkeypatch.setitem(original_entry.__globals__, "_mirror_and_write_os_clipboard", tail)
+    # The app's copy entry calls the tail through its deps seam (s19_app/tui/app/deps.py).
+    monkeypatch.setattr(app_deps, "_mirror_and_write_os_clipboard", tail)
     return ledger
 
 

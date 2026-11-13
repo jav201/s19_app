@@ -344,7 +344,7 @@ async def _run_cell(
     monkeypatch.setattr(
         clipboard_module, "_mirror_and_write_os_clipboard", marked_tail
     )
-    monkeypatch.setattr(app_module, "_mirror_and_write_os_clipboard", marked_tail)
+    monkeypatch.setattr(app_module.deps, "_mirror_and_write_os_clipboard", marked_tail)
     app = S19TuiApp(base_dir=tmp_path)
     async with app.run_test(size=SIZE) as pilot:
         await _settle(pilot)

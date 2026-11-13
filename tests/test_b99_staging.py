@@ -2129,15 +2129,25 @@ _FINAL_NAME_ALLOWLIST = {
     # privately, then ``os.replace`` onto the manifest this save wrote);
     # ``_keep_previous_manifest`` claims a NEW name with ``O_CREAT|O_EXCL``
     # (never an overwrite) and unlinks only its own partial claim.
+    "s19_app/tui/app/save_commit.py": frozenset(
+        {
+            "_abort_save",
+            "_keep_previous_manifest",
+            "_restore_manifest",
+        }
+    ),
     # batch-101 Inc 7 (R-CMP-005.17): ``_drop_orphan_md`` (inside the A<->B
     # report worker) unlinks only the Markdown file this report just wrote,
     # when its HTML twin failed or was refused.
-    "s19_app/tui/app.py": frozenset(
+    "s19_app/tui/app/reports.py": frozenset(
         {
-            "_abort_save",
             "_drop_orphan_md",
-            "_keep_previous_manifest",
-            "_restore_manifest",
+        }
+    ),
+    # A2L JSON dump (operator-picked export target): overwriting the chosen
+    # path IS the action's semantics (see the allow-list intro).
+    "s19_app/tui/app/a2l_view.py": frozenset(
+        {
             "action_dump_a2l_json",
         }
     ),
@@ -2207,6 +2217,19 @@ _FINAL_NAME_DECLARED_EXCEPTIONS = {
 }
 
 
+def _module_tail(expr: ast.expr) -> Optional[str]:
+    """The last name of a call's owner: ``os`` for ``os`` and for ``deps.os``.
+
+    batch-modular routes D1 names through the package ``deps`` module, so a
+    primitive is called as ``deps.os.replace(...)`` there; a bare-name match
+    would miss it (E5 review F1)."""
+    if isinstance(expr, ast.Name):
+        return expr.id
+    if isinstance(expr, ast.Attribute):
+        return expr.attr
+    return None
+
+
 def _final_name_census(rel: str, source_text: str) -> list:
     """The LLR-155.3 AST census over one module's text: every
     ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
@@ -2241,14 +2264,12 @@ def _final_name_census(rel: str, source_text: str) -> list:
                 primitive = func.attr
             elif (
                 func.attr == "copy2"
-                and isinstance(func.value, ast.Name)
-                and func.value.id == "shutil"
+                and _module_tail(func.value) == "shutil"
             ):
                 primitive = "shutil.copy2"
             elif (
                 func.attr == "replace"
-                and isinstance(func.value, ast.Name)
-                and func.value.id == "os"
+                and _module_tail(func.value) == "os"
             ):
                 primitive = "os.replace"
         if primitive is None:
@@ -2263,6 +2284,29 @@ def _final_name_census(rel: str, source_text: str) -> list:
             f"placement allow-list (in {owner!r})"
         )
     return violations
+
+
+def test_tc_b99_13_census_sees_primitives_called_through_deps() -> None:
+    """E5 review F1 (batch-modular): the package split calls D1 names as
+    ``deps.os.replace(...)`` / ``deps.shutil.copy2(...)``. The census must flag
+    those forms outside the allow-list too, or a new final-name write in any app
+    mixin would stay green. Positive control: an unlisted function using each
+    form is reported; the same calls in an allow-listed function are not."""
+    rel = "s19_app/tui/app/save_commit.py"
+    src = "\n".join(
+        [
+            "def _not_listed(a, b):",
+            "    deps.os.replace(a, b)",
+            "    deps.shutil.copy2(a, b)",
+            "def _restore_manifest(a, b):",
+            "    deps.os.replace(a, b)",
+            "",
+        ]
+    )
+    found = _final_name_census(rel, src)
+    assert len(found) == 2, found
+    assert any("os.replace" in v and "_not_listed" in v for v in found), found
+    assert any("shutil.copy2" in v and "_not_listed" in v for v in found), found
 
 
 def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:

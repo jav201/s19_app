@@ -5875,19 +5875,18 @@ def test_at_flow_block_label_markup_safe(tmp_path: Path) -> None:
 
 
 def test_tc028_screens_directionb_imports_no_processing_libs() -> None:
-    """screens_directionb.py imports none of bincopy / pya2l / crcmod.
+    """The screens_directionb package imports none of bincopy / pya2l / crcmod.
 
     Intent: LLR-012.4 — the increment-9 scaffolds (Memory Map, Bookmarks)
-    add no data-processing capability. AST-walk the view-layer module and
+    add no data-processing capability. AST-walk the view-layer package and
     assert the deferred-logic processing libraries are absent from its
     imports (mirrors ``test_tui_hexview.py::test_tc_023_...``).
     """
     import ast
 
-    import s19_app.tui.screens_directionb as mod
+    from tests.support import package_source as ps
 
-    source = Path(mod.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    tree = ps.package_tree("screens_directionb")
     forbidden = {"bincopy", "pya2l", "crcmod"}
     imported: set[str] = set()
     for node in ast.walk(tree):
@@ -5898,7 +5897,8 @@ def test_tc028_screens_directionb_imports_no_processing_libs() -> None:
             imported.add(node.module.split(".")[0])
     leaked = sorted(forbidden & imported)
     assert leaked == [], (
-        f"screens_directionb.py must not import processing libs, found {leaked}"
+        f"the screens_directionb package must not import processing libs, "
+        f"found {leaked}"
     )
 
 
@@ -6069,9 +6069,9 @@ def test_tc026_patch_editor_panel_is_presentational() -> None:
     ``ActionRequested`` message rather than calling a writer/reader itself.
     """
     import ast
-    import inspect
 
     from s19_app.tui.screens_directionb import PatchEditorPanel
+    from tests.support import package_source as ps
 
     panel = PatchEditorPanel()
     # The widget hands the action to the app via a Message — it owns no
@@ -6080,10 +6080,9 @@ def test_tc026_patch_editor_panel_is_presentational() -> None:
         "the Patch Editor must emit an ActionRequested message"
     )
 
-    # The widget module must not import the change-format handler — that is
+    # The widget package must not import the change-format handler — that is
     # the service's job.
-    source = inspect.getsource(inspect.getmodule(PatchEditorPanel))
-    tree = ast.parse(source)
+    tree = ps.package_tree("screens_directionb")
     imported: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module:
@@ -6310,18 +6309,17 @@ def test_ab_diff_blank_select_yields_none_variant(tmp_path: Path) -> None:
 
 
 def test_tc028_screens_directionb_imports_no_processing_libs_after_inc10() -> None:
-    """screens_directionb.py still imports no bincopy / pya2l / crcmod.
+    """The screens_directionb package still imports no bincopy / pya2l / crcmod.
 
     Intent: LLR-012.4 — increment 10 adds the Patch Editor and A2B Diff
-    widgets to the view-layer module. AST-walk it again and confirm the
+    widgets to the view-layer package. AST-walk it again and confirm the
     deferred-logic processing libraries remain absent from its imports.
     """
     import ast
 
-    import s19_app.tui.screens_directionb as mod
+    from tests.support import package_source as ps
 
-    source = Path(mod.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    tree = ps.package_tree("screens_directionb")
     forbidden = {"bincopy", "pya2l", "crcmod"}
     imported: set[str] = set()
     for node in ast.walk(tree):
@@ -6332,8 +6330,8 @@ def test_tc028_screens_directionb_imports_no_processing_libs_after_inc10() -> No
             imported.add(node.module.split(".")[0])
     leaked = sorted(forbidden & imported)
     assert leaked == [], (
-        f"screens_directionb.py must not import processing libs after "
-        f"increment 10, found {leaked}"
+        f"the screens_directionb package must not import processing libs "
+        f"after increment 10, found {leaked}"
     )
 
 
@@ -8301,16 +8299,15 @@ def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) ->
     assert "markup=True" not in source, "issues_view must not enable markup on file text"
 
     # batch-94 Inc-001 (architect finding 3): the from_markup census extends
-    # to the reworked screens_directionb.py surfaces (the Patch Editor rework
-    # + the NEW Check Editor + the A2B check-spec dropdown all render
+    # to the reworked screens_directionb package surfaces (the Patch Editor
+    # rework + the NEW Check Editor + the A2B check-spec dropdown all render
     # file-derived text). AST-based (C-42 mechanic 5), not a regex: prose in
     # comments names the sink and a line-oriented scan would false-positive.
     import ast as _ast
 
-    import s19_app.tui.screens_directionb as _sdb
+    from tests.support import package_source as ps
 
-    sdb_source = _P(_sdb.__file__).read_text(encoding="utf-8")
-    tree = _ast.parse(sdb_source)
+    tree = ps.package_tree("screens_directionb")
     from_markup_calls = [
         node.lineno
         for node in _ast.walk(tree)
@@ -8319,8 +8316,9 @@ def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) ->
         and node.func.attr == "from_markup"
     ]
     assert from_markup_calls == [], (
-        "screens_directionb.py must not call from_markup — file-derived text "
-        f"renders through literal Text (C-17); found at {from_markup_calls}"
+        "the screens_directionb package must not call from_markup — "
+        "file-derived text renders through literal Text (C-17); found at "
+        f"{from_markup_calls}"
     )
     # markup=True census: exactly ONE pre-existing site — the batch-78 diff
     # run-list label — and its interpolations are the closed _KIND_MARKUP /
@@ -8339,8 +8337,9 @@ def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) ->
         ):
             markup_true_sites.append(node)
     assert len(markup_true_sites) == 1, (
-        "screens_directionb.py must carry exactly one markup=True site (the "
-        f"batch-78 diff run-list label); found {len(markup_true_sites)}"
+        "the screens_directionb package must carry exactly one markup=True "
+        f"site (the batch-78 diff run-list label); found "
+        f"{len(markup_true_sites)}"
     )
     allowed_interpolations = {"colour", "label", "index", "start", "end"}
     (site,) = markup_true_sites
@@ -8955,10 +8954,16 @@ def test_tc_042_8_strip_colour_is_pure_reuse_of_batch27_helpers() -> None:
     assert "ranges" in attrs and "range_validity" in attrs, (
         "update_memory_strip must read LoadedFile.ranges / range_validity"
     )
+    # Bare-name AND attribute-form callees: batch-modular calls D1 names as
+    # ``deps.parse_a2l_file(...)``, which a bare-name set never sees (E5 F1).
     calls = {
         n.func.id
         for n in ast.walk(tree)
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+    } | {
+        n.func.attr
+        for n in ast.walk(tree)
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
     }
     assert {"cell_status", "status_to_css_class", "cell_count_for_geometry"} <= calls, (
         f"update_memory_strip must reuse the batch-27 helpers; called {sorted(calls)}"
@@ -8978,7 +8983,7 @@ def test_tc_042_8_strip_colour_is_pure_reuse_of_batch27_helpers() -> None:
 
 def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
     """TC-042.12 / LLR-042.12: the memory strip is render-side only — its render
-    code lives in ``s19_app/tui/app.py`` and reuses the batch-27 public helpers
+    code lives in ``s19_app/tui/app/`` and reuses the batch-27 public helpers
     from ``screens_directionb`` (NOT in the engine-frozen set), so it adds 0 diff
     to any engine-frozen path.
 
@@ -8993,8 +8998,12 @@ def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
     import s19_app.tui.app as app_module
     import s19_app.tui.screens_directionb as sdb
 
-    # The strip renderer is defined in the non-frozen app module.
-    assert inspect.getsourcefile(S19TuiApp.update_memory_strip).endswith("app.py")
+    # The strip renderer is defined in the non-frozen app package.
+    strip_file = Path(inspect.getsourcefile(S19TuiApp.update_memory_strip)).resolve()
+    assert strip_file.parent == Path(app_module.__file__).resolve().parent, (
+        f"update_memory_strip must live in the app package "
+        f"(s19_app/tui/app/), got {strip_file}"
+    )
     # The reused colour/geometry helpers live in the non-frozen screens module.
     for name in ("cell_status", "status_to_css_class", "cell_count_for_geometry"):
         assert hasattr(sdb, name), f"batch-27 helper {name} must be a public reuse"

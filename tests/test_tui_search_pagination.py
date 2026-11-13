@@ -99,7 +99,7 @@ def test_search_after_pagination_resumes_from_visible_address(
         app = S19TuiApp(base_dir=tmp_path)
         # Patch the *imported alias* inside app.py so the search handlers
         # actually see the spy (the canonical handle in hexview is bypassed).
-        monkeypatch.setattr("s19_app.tui.app.find_string_in_mem", _spy)
+        monkeypatch.setattr("s19_app.tui.app.deps.find_string_in_mem", _spy)
         async with app.run_test() as pilot:
             await pilot.pause()
             app.current_file = _loaded_s19_dense(tmp_path)
@@ -145,7 +145,7 @@ def test_search_after_pagination_miss_round_trip(
 
     async def _drive() -> object:
         app = S19TuiApp(base_dir=tmp_path)
-        monkeypatch.setattr("s19_app.tui.app.find_string_in_mem", _spy)
+        monkeypatch.setattr("s19_app.tui.app.deps.find_string_in_mem", _spy)
         async with app.run_test() as pilot:
             await pilot.pause()
             app.current_file = _loaded_s19_dense(tmp_path)
@@ -184,7 +184,7 @@ def test_search_empty_row_bases_fallback(tmp_path: Path, monkeypatch) -> None:
 
     async def _drive() -> object:
         app = S19TuiApp(base_dir=tmp_path)
-        monkeypatch.setattr("s19_app.tui.app.find_string_in_mem", _spy)
+        monkeypatch.setattr("s19_app.tui.app.deps.find_string_in_mem", _spy)
         async with app.run_test() as pilot:
             await pilot.pause()
             # A LoadedFile whose row_bases is empty even though mem_map has data.

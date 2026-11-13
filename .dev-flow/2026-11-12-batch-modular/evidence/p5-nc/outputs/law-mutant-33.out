@@ -1,0 +1,29 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_dlg_14_101_copy_quit_has_reachable_shared_opener ____________
+
+clipboard = _ClipboardRecorder(os_value='SEED-1b', os_seeded=False, writes=[], reads=[], base_calls=[], entries=[], skips=[], workers=[], osc52=[], pushes=[])
+
+    def test_r_dlg_14_101_copy_quit_has_reachable_shared_opener(clipboard) -> None:
+        """R-DLG.14/101; mutations: orphan N9, wrong count, or unreachable opener.
+    
+        WinCI also round-trips Unicode and exact line endings through the shared
+        external writer and reader.
+        """
+        from tests.test_b101_reach_and_reports_escape import _read_tree, census_sources
+    
+        tree = _read_tree()
+        census = census_sources(tree)
+        assert len(census.dialogs) == 22, sorted(census.dialogs)
+        assert "_CopyQuitScreen" in census.dialogs, sorted(census.dialogs)
+>       assert census.dialogs_without_opener == [], census.dialogs_without_opener
+E       AssertionError: ['_CopyQuitScreen']
+E       assert ['_CopyQuitScreen'] == []
+E         
+E         Left contains one more item: '_CopyQuitScreen'
+E         Use -v to get more diff
+
+tests/test_b103_copy_quit_dialog.py:1013: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+1 failed in 4.71s

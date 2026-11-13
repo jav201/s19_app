@@ -95,6 +95,7 @@ from s19_app.tui.workspace import is_windows_device_name
 
 from tests.support import b100_links
 from tests.support import b100_save_dialog as sd
+from tests.support.package_source import package_tree
 from tests.support.timing import report_margin
 from tests.support.timing import timing_bound
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
@@ -763,8 +764,7 @@ def test_tc_b100_06_path_limit_met_and_exceeded(tmp_path: Path) -> None:
 
 
 def _app_module_ast() -> ast.Module:
-    source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
-    return ast.parse(source)
+    return package_tree("app")
 
 
 #: Inc 11 re-pin (census H, interfaces S-c "Split", B11-66): the commit half
@@ -839,7 +839,7 @@ def _force_stage(monkeypatch: pytest.MonkeyPatch, stage: str) -> None:
     def _raiser(*args, **kwargs):
         raise OSError(f"forced failure at the {stage} stage")
 
-    original_validate = app_module.validate_project_files
+    original_validate = app_module.deps.validate_project_files
     validate_calls = {"count": 0}
 
     def _validate_once_then_raise(project_dir):
@@ -849,23 +849,23 @@ def _force_stage(monkeypatch: pytest.MonkeyPatch, stage: str) -> None:
         return original_validate(project_dir)
 
     if stage == "validation":
-        monkeypatch.setattr(app_module, "validate_project_files", _raiser)
+        monkeypatch.setattr(app_module.deps, "validate_project_files", _raiser)
     elif stage == "copies":
         # LED .53 re-pin: the save body places through
         # ``place_into_workarea`` (the reuse flag feeds the exact-list
         # rollback), so the copies-stage break patches that seam.
-        monkeypatch.setattr(app_module, "place_into_workarea", _raiser)
+        monkeypatch.setattr(app_module.deps, "place_into_workarea", _raiser)
     elif stage == "variant-rebuild":
         monkeypatch.setattr(
-            app_module, "validate_project_files", _validate_once_then_raise
+            app_module.deps, "validate_project_files", _validate_once_then_raise
         )
     elif stage == "gather":
-        monkeypatch.setattr(app_module, "gather_project_artifacts", _raiser)
+        monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _raiser)
     elif stage == "manifest":
-        monkeypatch.setattr(app_module, "write_project_manifest", _raiser)
+        monkeypatch.setattr(app_module.deps, "write_project_manifest", _raiser)
     elif stage == "manifest-refused":
         monkeypatch.setattr(
-            app_module,
+            app_module.deps,
             "write_project_manifest",
             lambda *args, **kwargs: (
                 None,
@@ -1104,7 +1104,7 @@ def test_tc_b100_07_rollback_keeps_denied_folder_content_r7(
                 ["icacls", str(patches), "/deny", f"{user}:(RD)"], check=True
             )
             monkeypatch.setattr(
-                app_module, "write_project_manifest", _lift_deny_then_refuse
+                app_module.deps, "write_project_manifest", _lift_deny_then_refuse
             )
             try:
                 app._handle_save_dialog(_payload(app, "ab"))
@@ -1156,7 +1156,7 @@ def test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8(
             app.load_selected_file(src)
             await _flush(pilot)
             monkeypatch.setattr(
-                app_module,
+                app_module.deps,
                 "write_project_manifest",
                 _concurrent_writer_then_refuse,
             )
@@ -1204,7 +1204,7 @@ def test_tc_b100_07_manifest_mismatch_is_the_newest_status_line(
             app.load_selected_file(src)
             await _flush(pilot)
             monkeypatch.setattr(
-                app_module, "verify_written_manifest", _forced_mismatch
+                app_module.deps, "verify_written_manifest", _forced_mismatch
             )
             app._handle_save_dialog(_payload(app, "proj"))
             await _flush(pilot)
@@ -1332,7 +1332,7 @@ def test_tc_b100_07_rollback_never_touches_junction_target(
             await _flush(pilot)
             tree_before = _tree_listing_no_links(project_dir)
             monkeypatch.setattr(
-                app_module, "gather_project_artifacts", _concurrent_writer_then_fail
+                app_module.deps, "gather_project_artifacts", _concurrent_writer_then_fail
             )
             app._handle_save_dialog(
                 app_module.SaveProjectPayload(
@@ -1574,7 +1574,7 @@ def test_tc_b100_07_failed_verify_leaves_no_folder_fresh(
             await pilot.pause()
             app.load_selected_file(src)
             await _flush(pilot)
-            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            monkeypatch.setattr(app_module.deps, "verify_written_manifest", _raise)
             app._handle_save_dialog(_payload(app, "freshv"))
             await _flush(pilot)
             status = probe.last
@@ -1626,7 +1626,7 @@ def test_tc_b100_07_failed_verify_restores_previous_manifest(
             src_b.write_text(_S19_B, encoding="ascii")
             app.load_selected_file(src_b)
             await _flush(pilot)
-            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            monkeypatch.setattr(app_module.deps, "verify_written_manifest", _raise)
             app._handle_save_dialog(_payload(app, "ab"))
             await _flush(pilot)
             status = probe.last
@@ -1677,9 +1677,9 @@ def _failed_merge_with_restore_blocked(tmp_path: Path, monkeypatch, block: str) 
             src_b.write_text(_S19_B, encoding="ascii")
             app.load_selected_file(src_b)
             await _flush(pilot)
-            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            monkeypatch.setattr(app_module.deps, "verify_written_manifest", _raise)
             if block == "no-space":
-                monkeypatch.setattr(app_module, "_private_stage_dir", _no_space)
+                monkeypatch.setattr(app_module.deps, "_private_stage_dir", _no_space)
             try:
                 app._handle_save_dialog(_payload(app, "ab"))
                 await _flush(pilot)
@@ -1778,7 +1778,7 @@ def test_tc_b100_07_restore_retry_lands_when_the_holder_lets_go(
             src_b.write_text(_S19_B, encoding="ascii")
             app.load_selected_file(src_b)
             await _flush(pilot)
-            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            monkeypatch.setattr(app_module.deps, "verify_written_manifest", _raise)
             app._handle_save_dialog(_payload(app, "ab"))
             await _flush(pilot)
             for timer in timers:
@@ -1842,7 +1842,7 @@ def test_tc_b100_07_taken_previous_names_move_to_the_next_candidate(
     RED (corrective-pass base): the claim refused on the junction ended the
     search; no copy was kept."""
     b100_links.require_junctions()
-    monkeypatch.setattr(app_module, "datetime", _FixedClock)
+    monkeypatch.setattr(app_module.deps, "datetime", _FixedClock)
     app = S19TuiApp(base_dir=tmp_path / "app")
     project = app.workarea / "P"
     project.mkdir(parents=True)
@@ -2019,9 +2019,9 @@ def test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored(
             await pilot.pause()
             app.load_selected_file(src)
             await _flush(pilot)
-            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            monkeypatch.setattr(app_module.deps, "verify_written_manifest", _raise)
             if block == "no-space":
-                monkeypatch.setattr(app_module, "_private_stage_dir", _no_space)
+                monkeypatch.setattr(app_module.deps, "_private_stage_dir", _no_space)
             try:
                 app._handle_save_dialog(_payload(app, "P"))
                 await _flush(pilot)
@@ -2121,7 +2121,7 @@ def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left
     not be removed, and this arm is RED there."""
     from s19_app.tui.workspace import WorkareaPlacementError
 
-    real_place = app_module.place_into_workarea
+    real_place = app_module.deps.place_into_workarea
     made: list = []
 
     def _mkdir_home_then_raise(source, destination, *args, **kwargs):
@@ -2144,7 +2144,7 @@ def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left
             app.load_selected_file(src)
             await _flush(pilot)
             app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
-            monkeypatch.setattr(app_module, "place_into_workarea", _mkdir_home_then_raise)
+            monkeypatch.setattr(app_module.deps, "place_into_workarea", _mkdir_home_then_raise)
             _force_stage(monkeypatch, "manifest-refused")
             app._handle_save_dialog(_payload(app, "freshd"))
             await _flush(pilot)
@@ -2570,7 +2570,7 @@ def test_tc_b100_05_r3_failed_write_carries_the_target_document(
                                       severity=ValidationSeverity.ERROR, artifact="change")]
 
     monkeypatch.setattr(changes_io, "write_change_document", _refuse)
-    monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+    monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
     messages, ab, _ = _merge_into_ab(tmp_path, paste=True)
     assert any(m.startswith("Saved project to") for m in messages), messages
     written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
@@ -2657,7 +2657,7 @@ def test_tc_b100_05_r8_document_turned_into_a_link_before_the_check_is_dropped(
     import s19_app.tui.app as app_module
 
     private = tmp_path / "private.json"
-    original = app_module.recorded_document_state
+    original = app_module.deps.recorded_document_state
     swapped: list = []
 
     def _swap_then_classify(project_dir, text, a2l_context=None):
@@ -2671,7 +2671,7 @@ def test_tc_b100_05_r8_document_turned_into_a_link_before_the_check_is_dropped(
             swapped.append(target)
         return original(project_dir, text, a2l_context)
 
-    monkeypatch.setattr(app_module, "recorded_document_state", _swap_then_classify)
+    monkeypatch.setattr(app_module.deps, "recorded_document_state", _swap_then_classify)
     messages, ab, _ = _merge_into_ab(tmp_path)
     assert swapped, "vacuity guard: Save project never classified the carried record"
     assert any(m.startswith("Saved project to") for m in messages), messages
@@ -2802,7 +2802,7 @@ def test_tc_b100_07_each_save_stage_failure_on_the_worker_rolls_back(
         # ``flows/f1.json`` first through the same function, and that copy
         # reports its own line (``… could not be copied …``, base parity), so
         # only the row sources raise here.
-        real_place = app_module.place_into_workarea
+        real_place = app_module.deps.place_into_workarea
         fail_place = _fail_with(no_space)
 
         def _place(source, *args, **kwargs):
@@ -2810,11 +2810,11 @@ def test_tc_b100_07_each_save_stage_failure_on_the_worker_rolls_back(
                 return fail_place(source, *args, **kwargs)
             return real_place(source, *args, **kwargs)
 
-        monkeypatch.setattr(app_module, "place_into_workarea", _place)
+        monkeypatch.setattr(app_module.deps, "place_into_workarea", _place)
     elif stage == "gather":
-        monkeypatch.setattr(app_module, "gather_project_artifacts", _fail_with(no_space))
+        monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _fail_with(no_space))
     else:
-        monkeypatch.setattr(app_module, "write_project_manifest", _fail_with(no_space))
+        monkeypatch.setattr(app_module.deps, "write_project_manifest", _fail_with(no_space))
 
     async def scenario(app, pilot, log):
         from s19_app.tui.screens import SaveProjectPayload
@@ -2874,7 +2874,7 @@ def test_tc_b100_07_ast_census_every_post_creation_return_removes() -> None:
         (n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "_save_project_files"),
         None,
     )
-    assert worker is not None, "the Save worker step _save_project_files is not in app.py"
+    assert worker is not None, "the Save worker step _save_project_files is not in the app package"
     parent_of: dict = {}
     for node in ast.walk(worker):
         for child in ast.iter_child_nodes(node):

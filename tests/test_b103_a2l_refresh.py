@@ -964,7 +964,7 @@ def test_r010_detail_invalidation(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
             import importlib
 
             module = importlib.import_module("s19_app.tui.app")
-            real_parse = module.parse_a2l_cached
+            real_parse = module.deps.parse_a2l_cached
             started = threading.Event()
             release = threading.Event()
 
@@ -973,7 +973,7 @@ def test_r010_detail_invalidation(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
                 assert release.wait(20)
                 return real_parse(*args, **kwargs)
 
-            monkeypatch.setattr(module, "parse_a2l_cached", gated)
+            monkeypatch.setattr(module.deps, "parse_a2l_cached", gated)
             await _request_a2l(app, pilot, f.new)
             await wait_until(pilot, started.is_set, "A2L worker did not reach its parse gate")
             await pilot.press("d")
@@ -1534,14 +1534,14 @@ async def _start_busy_action(app: S19TuiApp, pilot, f: Fixture, monkeypatch: pyt
         import importlib
 
         module = importlib.import_module("s19_app.tui.app")
-        real = module.parse_a2l_cached
+        real = module.deps.parse_a2l_cached
 
         def gated(*args, **kwargs):
             started.set()
             assert release.wait(20)
             return real(*args, **kwargs)
 
-        monkeypatch.setattr(module, "parse_a2l_cached", gated)
+        monkeypatch.setattr(module.deps, "parse_a2l_cached", gated)
         await _request_a2l(app, pilot, f.old)
     elif case.endswith("/3"):
         _project(f, "project_b", image=f.img1, a2l=f.old)

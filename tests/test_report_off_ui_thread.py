@@ -70,13 +70,13 @@ def _record_thread(
         Used by:
             - every test in this module
     """
-    original = getattr(app_mod, name)
+    original = getattr(app_mod.deps, name)
 
     def _wrapped(*args: Any, **kwargs: Any) -> Any:
         sink[name] = threading.get_ident()
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(app_mod, name, _wrapped)
+    monkeypatch.setattr(app_mod.deps, name, _wrapped)
 
 
 def test_ac1_before_after_composes_off_the_ui_thread(
@@ -165,9 +165,9 @@ def _drive_diff_report(
         html_path.write_text("html", encoding="utf-8")
         return DiffReportResult(path=html_path, written=True)
 
-    monkeypatch.setattr(app_mod, "compare_images", lambda *a, **k: fake)
-    monkeypatch.setattr(app_mod, "generate_diff_report", _gen_md)
-    monkeypatch.setattr(app_mod, "generate_diff_report_html", _gen_html)
+    monkeypatch.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+    monkeypatch.setattr(app_mod.deps, "generate_diff_report", _gen_md)
+    monkeypatch.setattr(app_mod.deps, "generate_diff_report_html", _gen_html)
 
     progress: List[int] = []
     original = S19TuiApp.set_progress

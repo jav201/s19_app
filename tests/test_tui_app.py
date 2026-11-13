@@ -437,16 +437,16 @@ def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: 
         calls["count"] += 1
         return {"path": str(path), "sections": [], "errors": [], "tags": []}
 
-    monkeypatch.setattr(app_module, "parse_a2l_file", fake_parse)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", fake_parse)
 
-    first = app_module.parse_a2l_cached(a2l_path, None)
-    second = app_module.parse_a2l_cached(a2l_path, first)
+    first = app_module.deps.parse_a2l_cached(a2l_path, None)
+    second = app_module.deps.parse_a2l_cached(a2l_path, first)
 
     assert calls["count"] == 1
     assert first == second
 
     a2l_path.write_text("/begin PROJECT Changed\n/begin MODULE M\n/end MODULE\n/end PROJECT\n", encoding="utf-8")
-    third = app_module.parse_a2l_cached(a2l_path, first)
+    third = app_module.deps.parse_a2l_cached(a2l_path, first)
     assert calls["count"] == 2, "a changed A2L was served from the cache"
     assert third is not first and third[0] != first[0], (first[0], third[0])
     assert third[0][2] == a2l_path.stat().st_size, third[0]
@@ -473,14 +473,14 @@ def test_a2l_cache_synchronous_load_stores_its_entry(tmp_path: Path, monkeypatch
     a2l = tmp_path / "firmware.a2l"
     s19.write_bytes((examples / "firmware.s19").read_bytes())
     a2l.write_bytes((examples / "firmware.a2l").read_bytes())
-    real = app_module.parse_a2l_file
+    real = app_module.deps.parse_a2l_file
     calls = {"count": 0}
 
     def counting_parse(path, *args, **kwargs):
         calls["count"] += 1
         return real(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "parse_a2l_file", counting_parse)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", counting_parse)
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path / "app")
@@ -734,7 +734,7 @@ def test_parse_loaded_file_primary_after_mac_keeps_mac_payload(tmp_path: Path, m
     )
 
     monkeypatch.setattr(
-        "s19_app.tui.app.IntelHexFile",
+        "s19_app.tui.app.deps.IntelHexFile",
         lambda _path: type(
             "FakeHex",
             (),
@@ -1161,8 +1161,8 @@ def test_update_sections_caps_mac_out_of_range(tmp_path: Path, monkeypatch: pyte
             captured_labels.append(label.text if label is not None else str(item))
 
     monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#sections_list" else None)
-    monkeypatch.setattr(app_module, "Label", FakeLabel)
-    monkeypatch.setattr(app_module, "ListItem", FakeItem)
+    monkeypatch.setattr(app_module.deps, "Label", FakeLabel)
+    monkeypatch.setattr(app_module.deps, "ListItem", FakeItem)
 
     precomputed = list(range(0x5000, 0x5000 + app_module.MAX_SECTIONS_OUT_OF_RANGE * 3))
     app.update_sections(precomputed_out_of_range=precomputed)
@@ -1495,8 +1495,8 @@ def test_update_sections_caps_primary_ranges(
         "query_one",
         lambda selector, *_a, **_k: FakeList() if selector == "#sections_list" else None,
     )
-    monkeypatch.setattr(app_module, "Label", FakeLabel)
-    monkeypatch.setattr(app_module, "ListItem", FakeItem)
+    monkeypatch.setattr(app_module.deps, "Label", FakeLabel)
+    monkeypatch.setattr(app_module.deps, "ListItem", FakeItem)
 
     app.update_sections(precomputed_out_of_range=[])
 

@@ -1941,8 +1941,8 @@ def test_r_cmp_005_17_1_ab_html_failure_removes_markdown(
     def _raising(*_a, **_k):
         raise RuntimeError("x")
 
-    monkeypatch.setattr(app_mod, "compare_images", lambda *a, **k: fake)
-    monkeypatch.setattr(app_mod, "generate_diff_report_html", _raising)
+    monkeypatch.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+    monkeypatch.setattr(app_mod.deps, "generate_diff_report_html", _raising)
     project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
 
     async def _drive() -> str:

@@ -617,7 +617,7 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
 
 
 def test_tc078_3_both_sites(tmp_path: Path) -> None:
-    """Both app.py call sites pass the aggregates (the writer census).
+    """Both app-package call sites pass the aggregates (the writer census).
 
     Intent (LLR-078.3): the post-run site and the history-refresh site are
     the aggregate-passing writers. If either omits the counts the strip and
@@ -634,9 +634,9 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
     calls — it was matching my own explanatory COMMENT. A prose-matching oracle
     is not a census; it fails on documentation and passes on a renamed call.
     """
-    from s19_app.tui import app as app_module
+    from tests.support import package_source as ps
 
-    tree = ast.parse(inspect.getsource(app_module))
+    tree = ps.package_tree("app")
     calls = [
         node
         for node in ast.walk(tree)
@@ -647,7 +647,8 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
 
     # batch-97 Inc-3: the Check Editor's refused Write paints its line through
     # ``CheckEditorPanel.show_status_line`` (it wraps ``refresh_check_results``
-    # inside the panel), so app.py gains no fourth site and the census stays 3.
+    # inside the panel), so the app package gains no fourth site and the census
+    # stays 3.
     assert len(calls) == 3, (
         f"the writer census pins THREE refresh_check_results call sites; found "
         f"{len(calls)}. A new site must pass the aggregates and be recorded here."

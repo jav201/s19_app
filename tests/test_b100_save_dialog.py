@@ -80,6 +80,7 @@ from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
 from tests.support.timing import report_margin
+from tests.support import package_source as ps
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -644,7 +645,7 @@ def _padded_base(side_dir: Path, workarea_len: int = 180) -> Path:
 
 def _path_limit_name_length(base: Path) -> int:
     """L: the longest name that meets the full-path limit exactly."""
-    return app_module._SAVE_FULL_PATH_LIMIT - app_module._SAVE_REPORT_SUFFIX_CHARS - 1 - len(str(_wa(base)))
+    return app_module.deps._SAVE_FULL_PATH_LIMIT - app_module._SAVE_REPORT_SUFFIX_CHARS - 1 - len(str(_wa(base)))
 
 
 def _prep_junction(tmp_path: Path, base: Path) -> dict:
@@ -678,8 +679,8 @@ def _stub_lstat_p(monkeypatch, app, ctx):
             raise PermissionError(13, "denied", str(path))
         return original(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module.os, "lstat", _lstat)
-    return lambda: monkeypatch.setattr(app_module.os, "lstat", original)
+    monkeypatch.setattr(app_module.deps.os, "lstat", _lstat)
+    return lambda: monkeypatch.setattr(app_module.deps.os, "lstat", original)
 
 
 def _prep_strasse(tmp_path: Path, base: Path) -> dict:
@@ -739,15 +740,15 @@ async def _setup_s19_then_delete(app, pilot, ctx) -> None:
 def _stub_digest_mac(monkeypatch, app, ctx):
     """``_file_digest`` raises ``PermissionError`` for the MAC (TC stub,
     LLR-175.1l)."""
-    original = app_module._file_digest
+    original = app_module.deps._file_digest
 
     def _digest(path, *args, **kwargs):
         if Path(path).name == "firmware.mac":
             raise PermissionError(13, "Permission denied", str(path))
         return original(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "_file_digest", _digest)
-    return lambda: monkeypatch.setattr(app_module, "_file_digest", original)
+    monkeypatch.setattr(app_module.deps, "_file_digest", _digest)
+    return lambda: monkeypatch.setattr(app_module.deps, "_file_digest", original)
 
 
 async def _setup_blocked(app, pilot, ctx) -> None:
@@ -959,7 +960,7 @@ def test_tc_b100_47_name_cap_64_65_300(tmp_path: Path, monkeypatch: pytest.Monke
     → RED."""
     import s19_app.tui.app as app_module
 
-    monkeypatch.setattr(app_module, "_SAVE_FULL_PATH_LIMIT", 10_000)
+    monkeypatch.setattr(app_module.deps, "_SAVE_FULL_PATH_LIMIT", 10_000)
     base = tmp_path / "app"
     src = _sources(tmp_path)
 
@@ -1328,13 +1329,14 @@ def test_tc_b100_47_strasse_open_strasse_eszett_present_is_a_clash(tmp_path: Pat
 
 
 def test_tc_b100_47_one_preparation_ast_census() -> None:
-    """LLR-175.6 (B11-32, S2-6, V-2), AST arm: in ``app.py`` the Save path
-    reaches ``sanitize_project_name``, ``is_windows_device_name`` (on the
-    typed name), the ``RESERVED_WORKAREA_HOMES`` comparison,
-    ``PROJECT_NAME_MAX_CHARS``, ``_project_folder_refusal`` (on the target)
-    and ``_plan_project_save`` only inside ``_prepare_project_save`` (0 other
-    Save-path sites; declared exemptions: ``is_windows_device_name`` in the
-    commit's unrecorded-file line, ``_project_folder_refusal`` on
+    """LLR-175.6 (B11-32, S2-6, V-2), AST arm: in the ``s19_app/tui/app/``
+    package the Save path reaches ``sanitize_project_name``,
+    ``is_windows_device_name`` (on the typed name), the
+    ``RESERVED_WORKAREA_HOMES`` comparison, ``PROJECT_NAME_MAX_CHARS``,
+    ``_project_folder_refusal`` (on the target) and ``_plan_project_save``
+    only inside ``_prepare_project_save`` (0 other Save-path sites;
+    declared exemptions: ``is_windows_device_name`` in the commit's
+    unrecorded-file line, ``_project_folder_refusal`` on
     ``self.current_project_dir``). In ``screens.py`` the
     ``SaveProjectScreen`` class body calls none of the rules, the listing
     or the planner, and nothing in ``screens.py`` builds a ``SavePreview``.
@@ -1343,8 +1345,7 @@ def test_tc_b100_47_one_preparation_ast_census() -> None:
     handler refuses. Negative control: a dialog-side copy of the reserved
     rule → 1 extra site → RED. RED (base): ``_prepare_project_save`` does
     not exist."""
-    app_tree = ast.parse((ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8"))
-    cls = next(n for n in ast.walk(app_tree) if isinstance(n, ast.ClassDef) and n.name == "S19TuiApp")
+    cls = ps.merged_class("S19TuiApp")
     methods = {n.name: n for n in cls.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     assert "_prepare_project_save" in methods, "no _prepare_project_save (the one preparation)"
     save_path = [
@@ -2730,16 +2731,15 @@ def test_tc_b100_65_summary_rows_equal_the_plan(tmp_path: Path, key: str) -> Non
 
 def test_tc_b100_65_the_preview_and_the_dialog_list_nothing_themselves() -> None:
     """LLR-175.4 (AST arm): ``_save_dialog_preview`` and
-    ``_compose_save_preview`` in ``app.py`` call no placement or listing
-    function (``predict_placement``, ``place_into_workarea``, ``listdir``,
-    ``iterdir``, ``list_projects``) — they read the one preparation's
-    result.
+    ``_compose_save_preview`` in the ``s19_app/tui/app/`` package call no
+    placement or listing function (``predict_placement``,
+    ``place_into_workarea``, ``listdir``, ``iterdir``, ``list_projects``) —
+    they read the one preparation's result.
 
     Why: a painter that lists the disk itself paints a second plan.
     Negative control: a painter that calls ``predict_placement`` → 1 site →
     RED. RED (base): the two functions do not exist."""
-    tree = ast.parse((ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8"))
-    cls = next(n for n in ast.walk(tree) if isinstance(n, ast.ClassDef) and n.name == "S19TuiApp")
+    cls = ps.merged_class("S19TuiApp")
     methods = {n.name: n for n in cls.body if isinstance(n, ast.FunctionDef)}
     banned = {"predict_placement", "place_into_workarea", "listdir", "iterdir", "list_projects", "scandir"}
     for name in ("_save_dialog_preview", "_compose_save_preview"):
@@ -3379,13 +3379,13 @@ def test_tc_b100_65_a_direct_payload_saves_the_same_tree(tmp_path: Path) -> None
 def _spy_digest(monkeypatch) -> list:
     """Every ``_file_digest`` call's path (the app's module-level helper)."""
     calls: list = []
-    original = app_module._file_digest
+    original = app_module.deps._file_digest
 
     def _wrapped(path, *args, **kwargs):
         calls.append(os.path.normcase(str(Path(path).resolve())))
         return original(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "_file_digest", _wrapped)
+    monkeypatch.setattr(app_module.deps, "_file_digest", _wrapped)
     return calls
 
 
@@ -3581,8 +3581,7 @@ def test_tc_b100_65_first_frame_before_the_image_decision(tmp_path: Path) -> Non
 
     first = _run(base, scenario)
     assert first and first[0][0] is True and first[0][1] is True and first[0][2] > 0, first
-    tree = ast.parse((ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8"))
-    cls = next(n for n in ast.walk(tree) if isinstance(n, ast.ClassDef) and n.name == "S19TuiApp")
+    cls = ps.merged_class("S19TuiApp")
     action = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "action_save_project")
     calls = {
         (n.func.attr if isinstance(n.func, ast.Attribute) else getattr(n.func, "id", ""))
@@ -3614,7 +3613,7 @@ def test_tc_b100_65_save_as_inventory_walked_once_per_open(tmp_path: Path, monke
         return original(*args, **kwargs)
 
     monkeypatch.setattr(gather, "inventory_project_tree", _walk)
-    monkeypatch.setattr(app_module, "inventory_project_tree", _walk, raising=False)
+    monkeypatch.setattr(app_module.deps, "inventory_project_tree", _walk, raising=False)
 
     async def scenario(app, pilot, log):
         await _open_project_direct(pilot, app, "P")

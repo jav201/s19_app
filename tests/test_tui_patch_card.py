@@ -1010,7 +1010,7 @@ def test_tc080_7_card_renders_no_file_derived_row_text() -> None:
 
 
 def test_writer_census_every_app_site_pushes_mem_map() -> None:
-    """Every ``refresh_entries`` call in ``app.py`` passes ``mem_map``.
+    """Every ``refresh_entries`` call in the app package passes ``mem_map``.
 
     Intent: LLR-080.2 / §6.4's writer census — "an omitted site silently renders
     a card with no before-bytes", the MJ-1-class defect.
@@ -1024,13 +1024,13 @@ def test_writer_census_every_app_site_pushes_mem_map() -> None:
     lesson, **an input set is itself an oracle** and code mutation cannot test
     one — so this walks the AST and quantifies over whatever is really there.
 
-    A new ``refresh_entries`` call in ``app.py`` without ``mem_map`` fails HERE,
-    loudly, with its line number — which is the edge the Phase-2 census lacked.
+    A new ``refresh_entries`` call in the app package without ``mem_map`` fails
+    HERE, loudly, with its line number — which is the edge the Phase-2 census
+    lacked.
     """
-    import s19_app.tui.app as app_module
+    from tests.support import package_source as ps
 
-    source = Path(inspect.getfile(app_module)).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    tree = ps.package_tree("app")
     sites = [
         node
         for node in ast.walk(tree)
@@ -1042,18 +1042,18 @@ def test_writer_census_every_app_site_pushes_mem_map() -> None:
     # method), the universal below would pass over an empty set — vacuously.
     assert len(sites) >= 4, (
         f"the census found only {len(sites)} refresh_entries call(s) in "
-        "app.py — the derivation is broken, so its 'every site' claim would "
-        "be vacuous"
+        "the app package — the derivation is broken, so its 'every site' "
+        "claim would be vacuous"
     )
     missing = [
-        node.lineno
+        f"{ps.source_file_of(node).name}:{node.lineno}"
         for node in sites
         if "mem_map" not in {kw.arg for kw in node.keywords}
     ]
     assert missing == [], (
-        f"app.py:{missing} call refresh_entries WITHOUT mem_map. Under "
-        "sentinel-preserve the card keeps the PREVIOUS image's map and paints "
-        "stale before-bytes. Wire every site."
+        f"{missing} call refresh_entries WITHOUT mem_map in the app package. "
+        "Under sentinel-preserve the card keeps the PREVIOUS image's map and "
+        "paints stale before-bytes. Wire every site."
     )
 
 
@@ -1066,10 +1066,8 @@ def test_writer_census_panel_selfcall_supplies_none() -> None:
     look consistent, it would CLEAR a retained map on every mount, which is the
     MJ-1 defect wearing a tidy shirt.
     """
-    import s19_app.tui.screens_directionb as panel_module
-
     tree = ast.parse(
-        Path(inspect.getfile(panel_module)).read_text(encoding="utf-8")
+        Path(inspect.getfile(PatchEditorPanel)).read_text(encoding="utf-8")
     )
     selfcalls = [
         node
@@ -1087,7 +1085,7 @@ def test_writer_census_panel_selfcall_supplies_none() -> None:
     )
     passed = {kw.arg for kw in selfcalls[0].keywords}
     assert "mem_map" not in passed, (
-        f"screens_directionb.py:{selfcalls[0].lineno} — the panel self-call "
+        f"patch_editor.py:{selfcalls[0].lineno} — the panel self-call "
         "now passes mem_map. The panel cannot know one (C-7); if it passes "
         "None it CLEARS a retained map on every mount."
     )

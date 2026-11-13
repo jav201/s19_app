@@ -1,0 +1,5 @@
+# Known hand-adapted retargeter refusals for the batch-modular apply.
+# Format: <path>:<line> <code> <reason>   (one refusal per line; # comments and blanks ignored)
+# The listed refusals are tolerated by `retarget_tests.py --accept-refusal`; any
+# refusal not listed here still fails the run (exit 1).
+tests/test_b103_copy_views.py:111 R1 RC-C __globals__ tail spy, hand-adapted after the run (direct deps patch replaces the __globals__ branch)

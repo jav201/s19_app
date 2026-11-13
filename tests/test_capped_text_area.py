@@ -176,6 +176,7 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
 
     import s19_app.tui.screens as screens_mod
     import s19_app.tui.screens_directionb as directionb_mod
+    from tests.support import package_source as ps
 
     ids_by_module = {
         screens_mod: {
@@ -188,8 +189,13 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
     }
 
     for module, expected_ids in ids_by_module.items():
-        path = Path(module.__file__)
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+        if module is screens_mod:
+            path = Path(module.__file__)
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            where = path.name
+        else:
+            tree = ps.package_tree("screens_directionb")
+            where = "screens_directionb/"
         found: dict[str, str] = {}
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
@@ -204,15 +210,15 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
         for wid in expected_ids:
             constructor = found.get(wid)
             assert constructor is not None, (
-                f"{path.name}: no construction site found for #{wid}"
+                f"{where}: no construction site found for #{wid}"
             )
             cls = getattr(module, constructor, None)
             assert cls is not None, (
-                f"{path.name}: #{wid} is constructed as {constructor!r}, which "
+                f"{where}: #{wid} is constructed as {constructor!r}, which "
                 f"is not importable from the module — the AST name must "
                 f"resolve for the cap to be provable"
             )
             assert isinstance(cls, type) and issubclass(cls, CappedTextArea), (
-                f"{path.name}: #{wid} must be constructed as CappedTextArea or "
+                f"{where}: #{wid} must be constructed as CappedTextArea or "
                 f"a subclass of it (the 64 KiB paste cap); got {constructor!r}"
             )

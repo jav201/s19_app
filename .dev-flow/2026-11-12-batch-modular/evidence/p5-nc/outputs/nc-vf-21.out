@@ -1,0 +1,4 @@
+VERIFY base=4f721985 units_old=626 units_new=626 missing=0 duplicate=0 extra=0 body_diff=0 unlisted_rewrite=0
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=0 pins=12/12 reexports_missing=0 fresh_imports=32/32 cycles=1 caps_over=0 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=0 names=0 tc_shape=0
+VERIFY FAIL V14: patch.py imports flow: breaks the I-1 direction rule
+VERIFY FAIL
