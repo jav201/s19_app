@@ -2205,10 +2205,12 @@ def _responsive_copy(tmp_path, monkeypatch, source: str):
             recorded_writer = clipboard_module.write_os_clipboard
             marker = {"started": False, "ended": False}
             def marked_writer(text, *args, **kwargs):
+                marker["t_start"] = time.monotonic()
                 marker["started"] = True
                 try:
                     return recorded_writer(text, *args, **kwargs)
                 finally:
+                    marker["t_end"] = time.monotonic()
                     marker["ended"] = True
             monkeypatch.setattr(clipboard_module, "write_os_clipboard", marked_writer)
             held = _hold_clipboard()

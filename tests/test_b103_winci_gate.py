@@ -634,6 +634,9 @@ def test_artifact_scanner_known_bad_canary_forms(
         "C&#58;&#92;Users&#92;person&#92;private.txt",
         "/mnt/c/Users/person/private.txt",
         "/home/person/private.txt",
+        "WindowsPath('C:/Users/person/AppData/Local/Temp/pytest-0')",
+        r"C:\Users\runneradmin2\private.txt",
+        "C:/Users/runneradmins/private.txt",
     ],
     ids=[
         "bearer",
@@ -645,6 +648,9 @@ def test_artifact_scanner_known_bad_canary_forms(
         "xml-windows-path",
         "wsl-path",
         "unix-path",
+        "forward-slash-windows-path",
+        "runner-prefix-account",
+        "runner-prefix-account-forward-slash",
     ],
 )
 def test_artifact_scanner_known_bad_credentials_and_personal_paths(
@@ -658,6 +664,39 @@ def test_artifact_scanner_known_bad_credentials_and_personal_paths(
         violation.startswith(("CREDENTIAL", "PERSONAL_PATH"))
         for violation in audit.violations
     )
+
+
+def test_artifact_scanner_allows_only_the_hosted_runner_account(tmp_path: Path) -> None:
+    """WinCI 43438310100: a failing run's tracebacks carry pytest's tmp_path
+    under the GitHub-hosted runner account, which names no person. Those
+    forms pass; the same text with any other account is still RED."""
+    runner_forms = (
+        "tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/"
+        "pytest-of-runneradmin/pytest-0/test_x0')\n"
+        r"INFO base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-0\x"
+        "\n"
+        r"repr C:\\Users\\RUNNERADMIN\\AppData"
+        "\n"
+        "path end C:\\Users\\runneradmin\n"
+    )
+    transcript, junit, gate_transcript = _safe_artifacts(tmp_path)
+    transcript.write_text(runner_forms, encoding="utf-8")
+    junit.write_text(
+        '<testsuite tests="1" skipped="0" failures="1" errors="0">'
+        '<testcase classname="example" name="failure">'
+        '<failure message="controlled failure">'
+        "C:&#92;Users&#92;runneradmin&#92;AppData C:/Users/runneradmin/x"
+        "</failure></testcase></testsuite>",
+        encoding="utf-8",
+    )
+    audit = safety.audit_artifacts(transcript, junit, gate_transcript)
+    assert audit.violations == []
+
+    person = runner_forms.replace("runneradmin", "person").replace("RUNNERADMIN", "person")
+    transcript.write_text(person, encoding="utf-8")
+    audit = safety.audit_artifacts(transcript, junit, gate_transcript)
+    assert "PERSONAL_PATH artifact=transcript id=windows-user-path" in audit.violations
+    assert "PERSONAL_PATH artifact=transcript id=macos-user-path" in audit.violations
 
 
 def test_artifact_scanner_missing_empty_and_malformed_inputs_fail(tmp_path: Path) -> None:

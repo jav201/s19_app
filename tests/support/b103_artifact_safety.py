@@ -63,13 +63,22 @@ CREDENTIAL_PATTERNS = {
     ),
     "probe-nonce": re.compile(r"\bb103-probe-[0-9a-f]{32}\b", re.IGNORECASE),
 }
+#: The GitHub-hosted Windows runner's fixed account (pytest's tmp_path on
+#: WinCI is under it). It names no person, so it is the one account the
+#: Windows user-path checks skip, and only as a whole path segment:
+#: ``runneradmin2`` or any other account still fails closed.
+HOSTED_RUNNER_ACCOUNT = r"(?!runneradmin(?:[\\/\s<>\"']|$))"
 PERSONAL_PATH_PATTERNS = {
     "windows-user-path": re.compile(
-        r"(?i)\b[A-Z]:[\\/]+(?:Users|Documents and Settings)[\\/]+[^\\/\s<>\"']+"
+        r"(?i)\b[A-Z]:[\\/]+(?:Users|Documents and Settings)[\\/]+"
+        + HOSTED_RUNNER_ACCOUNT
+        + r"[^\\/\s<>\"']+"
     ),
     "wsl-user-path": re.compile(r"(?i)/mnt/[a-z]/users/[^/\s<>\"']+"),
     "unix-home-path": re.compile(r"(?i)/(?:home|root)/[^/\s<>\"']+"),
-    "macos-user-path": re.compile(r"(?i)/users/[^/\s<>\"']+"),
+    "macos-user-path": re.compile(
+        r"(?i)/users/" + HOSTED_RUNNER_ACCOUNT + r"[^/\s<>\"']+"
+    ),
 }
 BACKSLASH_ESCAPE = re.compile(
     r"\\(?:u([0-9a-fA-F]{4})|U([0-9a-fA-F]{8})|x([0-9a-fA-F]{2})|([abfnrtv\\/'\"]))"

@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -21,6 +22,9 @@ SEED = "SEED-1b"
 A2L_THIRD_ROW = "ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING"
 MAC_THIRD_ROW = "Curve_ExternalAxis"
 SIZE = (118, 54)
+#: How long the copy-notice check waits for the posted Notify message (the
+#: notice itself lives 5 s, so this stays well inside its lifetime).
+NOTICE_WAIT_S = 2.0
 
 
 def _is_winci() -> bool:
@@ -271,13 +275,28 @@ def _copy_notice(expected: str) -> str:
     return f"Copied {lines} {suffix} to the clipboard."
 
 
-def _assert_copy_notice(app, before: list, expected: str) -> None:
+async def _assert_copy_notice(app, pilot, before: list, expected: str) -> None:
     previous = {id(notification) for notification in before}
-    current = [
-        notification
-        for notification in list(app._notifications)
-        if id(notification) not in previous
-    ]
+
+    def new_notices() -> list:
+        return [
+            notification
+            for notification in list(app._notifications)
+            if id(notification) not in previous
+        ]
+
+    # App.notify only posts a Notify message; the notice reaches
+    # app._notifications when the app handles it, which can be after the copy
+    # tail has ended (WinCI 43438310100, AT-I1b-5/1). Wait for it, then pause
+    # once more so a duplicate notice would also be counted.
+    deadline = time.monotonic() + NOTICE_WAIT_S
+    while not any(str(n.message).startswith("Copied") for n in new_notices()):
+        if time.monotonic() > deadline:
+            break
+        await asyncio.sleep(0.005)
+        await pilot.pause()
+    await pilot.pause()
+    current = new_notices()
     copies = [
         notification
         for notification in current
@@ -359,7 +378,7 @@ async def _run_cell(
             await pilot.press("escape")
             await _settle(pilot)
         if _is_winci():
-            _assert_copy_notice(app, before, expected)
+            await _assert_copy_notice(app, pilot, before, expected)
         assert app.clipboard == expected, (
             f"AT-I1b-{source}: right-click copy must replace the app seed with "
             "the independently captured source before paste"
