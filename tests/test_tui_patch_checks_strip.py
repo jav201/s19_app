@@ -505,9 +505,18 @@ def test_tc078_1_strip_mounted(tmp_path: Path) -> None:
     # reads the class's OWN namespace, so an inherited attribute of the same
     # name cannot satisfy it.
     new_members = {"_check_strip_text", "_CHECK_STRIP_BAR_CELLS"}
-    assert new_members <= set(vars(PatchEditorPanel)), (
+    # P3a: the panel's own namespace is now the union of its in-package zone
+    # mixins (the thin class plus six); Textual bases still cannot satisfy it.
+    own_members = set().union(
+        *(
+            vars(klass)
+            for klass in PatchEditorPanel.__mro__
+            if klass.__module__.startswith("s19_app.tui.screens_directionb.patch_editor")
+        )
+    )
+    assert new_members <= own_members, (
         f"the strip's members must exist on PatchEditorPanel itself; missing "
-        f"{new_members - set(vars(PatchEditorPanel))!r}"
+        f"{new_members - own_members!r}"
     )
     assert not (new_members & set(dir(Widget))), (
         f"new members collide with Textual Widget internals: "
