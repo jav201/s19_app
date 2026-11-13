@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import asyncio
 import base64
+import gc
 import json
 import logging
 import os
@@ -11,8 +12,10 @@ import re
 import shutil
 import subprocess
 import sys
+import sysconfig
 import threading
 import time
+import traceback
 import xml.sax.saxutils
 from collections import Counter
 from pathlib import Path
@@ -2206,6 +2209,112 @@ def _trace_screen_spans(app, monkeypatch, diag: dict) -> None:
         monkeypatch.setattr(screen, name, timed)
 
 
+STALL_GAP_S = 0.15
+STALL_POLL_S = 0.02
+STALL_CAPTURES = 3
+STALL_FRAMES = 12
+
+
+def _frame_module(filename: str) -> str:
+    """A dotted module name relative to the repo, site-packages or the stdlib
+    (the shortest match wins); otherwise the file's base name. Never a path."""
+    paths = sysconfig.get_paths()
+    path = Path(filename)
+    best = None
+    for root in (REPO_ROOT, Path(paths["purelib"]), Path(paths["platlib"]), Path(paths["stdlib"])):
+        try:
+            rel = path.relative_to(root)
+        except ValueError:
+            continue
+        if best is None or len(rel.parts) < len(best.parts):
+            best = rel
+    name = ".".join(best.parts) if best is not None else path.name
+    return name[:-3] if name.endswith(".py") else name
+
+
+def _loop_stack(loop_ident: int) -> list:
+    frame = sys._current_frames().get(loop_ident)
+    if frame is None:
+        return ["<no loop frame>"]
+    rows = traceback.extract_stack(frame)[-STALL_FRAMES:]
+    return [f"{_frame_module(row.filename)}:{row.name}:{row.lineno}" for row in rows]
+
+
+class _StallSampler:
+    """Diagnostics only (P-001 round 4). Started by the marked writer after it
+    stamps ``t_start`` and stopped when it stamps ``t_end``: every 20 ms it
+    checks the last tick of ``ticks``; when none ran for more than 150 ms it
+    captures the loop thread's stack, once per stall, at most 3 times. It also
+    records its own largest wake gap (a gap far above 20 ms means this thread
+    could not run either: GIL held in C code, or the process not scheduled)."""
+
+    def __init__(self, loop_ident: int, ticks: list) -> None:
+        self.loop_ident = loop_ident
+        self.ticks = ticks
+        self.stop = threading.Event()
+        self.captures: list = []
+        self.max_wake_gap = 0.0
+        self.thread = threading.Thread(target=self._run, daemon=True)
+
+    def _run(self) -> None:
+        began = woke = time.monotonic()
+        captured_for = None
+        while not self.stop.wait(STALL_POLL_S):
+            now = time.monotonic()
+            self.max_wake_gap = max(self.max_wake_gap, now - woke)
+            woke = now
+            last = max(self.ticks[-1][1] if self.ticks else began, began)
+            if now - last <= STALL_GAP_S or last == captured_for:
+                continue
+            if len(self.captures) < STALL_CAPTURES:
+                self.captures.append((now, now - last, _loop_stack(self.loop_ident)))
+            captured_for = last
+
+
+def _gc_hook(events_out: list, loop_ident: int):
+    """Diagnostics only: ``gc.callbacks`` start/stop with the generation."""
+
+    def hook(phase: str, info: dict) -> None:
+        on_loop = threading.get_ident() == loop_ident
+        events_out.append((time.monotonic(), phase, info.get("generation"), on_loop))
+
+    return hook
+
+
+def _gc_collections(diag: dict, start: float, end: float) -> list:
+    rows, began = [], None
+    for at, phase, generation, on_loop in diag.get("gc", []):
+        if phase == "start":
+            began = at
+        elif began is not None:
+            if start <= began <= end:
+                rows.append((generation, began, at - began, on_loop))
+            began = None
+    return rows
+
+
+def _round4_report(diag: dict, start: float, end: float) -> str:
+    """Round-4 additions: loop stalls with stacks, GC in the write, sampler wake gap."""
+    rows = _gc_collections(diag, start, end)
+    per_gen = Counter(gen for gen, _at, _took, _loop in rows)
+    secs = {gen: round(sum(took for g, _a, took, _l in rows if g == gen), 4) for gen in per_gen}
+    longest = sorted(rows, key=lambda row: row[2], reverse=True)[:5]
+    gc_long = [
+        f"g{gen}{at - start:+.3f}/{took:.4f}{'' if on_loop else '(other thread)'}"
+        for gen, at, took, on_loop in longest
+    ]
+    sampler = diag.get("sampler")
+    stalls = [
+        f"{at - start:+.3f} gap={gap:.3f} stack=" + " > ".join(stack)
+        for at, gap, stack in (sampler.captures if sampler else [])
+    ]
+    wake = f"{sampler.max_wake_gap:.3f}" if sampler else "n/a"
+    return (
+        f" | gc_in_write count={dict(per_gen)} secs={secs} longest(start/dur)={gc_long}"
+        f" | sampler_max_wake_gap={wake} | loop_stalls>{STALL_GAP_S}s={stalls}"
+    )
+
+
 def _responsive_report(marker, lateness, diag: dict) -> str:
     """A few-KB timeline around the write, relative to ``t_start``; no payloads."""
     start = marker.get("t_start")
@@ -2247,11 +2356,23 @@ def _responsive_report(marker, lateness, diag: dict) -> str:
         f" | callbacks_per_100ms={bins[:40]}"
         f" | events={near[:25]}"
         f" | notices={notices[:6]}"
+        + _round4_report(diag, start, end)
     )
 
 
-def _responsive_copy(tmp_path, monkeypatch, source: str, *, control: bool = False):
-    diag: dict = {"ticks": [], "spans": [], "messages": [], "callbacks": [], "armed": False}
+async def _wait_sleep_only(predicate, timeout: float) -> None:
+    """``_wait`` without ``pilot.pause()``: no Pilot ``Callback`` messages (C2)."""
+    deadline = time.monotonic() + timeout
+    while not predicate():
+        if time.monotonic() >= deadline:
+            raise AssertionError("fixture predicate not satisfied before timeout")
+        await asyncio.sleep(0.02)
+
+
+def _responsive_copy(
+    tmp_path, monkeypatch, source: str, *, control: bool = False, sleep_poll: bool = False
+):
+    diag: dict = {"ticks": [], "spans": [], "messages": [], "callbacks": [], "gc": [], "armed": False}
 
     def message_hook(message) -> None:
         if not diag["armed"]:
@@ -2288,16 +2409,23 @@ def _responsive_copy(tmp_path, monkeypatch, source: str, *, control: bool = Fals
             _trace_screen_spans(app, monkeypatch, diag)
             recorded_writer = clipboard_module.write_os_clipboard
             marker = {"started": False, "ended": False}
+            loop_ident = threading.get_ident()
+            sampler = diag["sampler"] = _StallSampler(loop_ident, diag["ticks"])
             def marked_writer(text, *args, **kwargs):
                 marker["t_start"] = time.monotonic()
                 marker["started"] = True
+                if sampler.thread.ident is None:
+                    sampler.thread.start()
                 try:
                     return recorded_writer(text, *args, **kwargs)
                 finally:
                     marker["t_end"] = time.monotonic()
                     marker["ended"] = True
+                    sampler.stop.set()
             monkeypatch.setattr(clipboard_module, "write_os_clipboard", marked_writer)
             held = None if control else _hold_clipboard()
+            gc_hook = _gc_hook(diag["gc"], loop_ident)
+            gc.callbacks.append(gc_hook)
             diag["armed"] = True
             try:
                 async for lateness in arm_tick_lateness(app, marker, trace=diag["ticks"]):
@@ -2308,14 +2436,19 @@ def _responsive_copy(tmp_path, monkeypatch, source: str, *, control: bool = Fals
                         await _right_click(app, pilot, widget, (10, 2))
                     else:
                         await _right_click(app, pilot, widget, (4, widget.header_height + 2))
-                    await _wait(
-                        pilot,
-                        lambda: marker["ended"] and bool(ledger.tail_done),
-                        timeout=10.0,
-                    )
+                    def done() -> bool:
+                        return marker["ended"] and bool(ledger.tail_done)
+                    if sleep_poll:
+                        await _wait_sleep_only(done, timeout=10.0)
+                    else:
+                        await _wait(pilot, done, timeout=10.0)
                     await _settle(pilot)
                     break
             finally:
+                gc.callbacks.remove(gc_hook)
+                sampler.stop.set()
+                if sampler.thread.ident is not None:
+                    sampler.thread.join(1.0)
                 if held is not None:
                     _release_clipboard(held)
             diag["notices"] = [
@@ -2370,6 +2503,19 @@ def test_r_paste_14_c1_no_write_control_full_app(tmp_path, monkeypatch, source: 
     other_program_write(SEED_OS)
     marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, source, control=True)
     _assert_responsive(marker, lateness, obs, f"r_paste_14_c1_{source}", diag)
+
+
+def test_r_paste_14_c2_sleep_poll_control_full_app(tmp_path, monkeypatch) -> None:
+    """R-PASTE.14/C2 (diagnostic control, P-001 round 4): C1[key] with its wait
+    loop polling ``asyncio.sleep(0.02)`` instead of ``pilot.pause()``. Same
+    window, skips and bound. A PASS while C1 FAILs puts the stall on the Pilot
+    ``Callback`` storm; a FAIL puts it elsewhere."""
+    _winci_ready_or_skip()
+    other_program_write(SEED_OS)
+    marker, lateness, obs, diag = _responsive_copy(
+        tmp_path, monkeypatch, "key", control=True, sleep_poll=True
+    )
+    _assert_responsive(marker, lateness, obs, "r_paste_14_c2_key", diag)
 
 
 def _line_cut_observation(tmp_path: Path, monkeypatch) -> dict:

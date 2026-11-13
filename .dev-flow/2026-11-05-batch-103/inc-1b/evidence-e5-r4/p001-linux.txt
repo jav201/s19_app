@@ -1,0 +1,128 @@
+# P-001 WinCI round 4 instrumentation: Linux runs on the LAN Linux host (<host>), python 3.11, textual 8.2.8, isolated env (env -i, a scratch HOME with the isolated-runner basename), timeout 300, -n <= 2.
+# tree = clone of b103-inc1b-push at 436be332 + this commit's working changes (git hash-object of the 5 changed files equal to the PC worktree); base = an untouched clone at 436be332.
+# Host load (uptime) is printed beside every run (about 2-3.4). No timing number here decides anything (HT-08); the probe's unforced runs are N=2 and informational only (HT-07).
+
+=== manifest
+uptime-before:  14:36:02 up 23:24,  4 users,  load average: 2.33, 1.69, 2.17
+s19_app.__file__ = ~/work/zq-r4/tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+ARGS: tests/support/b103_winci_gate.py --validate-manifest
+WINCI_MANIFEST_OK tests=260 obligations=108 at_p1=14 at_p2=14
+rc=0
+uptime-after:  14:36:02 up 23:24,  5 users,  load average: 2.33, 1.69, 2.17
+
+=== gate-tree
+uptime-before:  14:36:09 up 23:24,  4 users,  load average: 2.31, 1.70, 2.16
+s19_app.__file__ = ~/work/zq-r4/tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+ARGS: -m pytest -p no:cacheprovider -n 2 -q tests/test_b103_winci_gate.py tests/test_id_registry.py
+bringing up nodes...
+bringing up nodes...
+
+226 passed in 8.92s
+rc=0
+uptime-after:  14:36:19 up 23:25,  4 users,  load average: 2.49, 1.76, 2.18
+
+=== collect: base 34 nodes, tree 35 nodes; diff base -> tree:
+34a35
+> tests/test_b103_clipboard_tail.py::test_r_paste_14_c2_sleep_poll_control_full_app
+
+=== tail file in 3 node chunks (-n 2), per chunk summary
+--- out-tail-base-chunk-00.txt
+=== tail-base-chunk-00
+uptime-before:  14:36:30 up 23:25,  4 users,  load average: 2.45, 1.79, 2.18
+s19_app.__file__ = ~/work/zq-r4/base/s19_app/__init__.py
+HEAD 436be332 dirty=0
+13 passed in 70.16s (0:01:10)
+rc=0
+uptime-after:  14:37:41 up 23:26,  4 users,  load average: 3.40, 2.22, 2.31
+--- out-tail-base-chunk-01.txt
+=== tail-base-chunk-01
+uptime-before:  14:37:41 up 23:26,  4 users,  load average: 3.40, 2.22, 2.31
+s19_app.__file__ = ~/work/zq-r4/base/s19_app/__init__.py
+HEAD 436be332 dirty=0
+11 passed in 100.69s (0:01:40)
+rc=0
+uptime-after:  14:39:23 up 23:28,  3 users,  load average: 3.35, 2.60, 2.44
+--- out-tail-base-chunk-02.txt
+=== tail-base-chunk-02
+uptime-before:  14:39:23 up 23:28,  3 users,  load average: 3.35, 2.60, 2.44
+s19_app.__file__ = ~/work/zq-r4/base/s19_app/__init__.py
+HEAD 436be332 dirty=0
+3 passed, 7 skipped in 28.70s
+rc=0
+uptime-after:  14:39:53 up 23:28,  4 users,  load average: 3.00, 2.59, 2.44
+--- out-tail-tree-chunk-00.txt
+=== tail-tree-chunk-00
+uptime-before:  14:39:53 up 23:28,  4 users,  load average: 3.00, 2.59, 2.44
+s19_app.__file__ = ~/work/zq-r4/tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+13 passed in 69.00s (0:01:09)
+rc=0
+uptime-after:  14:41:03 up 23:29,  3 users,  load average: 3.08, 2.70, 2.49
+--- out-tail-tree-chunk-01.txt
+=== tail-tree-chunk-01
+uptime-before:  14:41:03 up 23:29,  3 users,  load average: 3.08, 2.70, 2.49
+s19_app.__file__ = ~/work/zq-r4/tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+11 passed in 98.81s (0:01:38)
+rc=0
+uptime-after:  14:42:43 up 23:31,  3 users,  load average: 2.86, 2.77, 2.54
+--- out-tail-tree-chunk-02.txt
+=== tail-tree-chunk-02
+uptime-before:  14:42:43 up 23:31,  3 users,  load average: 2.86, 2.77, 2.54
+s19_app.__file__ = ~/work/zq-r4/tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+3 passed, 8 skipped in 28.28s
+rc=0
+uptime-after:  14:43:12 up 23:31,  3 users,  load average: 2.90, 2.80, 2.56
+
+=== per-node outcomes (-rA, SKIPPED count stripped): base vs tree
+base: 27 PASSED; tree: 27 PASSED; PASSED lists identical: yes
+skipped: base 7, tree 8 (the new R-PASTE.14/C2 node, same WinCI-only skip; the skip line moved 1451 -> 1454 by the 3 new import lines); FAILED/ERROR: 0 tree, 0 base
+
+=== sampler self-test probe (scratch script outside the tree, run against a scratch copy of the tree; WinCI skip bypassed; Linux control writer; one forced 300 ms main-thread time.sleep at t_start+0.5 s; local bound 0.100 s)
+--- run 1
+=== probe
+uptime-before:  14:43:44 up 23:32,  3 users,  load average: 2.30, 2.65, 2.52
+s19_app.__file__ = ~/work/zq-r4/probe-tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+ARGS: ~/work/zq-r4/probe_r4.py
+s19_app.__file__ = ~/work/zq-r4/probe-tree/s19_app/__init__.py
+frame modules: ['tests.test_b103_clipboard_tail', 'textual.__init__', 'asyncio.__init__', 'probe_r4']
+scanner positive control (a home path): ['PERSONAL_PATH artifact=ctl id=unix-home-path']
+forced C1[key]: FAIL; forced sleep 0.300 s
+  stall section: 0.15s=['+0.478 gap=0.172 stack=probe_r4:<lambda>:79 > tests.test_b103_clipboard_tail:test_r_paste_14_c1_no_write_control_full_app:2504 > tests.test_b103_clipboard_tail:_responsive_copy:2460 > asyncio.runners:run:190 > asyncio.runners:run:118 > asyncio.base_events:run_until_complete:641 > asyncio.base_events:run_forever:608 > asyncio.base_events:_run_once:1936 > asyncio.events:_run:84 > textual.message_pump:_process_messages:571 > textual.message_pump:_process_messages_loop:685 > textual.message_pump:_get_dispatch_methods:754', '+0.673 gap=0.166 stack=probe_r4:main:77 > probe_r4:run:54 > probe_r4:<lambda>:79 > tests.test_b103_clipboard_tail:test_r_paste_14_c1_no_write_control_full_app:2504 > tests.test_b103_clipboard_tail:_responsive_copy:2460 > asyncio.runners:run:190 > asyncio.runners:run:118 > asyncio.base_events:run_until_complete:641 > asyncio.base_events:run_forever:608 > asyncio.base_events:_run_once:1936 > asyncio.events:_run:84 > probe_r4:stall:39']
+  stack captured: True
+  message chars: 2104 abs-path hits: 0
+  scanner violations: []
+unforced C1[key]: FAIL max_late=0.165 n=22 t_end=+1.500 msgs_in_write={'Callback': 12584}
+  round-4 section:  count={0: 84, 1: 7, 2: 1} secs={0: 0.0225, 1: 0.0167, 2: 0.1204} longest(start/dur)=['g2+0.140/0.1204', 'g1+1.103/0.0035', 'g1+0.899/0.0034', 'g1+1.306/0.0031', 'g0+0.062/0.0021'] | sampler_max_wake_gap=0.144 | loop_stalls>0.15s=['+0.260 gap=0.211 stack=asyncio.runners:run:118 > asyncio.base_events:run_until_complete:641 > asyncio.base_events:run_forever:608 > asyncio.base_events:_run_once:1936 > asyncio.events:_run:84 > tests.test_b103_clipboard_tail:drive:2434 > tests.test_b103_clipboard_tail:_settle:80 > textual.pilot:pause:542 > textual.pilot:_wait_for_screen:504 > textual.message_pump:ca
+  scanner violations: [] abs-path hits: 0
+unforced C2: PASS max_late=0.058 n=28 t_end=+1.500 msgs_in_write={'Callback': 2904}
+  round-4 section:  count={0: 19, 1: 2} secs={0: 0.0056, 1: 0.0037} longest(start/dur)=['g1+0.254/0.0023', 'g0+0.062/0.0019', 'g0+0.248/0.0015', 'g0+0.138/0.0015', 'g1+0.140/0.0014'] | sampler_max_wake_gap=0.030 | loop_stalls>0.15s=[]
+  scanner violations: [] abs-path hits: 0
+rc=0
+uptime-after:  14:44:13 up 23:32,  3 users,  load average: 2.19, 2.59, 2.50
+--- run 2 (same probe, the round-4 section printed up to 2500 chars)
+=== probe
+uptime-before:  14:44:27 up 23:33,  3 users,  load average: 1.99, 2.53, 2.48
+s19_app.__file__ = ~/work/zq-r4/probe-tree/s19_app/__init__.py
+HEAD 436be332 dirty=5
+ARGS: ~/work/zq-r4/probe_r4.py
+s19_app.__file__ = ~/work/zq-r4/probe-tree/s19_app/__init__.py
+frame modules: ['tests.test_b103_clipboard_tail', 'textual.__init__', 'asyncio.__init__', 'probe_r4']
+scanner positive control (a home path): ['PERSONAL_PATH artifact=ctl id=unix-home-path']
+forced C1[key]: FAIL; forced sleep 0.300 s
+  stall section: 0.15s=['+0.360 gap=0.160 stack=textual.message_pump:_process_messages:571 > textual.message_pump:_process_messages_loop:663 > textual.message_pump:_dispatch_message:727 > textual.message_pump:on_event:808 > textual.message_pump:_on_message:829 > textual._callback:invoke:96 > textual._callback:_invoke:58 > textual.message_pump:on_callback:900 > textual._callback:invoke:96 > textual._callback:_invoke:57 > inspect:isawaitable:454 > <frozen abc>:__instancecheck__:117', '+0.626 gap=0.169 stack=probe_r4:main:77 > probe_r4:run:54 > probe_r4:<lambda>:79 > tests.test_b103_clipboard_tail:test_r_paste_14_c1_no_write_control_full_app:2504 > tests.test_b103_clipboard_tail:_responsive_copy:2460 > asyncio.runners:run:190 > asyncio.runners:run:118 > asyncio.base_events:run_until_complete:641 > asyncio.base_events:run_forever:608 > asyncio.base_events:_run_once:1936 > asyncio.events:_run:84 > probe_r4:stall:39']
+  stack captured: True
+  message chars: 2056 abs-path hits: 0
+  scanner violations: []
+unforced C1[key]: PASS max_late=0.055 n=26 t_end=+1.503 msgs_in_write={'Callback': 13980}
+  round-4 section:  count={0: 97, 1: 8} secs={0: 0.0261, 1: 0.0232} longest(start/dur)=['g1+1.168/0.0038', 'g1+1.374/0.0034', 'g1+0.649/0.0033', 'g1+0.855/0.0032', 'g1+1.059/0.0031'] | sampler_max_wake_gap=0.030 | loop_stalls>0.15s=[]
+  scanner violations: [] abs-path hits: 0
+unforced C2: PASS max_late=0.050 n=28 t_end=+1.500 msgs_in_write={'Callback': 2904}
+  round-4 section:  count={0: 19, 1: 2} secs={0: 0.0048, 1: 0.0075} longest(start/dur)=['g1+0.260/0.0042', 'g1+0.141/0.0033', 'g0+0.062/0.0022', 'g0+0.254/0.0018', 'g0+0.069/0.0001'] | sampler_max_wake_gap=0.030 | loop_stalls>0.15s=[]
+  scanner violations: [] abs-path hits: 0
+rc=0
+uptime-after:  14:44:56 up 23:33,  3 users,  load average: 2.14, 2.51, 2.48
