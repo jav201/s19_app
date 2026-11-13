@@ -110,3 +110,28 @@ Plus the real-terminal key pilot **P-1** (D-11): alt+p, alt+f, alt+a, tab, Esc a
 - The page-render half of R-A2L-LIST.035 (P1 times parse + resolve only).
 - The scenes' visual details at 80 columns: no approved capture exists at 80; the rows cite 118 and 220.
 - Whether the operator reads `8 of 20+` as intended (CV-4) and accepts the field-`all` consequence of D-3 (CV-2).
+
+## 9. Orchestrator rulings
+
+Orchestrator claude-opus-5-5, 2026-11-13T12:46-0600 (from `date`). These rulings override the PROPOSED rows above.
+
+**Not visible to the operator (decided and recorded, DF-02):**
+
+| D | Ruling | Reason |
+|---|---|---|
+| D-0 | A | One increment. The excess (85 rows against about 80, 42 nodes against about 40) is mostly single-sentence message rows that the approved scenes fix. Splitting off the approved layout would ship one approved screen in two halves. |
+| D-1 | A | Two groups of at most 4 files each. Ordering constraint: `app/a2l_view.py` also receives the P-002 teardown guard (Inc 1b round 2, carried to batch-modular). The guard lands on the Inc 7 base before E4, so the two increments never write the file in parallel (DF-10). |
+| D-5 | A | The I-1 additive hook `OsClipboardInput._take_paste(text) -> bool`, default `False`, is **pinned by the orchestrator** (the owner of I-1). It changes the Windows paste routes, so Inc 7 E5 must re-run the WinCI clipboard job and compare its FAILED set with the last Inc 1b WinCI run. |
+| D-13 | A | Builds once per load generation, off the UI thread (I-3 consumer note). |
+| D-14 | A | One new module. P3 is deferred (DF-05). |
+| D-15 | A | Canon home S2.5. |
+
+**Interfaces:** I-7 is pinned as written in `codewire/graph-inc7.md` §Interfaces. I-3, I-4 and I-5 are unchanged.
+
+**Visible to the operator (provisional, DF-09):** D-2, D-3, D-4, D-6, D-7, D-8, D-9, D-10, D-11 and D-12 are **provisional on option A**. E3 and E4 proceed on these options. Each one is only final after the operator's real-capture verdict (CV-1 … CV-11).
+- **D-4 is a conflict between two operator approvals:** Inc 12's R-TUI-042a.4 (Address and Length first) and the later G2 list table. Option A takes the later one (rule 7). The operator rules on CV-3 with both shown.
+- D-11 also needs pilot P-1 on Windows Terminal before E4 ends. If alt+f fails, option B applies.
+
+**E3 is due** (DF-03): Inc 7 changes the shared interface I-1 and takes operator text. One architecture and security pass.
+
+**Backlog:** BL-I7-1 … BL-I7-4 go to the batch close (PENDING). For BL-I7-3, the archive copy of the round-2 prototypes is an orchestrator task outside the repository.
