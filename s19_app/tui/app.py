@@ -22168,6 +22168,9 @@ class S19TuiApp(App):
             - Increment debounce token for each new keystroke.
             - Schedule short delayed callback.
             - Refresh filtered buffered rows only if token matches latest request.
+            - Drop the refresh when it comes due after the app stopped
+              running: shutdown has already removed the A2L tag table
+              (Inc 1b E5, R-COPY.26).
 
         Dependencies:
             Uses:
@@ -22181,6 +22184,8 @@ class S19TuiApp(App):
 
         def _apply_filter() -> None:
             if expected_token != self._a2l_filter_debounce_token:
+                return
+            if not self.is_running:
                 return
             self._refresh_a2l_filtered_tags(preserve_anchor=False)
 

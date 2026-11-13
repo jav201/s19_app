@@ -1,0 +1,78 @@
+# P-002 / R-COPY.26/1 on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename runner_iso).
+# Excerpts of each run.txt (grep of header, loci, E lines, summary). Tree = clone of b103-inc1b-push 8e778f8a.
+# dirty = git status --porcelain -- s19_app tests: 1 = the new untracked test only; 2 = the test + the app.py guard (or the mutant).
+# p002-mutant-revert = guard removed; p002-mutant-always = 'if not self.is_running' replaced by 'if True'.
+# p002-neigh-reset-base = same file without the guard: the 3 failures are pre-existing (the known `_right_gesture` session-reset census gap of the base).
+
+=== p002-red
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=1
+ARGS: tests/test_b103_a2l_filter_teardown.py
+tests/test_b103_a2l_filter_teardown.py:66: 
+s19_app/tui/app.py:22185: in _apply_filter
+s19_app/tui/app.py:21422: in _refresh_a2l_filtered_tags
+s19_app/tui/app.py:21608: in update_a2l_tags_view
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+FAILED tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped
+1 failed in 3.06s
+rc=1
+=== p002-green
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=2
+ARGS: tests/test_b103_a2l_filter_teardown.py
+1 passed in 2.51s
+rc=0
+=== p002-mutant-revert
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=1
+ARGS: tests/test_b103_a2l_filter_teardown.py
+tests/test_b103_a2l_filter_teardown.py:66: 
+s19_app/tui/app.py:22185: in _apply_filter
+s19_app/tui/app.py:21422: in _refresh_a2l_filtered_tags
+s19_app/tui/app.py:21608: in update_a2l_tags_view
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+FAILED tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped
+1 failed in 2.97s
+rc=1
+=== p002-mutant-always
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=2
+ARGS: tests/test_b103_a2l_filter_teardown.py
+E       AssertionError: 
+E       assert '' == "No A2L tags match 'KEEP'."
+tests/test_b103_a2l_filter_teardown.py:61: AssertionError
+FAILED tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped
+1 failed in 2.55s
+rc=1
+=== p002-neigh-a2l
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=2
+ARGS: -n 2 tests/test_b102_a2l_refresh.py
+8 passed in 19.83s
+rc=0
+=== p002-neigh-reset
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=2
+ARGS: -n 2 tests/test_b100_session_reset.py
+E       AssertionError: unclassified census names: ['_right_gesture']
+E       assert not {'_right_gesture'}
+E       AssertionError: ['_quit_pending', '_right_gesture']
+E       assert {'_quit_pendi...ight_gesture'} == {'_quit_pending'}
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag
+3 failed, 17 passed in 65.60s (0:01:05)
+rc=1
+=== p002-neigh-reset-base
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=1
+ARGS: -n 2 tests/test_b100_session_reset.py
+E       AssertionError: unclassified census names: ['_right_gesture']
+E       assert not {'_right_gesture'}
+E       AssertionError: ['_quit_pending', '_right_gesture']
+E       assert {'_quit_pendi...ight_gesture'} == {'_quit_pending'}
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag
+3 failed, 17 passed in 65.84s (0:01:05)
+rc=1
