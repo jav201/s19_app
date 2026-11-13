@@ -1,5 +1,5 @@
 RED transcript — Batch 102 / Inc 2 — A2L load/reload refresh (TC-B102-A2L-01..07)
-Tester: E4 | Worktree: C:/Users/jjgh8/Github/s19_app-b102-inc2-tests | Base commit: cb51fc8 (pre-fix tree, no source changes)
+Tester: E4 | Worktree: C:/Users/<user>/Github/s19_app-b102-inc2-tests | Base commit: cb51fc8 (pre-fix tree, no source changes)
 Date: 2026-11-03 16:08 UTC
 New tests: tests/test_b102_a2l_refresh.py (only file added; s19_app/ untouched)
 Command: python -m pytest tests/test_b102_a2l_refresh.py -v
@@ -7,14 +7,14 @@ Expected RED per .dev-flow/2026-11-03-batch-102/inc-2/02-test-cases.md: TC-02 (c
 TC-04 (mensaje generico 'No A2L tags.' en vez del mensaje con filtro), TC-05 (id() forzado colisiona la clave de identidad),
 TC-07 (apply instala el precalculo del worker sin verificar generaciones). TC-01/03/06 fijan comportamiento base (mutant controls).
 ==========================================================================================================
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
 ============================= test session starts =============================
-platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\python.exe
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\<user>\anaconda3\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b102-inc2-tests
+rootdir: C:\Users\<user>\Github\s19_app-b102-inc2-tests
 configfile: pyproject.toml
 plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, syrupy-4.8.0
 asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
@@ -32,7 +32,7 @@ tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_07_stale_prepared_load_discarde
 ================================== FAILURES ===================================
 _____________ test_tc_b102_a2l_02_same_size_reload_refreshes_rows _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_02_same_size_0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32162/test_tc_b102_a2l_02_same_size_0')
 
     def test_tc_b102_a2l_02_same_size_reload_refreshes_rows(tmp_path: Path) -> None:
         a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
@@ -116,7 +116,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_b102_a2l_refresh.py:285: AssertionError
 __________ test_tc_b102_a2l_04_no_match_filter_names_filter[Missing] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_04_no_match_f0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32162/test_tc_b102_a2l_04_no_match_f0')
 filt = 'Missing'
 
     @pytest.mark.parametrize("filt", ["Missing", HOSTILE_FILTER])
@@ -186,7 +186,7 @@ E         + No A2L tags.
 tests\test_b102_a2l_refresh.py:336: AssertionError
 ___________ test_tc_b102_a2l_04_no_match_filter_names_filter[[red]] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_04_no_match_f1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32162/test_tc_b102_a2l_04_no_match_f1')
 filt = '[red]'
 
     @pytest.mark.parametrize("filt", ["Missing", HOSTILE_FILTER])
@@ -256,7 +256,7 @@ E         + No A2L tags.
 tests\test_b102_a2l_refresh.py:336: AssertionError
 _____________ test_tc_b102_a2l_05_forced_id_collision_recomputes ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_05_forced_id_0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32162/test_tc_b102_a2l_05_forced_id_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029D82D14A10>
 
     def test_tc_b102_a2l_05_forced_id_collision_recomputes(
@@ -400,7 +400,7 @@ E           ]
 tests\test_b102_a2l_refresh.py:413: AssertionError
 ______________ test_tc_b102_a2l_07_stale_prepared_load_discarded ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_07_stale_prep0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32162/test_tc_b102_a2l_07_stale_prep0')
 
     def test_tc_b102_a2l_07_stale_prepared_load_discarded(tmp_path: Path) -> None:
         a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)

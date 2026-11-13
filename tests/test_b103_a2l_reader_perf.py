@@ -1,6 +1,6 @@
 """Batch-103 Inc 11 — the timing / memory arms (R-A2L-READ.52).
 
-Run ALONE on cachyos-rtx (``-m serial_timing``, never under ``-n``). Every
+Run ALONE on linux-runner (``-m serial_timing``, never under ``-n``). Every
 measurement is the median of 3 runs, each in a FRESH process (``/proc/self/status``
 ``VmHWM`` for the peak and ``VmRSS`` before the parse), so the peak is the true
 peak (``ru_maxrss`` is inherited across ``fork``/``exec``). Each run reports its
@@ -13,7 +13,7 @@ When ``B103_BASE_ROOT`` names a checkout of the e07fb00 base (its
 session and used as the reference; otherwise the hard-coded RED-transcript base
 numbers below are the fallback (the thresholds are never weakened).
 
-The base numbers (e07fb00, cachyos-rtx, E3 re-measure): case_06 parse 5.898 s /
+The base numbers (e07fb00, linux-runner, E3 re-measure): case_06 parse 5.898 s /
 535 MB; software_a 0.653 s / 95 MB; the 200,000-line string file 70.9 MB; the
 4.8-million-word one-section file 114.0 MB (memory only — its time is not
 bounded). The round-2 list form of ``_section_words`` (752.7 MB) and P2's
@@ -38,7 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CASE06 = REPO_ROOT / "examples" / "case_06_large_nested_a2l" / "firmware.a2l"
 SOFTWAREA = REPO_ROOT / "examples" / "case_00_public" / "software_a.a2l"
 
-# e07fb00 medians / peaks measured on cachyos-rtx (RED transcript) — the
+# e07fb00 medians / peaks measured on linux-runner (RED transcript) — the
 # fallback reference when B103_BASE_ROOT is not set.
 BASE_CASE06_S = 5.898
 BASE_SOFTWAREA_S = 0.653
@@ -46,7 +46,7 @@ BASE_CASE06_MB = 535.0
 BASE_SOFTWAREA_MB = 95.0
 BASE_STRING_MB = 70.9
 BASE_WORDS_MB = 114.0
-# The string file's base time, measured on cachyos-rtx in the RED run.
+# The string file's base time, measured on linux-runner in the RED run.
 BASE_STRING_S = 0.075
 
 RUNS = 3

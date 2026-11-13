@@ -22,7 +22,7 @@ Independent tester file (E4). Cases (``02-test-cases.md``):
 
 The timing arms carry ``serial_timing`` (run apart and serially); the memory
 bound R-A2L-MATCH.37/1 is a byte bound and carries none. The bounds are stated
-for the reference host (cachyos-rtx, Python 3.11.18); every upper bound goes
+for the reference host (linux-runner, Python 3.11.18); every upper bound goes
 through ``report_margin`` as ``tests/support/timing.py`` asks. The host load
 average is printed before and after each measured group (POSIX only). Lists are
 prepared before any clock or ``tracemalloc`` starts, except where the case

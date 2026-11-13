@@ -1,9 +1,9 @@
-url        file:///C:/Users/jjgh8/Github/s19_app-b103-inc12-integration/.dev-flow/2026-11-05-batch-103/inc-12/evidence-e5/DECISION.html
+url        file:///C:/Users/<user>/Github/s19_app-b103-inc12-integration/.dev-flow/2026-11-05-batch-103/inc-12/evidence-e5/DECISION.html
 http       200
 load       59ms
 title      "Batch-103 Inc 12 — decisión visual AT-B103-I12-2"
 bodyChars  2521
-patchright C:\Users\jjgh8\.vscode\extensions\danielsanmedium.dscodegpt-3.24.81\standalone/
+patchright C:\Users\<user>\.vscode\extensions\danielsanmedium.dscodegpt-3.24.81\standalone/
 text       Inc 12 — A2L tag table: decisión visual AT-B103-I12-2. Capturas reales de Windows Terminal, antes = e07fb00, después = Inc 12 sobre Inc 11. Tamaños: 80×50, 118×54 y 220×60. Cada ventana se abrió con e
 eval       "{\"title\":\"Batch-103 Inc 12 — decisión visual AT-B103-I12-2\",\"images\":28,\"broken\":[],\"links\":28,\"notes\":1}"
 

@@ -44,5 +44,5 @@ reporte de items abiertos. Haz push y merge", 2026-11-04).
   causa la colisión de colección si corres `pytest` sin ámbito `tests/`).
 - El marcador `serial_timing` no existe en la suite; no planear una "fase
   serial" futura con ese nombre.
-- Los laboratorios (cachyos-rtx / laptop) quedaron apagados; la suite corrió
+- Los laboratorios (linux-runner / laptop) quedaron apagados; la suite corrió
   en la PC de trabajo con `-n 8` y `pytest-xdist==3.8.0`.

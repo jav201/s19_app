@@ -2,7 +2,7 @@
 
 Design under test: ``.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md``
 R-A2L-DEF.136: describing every object of software_a (13,990 names) in one
-call finishes within 2.0 s (median of 3 runs, cachyos-rtx, Python 3.11).
+call finishes within 2.0 s (median of 3 runs, linux-runner, Python 3.11).
 In 2a the walk holds the name, method and table maps and every field; the case
 is re-run when 2b adds the span index to the same walk. The one-walk design
 (not one walk per name) is what the bound separates: a per-name walk takes

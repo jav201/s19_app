@@ -65,7 +65,7 @@ tests/b97_fixtures.py updated). No commits made.
 Full pytest output follows
 ================================================================================================
 
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -73,7 +73,7 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 ================================== FAILURES ===================================
 ______ test_tc_b102_sel_01_population_mounts_at_most_one_page[10000-200] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_01_population2')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_01_population2')
 count = 10000, expected = 200
 
     @pytest.mark.parametrize("count,expected", [(0, 0), (199, 199), (10000, 200)])
@@ -101,7 +101,7 @@ E       assert 10000 == 200
 tests\test_b102_parameter_picker.py:202: AssertionError
 _______ test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_02_filter_is_0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_02_filter_is_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220C5A44F20>
 
     def test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation(tmp_path: Path, monkeypatch) -> None:
@@ -121,7 +121,7 @@ E        +  where None = picker_class_or_none()
 tests\test_b102_parameter_picker.py:222: AssertionError
 _____ test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_03_repeated_i0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_03_repeated_i0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220C44BCB00>
 
     def test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview(tmp_path: Path, monkeypatch) -> None:
@@ -141,7 +141,7 @@ E        +  where None = picker_class_or_none()
 tests\test_b102_parameter_picker.py:272: AssertionError
 _______ test_tc_b102_sel_04_reentry_with_same_signature_preserves_state _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_04_reentry_wi0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_04_reentry_wi0')
 
     def test_tc_b102_sel_04_reentry_with_same_signature_preserves_state(tmp_path: Path) -> None:
         """TC-B102-SEL-04 (R-B102-SEL-004, full; E3 ruling 9: firma no nula): with
@@ -233,7 +233,7 @@ E       AssertionError: did not settle: the filter mounts the first page (200 of
 tests\test_b102_parameter_picker.py:97: AssertionError
 __________________ test_tc_b102_sel_05_pagination_boundaries __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_05_pagination0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_05_pagination0')
 
     def test_tc_b102_sel_05_pagination_boundaries(tmp_path: Path) -> None:
         """TC-B102-SEL-05 (R-B102-SEL-005, full): 250 filtered parameters on a
@@ -252,7 +252,7 @@ E        +  where None = picker_class_or_none()
 tests\test_b102_parameter_picker.py:406: AssertionError
 ____________ test_tc_b102_sel_05_pagination_controls_fit_at_80x24 _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_05_pagination1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b102_sel_05_pagination1')
 
     def test_tc_b102_sel_05_pagination_controls_fit_at_80x24(tmp_path: Path) -> None:
         """E3 ruling 6 (80x24): the new status line and the pagination row are
@@ -269,7 +269,7 @@ E        +  where None = picker_class_or_none()
 tests\test_b102_parameter_picker.py:431: AssertionError
 ____________ test_tc_b97_08_census_rows_and_one_docked_row[size0] _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_08_census_rows_and0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b97_08_census_rows_and0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
@@ -309,7 +309,7 @@ E         Use -v to get more diff
 tests\test_b97_check_editor.py:197: AssertionError
 ____________ test_tc_b97_08_census_rows_and_one_docked_row[size1] _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_08_census_rows_and1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b97_08_census_rows_and1')
 size = (118, 53)
 
     @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
@@ -349,7 +349,7 @@ E         Use -v to get more diff
 tests\test_b97_check_editor.py:197: AssertionError
 __________ test_tc_b97_61_every_control_displayed_in_its_home[size0] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_61_every_control_d0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b97_61_every_control_d0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -477,7 +477,7 @@ E           textual.css.query.NoMatches: No nodes match '#check_param_page_prev_
 ..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
 __________ test_tc_b97_61_every_control_displayed_in_its_home[size1] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_61_every_control_d1')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32172/test_tc_b97_61_every_control_d1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)

@@ -4,7 +4,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________ test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-294/test_qc_tm_10b_1_a2l_refresh_c0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-294/test_qc_tm_10b_1_a2l_refresh_c0')
 
     @pytest.mark.serial_timing
     def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None:
@@ -85,13 +85,13 @@ tests/test_b101_inplace_views.py:177: in drive
 tests/support/b100_projects.py:615: in run_app
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests/support/b100_projects.py:613: in _drive

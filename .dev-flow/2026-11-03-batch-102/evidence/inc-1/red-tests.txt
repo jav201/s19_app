@@ -1,14 +1,14 @@
 $ python -m pytest tests/test_b102_clipboard.py -v
 # RED run: Inc-1 product code not yet implemented; failures must be behavioural (assertions / missing-symbol imports), never syntax or collection errors.
 
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
 ============================= test session starts =============================
-platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\python.exe
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\<user>\anaconda3\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b102-inc1-tests
+rootdir: C:\Users\<user>\Github\s19_app-b102-inc1-tests
 configfile: pyproject.toml
 plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, syrupy-4.8.0
 asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
@@ -38,7 +38,7 @@ tests/test_b102_clipboard.py::test_tc_b102_08_empty_selection_cut_cuts_cursor_li
 ================================== FAILURES ===================================
 _ test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[patch_paste_text] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32159/test_tc_b102_01_paste_inserts_2')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32159/test_tc_b102_01_paste_inserts_2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ECE3B8F0>
 widget_id = 'patch_paste_text'
 
@@ -317,7 +317,7 @@ ______________ test_tc_b102_02_write_os_clipboard_cascade_order _______________
         ``False``. Imported lazily — the symbol is added by this increment.
         """
 >       from s19_app.tui.os_clipboard_input import write_os_clipboard
-E       ImportError: cannot import name 'write_os_clipboard' from 's19_app.tui.os_clipboard_input' (C:\Users\jjgh8\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
+E       ImportError: cannot import name 'write_os_clipboard' from 's19_app.tui.os_clipboard_input' (C:\Users\<user>\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
 
 tests\test_b102_clipboard.py:438: ImportError
 _________ test_tc_b102_03_cut_writes_os_and_removes_selection[input] __________
@@ -507,7 +507,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED3C3A70>
         """
         from s19_app.tui import os_clipboard_input as mod
 >       from s19_app.tui.os_clipboard_input import _write_via_powershell
-E       ImportError: cannot import name '_write_via_powershell' from 's19_app.tui.os_clipboard_input' (C:\Users\jjgh8\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
+E       ImportError: cannot import name '_write_via_powershell' from 's19_app.tui.os_clipboard_input' (C:\Users\<user>\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
 
 tests\test_b102_clipboard.py:629: ImportError
 _ test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[input] _

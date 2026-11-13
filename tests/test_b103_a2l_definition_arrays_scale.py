@@ -5,7 +5,7 @@ and live in ``test_b103_a2l_definition_arrays_coverage.py``).
 
 Run apart and serially::
 
-    /home/javiergr/miniconda3/envs/s19ci/bin/python -I -B -c "import sys; \\
+    ~/miniconda3/envs/s19ci/bin/python -I -B -c "import sys; \\
     sys.path.insert(0, '/tmp/b103-e4-3a-coverage/tree'); import pytest; \\
     sys.exit(pytest.main(['-p','no:cacheprovider','-m','serial_timing', \\
     'tests/test_b103_a2l_definition_arrays_scale.py']))" </dev/null

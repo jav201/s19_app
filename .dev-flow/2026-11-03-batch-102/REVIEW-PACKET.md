@@ -17,7 +17,7 @@ Batch-102 implements seven hot-fixes on `s19_app`: Windows OS clipboard copy/pas
 
 ### 3. How to test
 ```powershell
-Set-Location C:\Users\jjgh8\Github\s19_app
+Set-Location C:\Users\<user>\Github\s19_app
 python -m pytest tests/test_b102_clipboard.py tests/test_b102_a2l_refresh.py -q
 python -m pytest tests/test_b102_parameter_picker.py tests/test_b102_bulk_add.py -q
 python -m pytest tests/test_b102_patch_picker.py -q

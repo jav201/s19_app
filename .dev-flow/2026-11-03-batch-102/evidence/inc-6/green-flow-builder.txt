@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -6,7 +6,7 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 ================================== FAILURES ===================================
 ______________ test_tc_b97_18_crc_card_painted_in_the_crc_colour ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32276/test_tc_b97_18_crc_card_painte0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32276/test_tc_b97_18_crc_card_painte0')
 
     def test_tc_b97_18_crc_card_painted_in_the_crc_colour(tmp_path: Path) -> None:
         """TC-B97-18 (LLR-146.6, paint arm, PC-7): with a ``source \u2192 patch \u2192 crc \u2192
@@ -36,7 +36,7 @@ E        +  where False = any(<generator object test_tc_b97_18_crc_card_painted_
 tests\test_b97_flow_builder.py:769: AssertionError
 _______________ test_tc_b97_49_ribbon_paints_saved_then_unsaved _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32276/test_tc_b97_49_ribbon_paints_s0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-32276/test_tc_b97_49_ribbon_paints_s0')
 
     def test_tc_b97_49_ribbon_paints_saved_then_unsaved(tmp_path: Path) -> None:
         """TC-B97-49 (LLR-146.11, painted arm): a loaded flow paints ``· saved``
