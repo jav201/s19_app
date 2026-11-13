@@ -47,3 +47,38 @@ Tags: `design-gap` = the requirement and the graph change; `impl` = the graph is
 - No real terminal: what a raw NUL does in Windows Terminal (E3S-02) is not observed; the fix removes the case.
 - A Windows run of the hook (WinCI): not available to a reviewer; the Linux before/after run of the Inc 1a/1b clipboard tests is in `E3-architect.md` (E3A-01).
 - Host load was 7.9–8.9 on 16 cores; no timing above decides a threshold (HT-08).
+
+## Re-review after E3R1
+
+**Verdict: PASS-WITH-NOTES** — E3R1 closes E3S-01 (MAJOR) and every MEDIUM, and adds no MAJOR+. Two LOW notes go to PENDING.
+
+Scope: the corrected parts (`6f8e2362`, `E3-rulings.md` §E3R1 corrections), the new rows .075, .078, .082–.086, the re-pinned I-7 and the I-1 placement. The security lens needed no new run; Probe C (`E3-architect.md`) is about layout.
+
+### Earlier findings: does the fix close them?
+
+| Id | Closed? | Evidence (file:line at `6f8e2362`) |
+|---|---|---|
+| E3S-01 MAJOR | **Closed** | `PREVIEW_MAX = 200` (`graph-inc7.md:51`). `_preview` paints the first 200 rows and the *more line*, with the counts over all names (`:399`). Row .078 has the 4,906- and 32,768-name cases and a ≤ 0.25 s rebuild (`:404-406`). The rebuild stays debounced (0.15 s). 200 rows measured 0.128 s at load 8.6 (Probe A §4). |
+| E3S-02 MEDIUM | **Closed** | The filter and query echoes use the *short text*: .019, .025, .066 (`graph-inc7.md:299`, `:565`, `:576`), each with a 300-character case holding controls. .077 covers the dropdown row and the card's `✗` line (`:308`). |
+| E3S-03 MEDIUM | **Closed** | I-1: the hook gets `_strip_paste_controls(text, multiline=True)`, after the cap and the empty check, and is never called on a `restrict` box (`graph-inc7.md:30`, `:493`, `:502`, `:513`). Cases: R-PASTE.1/4 (a `restrict` subclass's override is never called) and .034/3 (no ESC reaches the hook). |
+| E3S-04 MEDIUM | **Closed** | Per-key coalescing: at most one running and one waiting ranking per key, so at most 2 `rank` calls per similar slot after any number of edits (`graph-inc7.md:87-88`, `:408`; row .075). |
+| E3S-05 MINOR | **Closed** (accepted and stated) | .033/5: the 98,302-character value is accepted; every text derived from it is capped or paged. |
+| E3S-06 LOW | **Closed** | *Display text* also replaces U+061C, U+200E/F, U+202A–U+202E, U+2066–U+2069; case .076/7. |
+| E3S-07…09 INFO | — | `_work` logs the error type and the key only, never a name (`graph-inc7.md:288`, `:290`). |
+
+### New findings
+
+| Id | Severity | About (file:line) | Defect | Concrete fix |
+|---|---|---|---|---|
+| E3S-R1 | LOW · design-gap | *display text* definition (`01-requirements.md`, CTX-A2L-LIST) | The zero-width and invisible format characters (U+200B–U+200D, U+2060, U+FEFF) still pass, so a typed or A2L name can look equal to another. No route of this increment makes them hostile: pasted text is stripped of bidi controls, and FOUND needs an exact match. This is a look-alike note, not an injection. | PENDING: add them to *display text*'s replaced set (one table, offsets kept). |
+| E3S-R2 | LOW · design-gap | text-mode empty summary `No A2L tags match '<text>'.` (R-B102-A2L-003, kept for mode `All`; `a2l_view.py:866`) | The kept base summary still echoes the whole filter text, next to .025's capped form. It is control-safe through `safe_text` but not capped: a 65,536-character one-name filter that matches nothing gives a 65,536-character summary. The behaviour is pre-existing, but it is now inconsistent with E3S-02's rule. | PENDING: the batch-end fold of R-B102-A2L-003 uses the short text as well. |
+
+Checked with no security finding:
+- .075: bounds the CPU per edit.
+- .078: bounds the preview.
+- .084–.086: no exception escapes a worker or a timer. A ranking error cannot make the app exit, because `exit_on_error=False` and `_work` catches every exception.
+- The I-1 placement.
+- The re-pinned I-7: no new outside input; `list_enabled` is a field test, not a widget query.
+
+### Checks not run, and why
+- No Windows run of the I-1 placement. The WinCI job at Inc 7 E5 covers it, after the Box A retarget.

@@ -102,3 +102,67 @@ The marks hold for the rows they cover, with these exceptions: R-A2L-LIST.050/1 
 - R-A2L-MATCH.40's 2.0 s adversarial rankings under contention (E3A-06): the 50,000-name adversarial fixtures of Inc 4 were not built; Probe A §5 is the mechanism at 55.7 ms.
 - The WinCI job: not available to a reviewer; Probe B is Linux only (LinuxH arms; the Windows-only arms skip).
 - The extractor was not re-run: the E2 runs (`codewire/extractor-*`) and the callers I re-read (`patch.py:1844`, `navigation.py:1360-1420`, `a2l_view.py:827-998`) agree; my findings are about callers the slice does not list (`patch.py`, the session census), found by `grep`.
+
+## Re-review after E3R1
+
+**Verdict: FAIL** — 1 new MAJOR (E3A-R1: R-A2L-LIST.083's row counts cannot be reached with the composition the graph pins; measured). E3R1 closes every earlier HIGH and MAJOR (table below). Once E3A-R1 is ruled, only MINOR findings remain.
+
+Scope: one pass over the parts E3R1 corrected (`6f8e2362`; `E3-rulings.md` §E3R1 corrections), plus the new rows .075, .078, .082–.086, the re-pinned I-7 and the I-1 placement. As the orchestrator directed, the short body is judged from 15 body rows up; the 80×24 floor goes to CV-1 / BL-I7-6.
+
+**Probe C** (<runner>, a throwaway clone of `b103-inc7` at `6f8e2362`, HT-02 environment, `HOME` …`/runner_iso`, scratch `~/work/zq-e3-7/`, deleted after; load 1.23 before, 3.78 after). I re-ran the P3 pilot (`evidence-e1/i7e3r1-layout-pilot.py`) with one change, a class toggle, on a tree where a 13-line patch gave the tags pane exactly the height parts `_compose_screen_a2l` pins (`graph-inc7.md:526`). The patch put the find box and its three buttons in their own row under the filter row (same CSS as `#a2l_tags_filters`: `height: auto; padding-bottom: 1`) and added a 3-line `#a2l_list_chips` and a 1-line `#a2l_list_missing` (list mode). The 118×54 run used the stacked CSS of `[Config]` (`#a2l_panes` vertical, hex pane 14 rows). Excerpt:
+
+```text
+######## size 120x30   #a2l_tags_pane: region=(23, 4, 54, 15)
+   a2l_tags_filters outer_h=4   a2l_find_row outer_h=4   a2l_list_chips outer_h=3   a2l_list_missing outer_h=1
+   fixed lines (non-table children, outer) = 14; pane outer height = 15
+   region=(25, 19, 50, 1) header=1 body rows shown=0 row_count=200
+######## size 118x54   #a2l_tags_pane: region=(5, 4, 112, 25)
+   fixed lines (non-table children, outer) = 14; pane outer height = 25
+   region=(7, 19, 108, 8) header=1 body rows shown=7 row_count=200
+######## size 160x40   #a2l_tags_pane: region=(23, 4, 77, 25)
+   fixed lines (non-table children, outer) = 14; pane outer height = 25
+   region=(25, 19, 73, 8) header=1 body rows shown=7 row_count=200
+```
+
+### Earlier findings: does the fix close them?
+
+| Id | Closed? | Evidence (file:line at `6f8e2362`) |
+|---|---|---|
+| E3A-01 HIGH | **Closed** (one MINOR note, E3A-R2) | Owner and order ruled (Inc 7 E4, after `b103-inc1b` is final). The 13 nodes of Probe B are listed with their rows (`E1-slice.md` §5.1). The class census counts by `isinstance`. The changed R-PASTE rows say "a single line with a space counts" and are scoped to `name`/`all` (`01-requirements.md` R-PASTE.1, R-TUI-043.4, R-PASTE.29). Each route has a one-name case (`P_CTRL`). |
+| E3A-02 MAJOR | **Closed** | `LabelListEntry` has no `row` (`graph-inc7.md:62-68`); `LabelListResolution.rows` holds the tag object or `{"name", "_list_pos"}` (`:70-76`); equality is stated as an interface check (`:135`). |
+| E3A-03 MAJOR | **Closed** | The I-7 block now names the box constructor with `suggest` and `list_enabled`, the three actions with `SkipAction`, `LabelListHost`, the dismiss route (`LabelListApplied` struck), `A2LExplorerBody(tags_pane, hex_pane, *, id)` with its child ids and classes, `TEXT_CELL_LABELS`, and the `partial` deliver (`graph-inc7.md:36-133`). |
+| E3A-04 MAJOR | **Closed** | One token per key, `similar:1` … `similar:10` (`graph-inc7.md:83-88`, `:261`); `.050/1` expects both lines (`:265`, `:419`). |
+| E3A-05 MAJOR | **Closed** | `exit_on_error=False`, and `_work` catches every error plus the `RuntimeError` from `call_from_thread` (`graph-inc7.md:283-291`). `is_running` is checked first in `_install`/`_deliver` (`:248`, `:274`). `current` holds its widget and checks `is_attached` (`:274`, `:636`). The modal has its own timer with an `is_attached` check (`:399`). Rows .084–.086 have positive arms. |
+| E3A-06 MEDIUM | **Closed** | One running and one waiting ranking per key (`graph-inc7.md:87-88`, `:261`); row .075 counts `rank` calls. |
+| E3A-07 MAJOR | **Closed** | DUPLICATE/HIDDEN rows are the tag object, so `patch.py:1844`'s `id()` map holds. A missing row reaches V4 with `preserve_anchor=True` (its only `True` caller is `patch.py:1847`, checked by `grep`), and V4 calls V8. V8 re-resolves and writes in place with no `clear()` (`graph-inc7.md:565`, `:614`). Cases .036/3–/5 cover R-A2L-048/2, -049/1 and -105/1 in list mode. |
+| E3A-08 MAJOR | **Closed** | List mode needs a loaded A2L (definition; `_a2l_list_names` `graph-inc7.md:539`); the absent branch clears the resolution (`:626`); cases .008/3, .023/2. |
+| E3A-09 MEDIUM | **Closed** | Both attributes are in `SNAPSHOT_EXCLUSIONS` with reasons (`graph-inc7.md:692`, `:695`; `E1-slice.md` §5.2). |
+| E3A-10 MAJOR | **Partly.** The regimes are defined, and R-TUI-037.1/.2 keep the base split for short bodies, so tc019 stays valid. The row count from 15 body rows up cannot be reached: **E3A-R1** | `01-requirements.md` *body regimes*, R-TUI-037.1/.2, .080, .082, .083; `graph-inc7.md:461-470`, `:698`. |
+| E3A-11 MAJOR | **Closed** | R-TUI-069.7 is changed, with three cases. The E4 retarget table covers tc019, tc020, the six `tc016s` SVGs (canonical CI only, the batch-47 bridge) and Inc 12's R-TUI-042a.5 (`E1-slice.md` §5.3). |
+| E3A-12 MEDIUM | **Closed** | `list_enabled()` in `_take_paste` (`graph-inc7.md:328`); .033/4 (field `source`). |
+| E3A-13, -14 MINOR | **Closed** | .031/4; .047 "as the window opened", .047/3. |
+| E3A-15 MINOR | **Closed** (backlog BL-I7-5) | `E1-rulings.md` §7. |
+| E3A-16, -17 INFO | — | Placement pinned (`graph-inc7.md:30`, `:513`). |
+
+### New findings
+
+| Id | Severity | About (file:line) | Defect | Concrete fix |
+|---|---|---|---|---|
+| E3A-R1 | **MAJOR** · design-gap (visible: CV-1) | R-A2L-LIST.083 (`01-requirements.md`, thresholds 120×30 ≥ 1, 160×40 ≥ 11, 118×54 ≥ 10); `[Config]` example .083/2 (`graph-inc7.md:705`); `_compose_screen_a2l` (`:526`) | **The row counts of .083 assume base's single toolbar row, but the pinned composition has two.** The threshold adds "9 base lines + 4 list-mode lines". Base holds the find box and its buttons in the filter row (`compose_screens.py:674-686`; P3: `a2l_tags_filters outer_h=4`); the graph moves them to a separate "find row". Probe C, with exactly the pinned rows, gives 14 fixed lines: **120×30 shows 0 table rows, 160×40 shows 7 and 118×54 shows 7**. All three thresholds fail, the first at the 15-row body the orchestrator named. At the reference size 118×54 the table drops from 29 rows (P3, base) to 7. | Re-derive .083 from the composition, not from the base budget, and choose one: (a) keep the find box and its three buttons in the filter row, as base does (10 fixed lines: 1, 11 and 11 rows, which meets the row's current thresholds); or (b) keep two rows but make both compact (`Input`/`Button` `compact=True`, one line each: about 8 fixed lines, giving 3, 13 and 13 rows — derived, not measured). Either way, E4 measures the counts on the built tree, and the CV-1 capture at 118×54 is compared with the table height of the approved `av-list.118`, because the reference size is where the operator sees this. |
+| E3A-R2 | MINOR · impl | `E1-slice.md` §5.1 lead sentence | The retarget names `_box_a` in `tests/support/b103_clipboard.py`, but it is defined in `tests/test_b103_clipboard_core.py:92` and `tests/test_b103_clipboard_windows.py:97`. The WinCI-only arms of `test_b103_clipboard_windows.py` also query the box inline in 10 places (`:99`, `:294`, `:366`, `:1055`, `:1095`, `:1250`, `:1287`, `:1550`, `:2072`, `:2105`). A Linux run cannot show them failing, so they are not among the 13, and "every test that names the box" covers them in words only. | PENDING: list both `_box_a` helpers and the Windows file's sites in §5.1, so E4 retargets what Linux cannot show. |
+| E3A-R3 | MINOR · design-gap | R-TUI-037.1/.2 as changed | They say "4/7 (3/7) of the **screen** width", but their thresholds measure the **body** (P3: 42 of 74). | PENDING: "of the A2L Explorer body width". |
+| E3A-R4 | MINOR · design-gap | `LabelRanker._install` with `index None` (`graph-inc7.md:248`); .084/2 | After a build error the ranker stays not ready until the next A2L load. Every later dropdown and closest-name request is held and never served, and nothing tells the operator. | PENDING: on a failed build, deliver `[]` to the held requests (the "no similar name" form) and retry the build once on the next request; or add a row that says the dropdown is off until the next load. |
+
+Checked with no MAJOR+:
+- .075 (coalescing): its `rank`-call counts follow from `request`/`_deliver`.
+- .078: see `E3-security.md`.
+- .082: card ≤ 5 lines in the short body, the base rule.
+- .084–.086: each has a positive arm, so an always-drop guard fails.
+- The re-pinned I-7.
+- The I-1 placement: after the cap and the empty check, before the first-line cut, never on a `restrict` box, given the multi-line-stripped text.
+- `A2LExplorerBody.on_resize`: its classes come from the body's own size, which the classes do not change, so there is no resize loop.
+
+### Checks not run, and why
+- The built composition: no code exists yet. Probe C reproduces only the pinned heights (rows and lines), not widths, the dropdown overlay or the real chips text.
+- Option (b) of E3A-R1 is arithmetic, not measured.
+- The WinCI arms (E3A-R2): Windows only.
