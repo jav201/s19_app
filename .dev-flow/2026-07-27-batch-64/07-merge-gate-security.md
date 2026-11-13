@@ -240,7 +240,7 @@ is in scope, so no CI oracle is affected. **Not a security finding.**
 
 **Data exposure in the travelling blocks (scope item 4) — CLEAR, and this is the half that matters.**
 I regex-scanned **every added line** of all four out-of-VCS destinations for
-`[A-Za-z]:\ | /Users/ | <USER> | jav201 | javgranados | OneDrive | AppData | G:\ | My Drive | ConsultIA | GRNDIA`.
+`[A-Za-z]:\ | /Users/ | <USER> | jav201 | <email-user> | OneDrive | AppData | G:\ | My Drive | ConsultIA | GRNDIA`.
 Result: **NONE**, on every added line, in every file — including the two that load into every future
 session. Every path inside the blocks is repo-relative. My Phase-2 clearance of this lane holds
 without qualification; only the *committed-artifact* half needed the F5 correction.
