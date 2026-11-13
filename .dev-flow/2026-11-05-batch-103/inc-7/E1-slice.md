@@ -39,7 +39,7 @@ Not changed (read, reused): `a2l_parameter_picker.py` (`parse_parameter_list`, I
 | L19 | `LabelListPasteModal.action_apply` | a2l_label_list.py | new | .053, .054 |
 | L20 | `LabelListPasteModal.action_cancel` | a2l_label_list.py | new | .055, .070 |
 | L21 | `LabelListPasteModal.refresh_tags` | a2l_label_list.py | new | .056 |
-| L22 | `ListAwareDetailCard.show_tag` | a2l_label_list.py | new (overrides `A2LDetailCard.show_tag`, `shared.py:601`) | .027–.030 |
+| L22 | `list_card_text` | a2l_label_list.py | new (E2: the card subclass moved to G-V as V13; see `codewire/graph-inc7.md` E2-1) | .027–.030 |
 | L23 | `A2LExplorerBody.on_resize` | a2l_label_list.py | new | .047, .080, .081, R-TUI-069.6 |
 | L24 | `A2LExplorerBody.action_paste_list` | a2l_label_list.py | new | .040 |
 | L25 | `A2LExplorerBody.action_mode_all` | a2l_label_list.py | new | .026 |
@@ -58,9 +58,11 @@ Not changed (read, reused): `a2l_parameter_picker.py` (`parse_parameter_list`, I
 | V10 | `A2lViewMixin._schedule_a2l_filter_refresh` | a2l_view.py:1548 | changed | .060, .062, .074 |
 | V11 | `A2lViewMixin.a2l_open_label_list` | a2l_view.py | new | .040, .041, .053, .054 |
 | V12 | `A2lViewMixin._refresh_a2l_dependent_views` | a2l_view.py:871 | changed | .056 |
+| V13 | `ListAwareDetailCard.show_tag` | a2l_view.py | new (E2; subclass of `A2LDetailCard`, `shared.py:540`; in G-V because `a2l_label_list.py` may not import `s19_app.tui.app`) | .027–.030 |
+| L6b | `LabelRanker._install` | a2l_label_list.py | new (E2: the index hand-over on the UI thread) | .072, .074 |
 | — | `styles.tcss` A2L pane rules (`:440-456`) | styles.tcss | changed | .080, .081, R-TUI-037.1/.2 (retired), R-TUI-069.6 |
 
-Count: L1–L28 = 28 (G-L: 26 new, 2 changed); V1–V12 = 12 (G-V: 3 new — `_a2l_list_names`, `_paint_a2l_filter_chips`, `a2l_open_label_list` — and 9 changed); total 40 = 29 new + 11 changed.
+Count at E1: 40 functions (29 new, 11 changed). **At E2: 42 nodes (31 new, 11 changed)** — G-L 29 (L1–L28 with L22 now `list_card_text`, plus L6b `LabelRanker._install`: 27 new, 2 changed), G-V 13 (V1–V13: 4 new, 9 changed); `codewire/graph-inc7.md` §Size, E2-1.
 
 ## 3. Real callers of every changed function (Code-Wire extractor, baseline)
 
