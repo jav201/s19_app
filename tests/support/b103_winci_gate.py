@@ -280,7 +280,7 @@ def load_manifest(path: Path = DEFAULT_MANIFEST) -> Manifest:
     }
     for key, value in computed.items():
         _require(counts.get(key) == value, f"count mismatch {key}: declared={counts.get(key)} actual={value}")
-    _require(computed["testcases"] == 256, "WinCI population must contain 256 testcases")
+    _require(computed["testcases"] == 259, "WinCI population must contain 259 testcases")
     _require(computed["obligations"] == 108, "WinCI must contain 108 obligations")
     _require(computed["view_obligations"] == 46, "views census")
     _require(computed["tail_obligations"] == 25, "tail census")

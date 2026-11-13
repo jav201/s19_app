@@ -211,7 +211,8 @@ from tools.id_registry import (
 # batch-103 Inc 1b E5: HEAD 305e5892 had 303; +4: tests/test_b103_e5_safety.py,
 # tests/test_b103_winci_gate.py, tests/support/b103_winci_gate.py and
 # tests/support/b103_artifact_safety.py (the JSON does not count); 303 -> 307.
-EXPECTED_SCANNED_TEST_FILES = 307
+# batch-103 Inc 1b E5 WinCI round 2: 307 -> 308 (tests/test_b103_a2l_filter_teardown.py).
+EXPECTED_SCANNED_TEST_FILES = 308
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

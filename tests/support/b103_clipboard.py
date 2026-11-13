@@ -560,7 +560,9 @@ async def wait_for_copy_tail(pilot, marker: dict, timeout: float = 10.0) -> None
     await _poll_until(pilot, lambda: bool(marker.get("ended")), timeout)
 
 
-async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
+async def arm_tick_lateness(
+    app: App, marker: dict, interval: float = 0.05, trace: list | None = None
+) -> list:
     """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
 
     Summary:
@@ -578,13 +580,18 @@ async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> l
         on exit) with ``time.monotonic()``. A tick due before ``t_start``
         measures the app's own key or click dispatch, not the clipboard
         call, and is dropped; a wrapper that never stamps ``t_start``
-        records nothing, so the ≥ 10-tick check fails loud."""
+        records nothing, so the ≥ 10-tick check fails loud.
+
+        ``trace`` (optional, diagnostics only) receives ``(due, now)`` for
+        every tick, inside the window or not; it never changes ``lateness``."""
     lateness: list = []
     due = time.monotonic() + interval
 
     def _tick():
         nonlocal due
         now = time.monotonic()
+        if trace is not None:
+            trace.append((due, now))
         start = marker.get("t_start")
         end = marker.get("t_end")
         if start is not None and due >= start and (end is None or due <= end):

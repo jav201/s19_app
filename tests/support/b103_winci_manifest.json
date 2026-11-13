@@ -2,7 +2,7 @@
   "schema_version": 1,
   "description": "Static WinCI oracle for the six clipboard test families; derived by AST inspection, never by importing tests at gate runtime.",
   "counts": {
-    "testcases": 256,
+    "testcases": 259,
     "obligations": 108,
     "view_obligations": 46,
     "tail_obligations": 25,
@@ -13,14 +13,14 @@
     "linux_only_skips": 6,
     "legacy_linux_h_skips": 37,
     "manual_skips": 1,
-    "winci_passed": 212,
+    "winci_passed": 215,
     "winci_skipped": 44
   },
   "handoff_reconciliation": {
     "linux_passed": 160,
-    "linux_skipped": 96,
-    "linux_total": 256,
-    "linux_skip_composition": "77 Windows-only + 4 WinCI-only tail + 14 AT P2 + 1 AT-I1b-8 manual = 96",
+    "linux_skipped": 99,
+    "linux_total": 259,
+    "linux_skip_composition": "77 Windows-only + 7 WinCI-only tail (incl. 3 R-PASTE.14/C1 controls) + 14 AT P2 + 1 AT-I1b-8 manual = 99",
     "winci_skip_composition": "37 legacy LinuxH + 6 exact Linux-only failing-writer arms + 1 AT-I1b-8 manual = 44"
   },
   "at_partitions": {
@@ -238,7 +238,7 @@
     {
       "path": "tests/test_b103_clipboard_tail.py",
       "junit_classnames": ["tests.test_b103_clipboard_tail", "test_b103_clipboard_tail"],
-      "expected_count": 31,
+      "expected_count": 34,
       "tests": [
         {"name": "test_r_copy_06_1_button_keeps_seeds", "obligation": {"requirement": "R-COPY.6/1", "internal_arms": ["button-focus", "while-open-os-read", "after-n-os-read"]}},
         {"name": "test_r_copy_06_2_no_focus_keeps_seeds", "obligation": {"requirement": "R-COPY.6/2", "internal_arms": ["no-focus", "while-open-os-read", "after-n-os-read"]}},
@@ -270,7 +270,8 @@
         {"name": "test_r_paste_13_101_held_row_copy_warns_within_bound", "obligation": {"requirement": "R-PASTE.13/101", "internal_arms": ["held-real-clipboard", "one-cascade", "elapsed-bound"]}},
         {"name": "test_r_paste_14_101_view_key_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/101", "internal_arms": ["view-key", "writer-off-thread", "tick-lateness"]}},
         {"name": "test_r_paste_14_102_view_right_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/102", "internal_arms": ["view-right", "writer-off-thread", "tick-lateness"]}},
-        {"name": "test_r_paste_14_103_row_right_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/103", "internal_arms": ["row-right", "writer-off-thread", "tick-lateness"]}}
+        {"name": "test_r_paste_14_103_row_right_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/103", "internal_arms": ["row-right", "writer-off-thread", "tick-lateness"]}},
+        {"name": "test_r_paste_14_c1_no_write_control_full_app", "ids": ["key", "right", "row"]}
       ]
     },
     {

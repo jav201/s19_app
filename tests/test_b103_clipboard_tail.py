@@ -2186,10 +2186,86 @@ def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch) 
     assert elapsed <= report_margin("r_paste_13_101_row", elapsed, bound), elapsed
 
 
-def _responsive_copy(tmp_path, monkeypatch, source: str):
+_TRACE_SKIP = frozenset({"Timer", "Idle"})
+CONTROL_WRITE_S = 1.5
+
+
+def _trace_screen_spans(app, monkeypatch, diag: dict) -> None:
+    """Diagnostics only: record the layout (L) and paint (P) spans of the screen."""
+    screen = app.screen
+    for name, tag in (("_refresh_layout", "L"), ("_compositor_refresh", "P")):
+        original = getattr(screen, name)
+
+        def timed(*args, _original=original, _tag=tag, **kwargs):
+            began = time.monotonic()
+            try:
+                return _original(*args, **kwargs)
+            finally:
+                diag["spans"].append((_tag, began, time.monotonic() - began))
+
+        monkeypatch.setattr(screen, name, timed)
+
+
+def _responsive_report(marker, lateness, diag: dict) -> str:
+    """A few-KB timeline around the write, relative to ``t_start``; no payloads."""
+    start = marker.get("t_start")
+    if start is None:
+        return "no t_start stamp"
+    end = marker.get("t_end", start)
+    low, high = start - 0.3, end + 0.1
+
+    def rel(value: float) -> str:
+        return f"{value - start:+.3f}"
+
+    ticks = [f"{rel(due)}/{now - due:.3f}" for due, now in diag["ticks"] if low <= due <= high]
+    spans = [row for row in diag["spans"] if row[1] + row[2] >= low and row[1] <= high]
+    long_spans = [f"{tag}{rel(began)}/{took:.3f}" for tag, began, took in spans if took >= 0.005]
+    in_write = Counter(name for at, name in diag["messages"] if start <= at <= end)
+    in_write["Callback"] = sum(1 for at in diag["callbacks"] if start <= at <= end)
+    bins = [0] * (int((end - start) / 0.1) + 1)
+    for at in diag["callbacks"]:
+        if start <= at <= end:
+            bins[int((at - start) / 0.1)] += 1
+    near = [
+        f"{rel(at)} {name}"
+        for at, name in diag["messages"]
+        if low <= at <= high and name not in ("Update", "Layout")
+    ]
+    offset = diag.get("wall_offset", 0.0)
+    notices = [
+        f"{rel(raised - offset)} {severity} "
+        + " ".join(re.sub(r"[^A-Za-z ]", " ", message).split()[:2])
+        for raised, severity, message in diag.get("notices", [])
+    ]
+    return (
+        f"max_late={max(lateness, default=0.0):.3f} n={len(lateness)} t_end={rel(end)}"
+        f" | ticks(due/late)={ticks[:50]}"
+        f" | spans>=5ms(start/dur)={long_spans[:30]}"
+        f" paint_s={sum(row[2] for row in spans if row[0] == 'P'):.3f}"
+        f" layout_s={sum(row[2] for row in spans if row[0] == 'L'):.3f}"
+        f" | msgs_in_write={dict(in_write.most_common(8))}"
+        f" | callbacks_per_100ms={bins[:40]}"
+        f" | events={near[:25]}"
+        f" | notices={notices[:6]}"
+    )
+
+
+def _responsive_copy(tmp_path, monkeypatch, source: str, *, control: bool = False):
+    diag: dict = {"ticks": [], "spans": [], "messages": [], "callbacks": [], "armed": False}
+
+    def message_hook(message) -> None:
+        if not diag["armed"]:
+            return
+        name = type(message).__name__
+        if name == "Callback":
+            # Pilot.pause posts one per widget (_wait_for_screen): counted, not listed.
+            diag["callbacks"].append(time.monotonic())
+        elif name not in _TRACE_SKIP and len(diag["messages"]) < 20_000:
+            diag["messages"].append((time.monotonic(), name))
+
     async def drive():
         app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(118, 54)) as pilot:
+        async with app.run_test(size=(118, 54), message_hook=message_hook) as pilot:
             await _settle(pilot)
             if source == "key":
                 expected = await _select_hex(app, pilot, tmp_path)
@@ -2199,9 +2275,17 @@ def _responsive_copy(tmp_path, monkeypatch, source: str):
                 widget = app.query_one("#hex_view")
             else:
                 widget, expected = await _a2l_third_row(app, pilot, tmp_path)
-            real_run = clipboard_module.subprocess.run
-            ledger = _instrument(app, monkeypatch, writer_result=None)
-            _allow_real_processes(monkeypatch, ledger, real_run)
+            if control:
+                # The no-write control: the same app and gesture, the OS
+                # write replaced by an off-thread sleep that then fails.
+                ledger = _instrument(
+                    app, monkeypatch, writer_result=False, writer_delay=CONTROL_WRITE_S
+                )
+            else:
+                real_run = clipboard_module.subprocess.run
+                ledger = _instrument(app, monkeypatch, writer_result=None)
+                _allow_real_processes(monkeypatch, ledger, real_run)
+            _trace_screen_spans(app, monkeypatch, diag)
             recorded_writer = clipboard_module.write_os_clipboard
             marker = {"started": False, "ended": False}
             def marked_writer(text, *args, **kwargs):
@@ -2213,9 +2297,10 @@ def _responsive_copy(tmp_path, monkeypatch, source: str):
                     marker["t_end"] = time.monotonic()
                     marker["ended"] = True
             monkeypatch.setattr(clipboard_module, "write_os_clipboard", marked_writer)
-            held = _hold_clipboard()
+            held = None if control else _hold_clipboard()
+            diag["armed"] = True
             try:
-                async for lateness in arm_tick_lateness(app, marker):
+                async for lateness in arm_tick_lateness(app, marker, trace=diag["ticks"]):
                     if source == "key":
                         await pilot.press("ctrl+c")
                         await _settle(pilot, 1)
@@ -2231,42 +2316,60 @@ def _responsive_copy(tmp_path, monkeypatch, source: str):
                     await _settle(pilot)
                     break
             finally:
-                _release_clipboard(held)
-            return marker, lateness, _observe(app, ledger, expected=expected)
+                if held is not None:
+                    _release_clipboard(held)
+            diag["notices"] = [
+                (float(n.raised_at), str(n.severity), str(n.message))
+                for n in list(app._notifications)
+            ]
+            diag["wall_offset"] = time.time() - time.monotonic()
+            return marker, lateness, _observe(app, ledger, expected=expected), diag
     return asyncio.run(drive())
 
 
-def _assert_responsive(marker, lateness, obs, label: str) -> None:
+def _assert_responsive(marker, lateness, obs, label: str, diag: dict) -> None:
     _failure(obs, obs["expected"], view=True)
     _require(marker["started"] and marker["ended"], "responsive writer did not run to completion")
     _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
-    _require(len(lateness) >= 10, "responsive writer control recorded too few ticks")
+    report = _responsive_report(marker, lateness, diag)
+    _require(len(lateness) >= 10, "responsive writer control recorded too few ticks: " + report)
     bound = timing_bound(0.1)
-    _require(max(lateness) <= report_margin(label, max(lateness), bound), "responsive writer exceeded its tick bound")
+    _require(max(lateness) <= report_margin(label, max(lateness), bound), "responsive writer exceeded its tick bound: " + report)
 
 
 def test_r_paste_14_101_view_key_write_stays_responsive(tmp_path, monkeypatch) -> None:
     """R-PASTE.14/101: view-key writer is off-thread and ticks stay bounded."""
     _winci_ready_or_skip()
     other_program_write(SEED_OS)
-    marker, lateness, obs = _responsive_copy(tmp_path, monkeypatch, "key")
-    _assert_responsive(marker, lateness, obs, "r_paste_14_101_key")
+    marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "key")
+    _assert_responsive(marker, lateness, obs, "r_paste_14_101_key", diag)
 
 
 def test_r_paste_14_102_view_right_write_stays_responsive(tmp_path, monkeypatch) -> None:
     """R-PASTE.14/102: view-right writer is off-thread and ticks stay bounded."""
     _winci_ready_or_skip()
     other_program_write(SEED_OS)
-    marker, lateness, obs = _responsive_copy(tmp_path, monkeypatch, "right")
-    _assert_responsive(marker, lateness, obs, "r_paste_14_102_right")
+    marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "right")
+    _assert_responsive(marker, lateness, obs, "r_paste_14_102_right", diag)
 
 
 def test_r_paste_14_103_row_right_write_stays_responsive(tmp_path, monkeypatch) -> None:
     """R-PASTE.14/103: row-right writer is off-thread and ticks stay bounded."""
     _winci_ready_or_skip()
     other_program_write(SEED_OS)
-    marker, lateness, obs = _responsive_copy(tmp_path, monkeypatch, "row")
-    _assert_responsive(marker, lateness, obs, "r_paste_14_103_row")
+    marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "row")
+    _assert_responsive(marker, lateness, obs, "r_paste_14_103_row", diag)
+
+
+@pytest.mark.parametrize("source", ["key", "right", "row"], ids=["key", "right", "row"])
+def test_r_paste_14_c1_no_write_control_full_app(tmp_path, monkeypatch, source: str) -> None:
+    """R-PASTE.14/C1 (control for /101 … /103): the same full app and gesture
+    with the OS write replaced by an off-thread 1.5 s sleep. Same window and
+    the same bound: a FAIL here means the app's own render cost, not the write."""
+    _winci_ready_or_skip()
+    other_program_write(SEED_OS)
+    marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, source, control=True)
+    _assert_responsive(marker, lateness, obs, f"r_paste_14_c1_{source}", diag)
 
 
 def _line_cut_observation(tmp_path: Path, monkeypatch) -> dict:
