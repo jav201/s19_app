@@ -1,0 +1,103 @@
+s19_app.__file__ = ~/work/zq-i7/repo/s19_app/__init__.py
+python = 3.11.18
+repo HEAD = 2dbd7d5a
+load before = (2.91015625, 3.06982421875, 2.27880859375)
+
+=== 1. case 08
+make_release_case rc = 0
+case08 names = 462 distinct = 462
+by kind = {'ASCII': 10, 'CURVE': 60, 'MAP': 20, 'MEASUREMENT': 104, 'VALUE': 208, 'VAL_BLK': 60}
+index len = 462
+
+=== 2. dropdown rankings over case 08, limit 20 (rank(q, index, 20))
+-- q='0017': 5 entries
+    1 MAP_0017 · substring · (4,8)
+    2 CURVE_0017 · substring · (6,10)
+    3 VALUE_0017 · substring · (6,10)
+    4 VAL_BLK_0017 · substring · (8,12)
+    5 MEASUREMENT_0017 · substring · (12,16)
+-- q='cuvre_00': 20 entries
+    1 CURVE_0001 · fuzzy · (0,5),(6,10) · e1
+    2 CURVE_0002 · fuzzy · (0,5),(6,10) · e1
+    3 CURVE_0003 · fuzzy · (0,5),(6,10) · e1
+    4 CURVE_0004 · fuzzy · (0,5),(6,10) · e1
+    5 CURVE_0005 · fuzzy · (0,5),(6,10) · e1
+    6 CURVE_0006 · fuzzy · (0,5),(6,10) · e1
+    7 CURVE_0007 · fuzzy · (0,5),(6,10) · e1
+    8 CURVE_0008 · fuzzy · (0,5),(6,10) · e1
+    9 CURVE_0009 · fuzzy · (0,5),(6,10) · e1
+   10 CURVE_0010 · fuzzy · (0,5),(6,10) · e1
+   11 CURVE_0011 · fuzzy · (0,5),(6,10) · e1
+   12 CURVE_0012 · fuzzy · (0,5),(6,10) · e1
+   13 CURVE_0013 · fuzzy · (0,5),(6,10) · e1
+   14 CURVE_0014 · fuzzy · (0,5),(6,10) · e1
+   15 CURVE_0015 · fuzzy · (0,5),(6,10) · e1
+   16 CURVE_0016 · fuzzy · (0,5),(6,10) · e1
+   17 CURVE_0017 · fuzzy · (0,5),(6,10) · e1
+   18 CURVE_0018 · fuzzy · (0,5),(6,10) · e1
+   19 CURVE_0019 · fuzzy · (0,5),(6,10) · e1
+   20 CURVE_0020 · fuzzy · (0,5),(6,10) · e1
+-- q='0042 val': 2 entries
+    1 VALUE_0042 · token · (0,3),(6,10)
+    2 VAL_BLK_0042 · token · (0,3),(8,12)
+-- q='value_0002': 1 entries
+    1 VALUE_0002 · exact · (0,10)
+-- q='VALUE_0002': 1 entries
+    1 VALUE_0002 · exact · (0,10)
+-- q='map_002': 3 entries
+    1 MAP_0020 · prefix · (0,7)
+    2 MAP_0002 · subsequence · (0,3),(4,6),(7,8)
+    3 MAP_0012 · subsequence · (0,3),(4,6),(7,8)
+-- q='zzzz': 0 entries
+-- q='   ': 0 entries
+-- q="'x'*257": 0 entries
+-- q='cuvre_00' limit 21: 21 entries
+-- q='cuvre_00' limit 100: 60 entries
+-- q='0017' limit 100: 5 entries
+
+=== 3. paste-modal list of the G2 scenes, resolved (exact, case-sensitive, pasted order)
+tokens = 12
+   (1, 'VALUE_0002', 'found')
+   (2, 'CURVE_0001', 'found')
+   (3, 'MAP_0003', 'found')
+   (4, 'MEASUREMENT_0005', 'found')
+   (5, 'VALUE_0042', 'found')
+   (6, 'CURVE_0017', 'found')
+   (7, 'MAP_0024', 'not in A2L')
+   (8, 'MAP_0001', 'found')
+   (9, 'MEASUREMENT_0012', 'found')
+   (10, 'VALUE_0002', 'dup of #1')
+   (11, 'CURVE_0071', 'not in A2L')
+   (12, 'VALUE_0118', 'found')
+counts: 12 pasted · 9 found · 2 missing · 1 duplicate
+joined filter text = 'VALUE_0002, CURVE_0001, MAP_0003, MEASUREMENT_0005, VALUE_0042, CURVE_0017, MAP_0024, MAP_0001, MEASUREMENT_0012, VALUE_0002, CURVE_0071, VALUE_0118'
+
+=== 4. closest names (rank limit 3)
+-- 'MAP_0024': []
+-- 'CURVE_0071': []
+-- 'value_0002': ['VALUE_0002 · exact · (0,10)']
+-- 'VALUE_002': ['VALUE_0020 · prefix · (0,9)', 'VALUE_0021 · prefix · (0,9)', 'VALUE_0022 · prefix · (0,9)']
+-- "'x'*300": []
+
+=== 5. hostile size: a 65,536-character paste
+software_a names = 13990
+case08: paste chars = 65525, tokens = 4906, joined = 70430 chars, missing = 1636, dup = 2962, parse+resolve median of 5 = 1.1 ms
+software_a: paste chars = 65522, tokens = 2048, joined = 67569 chars, missing = 683, dup = 0, parse+resolve median of 5 = 1.2 ms
+software_a: closest names for 10 missing names (limit 3 each): median of 3 = 24.0 ms
+
+=== 6. Textual input parser: key names
+textual = 8.2.8
+   '\x1bp'              -> ['alt+p']
+   '\x1bf'              -> ['ctrl+right']
+   '\x1ba'              -> ['alt+a']
+   '\x1b[112;3u'        -> ['alt+p']
+   '\x1b[102;3u'        -> ['alt+f']
+   '\x1b[97;3u'         -> ['alt+a']
+   '\t'                 -> ['tab']
+   '\x1b[9u'            -> ['tab']
+
+=== 7. headless: a box-level tab binding runs before the app's focus_next
+   hits = [('complete', 'a')] focused = a
+   from #b: focused = a
+load after = (2.91748046875, 3.068359375, 2.28271484375)
+rc=0

@@ -1,0 +1,1144 @@
+{
+  "marks": [
+    {
+      "name": "parse_parameter_list",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 69,
+      "def": {
+        "qualname": "parse_parameter_list",
+        "line": 70,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "list"
+      }
+    },
+    {
+      "name": "A2lViewMixin._jump_to_tag_by_data",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 443,
+      "def": {
+        "qualname": "A2lViewMixin._jump_to_tag_by_data",
+        "line": 444,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 828,
+      "def": {
+        "qualname": "A2lViewMixin._refresh_a2l_filtered_tags",
+        "line": 829,
+        "params": [
+          {
+            "name": "preserve_anchor",
+            "type": "bool",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_dependent_views",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 873,
+      "def": {
+        "qualname": "A2lViewMixin._refresh_a2l_dependent_views",
+        "line": 874,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_view",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 941,
+      "def": {
+        "qualname": "A2lViewMixin.update_a2l_view",
+        "line": 942,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_tags_view",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1004,
+      "def": {
+        "qualname": "A2lViewMixin.update_a2l_tags_view",
+        "line": 1005,
+        "params": [
+          {
+            "name": "tags",
+            "type": "list[dict]",
+            "default": null
+          },
+          {
+            "name": "empty_message",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._build_a2l_table_cells",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1340,
+      "def": {
+        "qualname": "A2lViewMixin._build_a2l_table_cells",
+        "line": 1341,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "name_width",
+            "type": "Optional[int]",
+            "default": "None"
+          }
+        ],
+        "returns": "tuple[Text, ...]"
+      }
+    },
+    {
+      "name": "A2lViewMixin._filter_a2l_tags",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1443,
+      "def": {
+        "qualname": "A2lViewMixin._filter_a2l_tags",
+        "line": 1444,
+        "params": [
+          {
+            "name": "tags",
+            "type": "list[dict]",
+            "default": null
+          }
+        ],
+        "returns": "list[dict]"
+      }
+    },
+    {
+      "name": "A2lViewMixin._tag_matches_filter",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1463,
+      "def": {
+        "qualname": "A2lViewMixin._tag_matches_filter",
+        "line": 1464,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1556,
+      "def": {
+        "qualname": "A2lViewMixin._schedule_a2l_filter_refresh",
+        "line": 1557,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ComposeScreensMixin._compose_screen_a2l",
+      "reqs": null,
+      "file": "s19_app/tui/app/compose_screens.py",
+      "line": 629,
+      "def": {
+        "qualname": "ComposeScreensMixin._compose_screen_a2l",
+        "line": 630,
+        "params": [],
+        "returns": "Container"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_selected",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1332,
+      "def": {
+        "qualname": "NavigationMixin.on_data_table_row_selected",
+        "line": 1333,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowSelected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_highlighted",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1378,
+      "def": {
+        "qualname": "NavigationMixin.on_data_table_row_highlighted",
+        "line": 1379,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowHighlighted",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_input_changed",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1496,
+      "def": {
+        "qualname": "NavigationMixin.on_input_changed",
+        "line": 1497,
+        "params": [
+          {
+            "name": "event",
+            "type": "Input.Changed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "_a2l_detail_card_text",
+      "reqs": null,
+      "file": "s19_app/tui/app/shared.py",
+      "line": 320,
+      "def": {
+        "qualname": "_a2l_detail_card_text",
+        "line": 321,
+        "params": [
+          {
+            "name": "tag",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "Text"
+      }
+    },
+    {
+      "name": "A2LDetailCard.show_tag",
+      "reqs": null,
+      "file": "s19_app/tui/app/shared.py",
+      "line": 602,
+      "def": {
+        "qualname": "A2LDetailCard.show_tag",
+        "line": 603,
+        "params": [
+          {
+            "name": "tag",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "_strip_paste_controls",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 505,
+      "def": {
+        "qualname": "_strip_paste_controls",
+        "line": 506,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "multiline",
+            "type": "bool",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "OsClipboardInput._on_paste",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 927,
+      "def": {
+        "qualname": "OsClipboardInput._on_paste",
+        "line": 928,
+        "params": [
+          {
+            "name": "event",
+            "type": "events.Paste",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OsClipboardInput.action_paste",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 1040,
+      "def": {
+        "qualname": "OsClipboardInput.action_paste",
+        "line": 1041,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "build_label_index",
+      "reqs": null,
+      "file": "s19_app/tui/services/label_match.py",
+      "line": 123,
+      "def": {
+        "qualname": "build_label_index",
+        "line": 124,
+        "params": [
+          {
+            "name": "names",
+            "type": "Iterable[str]",
+            "default": null
+          }
+        ],
+        "returns": "LabelIndex"
+      }
+    },
+    {
+      "name": "rank",
+      "reqs": null,
+      "file": "s19_app/tui/services/label_match.py",
+      "line": 250,
+      "def": {
+        "qualname": "rank",
+        "line": 251,
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "index",
+            "type": "LabelIndex",
+            "default": null
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": null
+          }
+        ],
+        "returns": "list[LabelMatch]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "parse_parameter_list",
+      "reqs": [
+        "R-A2L-LIST.001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list",
+        "names": [
+          "result"
+        ],
+        "raw": "list result"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/a2l_parameter_picker.py:70 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "parse_parameter_list"
+    },
+    {
+      "name": "_strip_paste_controls",
+      "reqs": [
+        "R-A2L-LIST.034"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "multiline",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "result"
+        ],
+        "raw": "str result"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/os_clipboard_input.py:506 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "_strip_paste_controls"
+    },
+    {
+      "name": "OsClipboardInput._on_paste",
+      "reqs": [
+        "R-A2L-LIST.033"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Paste",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/os_clipboard_input.py:928 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "OsClipboardInput._on_paste"
+    },
+    {
+      "name": "OsClipboardInput.action_paste",
+      "reqs": [
+        "R-A2L-LIST.033"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/os_clipboard_input.py:1041 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "OsClipboardInput.action_paste"
+    },
+    {
+      "name": "A2lViewMixin._jump_to_tag_by_data",
+      "reqs": [
+        "R-A2L-LIST.031"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:444 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._jump_to_tag_by_data"
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "reqs": [
+        "R-A2L-LIST.006"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "preserve_anchor",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:829 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._refresh_a2l_filtered_tags"
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_dependent_views",
+      "reqs": [
+        "R-A2L-LIST.056"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:874 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._refresh_a2l_dependent_views"
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_view",
+      "reqs": [
+        "R-A2L-LIST.072"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:942 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin.update_a2l_view"
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_tags_view",
+      "reqs": [
+        "R-A2L-LIST.009"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[dict]",
+          "name": "tags",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "empty_message",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1005 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin.update_a2l_tags_view"
+    },
+    {
+      "name": "A2lViewMixin._build_a2l_table_cells",
+      "reqs": [
+        "R-A2L-LIST.014"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "name_width",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Text, ...]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[Text, ...] result"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1341 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._build_a2l_table_cells"
+    },
+    {
+      "name": "A2lViewMixin._filter_a2l_tags",
+      "reqs": [
+        "R-A2L-LIST.005"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[dict]",
+          "name": "tags",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[dict]",
+        "names": [
+          "result"
+        ],
+        "raw": "list[dict] result"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1444 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._filter_a2l_tags"
+    },
+    {
+      "name": "A2lViewMixin._tag_matches_filter",
+      "reqs": [
+        "R-A2L-007.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "result"
+        ],
+        "raw": "bool result"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1464 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._tag_matches_filter"
+    },
+    {
+      "name": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "reqs": [
+        "R-A2L-LIST.060"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1557 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._schedule_a2l_filter_refresh"
+    },
+    {
+      "name": "ComposeScreensMixin._compose_screen_a2l",
+      "reqs": [
+        "R-A2L-LIST.080"
+      ],
+      "in": [],
+      "out": {
+        "type": "Container",
+        "names": [
+          "result"
+        ],
+        "raw": "Container result"
+      },
+      "module": "s19_app/tui/app/compose_screens.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/compose_screens.py:630 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "ComposeScreensMixin._compose_screen_a2l"
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_selected",
+      "reqs": [
+        "R-A2L-LIST.031"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowSelected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1333 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_data_table_row_selected"
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_highlighted",
+      "reqs": [
+        "R-A2L-LIST.027"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowHighlighted",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1379 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_data_table_row_highlighted"
+    },
+    {
+      "name": "NavigationMixin.on_input_changed",
+      "reqs": [
+        "R-A2L-LIST.060"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Input.Changed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1497 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_input_changed"
+    },
+    {
+      "name": "_a2l_detail_card_text",
+      "reqs": [
+        "R-A2L-LIST.029"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Text",
+        "names": [
+          "result"
+        ],
+        "raw": "Text result"
+      },
+      "module": "s19_app/tui/app/shared.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/shared.py:321 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "_a2l_detail_card_text"
+    },
+    {
+      "name": "A2LDetailCard.show_tag",
+      "reqs": [
+        "R-A2L-LIST.027"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/shared.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/shared.py:603 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LDetailCard.show_tag"
+    },
+    {
+      "name": "build_label_index",
+      "reqs": [
+        "R-A2L-LIST.072"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LabelIndex",
+        "names": [
+          "result"
+        ],
+        "raw": "LabelIndex result"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/services/label_match.py:124 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "build_label_index"
+    },
+    {
+      "name": "rank",
+      "reqs": [
+        "R-A2L-LIST.060"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "LabelIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[LabelMatch]",
+        "names": [
+          "result"
+        ],
+        "raw": "list[LabelMatch] result"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/services/label_match.py:251 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "rank"
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2LDetailCard.show_tag",
+      "callee": "_a2l_detail_card_text",
+      "sites": [
+        "s19_app/tui/app/shared.py:625"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._filter_a2l_tags",
+      "callee": "A2lViewMixin._tag_matches_filter",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1458"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_dependent_views",
+      "callee": "A2LDetailCard.show_tag",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:927"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_dependent_views",
+      "callee": "A2lViewMixin.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:913"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "callee": "A2lViewMixin._filter_a2l_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:859"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "callee": "A2lViewMixin.update_a2l_tags_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:866",
+        "s19_app/tui/app/a2l_view.py:871"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "callee": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1586"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_tags_view",
+      "callee": "A2lViewMixin._build_a2l_table_cells",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1085"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_view",
+      "callee": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1001"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_view",
+      "callee": "A2lViewMixin.update_a2l_tags_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:987"
+      ]
+    },
+    {
+      "caller": "NavigationMixin.on_data_table_row_highlighted",
+      "callee": "A2LDetailCard.show_tag",
+      "sites": [
+        "s19_app/tui/app/navigation.py:1423"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput._on_paste",
+      "callee": "_strip_paste_controls",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:947",
+        "s19_app/tui/os_clipboard_input.py:953"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput.action_paste",
+      "callee": "_strip_paste_controls",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:1104",
+        "s19_app/tui/os_clipboard_input.py:1108"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "A2lViewMixin.update_a2l_tags_view": [
+      "s19_app/tui/app/a2l_view.py:1214",
+      "s19_app/tui/app/a2l_view.py:366",
+      "s19_app/tui/app/a2l_view.py:392",
+      "s19_app/tui/app/a2l_view.py:507"
+    ],
+    "A2lViewMixin._jump_to_tag_by_data": [
+      "s19_app/tui/app/a2l_view.py:441"
+    ],
+    "A2lViewMixin._build_a2l_table_cells": [
+      "s19_app/tui/app/a2l_view.py:1210",
+      "s19_app/tui/app/a2l_view.py:1307"
+    ],
+    "A2lViewMixin._refresh_a2l_filtered_tags": [
+      "s19_app/tui/app/a2l_view.py:1554"
+    ],
+    "A2LDetailCard.show_tag": [
+      "s19_app/tui/app/shared.py:581"
+    ],
+    "_a2l_detail_card_text": [
+      "s19_app/tui/app/shared.py:600"
+    ],
+    "_strip_paste_controls": [
+      "s19_app/tui/capped_text_area.py:169",
+      "s19_app/tui/capped_text_area.py:238"
+    ],
+    "OsClipboardInput.action_paste": [
+      "s19_app/tui/os_clipboard_input.py:977"
+    ],
+    "parse_parameter_list": [
+      "s19_app/tui/screens.py:1019"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

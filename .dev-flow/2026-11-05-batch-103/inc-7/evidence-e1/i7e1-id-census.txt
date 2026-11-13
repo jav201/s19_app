@@ -1,0 +1,68 @@
+# i7e1 id census (git grep on b103-inc7 = 2dbd7d5a; plus s19w review folder); run 2026-11-13T12:21:39-06:00
+R-A2L-LIST: files with hits in tree = 0
+AT-B103-I7: files with hits in tree = 0
+CTX-A2L-LIST: files with hits in tree = 0
+BL-I7-: files with hits in tree = 0
+s19w review:
+0
+other s19_app worktrees:
+  s19_app: 0
+  s19_app-b100-close: 0
+  s19_app-b100-fix3: 0
+  s19_app-b102-inc1-code: 0
+  s19_app-b102-inc1-tests: 0
+  s19_app-b102-inc2-code: 0
+  s19_app-b102-inc2-tests: 0
+  s19_app-b102-inc3-code: 0
+  s19_app-b102-inc3-tests: 0
+  s19_app-b102-inc4-code: 0
+  s19_app-b102-inc4-tests: 0
+  s19_app-b102-inc5-code: 0
+  s19_app-b102-inc5-tests: 0
+  s19_app-b102-inc6-code: 0
+  s19_app-b102-inc6-tests: 0
+  s19_app-b102-inc7-code: 0
+  s19_app-b102-inc7-tests: 0
+  s19_app-b103: 0
+  s19_app-b103-inc10: 0
+  s19_app-b103-inc11-code: 0
+  s19_app-b103-inc11-tests: 0
+  s19_app-b103-inc12-before: 0
+  s19_app-b103-inc12-code: 0
+  s19_app-b103-inc12-integration: 0
+  s19_app-b103-inc12-run: 0
+  s19_app-b103-inc12-tests: 0
+  s19_app-b103-inc1a-code: 0
+  s19_app-b103-inc1a-tests: 0
+  s19_app-b103-inc1b-code: 0
+  s19_app-b103-inc1b-integration: 0
+  s19_app-b103-inc1b-mutplan: 0
+  s19_app-b103-inc1b-push: 0
+  s19_app-b103-inc1b-tests: 0
+  s19_app-b103-inc2a-code: 0
+  s19_app-b103-inc2a-tests: 0
+  s19_app-b103-inc2b-code: 0
+  s19_app-b103-inc2b-tests: 0
+  s19_app-b103-inc3a-code: 0
+  s19_app-b103-inc3b-code: 0
+  s19_app-b103-inc3b-tests: 0
+  s19_app-b103-inc4-code: 0
+  s19_app-b103-inc4-tests: 0
+  s19_app-b103-inc5-code: 0
+  s19_app-b103-inc5-tests: 0
+  s19_app-b103-inc6-code: 0
+  s19_app-b103-inc6-integration: 0
+  s19_app-b103-inc6-tests: 0
+  s19_app-b103-inc7: 0
+  s19_app-b103-inc8: 0
+  s19_app-b103-wci: 0
+  s19_app-b94: 0
+  s19_app-mod-verify: 0
+  s19_app-modular: 0
+  s19_app-modular-squash: 0
+  s19_app-pe-split: 0
+  s19_app-proto: 0
+  s19_app-release: 0
+  s19_app-stale-2026-05: 0
+  s19_app-tc: 0
+  s19_app-wt-batch90: 0
