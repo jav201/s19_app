@@ -1,0 +1,5 @@
+927e7fe7a5ba154f212bc878afa49c8f1f0a6e47c24475941ad011992ab73674  tests/test_b103_clipboard_tail.py
+b7970106a6c69f52932c136dff5036de128ed2709c52f4923453a73f83d91b31  s19_app/tui/app.py (unmodified base)
+0c6b8b468910ad36ef3f4b3a38d9016fb28ae98cf168615215451221ca3b3f1f  s19_app/tui/os_clipboard_input.py (unmodified base)
+5212a36388fe336cf14e0b34b31dcff07bf5b5e59886604bd95832f51a57fb59  s19_app/tui/capped_text_area.py (unmodified base)
+6563c9ceb4712ae8aa122f1ed6909919c85616625e8b8cb6ec07ac43519adcbf  .dev-flow/2026-11-05-batch-103/inc-1b/evidence-e4/tail/red-final.txt

@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GC",
+  "id": "GC-C11",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C11/post/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 2,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 16.761,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice": "failed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C11/pre/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 16.923,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C11/restored/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 16.542,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C11/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_sha256_before": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "source_sha256_mutated": "778a6b66a4cf7e0ef33df326a2c5fe371fbca1df4f5c124abd3e0301140d9237",
+  "source_sha256_restored": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice",
+    "tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

@@ -1,0 +1,14 @@
+s19_app.__file__=<HOME>/work/e4-tail-29ce-green-1794501691-1965/tree/s19_app/__init__.py
+INTEGRATION_HEAD=29ce6448e49cc8a67ecf7a5a7c38a4f31833368c
+30524402b42ccf2dd1deb0a57a2a6898447af2bbbea749ea4ca7eaa46b3a783d  tests/test_b103_clipboard_tail.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/e4-tail-29ce-green-1794501691-1965/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once PASSED [100%]
+
+============================== 1 passed in 21.45s ==============================
+E3A_EXIT_STATUS=0

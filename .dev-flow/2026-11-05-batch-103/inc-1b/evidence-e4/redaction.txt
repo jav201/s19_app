@@ -1,0 +1,11 @@
+matrix/red-junit.xml: 57,0,0,28,0,0,1
+matrix/red-report.md: 2,0,0,0,0,0,1
+matrix/red-transcript.txt: 52,0,0,28,0,0,0
+quit/red-linux.txt: 3,0,0,0,0,0,0
+quit/report.md: 4,0,0,0,0,0,0
+tail/base-equivalence.txt: 0,0,1,0,0,0,0
+tail/red-final.txt: 4,0,0,0,0,0,0
+tail/RED-REPORT.md: 1,0,0,0,0,0,1
+tail/setup-final.txt: 1,0,0,0,0,0,0
+views/red-linux-e2e93548.txt: 9,0,0,0,0,0,0
+views/REPORT.md: 3,0,0,1,1,0,0

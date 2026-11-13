@@ -1,0 +1,122 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GT",
+  "id": "GT-T03",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut2/out-GT/GT/GT-T03/post/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 3,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 33.148,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality": "failed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]": "failed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut2/out-GT/GT/GT-T03/pre/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    },
+    "elapsed_seconds": 35.787,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut2/out-GT/GT/GT-T03/restored/junit.xml",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    },
+    "elapsed_seconds": 35.816,
+    "nodes": {
+      "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]": "passed",
+      "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut2/out-GT/GT/GT-T03/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/app.py",
+  "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "source_sha256_mutated": "92e96f8b4c9b64b94ae804f1fae16ec9ab21098667234d7eb531e3534567804f",
+  "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+    "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+    "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

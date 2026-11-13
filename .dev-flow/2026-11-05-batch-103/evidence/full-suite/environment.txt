@@ -1,0 +1,5 @@
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs            16G   16G     0 100% /tmp
+total 4.0K
+-rw-r--r-- 1 <USER> <USER> 4.0K Nov 11 13:53 chunk-01.txt
+-rw-r--r-- 1 <USER> <USER>    0 Nov 11 13:53 summary.json

@@ -1,0 +1,55 @@
+case,pytest_node,linux_coverage,winci,result,observation
+R-COPY.1/1,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/1],partial-writer-proxy,not_run,red,writer=[] para selección hex de 3 líneas; lectura OS separada pendiente
+R-COPY.1/2,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/2],partial-writer-proxy,not_run,red,writer=[] para selección stats de 5 líneas; lectura OS separada pendiente
+R-COPY.1/3,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/3],partial-writer-proxy,not_run,red,writer=[] para summary A2L; lectura OS separada pendiente
+R-COPY.1/4,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4],partial-writer-proxy,not_run,red,writer=[] para dos líneas detail; lectura OS separada pendiente
+R-COPY.1/5,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/5],partial-writer-proxy,not_run,red,writer=[] para dos líneas JSON; lectura OS separada pendiente
+R-COPY.1/6,test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/6],partial-writer-proxy,not_run,red,writer=[] para dos pasos help; lectura OS separada pendiente
+R-COPY.2/1,test_r_copy_2_app_clipboard[R-COPY.2/1],full-linux,not_run,red,app.clipboard ya coincide; nueva cardinalidad base/tail/writer ausente con base=[]
+R-COPY.2/2,test_r_copy_2_app_clipboard[R-COPY.2/2],full-linux,not_run,red,right-click no refleja selección y app.clipboard conserva SEED-1b
+R-COPY.2/3,test_r_copy_2_app_clipboard[R-COPY.2/3],full-linux,not_run,red,right-click de fila A2L no refleja nombre y app.clipboard conserva SEED-1b
+R-COPY.2/4,test_r_copy_2_app_clipboard[R-COPY.2/4],full-linux,not_required,red,con writer=False la fila A2L no llega al mirror y app.clipboard conserva SEED-1b
+R-COPY.4/1,test_r_copy_4_full_row_names[R-COPY.4/1],partial-writer-proxy,not_run,red,writer=[] para nombre A2L completo de fila 3; lectura OS separada pendiente
+R-COPY.4/2,test_r_copy_4_full_row_names[R-COPY.4/2],partial-writer-proxy,not_run,red,writer=[] para Curve_ExternalAxis; brazo MAC largo .plain no alcanzado en RED
+R-COPY.4/3,test_r_copy_4_full_row_names[R-COPY.4/3],partial-writer-proxy,not_run,red,writer=[] para fila A2L 5 clicada con fila 2 resaltada; lectura OS separada pendiente
+R-COPY.10/1,test_r_copy_10_one_osc52_request[R-COPY.10/1],full-linux,not_run,pass-base,exactamente una solicitud OSC 52 decodifica la selección Ctrl+C
+R-COPY.10/2,test_r_copy_10_one_osc52_request[R-COPY.10/2],full-linux,not_run,red,osc52=[] tras right-click válido de selección
+R-COPY.10/3,test_r_copy_10_one_osc52_request[R-COPY.10/3],full-linux,not_run,red,osc52=[] tras right-click válido de fila A2L
+R-COPY.11/1,test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/1],partial-writer-proxy,not_run,pass-base,left drag deja selección sin entry/tail/base/writer/OSC 52 y conserva seed
+R-COPY.11/2,test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/2],partial-writer-proxy,not_run,pass-base,down x3 mueve highlight sin copia; seed conservada
+R-COPY.11/3,test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/3],partial-writer-proxy,not_run,pass-base,F7 selecciona JSON sin entry/tail/base/writer/OSC 52
+R-COPY.11/4,test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4],partial-writer-proxy,not_run,pass-base,left click resalta fila 5 sin copia; seed conservada
+R-COPY.11/5,test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5],partial-writer-proxy,not_run,pass-base,right-drag con marcador no copia selección anterior ni arrastrada
+R-COPY.12/1,test_r_copy_12_right_click_selection[R-COPY.12/1],partial-writer-proxy,not_run,red,writer=[] para snapshot hex en valid release; lectura OS separada pendiente
+R-COPY.12/2,test_r_copy_12_right_click_selection[R-COPY.12/2],partial-writer-proxy,not_run,red,writer=[] para snapshot stats; lectura OS separada pendiente
+R-COPY.12/3,test_r_copy_12_right_click_selection[R-COPY.12/3],partial-writer-proxy,not_run,red,writer=[] para dos líneas detail capturadas al press; lectura OS separada pendiente
+R-COPY.12/4,test_r_copy_12_right_click_selection[R-COPY.12/4],partial-writer-proxy,not_run,red,writer=[] para selección JSON previa al press; lectura OS separada pendiente
+R-COPY.12/5,test_r_copy_12_right_click_selection[R-COPY.12/5],partial-writer-proxy,not_run,red,writer=[] para selección modal help; lectura OS separada pendiente
+R-COPY.12/6,test_r_copy_12_right_click_selection[R-COPY.12/6],partial-writer-proxy,not_run,red,writer=[] para selección cross-view completa stats antes que a2l; lectura OS separada pendiente
+R-COPY.12/7,test_r_copy_12_7_back_to_back_and_reentry,partial-writer-proxy,not_run,red,reentry inválido no copia; valid release posterior tiene entry=[] y replay no alcanzado
+R-COPY.12/8,test_r_copy_12_8_positive_bounds_and_cardinality,partial-writer-proxy,not_run,red,entry=[] en brazo hex out_of_bounds=False; brazos A2L/MAC y cardinalidad posterior no alcanzados
+R-COPY.13/1,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/1],full-linux,not_run,pass-base,empty click hex conserva seed y no produce sinks ni notices
+R-COPY.13/2,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/2],full-linux,not_run,pass-base,empty click JSON conserva seed y no produce sinks ni notices
+R-COPY.13/3,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/3],full-linux,not_run,pass-base,empty click help conserva seed y no produce sinks ni notices
+R-COPY.13/4,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4],full-linux,not_run,pass-base,click en stats sin parte de selección hex no copia y conserva seed
+R-COPY.13/5,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/5],full-linux,not_run,pass-base,click en header no copia y conserva seed
+R-COPY.13/6,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/6],full-linux,not_run,pass-base,click en tabla vacía no copia y conserva seed
+R-COPY.13/7,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7],full-linux,not_run,pass-base,right-drag cancela y mantiene todos los sinks en cero
+R-COPY.13/8,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8],full-linux,not_run,pass-base,exit-return permanece cancelado y mantiene todos los sinks en cero
+R-COPY.13/9,test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9],full-linux,not_run,red,padding A2L out_of_bounds=True mueve cursor 0→2; brazo MAC no alcanzado en RED
+R-COPY.14/1,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/1],full-linux,not_run,pass-base,empty click hex emite cero notices
+R-COPY.14/2,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/2],full-linux,not_run,pass-base,empty click JSON emite cero notices
+R-COPY.14/3,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/3],full-linux,not_run,pass-base,empty click help emite cero notices
+R-COPY.14/4,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4],full-linux,not_run,pass-base,click fuera de selección emite cero notices
+R-COPY.14/5,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/5],full-linux,not_run,pass-base,click en header emite cero notices
+R-COPY.14/6,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/6],full-linux,not_run,pass-base,click en tabla vacía emite cero notices
+R-COPY.14/7,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/7],full-linux,not_run,pass-base,right-drag emite cero notices
+R-COPY.14/8,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8],full-linux,not_run,pass-base,exit-return emite cero notices
+R-COPY.14/9,test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9],full-linux,not_run,pass-base,padding A2L y MAC emite cero notices en ambos brazos
+R-COPY.15/1,test_r_copy_15_right_click_clears_selection[R-COPY.15/1],full-linux,not_required,pass-base,selección hex queda vacía tras right-click
+R-COPY.15/2,test_r_copy_15_right_click_clears_selection[R-COPY.15/2],full-linux,not_required,pass-base,selección stats queda vacía tras right-click
+R-COPY.15/3,test_r_copy_15_right_click_clears_selection[R-COPY.15/3],full-linux,not_required,pass-base,selected_text JSON queda vacío tras right-click
+R-COPY.21/1,test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1],full-linux,not_required,pass-base,fila A2L 5 resaltada y detail actualizado sin RowSelected
+R-COPY.21/2,test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2],full-linux,not_required,pass-base,fila MAC 3 resaltada sin RowSelected
+R-COPY.22/1,test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1],full-linux,not_required,red,alt_hex cambia su primera línea por salto a 0x0000FFB0 tras right-click A2L
+R-COPY.22/2,test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2],full-linux,not_required,pass-base,mac_hex conserva primera línea y RowSelected queda en cero

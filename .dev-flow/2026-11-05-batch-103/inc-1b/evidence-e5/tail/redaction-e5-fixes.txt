@@ -1,0 +1,2 @@
+_no_secret failure redaction: OK
+hostile argv/kwargs assert diagnostics: absent

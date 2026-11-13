@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GN",
+  "id": "GN-N03",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GN/GN-N03/post/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 2,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 70.173,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed": "failed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GN/GN-N03/pre/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 62.724,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GN/GN-N03/restored/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 149.592,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GN/GN-N03/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_sha256_before": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "source_sha256_mutated": "d1e95ce4a70b92bdce9dc7d38077bb3b61899b3368bfb0bc1c1564f2aa04bd0d",
+  "source_sha256_restored": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

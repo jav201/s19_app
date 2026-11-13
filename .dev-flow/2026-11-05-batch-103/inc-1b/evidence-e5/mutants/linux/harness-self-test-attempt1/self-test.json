@@ -1,0 +1,69 @@
+{
+  "checks": {
+    "all_restored": true,
+    "all_verdicts_observed": false,
+    "expected_verdicts": false,
+    "known_bad_killed": true,
+    "no_new_bytecode": true,
+    "zero_apply_bad": true
+  },
+  "results": [
+    {
+      "actual_verdict": "KILLED",
+      "applied_count": 1,
+      "counts": {
+        "error": 0,
+        "failed": 1,
+        "passed": 0,
+        "skipped": 0
+      },
+      "expected_verdict": "KILLED",
+      "no_new_bytecode": true,
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_target_green": true,
+      "source_sha256_restored": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+    },
+    {
+      "actual_verdict": "SURVIVED",
+      "applied_count": 1,
+      "counts": {
+        "error": 0,
+        "failed": 0,
+        "passed": 1,
+        "skipped": 0
+      },
+      "expected_verdict": "SURVIVED",
+      "no_new_bytecode": true,
+      "reason": "all selected nodes passed",
+      "restore_ok": true,
+      "restored_target_green": true,
+      "source_sha256_restored": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+    },
+    {
+      "actual_verdict": "BAD",
+      "applied_count": 1,
+      "counts": {
+        "error": 0,
+        "failed": 0,
+        "passed": 0,
+        "skipped": 0
+      },
+      "expected_verdict": "CRASH",
+      "no_new_bytecode": true,
+      "reason": "pytest usage/selection failure exit=4",
+      "restore_ok": true,
+      "restored_target_green": true,
+      "source_sha256_restored": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+    },
+    {
+      "actual_verdict": "BAD",
+      "applied_count": 0,
+      "expected_verdict": "BAD",
+      "reason": "anchor count=0, required exactly 1; no bytes written",
+      "restore_ok": true
+    }
+  ],
+  "scope": "disposable toy fixtures only; zero product mutants executed",
+  "verdict": "FAIL"
+}

@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GQ",
+  "id": "GQ-Q12",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/post/junit.xml",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 2,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 19.21,
+    "nodes": {
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "failed",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/pre/junit.xml",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 19.802,
+    "nodes": {
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "passed",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/restored/junit.xml",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 19.734,
+    "nodes": {
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "passed",
+      "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/app.py",
+  "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "source_sha256_mutated": "63c95f4a41e12b981a4574c97ffc7e4fcbe4a426b1aeabaf9f8cc0588d74c92e",
+  "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+  "tests": [
+    "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+    "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

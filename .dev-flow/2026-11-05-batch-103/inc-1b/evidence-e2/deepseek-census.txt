@@ -1,0 +1,35 @@
+## Census — `inc-1b` (batch-103), graph vs rulings/requirements/test cases
+
+Scope read: `codewire/graph-inc1b.md` (786 lines), `E3-rulings.md`, `01-requirements.md`, `02-test-cases.md`, `evidence-e2/lint-transcript.txt` (+ `E1-slice.md` only where `02-test-cases.md:137` points to it). Nothing edited, nothing run.
+
+### A. E3 ruling coverage
+
+| Item | Result | Evidence (file:line) |
+|---|---|---|
+| E3A-01 empty string → `SkipAction` before coroutine/worker, idle + modal examples | **PASS** | ruling `E3-rulings.md:7`; graph `graph-inc1b.md:19,166,167` (idle), `:168` (modal), `:281,327,517`; req `01-requirements.md:9,118,120`; tests `02-test-cases.md:90` (two armings), `:101` |
+| E3A-02 `out_of_bounds` guards in N2/N5 + positive/negative controls on the same row | **PASS** | ruling `:8`; graph `:189` (N2), `:194` neg, `:195` pos, `:241,242,243` (N5), `:529`; req `:38-40,115,123`; tests `:20,39-41,75,84` |
+| E3A-03 concrete examples per Ctrl+C source, detail-card right-click, drag/F7 non-copy, seeds before/after Stay; R-COPY.2/4 moved to row+failure | **PASS** | ruling `:9`; graph `:169-173` (six Ctrl+C sources), `:197` (detail right-click), `:223,224` (drag/F7), `:278,279` (seeds while open / after `n`), `:175,420,589` (row + failing writer); req `:104,113,114,118`; tests `:28-33,37,63,65,70,43` |
+| E3A-04 MAC `.plain`/`str` + single known producer prefix, spaces preserved | **PASS** | ruling `:10`; graph `:189` (`painted = cell.plain if isinstance(cell, Text) else str(cell)`, prefix matched once), `:192,193` (`⚠ Curve_ExternalAxis`, long-name arm), `:594`; `02-test-cases.md:20` + delegation `:137` → `E1-slice.md:29` (concrete `Text("⚠ Long record name…")` example), `E1-slice.md:65` |
+| E3A-05 integrated 24 nodes / 2 sources; `notes={}` historical correction | **PASS** | ruling `:11`; graph `:9` (24 nodes, 2 files), `:36,39` (`notes={}`, older geometry/hex-width historical), `:140` (24 = 10+2 / 6+6), `:649,774,783,784`; tests `:137` (provenance `6adb6337`) |
+| E3-01 copy deferred to valid button-3 `MouseUp`; move/reentry cancels permanently | **PASS** | ruling `:12`; graph `:29,212,213-222` (right-drag, out-and-return, row-drag, context, reentry), `:502-509`; req `:28,35` (right-click/right-drag terms), `:113,114,115`; tests `:18,19,67,82,83` |
+| E3-02 exact NUL texts, zero sinks, after-cap arm | **PASS** (two wording gaps, §C3) | ruling `:13`; graph `:21,81,101` (`NUL3`, `NUL_AFTER`), `:124,402,405,424,425,426`; req `:85-88,127`; tests `:113,114,115` |
+| E3-03 hostile fixture without NUL, exact payloads, PowerShell stdin/static argv, log controls | **PASS** (fixture literal differs, §C2) | ruling `:14`; graph `:102` (`HOSTILE`), `:133,203,426?`→`:426` no; see `:203` and `:426` region `:420-427`; tests `:20` (`HOSTILE_NAME`), `:125` (1 base/1 PowerShell/1 OSC 52/1 notice, `shell=False`, payload absent from argv, 0 extra sequences, no name/prefix in logs) |
+
+### B. Ledger / evidence checks
+
+| Check | Result | Evidence |
+|---|---|---|
+| 23 active requirements | **PASS** | `01-requirements.md:142`; rows `:103,104,106,108-127` = R-COPY.1,.2,.4,.6…25 (23); withdrawn `.3/.5` at `:105,:107` |
+| 112 active cases (93 + 10 + 9), 9 withdrawn | **PASS** | `02-test-cases.md:158`; independent tally of `:28-134` = 93 R-COPY (incl. grouped `R-COPY.14/1 … /9`) + 10 cited + 9 dialog/quit; withdrawn `:38,:42` |
+| `evidence-e2/lint-transcript.txt` = 24 nodes / 7 entities / 16 edges / 41 findings | **PASS** | `evidence-e2/lint-transcript.txt:1` (`nodes=24 entities=7 edges=16 findings=41 not read=0`); file body confirms: 24 node `req:` blocks, 7 entity headers `:492,502,511,519,525,532,541`, 16 `──▶` edges `:553-576`, 41 `finding ` lines `:582-782` |
+| R-COPY.25 present in the tail node's `req:` | **PASS** | `graph-inc1b.md:402` |
+| No empty-return contract | **PASS** | plain `return` appears only as the RED mutant: `:167`, `01-requirements.md:118`, and tests `:90` route through `textual.actions.SkipAction` |
+| No copy-on-MouseDown contract | **PASS** | `graph-inc1b.md:29,212` ("Do not call N1 on `MouseDown`"), `:506`; `02-test-cases.md:19` ("it starts no copy"); `01-requirements.md:114` (copy on press → RED) |
+
+### C. Missing / contradictory text (no verdict)
+
+1. **Node arithmetic contradicts itself** — `graph-inc1b.md:9` states "17 group-A nodes: 10 implementation … + 7 unchanged context groups" and "24 … (12 implementation + 12 context)" in the same sentence, while the integrated body prints 10 implementation nodes + only 6 group-A context headers (`:323,334,343,353,364,373`) and `:140` itself says "6 app + 6 clipboard" with the group-A tail block omitted. `:783`/`:785` repeat "group A remains 17 nodes (… C1-C7 …)". `E3-rulings.md:11` supplies the missing qualifier ("only a fragment count"); `graph-inc1b.md` does not.
+2. **Hostile-fixture literal differs between documents** — `graph-inc1b.md:102` `HOSTILE = "A[red]B\x1b]52;c;U0VDRVQ=\x07C\nD"` vs `02-test-cases.md:20` `HOSTILE_NAME = '[red]\x1b\x07\x1b]52;c;U0VFRF9PU0M=\x07\nSUFFIX'`. Both satisfy markup+ESC+BEL+OSC-like+LF and no NUL, but they cannot both be "the expected payload" (`graph-inc1b.md:203` / `02-test-cases.md:125`).
+3. **E3-02 required observables partially dropped downstream** — the `_copy_notice_text`/helper count `0` and the "escaped payload" absence appear in `graph-inc1b.md:81,424` and `E3-rulings.md:13`, but not in `01-requirements.md:127` (`0 toolkit base calls, 0 writer calls/processes, 0 OSC 52 requests, 0 copy/cut notices`) nor `02-test-cases.md:113` ("no log record contains payload or a payload prefix").
+4. **`.plain` contract has no requirement-level or case-level text** — `01-requirements.md:67-72` states only the behavioural name contract (leading glyph removed, no shortened cell, C0/markup verbatim); `02-test-cases.md:137` explicitly delegates the `.plain`→`str` / long-name-with-spaces example to `E1-slice.md:29`, and R-COPY.4 has no case row for the long-name arm (`02-test-cases.md:39-41`).
+5. **Residual E1-slice sketch conflicts with the graph's own supersession note** (outside the three compared files, but `E3-rulings.md:16` includes `E1-slice.md` in the correction population) — `E1-slice.md:31` still declares `S19TuiApp._write_copied_text` in `app.py`, `:32` still places `_copy_notice_text` in `app.py`, and `:35` still marks `_compose_screen_a2l` **changed**, against `graph-inc1b.md:14,140` (tail/helper owned by `os_clipboard_input.py`), `:25` ("`_compose_screen_a2l` remains unchanged") and `:33` ("superseded").

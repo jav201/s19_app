@@ -1,0 +1,57 @@
+<LOCAL_HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_e5_powershell_preserves_lf_and_emits_bom_free_readers __________
+
+    def test_e5_powershell_preserves_lf_and_emits_bom_free_readers() -> None:
+        """Static E5 oracle: exact LF transport and stdout without a UTF-8 BOM."""
+        failures = []
+        write_command = "".join(clipboard_module._POWERSHELL_WRITE_COMMAND)
+        if "[Console]::In.ReadToEnd()" not in write_command:
+            failures.append("writer must read stdin once with [Console]::In.ReadToEnd()")
+        if "[Windows.Clipboard]::SetText($text)" not in write_command:
+            failures.append("writer must call .NET [Windows.Clipboard]::SetText($text)")
+        if "Set-Clipboard" in write_command:
+            failures.append("writer must not rebuild lines with Set-Clipboard")
+    
+        utf8_without_bom = re.compile(
+            r"UTF8Encoding\]?\s*(?:::\s*new\s*)?\(\s*\$false\s*\)"
+        )
+        readers = (
+            (Path(clipboard_module.__file__), "_read_via_powershell"),
+            (Path(__file__), "other_program_read"),
+        )
+        for path, function_name in readers:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            function = next(
+                node
+                for node in tree.body
+                if isinstance(node, ast.FunctionDef) and node.name == function_name
+            )
+            literals = "".join(
+                node.value
+                for node in ast.walk(function)
+                if isinstance(node, ast.Constant) and isinstance(node.value, str)
+            )
+            output_encodings = re.findall(
+                r"\[Console\]::OutputEncoding\s*=\s*([^;]+)", literals
+            )
+            if len(output_encodings) != 1 or not all(
+                utf8_without_bom.search(encoding) for encoding in output_encodings
+            ):
+                failures.append(f"{function_name} must use UTF8Encoding($false) for stdout")
+    
+>       assert not failures, "\n".join(failures)
+E       AssertionError: writer must read stdin once with [Console]::In.ReadToEnd()
+E         writer must call .NET [Windows.Clipboard]::SetText($text)
+E         writer must not rebuild lines with Set-Clipboard
+E         _read_via_powershell must use UTF8Encoding($false) for stdout
+E       assert not ['writer must read stdin once with [Console]::In.ReadToEnd()', 'writer must call .NET [Windows.Clipboard]::SetText($text)', 'writer must not rebuild lines with Set-Clipboard', '_read_via_powershell must use UTF8Encoding($false) for stdout']
+
+tests\test_b103_clipboard_tail.py:1150: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_clipboard_tail.py::test_e5_powershell_preserves_lf_and_emits_bom_free_readers
+1 failed in 0.33s

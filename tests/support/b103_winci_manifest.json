@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "description": "Static WinCI oracle for the six clipboard test families; derived by AST inspection, never by importing tests at gate runtime.",
+  "counts": {
+    "testcases": 256,
+    "obligations": 108,
+    "view_obligations": 46,
+    "tail_obligations": 25,
+    "quit_obligations": 9,
+    "at_obligations": 28,
+    "at_p1": 14,
+    "at_p2": 14,
+    "linux_only_skips": 6,
+    "legacy_linux_h_skips": 37,
+    "manual_skips": 1,
+    "winci_passed": 212,
+    "winci_skipped": 44
+  },
+  "handoff_reconciliation": {
+    "linux_passed": 160,
+    "linux_skipped": 96,
+    "linux_total": 256,
+    "linux_skip_composition": "77 Windows-only + 4 WinCI-only tail + 14 AT P2 + 1 AT-I1b-8 manual = 96",
+    "winci_skip_composition": "37 legacy LinuxH + 6 exact Linux-only failing-writer arms + 1 AT-I1b-8 manual = 44"
+  },
+  "at_partitions": {
+    "P1": [
+      "AT-I1b-1/1-T1-P1", "AT-I1b-1/3-T2-P1",
+      "AT-I1b-2/1-T1-P1", "AT-I1b-2/3-T2-P1",
+      "AT-I1b-3/1-T1-P1", "AT-I1b-3/3-T2-P1",
+      "AT-I1b-4/1-T1-P1", "AT-I1b-4/3-T2-P1",
+      "AT-I1b-5/1-T1-P1", "AT-I1b-5/3-T2-P1",
+      "AT-I1b-6/1-T1-P1", "AT-I1b-6/3-T2-P1",
+      "AT-I1b-7/1-T1-P1", "AT-I1b-7/3-T2-P1"
+    ],
+    "P2": [
+      "AT-I1b-1/2-T1-P2", "AT-I1b-1/4-T2-P2",
+      "AT-I1b-2/2-T1-P2", "AT-I1b-2/4-T2-P2",
+      "AT-I1b-3/2-T1-P2", "AT-I1b-3/4-T2-P2",
+      "AT-I1b-4/2-T1-P2", "AT-I1b-4/4-T2-P2",
+      "AT-I1b-5/2-T1-P2", "AT-I1b-5/4-T2-P2",
+      "AT-I1b-6/2-T1-P2", "AT-I1b-6/4-T2-P2",
+      "AT-I1b-7/2-T1-P2", "AT-I1b-7/4-T2-P2"
+    ]
+  },
+  "files": [
+    {
+      "path": "tests/test_b103_clipboard_windows.py",
+      "junit_classnames": ["tests.test_b103_clipboard_windows", "test_b103_clipboard_windows"],
+      "expected_count": 77,
+      "tests": [
+        {"name": "test_runner_clipboard_probe"},
+        {"name": "test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_10_1_5_6_no_text_no_powershell", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_4_1_single_line_inserts_first_line_at_cursor"},
+        {"name": "test_r_tui_044_3_1_multi_line_inserts_all_at_cursor"},
+        {"name": "test_r_tui_043_5_1_2_ctrl_v_replaces_selection", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_11_1_code_page_characters_arrive_unchanged", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_12_2_held_clipboard_logs_warning"},
+        {"name": "test_r_tui_043_13_1_no_clipboard_text_in_log_win"},
+        {"name": "test_r_tui_044_2_4_ctrl_v_of_os_text_capped", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_044_2_7_win32_read_bounded_on_no_terminator"},
+        {"name": "test_r_paste_34_2_own_write_strips_single_line"},
+        {"name": "test_r_paste_34_4_win_right_click_strips_single_line"},
+        {"name": "test_r_paste_35_2_own_write_strips_multi_line"},
+        {"name": "test_r_paste_35_4_win_right_click_strips_multi_line"},
+        {"name": "test_r_paste_2_five_consecutive_copies_reach_other_program", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_3_win_copy_puts_selection_on_app_clipboard"},
+        {"name": "test_r_paste_5_win_no_selection_keeps_os_clipboard"},
+        {"name": "test_r_paste_6_win_cut_copies_selection"},
+        {"name": "test_r_paste_9_2_held_clipboard_write_warning", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_11_1_2_copy_ends_within_typed_key_time", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_12_2_copy_over_limit_os", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive"},
+        {"name": "test_r_paste_14_1_held_write_ctrl_c_stays_responsive"},
+        {"name": "test_r_paste_14_2_held_write_right_click_stays_responsive"},
+        {"name": "test_r_tui_043_9_2_held_read_right_click_stays_responsive"},
+        {"name": "test_r_paste_24_1_2_five_right_click_copies", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_24_3_unfocused_multi_line_right_click_copies"},
+        {"name": "test_r_paste_25_26_win_right_click_copy_app_clipboard", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_29_30_win_right_click_paste_placement", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_31_5_6_right_click_no_text_no_powershell", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_6_5_win_right_click_pastes_app_clipboard", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_11_2_right_click_keeps_code_page", "ids": ["single", "multi"]},
+        {"name": "test_r_tui_043_12_3_win_right_click_held_logs_warning"},
+        {"name": "test_r_tui_043_13_2_win_right_click_no_log_leak"},
+        {"name": "test_r_tui_044_2_6_win_right_click_paste_capped", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_12_3_win_right_click_copy_over_limit", "ids": ["single", "multi"]},
+        {"name": "test_r_paste_10_2_win_right_click_copy_logs_warning"},
+        {"name": "test_r_paste_16_1_read_rescue_starts_system_powershell"},
+        {"name": "test_r_paste_16_2_write_rescue_starts_system_powershell"},
+        {"name": "test_r_paste_16_3_decoy_powershell_never_runs"},
+        {"name": "test_r_paste_17_no_powershell_starts_nothing", "ids": ["read", "write"]},
+        {"name": "test_r_paste_21_5_direct_win32_call_opens_nothing_and_fails"}
+      ]
+    },
+    {
+      "path": "tests/test_b103_clipboard_matrix.py",
+      "junit_classnames": ["tests.test_b103_clipboard_matrix", "test_b103_clipboard_matrix"],
+      "expected_count": 37,
+      "skip": {"category": "legacy-linux-h", "reason": "Windows only"},
+      "tests": [
+        {
+          "name": "test_at_i1a_matrix_copy_then_paste",
+          "ids": [
+            "A->A_ctrl_c_ctrl_v", "A->A_ctrl_c_terminal", "A->A_ctrl_c_right_click",
+            "A->A_right_click_ctrl_v", "A->A_right_click_terminal", "A->A_right_click_right_click",
+            "A->M_ctrl_c_ctrl_v", "A->M_ctrl_c_terminal", "A->M_ctrl_c_right_click",
+            "A->M_right_click_ctrl_v", "A->M_right_click_terminal", "A->M_right_click_right_click",
+            "M->A_ctrl_c_ctrl_v", "M->A_ctrl_c_terminal", "M->A_ctrl_c_right_click",
+            "M->A_right_click_ctrl_v", "M->A_right_click_terminal", "M->A_right_click_right_click",
+            "M->M_ctrl_c_ctrl_v", "M->M_ctrl_c_terminal", "M->M_ctrl_c_right_click",
+            "M->M_right_click_ctrl_v", "M->M_right_click_terminal", "M->M_right_click_right_click"
+          ]
+        },
+        {"name": "test_r_tui_044_1_walk_single_line_round_trip", "ids": ["workspace", "a2l", "mac", "patch", "diff", "crc_designer"]},
+        {"name": "test_r_tui_044_1_10_command_palette_box_round_trip"},
+        {"name": "test_r_tui_044_1_11_load_dialog_path_box_round_trip"},
+        {"name": "test_r_paste_18_walk_multi_line_round_trip", "ids": ["patch", "sje"]},
+        {"name": "test_r_tui_044_1_7_flow_ref_box_round_trip"},
+        {"name": "test_r_tui_044_1_8_fx_set_name_box_round_trip"},
+        {"name": "test_r_tui_044_1_5_check_mem_address_box_round_trip"}
+      ]
+    },
+    {
+      "path": "tests/test_b103_copy_views.py",
+      "junit_classnames": ["tests.test_b103_copy_views", "test_b103_copy_views"],
+      "expected_count": 54,
+      "tests": [
+        {
+          "name": "test_r_copy_1_ctrl_c_writes_each_view",
+          "ids": ["R-COPY.1/1", "R-COPY.1/2", "R-COPY.1/3", "R-COPY.1/4", "R-COPY.1/5", "R-COPY.1/6"],
+          "obligations": [
+            {"id": "R-COPY.1/1", "requirement": "R-COPY.1/1", "internal_arms": ["hex-selection", "separate-os-read"]},
+            {"id": "R-COPY.1/2", "requirement": "R-COPY.1/2", "internal_arms": ["stats-selection", "separate-os-read"]},
+            {"id": "R-COPY.1/3", "requirement": "R-COPY.1/3", "internal_arms": ["summary-selection", "separate-os-read"]},
+            {"id": "R-COPY.1/4", "requirement": "R-COPY.1/4", "internal_arms": ["detail-selection", "separate-os-read"]},
+            {"id": "R-COPY.1/5", "requirement": "R-COPY.1/5", "internal_arms": ["json-selection", "separate-os-read"]},
+            {"id": "R-COPY.1/6", "requirement": "R-COPY.1/6", "internal_arms": ["help-selection", "separate-os-read"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_2_app_clipboard",
+          "ids": ["R-COPY.2/1", "R-COPY.2/2", "R-COPY.2/3", "R-COPY.2/4"],
+          "skips": [{"id": "R-COPY.2/4", "category": "linux-only", "reason": "Linux-only existing failing-writer arm"}],
+          "obligations": [
+            {"id": "R-COPY.2/1", "requirement": "R-COPY.2/1", "internal_arms": ["key", "app-base-osc-writer"]},
+            {"id": "R-COPY.2/2", "requirement": "R-COPY.2/2", "internal_arms": ["right-view", "app-base-osc-writer"]},
+            {"id": "R-COPY.2/3", "requirement": "R-COPY.2/3", "internal_arms": ["right-row", "app-base-osc-writer"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_4_full_row_names",
+          "ids": ["R-COPY.4/1", "R-COPY.4/2", "R-COPY.4/3"],
+          "obligations": [
+            {"id": "R-COPY.4/1", "requirement": "R-COPY.4/1", "internal_arms": ["a2l-row-3", "separate-os-read"]},
+            {"id": "R-COPY.4/2", "requirement": "R-COPY.4/2", "internal_arms": ["mac-rich-text", "mac-long-rich-text", "separate-os-read"]},
+            {"id": "R-COPY.4/3", "requirement": "R-COPY.4/3", "internal_arms": ["a2l-row-5-other-highlight", "separate-os-read"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_10_one_osc52_request",
+          "ids": ["R-COPY.10/1", "R-COPY.10/2", "R-COPY.10/3"],
+          "obligations": [
+            {"id": "R-COPY.10/1", "requirement": "R-COPY.10/1", "internal_arms": ["key", "one-decoded-osc52"]},
+            {"id": "R-COPY.10/2", "requirement": "R-COPY.10/2", "internal_arms": ["right-view", "one-decoded-osc52"]},
+            {"id": "R-COPY.10/3", "requirement": "R-COPY.10/3", "internal_arms": ["right-row", "one-decoded-osc52"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_11_selection_and_highlight_do_not_copy",
+          "ids": ["R-COPY.11/1", "R-COPY.11/2", "R-COPY.11/3", "R-COPY.11/4", "R-COPY.11/5"],
+          "obligations": [
+            {"id": "R-COPY.11/1", "requirement": "R-COPY.11/1", "internal_arms": ["left-drag", "zero-writers-osc-os-write"]},
+            {"id": "R-COPY.11/2", "requirement": "R-COPY.11/2", "internal_arms": ["row-highlight", "zero-writers-osc-os-write"]},
+            {"id": "R-COPY.11/3", "requirement": "R-COPY.11/3", "internal_arms": ["f7-selection", "zero-writers-osc-os-write"]},
+            {"id": "R-COPY.11/4", "requirement": "R-COPY.11/4", "internal_arms": ["left-click-row", "zero-writers-osc-os-write"]},
+            {"id": "R-COPY.11/5", "requirement": "R-COPY.11/5", "internal_arms": ["right-drag-not-forwarded", "right-drag-forwarded", "zero-writers-osc-os-write"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_12_right_click_selection",
+          "ids": ["R-COPY.12/1", "R-COPY.12/2", "R-COPY.12/3", "R-COPY.12/4", "R-COPY.12/5", "R-COPY.12/6"],
+          "obligations": [
+            {"id": "R-COPY.12/1", "requirement": "R-COPY.12/1", "internal_arms": ["hex", "separate-os-read"]},
+            {"id": "R-COPY.12/2", "requirement": "R-COPY.12/2", "internal_arms": ["stats", "separate-os-read"]},
+            {"id": "R-COPY.12/3", "requirement": "R-COPY.12/3", "internal_arms": ["detail", "separate-os-read"]},
+            {"id": "R-COPY.12/4", "requirement": "R-COPY.12/4", "internal_arms": ["json", "separate-os-read"]},
+            {"id": "R-COPY.12/5", "requirement": "R-COPY.12/5", "internal_arms": ["help", "separate-os-read"]},
+            {"id": "R-COPY.12/6", "requirement": "R-COPY.12/6", "internal_arms": ["cross-widget", "separate-os-read"]}
+          ]
+        },
+        {"name": "test_r_copy_12_7_back_to_back_and_reentry", "obligation": {"requirement": "R-COPY.12/7", "internal_arms": ["replacement", "back-to-back", "reentry-replay", "separate-os-read"]}},
+        {"name": "test_r_copy_12_8_positive_bounds_and_cardinality", "obligation": {"requirement": "R-COPY.12/8", "internal_arms": ["hex", "a2l", "mac", "positive-bounds", "cardinality"]}},
+        {
+          "name": "test_r_copy_13_empty_and_cancelled_gestures",
+          "ids": ["R-COPY.13/1", "R-COPY.13/2", "R-COPY.13/3", "R-COPY.13/4", "R-COPY.13/5", "R-COPY.13/6", "R-COPY.13/7", "R-COPY.13/8", "R-COPY.13/9"],
+          "obligations": [
+            {"id": "R-COPY.13/1", "requirement": "R-COPY.13/1", "internal_arms": ["empty-selection", "seed-unchanged"]},
+            {"id": "R-COPY.13/2", "requirement": "R-COPY.13/2", "internal_arms": ["empty-json-selection", "seed-unchanged"]},
+            {"id": "R-COPY.13/3", "requirement": "R-COPY.13/3", "internal_arms": ["empty-help-selection", "seed-unchanged"]},
+            {"id": "R-COPY.13/4", "requirement": "R-COPY.13/4", "internal_arms": ["unselected-view", "seed-unchanged"]},
+            {"id": "R-COPY.13/5", "requirement": "R-COPY.13/5", "internal_arms": ["table-padding", "seed-unchanged"]},
+            {"id": "R-COPY.13/6", "requirement": "R-COPY.13/6", "internal_arms": ["empty-table", "seed-unchanged"]},
+            {"id": "R-COPY.13/7", "requirement": "R-COPY.13/7", "internal_arms": ["right-drag-not-forwarded", "right-drag-forwarded", "seed-unchanged"]},
+            {"id": "R-COPY.13/8", "requirement": "R-COPY.13/8", "internal_arms": ["return-to-start-not-forwarded", "return-to-start-forwarded", "seed-unchanged"]},
+            {"id": "R-COPY.13/9", "requirement": "R-COPY.13/9", "internal_arms": ["a2l-padding", "mac-padding", "seed-unchanged"]}
+          ]
+        },
+        {
+          "name": "test_r_copy_14_empty_and_cancelled_gestures_have_no_notice",
+          "ids": ["R-COPY.14/1", "R-COPY.14/2", "R-COPY.14/3", "R-COPY.14/4", "R-COPY.14/5", "R-COPY.14/6", "R-COPY.14/7", "R-COPY.14/8", "R-COPY.14/9"],
+          "obligations": [
+            {"id": "R-COPY.14/1", "requirement": "R-COPY.14/1", "internal_arms": ["empty-selection", "zero-notices"]},
+            {"id": "R-COPY.14/2", "requirement": "R-COPY.14/2", "internal_arms": ["empty-json-selection", "zero-notices"]},
+            {"id": "R-COPY.14/3", "requirement": "R-COPY.14/3", "internal_arms": ["empty-help-selection", "zero-notices"]},
+            {"id": "R-COPY.14/4", "requirement": "R-COPY.14/4", "internal_arms": ["unselected-view", "zero-notices"]},
+            {"id": "R-COPY.14/5", "requirement": "R-COPY.14/5", "internal_arms": ["table-padding", "zero-notices"]},
+            {"id": "R-COPY.14/6", "requirement": "R-COPY.14/6", "internal_arms": ["empty-table", "zero-notices"]},
+            {"id": "R-COPY.14/7", "requirement": "R-COPY.14/7", "internal_arms": ["right-drag-not-forwarded", "right-drag-forwarded", "zero-notices"]},
+            {"id": "R-COPY.14/8", "requirement": "R-COPY.14/8", "internal_arms": ["return-to-start-not-forwarded", "return-to-start-forwarded", "zero-notices"]},
+            {"id": "R-COPY.14/9", "requirement": "R-COPY.14/9", "internal_arms": ["a2l-padding", "mac-padding", "zero-notices"]}
+          ]
+        },
+        {"name": "test_r_copy_15_right_click_clears_selection", "ids": ["R-COPY.15/1", "R-COPY.15/2", "R-COPY.15/3"]},
+        {"name": "test_r_copy_21_valid_right_click_highlights_without_selection", "ids": ["R-COPY.21/1", "R-COPY.21/2"]},
+        {"name": "test_r_copy_22_right_click_does_not_jump_hex", "ids": ["R-COPY.22/1", "R-COPY.22/2"]}
+      ]
+    },
+    {
+      "path": "tests/test_b103_clipboard_tail.py",
+      "junit_classnames": ["tests.test_b103_clipboard_tail", "test_b103_clipboard_tail"],
+      "expected_count": 31,
+      "tests": [
+        {"name": "test_r_copy_06_1_button_keeps_seeds", "obligation": {"requirement": "R-COPY.6/1", "internal_arms": ["button-focus", "while-open-os-read", "after-n-os-read"]}},
+        {"name": "test_r_copy_06_2_no_focus_keeps_seeds", "obligation": {"requirement": "R-COPY.6/2", "internal_arms": ["no-focus", "while-open-os-read", "after-n-os-read"]}},
+        {"name": "test_r_copy_06_3_highlighted_row_is_not_a_selection", "obligation": {"requirement": "R-COPY.6/3", "internal_arms": ["highlighted-row", "while-open-os-read", "after-n-os-read"]}},
+        {"name": "test_r_copy_06_4_empty_input_keeps_seeds", "obligation": {"requirement": "R-COPY.6/4", "internal_arms": ["empty-input", "while-open-os-read", "after-n-os-read"]}},
+        {"name": "test_r_copy_06_5_empty_json_selection_keeps_seeds", "obligation": {"requirement": "R-COPY.6/5", "internal_arms": ["empty-json-selection", "while-open-os-read", "after-n-os-read"]}},
+        {"name": "test_r_copy_07_1_row_notice_once", "obligation": {"requirement": "R-COPY.7/1", "internal_arms": ["row-copy", "one-notice", "separate-os-read"]}},
+        {"name": "test_r_copy_07_2_stats_right_click_notice", "obligation": {"requirement": "R-COPY.7/2", "internal_arms": ["stats-right-click", "one-notice", "separate-os-read"]}},
+        {"name": "test_r_copy_07_3_hex_key_notice", "obligation": {"requirement": "R-COPY.7/3", "internal_arms": ["hex-key", "one-notice", "separate-os-read"]}},
+        {"name": "test_r_copy_07_4_direct_input_copy_notice", "obligation": {"requirement": "R-COPY.7/4", "internal_arms": ["direct-input-copy", "selection-unchanged", "separate-os-read"]}},
+        {"name": "test_r_copy_07_5_direct_textarea_copy_and_final_lf", "obligation": {"requirement": "R-COPY.7/5", "internal_arms": ["no-final-lf", "final-lf", "separate-os-read"]}},
+        {"name": "test_r_copy_07_6_direct_cut_notices_and_cap", "obligation": {"requirement": "R-COPY.7/6", "internal_arms": ["input", "textarea", "textarea-line-cut", "input-over-cap", "textarea-over-cap"]}},
+        {"name": "test_r_copy_07_7_direct_right_click_notice_once", "obligation": {"requirement": "R-COPY.7/7", "internal_arms": ["input", "textarea", "e3a-24c-unrelated-view"]}},
+        {"name": "test_r_copy_07_8_failed_write_has_no_success_notice", "skip": {"category": "linux-only", "reason": "Linux failing-writer arm; WinCI uses the isolated held clipboard"}},
+        {"name": "test_r_copy_08_1_key_caps_json_and_direct_boxes", "obligation": {"requirement": "R-COPY.8/1", "internal_arms": ["json-key", "input-key", "textarea-key"]}},
+        {"name": "test_r_copy_08_2_right_click_caps_json_and_direct_boxes", "obligation": {"requirement": "R-COPY.8/2", "internal_arms": ["json-right", "input-right", "textarea-right"]}},
+        {"name": "test_r_copy_09_1_cut_notice_original_n_and_boundaries", "obligation": {"requirement": "R-COPY.9/1", "internal_arms": ["original-75210", "exact-65536", "after-65537", "failed-over-cap-write"]}},
+        {"name": "test_r_copy_09_2_right_click_cut_notice_original_n", "obligation": {"requirement": "R-COPY.9/2", "internal_arms": ["right-click", "original-n", "separate-os-read"]}},
+        {"name": "test_r_copy_25_1_view_and_row_nul_fail_closed", "obligation": {"requirement": "R-COPY.25/1", "internal_arms": ["view-key", "view-right-click", "a2l-full-name-right-click"]}},
+        {"name": "test_r_copy_25_2_every_direct_box_route_nul_fail_closed", "obligation": {"requirement": "R-COPY.25/2", "internal_arms": ["input-copy", "input-cut", "input-right", "textarea-copy", "textarea-cut", "textarea-right"]}},
+        {"name": "test_r_copy_25_3_nul_only_after_cap_is_allowed", "obligation": {"requirement": "R-COPY.25/3", "internal_arms": ["view-key", "input-copy", "textarea-copy"]}},
+        {"name": "test_r_paste_09_101_view_key_failure_warning", "skip": {"category": "linux-only", "reason": "Linux failing-writer arm"}},
+        {"name": "test_r_paste_09_102_view_right_failure_warning", "skip": {"category": "linux-only", "reason": "Linux failing-writer arm"}},
+        {"name": "test_r_paste_09_103_row_right_failure_warning", "skip": {"category": "linux-only", "reason": "Linux failing-writer arm"}},
+        {"name": "test_r_paste_10_101_exact_tail_warning_without_payload", "skip": {"category": "linux-only", "reason": "Linux failing-writer arm"}},
+        {"name": "test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs", "obligation": {"requirement": "R-TUI-043.13/101", "internal_arms": ["view-key-real-writer", "view-right-click-real-writer", "row-success-real-writer", "row-held-real-writer"]}},
+        {"name": "test_e5_powershell_preserves_lf_and_emits_bom_free_readers"},
+        {"name": "test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs", "obligation": {"requirement": "R-TUI-043.13/102", "internal_arms": ["winci-real-powershell", "exact-payload", "argv-stdin-cwd", "clean-logs"]}},
+        {"name": "test_r_paste_13_101_held_row_copy_warns_within_bound", "obligation": {"requirement": "R-PASTE.13/101", "internal_arms": ["held-real-clipboard", "one-cascade", "elapsed-bound"]}},
+        {"name": "test_r_paste_14_101_view_key_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/101", "internal_arms": ["view-key", "writer-off-thread", "tick-lateness"]}},
+        {"name": "test_r_paste_14_102_view_right_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/102", "internal_arms": ["view-right", "writer-off-thread", "tick-lateness"]}},
+        {"name": "test_r_paste_14_103_row_right_write_stays_responsive", "obligation": {"requirement": "R-PASTE.14/103", "internal_arms": ["row-right", "writer-off-thread", "tick-lateness"]}}
+      ]
+    },
+    {
+      "path": "tests/test_b103_copy_quit_dialog.py",
+      "junit_classnames": ["tests.test_b103_copy_quit_dialog", "test_b103_copy_quit_dialog"],
+      "expected_count": 28,
+      "tests": [
+        {"name": "test_r_copy_16_1_button_and_materialized_empty_selection", "obligation": {"requirement": "R-COPY.16/1", "internal_arms": ["standard-not-materialized", "standard-materialized", "wide-not-materialized", "wide-materialized", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_16_2_no_widget_focused", "obligation": {"requirement": "R-COPY.16/2", "internal_arms": ["no-focus", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_16_3_highlighted_table_row_is_not_selection", "obligation": {"requirement": "R-COPY.16/3", "internal_arms": ["highlighted-row", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_16_4_empty_single_line_input", "obligation": {"requirement": "R-COPY.16/4", "internal_arms": ["empty-input", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_16_5_empty_json_selection", "obligation": {"requirement": "R-COPY.16/5", "internal_arms": ["empty-json-selection", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_16_6_multiline_text_without_selection", "obligation": {"requirement": "R-COPY.16/6", "internal_arms": ["multiline-no-selection", "while-open-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_17_1_y_quits_within_one_second"},
+        {"name": "test_r_copy_17_2_tab_enter_on_quit"},
+        {"name": "test_r_copy_17_3_click_quit"},
+        {"name": "test_r_copy_18_1_stay_has_confirm_emphasis"},
+        {"name": "test_r_copy_19_1_busy_ctrl_c_opens_busy_question"},
+        {"name": "test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection", "obligation": {"requirement": "R-COPY.20/1", "internal_arms": ["not-materialized", "materialized", "before-and-after-ctrl-c-os-read", "after-escape-os-read"]}},
+        {"name": "test_r_copy_20_2_load_dialog_stays_top", "obligation": {"requirement": "R-COPY.20/2", "internal_arms": ["load-modal", "before-and-after-ctrl-c-os-read", "after-escape-os-read"]}},
+        {"name": "test_r_copy_20_3_existing_copy_quit_stays_single", "obligation": {"requirement": "R-COPY.20/3", "internal_arms": ["single-body-b", "before-and-after-second-ctrl-c-os-read", "after-stay-os-read"]}},
+        {"name": "test_r_copy_20_4_busy_question_stays_top"},
+        {"name": "test_r_copy_23_1_idle_q_asks_without_selection"},
+        {"name": "test_r_copy_23_2_q_with_selection_and_second_q_stays_single"},
+        {"name": "test_r_copy_24_1_ctrl_q_quits_immediately"},
+        {"name": "test_r_copy_24_2_palette_quit_quits_immediately"},
+        {"name": "test_r_dlg_1_101_window_keys_do_not_act_behind_dialog"},
+        {"name": "test_r_dlg_2_101_escape_answers_stay"},
+        {"name": "test_r_dlg_6_101_initial_focus_is_stay"},
+        {"name": "test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state"},
+        {"name": "test_r_dlg_11_101_buttons_expose_exact_keys"},
+        {"name": "test_r_dlg_12_101_n_presses_stay"},
+        {"name": "test_r_dlg_12_102_y_presses_quit"},
+        {"name": "test_r_dlg_14_101_copy_quit_has_reachable_shared_opener"},
+        {"name": "test_r_quit_8_101_confirmed_busy_quit_waits_for_load"}
+      ]
+    },
+    {
+      "path": "tests/test_b103_copy_paste_matrix.py",
+      "junit_classnames": ["tests.test_b103_copy_paste_matrix", "test_b103_copy_paste_matrix"],
+      "expected_count": 29,
+      "tests": [
+        {
+          "name": "test_copy_paste_acceptance_cell",
+          "ids": [
+            "AT-I1b-1/1-T1-P1", "AT-I1b-1/2-T1-P2", "AT-I1b-1/3-T2-P1", "AT-I1b-1/4-T2-P2",
+            "AT-I1b-2/1-T1-P1", "AT-I1b-2/2-T1-P2", "AT-I1b-2/3-T2-P1", "AT-I1b-2/4-T2-P2",
+            "AT-I1b-3/1-T1-P1", "AT-I1b-3/2-T1-P2", "AT-I1b-3/3-T2-P1", "AT-I1b-3/4-T2-P2",
+            "AT-I1b-4/1-T1-P1", "AT-I1b-4/2-T1-P2", "AT-I1b-4/3-T2-P1", "AT-I1b-4/4-T2-P2",
+            "AT-I1b-5/1-T1-P1", "AT-I1b-5/2-T1-P2", "AT-I1b-5/3-T2-P1", "AT-I1b-5/4-T2-P2",
+            "AT-I1b-6/1-T1-P1", "AT-I1b-6/2-T1-P2", "AT-I1b-6/3-T2-P1", "AT-I1b-6/4-T2-P2",
+            "AT-I1b-7/1-T1-P1", "AT-I1b-7/2-T1-P2", "AT-I1b-7/3-T2-P1", "AT-I1b-7/4-T2-P2"
+          ],
+          "obligations": [
+            {"id": "AT-I1b-1/1-T1-P1", "requirement": "AT-I1b-1/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-1/2-T1-P2", "requirement": "AT-I1b-1/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-1/3-T2-P1", "requirement": "AT-I1b-1/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-1/4-T2-P2", "requirement": "AT-I1b-1/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-2/1-T1-P1", "requirement": "AT-I1b-2/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-2/2-T1-P2", "requirement": "AT-I1b-2/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-2/3-T2-P1", "requirement": "AT-I1b-2/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-2/4-T2-P2", "requirement": "AT-I1b-2/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-3/1-T1-P1", "requirement": "AT-I1b-3/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-3/2-T1-P2", "requirement": "AT-I1b-3/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-3/3-T2-P1", "requirement": "AT-I1b-3/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-3/4-T2-P2", "requirement": "AT-I1b-3/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-4/1-T1-P1", "requirement": "AT-I1b-4/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-4/2-T1-P2", "requirement": "AT-I1b-4/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-4/3-T2-P1", "requirement": "AT-I1b-4/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-4/4-T2-P2", "requirement": "AT-I1b-4/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-5/1-T1-P1", "requirement": "AT-I1b-5/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-5/2-T1-P2", "requirement": "AT-I1b-5/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-5/3-T2-P1", "requirement": "AT-I1b-5/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-5/4-T2-P2", "requirement": "AT-I1b-5/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-6/1-T1-P1", "requirement": "AT-I1b-6/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-6/2-T1-P2", "requirement": "AT-I1b-6/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-6/3-T2-P1", "requirement": "AT-I1b-6/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-6/4-T2-P2", "requirement": "AT-I1b-6/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-7/1-T1-P1", "requirement": "AT-I1b-7/1", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-7/2-T1-P2", "requirement": "AT-I1b-7/2", "internal_arms": ["right-click-copy", "separate-os-read", "T1-first-line", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"},
+            {"id": "AT-I1b-7/3-T2-P1", "requirement": "AT-I1b-7/3", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P1-ctrl-v"], "at_partition": "P1"},
+            {"id": "AT-I1b-7/4-T2-P2", "requirement": "AT-I1b-7/4", "internal_arms": ["right-click-copy", "separate-os-read", "T2-exact-text", "P2-terminal-paste-from-os-artifact"], "at_partition": "P2"}
+          ]
+        },
+        {
+          "name": "test_manual_windows_terminal_operator_acceptance",
+          "skip": {
+            "category": "manual",
+            "reason": "AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access",
+            "manual_id": "AT-I1b-8"
+          }
+        }
+      ]
+    }
+  ]
+}

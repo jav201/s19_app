@@ -1,0 +1,22 @@
+{
+  "round": "b103_ux_r2",
+  "gate": "G2",
+  "base": "e07fb00",
+  "exported_at": "2026-11-12T03:47:15.248Z",
+  "answers": {
+    "q1_pe": "approve",
+    "q2_av": "approve",
+    "q2_order": "reads_right",
+    "q3_body": "A",
+    "q4_q": "A",
+    "q5_ctrlc_sel": "approve",
+    "q6_notices": "approve",
+    "q7_export": "B",
+    "q7_default": "always_ask"
+  },
+  "notes": {
+    "q2_av": "El visor de hex en esta pantalla siempre salen las lineas del hex en dos líneas, haciendo la visibilidad pobre, revisa el despliegue busca alternativas como aumentar el tamaño de ancho de ese visor. ",
+    "q3_body": "Recuerda revisar que los diálogos siempre desplieguen bien los textos botones y campos de entrada de texto, en la versión del batch 101 esto tenía problemas en el check editor y patch editor. Lo dejo aquí como nota para que no se repita. "
+  },
+  "general_note": ""
+}

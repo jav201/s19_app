@@ -16,9 +16,12 @@ from datetime import datetime, timezone
 from typing import Any, Callable, List, Literal, Mapping, Optional, Sequence, Tuple
 
 from textual import events, work
+from textual.actions import SkipAction
 from textual.app import App, ComposeResult
+from textual.geometry import Offset
 from textual.message import Message
 from textual.binding import Binding
+from textual.screen import Screen
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.timer import Timer
 from textual.reactive import reactive
@@ -84,7 +87,8 @@ from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet, VariantDescriptor
 from .operations import get_operation, list_operation_ids
-from .os_clipboard_input import OsClipboardInput
+from .os_clipboard_input import OsClipboardInput, _mirror_and_write_os_clipboard
+from .capped_text_area import CappedTextArea
 from .rail import Rail, RailEntry, RailItem, RAIL_ENTRIES
 from .screens import (
     ChangeSetJsonScreen,
@@ -458,6 +462,11 @@ _QUIT_TITLE = "Quit?"
 _QUIT_BODY = "still working: {label} — wait, or quit after it finishes"
 _QUIT_YES, _QUIT_NO = "Quit (y)", "Stay (n)"
 
+#: Inc 1b (S7, G2 r2 q3_body=B): the copy-quit dialog's body — shown when
+#: Ctrl+C reaches the shared fallback with nothing selected to copy, or when
+#: ``q`` is pressed while idle (R-COPY.16 / R-COPY.23).
+_COPY_QUIT_BODY = "Quit the app? Nothing is selected to copy."
+
 
 class _QuitQuestionScreen(ConfirmQuestionScreen):
     """The quit question (HLR-177b); a subclass so ``action_quit`` can
@@ -468,6 +477,34 @@ class _QuitQuestionScreen(ConfirmQuestionScreen):
     ``Quit (y)`` the plain one."""
 
     PRIMARY_BUTTON = "confirm_no"
+
+
+class _CopyQuitScreen(_QuitQuestionScreen):
+    """The copy-quit dialog (Inc 1b, R-COPY.16 / R-COPY.23): the same
+    ``Quit?`` shell as :class:`_QuitQuestionScreen`, opened by the shared
+    ``action_help_quit`` opener when the operator pressed ``q`` while idle
+    or Ctrl+C with nothing selected to copy (G2 r2 body B). It declares no
+    methods: ``AUTO_FOCUS = "#confirm_no"``, ``PRIMARY_BUTTON``, the
+    ``y`` / ``n`` / ``escape`` bindings, the plain-text labels and the
+    one-answer ``_dismissed`` guard all come from the inherited
+    ``ConfirmQuestionScreen`` chain (``screens.py``). ``action_quit``'s
+    ``isinstance`` stack guard recognises it through ``_QuitQuestionScreen``."""
+
+
+@dataclass(frozen=True)
+class _RightGesture:
+    """Inc 1b (S7): the one transient right-click candidate (N3).
+
+    Holds the pre-dispatch snapshot captured on a button-3 ``MouseDown`` —
+    the text to copy (or ``None``), the press offset, screen and widget, and
+    a ``valid`` flag that a changed-offset ``MouseMove`` clears permanently.
+    It is gesture state, not session-action state (TC-B100-09)."""
+
+    text: Optional[str]
+    screen_offset: Optional[Offset]
+    screen: Optional[Screen]
+    widget: Optional[Widget]
+    valid: bool
 
 
 @dataclass(frozen=True)
@@ -1224,6 +1261,17 @@ def _mac_status_glyph(status: str, in_mem: str) -> tuple[str, str]:
     return _MAC_GLYPH_UNCHECKED
 
 
+#: Inc 1b (S7): the four status glyphs the MAC producer prepends to a record
+#: name (``_populate_mac_datatable``); ``S19TuiApp._right_click_text`` removes
+#: exactly one of these glyph-plus-space prefixes from a stored Rich cell.
+_MAC_COPY_GLYPHS: tuple[str, ...] = (
+    _MAC_GLYPH_PARSE_ERROR[0],
+    _MAC_GLYPH_OUT_OF_IMAGE[0],
+    _MAC_GLYPH_IN_IMAGE[0],
+    _MAC_GLYPH_UNCHECKED[0],
+)
+
+
 #: Fixed cell budget for the Workspace per-range coverage micro-bar (LLR-042.7).
 #: Small enough (<= the ~18 usable cols of the 22-wide ``#ws_left`` pane) that the
 #: bar renders as an ADDED third line inside the range row without widening it.
@@ -1453,7 +1501,87 @@ def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
     return text
 
 
-class A2LTagTable(DataTable):
+class _CopyRowTable(DataTable):
+    """
+    Summary:
+        Shared row-copy table base (Inc 1b, R-COPY.21 / R-COPY.22): the one
+        base for both copy-able tables — ``A2LTagTable`` and the MAC records
+        table. It owns only the non-left click policy: a button-3 (or any
+        non-left) click on a valid in-bounds row moves the cursor/highlight
+        and suppresses the toolkit's ``RowSelected`` / hex-jump route, while
+        left clicks keep the toolkit default and ``out_of_bounds=True``
+        padding is prevented from default and returns without moving the
+        cursor or emitting ``RowSelected``. Row-name resolution stays in
+        ``S19TuiApp._right_click_text``; this class never reads a name.
+
+    Data Flow:
+        - ``#a2l_tags_list`` is an ``A2LTagTable`` (this base) and
+          ``#mac_records_list`` is a direct instance of this class
+          (``_compose_screen_mac``).
+        - ``on_click`` runs before ``DataTable._on_click`` in the MRO; a
+          ``prevent_default()`` there stops the toolkit default route.
+
+    Dependencies:
+        Uses:
+            - textual.widgets.DataTable ; textual.events.Click
+        Used by:
+            - ``A2LTagTable`` (subclass)
+            - ``S19TuiApp._compose_screen_mac``
+    """
+
+    def on_click(self, event: events.Click) -> None:
+        """
+        Summary:
+            Non-left click on a valid in-bounds row moves the cursor and
+            suppresses only the toolkit's selection route; left clicks keep
+            the toolkit default, while ``out_of_bounds=True`` padding is
+            prevented from default and returns without moving the cursor or
+            emitting ``RowSelected`` (Inc 1b, R-COPY.21 / R-COPY.22).
+
+        Args:
+            event (events.Click): The click, carrying the cell's
+                ``row`` / ``column`` / ``out_of_bounds`` metadata in
+                ``event.style.meta``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``out_of_bounds=True`` is empty row padding: prevent the
+              default and return without moving the cursor or emitting
+              ``RowSelected`` (no copy, no hex jump).
+            - An in-bounds ``button == 1`` click returns untouched, so
+              ``DataTable._on_click`` still runs (highlight +
+              ``RowSelected`` + hex jump on an already-highlighted row).
+            - Any other button on a valid in-bounds row calls public
+              :meth:`DataTable.move_cursor` (so ``RowHighlighted`` and
+              cursor scrolling fire) and then ``prevent_default()`` before
+              MRO dispatch can reach ``DataTable._on_click``.
+
+        Dependencies:
+            Uses:
+                - ``DataTable.move_cursor``
+                - ``events.Click.prevent_default``
+            Used by:
+                - Textual ``Click`` dispatch for both copy tables
+        """
+        meta = event.style.meta
+        if meta.get("out_of_bounds", False):
+            event.prevent_default()
+            return
+        if event.button == 1:
+            return
+        row = meta.get("row")
+        column = meta.get("column")
+        if not (isinstance(row, int) and isinstance(column, int)):
+            return
+        if not (0 <= row < self.row_count and column >= 0):
+            return
+        self.move_cursor(row=row, column=column, animate=True)
+        event.prevent_default()
+
+
+class A2LTagTable(_CopyRowTable):
     """
     Summary:
         The A2L Explorer's tag table, which REPORTS ITS OWN RESIZE
@@ -2899,7 +3027,7 @@ class S19TuiApp(App):
         Binding("ctrl+s", "save_project", "Save project", priority=True),
         ("slash", "focus_find", "Find"),
         ("g", "focus_goto", "Go-to"),
-        ("q", "quit", "Quit"),
+        ("q", "help_quit", "Quit"),
         Binding("l", "load_file", "Load", show=False),
         # Unload-all teardown; per-artifact unload is driven by the Inc-2
         # Workspace "Loaded" panel calling `_apply_unload`. `show=False` keeps
@@ -3033,6 +3161,11 @@ class S19TuiApp(App):
         #: Inc 12b (S-c): quit confirmed while a session action runs; UI
         #: control state, not session state (TC-B100-09).
         self._quit_pending: bool = False
+        #: Inc 1b (S7): the one transient right-click candidate (N3); ``None``
+        #: until a button-3 ``MouseDown`` captures a snapshot, and consumed
+        #: back to ``None`` on every not-forwarded ``MouseUp``. Gesture state,
+        #: not session state (TC-B100-09).
+        self._right_gesture: Optional[_RightGesture] = None
         #: Inc 10a E4-R3: the widget a focus landing last put the focus on
         #: because the shown window's declared target was not shown (or, on
         #: A2L, the switch landing of E4-R4); a completed load moves a focus
@@ -8857,7 +8990,9 @@ class S19TuiApp(App):
             # (batch-47, LLR-071.1/071.2). Numeric-only content → markup=False.
             Static("", id="mac_coverage_strip", markup=False),
             Container(
-                DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
+                _CopyRowTable(
+                    id="mac_records_list", zebra_stripes=True, cursor_type="row"
+                ),
                 Label("", id="mac_records_summary"),
                 id="mac_scroll",
             ),
@@ -10191,9 +10326,12 @@ class S19TuiApp(App):
     def _build_palette_entries(self) -> tuple[PaletteEntry, ...]:
         """
         Summary:
-            Build the command-palette command list 1:1 from ``BINDINGS`` so
+            Build the command-palette command list from ``BINDINGS`` so
             every key-bound action has exactly one palette entry that
-            dispatches the same action id (LLR-003.2 parity by construction).
+            dispatches the same action id (LLR-003.2 parity by construction),
+            except the ``q`` binding's ``help_quit`` which projects to
+            ``PaletteEntry("Quit", "quit")`` so palette Quit keeps the
+            unchanged ``action_quit`` (Inc 1b, R-COPY.24).
 
         Args:
             None
@@ -10207,6 +10345,9 @@ class S19TuiApp(App):
         Data Flow:
             - Walks ``BINDINGS``, keeping the first description seen for
               each distinct action id so aliased keys collapse to one entry.
+            - Projects the ``help_quit`` binding to ``PaletteEntry("Quit",
+              "quit")`` (never ``help_quit``) so palette Quit still exits
+              immediately while idle.
             - Appends ``EXTRA_PALETTE_ENTRIES`` (the keyboard-reachable
               viewer settings command).
 
@@ -10226,6 +10367,9 @@ class S19TuiApp(App):
             if action in seen_actions:
                 continue
             seen_actions.add(action)
+            if action == "help_quit":
+                entries.append(PaletteEntry("Quit", "quit"))
+                continue
             entries.append(PaletteEntry(description, action))
         for label, action in self.EXTRA_PALETTE_ENTRIES:
             entries.append(PaletteEntry(label, action))
@@ -23013,6 +23157,262 @@ class S19TuiApp(App):
         self.set_status(_BUSY_LINE.format(label=run.label))
         self.logger.info("Request refused while busy: %s", run.label)
         return True
+
+    def copy_to_clipboard(self, text: str) -> None:
+        """
+        Summary:
+            Schedule the OS clipboard tail once for a non-empty copy, or
+            raise :class:`textual.actions.SkipAction` for ``""`` (Inc 1b,
+            R-COPY.1 … R-COPY.10, I-1). An empty string raises BEFORE any
+            coroutine or worker is built — a normal return would mark the
+            Ctrl+C binding handled and suppress the idle copy-quit fallback
+            (R-COPY.16). A non-empty string schedules
+            ``_mirror_and_write_os_clipboard(self, text)`` exactly once with
+            the original, untruncated text; the tail alone owns the app
+            clipboard mirror, the 65,536-character cap, the OS write, the
+            NUL refusal (R-COPY.25) and the result notice. Text-box
+            copy/cut still calls the tail directly, never this override.
+
+        Args:
+            text (str): The original, untruncated text to copy.
+
+        Returns:
+            None
+
+        Raises:
+            textual.actions.SkipAction: When ``text == ""``.
+
+        Data Flow:
+            - ``Screen.action_copy_text`` / stock ``TextArea.action_copy``
+              call this override for Ctrl+C and F7-style copies; ``on_event``
+              calls it once for a valid button-3 release.
+
+        Dependencies:
+            Uses:
+                - ``_mirror_and_write_os_clipboard``
+                - ``App.run_worker`` (inherited)
+            Used by:
+                - Textual ``Screen.action_copy_text`` / stock ``TextArea``
+                - ``S19TuiApp.on_event``
+        """
+        if text == "":
+            raise SkipAction
+        self.run_worker(_mirror_and_write_os_clipboard(self, text))
+
+    def _right_click_text(self, x: int, y: int) -> Optional[str]:
+        """
+        Summary:
+            Read-only resolution of the text a button-3 press on the
+            top-screen cell ``(x, y)`` would copy (Inc 1b, R-COPY.4,
+            R-COPY.12 … R-COPY.14). ``None`` means no clipboard action.
+            The early text-box exclusion runs first, then the JSON view's
+            own selection, then the A2L/MAC table row name, then the
+            whole top-screen selection only for a widget that actually
+            holds part of it.
+
+        Args:
+            x (int): Top-screen column of the press.
+            y (int): Top-screen row of the press.
+
+        Returns:
+            Optional[str]: The text to copy, or ``None`` when the press is
+            on a text box, empty space, a header, an unrelated widget, or a
+            table cell with ``out_of_bounds=True``.
+
+        Data Flow:
+            - ``get_widget_at`` + ``get_style_at`` supply the widget and the
+              compositor metadata (``row`` / ``column`` / ``out_of_bounds``)
+              Textual assigns to the forwarded mouse event.
+            - A2L resolves the clicked row key through
+              ``coordinate_to_cell_key((row, 0))`` and reads the mapped
+              tag's full ``name``; MAC reads column 0, normalizes with
+              ``.plain``/``str`` and removes exactly one known
+              glyph-plus-space prefix.
+
+        Dependencies:
+            Uses:
+                - ``OsClipboardInput`` / ``CappedTextArea``
+                - ``Screen.get_widget_at`` / ``Screen.get_style_at``
+                - ``DataTable.coordinate_to_cell_key`` / ``get_row_at``
+                - ``_a2l_row_key_to_tag`` / ``_MAC_COPY_GLYPHS``
+            Used by:
+                - ``S19TuiApp.on_event``
+        """
+        try:
+            widget, _ = self.screen.get_widget_at(x, y)
+        except Exception:
+            return None
+        if any(
+            isinstance(node, (OsClipboardInput, CappedTextArea))
+            for node in widget.ancestors_with_self
+        ):
+            return None
+        meta = self.screen.get_style_at(x, y).meta
+        widget_id = widget.id
+        if widget_id == "patch_json_view":
+            return widget.selected_text or None
+        if widget_id in ("a2l_tags_list", "mac_records_list"):
+            row = meta.get("row")
+            column = meta.get("column")
+            if not (isinstance(row, int) and isinstance(column, int)):
+                return None
+            if meta.get("out_of_bounds", False):
+                return None
+            if not (0 <= row < widget.row_count and column >= 0):
+                return None
+            if widget_id == "a2l_tags_list":
+                try:
+                    row_key, _ = widget.coordinate_to_cell_key((row, 0))
+                except Exception:
+                    return None
+                key_value = getattr(row_key, "value", row_key)
+                key_str = str(key_value) if isinstance(key_value, str) else None
+                tag = (
+                    self._a2l_row_key_to_tag.get(key_str)
+                    if key_str is not None
+                    else None
+                )
+                if isinstance(tag, dict):
+                    name = tag.get("name")
+                    if name:
+                        return str(name)
+                return None
+            try:
+                cell = widget.get_row_at(row)[0]
+            except Exception:
+                return None
+            painted = cell.plain if isinstance(cell, Text) else str(cell)
+            for glyph in _MAC_COPY_GLYPHS:
+                prefix = f"{glyph} "
+                if painted.startswith(prefix):
+                    name = painted[len(prefix):]
+                    return name or None
+            return None
+        selected = self.screen.get_selected_text()
+        if selected and widget in self.screen.selections:
+            return selected
+        return None
+
+    async def on_event(self, event: events.Event) -> None:
+        """
+        Summary:
+            Deferred right-click capture (Inc 1b, R-COPY.11 … R-COPY.15,
+            E3-01): snapshot on button-3 ``MouseDown``, invalidate on any
+            changed-offset ``MouseMove``, and copy once on a valid matching
+            ``MouseUp`` — always before the single ``super().on_event``
+            forward so the toolkit still clears the selection afterwards.
+
+        Args:
+            event (events.Event): The driver event reaching the app entry.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Every not-forwarded ``MouseDown`` first clears any old
+              ``_right_gesture``; button 3 stores a fresh snapshot with
+              ``valid=True`` (no copy on press).
+            - A ``MouseMove`` whose ``screen_offset`` differs permanently
+              clears ``valid`` via ``replace`` (exit-and-return does not
+              restore it).
+            - Every not-forwarded ``MouseUp`` consumes/clears the candidate
+              before a possible copy; a valid button-3 release with the same
+              offset/screen/widget and non-empty text calls
+              ``copy_to_clipboard`` once.
+            - Every path ends with exactly one ``await super().on_event``.
+
+        Dependencies:
+            Uses:
+                - ``_RightGesture`` / ``replace``
+                - ``S19TuiApp._right_click_text``
+                - ``S19TuiApp.copy_to_clipboard``
+            Used by:
+                - Textual driver event dispatch
+        """
+        if isinstance(event, events.MouseDown) and not event.is_forwarded:
+            self._right_gesture = None
+            if event.button == 3:
+                screen = self.screen
+                try:
+                    widget, _ = screen.get_widget_at(event.screen_x, event.screen_y)
+                except Exception:
+                    widget = None
+                self._right_gesture = _RightGesture(
+                    text=self._right_click_text(event.screen_x, event.screen_y),
+                    screen_offset=event.screen_offset,
+                    screen=screen,
+                    widget=widget,
+                    valid=True,
+                )
+        elif isinstance(event, events.MouseMove):
+            candidate = self._right_gesture
+            if candidate is not None and event.screen_offset != candidate.screen_offset:
+                self._right_gesture = replace(candidate, valid=False)
+        elif isinstance(event, events.MouseUp) and not event.is_forwarded:
+            candidate = self._right_gesture
+            self._right_gesture = None
+            if (
+                candidate is not None
+                and event.button == 3
+                and candidate.valid
+                and candidate.text
+                and candidate.screen is self.screen
+                and candidate.screen_offset == event.screen_offset
+            ):
+                try:
+                    widget, _ = self.screen.get_widget_at(event.screen_x, event.screen_y)
+                except Exception:
+                    widget = None
+                if widget is candidate.widget:
+                    self.copy_to_clipboard(candidate.text)
+        await super().on_event(event)
+
+    def action_help_quit(self) -> None:
+        """
+        Summary:
+            Shared q / Ctrl+C fallback (Inc 1b, R-COPY.6, .16, .19, .20,
+            .23): with a running session action it opens the existing busy
+            ``_QuitQuestionScreen`` (R-QUIT.1); otherwise it opens exactly
+            one ``_CopyQuitScreen`` with body B. Both use ``_answer_quit``.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``q`` reaches this via the ``help_quit`` binding (selection
+              present or absent); Ctrl+C reaches it only after a copy raised
+              ``SkipAction`` for nothing selected.
+            - The modal binding chain (C4) already keeps q / Ctrl+C away
+              while any dialog is open, so no explicit modal-stack branch is
+              added and no second dialog is stacked.
+
+        Dependencies:
+            Uses:
+                - ``_running_session_action``
+                - ``_QuitQuestionScreen`` / ``_CopyQuitScreen``
+                - ``_answer_quit``
+            Used by:
+                - the ``q`` binding and the toolkit Ctrl+C fallback
+        """
+        run = self._running_session_action()
+        if run is not None:
+            self.push_screen(
+                _QuitQuestionScreen(
+                    _QUIT_TITLE,
+                    _QUIT_BODY.format(label=run.label),
+                    _QUIT_YES,
+                    _QUIT_NO,
+                ),
+                self._answer_quit,
+            )
+            return
+        self.push_screen(
+            _CopyQuitScreen(_QUIT_TITLE, _COPY_QUIT_BODY, _QUIT_YES, _QUIT_NO),
+            self._answer_quit,
+        )
 
     def action_quit(self) -> None:
         """S-c: quit now, or ask while a session action runs (HLR-177b)."""

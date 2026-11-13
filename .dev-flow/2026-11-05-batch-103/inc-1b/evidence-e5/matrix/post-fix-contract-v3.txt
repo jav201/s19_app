@@ -1,0 +1,9 @@
+PASS external_write_is_exact_and_self_verified
+PASS mismatch_diagnostics_hold_only_metadata
+PASS probe_returns_no_clipboard_content
+PASS other_program_helpers_guard_before_process
+PASS bom_is_not_relaxed_away
+PASS gate_contract
+PASS matrix_and_workflow_contract
+CONTRACT_FAILURES=0
+CONTRACT_EXIT=0

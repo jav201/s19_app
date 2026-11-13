@@ -1,0 +1,10 @@
+matrix/integration-29ce-p1-junit.xml: 15,0,0,0,0,0,1
+matrix/integration-29ce-p1-report.md: 3,0,0,0,0,0,1
+matrix/integration-29ce-p1-transcript.txt: 10,0,0,0,0,0,0
+quit/integration-linux-oracle-error.txt: 3,0,0,0,0,0,0
+quit/integration-linux.txt: 3,0,0,0,0,0,0
+quit/integration-report.md: 4,0,0,0,0,0,0
+tail/integration-29ce-e3a.txt: 3,0,0,0,0,0,0
+tail/integration-29ce-linux.txt: 4,0,0,0,0,0,0
+tail/integration-29ce-report.md: 1,0,0,0,0,0,0
+tail/integration-29ce-setup.txt: 2,0,0,0,0,0,0

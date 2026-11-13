@@ -1,0 +1,74 @@
+s19_app.__file__ = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/tree/s19_app/__init__.py
+integration = 29ce6448e49cc8a67ecf7a5a7c38a4f31833368c
+platform = Linux-7.3.3-1-cachyos-x86_64-with-glibc2.44
+python = 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+HOME = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/home
+TMPDIR = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/tmp
+XDG_CONFIG_HOME = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/xdg-config
+XDG_DATA_HOME = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/xdg-data
+XDG_CACHE_HOME = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/xdg-cache
+LOCALAPPDATA = <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/local-app-data
+DISPLAY = None WAYLAND_DISPLAY = None
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 29 items
+
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] PASSED [  3%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [  6%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] PASSED [ 10%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 13%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] PASSED [ 17%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 20%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] PASSED [ 24%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 27%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] PASSED [ 31%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 34%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] PASSED [ 37%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 41%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] PASSED [ 44%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 48%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] PASSED [ 51%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 55%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] PASSED [ 58%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 62%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] PASSED [ 65%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 68%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] PASSED [ 72%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 75%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] PASSED [ 79%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 82%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] PASSED [ 86%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 89%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] PASSED [ 93%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 96%]
+tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance SKIPPEDminal steps and choose to use his own clipboard;
+no agent access)                                                         [100%]
+
+- generated xml file: <HOME>/work/b103-inc1b-matrix-29ce-TM4GTv/evidence/integration-29ce-p1-junit.xml -
+=========================== short test summary info ============================
+SKIPPED [14] tests/test_b103_copy_paste_matrix.py:33: not_run: terminal paste requires the real copy->separate OS read artifact on isolated WinCI; Linux has no permitted OS read
+SKIPPED [1] tests/test_b103_copy_paste_matrix.py:456: AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access
+================== 14 passed, 15 skipped in 263.37s (0:04:23) ==================
+
+POST_RUN_HEAD=29ce6448e49cc8a67ecf7a5a7c38a4f31833368c
+POST_RUN_STATUS:
+ M tests/test_b103_copy_paste_matrix.py
+POST_RUN_DIFF_CHECK:
+PYTEST_EXIT=0

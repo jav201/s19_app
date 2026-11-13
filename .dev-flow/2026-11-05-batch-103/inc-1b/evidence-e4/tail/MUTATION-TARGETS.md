@@ -1,0 +1,18 @@
+# CLIPBOARD/TAIL mutation targets
+
+E4 writes these targets from `codewire/graph-clipboard.md` and `graph-app.md`; it does not run mutants.
+
+- Override/tail re-entry: an override that mirrors, writes, truncates, sanitizes or notifies; a tail that calls `app.copy_to_clipboard` instead of unbound `App.copy_to_clipboard`; a second tail schedule. Observable: override/tail/base counts differ from view `1/1/1` and direct-box `0/1/1`.
+- Missing early empty-copy `SkipAction`: empty text returns normally, constructs a worker, or changes a seed. Observable: R-COPY.6 counts/seeds and the fallback route owned by the adjacent view/quit family.
+- Cap removal/off-by-one: base or writer gets 75,210/70,000 characters, cap uses 65,535, or `>=` rejects exact 65,536. Observable: independent kept/discarded markers, payload lengths and exact 65,536/65,537 arms.
+- Original-length loss: helper receives capped text, producing `(65,536 in all)` instead of `(75,210 in all)` or `(65,537 in all)`. Observable: helper payload and exact notice.
+- Notice helper defects: singular `1 lines`, final LF counted as another line, ordinary notice substituted for cut notice, notice before writer result, duplicate notice from override and tail, or success/cut notice on writer failure. Observable: settled app notification list and helper/writer order/cardinality.
+- Base/OSC52 cardinality: zero or two base calls, or raw hostile text emitted as an additional terminal request. Observable: base payload list and decoded/raw OSC52 lists.
+- Writer failure: missing six-second warning, duplicate warning in the override, missing exact tail WARNING, or copied text/prefix in either log. Observable: one exact warning, exact `OS clipboard write failed; retained Textual internal clipboard only`, writer cascade WARNING, and secret absence.
+- Right-click producer: no press snapshot, copy on press, clicked/highlighted row instead of the pressed row, painted/truncated/internal-key text, or no valid-release copy. Observable: override count is zero on base and exact model/selection payload is absent.
+- Direct-box routing: box copy/cut/right-click is routed through the view override, bypasses the tail, writes twice, or duplicates a notice. Observable: override `0`, tail/base/writer/OSC52 `1` per gesture; cuts stay deleted even on refusal/failure.
+- Cursor-line cut: no-selection Ctrl+X removes no line, fails to enter the tail, or produces no one-line notice. Observable: `first\nthird`, one payload `line_to_cut` with its permitted line ending, and direct-route counts.
+- Capped-NUL guard moved after base/writer/helper, NUL sanitized, fixed text altered, payload/prefix/escape logged, or a success sink used. Observable: changed seeds and nonzero base/writer/OSC52/process/helper counts instead of all zero, plus missing fixed six-second warning/WARNING.
+- NUL checked in original rather than capped text: the 65,537th character causes refusal. Observable: missing capped write/OSC52/helper and missing `(65,537 in all)` cut notice.
+- Hostile-name sanitization or transport: painted/U+FFFD projection, markup/ESC/BEL/LF removal, payload in argv, non-static command, `shell=True`, missing stdin payload, extra terminal sequence, or raw/prefix/escaped payload in logs. Observable: exact `HOSTILE_NAME` mismatch and process/argv/stdin/raw-write/log assertions.
+- Held-clipboard timing (WinCI only): retry until the eight-second holder releases, duplicate cascade, writer on the event-loop thread. Observable: warning after `timing_bound(2.5)`, writer count greater than one, writer thread equal to UI thread, or any 50 ms tick late by more than `timing_bound(0.1)`.

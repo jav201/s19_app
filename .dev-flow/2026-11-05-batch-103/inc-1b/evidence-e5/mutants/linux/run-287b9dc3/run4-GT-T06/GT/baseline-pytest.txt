@@ -1,0 +1,12 @@
+s19_app.__file__=<HOME>/work/zq-t06/out/GT/pristine/s19_app/__init__.py
+........................................................................ [ 50%]
+.........ssss.............................s.s.s.s.s.s.s.s.s.s.s.s.s.ss   [100%]
+============================= QC-TM timing margins =============================
+83.3%  0.167 s / 1.000 s  test_r_copy_17_3_click_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+83.6%  0.164 s / 1.000 s  test_r_copy_17_1_y_quits_within_one_second  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+83.9%  0.161 s / 1.000 s  test_r_copy_24_2_palette_quit_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+83.9%  0.161 s / 1.000 s  test_r_dlg_12_102_y_presses_quit  tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+84.1%  0.159 s / 1.000 s  test_r_copy_17_2_tab_enter_on_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+86.3%  0.137 s / 1.000 s  test_r_copy_24_1_ctrl_q_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+QC-TM: 6 bounds, 0 under 20 % margin
+123 passed, 19 skipped in 1416.59s (0:23:36)

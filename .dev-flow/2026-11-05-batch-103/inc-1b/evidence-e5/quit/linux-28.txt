@@ -1,0 +1,131 @@
+s19_app.__file__ = /tmp/b103-quit-e5-final-26tD1o/tree/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.2.0, pluggy-1.7.0 -- /tmp/b103-quit-e5-final-26tD1o/venv/bin/python
+rootdir: /tmp/b103-quit-e5-final-26tD1o/tree
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5
+collecting ... collected 28 items
+
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection PASSED [  3%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused PASSED [  7%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection PASSED [ 10%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input PASSED [ 14%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection PASSED [ 17%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection PASSED [ 21%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second PASSED [ 25%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit PASSED [ 28%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit PASSED  [ 32%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis PASSED [ 35%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question PASSED [ 39%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection PASSED [ 42%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top PASSED [ 46%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single PASSED [ 50%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top PASSED [ 53%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection PASSED [ 57%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single PASSED [ 60%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately PASSED [ 64%]
+tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately PASSED [ 67%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog PASSED [ 71%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay PASSED [ 75%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay PASSED [ 78%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state PASSED [ 82%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys PASSED [ 85%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay PASSED [ 89%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit PASSED [ 92%]
+tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener PASSED [ 96%]
+tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load PASSED [100%]
+============================= QC-TM timing margins =============================
+87.3%  0.127 s / 1.000 s  test_r_copy_17_1_y_quits_within_one_second  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+87.5%  0.125 s / 1.000 s  test_r_copy_17_3_click_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+89.8%  0.102 s / 1.000 s  test_r_copy_24_2_palette_quit_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+90.0%  0.100 s / 1.000 s  test_r_dlg_12_102_y_presses_quit  tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+90.3%  0.097 s / 1.000 s  test_r_copy_17_2_tab_enter_on_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+92.0%  0.080 s / 1.000 s  test_r_copy_24_1_ctrl_q_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+QC-TM: 6 bounds, 0 under 20 % margin
+
+============================== slowest durations ===============================
+24.72s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+12.85s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+8.71s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+8.69s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+8.63s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+8.51s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+8.44s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+8.43s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+8.38s call     tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+8.28s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+8.10s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+7.01s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+7.00s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+6.90s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+6.77s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+6.76s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+6.70s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+6.51s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+6.42s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+6.33s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+6.33s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+6.15s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+6.14s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+6.00s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+5.96s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+5.93s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+5.86s call     tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+1.36s call     tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+0.00s setup    tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_6_multiline_text_without_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_4_empty_single_line_input
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_2_no_widget_focused
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_5_empty_json_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_3_highlighted_table_row_is_not_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection
+0.00s teardown tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+======================== 28 passed in 218.03s (0:03:38) ========================

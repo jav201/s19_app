@@ -1,0 +1,154 @@
+RUN_HEAD=0d4d4e7c800b27040769a1a10117e62884cc7326
+DISPLAY=<unset> WAYLAND_DISPLAY=<unset>
+s19_app.__file__ = /tmp/b103-e5-matrix-final-LoTLyy/tree/s19_app/__init__.py
+textual.__version__ = 8.2.8
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: /tmp/b103-e5-matrix-final-LoTLyy/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 29 items
+
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] PASSED [  3%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [  6%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] PASSED [ 10%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 13%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] PASSED [ 17%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 20%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] PASSED [ 24%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 27%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] PASSED [ 31%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 34%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] PASSED [ 37%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 41%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] PASSED [ 44%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 48%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] PASSED [ 51%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 55%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] PASSED [ 58%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 62%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] PASSED [ 65%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 68%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] PASSED [ 72%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 75%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] PASSED [ 79%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 82%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] PASSED [ 86%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 89%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] PASSED [ 93%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 96%]
+tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance SKIPPEDminal steps and choose to use his own clipboard;
+no agent access)                                                         [100%]
+
+- generated xml file: /tmp/b103-e5-matrix-final-LoTLyy/evidence/linux-p1-junit.xml -
+============================== slowest durations ===============================
+23.33s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]
+23.01s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]
+22.96s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+21.69s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+20.78s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]
+20.02s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]
+19.89s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]
+19.08s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]
+18.91s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]
+18.89s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]
+18.29s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]
+17.86s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+17.19s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]
+16.30s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+0.00s teardown tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+0.00s call     tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+0.00s setup    tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance
+=========================== short test summary info ============================
+SKIPPED [14] tests/test_b103_copy_paste_matrix.py:38: not_run: terminal paste requires the real copy->separate OS read artifact on isolated WinCI; Linux has no permitted OS read
+SKIPPED [1] tests/test_b103_copy_paste_matrix.py:479: AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access
+================== 14 passed, 15 skipped in 278.32s (0:04:38) ==================
+POST_RUN_STATUS:
+ M .github/workflows/clipboard-windows.yml
+ M tests/support/b103_clipboard.py
+ M tests/test_b103_copy_paste_matrix.py
+POST_RUN_DIFF_CHECK:
+PYTEST_EXIT=0

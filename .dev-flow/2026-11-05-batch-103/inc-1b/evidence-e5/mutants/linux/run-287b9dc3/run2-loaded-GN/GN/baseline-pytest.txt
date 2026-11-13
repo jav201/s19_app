@@ -1,0 +1,697 @@
+s19_app.__file__=<HOME>/work/zq-mut2/out-GN/GN/pristine/s19_app/__init__.py
+.........F......................................F...........FF.FFF.F.F.. [ 50%]
+.........ssss.............................s.s.s.s.s.s.s.s.s.s.s.s.s.ss   [100%]
+=================================== FAILURES ===================================
+___________________ test_r_copy_2_app_clipboard[R-COPY.2/4] ____________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3')
+clipboard = ClipboardLedger(entry=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], tail=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT....SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], writes=['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'], result=False)
+case = 4
+
+    @pytest.mark.parametrize("case", [1, 2, 3, 4], ids=[f"R-COPY.2/{i}" for i in range(1, 5)])
+    def test_r_copy_2_app_clipboard(tmp_path: Path, clipboard, case: int) -> None:
+        if case == 4 and sys.platform == "win32":
+            pytest.skip("Linux-only existing failing-writer arm")
+    
+        async def drive():
+            needs = ("a2l",) if case >= 3 else ("s19",)
+            async with _session(tmp_path, clipboard, needs) as session:
+                if case == 1:
+                    expected = await _make_view_selection(session, "hex")
+                    _arm(session)
+                    await session.pilot.press("ctrl+c")
+                elif case == 2:
+                    expected = await _make_view_selection(session, "hex")
+                    _arm(session)
+                    await _right_click(session, session.app.query_one("#hex_view"), (10, 2))
+                else:
+                    await _activate(session, "a2l")
+                    table = _table(session, "#a2l_tags_list")
+                    assert _a2l_name(session.app, 2) == A2L_ROW_3
+                    expected = A2L_ROW_3
+                    clipboard.result = case != 4
+                    _arm(session)
+                    await _right_click(
+                        session,
+                        table,
+                        _row_offset(table, 2),
+                        out_of_bounds=False,
+                        expected_row=2,
+                    )
+                await _settle(session.pilot)
+                assert session.app.clipboard == expected
+                assert session.clipboard.base == [expected]
+                assert session.osc52 == [expected]
+                assert session.clipboard.writes == [expected]
+                if case == 4:
+                    assert _notices(session.app) == [(WRITE_FAILED, "warning")]
+    
+>       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:524: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        needs = ("a2l",) if case >= 3 else ("s19",)
+        async with _session(tmp_path, clipboard, needs) as session:
+            if case == 1:
+                expected = await _make_view_selection(session, "hex")
+                _arm(session)
+                await session.pilot.press("ctrl+c")
+            elif case == 2:
+                expected = await _make_view_selection(session, "hex")
+                _arm(session)
+                await _right_click(session, session.app.query_one("#hex_view"), (10, 2))
+            else:
+                await _activate(session, "a2l")
+                table = _table(session, "#a2l_tags_list")
+                assert _a2l_name(session.app, 2) == A2L_ROW_3
+                expected = A2L_ROW_3
+                clipboard.result = case != 4
+                _arm(session)
+                await _right_click(
+                    session,
+                    table,
+                    _row_offset(table, 2),
+                    out_of_bounds=False,
+                    expected_row=2,
+                )
+            await _settle(session.pilot)
+            assert session.app.clipboard == expected
+            assert session.clipboard.base == [expected]
+            assert session.osc52 == [expected]
+            assert session.clipboard.writes == [expected]
+            if case == 4:
+>               assert _notices(session.app) == [(WRITE_FAILED, "warning")]
+E               AssertionError: assert [] == [('Clipboard ...', 'warning')]
+E                 
+E                 Right contains one more item: ('Clipboard write failed — copied inside the app only.', 'warning')
+E                 Use -v to get more diff
+
+tests/test_b103_copy_views.py:522: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.002s
+WARNING  s19tui:app.py:16781 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/prg.s19'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/prg.s19 size_bytes=9410 copy_seconds=0.002
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.020s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.007s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/prg.s19 file_type=s19 elapsed_seconds=1.688 has_mac=False precomputed=True
+INFO     s19tui:app.py:17079 A2L copy complete: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l size_bytes=241699 copy_seconds=0.016
+INFO     s19tui:app.py:992 A2L cache miss: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l size_bytes=241699
+WARNING  s19tui:app.py:17140 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/ASAP2_Demo_V171.a2l'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=2
+INFO     s19tui:app.py:20269 A2L parse summary: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l elapsed_seconds=0.248 sections=1 tags=118 errors=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=236 elapsed_seconds=0.017
+INFO     s19tui:app.py:19105 MAC row cache built: records=0 elapsed_seconds=0.018
+INFO     s19tui:app.py:17979 Load phase boundary: populate_issues_table_done rows=40 total=236 elapsed=0.054
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.074
+INFO     s19tui:app.py:21663 Load phase boundary: populate_a2l_table_done rows=118 total=118 elapsed=0.026
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:17159 A2L view refresh complete: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l elapsed_seconds=0.373
+INFO     s19tui:app.py:17167 A2L loaded: <HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_2_app_clipboard_R_3/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+___________ test_r_copy_15_right_click_clears_selection[R-COPY.15/2] ___________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1')
+clipboard = ClipboardLedger(entry=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], tail=['C... · Entry'], writes=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], result=True)
+source = 'stats'
+
+    @pytest.mark.parametrize("source", ["hex", "stats", "json"], ids=[f"R-COPY.15/{i}" for i in range(1, 4)])
+    def test_r_copy_15_right_click_clears_selection(tmp_path: Path, clipboard, source: str) -> None:
+        async def drive():
+            async with _session(tmp_path, clipboard, ("s19",)) as session:
+                expected = await _make_view_selection(session, source)
+                selector, offset = _right_target(source)
+                _arm(session)
+                await _right_click(session, session.app.screen.query_one(selector), offset)
+                _assert_single_copy(session, expected)
+                if source == "json":
+                    assert session.app.query_one("#patch_json_view", TextArea).selected_text == ""
+                else:
+                    assert not session.app.screen.get_selected_text()
+    
+>       asyncio.run(drive())
+
+tests/test_b103_copy_views.py:871: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:865: in drive
+    _assert_single_copy(session, expected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = Session(app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), pilot=<Pilot a...· Entry'], writes=['Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'], result=True))
+expected = 'Coverage: 6.68%\nRanges: 11\nErrors: 0\nWarnings: 0\nLoader 0 err · ⚠4 OOO · Entry'
+notice = True
+
+    def _assert_single_copy(session: Session, expected: str, *, notice: bool = True) -> None:
+        assert session.clipboard.entry == [expected]
+        assert session.clipboard.tail == [expected]
+        assert session.clipboard.base == [expected]
+        assert session.clipboard.writes == [expected]
+        assert session.osc52 == [expected]
+        assert session.app.clipboard == expected
+        _assert_os(expected)
+        if notice:
+            copy_notices = [m for m, _ in _notices(session.app) if m.startswith("Copied")]
+>           assert len(copy_notices) == 1, copy_notices
+E           AssertionError: []
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+tests/test_b103_copy_views.py:251: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.061
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.008s
+WARNING  s19tui:app.py:16781 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/prg.s19'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/.s19tool/workarea/temp/prg.s19 size_bytes=9410 copy_seconds=0.008
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/.s19tool/workarea/temp/prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/.s19tool/workarea/temp/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.034s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.053
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.062s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.003
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.031
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.041
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_15_right_click_cle1/.s19tool/workarea/temp/prg.s19 file_type=s19 elapsed_seconds=4.425 has_mac=False precomputed=True
+__________________ test_r_copy_07_2_stats_right_click_notice ___________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f00641ed5d0>
+
+    def test_r_copy_07_2_stats_right_click_notice(tmp_path, monkeypatch) -> None:
+        """R-COPY.7/2: five selected stats lines produce one notice."""
+        obs = _view_observation(tmp_path, monkeypatch, "stats", "right")
+>       _success(obs, obs["expected"], "Copied 5 lines to the clipboard.", view=True)
+
+tests/test_b103_clipboard_tail.py:758: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:340: in _success
+    _require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'success notice sequence differed'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: success notice sequence differed
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.050
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.008s
+WARNING  s19tui:app.py:16781 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/prg.s19'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/.s19tool/workarea/temp/prg.s19 size_bytes=9410 copy_seconds=0.008
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/.s19tool/workarea/temp/prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/.s19tool/workarea/temp/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.010s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.034
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.036s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.025
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.026
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_2_stats_right_c0/.s19tool/workarea/temp/prg.s19 file_type=s19 elapsed_seconds=1.977 has_mac=False precomputed=True
+_______________________ test_r_copy_07_3_hex_key_notice ________________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f005bd5f310>
+
+    def test_r_copy_07_3_hex_key_notice(tmp_path, monkeypatch) -> None:
+        """R-COPY.7/3: three selected hex lines produce one notice."""
+        obs = _view_observation(tmp_path, monkeypatch, "hex", "key")
+>       _success(obs, obs["expected"], "Copied 3 lines to the clipboard.", view=True)
+
+tests/test_b103_clipboard_tail.py:764: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:340: in _success
+    _require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'success notice sequence differed'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: success notice sequence differed
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.005s
+WARNING  s19tui:app.py:16781 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/prg.s19'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/.s19tool/workarea/temp/prg.s19 size_bytes=9410 copy_seconds=0.005
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/.s19tool/workarea/temp/prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/.s19tool/workarea/temp/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.042s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.011
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.012s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.043
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.047
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_3_hex_key_notic0/.s19tool/workarea/temp/prg.s19 file_type=s19 elapsed_seconds=2.455 has_mac=False precomputed=True
+______________ test_r_copy_07_5_direct_textarea_copy_and_final_lf ______________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f005aedfc90>
+
+    def test_r_copy_07_5_direct_textarea_copy_and_final_lf(tmp_path, monkeypatch) -> None:
+        """R-COPY.7/5: three lines, with or without a final LF."""
+        def arm(text):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, "textarea", "copy", text)
+                _success(obs, text, "Copied 3 lines to the clipboard.", view=False)
+                _require(obs["after_text"] == text, "direct textarea copy changed its text")
+            return check
+>       _run_arms(monkeypatch, [
+            ("no-final-lf", arm("L1\nL2\nL3")),
+            ("final-lf", arm("L1\nL2\nL3\n")),
+        ])
+
+tests/test_b103_clipboard_tail.py:783: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: no-final-lf'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: no-final-lf
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.051
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_5_direct_textar0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.028
+_________________ test_r_copy_07_6_direct_cut_notices_and_cap __________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0059b1b7d0>
+
+    def test_r_copy_07_6_direct_cut_notices_and_cap(tmp_path, monkeypatch) -> None:
+        """R-COPY.7/6: direct cuts in both classes, including line cut and cap."""
+        def cut(kind, text, notice):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "cut", text)
+                _success(obs, text, notice, view=False)
+                _require(obs["after_text"] == "", "direct cut did not empty its box")
+            return check
+        def line_cut():
+            obs = _line_cut_observation(tmp_path, monkeypatch)
+            _counts(obs, override=0, tail=1, base=1, writer=1, osc=1, helper=1)
+            payloads = obs["tail_payloads"] + obs["base_payloads"] + obs["writer_payloads"] + obs["osc"] + [obs["app"], obs["os"]]
+            _require(all(payload in {"line_to_cut", "line_to_cut\n"} for payload in payloads), "line-cut payload escaped its exact alternatives")
+            _require(len({payload for payload in payloads}) == 1, "line-cut sinks disagreed on the payload")
+            _require(obs["helper_payloads"] == payloads[:1], "line-cut notice-helper payload differed")
+            _require([(row[0], row[1]) for row in obs["notices"] if row[0].startswith("Copied")] == [
+                ("Copied 1 line to the clipboard.", "information")
+            ], "line-cut success notice sequence differed")
+            _require(obs["after_text"] == "first\nthird", "line cut left unexpected box text")
+>       _run_arms(monkeypatch, [
+            ("input", cut("input", "abc", "Copied 1 line to the clipboard.")),
+            ("textarea", cut("textarea", "L1\nL2\nL3", "Copied 3 lines to the clipboard.")),
+            ("textarea-line-cut", line_cut),
+            ("input-over-cap", cut("input", P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).")),
+            ("textarea-over-cap", cut("textarea", P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).")),
+        ])
+
+tests/test_b103_clipboard_tail.py:808: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'clipboard arm failures: input, textarea, input-over-cap, textarea-over-cap'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: input, textarea, input-over-cap, textarea-over-cap
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.045
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.052
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.027
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.028
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_6_direct_cut_no0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.050
+_______________ test_r_copy_07_7_direct_right_click_notice_once ________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f005a1b2cd0>
+
+    def test_r_copy_07_7_direct_right_click_notice_once(tmp_path, monkeypatch) -> None:
+        """R-COPY.7/7: direct right-click and E3A-24(c) exclusion."""
+        def arm(kind, text, notice):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "right", text)
+                _success(obs, text, notice, view=False)
+                _require(obs["after_text"] == text, "direct right-click copy changed its text")
+            return check
+        def unrelated_view():
+            obs = _unrelated_view_box_observation(tmp_path, monkeypatch)
+            _success(obs, "abc", "Copied 1 line to the clipboard.", view=False)
+            _require(obs["after_text"] == "abc", "unrelated-view copy changed its box text")
+            _require(obs["unrelated"] not in obs["app"], "unrelated view text reached the application clipboard")
+            _require(all(obs["unrelated"] not in payload for payload in obs["osc"] + obs["writer_payloads"]), "unrelated view text reached a copy sink")
+>       _run_arms(monkeypatch, [
+            ("input", arm("input", "abc", "Copied 1 line to the clipboard.")),
+            ("textarea", arm("textarea", "L1\nL2\nL3", "Copied 3 lines to the clipboard.")),
+            ("e3a-24c-unrelated-view", unrelated_view),
+        ])
+
+tests/test_b103_clipboard_tail.py:831: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: e3a-24c-unrelated-view'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: e3a-24c-unrelated-view
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.062
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.066
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.053
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.006s
+WARNING  s19tui:app.py:16781 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/prg.s19'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/prg.s19 size_bytes=9410 copy_seconds=0.006
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.031s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.040
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.054s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.041
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.048
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/prg.s19 file_type=s19 elapsed_seconds=3.333 has_mac=False precomputed=True
+INFO     s19tui:app.py:17079 A2L copy complete: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l size_bytes=241699 copy_seconds=0.015
+INFO     s19tui:app.py:992 A2L cache miss: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l size_bytes=241699
+WARNING  s19tui:app.py:17140 Recent sources not updated: '<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/ASAP2_Demo_V171.a2l'
+INFO     s19tui:app.py:9166 Workarea refreshed. files=2
+INFO     s19tui:app.py:20269 A2L parse summary: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l elapsed_seconds=0.432 sections=1 tags=118 errors=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=236 elapsed_seconds=0.070
+INFO     s19tui:app.py:19105 MAC row cache built: records=0 elapsed_seconds=0.076
+INFO     s19tui:app.py:17979 Load phase boundary: populate_issues_table_done rows=40 total=236 elapsed=0.147
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.234
+INFO     s19tui:app.py:21663 Load phase boundary: populate_a2l_table_done rows=118 total=118 elapsed=0.071
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:17159 A2L view refresh complete: path=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l elapsed_seconds=1.177
+INFO     s19tui:app.py:17167 A2L loaded: <HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_07_7_direct_right_0/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.005
+_______________ test_r_copy_08_1_key_caps_json_and_direct_boxes ________________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f005a754ed0>
+
+    def test_r_copy_08_1_key_caps_json_and_direct_boxes(tmp_path, monkeypatch) -> None:
+        """R-COPY.8/1 plus R-PASTE.12/1 regression: cap before every sink."""
+        def json_arm():
+            obs = _view_observation(tmp_path, monkeypatch, "json", "key", text=J75210)
+            _success(obs, J75210, "Copied the first 65,536 characters to the clipboard (75,210 in all).", view=True)
+        def box_arm(kind):
+            def check():
+                obs = _box_observation(tmp_path, monkeypatch, kind, "copy", P70000)
+                _success(obs, P70000, "Copied the first 65,536 characters to the clipboard (70,000 in all).", view=False)
+            return check
+>       _run_arms(monkeypatch, [
+            ("json-key", json_arm),
+            ("input-key", box_arm("input")),
+            ("textarea-key", box_arm("textarea")),
+        ])
+
+tests/test_b103_clipboard_tail.py:856: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'clipboard arm failures: input-key'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: input-key
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.055
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_08_1_key_caps_json0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.063
+____________ test_r_copy_09_1_cut_notice_original_n_and_boundaries _____________
+
+tmp_path = PosixPath('<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f005b2f6e90>
+
+    def test_r_copy_09_1_cut_notice_original_n_and_boundaries(tmp_path, monkeypatch) -> None:
+        """R-COPY.9/1: original N, exact cap boundary, and no cut on failure."""
+        def over_cap():
+            obs = _view_observation(tmp_path, monkeypatch, "json", "key", text=J75210)
+            _success(obs, J75210, "Copied the first 65,536 characters to the clipboard (75,210 in all).", view=True)
+        def exact_cap():
+            obs = _box_observation(tmp_path, monkeypatch, "input", "copy", P65536)
+            _success(obs, P65536, "Copied 1 line to the clipboard.", view=False)
+        def one_over():
+            obs = _box_observation(tmp_path, monkeypatch, "input", "copy", P65537)
+            _success(obs, P65537, "Copied the first 65,536 characters to the clipboard (65,537 in all).", view=False)
+        def failure():
+            obs = _view_observation(
+                tmp_path,
+                monkeypatch,
+                "json",
+                "key",
+                text=J75210,
+                writer_result=None,
+                held=True,
+            )
+            _failure(obs, J75210, view=True)
+>       _run_arms(monkeypatch, [
+            ("original-75210", over_cap),
+            ("exact-65536", exact_cap),
+            ("after-65537", one_over),
+            ("failed-over-cap-write", failure),
+        ])
+
+tests/test_b103_clipboard_tail.py:902: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_clipboard_tail.py:409: in _run_arms
+    _require(not failures, "clipboard arm failures: " + ", ".join(failures))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'clipboard arm failures: original-75210, after-65537'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: clipboard arm failures: original-75210, after-65537
+
+tests/test_b103_clipboard_tail.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.057
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.055
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.034
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:3343 App initialized. base_dir=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0 workarea=<HOME>/work/zq-mut2/out-GN/GN/baseline-evidence/run/environment/tmp/pytest-of-<USER>/pytest-0/test_r_copy_09_1_cut_notice_or0/.s19tool/workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.038
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+============================= QC-TM timing margins =============================
+84.7%  0.153 s / 1.000 s  test_r_dlg_12_102_y_presses_quit  tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_102_y_presses_quit
+85.0%  0.150 s / 1.000 s  test_r_copy_24_2_palette_quit_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately
+85.7%  0.143 s / 1.000 s  test_r_copy_17_1_y_quits_within_one_second  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second
+85.7%  0.143 s / 1.000 s  test_r_copy_17_2_tab_enter_on_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit
+86.5%  0.135 s / 1.000 s  test_r_copy_17_3_click_quit  tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit
+87.9%  0.121 s / 1.000 s  test_r_copy_24_1_ctrl_q_quits_immediately  tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately
+QC-TM: 6 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_views.py::test_r_copy_2_app_clipboard[R-COPY.2/4]
+FAILED tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_07_2_stats_right_click_notice
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_07_3_hex_key_notice - A...
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_07_5_direct_textarea_copy_and_final_lf
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_07_6_direct_cut_notices_and_cap
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_08_1_key_caps_json_and_direct_boxes
+FAILED tests/test_b103_clipboard_tail.py::test_r_copy_09_1_cut_notice_original_n_and_boundaries
+9 failed, 114 passed, 19 skipped in 4100.68s (1:08:20)
