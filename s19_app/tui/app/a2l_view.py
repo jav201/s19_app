@@ -966,7 +966,8 @@ class A2lViewMixin:
             - Paint the mode tag (``LIST`` / ``FILTER``) and the chips line(s).
             - Show ``#a2l_list_missing`` with the missing line in list mode and
               hide it in text mode. Every widget is queried defensively so an
-              uncomposed surface is a no-op.
+              uncomposed surface is a no-op; an app that is not running has
+              no screen to query, so nothing is painted.
 
         Dependencies:
             Uses:
@@ -975,6 +976,8 @@ class A2lViewMixin:
             Used by:
                 - ``_refresh_a2l_filtered_tags``
         """
+        if not self.is_running:
+            return
         names = self._a2l_list_names()
         self._mark_a2l_filter_mode()
         mode_tag = self.query("#a2l_filter_mode_tag")
