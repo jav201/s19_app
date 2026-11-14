@@ -2162,11 +2162,111 @@ def _allow_real_processes(monkeypatch, ledger, original_run) -> None:
     monkeypatch.setattr(clipboard_module.subprocess, "run", process_spy)
 
 
+def _r13_diag_install(app, ledger, monkeypatch) -> dict:
+    """Diagnostics only (P-001): record who ran what and when; behaviour is unchanged."""
+    t0 = time.monotonic()
+    diag = {"t0": t0, "events": [], "notify": [], "added": [], "writer": []}
+
+    def mark(name: str, **extra) -> None:
+        diag["events"].append((name, round(time.monotonic() - t0, 4), extra))
+
+    inner_tail = clipboard_module._mirror_and_write_os_clipboard
+
+    async def tail_mark(app_self, text: str):
+        mark("tail_start", same_app=app_self is app)
+        try:
+            return await inner_tail(app_self, text)
+        finally:
+            mark("tail_end")
+
+    for module in (clipboard_module, app_module, capped_module):
+        monkeypatch.setattr(module, "_mirror_and_write_os_clipboard", tail_mark, raising=False)
+
+    inner_writer = clipboard_module.write_os_clipboard
+
+    def writer_mark(text: str, *args, **kwargs):
+        mark("writer_start")
+        try:
+            result = inner_writer(text, *args, **kwargs)
+        except BaseException as exc:
+            diag["writer"].append(f"raised {type(exc).__name__}: {str(exc)[:80]}")
+            raise
+        finally:
+            mark("writer_end")
+        diag["writer"].append(f"written={result!r}")
+        return result
+
+    monkeypatch.setattr(clipboard_module, "write_os_clipboard", writer_mark)
+
+    inner_notify = app.notify
+
+    def notify_mark(message, *args, **kwargs):
+        row = {
+            "mono": round(time.monotonic() - t0, 4),
+            "wall": time.time(),
+            "msg": str(message)[:40],
+            "sev": kwargs.get("severity"),
+            "timeout": kwargs.get("timeout"),
+            "screen": type(app.screen).__name__,
+            "app_id": id(app),
+        }
+        diag["notify"].append(row)
+        try:
+            return inner_notify(message, *args, **kwargs)
+        except BaseException as exc:
+            row["raised"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+            raise
+        finally:
+            row["returned_mono"] = round(time.monotonic() - t0, 4)
+
+    monkeypatch.setattr(app, "notify", notify_mark)
+
+    notifications = app._notifications
+    inner_add = notifications.add
+
+    def add_mark(notification):
+        diag["added"].append({
+            "mono": round(time.monotonic() - t0, 4),
+            "msg": str(notification.message)[:40],
+            "raised_at": notification.raised_at,
+            "timeout": notification.timeout,
+        })
+        return inner_add(notification)
+
+    monkeypatch.setattr(notifications, "add", add_mark)
+    return diag
+
+
+def _r13_diag_snapshot(app, diag: dict, label: str) -> dict:
+    raw = list(app._notifications._notifications.values())
+    now_wall = time.time()
+    return {
+        "label": label,
+        "mono": round(time.monotonic() - diag["t0"], 4),
+        "wall": now_wall,
+        "raw_count": len(raw),
+        "raw": [
+            (str(n.message)[:40], n.raised_at, n.timeout, round(n.time_left, 4), n.has_expired)
+            for n in raw[:4]
+        ],
+        "reaped_rows": [(m[:40], s, t) for m, s, t in _notice_rows(app)][:4],
+        "queue_size": getattr(getattr(app, "_message_queue", None), "qsize", lambda: None)(),
+        "screen": type(app.screen).__name__,
+        "app_id": id(app),
+    }
+
+
+def _r13_diag_text(diag: dict) -> str:
+    body = {key: value for key, value in diag.items() if key != "t0"}
+    return json.dumps(body, default=repr, separators=(",", ":"))[:3500]
+
+
 @pytest.mark.serial_timing
-def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch) -> None:
+def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch, record_property) -> None:
     """R-PASTE.13/101: held row write ends within 2.5 s, one cascade."""
     _winci_ready_or_skip()
     other_program_write(SEED_OS)
+    diag: dict = {}
     async def drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
@@ -2175,6 +2275,7 @@ def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch) 
             real_run = clipboard_module.subprocess.run
             ledger = _instrument(app, monkeypatch, writer_result=None)
             _allow_real_processes(monkeypatch, ledger, real_run)
+            diag.update(_r13_diag_install(app, ledger, monkeypatch))
             held = _hold_clipboard()
             try:
                 started = time.monotonic()
@@ -2185,14 +2286,28 @@ def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch) 
                     timeout=10.0,
                 )
                 elapsed = time.monotonic() - started
+                diag["events"].append(("wait_returned", round(time.monotonic() - diag["t0"], 4), {}))
             finally:
                 _release_clipboard(held)
-            return elapsed, _observe(app, ledger, expected=expected)
-    elapsed, obs = asyncio.run(drive())
-    _failure(obs, obs["expected"], view=True)
-    _require(obs["counts"]["writer"] == 1, "held copy did not perform exactly one writer call")
-    bound = timing_bound(2.5)
-    assert elapsed <= report_margin("r_paste_13_101_row", elapsed, bound), elapsed
+            diag["snap_pre"] = _r13_diag_snapshot(app, diag, "pre_observe")
+            obs = _observe(app, ledger, expected=expected)
+            diag["snap_observe"] = _r13_diag_snapshot(app, diag, "post_observe")
+            await _settle(pilot, 2)
+            diag["snap_settled"] = _r13_diag_snapshot(app, diag, "settled")
+            return elapsed, obs
+    try:
+        elapsed, obs = asyncio.run(drive())
+    except AssertionError as exc:
+        record_property("r13_101_diag", _r13_diag_text(diag))
+        raise AssertionError(f"{exc} | r13_diag={_r13_diag_text(diag)}") from None
+    record_property("r13_101_diag", _r13_diag_text(diag))
+    try:
+        _failure(obs, obs["expected"], view=True)
+        _require(obs["counts"]["writer"] == 1, "held copy did not perform exactly one writer call")
+        bound = timing_bound(2.5)
+        assert elapsed <= report_margin("r_paste_13_101_row", elapsed, bound), elapsed
+    except AssertionError as exc:
+        raise AssertionError(f"{exc} | r13_diag={_r13_diag_text(diag)}") from None
 
 
 _TRACE_SKIP = frozenset({"Timer", "Idle"})
