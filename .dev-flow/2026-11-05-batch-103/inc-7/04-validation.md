@@ -1,6 +1,6 @@
 # Inc 7 — validation (E5)
 
-**Verdict: @VERDICT@.** Reviewer X7 (claude-opus-5-5), one pass, code + security (`E5-review.md`). Base `63791549`; reviewed `11bdeb98`; fixes `876ea4e3` (WinCI census), `ab454a8e` (F-X7-1), `5a737033` (F-X7-3); captures `710a6fc7` (`E5-captures.md`). Runner `<runner>`, clone of `710a6fc7` with `main` = origin/main `0c3a6bd4` (HT-03), HT-02 environment (HOME basename `<runner-home>`), `-p no:cacheprovider`, `-n 2` (timing `-n 0`), `timeout 300`; `s19_app.__file__` is the first line of every transcript (`evidence/e5/logs/`, home path redacted to `~`).
+**Verdict: PASS-WITH-NOTES.** Reviewer X7 (claude-opus-5-5), one pass, code + security (`E5-review.md`). Base `63791549`; reviewed `11bdeb98`; fixes `876ea4e3` (WinCI census), `ab454a8e` (F-X7-1), `5a737033` (F-X7-3); captures `710a6fc7` (`E5-captures.md`). Runner `<runner>`, clone of `710a6fc7` with `main` = origin/main `0c3a6bd4` (HT-03), HT-02 environment (HOME basename `<runner-home>`), `-p no:cacheprovider`, `-n 2` (timing `-n 0`), `timeout 300`; `s19_app.__file__` is the first line of every transcript (`evidence/e5/logs/`, home path redacted to `~`).
 
 **D-2 … D-12 and CV-1 … CV-11 are provisional, awaiting the operator's confirmation on the final page (P-059)**: `E5-review.md` § "Operator items".
 
@@ -28,7 +28,15 @@ First battery on the clone of `710a6fc7` (1-min load 1.5-2.6, another worker's p
 | Laws: `test_b101_help_legend_docs.py`, `test_requirements_canon.py`, `test_tui_report_seam.py` | 1 failed, 109 passed | the failure = `test_canon_rows_hold_the_obligation_word_once`: R-A2L-DEF.153, R-PICKER-CORRECT.004, .008 (base-identical, P-105) |
 | Laws: `test_b101_doc_hygiene`, `test_batch91_registry_hygiene`, `test_deps_seam_law`, `test_docs_canon`, `test_id_registry`, `test_no_private_tokens`, `test_legend_n8`, `test_tui_legend`, `test_engine_unchanged` | 122 passed | `EXPECTED_SCANNED_TEST_FILES` 317 holds |
 
-@RERUNS@
+Re-runs on a fresh clone of `6aaf4040` (`repo2`; the first clone had one test file copied in during its law runs, an HT-03 slip, so every law was re-run here):
+
+| Run | Result | Load (1-min, start → end) |
+|---|---|---|
+| `test_b103_inc12_tag_table.py::test_r_tui_042a_5_3_64_bit_page` | 1 passed | 2.59 |
+| `test_b102_clipboard.py` (whole file) | 20 passed | 2.70 |
+| Laws: `test_suite_hygiene.py` | 67 passed | 3.02 |
+| Laws: help-legend + canon + report-seam | 1 failed, 109 passed (the 3 base canon rows) | 3.45 |
+| Laws: the other 9 files | 122 passed | 3.36 |
 
 Expected base failures seen and only those: the 13 Inc 12 card nodes (F-I7-6), the 3 canon rows (P-105), the 3 session-reset nodes (P-038).
 
@@ -50,7 +58,15 @@ MU7: 50 mutants, 42 killed (5 by 3 new nodes), 7 equivalent (accepted), 1 MINOR 
 
 ## Timing (HT-08)
 
-@TIMING@
+Run with `-n 0`, one node per run, after the other worker's `serial_timing` runs had ended (process list checked):
+
+| Node | Result | 1-min load start → end | Verdict |
+|---|---|---|---|
+| `test_b103_label_list.py::test_r_a2l_list_078_3` (R-A2L-LIST.078/3) | 1 passed in 13.14 s | 1.62 → 1.67 | **PASS** (decided, load < 2) |
+| `test_b103_a2l_list_view.py::test_r_a2l_list_035_1` (R-A2L-LIST.035) | 1 passed in 11.13 s | 1.67 → 1.97 | **PASS** (decided, load < 2) |
+| `test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l` | `timeout 300` (RC 124), no verdict | 1.97 → 2.68 | **not decided** (the node does not finish in the 300 s budget at `-n 0`; MD-07: a timeout is no result) |
+
+The two Inc 7 arms also passed inside the first battery (load ~2), not counted.
 
 ## Review
 
@@ -58,7 +74,11 @@ One pass: 2 MAJOR found and fixed test-first (F-X7-1 layout, F-X7-3 security), 5
 
 ## trace_check
 
-@TRACE@
+```
+python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-7/01-requirements.md --base 63791549 --src s19_app
+trace_check: 4 US, 96 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 0 gap(s)
+```
+(The first run gave `SLICE s19_app/tui/window_help.py changed since 63791549 and no requirement file names it` — F-I7-5's help edit; closed by the `Files` paragraph.)
 
 ## Not run
 
