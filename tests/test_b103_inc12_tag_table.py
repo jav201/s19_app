@@ -666,17 +666,18 @@ def test_r_tui_042a_5_2_short_name_cut_too_at_80(tmp_path: Path) -> None:
 
 
 def test_r_tui_042a_5_3_64_bit_page(tmp_path: Path) -> None:
-    """R-TUI-042a.5 case /3: PAGE64(48) at 80/95/100/118 (*w* = 9/17/20/29).
+    """R-TUI-042a.5 case /3: PAGE64(48) at 80/95/100/118 (*w* = 9/17/20/31).
 
-    The 118-column arm runs at 118×30, a short body (measured *w* = 29):
-    Inc 7 stacks the panes at 118×54 (R-A2L-LIST.080), where the tag table takes
-    the full body width and *w* (79) is no longer under 34.
+    The 118-column arm runs at 118×30, a short body (measured *w* = 31; 29 before
+    Inc 7 E5 F-X7-1 hid the short body's horizontal scrollbar): Inc 7 stacks the panes at
+    118×54 (R-A2L-LIST.080), where the tag table takes the full body width and *w*
+    (79) is no longer under 34.
     """
-    heads = {80: 4, 95: 8, 100: 9, 118: 14}
+    heads = {80: 4, 95: 8, 100: 9, 118: 15}
     for width, head in heads.items():
         async def _check(app, pilot, table, width=width, head=head):
             geom = _geom(table)
-            w = {80: 9, 95: 17, 100: 20, 118: 29}[width]
+            w = {80: 9, 95: 17, 100: 20, 118: 31}[width]
             assert geom.w == w, (geom.w, w)
             for r in range(table.row_count):
                 tag = _tags_of(app, table)[r]
