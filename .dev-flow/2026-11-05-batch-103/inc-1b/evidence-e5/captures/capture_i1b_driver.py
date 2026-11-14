@@ -107,7 +107,9 @@ def main() -> int:
                     if not ok:
                         raise AssertionError("no notice appeared")
                 elif args.scenario == "nul-refusal":
-                    self.copy_to_clipboard("VISIBLE\x00SECRET-SUFFIX")
+                    # Tail renamed after the capture run (was a canary-shaped token the
+                    # DF-06 redaction check rejects); the refusal depends only on the NUL.
+                    self.copy_to_clipboard("VISIBLE\x00HIDDEN-TAIL")
                     ok = await self._wait(lambda: len(self._notifications) > 0, 5.0)
                     if not ok:
                         raise AssertionError("no notice appeared")
