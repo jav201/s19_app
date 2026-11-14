@@ -196,3 +196,5 @@ missing 0, new 9, outcome_diff 11 (`full-suite/cmp.txt`).
   none from this folder).
 - PP-02 on `git diff a95d0ea9..HEAD` and its commit messages: pattern hits 0 / 0; needle
   hits 0 / 0 (7 needles, counts only). Added lines with CR: 0. No push made.
+
+- D-R11-2 resolved: Inc 1b records name the runner HOME as `<runner-home>` (HT-11), merged as 5590e13f from b103-inc1b-push; `test_r_tst_070_2` and `_3` GREEN (2 passed) on an archive of the merged tip, isolated env on rtx.
