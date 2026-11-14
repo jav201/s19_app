@@ -923,6 +923,40 @@ class OsClipboardInput(Input):
             self._press_cursor = None
         return super().focus_on_click()
 
+    def _take_paste(self, text: str) -> bool:
+        """Hook for a subclass to take a whole, stripped paste.
+
+        Summary:
+            Default no-op both paste routes call with the capped, stripped
+            paste text before the first-line cut; a subclass override
+            returns ``True`` to say it inserted ``text`` itself, so the
+            route inserts nothing more.
+
+        Args:
+            text (str): The paste text, capped at ``_CLIPBOARD_CAP_CHARS``
+                and already stripped through ``_strip_paste_controls(text,
+                multiline=True)``, so an override never has to strip.
+
+        Returns:
+            bool: ``False`` — the base box does not take the paste, so the
+            route falls through to its stock first-line insert. A subclass
+            returns ``True`` once it has inserted ``text``.
+
+        Data Flow:
+            - Called only when ``self.restrict`` is not set, after the
+              65,536-character cap (and, in ``action_paste``, after the
+              empty-text check) and before the first-line cut.
+            - ``True`` stops the route (``prevent_default``/``stop`` in
+              ``_on_paste``, ``return`` in ``action_paste``); ``False``
+              continues to the first-line cut and strip.
+
+        Dependencies:
+            Used by:
+                - :meth:`OsClipboardInput._on_paste`
+                - :meth:`OsClipboardInput.action_paste`
+        """
+        return False
+
     def _on_paste(self, event: events.Paste) -> None:
         """Cut and strip a terminal paste into a single-line box in place.
 
@@ -939,6 +973,12 @@ class OsClipboardInput(Input):
         """
         if len(event.text) > _CLIPBOARD_CAP_CHARS:
             event.text = event.text[:_CLIPBOARD_CAP_CHARS]
+        if not self.restrict and self._take_paste(
+            _strip_paste_controls(event.text, multiline=True)
+        ):
+            event.prevent_default()
+            event.stop()
+            return
         if event.text:
             first_line = event.text.splitlines()[0]
             if self.restrict:
@@ -1090,6 +1130,10 @@ class OsClipboardInput(Input):
             logger.warning(
                 "action_paste: no clipboard text available (source=%s)", source
             )
+            return
+        if not self.restrict and self._take_paste(
+            _strip_paste_controls(text, multiline=True)
+        ):
             return
         first_line = text.splitlines()[0]
         if self.restrict:
