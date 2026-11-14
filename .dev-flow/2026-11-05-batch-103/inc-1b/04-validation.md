@@ -2,7 +2,7 @@
 
 Batch 2026-11-05-batch-103, increment 1b. Branch `b103-inc1b-push`, base of the increment `dc44b364`, tree at this write `290d80ae` plus the records of this commit. Written by the close-out worker (relevo-9, P-003). Every outcome below cites a committed record; none is typed from memory.
 
-**Verdict: OPEN.** Two sections are PENDING and the orchestrator fills them (see "PENDING" below). Everything else here is final.
+**Verdict: OPEN.** Reason: `redact_e5.py --check` on the current tree FAILS (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). Everything else passes: WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. It becomes PASS-WITH-NOTES when that one residual is cleared and the check is re-run. Visible items (the 8 captures; AT-I1b-8) are awaiting the operator's verdict on the final review page.
 
 ## Final runs
 
@@ -46,28 +46,52 @@ Each PNG has a sidecar `<name>.png.txt` (notices read from the app, top screen, 
 
 See "Trace check" at the end of this record (the output of the skill's `trace_check.py`).
 
-## PENDING: WinCI round 53bd5fc8 N=10 #2 (runs 43548669695...43548717495)
+## WinCI rounds #2 (53bd5fc8) and #3 (b2d6eb25)
 
-PENDING. The orchestrator fills this section from the tally of those runs. No outcome is written here.
+**Round #2, 53bd5fc8, N=10** (runs 43548669695...43548717495; record `E5-winci-53bd5fc8-n10-2.md`, commit 0dd75cd3): 10 valid runs, every gated node 0/10 except **R-PASTE.13/101, 2/10** (runs 43548702062, 43548712365; obligations 107/108). RR-1 **confirmed** (hypothesis H5): in both failing captures `notify` had returned but `Notifications.add` ran 0.266 s and 0.593 s later, after the first snapshot (`raw_count=0`, `queue_size=2`); the notice appeared only at the settled snapshot. A test-side race, not a product defect. Pre-fix rate over all diagnosed or undiagnosed sets: 5/39.
 
-## PENDING: P-101 re-review verdict
+**Round #3, b2d6eb25, N=10** (runs 43553568285 push, 43553575808, 43553577902, 43553579975, 43553582313, 43553584805, 43553586953, 43553589381, 43553591762, 43553594052; record `E5-winci-b2d6eb25-n10.md`): the base carries the test-only RR-1 fix (a bounded wait for the queued notice, bound/text/severity unchanged). All 10 runs `success`, `WINCI_GATE_RESULT PASS violations=0`, 216 passed / 44 skipped, obligations 108/108, acceptance 28/28, artifact-safety PASS.
+- **R-PASTE.13/101: 0/10** after the fix (reported on its own; the fix changes the test). Every other gated node 0/10.
+- `r13_101_diag` in all ten: `notice_wait_s` 0.0 to 0.093 s (9 runs 0.0, 1 run 0.093 s); notify-to-add delay 0 in all ten; the first read came after the add in all ten (15 to 93 ms). The 0.27 to 0.59 s lag of round #2 did not recur, so the wait was exercised only to 0.093 s on WinCI; its absorption of larger lags rests on the Linux-seam controls (`E5-rereview-final.md` section 7).
+- C2 (report-only) exceeded 0.200 s in 8 of 10 runs (0.247 to 0.419 s), as in round #2; nothing is asserted on it.
+- PP-04 against round #2: R-PASTE.13/101 gone (2 -> 0); no new failing node.
+- With a pre-fix rate near 0.13, P(0 in 10) is about 0.25 without any effect of the fix, so 0/10 alone does not prove it; the evidence is the confirmed mechanism, the controls and this clean round (HT-07).
 
-PENDING. The final code/security re-review and independent coverage on the final tree (reviewer record `E5-rereview-final.md`), then `redact_e5.py`, `redact_e5.py --check` and `evidence-e5/refresh_manifests.py --check` (DF-06). The orchestrator fills this section. No verdict is written here.
+## P-101 re-review verdict
+
+Record `E5-rereview-final.md` (code-reviewer, one pass, commit 265df693): **PASS-WITH-NOTES**, no HIGH. DF-06 checks PASS at 53bd5fc8 (`REDACTION_CHECK PASS files=295 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`). RR-1 (MEDIUM) was confirmed by round #2 and fixed test-only in b2d6eb25 (section 7 of that record; controls on the Linux seam: drop-notify FAIL, +3.5 s FAIL, unmutated PASS, +0.5 s PASS). RR-2, RR-3, RR-4 (LOW) stay open items (below).
+
+**DF-06 re-run on the current tree** (records changed after 53bd5fc8; `python -I -B` on the PC, read-only `--check` modes, the E4 refresh script not run), at tip 11610b70:
+
+```text
+PRE_RULE canary_prefix hits=1
+PENDING captures/capture_i1b_driver.py replacements=1
+EXCEPTION matrix/contract_probe.py retained=5
+EXCEPTION quit/validate_routes.py retained=2
+EXCEPTION legacy/redaction_runtime_probe.py retained=1
+REDACTION_CHECK FAIL files=305 residual=1 exceptions=8
+MANIFEST_VERIFY_RESULT PASS manifests=6 files=83
+```
+
+Reading: the `files` count grew 295 -> 305 because the close-out commit c66f467f added `evidence-e5/captures/` (8 PNG, 8 sidecars, driver, wrapper). The one residual is the string `VISIBLE<NUL>SECRET-SUFFIX` at `capture_i1b_driver.py:110`, a synthetic test payload that matches rule `canary_prefix` (`SECRET-[A-Z0-9-]+`). It is not a leak (it is the copy-with-NUL test input), but the check is a gate and it fails. This record does not edit the driver (it produced the committed captures; changing it is a decision for the orchestrator: reword the payload and note it, or add the file to the exceptions with a reason). The manifests pass.
 
 ## Other open items (not this record's to close)
 
-P-001 (R-PASTE.13/101 intermittent, cause open), P-004 (AT-I1b-8, the operator's), P-005 (GW-W01 ... 04 WinCI-only mutants; GC-C14 blocked by design), P-103 does not belong to Inc 1b.
+- **P-001** (R-PASTE.13/101): cause found (test-side race, H5), fixed in b2d6eb25, post-fix rate 0/10 (`E5-winci-b2d6eb25-n10.md`); pre-fix 5/39.
+- **RR-2** (LOW): no Linux test pins the `[t_start, t_end]` tick window; narrowing it is caught only on WinCI by the >= 10 ticks rule.
+- **RR-3** (LOW): `raise AssertionError(...) from None` in the R-PASTE.13/101 wrappers drops the original traceback (the message stays unique).
+- **RR-4** (LOW, records): `steps.log` entries of 2026-11-13 06:31 and 06:32 say `files=304`; the committed tree reports `files=295` (the earlier count included untracked files). Correction by this note only; `steps.log` is append-only and the lines are not edited (PP-06).
+- **P-004** (AT-I1b-8, the operator's), **P-005** (GW-W01 ... 04 WinCI-only mutants; GC-C14 blocked by design), canon fold at batch end. P-103 does not belong to Inc 1b.
+- New: the DF-06 residual above (`capture_i1b_driver.py`), to clear before the verdict can become PASS-WITH-NOTES.
 
 ## Trace check
 
-Command, run on the PC under `python -I -B` (the checker imports no app code; HT-01), from the repository root, with the Inc 1b files staged:
+Command, run on the PC under `python -I -B` (the checker imports no app code; HT-01), from the repository root, after the E5 close-out reworded R-COPY.3/.5 as "Withdrawn" (commit 03c59d62):
 
 ```text
 python -I -B ~/.claude/skills/dev-flow/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-1b/01-requirements.md --base dc44b364 --src s19_app
-TEST   R-COPY.3 is named by no file under tests, and neither is a TC/AT id it lists
-TEST   R-COPY.5 is named by no file under tests, and neither is a TC/AT id it lists
-trace_check: 1 US, 26 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 2 gap(s)
-exit=1
+trace_check: 1 US, 24 active requirements (2 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 0 gap(s)
+exit=0
 ```
 
-Reading: US, CASE, SLICE and EVID pass. The two TEST gaps are R-COPY.3 and R-COPY.5, which the E1 addendum withdrew by striking the rows through (`~~`); the checker only honours a "— Withdrawn" mark, so it counts them as active (26 active = 24 + these 2). They are withdrawn rows with withdrawn cases (`02-test-cases.md`), not missing tests. `01-requirements.md` is not edited to silence the checker (PP-06). CANON is not run: the canon fold is a batch-end step.
+CANON is not run: the canon fold is a batch-end step.
