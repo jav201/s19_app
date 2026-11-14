@@ -15,6 +15,8 @@ from ..a2l_describe import CurveDescriptionScreen
 from ..a2l import describe_curve_tag
 from ..segment_split_view import SplitJoinWindow
 from ..workspace import WORKAREA_TEMP
+from ..a2l_parameter_picker import parse_parameter_list
+from s19_app.tui import a2l_label_list as label_list
 from . import deps
 from .shared import (
     _A2L_ISSUE_SEVERITY_RANK,
@@ -827,33 +829,39 @@ class A2lViewMixin:
     def _refresh_a2l_filtered_tags(self, preserve_anchor: bool) -> None:
         """
         Summary:
-            Rebuild filtered A2L tag source list and render a buffered window.
+            Rebuild the filtered A2L tag source list (list mode or text mode)
+            and render the buffered window plus the filter chips.
 
         Args:
-            preserve_anchor (bool): Keep current buffered start when possible; otherwise reset to top.
+            preserve_anchor (bool): Keep the current buffered start when
+                possible; otherwise reset to top.
 
         Returns:
             None
 
         Data Flow:
-            - Apply active filter mode/text to cached enriched tags.
-            - Optionally reset buffered start index on filter model changes.
-            - When a non-empty filter matches nothing, pass the
-              filter-specific empty message ``No A2L tags match
-              '<filter>'.`` so the operator reads a successful load
-              whose filter excluded every row as exactly that, not as a
-              missing load (F-B102-A2L-2); ``update_a2l_tags_view``
-              remains the one writer of the summary text.
-            - Render only current buffered window to list view.
+            - List mode with ``preserve_anchor=True`` (the in-place write
+              route's fallback, ``patch.py:1847``): repaint the shown page in
+              place and refresh the chips, no ``clear()`` (R-A2L-LIST.036).
+            - Otherwise filter via ``_filter_a2l_tags``, reset or clamp the
+              anchor, and render the window through ``update_a2l_tags_view``.
+            - A non-empty text with no row passes the short-text summary, the
+              mode-hint variant when the text matches under ``All``
+              (R-A2L-LIST.025); then paint the filter chips.
 
         Dependencies:
             Uses:
-                - ``_filter_a2l_tags``
+                - ``_a2l_list_names`` / ``_filter_a2l_tags`` / ``_a2l_empty_message``
+                - ``_repaint_a2l_tag_cells`` / ``_paint_a2l_filter_chips``
                 - ``update_a2l_tags_view``
             Used by:
                 - ``update_a2l_view``
                 - filter and debounce handlers
         """
+        if preserve_anchor and self._a2l_list_names() is not None:
+            self._repaint_a2l_tag_cells()
+            self._paint_a2l_filter_chips()
+            return
         self._a2l_filtered_tags = self._filter_a2l_tags(self._a2l_enriched_tags)
         if not preserve_anchor:
             self._a2l_window_start = 0
@@ -863,10 +871,240 @@ class A2lViewMixin:
         if not self._a2l_filtered_tags and filter_text:
             self.update_a2l_tags_view(
                 self._a2l_filtered_tags,
-                empty_message=f"No A2L tags match '{filter_text}'.",
+                empty_message=self._a2l_empty_message(filter_text),
             )
+            self._paint_a2l_filter_chips()
             return
         self.update_a2l_tags_view(self._a2l_filtered_tags)
+        self._paint_a2l_filter_chips()
+
+    def _a2l_empty_message(self, text: str) -> str:
+        """
+        Summary:
+            Build the no-match summary for an empty text-mode result, switching
+            to the mode hint when the text would match under ``All``.
+
+        Args:
+            text (str): The stripped, non-empty filter text.
+
+        Returns:
+            str: ``No A2L tags match '<short>'.``, or ``No tag matches
+                '<short>' with mode <label> — <n> match with mode All alt+a``
+                when the text matches at least one tag under ``All`` and the
+                active mode is not ``all``. ``<short>`` is the short text of
+                ``text`` (``display_text(text, 64)``).
+
+        Data Flow:
+            - Shorten the text once (E3S-02).
+            - With mode ``all``, or when the text matches nothing under
+              ``all``, keep the R-B102-A2L-003 summary with the short text.
+            - Otherwise count the tags the text matches under ``all`` and
+              build the mode-hint summary (R-A2L-LIST.025).
+
+        Dependencies:
+            Uses:
+                - ``_tag_matches_filter``
+                - ``display_text`` / ``MODE_LABEL`` (a2l_label_list)
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        short = label_list.display_text(text, 64)
+        mode = self.a2l_tags_filter_mode
+        if mode == "all":
+            return f"No A2L tags match '{short}'."
+        lower = text.lower()
+        matches = sum(
+            1 for tag in self._a2l_enriched_tags if self._tag_matches_filter(tag, lower)
+        )
+        if not matches:
+            return f"No A2L tags match '{short}'."
+        label = label_list.MODE_LABEL.get(mode, mode)
+        return (
+            f"No tag matches '{short}' with mode {label} "
+            f"— {matches} match with mode All alt+a"
+        )
+
+    def _paint_a2l_filter_chips(self) -> None:
+        """
+        Summary:
+            Paint the list-mode / text-mode filter chips, mode tag and missing
+            line above the A2L tag table (R-A2L-LIST.007-.008, .017-.024).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Decide list mode via ``_a2l_list_names`` and mark the active
+              mode's button with the ``-on`` class.
+            - Paint the mode tag (``LIST`` / ``FILTER``) and the chips line(s).
+            - Show ``#a2l_list_missing`` with the missing line in list mode and
+              hide it in text mode. Every widget is queried defensively so an
+              uncomposed surface is a no-op.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_list_names`` / ``_mark_a2l_filter_mode``
+                - ``_a2l_list_chips`` / ``_a2l_text_chips``
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        names = self._a2l_list_names()
+        self._mark_a2l_filter_mode()
+        mode_tag = self.query("#a2l_filter_mode_tag")
+        if mode_tag:
+            mode_tag.first(deps.Label).update("LIST" if names is not None else "FILTER")
+        if names is not None:
+            chips, missing = self._a2l_list_chips()
+        else:
+            chips, missing = self._a2l_text_chips(), None
+        chips_widget = self.query("#a2l_list_chips")
+        if chips_widget:
+            chips_widget.first(Static).update(chips)
+        missing_widget = self.query("#a2l_list_missing")
+        if not missing_widget:
+            return
+        missing_static = missing_widget.first(Static)
+        if missing is None:
+            missing_static.add_class("hidden")
+        else:
+            missing_static.remove_class("hidden")
+            missing_static.update(missing)
+
+    def _mark_a2l_filter_mode(self) -> None:
+        """Mark the active filter mode's button with the ``-on`` class (R-A2L-007.9)."""
+        active = {
+            "all": "a2l_filter_all",
+            "invalid": "a2l_filter_invalid",
+            "inmem": "a2l_filter_inmem",
+        }.get(self.a2l_tags_filter_mode)
+        for button_id in ("a2l_filter_all", "a2l_filter_invalid", "a2l_filter_inmem"):
+            buttons = self.query(f"#{button_id}")
+            if not buttons:
+                continue
+            button = buttons.first(Button)
+            if button_id == active:
+                button.add_class("-on")
+            else:
+                button.remove_class("-on")
+
+    def _a2l_list_names(self) -> Optional[list[str]]:
+        """
+        Summary:
+            Return the pasted names when the viewer is in list mode, else ``None``.
+
+        Args:
+            None
+
+        Returns:
+            Optional[list[str]]: The pasted names in order when an A2L is
+                loaded, the filter field is ``name`` or ``all`` and the filter
+                text is a list text (two or more names); else ``None`` (text
+                mode).
+
+        Data Flow:
+            - An unloaded A2L, a non-``name``/``all`` field, or fewer than two
+              parsed names each fall through to ``None`` (R-A2L-LIST.008, E3A-08).
+
+        Dependencies:
+            Uses:
+                - ``parse_parameter_list`` (I-5)
+            Used by:
+                - ``_filter_a2l_tags``
+                - ``_refresh_a2l_filtered_tags``
+                - ``_paint_a2l_filter_chips``
+        """
+        if not self.current_a2l_data:
+            return None
+        if self.a2l_tags_filter_field not in ("name", "all"):
+            return None
+        names = parse_parameter_list(self.a2l_tags_filter_text)
+        if len(names) < 2:
+            return None
+        return names
+
+    def _a2l_mode_keeps(self, tag: dict, mode: str) -> bool:
+        """Return True when ``mode`` keeps ``tag`` with no filter text.
+
+        Summary:
+            The shipped mode test, factored so the list-mode hidden predicate
+            and the mode line's ``<h>`` count read one definition
+            (R-A2L-LIST.005, .021). ``all`` keeps every tag; ``invalid`` keeps
+            a schema-invalid or checked-not-in-image tag; ``inmem`` keeps an
+            in-image tag.
+
+        Args:
+            tag (dict): Enriched A2L tag.
+            mode (str): The filter mode (``all`` / ``invalid`` / ``inmem``).
+
+        Returns:
+            bool: True when the tag would stay in the text-mode table under
+                ``mode`` with an empty filter text.
+        """
+        if mode == "invalid":
+            return (not tag.get("schema_ok", True)) or (
+                tag.get("memory_checked") and tag.get("in_memory") is False
+            )
+        if mode == "inmem":
+            return tag.get("in_memory") is True
+        return True
+
+    def _a2l_mode_line(self) -> Text:
+        """Build the mode line (R-A2L-LIST.020, .021)."""
+        mode = self.a2l_tags_filter_mode
+        total = len(self._a2l_enriched_tags)
+        label = label_list.MODE_LABEL.get(mode, mode)
+        if mode == "all":
+            return Text(f"mode {label} · no tag hidden by mode ({total} tags)")
+        kept = sum(
+            1 for tag in self._a2l_enriched_tags if self._a2l_mode_keeps(tag, mode)
+        )
+        return Text(f"mode {label} · hides {total - kept} of {total} tags  alt+a All")
+
+    def _a2l_text_chips(self) -> Text:
+        """Build the text-mode chips line (R-A2L-LIST.019)."""
+        text = self.a2l_tags_filter_text
+        if text:
+            part = (
+                f"'{label_list.display_text(text, 64)}' in {self.a2l_tags_filter_field}"
+            )
+        else:
+            part = "no text filter"
+        line = Text()
+        line.append(" TEXT ")
+        line.append("  ")
+        line.append(part)
+        line.append(
+            f"  ·  showing {len(self._a2l_filtered_tags)} of {len(self._a2l_enriched_tags)}"
+        )
+        line.append("   paste several names, or alt+p, to filter by a LIST")
+        line.append("\n")
+        line.append(self._a2l_mode_line())
+        return line
+
+    def _a2l_list_chips(self) -> tuple[Text, Text]:
+        """Build the list-mode chips and missing line (R-A2L-LIST.017-.018, .022)."""
+        resolution = getattr(self, "_a2l_list_resolution", None)
+        if resolution is None:
+            return Text(), Text()
+        counts, ribbon, missing = label_list.list_summary_texts(
+            resolution, label_list.VIEWER_RIBBON
+        )
+        chips = Text()
+        chips.append(" LIST ")
+        chips.append("  ")
+        chips.append(counts)
+        chips.append("\n")
+        chips.append("order ")
+        chips.append(ribbon)
+        chips.append(
+            "   field ignored in LIST mode · esc back to text filter · alt+p edit the list"
+        )
+        chips.append("\n")
+        chips.append(self._a2l_mode_line())
+        return chips, missing
 
     def _refresh_a2l_dependent_views(self) -> None:
         """
@@ -1435,6 +1673,47 @@ class A2lViewMixin:
         )
 
     def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
+        """
+        Summary:
+            Resolve list mode into one row per pasted name, else run the
+            shipped mode-then-substring text filter.
+
+        Args:
+            tags (list[dict]): Enriched A2L tags.
+
+        Returns:
+            list[dict]: In list mode, the resolution rows in pasted order
+                (each row is the tag object itself for a found / duplicate /
+                hidden name, or ``{"name": ..., "_list_pos": ...}`` for a
+                missing name); in text mode, the tags the active mode and the
+                filter text keep.
+
+        Data Flow:
+            - List mode: resolve the pasted names over ``tags`` with the
+              active mode's hidden test, keep the resolution in
+              ``_a2l_list_resolution`` and return its rows (R-A2L-LIST.006).
+            - Text mode: clear the resolution and run the unchanged shipped
+              mode-then-substring filter.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_list_names`` / ``_a2l_mode_keeps``
+                - ``resolve_label_list`` (a2l_label_list)
+                - ``_tag_matches_filter``
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        names = self._a2l_list_names()
+        if names is not None:
+            mode = self.a2l_tags_filter_mode
+            resolution = label_list.resolve_label_list(
+                names,
+                tags,
+                hidden=lambda tag: not self._a2l_mode_keeps(tag, mode),
+            )
+            self._a2l_list_resolution = resolution
+            return list(resolution.rows)
+        self._a2l_list_resolution = None
         mode = self.a2l_tags_filter_mode
         text = (self.a2l_tags_filter_text or "").lower()
         filtered = []
