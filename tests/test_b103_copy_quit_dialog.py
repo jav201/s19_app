@@ -1008,8 +1008,12 @@ def test_r_dlg_14_101_copy_quit_has_reachable_shared_opener(clipboard) -> None:
 
     tree = _read_tree()
     census = census_sources(tree)
-    assert len(census.dialogs) == 22, sorted(census.dialogs)
+    # 23 since batch-103 Inc 7: the paste window ``LabelListPasteModal``
+    # (opened by alt+p and the ``Paste list…`` button) is a dialog in the
+    # census's sense, and like every dialog it must have an opener.
+    assert len(census.dialogs) == 23, sorted(census.dialogs)
     assert "_CopyQuitScreen" in census.dialogs, sorted(census.dialogs)
+    assert "LabelListPasteModal" in census.dialogs, sorted(census.dialogs)
     assert census.dialogs_without_opener == [], census.dialogs_without_opener
     action = "S19TuiApp.action_help_quit"
     assert action in census.actions, action
