@@ -15,3 +15,4 @@
 2026-11-14T03:21:14-06:00 | E4 T7 | Sonnet 5.5 | done: 237 tests (L 111, V 116, AT 10) + retargets R1-R3; RED on base: L 109 RED + 2 by design, V 108 RED + 8 by design, AT 10 RED; tail retarget withheld (F-T7-5); see inc-7/E4-test.md
 2026-11-14 04:16:11 CSTM | E4 C7 | sonnet-5.5 + deepseek-v4-pro | impl done: 12 commits 022a16b8..65e2c88f, smoke held; record E4-impl.md
 2026-11-14T04:17:19-06:00 | E4 I7 | claude-opus-5.5 | integrator pass 1 start: merged b103-inc7-tests (38e45ece) into b103-inc7 (beaa6493)
+2026-11-14T05:07:19-06:00 | E4 I7 | claude-opus-5.5 | pass 1 stopped (context): 16 failures fixed (4 code, 12 test), L 111/V 116/AT 10 GREEN, rulings applied, ruling a stop-and-report (F-I7-1), trace_check 1 gap (EVID); next steps in E4-integration.md

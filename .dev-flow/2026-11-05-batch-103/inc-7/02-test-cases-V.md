@@ -12,7 +12,7 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.008/2 | X008.2 | `test_r_a2l_list_008_2` | full |
 | R-A2L-LIST.008/3 | X008.3 (E3R1, E3A-08: unload in list mode → `FILTER`, `No A2L tags.`) | `test_r_a2l_list_008_3` | full |
 | R-A2L-LIST.009/1 | X009.1 | `test_r_a2l_list_009_1` | full |
-| R-A2L-LIST.010/1 | X010.1 | `test_r_a2l_list_010_1` | full |
+| R-A2L-LIST.010/1 | X010.1 | `test_r_a2l_list_010_1` | partial (T7: reads the rendered line of the fixed columns, not every row) |
 | R-A2L-LIST.011/1 | X011.1 | `test_r_a2l_list_011_1` | full |
 | R-A2L-LIST.011/2 | X011.2 | `test_r_a2l_list_011_2` | full |
 | R-A2L-LIST.011/3 | X011.3 | `test_r_a2l_list_011_3` | full |
@@ -73,9 +73,9 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.035/1 | X035.1 | `test_r_a2l_list_035_1` | full |
 | R-A2L-LIST.036/1 | X036.1 | `test_r_a2l_list_036_1` | full |
 | R-A2L-LIST.036/2 | X036.2 | `test_r_a2l_list_036_2` | full |
-| R-A2L-LIST.036/3 | X036.3 (E3R1, E3A-07: now with a missing and a duplicate row) | `test_r_a2l_list_036_3` | full |
-| R-A2L-LIST.036/4 | X036.4 (E3R1, E3A-07: R-A2L-049/1 in list mode, first shown row kept) | `test_r_a2l_list_036_4` | full |
-| R-A2L-LIST.036/5 | X036.5 (E3R1, E3A-07: R-A2L-105/1 in list mode, cursor row and card kept) | `test_r_a2l_list_036_5` | full |
+| R-A2L-LIST.036/3 | X036.3 (E3R1, E3A-07: now with a missing and a duplicate row) | `test_r_a2l_list_036_3` | partial (T7: drives `_refresh_a2l_values_after_write`, not the Save dialog) |
+| R-A2L-LIST.036/4 | X036.4 (E3R1, E3A-07: R-A2L-049/1 in list mode, first shown row kept) | `test_r_a2l_list_036_4` | partial (as /3) |
+| R-A2L-LIST.036/5 | X036.5 (E3R1, E3A-07: R-A2L-105/1 in list mode, cursor row and card kept) | `test_r_a2l_list_036_5` | partial (as /3) |
 | R-A2L-LIST.085/2 | X085.2 (E3R1, E3A-05: the card's closest-names ranking released after teardown, with its positive arm) | `test_r_a2l_list_085_2` | full |
 | R-A2L-007.1/1 | X(R-A2L-007.1).1 | `test_r_a2l_007_1_1` | full |
 | R-A2L-007.1/2 | X(R-A2L-007.1).2 | `test_r_a2l_007_1_2` | full |
@@ -103,7 +103,7 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.054/1 | X054.1 | `test_r_a2l_list_054_1` | full |
 | R-A2L-LIST.055/1 | X055.1 | `test_r_a2l_list_055_1` | full |
 | R-A2L-LIST.055/2 | X055.2 | `test_r_a2l_list_055_2` | full |
-| R-A2L-LIST.056/1 | X056.1 | `test_r_a2l_list_056_1` | full |
+| R-A2L-LIST.056/1 | X056.1 | `test_r_a2l_list_056_1` | partial (T7: a cloned MEASUREMENT block named `MAP_0024`) |
 | R-A2L-LIST.060/1 | X060.1 | `test_r_a2l_list_060_1` | full |
 | R-A2L-LIST.060/2 | X060.2 | `test_r_a2l_list_060_2` | full |
 | R-A2L-LIST.060/3 | X060.3 | `test_r_a2l_list_060_3` | full |
@@ -122,3 +122,7 @@ Format: `roles/tester.md` — `<requirement id>/<n> | example id | test name | f
 | R-A2L-LIST.083/3 | X083.3 (E3R1, E3A-10: 118×54 → ≥ 11 rows; measured P4, E3R2, was ≥ 10 derived) | `test_r_a2l_list_083_3` | full |
 
 **After E3R1: 116 cases over 54 requirements** (E1: 94 over 48; R-A2L-LIST.085 is shared with G-L, which holds its other five cases). E3R1 added 22: .008/3, .019/3, .023/2, .025/3, .031/4, .036/4–/5, .085/2, R-TUI-069.7/1–/3, R-TUI-037.1/1–/3, R-TUI-037.2/1–/3, .082/1–/2, .083/1–/3, and re-pointed .036/3 (a list with a missing and a duplicate row). The tc019 tests (`tests/test_tui_directionb.py:1373`, `:1415`, `:1451`) stay as they are and keep passing under R-TUI-037.1/.2 as changed: they run at short bodies (`E1-slice.md` §5).
+
+## Folded at E4 (integrator I7)
+
+Every planned name above exists with that name in `tests/test_b103_a2l_list_view.py` (116/116, checked by script against `02-test-cases-T.md`). Rows marked partial were set from T7's hand-back (`E4-test.md` "What this does not prove"). Results: `E4-integration.md`.

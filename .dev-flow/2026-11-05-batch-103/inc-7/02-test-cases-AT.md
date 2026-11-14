@@ -16,3 +16,7 @@ Format: `roles/tester.md`. Each AT drives the real app headless through keys and
 | AT-B103-I7-4/2 | the same at 220×60 | `test_at_b103_i7_4_layout_220` | full | R-A2L-LIST.081, R-TUI-069.6 |
 
 10 cases over 4 acceptance tests. Keys that only a real Windows Terminal can prove (alt+p, alt+f, alt+a delivery): the pilot P-1 of `E1-rulings.md` D-11, not these headless cases.
+
+## Folded at E4 (integrator I7)
+
+Every planned name above exists with that name in `tests/test_b103_a2l_list_at.py` (10/10, checked by script against `02-test-cases-T.md`). Results: `E4-integration.md`.

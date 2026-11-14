@@ -8,6 +8,8 @@ Batch `2026-11-05-batch-103`, increment 7. Stage E1 of the design-first flow (sk
 
 **E3R1.** The rows below carry the corrections the orchestrator ruled in `E3-rulings.md` (E3A-01 … E3A-14, E3S-01 … E3S-06); each changed or new row's Status names its finding, and `E3-rulings.md` §E3R1 corrections lists every change with its line.
 
+**Files (E4, integrator I7).** The rows are built in `s19_app/tui/a2l_label_list.py` (new module, group G-L: the label-list functions, `LabelRanker`, `LabelSuggestBox`, `ListAwareFilterInput`, `LabelListPasteModal`, `A2LExplorerBody`), `s19_app/tui/os_clipboard_input.py` (the I-1 hook), `s19_app/tui/app/a2l_view.py`, `s19_app/tui/app/compose_screens.py` and `s19_app/tui/styles.tcss` (group G-V); `E1-slice.md` §6.4.
+
 **Status.** `new` (family `R-A2L-LIST`, checked unused: `evidence-e1/i7e1-id-census.txt`), `changed` (an existing canon row of `REQUIREMENTS.md`, restated here with its id; the reason is in `E1-rulings.md` §2), `retired` (an existing canon row this increment withdraws).
 
 ## User stories
