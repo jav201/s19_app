@@ -26,6 +26,28 @@ from .shared import (
     A2LDetailCard,
 )
 
+#: The shipped 16 A2L tag-table columns (text mode), in ``_build_a2l_table_cells``
+#: order. List mode swaps these for ``label_list.LIST_COLUMNS`` and back
+#: (R-A2L-LIST.009, R-TUI-042a.4).
+_A2L_TEXT_COLUMNS = (
+    "Address",
+    "Length",
+    "Tag",
+    "Source",
+    "Raw",
+    "Physical",
+    "InMem",
+    "Region",
+    "Limits",
+    "Unit",
+    "Bits",
+    "Endian",
+    "Virt",
+    "Func",
+    "Access",
+    "Dtype",
+)
+
 
 def _a2l_tag_in_memory_display(tag: dict) -> str:
     if not tag.get("memory_checked"):
@@ -1209,6 +1231,10 @@ class A2lViewMixin:
                 - ``_refresh_a2l_dependent_views``
                 - A2L filter handlers
         """
+        ranker = getattr(self, "_a2l_label_ranker", None)
+        if ranker is None:
+            ranker = label_list.LabelRanker(self)
+            self._a2l_label_ranker = ranker
         if not self.current_a2l_data:
             self._a2l_enriched_tags = []
             self._a2l_filtered_tags = []
@@ -1217,6 +1243,8 @@ class A2lViewMixin:
             self._a2l_tag_hex_highlight = None
             self._a2l_tag_find_query = ""
             self._a2l_tag_find_last_index = -1
+            ranker.prepare([], self._a2l_view_generation)
+            self._a2l_list_resolution = None
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
             self.update_mac_view()
@@ -1226,6 +1254,7 @@ class A2lViewMixin:
                 self.update_validation_issues_view()
             return
         self._compute_a2l_enriched_tags()
+        ranker.prepare(self._a2l_distinct_tag_names(), self._a2l_view_generation)
         # LLR-037.3: install the validation issue list after enrichment (the
         # MAC-view cache consumes _a2l_enriched_tags) and before the tag rows
         # render, so the first frame reads a fresh issue-severity map.
@@ -1290,6 +1319,11 @@ class A2lViewMixin:
         self._a2l_row_key_to_tag = {}
         a2l_table.suppress_row_highlight = True
         try:
+            resolution = getattr(self, "_a2l_list_resolution", None)
+            if resolution is not None:
+                self._update_a2l_list_page(a2l_table, summary_label, resolution)
+                return
+            self._set_a2l_table_columns(a2l_table, _A2L_TEXT_COLUMNS)
             a2l_table.clear(columns=False)
             if not tags:
                 self._a2l_window_start = 0
@@ -1430,6 +1464,8 @@ class A2lViewMixin:
                 - ``update_a2l_tags_view`` (after each non-empty page build)
                 - ``on_a2l_tag_table_measured``
         """
+        if getattr(self, "_a2l_list_resolution", None) is not None:
+            return
         a2l_table = self.query_one("#a2l_tags_list", DataTable)
         name_width = self._a2l_tag_name_width(a2l_table)
         if name_width is None:
@@ -1523,6 +1559,10 @@ class A2lViewMixin:
         """
         table = self.query_one("#a2l_tags_list", DataTable)
         summary_label = self.query_one("#a2l_tags_summary", deps.Label)
+        names = self._a2l_list_names()
+        if names is not None:
+            self._repaint_a2l_list_cells(table, summary_label, names)
+            return
         tags = self._a2l_filtered_tags
         total_tags = len(tags)
         if not total_tags:
@@ -1569,6 +1609,109 @@ class A2lViewMixin:
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
         table.notify_style_update()
+
+    def _a2l_table_column_labels(self, a2l_table: DataTable) -> tuple[str, ...]:
+        """Return ``a2l_table``'s current column labels in order."""
+        return tuple(column.label.plain for column in a2l_table.columns)
+
+    def _set_a2l_table_columns(
+        self, a2l_table: DataTable, labels: tuple[str, ...]
+    ) -> None:
+        """Set ``a2l_table``'s columns to ``labels`` only when they differ."""
+        if self._a2l_table_column_labels(a2l_table) == labels:
+            return
+        a2l_table.clear(columns=True)
+        a2l_table.add_columns(*labels)
+
+    def _a2l_list_text_cells(self, tag: dict) -> Mapping[str, Text]:
+        """Map the shipped text-mode labels to ``tag``'s 16 built cells."""
+        cells = self._build_a2l_table_cells(tag)
+        return dict(zip(_A2L_TEXT_COLUMNS, cells))
+
+    def _update_a2l_list_page(
+        self,
+        a2l_table: DataTable,
+        summary_label: deps.Label,
+        resolution: label_list.LabelListResolution,
+    ) -> None:
+        """Render one list-mode page of ``resolution`` into ``a2l_table``."""
+        self._set_a2l_table_columns(a2l_table, label_list.LIST_COLUMNS)
+        a2l_table.clear(columns=False)
+        total = len(resolution.entries)
+        self._a2l_window_start = self._a2l_clamp_page_start(total)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(total, self._a2l_window_start, page_size)
+        self._a2l_window_start = start
+        mode = self.a2l_tags_filter_mode
+        for index in range(start, end):
+            entry = resolution.entries[index]
+            text_cells = (
+                self._a2l_list_text_cells(entry.tag)
+                if entry.tag is not None
+                else None
+            )
+            cells = label_list.list_row_cells(entry, text_cells, mode)
+            row_key = f"a2l:{index}"
+            self._a2l_row_key_to_tag[row_key] = resolution.rows[index]
+            a2l_table.add_row(*cells, key=row_key)
+        summary_label.update(Text(f"LIST  rows {start + 1}-{end} / {total} in pasted order"))
+
+    def _repaint_a2l_list_cells(
+        self,
+        table: DataTable,
+        summary_label: deps.Label,
+        names: list[str],
+    ) -> None:
+        """Re-resolve and write the shown list-mode page in place (R-A2L-LIST.036)."""
+        mode = self.a2l_tags_filter_mode
+        resolution = label_list.resolve_label_list(
+            names,
+            self._a2l_enriched_tags,
+            hidden=lambda tag: not self._a2l_mode_keeps(tag, mode),
+        )
+        self._a2l_list_resolution = resolution
+        self._a2l_filtered_tags = list(resolution.rows)
+        total = len(resolution.entries)
+        if not total:
+            return
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(total, self._a2l_window_start, page_size)
+        from textual.coordinate import Coordinate
+
+        for i in range(end - start):
+            index = start + i
+            entry = resolution.entries[index]
+            text_cells = (
+                self._a2l_list_text_cells(entry.tag)
+                if entry.tag is not None
+                else None
+            )
+            cells = label_list.list_row_cells(entry, text_cells, mode)
+            for column, cell in enumerate(cells):
+                existing = table.get_cell_at(Coordinate(i, column))
+                if isinstance(existing, Text):
+                    text_changed = existing.plain != cell.plain
+                    style_changed = existing.style != cell.style
+                else:
+                    text_changed = str(existing) != cell.plain
+                    style_changed = True
+                if text_changed or style_changed:
+                    table.update_cell_at(Coordinate(i, column), cell, update_width=True)
+            self._a2l_row_key_to_tag[f"a2l:{index}"] = resolution.rows[index]
+        summary_label.update(Text(f"LIST  rows {start + 1}-{end} / {total} in pasted order"))
+        table.notify_style_update()
+
+    def _a2l_distinct_tag_names(self) -> list[str]:
+        """Return the distinct non-empty tag names of the current A2L in order."""
+        seen: set[str] = set()
+        names: list[str] = []
+        for tag in self._a2l_enriched_tags:
+            name = str(tag.get("name") or "")
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            names.append(name)
+        return names
 
     def _build_a2l_table_cells(
         self, tag: dict, name_width: Optional[int] = None
