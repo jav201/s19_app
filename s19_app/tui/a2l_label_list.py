@@ -963,6 +963,17 @@ class ListAwareFilterInput(OsClipboardInput):
         self._suggest = suggest
         self._list_enabled = list_enabled
 
+    @property
+    def _value(self) -> Text:
+        """Paint the display text of the value; the value keeps the name itself.
+
+        Tab copies a ranked A2L name as is (I-3 obligation 3), and a stock
+        ``Input`` paints its value raw, so an ESC, NUL or bidi control of a
+        hostile name would reach the terminal (E5 F-X7-3, R-A2L-LIST.076).
+        ``display_text`` replaces them one for one, so cursor offsets hold.
+        """
+        return Text(display_text(self.value), no_wrap=True, overflow="ignore", end="")
+
     def action_move_choice(self, step: int) -> None:
         """
         Summary:
@@ -1227,7 +1238,8 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         self._set_columns()
         ta = self.query_one("#a2l_list_text", TextArea)
         names = self._names
-        ta.text = ("\n".join(names) + "\n") if names else ""
+        # Display texts only: a stock TextArea paints controls raw (E5 F-X7-3).
+        ta.text = ("\n".join(display_text(n) for n in names) + "\n") if names else ""
         ta.focus()
         self._preview()
 
@@ -1395,7 +1407,8 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         suggest = self.query_one("#a2l_list_add_suggest", LabelSuggestBox)
         if not suggest.is_open or suggest.choice is None:
             return
-        name = suggest.choice
+        # The display text: a stock TextArea paints controls raw (E5 F-X7-3).
+        name = display_text(suggest.choice)
         ta = self.query_one("#a2l_list_text", TextArea)
         text = ta.text
         if text and not text.endswith("\n"):

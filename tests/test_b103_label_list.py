@@ -1601,3 +1601,62 @@ def test_r_a2l_list_077_1_similar_line(ll, names, enriched, monkeypatch) -> None
     name = "N" * 300
     text = _similar_lines(monkeypatch, enriched, names, name + "\n")
     assert f"  similar to #1 {name[:63]}…: none (digits must match exactly)" in text
+
+
+# ---------------------------------------------------------------------------
+# E5 (X7) F-X7-3: an A2L tag name copied into a box never reaches the terminal raw
+# (R-A2L-LIST.076 extended to the filter box and the text area; a stock Textual
+# Input / TextArea paints ESC, NUL and the bidi controls of its value as is).
+# ---------------------------------------------------------------------------
+
+X7_HOSTILE = "A[red]" + chr(0x1B) + "[31mB" + chr(0x202E) + "C" + chr(0) + "D"
+X7_UNSAFE = (chr(0x1B), chr(0x202E), chr(0))
+
+
+def test_x7_tab_completed_hostile_name_is_painted_as_display_text(ll) -> None:
+    """Tab copies the name itself (I-3 obligation 3), but the box paints its display text."""
+    from s19_app.tui.a2l_label_list import display_text
+    from s19_app.tui.services.label_match import LabelMatch, MatchRule
+
+    async def sc(host, pilot, box, suggest):
+        box.focus()
+        suggest.show_ranked("a", [LabelMatch(X7_HOSTILE, MatchRule.PREFIX, 0, ((0, 1),))])
+        await pilot.pause()
+        await pilot.press("tab")
+        await pilot.pause()
+        return box.value, box.render_line(0).text
+
+    value, painted = drive_box(sc)
+    assert value == X7_HOSTILE, "the box must hold the name itself (I-3 obligation 3)"
+    assert display_text(X7_HOSTILE) in painted
+    assert not any(ch in painted for ch in X7_UNSAFE), repr(painted)
+
+
+def test_x7_enter_on_the_add_line_appends_the_display_text_of_a_hostile_name(ll, names, enriched, monkeypatch) -> None:
+    """Enter appends a ranked name to the text area; a name holding controls goes in as its display text."""
+    from s19_app.tui.a2l_label_list import display_text
+    from s19_app.tui.services.label_match import LabelMatch, MatchRule
+
+    async def sc(app, pilot, modal, seen):
+        add = modal.query_one("#a2l_list_add", Input)
+        add.focus()
+        suggest = modal.query_one("#a2l_list_add_suggest")
+        suggest.show_ranked("a", [LabelMatch(X7_HOSTILE, MatchRule.PREFIX, 0, ((0, 1),))])
+        await pilot.pause()
+        await pilot.press("enter")
+        await pilot.pause()
+        return modal.query_one("#a2l_list_text", TextArea).text
+
+    _, text, _ = run_modal(monkeypatch, enriched, names, sc)
+    assert text == display_text(X7_HOSTILE) + "\n", repr(text)
+
+
+def test_x7_the_paste_window_prefill_holds_display_texts_only(ll, names, enriched, monkeypatch) -> None:
+    """The list-mode prefill (R-A2L-LIST.041) never writes a control of a viewer name into the text area."""
+    from s19_app.tui.a2l_label_list import display_text
+
+    async def sc(app, pilot, modal, seen):
+        return modal.query_one("#a2l_list_text", TextArea).text
+
+    _, text, _ = run_modal(monkeypatch, enriched, names, sc, initial=[X7_HOSTILE, "MAP_0003"])
+    assert text == display_text(X7_HOSTILE) + "\nMAP_0003\n", repr(text)
