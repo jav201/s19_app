@@ -34,6 +34,7 @@ from tests.support.b103_label_list import (
     HOST_SHOWN,
     Hold,
     build_case08,
+    build_paste,
     capture_workers,
     case_names,
     case_tags,
@@ -1405,18 +1406,6 @@ def test_r_a2l_list_070_2(ll, names, enriched, monkeypatch) -> None:
 
     _, (is_open, still, value), _ = run_modal(monkeypatch, enriched, names, sc)
     assert not is_open and still and value == "0042 val"
-
-
-def build_paste(pool: list, cap: int = 65536) -> str:
-    """The P1 section-5 hostile paste: every third name missing, the rest cycled from ``pool``."""
-    parts, size, i = [], 0, 0
-    while True:
-        name = pool[i % len(pool)] if i % 3 else f"MISSING_{i:06d}"
-        if size + len(name) + 1 > cap:
-            return "\n".join(parts)
-        parts.append(name)
-        size += len(name) + 1
-        i += 1
 
 
 def _big_preview(monkeypatch, enriched, names, text: str):

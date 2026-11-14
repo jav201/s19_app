@@ -252,3 +252,15 @@ def oracle_missing(rows: list) -> str:
     dups = [r for r in rows if r[2] == "duplicate"]
     return (f"Missing {len(miss)} " + part(miss, lambda r: f"#{r[0]} {r[1]}")
             + f"    Duplicates {len(dups)} " + part(dups, lambda r: f"#{r[0]} {r[1]} (= #{r[3]})"))
+
+
+def build_paste(pool: list, cap: int = 65536) -> str:
+    """The P1 section-5 hostile paste: every third name missing, the rest cycled from ``pool``."""
+    parts, size, i = [], 0, 0
+    while True:
+        name = pool[i % len(pool)] if i % 3 else f"MISSING_{i:06d}"
+        if size + len(name) + 1 > cap:
+            return "\n".join(parts)
+        parts.append(name)
+        size += len(name) + 1
+        i += 1
