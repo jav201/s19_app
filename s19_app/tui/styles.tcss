@@ -437,22 +437,106 @@ DataTable > .datatable--odd-row {
  * the panes take the remainder; with `100%` the header would clip the
  * panes' bottom row. As the only remaining child this renders identically
  * to the former `100%`. */
+/* --- A2L Explorer body regimes (batch-103 Inc 7, D-2 A) ------------------
+ * `#a2l_panes` (A2LExplorerBody) takes one of three regimes, toggled by its
+ * `on_resize` (E3A-10): `-wide` (body >= 180 columns), `-short` (body < 180
+ * and (< 110 columns or < 32 rows)), and stacked (neither class — 110..179
+ * columns and >= 32 rows). `#a2l_hex_pane` now holds `#a2l_detail_card` and
+ * `#a2l_hexbox` (the hex controls and `#alt_hex_scroll`). The card carries
+ * `overflow-y: auto` in all three bodies so it scrolls whenever its content
+ * is longer than its height (R-TUI-069.7). */
 #a2l_panes {
-    layout: horizontal;
+    layout: vertical;
     height: 1fr;
 }
 
-/* Flat 3:4 proportional ratio at every terminal width (LLR-009.1,
- * increment 13). The hex pane is 3/7 of the A2L content width; the tags
- * pane is the 4/7 remainder. */
 #a2l_tags_pane {
+    width: 100%;
+    height: 1fr;
+}
+
+/* Stacked body (R-A2L-LIST.080): the hex pane 14 rows high under the tags
+ * pane, the detail card left of an 86-column hex box. */
+#a2l_hex_pane {
+    width: 100%;
+    height: 14;
+    layout: horizontal;
+}
+
+#a2l_detail_card {
+    width: 1fr;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+#a2l_hexbox {
+    width: 86;
+}
+
+/* Wide body (>= 180 columns, R-TUI-069.6 / R-A2L-LIST.081): the tags pane
+ * left of a 90-column hex pane; the card above the hex box, at most 8 lines. */
+#a2l_panes.-wide {
+    layout: horizontal;
+}
+
+#a2l_panes.-wide #a2l_tags_pane {
+    width: 1fr;
+    height: 100%;
+}
+
+#a2l_panes.-wide #a2l_hex_pane {
+    width: 90;
+    height: 100%;
+    layout: vertical;
+}
+
+#a2l_panes.-wide #a2l_detail_card {
+    width: 100%;
+    height: auto;
+    max-height: 8;
+}
+
+#a2l_panes.-wide #a2l_hexbox {
+    width: 100%;
+    height: 1fr;
+}
+
+/* Short body (R-TUI-037.1/.2, R-A2L-LIST.082): the pre-Inc-7 4fr/3fr
+ * horizontal split restored; the card above the hex box, at most 5 lines. */
+#a2l_panes.-short {
+    layout: horizontal;
+}
+
+#a2l_panes.-short #a2l_tags_pane {
     width: 4fr;
     height: 100%;
 }
 
-#a2l_hex_pane {
+#a2l_panes.-short #a2l_hex_pane {
     width: 3fr;
     height: 100%;
+    layout: vertical;
+}
+
+#a2l_panes.-short #a2l_detail_card {
+    width: 100%;
+    height: auto;
+    max-height: 5;
+}
+
+#a2l_panes.-short #a2l_hexbox {
+    width: 100%;
+    height: 1fr;
+}
+
+/* List-mode chips and the missing-names line (R-A2L-LIST.083): one screen
+ * line per text line, the cut marked with `…`. */
+#a2l_list_chips, #a2l_list_missing {
+    height: auto;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
 }
 
 /* --- MAC View 2-pane re-layout (batch-06 increment 1, LLR-001.1-.4) -----
