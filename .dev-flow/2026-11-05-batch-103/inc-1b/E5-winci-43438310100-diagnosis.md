@@ -34,5 +34,5 @@ All three are **test defects** (class (a) of the approved-design rule: the test 
 - **Negative controls** (`tests/test_b103_winci_gate.py`):
   - The same text with a person account → `windows-user-path` + `macos-user-path` RED.
   - A prefix-extended runner name (`…2`, `…s`) → RED.
-  - The forward-slash `WindowsPath('C:/Users/person/…')` → RED.
+  - The forward-slash `WindowsPath('C:/Users/<person>/…')` → RED.
 - Rejected alternative: `--basetemp` under `RUNNER_TEMP`. It needs a workflow change and a WinCI round to prove, and other user-profile paths (logs, caches) could still leak the same account.
