@@ -6,7 +6,7 @@ plus the mandatory Inc-1 addendas of
 ``.dev-flow/2026-11-03-batch-102/design/E3-rulings-inc1-inc2.md``:
 
 * TC-B102-01 — paste inserts the OS clipboard text at the three
-  representative surfaces (Load ``#load_path``, A2L ``#a2l_tags_filter_input``,
+  representative surfaces (Load ``#load_path``, A2L ``#a2l_tag_find_input``,
   Patch paste ``#patch_paste_text``); over-cap payloads truncate at 65,536.
 * TC-B102-02 — copy writes the selection to the OS clipboard through
   ``write_os_clipboard`` (Win32 → Tk → PowerShell cascade, first success
@@ -83,7 +83,7 @@ _WRITE_CAP = 65536
 #: aceptación") mapped to the rail key that reveals their container.
 _PASTE_SURFACES = {
     "load_path": None,  # pushed as a modal Load dialog
-    "a2l_tags_filter_input": "a2l",
+    "a2l_tag_find_input": "a2l",
     "patch_paste_text": "patch",
 }
 

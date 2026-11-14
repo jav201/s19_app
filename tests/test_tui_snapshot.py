@@ -1097,6 +1097,29 @@ def _batch94_inc001_drift_marks(screen: str, density: str, size_key: str) -> tup
     )
 
 
+# batch-103 Inc 7 (E1-slice 5.3, F-R11-1): the A2L Explorer's filter row, chips lines, mode
+# tag and Paste-list button (R-A2L-LIST.007/.008/.019-.021/.040) change the six ``a2l-*``
+# baselines; the split itself is kept (R-TUI-037.1/.2 hold in the short body). They are
+# regenerated ONLY by the canonical CI (HT-09, snapshot-regen.yml), never locally. The
+# batch-47 bridge above is RETIRED, so this is a NEW live mark, not a revival.
+# RETIRE this mark when that regen lands: under strict=False a stale mark XPASSes
+# silently and masks regressions (the batch-77 retirement note is the precedent).
+def _batch103_inc7_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-103 Inc 7 drift mark for the six ``a2l`` cells (canonical-CI regen pending)."""
+    del density, size_key
+    if screen != "a2l":
+        return ()
+    return (
+        pytest.mark.xfail(
+            reason=(
+                "batch-103 Inc 7: R-A2L-LIST.007/.008 (mode tag), .019-.021 (chips lines) and "
+                ".040 (Paste list button) change the A2L Explorer filter row; canonical-CI regen pending"
+            ),
+            strict=False,
+        ),
+    )
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -1113,7 +1136,8 @@ _RESTYLED_CELLS = [
         + _batch47_mac_drift_marks(screen, density, size_key)
         + _batch47_theme_drift_marks(screen, density, size_key)
         + _discoverability_drift_marks(screen, density, size_key)
-        + _batch94_inc001_drift_marks(screen, density, size_key),
+        + _batch94_inc001_drift_marks(screen, density, size_key)
+        + _batch103_inc7_a2l_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")

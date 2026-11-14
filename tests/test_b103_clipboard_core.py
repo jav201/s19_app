@@ -90,14 +90,14 @@ async def _drive_real_app(tmp_path: Path, screen_key: str | None = None):
 
 
 async def _box_a(tmp_path: Path, screen_key: str = "a2l"):
-    """Yield ``(app, pilot, widget)`` for Box A (``#a2l_tags_filter_input``)."""
+    """Yield ``(app, pilot, widget)`` for Box A (``#a2l_tag_find_input``)."""
     app = S19TuiApp(base_dir=tmp_path)
     async with app.run_test(size=(160, 48)) as pilot:
         await pilot.pause()
         app.action_show_screen(screen_key)
         for _ in range(4):
             await pilot.pause()
-        widget = app.query_one("#a2l_tags_filter_input", Input)
+        widget = app.query_one("#a2l_tag_find_input", Input)
         widget.focus()
         await pilot.pause()
         yield app, pilot, widget
@@ -127,7 +127,7 @@ def _run_a(tmp_path: Path, body):
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            widget = app.query_one("#a2l_tags_filter_input", Input)
+            widget = app.query_one("#a2l_tag_find_input", Input)
             widget.focus()
             return await body(app, pilot, widget)
     return asyncio.run(_main())
@@ -183,7 +183,7 @@ def test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard(tmp_path: Path) -> None
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box_a = app.query_one("#a2l_tags_filter_input", Input)
+            box_a = app.query_one("#a2l_tag_find_input", Input)
             box_a.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -227,7 +227,7 @@ def test_r_tui_043_7_1_and_043_8_1_neither_clipboard_warns_and_selects(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -272,7 +272,7 @@ def test_r_tui_043_12_1_warning_line_when_no_text_read_on_linux(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -304,7 +304,7 @@ def test_r_tui_043_13_1_no_clipboard_text_reaches_the_log(tmp_path: Path) -> Non
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -399,7 +399,7 @@ def test_r_tui_044_2_2_app_clipboard_fallback_single_line_capped(tmp_path: Path)
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            widget = app.query_one("#a2l_tags_filter_input", Input)
+            widget = app.query_one("#a2l_tag_find_input", Input)
             widget.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -481,7 +481,7 @@ def test_r_paste_34_3_app_clipboard_fallback_single_line_strips(tmp_path: Path) 
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            widget = app.query_one("#a2l_tags_filter_input", Input)
+            widget = app.query_one("#a2l_tag_find_input", Input)
             widget.focus()
             app._clipboard = P_CTRL
             await pilot.pause()
@@ -511,7 +511,7 @@ def test_r_paste_34_4_right_click_paste_single_line_strips(tmp_path: Path) -> No
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            widget = app.query_one("#a2l_tags_filter_input", Input)
+            widget = app.query_one("#a2l_tag_find_input", Input)
             widget.focus()
             app._clipboard = P_CTRL
             await pilot.pause()
@@ -757,7 +757,7 @@ def test_r_paste_3_copy_puts_selection_on_app_clipboard(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "COPYME-1"
             box.selection = (0, len(box.value))
             box.focus()
@@ -793,7 +793,7 @@ def test_r_paste_4_copy_leaves_box_unchanged(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "COPYME-1"
             box.selection = (0, len(box.value))
             box.focus()
@@ -827,7 +827,7 @@ def test_r_paste_5_no_selection_changes_no_clipboard(tmp_path: Path, action: str
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
                 widget.focus()
                 await pilot.pause()
                 widget.value = "KEEP"
@@ -852,7 +852,7 @@ def test_r_paste_6_cut_copies_selection(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "CUTME-1"
             box.selection = (0, len(box.value))
             box.focus()
@@ -876,7 +876,7 @@ def test_r_paste_7_cut_removes_selection(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             box.value = "DE AD BE EF"
@@ -929,7 +929,7 @@ def test_r_paste_9_1_write_failure_warning_on_linux(tmp_path: Path, kind: str) -
                     app.action_show_screen("a2l")
                     for _ in range(4):
                         await pilot.pause()
-                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget = app.query_one("#a2l_tag_find_input", Input)
                 else:
                     app.action_show_screen("patch")
                     for _ in range(4):
@@ -964,7 +964,7 @@ def test_r_paste_10_1_warning_line_per_failed_copy_without_text(tmp_path: Path) 
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "SECRET-COPY-43"
             box.selection = (0, len(box.value))
             box.focus()
@@ -1024,7 +1024,7 @@ def test_r_paste_15_one_osc52_request_per_copy(tmp_path: Path, action: str, box_
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
                 widget.value = P1
                 widget.selection = (0, len(P1))
                 widget.focus()
@@ -1091,7 +1091,7 @@ def test_r_paste_25_right_click_puts_selection_on_app_clipboard(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             box.value = "AAAA-BBBB"
@@ -1119,7 +1119,7 @@ def test_r_paste_26_right_click_copy_leaves_text_and_selection(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             box.value = "AAAA-BBBB"
@@ -1197,7 +1197,7 @@ def test_r_paste_9_4_write_failure_warning_after_right_click_copy(tmp_path: Path
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             box.value = "AAAA-BBBB"
@@ -1226,7 +1226,7 @@ def test_r_paste_10_2_warning_line_per_failed_right_click_copy(tmp_path: Path) -
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "SECRET-RC-44"
             box.selection = (0, len(box.value))
             box.focus()
@@ -1284,7 +1284,7 @@ def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
                 widget.value = P1
                 widget.selection = (0, len(P1))
             else:
@@ -1317,7 +1317,7 @@ def test_r_tui_043_6_5_right_click_no_selection_pastes_app_clipboard(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box_a = app.query_one("#a2l_tags_filter_input", Input)
+            box_a = app.query_one("#a2l_tag_find_input", Input)
             box_a.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box_a)
@@ -1354,7 +1354,7 @@ def test_r_tui_043_7_2_and_043_8_2_right_click_warns_and_selects(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -1385,7 +1385,7 @@ def test_r_tui_043_12_3_warning_line_on_right_click_no_text(tmp_path: Path) -> N
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
@@ -1413,7 +1413,7 @@ def test_r_tui_043_13_2_no_clipboard_text_in_log_on_right_click(tmp_path: Path) 
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
@@ -1443,7 +1443,7 @@ def test_r_tui_044_2_6_right_click_paste_capped(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box_a = app.query_one("#a2l_tags_filter_input", Input)
+            box_a = app.query_one("#a2l_tag_find_input", Input)
             box_a.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box_a)
@@ -1484,7 +1484,7 @@ def test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -1527,7 +1527,7 @@ def test_r_paste_11_3_linux_copy_ends_within_typed_key_time(tmp_path: Path) -> N
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             key_time = await typed_key_time(pilot, box, app)
@@ -1568,7 +1568,7 @@ def test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             key_time = await typed_key_time(pilot, box, app)
@@ -1611,7 +1611,7 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -1668,11 +1668,30 @@ def _census_text_box_constructions() -> dict:
                 return isinstance(kw.value, ast.Constant) and kw.value.value is True
         return False
 
+    trees = []
     for path in sorted(root.rglob("*.py")):
         try:
-            tree = ast.parse(path.read_text(encoding="utf-8"))
+            trees.append((path, ast.parse(path.read_text(encoding="utf-8"))))
         except Exception:
             continue
+    # Inc 7 (R-PASTE.1, R-TUI-043.4, R-PASTE.29 census, E3A-01 row 6/7): a box built from a
+    # subclass of OsClipboardInput (``ListAwareFilterInput``) is an OsClipboardInput kind,
+    # as ``isinstance(box, OsClipboardInput)`` says; the subclass names are resolved from
+    # the ``class X(Base)`` statements of the same tree, transitively.
+    os_kinds = {"OsClipboardInput"}
+    grown = True
+    while grown:
+        grown = False
+        for _path, tree in trees:
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef) and node.name not in os_kinds:
+                    bases = {b.id for b in node.bases if isinstance(b, ast.Name)}
+                    bases |= {b.attr for b in node.bases if isinstance(b, ast.Attribute)}
+                    if bases & os_kinds:
+                        os_kinds.add(node.name)
+                        grown = True
+
+    for path, tree in trees:
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 name = None
@@ -1682,6 +1701,8 @@ def _census_text_box_constructions() -> dict:
                     name = node.func.attr
                 if name == "TextArea" and _kw(node, "read_only"):
                     continue  # the read-only JSON view is not a text box
+                if name in os_kinds:
+                    name = "OsClipboardInput"
                 if name in ("OsClipboardInput", "CappedTextArea", "JsonHighlightTextArea", "Input", "TextArea"):
                     counts[name] += 1
                     counts["sites"].append(f"{path.name}:{node.lineno}")
@@ -1990,7 +2011,7 @@ def test_r_tui_043_5_3_terminal_paste_replaces_selection(tmp_path: Path, box_kin
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
                 widget.focus()
                 await pilot.pause()
                 widget.value = "AAAA-BBBB"
@@ -2177,7 +2198,7 @@ def test_r_tui_043_6_4_linux_x_clipboard_is_not_read(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -2203,7 +2224,7 @@ def test_r_paste_9_3_linux_copy_leaves_x_clipboard(tmp_path: Path) -> None:
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "COPY-X"
             box.selection = (0, len(box.value))
             box.focus()
