@@ -21,11 +21,19 @@ Later units add ``LabelRanker``, ``LabelSuggestBox``, ``ListAwareFilterInput``,
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Callable, Mapping, Sequence
 
 from rich.text import Text
+from textual.app import App
 
+from s19_app.tui.services.label_match import (
+    LabelIndex,
+    LabelMatch,
+    build_label_index,
+    rank,
+)
 from .a2l_parameter_picker import parse_parameter_list
 from .insight_style import DGRAY, GREEN, RED, YELLOW
 
@@ -474,3 +482,252 @@ def list_card_text(
         else:
             text.append("closest —")
     return text
+
+
+logger = logging.getLogger(__name__)
+
+
+class LabelRanker:
+    """Rank tag names for the list-mode dropdown and closest names (I-3, I-7).
+
+    One instance per app; the viewer (G-V V9) creates it. :meth:`prepare` builds
+    the prepared name list once per A2L load generation off the UI thread;
+    :meth:`request` ranks a text per consumer key off the UI thread and hands the
+    result to its ``deliver`` callback. Every worker runs through :meth:`_work`
+    on a thread with ``exit_on_error=False`` and touches no widget.
+    """
+
+    def __init__(self, app: App) -> None:
+        """
+        Summary:
+            Create a ranker bound to ``app``, with no prepared name list.
+
+        Args:
+            app (App): The running Textual app; workers hand their result back
+                through ``app.call_from_thread``.
+
+        Returns:
+            None
+        """
+        self._app = app
+        self._generation: int | None = None
+        self._index: LabelIndex | None = None
+        self._names: tuple[str, ...] = ()
+        self._retry = False
+        self._tokens: dict[str, int] = {}
+        self._held: dict[str, tuple] = {}
+        self._running: set[str] = set()
+        self._waiting: dict[str, tuple] = {}
+
+    @property
+    def ready(self) -> bool:
+        """Whether the prepared name list is built and current (``_index`` set)."""
+        return self._index is not None
+
+    def prepare(self, names: Sequence[str], generation: int) -> None:
+        """
+        Summary:
+            Build the prepared name list of ``generation`` off the UI thread,
+            once per generation (R-A2L-LIST.072).
+
+        Args:
+            names (Sequence[str]): The distinct tag names of the A2L load, in
+                order; copied to a tuple on the UI thread before the worker runs.
+            generation (int): The A2L load generation this list belongs to. An
+                equal generation (already prepared or being prepared) returns.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Record ``generation`` and ``names``, drop the old index (``ready``
+              becomes False) and reset the one build retry.
+            - Start one thread worker whose body is :meth:`_work` running
+              ``build_label_index(names)`` and handing the index to
+              :meth:`_install`.
+
+        Dependencies:
+            Uses:
+                - build_label_index (I-3)
+                - _work ; _install ; _start_build
+            Used by:
+                - (Inc 7) the A2L viewer refresh (V9)
+        """
+        if generation == self._generation:
+            return
+        self._generation = generation
+        self._index = None
+        self._names = tuple(names)
+        self._retry = False
+        self._start_build(generation)
+
+    def request(
+        self,
+        key: str,
+        query: str,
+        limit: int,
+        deliver: Callable[[list[LabelMatch]], None],
+        current: Callable[[], bool],
+    ) -> None:
+        """
+        Summary:
+            Rank ``query`` for the consumer ``key`` off the UI thread and
+            deliver the result once it is still current (R-A2L-LIST.071, .073,
+            .075, .050, .087).
+
+        Args:
+            key (str): The consumer key — ``filter``, ``add``, ``card`` or
+                ``similar:1`` … ``similar:10``; one token per key.
+            query (str): The text to rank.
+            limit (int): The largest number of names; capped at
+                :data:`RANK_LIMIT` (20).
+            deliver (Callable[[list[LabelMatch]], None]): Holds the widget it
+                serves; called on the UI thread with the ranked names.
+            current (Callable[[], bool]): Holds the widget it serves; returns
+                False once ``not widget.is_attached``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Give the key a new token (the latest token per key wins).
+            - Not ready: retry a failed build once (E3A-R4) or hold the request
+              for :meth:`_install`.
+            - Ready: when a ranking for the key runs, keep this as its one
+              waiting request; else mark the key running and start one thread
+              worker running ``rank(query, index, min(limit, 20))`` and handing
+              the result to :meth:`_deliver`. ``rank`` never runs on the UI
+              thread.
+
+        Dependencies:
+            Uses:
+                - rank (I-3)
+                - _work ; _deliver ; _start_build ; _start_ranking
+            Used by:
+                - (Inc 7) the A2L viewer filter debounce and the paste window
+        """
+        token = self._tokens.get(key, 0) + 1
+        self._tokens[key] = token
+        if not self.ready:
+            if self._retry:
+                self._retry = False
+                self._start_build(self._generation, retry=True)
+            self._held[key] = (token, query, limit, deliver, current)
+            return
+        if key in self._running:
+            self._waiting[key] = (token, query, limit, deliver, current)
+            return
+        self._start_ranking(key, token, query, limit, deliver, current)
+
+    def _install(self, generation: int, index: LabelIndex | None) -> None:
+        """Hand a built ``index`` (or its failure) to the UI thread."""
+        if not self._app.is_running:
+            return
+        if generation != self._generation:
+            return
+        if index is None:
+            self._held.clear()
+            self._retry = True
+            return
+        self._index = index
+        self._retry = False
+        held, self._held = self._held, {}
+        for key, request in held.items():
+            if request[0] == self._tokens.get(key):
+                self._start_ranking(key, *request)
+
+    def _deliver(
+        self,
+        key: str,
+        token: int,
+        generation: int,
+        matches: list[LabelMatch] | None,
+        deliver: Callable[[list[LabelMatch]], None],
+        current: Callable[[], bool],
+    ) -> None:
+        """Deliver ``matches`` only while its request is still current."""
+        if not self._app.is_running:
+            return
+        self._running.discard(key)
+        waiting = self._waiting.pop(key, None)
+        if waiting is not None and self.ready:
+            self._start_ranking(key, *waiting)
+        if matches is None:
+            return
+        if token != self._tokens.get(key):
+            return
+        if generation != self._generation:
+            return
+        if not current():
+            return
+        deliver(matches)
+
+    def _work(
+        self, job: Callable[[], object], hand_over: Callable[[object], None]
+    ) -> None:
+        """Run ``job`` on the worker thread and hand its result back; never raises."""
+        try:
+            result = job()
+        except Exception:
+            result = None
+        try:
+            self._app.call_from_thread(hand_over, result)
+        except RuntimeError:
+            return
+
+    def _start_build(self, generation: int, retry: bool = False) -> None:
+        """Start the name-list build worker for ``generation`` (``retry`` = rebuild)."""
+        names = self._names
+
+        def job() -> object:
+            try:
+                return build_label_index(names)
+            except Exception as exc:
+                logger.warning("label-list build failed: %s", type(exc).__name__)
+                raise
+
+        def hand_over(result: object) -> None:
+            self._install(generation, result)
+            if retry and result is None:
+                self._retry = False
+
+        self._app.run_worker(
+            lambda: self._work(job, hand_over),
+            thread=True,
+            exit_on_error=False,
+            group="a2l_label_list",
+        )
+
+    def _start_ranking(
+        self,
+        key: str,
+        token: int,
+        query: str,
+        limit: int,
+        deliver: Callable[[list[LabelMatch]], None],
+        current: Callable[[], bool],
+    ) -> None:
+        """Mark ``key`` running and rank ``query`` off the UI thread."""
+        self._running.add(key)
+        index = self._index
+        generation = self._generation
+        limit = min(limit, RANK_LIMIT)
+
+        def job() -> object:
+            try:
+                return rank(query, index, limit)
+            except Exception as exc:
+                logger.warning(
+                    "label-list rank failed: %s key=%s", type(exc).__name__, key
+                )
+                raise
+
+        def hand_over(result: object) -> None:
+            self._deliver(key, token, generation, result, deliver, current)
+
+        self._app.run_worker(
+            lambda: self._work(job, hand_over),
+            thread=True,
+            exit_on_error=False,
+            group="a2l_label_list",
+        )
