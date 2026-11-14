@@ -220,7 +220,8 @@ from tools.id_registry import (
 # (tests/test_b103_a2l_filter_teardown.py, Inc 1b E5 WinCI round 2); 311 -> 312.
 # batch-103 Inc 7 E4: +4 (tests/test_b103_label_list.py, tests/test_b103_a2l_list_view.py,
 # tests/test_b103_a2l_list_at.py, tests/support/b103_label_list.py); 312 -> 316.
-EXPECTED_SCANNED_TEST_FILES = 316
+# batch-103 Inc 7 E4 MU7: +1 (tests/test_b103_inc7_mu_survivors.py); 316 -> 317.
+EXPECTED_SCANNED_TEST_FILES = 317
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

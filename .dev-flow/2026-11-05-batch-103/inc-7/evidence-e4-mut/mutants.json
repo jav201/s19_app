@@ -1,0 +1,434 @@
+[
+ {
+  "id": "MU01a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if len(all_missing) > SIMILAR_MAX:",
+  "new": "        if False:",
+  "req": "R-A2L-LIST.051 cap line removed",
+  "k": "051",
+  "extra": ""
+ },
+ {
+  "id": "MU01b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if len(all_missing) > SIMILAR_MAX:",
+  "new": "        if len(all_missing) >= SIMILAR_MAX:",
+  "req": "R-A2L-LIST.051 cap line off by one (at exactly 10)",
+  "k": "051",
+  "extra": ""
+ },
+ {
+  "id": "MU01c",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        missing = all_missing[:SIMILAR_MAX]",
+  "new": "        missing = all_missing[:SIMILAR_MAX + 1]",
+  "req": "R-A2L-LIST.051 cap 11 lines",
+  "k": "051",
+  "extra": ""
+ },
+ {
+  "id": "MU02",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    found = res.count(FOUND) + hidden",
+  "new": "    found = res.count(FOUND)",
+  "req": "R-A2L-LIST.017 found count without hidden",
+  "k": "017 or 021",
+  "extra": ""
+ },
+ {
+  "id": "MU03",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    if entry.status == MISSING or entry.tag is None:",
+  "new": "    if entry.status == MISSING:",
+  "req": "R-A2L-LIST.015 tag-is-None branch (duplicate of a missing name)",
+  "k": "015 or 078",
+  "extra": ""
+ },
+ {
+  "id": "MU04",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "            # Text mode again: repaint the mode tag and chips (R-A2L-LIST.008/3, E3A-08).\n            self._paint_a2l_filter_chips()\n",
+  "new": "            pass\n",
+  "req": "R-A2L-LIST.008/3 .023/2 chips and FILTER tag not repainted on unload",
+  "k": "008 or 023 or 007",
+  "extra": ""
+ },
+ {
+  "id": "MU05a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if not self._app.is_running:\n            return\n        if generation != self._generation:",
+  "new": "        if generation != self._generation:",
+  "req": "R-A2L-LIST.084 is_running check in _install dropped",
+  "k": "084 or 085 or 087",
+  "extra": ""
+ },
+ {
+  "id": "MU05b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if not self._app.is_running:\n            return\n        self._running.discard(key)",
+  "new": "        self._running.discard(key)",
+  "req": "R-A2L-LIST.084/.085 is_running check in _deliver dropped",
+  "k": "084 or 085 or 087",
+  "extra": ""
+ },
+ {
+  "id": "MU05c",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if not self.is_attached or not self.app.is_running:",
+  "new": "        if not self.is_attached:",
+  "req": "R-A2L-LIST.085/.086 is_running check of the paste window painters dropped",
+  "k": "084 or 085 or 086",
+  "extra": ""
+ },
+ {
+  "id": "MU06a",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "            if not self.is_running:\n                return\n            self._refresh_a2l_filtered_tags(preserve_anchor=False)",
+  "new": "            self._refresh_a2l_filtered_tags(preserve_anchor=False)",
+  "req": "P-002 guard in _schedule_a2l_filter_refresh dropped",
+  "k": "",
+  "extra": "tests/test_b103_a2l_filter_teardown.py"
+ },
+ {
+  "id": "MU06b",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "        if not self.is_running:\n            return\n        names = self._a2l_list_names()\n        self._mark_a2l_filter_mode()",
+  "new": "        names = self._a2l_list_names()\n        self._mark_a2l_filter_mode()",
+  "req": "row-17 guard of _paint_a2l_filter_chips dropped",
+  "k": "",
+  "extra": "tests/test_tui_app.py::test_refresh_a2l_filtered_tags_resets_anchor"
+ },
+ {
+  "id": "MU07",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "LIST_COLUMNS = (\"#\", \"Tag\", \"Status\", \"Kind\", \"Address\", \"Len\", \"Physical\", \"Unit\", \"Limits\")",
+  "new": "LIST_COLUMNS = (\"Address\", \"Len\", \"#\", \"Tag\", \"Status\", \"Kind\", \"Physical\", \"Unit\", \"Limits\")",
+  "req": "R-A2L-LIST.009/.010 D-4 B: Address/Len first again",
+  "k": "010 or 009",
+  "extra": "tests/test_b103_inc12_tag_table.py"
+ },
+ {
+  "id": "MU08a",
+  "file": "s19_app/tui/app/compose_screens.py",
+  "old": "            Static(\"\", id=\"a2l_list_chips\", markup=False),",
+  "new": "            Static(\"\", id=\"a2l_list_chips\"),",
+  "req": "R-A2L-LIST.076 markup=False dropped on the viewer chips",
+  "k": "076 or 077",
+  "extra": ""
+ },
+ {
+  "id": "MU08b",
+  "file": "s19_app/tui/app/compose_screens.py",
+  "old": "            Static(\"\", id=\"a2l_list_missing\", markup=False),\n            A2LTagTable(",
+  "new": "            Static(\"\", id=\"a2l_list_missing\"),\n            A2LTagTable(",
+  "req": "R-A2L-LIST.076 markup=False dropped on the viewer missing line",
+  "k": "076 or 077",
+  "extra": ""
+ },
+ {
+  "id": "MU08c",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "            yield Static(\"\", id=\"a2l_list_missing\", markup=False)",
+  "new": "            yield Static(\"\", id=\"a2l_list_missing\")",
+  "req": "R-A2L-LIST.076 markup=False dropped on the window missing line",
+  "k": "076 or 077",
+  "extra": ""
+ },
+ {
+  "id": "MU08d",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "            yield Static(\"\", id=\"a2l_list_similar\", markup=False)",
+  "new": "            yield Static(\"\", id=\"a2l_list_similar\")",
+  "req": "R-A2L-LIST.076/.077 markup=False dropped on the similar line",
+  "k": "076 or 077",
+  "extra": ""
+ },
+ {
+  "id": "MU08e",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        line.update(Text(\"\\n\".join(parts)))",
+  "new": "        line.update(\"\\n\".join(parts))",
+  "req": "R-A2L-LIST.076 similar line painted as a str",
+  "k": "076 or 077",
+  "extra": ""
+ },
+ {
+  "id": "MU08f",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "            \" \u00b7 \".join(f\"#{e.pos} {display_text(e.name, SHORT_AT)}\" for e in shown),\n            style=RED,",
+  "new": "            \" \u00b7 \".join(f\"#{e.pos} {e.name}\" for e in shown),\n            style=RED,",
+  "req": "R-A2L-LIST.076/.077 missing line paints the raw name",
+  "k": "076 or 077 or 024",
+  "extra": ""
+ },
+ {
+  "id": "MU09",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "            first_tag[name] = tag",
+  "new": "            first_tag[name.lower()] = tag",
+  "req": "R-A2L-LIST.002 name matched case-folded (tag side)",
+  "k": "002 or 003 or 004",
+  "extra": ""
+ },
+ {
+  "id": "MU10",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if first is not None:\n            tag = first_tag.get(name)",
+  "new": "        if False:\n            tag = first_tag.get(name)",
+  "req": "R-A2L-LIST.003 no duplicate check",
+  "k": "003 or 017",
+  "extra": ""
+ },
+ {
+  "id": "MU11",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "entries.append(LabelListEntry(pos, name, MISSING, None, None))",
+  "new": "entries.append(LabelListEntry(pos, name, FOUND, None, None))",
+  "req": "R-A2L-LIST.004 missing treated as found",
+  "k": "004 or 017",
+  "extra": ""
+ },
+ {
+  "id": "MU12",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        elif hidden is not None and hidden(tag):",
+  "new": "        elif False:",
+  "req": "R-A2L-LIST.005 mode ignored in list mode",
+  "k": "005 or 017",
+  "extra": ""
+ },
+ {
+  "id": "MU13",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    if char_type:\n        return str(char_type)",
+  "new": "    if False:\n        return str(char_type)",
+  "req": "R-A2L-LIST.013 Kind: char_type ignored",
+  "k": "013",
+  "extra": ""
+ },
+ {
+  "id": "MU14",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    missing = res.count(MISSING)\n    dup",
+  "new": "    missing = res.count(MISSING) + hidden\n    dup",
+  "req": "R-A2L-LIST.017 hidden counted as missing",
+  "k": "017",
+  "extra": ""
+ },
+ {
+  "id": "MU15",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    if 2 * n <= budget:\n        for entry in entries:\n            text.append(GLYPH[entry.status], style=_STATUS_STYLE[entry.status])\n            text.append(\" \")\n    else:",
+  "new": "    if True:\n        for entry in entries:\n            text.append(GLYPH[entry.status], style=_STATUS_STYLE[entry.status])\n            text.append(\" \")\n    else:",
+  "req": "R-A2L-LIST.018 ribbon with no budget",
+  "k": "018 or 046",
+  "extra": ""
+ },
+ {
+  "id": "MU16a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        shown = missing[:MISSING_MAX]",
+  "new": "        shown = missing",
+  "req": "R-A2L-LIST.024 missing line with no cap",
+  "k": "024",
+  "extra": ""
+ },
+ {
+  "id": "MU16b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        shown = dupes[:MISSING_MAX]",
+  "new": "        shown = dupes",
+  "req": "R-A2L-LIST.024 duplicates line with no cap",
+  "k": "024",
+  "extra": ""
+ },
+ {
+  "id": "MU17",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "VIEWER_RIBBON = 80",
+  "new": "VIEWER_RIBBON = 60",
+  "req": "R-A2L-LIST.046 viewer ribbon budget 80 -> 60",
+  "k": "046 or 018",
+  "extra": ""
+ },
+ {
+  "id": "MU18a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "DROPDOWN_ROWS = 8",
+  "new": "DROPDOWN_ROWS = 20",
+  "req": "R-A2L-LIST.063 dropdown 20 rows",
+  "k": "063 or 065",
+  "extra": ""
+ },
+ {
+  "id": "MU18b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        total = \"20+\" if self._total == RANK_LIMIT else str(self._total)",
+  "new": "        total = str(self._total)",
+  "req": "R-A2L-LIST.065 total never 20+",
+  "k": "065",
+  "extra": ""
+ },
+ {
+  "id": "MU19a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        self.dismiss(names if names else None)",
+  "new": "        self.dismiss(names)",
+  "req": "R-A2L-LIST.054 apply with no names dismisses []",
+  "k": "053 or 054",
+  "extra": ""
+ },
+ {
+  "id": "MU19b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "            suggest.close()\n            return\n        self.dismiss(None)",
+  "new": "            suggest.close()\n        self.dismiss(None)",
+  "req": "R-A2L-LIST.070 esc closes the dropdown and the window",
+  "k": "055 or 070",
+  "extra": ""
+ },
+ {
+  "id": "MU20",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        if text and not text.endswith(\"\\n\"):\n            text += \"\\n\"\n        ta.text = text + name + \"\\n\"",
+  "new": "        ta.text = text + name + \"\\n\"",
+  "req": "R-A2L-LIST.057 appended without a new line",
+  "k": "057 or 058",
+  "extra": ""
+ },
+ {
+  "id": "MU21a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    return len(parse_parameter_list(text)) >= 2",
+  "new": "    return len(parse_parameter_list(text)) >= 1",
+  "req": "R-A2L-LIST.001/.006 list text from one name",
+  "k": "001 or 006 or 062 or r_a2l_007",
+  "extra": ""
+ },
+ {
+  "id": "MU21b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    return len(parse_parameter_list(text)) >= 2",
+  "new": "    return len(parse_parameter_list(text)) >= 3",
+  "req": "R-A2L-LIST.001/.006 list text needs three names",
+  "k": "001 or 006 or 062 or r_a2l_007",
+  "extra": ""
+ },
+ {
+  "id": "MU22a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "WIDE_AT = 180",
+  "new": "WIDE_AT = 160",
+  "req": "R-A2L-LIST.082 wide regime from 160",
+  "k": "080 or 081 or 082 or 083",
+  "extra": ""
+ },
+ {
+  "id": "MU22b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "STACK_MIN_HEIGHT = 32",
+  "new": "STACK_MIN_HEIGHT = 28",
+  "req": "R-A2L-LIST.083/R-TUI-037 short body below 28",
+  "k": "083 or r_tui_037 or r_tui_069",
+  "extra": ""
+ },
+ {
+  "id": "MU22c",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "STACK_MIN_WIDTH = 110",
+  "new": "STACK_MIN_WIDTH = 100",
+  "req": "R-A2L-LIST.080/R-TUI-037 short body below 100",
+  "k": "080 or r_tui_037",
+  "extra": ""
+ },
+ {
+  "id": "MU23",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "SHORT_AT = 64",
+  "new": "SHORT_AT = 80",
+  "req": "R-A2L-LIST.077 short text cap 64 -> 80",
+  "k": "077 or 076",
+  "extra": ""
+ },
+ {
+  "id": "MU24",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "    s = \"\" if dup == 1 else \"s\"",
+  "new": "    s = \"s\"",
+  "req": "R-A2L-LIST.017 plural of duplicate always",
+  "k": "017",
+  "extra": ""
+ },
+ {
+  "id": "MU25",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "            self._a2l_list_resolution = None\n            self._update_a2l_summary_buffer()",
+  "new": "            self._update_a2l_summary_buffer()",
+  "req": "R-A2L-LIST.008 kept resolution after the unload",
+  "k": "008 or 023",
+  "extra": ""
+ },
+ {
+  "id": "MU26",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "        self._set_a2l_table_columns(a2l_table, label_list.LIST_COLUMNS)\n        a2l_table.clear(columns=False)",
+  "new": "        a2l_table.clear(columns=False)",
+  "req": "R-A2L-LIST.009 list columns not set",
+  "k": "009 or 010 or 011",
+  "extra": ""
+ },
+ {
+  "id": "MU27",
+  "file": "s19_app/tui/app/a2l_view.py",
+  "old": "                hidden=lambda tag: not self._a2l_mode_keeps(tag, mode),\n            )\n            self._a2l_list_resolution = resolution\n            return list(resolution.rows)",
+  "new": "                hidden=None,\n            )\n            self._a2l_list_resolution = resolution\n            return list(resolution.rows)",
+  "req": "R-A2L-LIST.005 viewer resolves without the mode predicate",
+  "k": "005 or 017 or r_a2l_007",
+  "extra": ""
+ },
+ {
+  "id": "MU28",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "WINDOW_RIBBON = 50",
+  "new": "WINDOW_RIBBON = 40",
+  "req": "R-A2L-LIST.046/.018 window ribbon budget 50 -> 40",
+  "k": "046 or 018",
+  "extra": ""
+ },
+ {
+  "id": "MU29",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "PREVIEW_MAX = 200",
+  "new": "PREVIEW_MAX = 300",
+  "req": "R-A2L-LIST.019 preview cap 200 -> 300",
+  "k": "019 or 078",
+  "extra": ""
+ },
+ {
+  "id": "MU30",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "MISSING_MAX = 20",
+  "new": "MISSING_MAX = 30",
+  "req": "R-A2L-LIST.024 missing cap 20 -> 30",
+  "k": "024",
+  "extra": ""
+ },
+ {
+  "id": "MU31",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "RANK_LIMIT = 20",
+  "new": "RANK_LIMIT = 30",
+  "req": "R-A2L-LIST.063 rank limit 20 -> 30",
+  "k": "063 or 065",
+  "extra": ""
+ },
+ {
+  "id": "MU32",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "CLOSEST_LIMIT = 3",
+  "new": "CLOSEST_LIMIT = 4",
+  "req": "R-A2L-LIST.059/.049 closest names 3 -> 4",
+  "k": "049 or 050 or 059",
+  "extra": ""
+ }
+]

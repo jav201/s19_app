@@ -1,0 +1,17 @@
+GREEN	extra	rc=2	load=0.10	97s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed, 2 passed in 96.91s (0:01:36)
+GREEN	RESULT	killed
+MU32	extra	rc=2	load=1.43	14s	tests/test_b103_inc7_mu_survivors.py::test_the_similar_line_holds_exactly_three_closest_names	1 failed in 13.10s
+MU32	RESULT	killed
+MU05c	extra	rc=2	load=1.52	14s	tests/test_b103_inc7_mu_survivors.py::test_the_paste_window_paints_nothing_once_the_app_has_stopped	1 failed in 13.17s
+MU05c	RESULT	killed
+MU22a	extra	rc=2	load=1.77	84s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 83.24s (0:01:23)
+MU22a	RESULT	killed
+MU22b	extra	rc=2	load=1.85	75s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 74.79s (0:01:14)
+MU22b	RESULT	killed
+MU22c	extra	rc=2	load=1.96	75s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 74.73s (0:01:14)
+MU22c	RESULT	killed
+MU07r	extra	rc=0	load=1.74	132s		40 passed in 131.19s (0:02:11)
+MU07r	RESULT	survived
+MU07v	L	rc=5	load=2.57	2s		no tests ran in 1.28s
+MU07v	V	rc=0	load=2.57	15s		1 passed in 14.96s
+MU07v	RESULT	survived

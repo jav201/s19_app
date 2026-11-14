@@ -19,3 +19,4 @@
 2026-11-14T05:13:04-06:00 | E4 I7b | claude-opus-5.5 | integrator pass 2 start: from 4204361e (STATE / NEXT STEP), rulings P-089
 2026-11-14T06:56:59-06:00 | E4 I7c | claude-opus-5.5 | pass 3: runner logs read, timeouts re-run; 3 tree-only fixed (759e02a9 code, 46715e47 records, ab07a07e test); NOT E4 GREEN: F-I7-5 help names Filter tags (ruling needed); base-identical: 13 inc12 card nodes, canon, hygiene (Inc 7 E1/E3 records); timing arms + QC-TM 10b_1 not decided (load) -> E5; trace_check 1 gap (EVID); see inc-7/E4-integration.md
 2026-11-14T07:19:47-06:00 | E4 MU7 step0 | claude-sonnet-5.5 | F-I7-5 help text 91e5eeab, F-I7-7 redaction 7463c9e3; laws green except 3 base canon rows; E4 GREEN; stopped before mutants
+2026-11-14T09:21:43-06:00 | E4 MU7 mutants | claude-sonnet-5.5 | 50 mutants: 42 killed (5 by new tests), 7 equivalent, 1 MINOR; record E4-mutants.md

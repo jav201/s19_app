@@ -1,0 +1,11 @@
+[
+ {
+  "id": "MU33",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "        except RuntimeError:\n            return",
+  "new": "        except ZeroDivisionError:\n            return",
+  "req": "R-A2L-LIST.084/.085 _work no longer swallows the RuntimeError of call_from_thread (app stopped)",
+  "k": "084 or 085 or 086 or 087",
+  "extra": ""
+ }
+]

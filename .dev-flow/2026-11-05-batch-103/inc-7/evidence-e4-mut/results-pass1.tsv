@@ -1,0 +1,123 @@
+MU01a	L	rc=2	load=0.83	14s	tests/test_b103_label_list.py::test_r_a2l_list_051_1 - AssertionError:...	1 failed, 1 passed in 13.49s
+MU01a	RESULT	killed
+MU01b	L	rc=2	load=1.09	14s	tests/test_b103_label_list.py::test_r_a2l_list_051_2 - AssertionError:...	1 failed, 1 passed in 13.63s
+MU01b	RESULT	killed
+MU01c	L	rc=0	load=1.37	14s		2 passed in 13.61s
+MU01c	V	rc=5	load=1.73	2s		no tests ran in 1.19s
+MU01c	RESULT	survived
+MU02	L	rc=5	load=1.76	2s		no tests ran in 1.27s
+MU02	V	rc=2	load=1.76	29s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_017_2 - AssertionErr...	1 failed, 3 passed in 28.54s
+MU02	RESULT	killed
+MU03	L	rc=2	load=2.09	16s	tests/test_b103_label_list.py::test_r_a2l_list_078_2 - AttributeError:...	2 failed, 1 passed in 16.00s
+MU03	RESULT	killed
+MU04	L	rc=5	load=1.15	2s		no tests ran in 1.25s
+MU04	V	rc=2	load=1.15	54s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_008_3 - AssertionErr...	1 failed, 5 passed in 53.28s
+MU04	RESULT	killed
+MU05a	L	rc=2	load=1.88	4s	tests/test_b103_label_list.py::test_r_a2l_list_084_1 - AssertionError:...	1 failed, 5 passed in 3.53s
+MU05a	RESULT	killed
+MU05b	L	rc=2	load=1.81	4s	tests/test_b103_label_list.py::test_r_a2l_list_085_1 - AssertionError:...	1 failed, 4 passed in 3.25s
+MU05b	RESULT	killed
+MU05c	L	rc=0	load=1.74	16s		11 passed in 15.75s
+MU05c	V	rc=0	load=1.67	28s		1 passed in 27.76s
+MU05c	RESULT	survived
+MU06a	extra	rc=2	load=2.17	4s	tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped	1 failed in 3.62s
+MU06a	RESULT	killed
+MU06b	extra	rc=2	load=2.23	2s	tests/test_tui_app.py::test_refresh_a2l_filtered_tags_resets_anchor - ...	1 failed in 1.26s
+MU06b	RESULT	killed
+MU07	extra	rc=2	load=2.23	94s	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name	1 failed, 19 passed in 93.68s (0:01:33)
+MU07	RESULT	killed
+MU08a	L	rc=0	load=3.15	16s		12 passed in 15.28s
+MU08a	V	rc=5	load=3.35	2s		no tests ran in 1.27s
+MU08a	RESULT	survived
+MU08b	L	rc=0	load=3.32	15s		12 passed in 14.84s
+MU08b	V	rc=5	load=3.40	2s		no tests ran in 1.28s
+MU08b	RESULT	survived
+MU08c	L	rc=0	load=3.45	15s		12 passed in 14.85s
+MU08c	V	rc=5	load=3.49	2s		no tests ran in 1.33s
+MU08c	RESULT	survived
+MU08d	L	rc=0	load=3.49	16s		12 passed in 15.35s
+MU08d	V	rc=5	load=3.60	2s		no tests ran in 1.29s
+MU08d	RESULT	survived
+MU08e	L	rc=0	load=3.39	16s		12 passed in 15.42s
+MU08e	V	rc=5	load=3.60	2s		no tests ran in 1.29s
+MU08e	RESULT	survived
+MU08f	L	rc=2	load=3.64	2s	tests/test_b103_label_list.py::test_r_a2l_list_076_3 - AssertionError:...	1 failed, 2 passed in 1.31s
+MU08f	RESULT	killed
+MU09	L	rc=2	load=3.64	2s	tests/test_b103_label_list.py::test_r_a2l_list_002_3 - AssertionError:...	2 failed in 1.78s
+MU09	RESULT	killed
+MU10	L	rc=2	load=3.66	2s	tests/test_b103_label_list.py::test_r_a2l_list_003_1 - AssertionError:...	2 failed in 1.77s
+MU10	RESULT	killed
+MU11	L	rc=2	load=3.66	2s	tests/test_b103_label_list.py::test_r_a2l_list_004_2 - AssertionError:...	2 failed in 1.75s
+MU11	RESULT	killed
+MU12	L	rc=2	load=3.69	2s	tests/test_b103_label_list.py::test_r_a2l_list_005_2 - AssertionError:...	2 failed in 1.72s
+MU12	RESULT	killed
+MU13	L	rc=5	load=3.69	2s		no tests ran in 1.27s
+MU13	V	rc=2	load=3.64	15s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_013_2 - AssertionErr...	2 failed in 14.30s
+MU13	RESULT	killed
+MU14	L	rc=5	load=3.64	2s		no tests ran in 1.25s
+MU14	V	rc=2	load=3.64	16s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_017_2 - AssertionErr...	1 failed, 1 passed in 15.06s
+MU14	RESULT	killed
+MU15	L	rc=2	load=3.60	15s	tests/test_b103_label_list.py::test_r_a2l_list_046_2 - AssertionError:...	1 failed, 1 passed in 14.18s
+MU15	RESULT	killed
+MU16a	L	rc=5	load=3.62	2s		no tests ran in 1.32s
+MU16a	V	rc=2	load=3.62	15s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_024_1 - AssertionErr...	2 failed in 14.68s
+MU16a	RESULT	killed
+MU16b	L	rc=5	load=3.80	2s		no tests ran in 1.25s
+MU16b	V	rc=2	load=3.82	15s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_024_2 - AssertionErr...	1 failed, 1 passed in 14.61s
+MU16b	RESULT	killed
+MU17	L	rc=0	load=3.85	15s		2 passed in 14.20s
+MU17	V	rc=2	load=3.81	15s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_018_2 - AssertionErr...	1 failed, 1 passed in 14.45s
+MU17	RESULT	killed
+MU18a	L	rc=2	load=3.78	2s	tests/test_b103_label_list.py::test_r_a2l_list_063_1 - AssertionError:...	2 failed, 1 passed in 1.98s
+MU18a	RESULT	killed
+MU18b	L	rc=2	load=3.80	2s	tests/test_b103_label_list.py::test_r_a2l_list_065_2 - AssertionError:...	1 failed, 1 passed in 1.86s
+MU18b	RESULT	killed
+MU19a	L	rc=5	load=3.80	2s		no tests ran in 1.24s
+MU19a	V	rc=0	load=3.74	34s		3 passed in 33.17s
+MU19a	RESULT	survived
+MU19b	L	rc=2	load=3.28	14s	tests/test_b103_label_list.py::test_r_a2l_list_070_2 - assert (not Fal...	1 failed, 1 passed in 14.02s
+MU19b	RESULT	killed
+MU20	L	rc=2	load=3.21	16s	tests/test_b103_label_list.py::test_r_a2l_list_057_2 - AssertionError:...	1 failed, 2 passed in 15.86s
+MU20	RESULT	killed
+MU21a	L	rc=0	load=2.99	2s		3 passed in 1.67s
+MU21a	V	rc=2	load=2.99	104s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_062_1 - AssertionErr...	2 failed, 9 passed in 103.16s (0:01:43)
+MU21a	RESULT	killed
+MU21b	L	rc=0	load=3.15	2s		3 passed in 1.73s
+MU21b	V	rc=2	load=3.22	88s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_062_2 - AssertionErr...	1 failed, 10 passed in 87.34s (0:01:27)
+MU21b	RESULT	killed
+MU22a	L	rc=5	load=3.32	2s		no tests ran in 1.28s
+MU22a	V	rc=0	load=3.46	66s		8 passed in 65.96s (0:01:05)
+MU22a	RESULT	survived
+MU22b	L	rc=5	load=3.63	2s		no tests ran in 1.28s
+MU22b	V	rc=0	load=3.66	111s		13 passed in 110.90s (0:01:50)
+MU22b	RESULT	survived
+MU22c	L	rc=5	load=3.40	2s		no tests ran in 1.25s
+MU22c	V	rc=0	load=3.37	63s		8 passed in 62.50s (0:01:02)
+MU22c	RESULT	survived
+MU23	L	rc=2	load=3.95	2s	tests/test_b103_label_list.py::test_r_a2l_list_077_1 - AssertionError:...	1 failed, 5 passed in 1.48s
+MU23	RESULT	killed
+MU24	L	rc=5	load=3.96	2s		no tests ran in 1.28s
+MU24	V	rc=2	load=3.96	16s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_017_1 - AssertionErr...	2 failed in 15.01s
+MU24	RESULT	killed
+#	pause	load 4.13
+MU25	L	rc=5	load=2.83	2s		no tests ran in 1.33s
+MU25	V	rc=2	load=2.84	44s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_008_3 - AssertionErr...	1 failed, 3 passed in 43.59s
+MU25	RESULT	killed
+MU26	L	rc=5	load=2.96	2s		no tests ran in 1.17s
+MU26	V	rc=2	load=2.96	21s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_009_1 - AssertionErr...	1 failed, 4 passed in 20.13s
+MU26	RESULT	killed
+MU27	L	rc=0	load=3.04	2s		2 passed in 1.70s
+MU27	V	rc=2	load=3.04	45s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_017_2 - AssertionErr...	1 failed, 4 passed in 44.65s
+MU27	RESULT	killed
+MU28	L	rc=2	load=3.29	14s	tests/test_b103_label_list.py::test_r_a2l_list_046_2 - AssertionError:...	1 failed, 1 passed in 13.98s
+MU28	RESULT	killed
+MU29	L	rc=2	load=3.36	15s	tests/test_b103_label_list.py::test_r_a2l_list_078_1 - assert (300 == ...	2 failed in 14.62s
+MU29	RESULT	killed
+MU30	L	rc=5	load=3.36	2s		no tests ran in 1.21s
+MU30	V	rc=2	load=3.41	15s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_024_2 - AssertionErr...	2 failed in 14.29s
+MU30	RESULT	killed
+MU31	L	rc=2	load=3.25	3s	tests/test_b103_label_list.py::test_r_a2l_list_065_2 - AssertionError:...	1 failed, 3 passed in 2.05s
+MU31	RESULT	killed
+MU32	L	rc=0	load=3.25	16s		5 passed in 15.64s
+MU32	V	rc=5	load=3.25	2s		no tests ran in 1.25s
+MU32	RESULT	survived
