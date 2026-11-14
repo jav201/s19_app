@@ -1,6 +1,7 @@
 """s19_app.tui.app.a2l_view — S19TuiApp mixin: a2l_view (moved verbatim from s19_app/tui/app.py at 4f721985)."""
 from __future__ import annotations
 
+import functools
 import json
 from pathlib import Path
 import time
@@ -24,6 +25,7 @@ from .shared import (
     _severity_style,
     A2LTagTable,
     A2LDetailCard,
+    _a2l_detail_card_text,
 )
 
 #: The shipped 16 A2L tag-table columns (text mode), in ``_build_a2l_table_cells``
@@ -1128,6 +1130,61 @@ class A2lViewMixin:
         chips.append(self._a2l_mode_line())
         return chips, missing
 
+    def a2l_open_label_list(self) -> None:
+        """
+        Summary:
+            Open the paste window, seeded with the viewer's pasted names when
+            the viewer is in list mode, and apply its result to the filter box
+            (R-A2L-LIST.040, .041, .053, .054).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Seed the window with the current enriched tags, the shared
+              label ranker, the viewer's pasted names (empty in text mode)
+              and the ``#a2l_panes`` width regime.
+            - On dismiss with a non-empty name list, replace the filter box
+              value with the names joined by ``, `` (cursor 0, so the box's
+              Changed event runs the debounced refresh) and close the
+              dropdown; ``None`` leaves the filter untouched.
+
+        Dependencies:
+            Uses:
+                - ``LabelListPasteModal`` / ``LabelRanker``
+                - ``_a2l_list_names``
+            Used by:
+                - ``A2LExplorerBody.action_paste_list`` (alt+p)
+        """
+        names = self._a2l_list_names() or []
+        ranker = getattr(self, "_a2l_label_ranker", None)
+        if ranker is None:
+            ranker = label_list.LabelRanker(self)
+            self._a2l_label_ranker = ranker
+        try:
+            wide = self.query_one("#a2l_panes").size.width >= label_list.WIDE_AT
+        except Exception:
+            wide = False
+        modal = label_list.LabelListPasteModal(
+            tags=self._a2l_enriched_tags,
+            ranker=ranker,
+            names=names,
+            wide=wide,
+        )
+
+        def apply_result(result: Optional[list[str]]) -> None:
+            if not result:
+                return
+            box = self.query_one("#a2l_tags_filter_input", Input)
+            box.value = ", ".join(result)
+            box.cursor_position = 0
+            self.query_one("#a2l_filter_suggest", label_list.LabelSuggestBox).close()
+
+        self.push_screen(modal, apply_result)
+
     def _refresh_a2l_dependent_views(self) -> None:
         """
         Summary:
@@ -1142,6 +1199,8 @@ class A2lViewMixin:
 
         Data Flow:
             - Reset only the filter mode, then render fresh A2L/MAC/Issues data.
+            - Re-resolve the open paste window's names against the new tags
+              (R-A2L-LIST.056).
             - Invalidate the old hex span, description and detail selection;
               register the final detail clear behind queued row highlights.
             - Refresh both pickers, Memory Map, Split / Join and Loaded through
@@ -1151,6 +1210,7 @@ class A2lViewMixin:
             Uses:
                 - ``update_a2l_view`` / ``_prefill_check_editor`` /
                   ``_prefill_patch_editor`` / ``update_memory_map``
+                - ``LabelListPasteModal.refresh_tags``
                 - ``SplitJoinWindow.invalidate_a2l_selection`` /
                   ``watch_current_file`` / ``_refresh_loaded_panel``
             Used by:
@@ -1176,6 +1236,8 @@ class A2lViewMixin:
             screen = None
         if isinstance(screen, CurveDescriptionScreen):
             screen.dismiss(None)
+        if isinstance(screen, label_list.LabelListPasteModal):
+            screen.refresh_tags(self._a2l_enriched_tags)
         try:
             card = self.query_one("#a2l_detail_card", A2LDetailCard)
         except Exception:
@@ -1612,7 +1674,7 @@ class A2lViewMixin:
 
     def _a2l_table_column_labels(self, a2l_table: DataTable) -> tuple[str, ...]:
         """Return ``a2l_table``'s current column labels in order."""
-        return tuple(column.label.plain for column in a2l_table.columns)
+        return tuple(column.label.plain for column in a2l_table.ordered_columns)
 
     def _set_a2l_table_columns(
         self, a2l_table: DataTable, labels: tuple[str, ...]
@@ -1970,7 +2032,8 @@ class A2lViewMixin:
     def _schedule_a2l_filter_refresh(self) -> None:
         """
         Summary:
-            Debounce rapid filter-input events and refresh only buffered A2L tags window.
+            Debounce rapid filter-input events, refresh the buffered A2L tags
+            window and drive the filter box's suggestion dropdown.
 
         Args:
             None
@@ -1985,16 +2048,22 @@ class A2lViewMixin:
             - Drop the refresh when it comes due after the app stopped
               running: shutdown has already removed the A2L tag table
               (Inc 1b E5, R-COPY.26).
+            - After the refresh, open the dropdown with the ranked names of
+              the stripped text; an empty or list text closes it
+              (R-A2L-LIST.060, .062).
 
         Dependencies:
             Uses:
                 - ``set_timer``
                 - ``_refresh_a2l_filtered_tags``
+                - ``LabelRanker.request`` / ``LabelSuggestBox``
             Used by:
                 - ``on_input_changed`` for A2L filter input
         """
         self._a2l_filter_debounce_token += 1
         expected_token = self._a2l_filter_debounce_token
+        box = self.query_one("#a2l_tags_filter_input", Input)
+        suggest = self.query_one("#a2l_filter_suggest", label_list.LabelSuggestBox)
 
         def _apply_filter() -> None:
             if expected_token != self._a2l_filter_debounce_token:
@@ -2002,5 +2071,145 @@ class A2lViewMixin:
             if not self.is_running:
                 return
             self._refresh_a2l_filtered_tags(preserve_anchor=False)
+            text = box.value.strip()
+            if not text or label_list.is_list_text(text):
+                suggest.close()
+                return
+            ranker = getattr(self, "_a2l_label_ranker", None)
+            if ranker is not None:
+                ranker.request(
+                    "filter",
+                    text,
+                    label_list.RANK_LIMIT,
+                    functools.partial(suggest.show_ranked, text),
+                    current=lambda: box.is_attached and box.value.strip() == text,
+                )
 
         self.set_timer(0.15, _apply_filter)
+
+
+class ListAwareDetailCard(A2LDetailCard):
+    """The A2L Explorer detail card, aware of list mode (R-A2L-LIST.027-.030).
+
+    A subclass of :class:`A2LDetailCard` (``shared.py``) so the type queries
+    ``a2l_view.py`` and ``navigation.py:1418`` still match. In list mode it
+    finds the highlighted pasted name's entry and paints the missing /
+    duplicate / hidden card lines; in text mode it shows the shipped card
+    unchanged. It lives in G-V because :mod:`a2l_label_list` may not import
+    the app package.
+    """
+
+    def show_tag(self, tag: Optional[dict]) -> None:
+        """
+        Summary:
+            Update the card for the highlighted A2L row, switching on list mode.
+
+        Args:
+            tag (Optional[dict]): The highlighted row's dict — the enriched
+                tag object for a found / duplicate / hidden name, the
+                ``{"name": ..., "_list_pos": ...}`` dict for a missing name,
+                or ``None``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - No list resolution (text mode) or ``None`` → the shipped card.
+            - A missing row → its ``✗`` / ``pasted #`` lines, then a ``card``
+              ranking for the closest names.
+            - A duplicate or hidden row → the shipped card + its addendum.
+            - A found row → the shipped card.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_detail_card_text`` / ``label_list.list_card_text``
+                - ``label_list.LabelRanker.request``
+            Used by:
+                - ``on_data_table_row_highlighted``
+        """
+        self._shown_entry = None
+        if tag is None:
+            super().show_tag(tag)
+            return
+        resolution = getattr(self.app, "_a2l_list_resolution", None)
+        if resolution is None:
+            super().show_tag(tag)
+            return
+        entry = self._resolve_entry(tag, resolution)
+        if entry is None or entry.status == label_list.FOUND:
+            super().show_tag(tag)
+            return
+        if entry.status == label_list.MISSING:
+            self._paint_missing(entry)
+            return
+        self._paint_addendum(tag, entry)
+
+    def _resolve_entry(
+        self, tag: dict, resolution: label_list.LabelListResolution
+    ) -> Optional[label_list.LabelListEntry]:
+        """Resolve ``tag`` to its list-mode entry, or ``None`` for the shipped card."""
+        if "_list_pos" in tag:
+            return resolution.entries[tag["_list_pos"] - 1]
+        entry = self._cursor_entry(resolution)
+        if entry is not None and entry.tag is tag:
+            return entry
+        return None
+
+    def _cursor_entry(
+        self, resolution: label_list.LabelListResolution
+    ) -> Optional[label_list.LabelListEntry]:
+        """Return the tag table's cursor-row entry, or ``None``."""
+        try:
+            a2l_table = self.app.query_one("#a2l_tags_list", DataTable)
+            row_index = a2l_table.cursor_row
+            if row_index is None:
+                return None
+            row_key, _ = a2l_table.coordinate_to_cell_key((row_index, 0))
+        except Exception:
+            return None
+        key = getattr(row_key, "value", row_key)
+        if not isinstance(key, str) or not key.startswith("a2l:"):
+            return None
+        try:
+            index = int(key[len("a2l:"):])
+        except ValueError:
+            return None
+        if 0 <= index < len(resolution.entries):
+            return resolution.entries[index]
+        return None
+
+    def _paint_missing(self, entry: label_list.LabelListEntry) -> None:
+        """Paint the missing card and request its closest names off the UI thread."""
+        self._set_card_text(label_list.list_card_text(entry, None))
+        ranker = getattr(self.app, "_a2l_label_ranker", None)
+        if ranker is None:
+            return
+        self._shown_entry = entry
+
+        def deliver(matches: list) -> None:
+            self._set_card_text(
+                label_list.list_card_text(entry, [match.name for match in matches])
+            )
+
+        def current() -> bool:
+            return self.is_attached and self._shown_entry is entry
+
+        ranker.request(
+            "card",
+            entry.name,
+            label_list.CLOSEST_LIMIT,
+            deliver,
+            current,
+        )
+
+    def _paint_addendum(self, tag: dict, entry: label_list.LabelListEntry) -> None:
+        """Paint the shipped card followed by the duplicate / hidden addendum."""
+        text = _a2l_detail_card_text(tag)
+        text.append("\n")
+        text.append(label_list.list_card_text(entry, None))
+        self._set_card_text(text)
+
+    def _set_card_text(self, text: Text) -> None:
+        """Write ``text`` as the card's content (markup off, re-wrapped)."""
+        self._card_text = text
+        self._rewrite_card_text()
