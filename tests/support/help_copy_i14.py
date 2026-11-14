@@ -11,7 +11,7 @@ REWRITTEN_SECTIONS = {
         'A2L Explorer',
         (
             'Load an A2L (`^L`) to list its tags (measurements and characteristics) in the tag table, each with its address, length, values and the memory region it falls in.',
-            'Filter tags narrows the table to the tags that match; All, Invalid and In-Memory choose which tags it lists; type in Find in tag table and press Find next to move to the next matching tag; Page Prev and Page Next turn its pages.',
+            'The box that says type part of a name — or paste a list narrows the table to the tags that match; All, Invalid and In-Memory choose which tags it lists; type in Find in tag table and press Find next to move to the next matching tag; Page Prev and Page Next turn its pages.',
             "`/` puts the cursor in Search ASCII text, the search box of the hex pane: Find Next finds that text in the loaded image's bytes. `g` puts it in Goto 0xADDR: Goto shows that address.",
             "`d` describes the highlighted tag, with its points for a CURVE or MAP tag. `j` writes the parsed A2L as JSON into the work area's `temp\\` folder.",
             "The Region column comes from the A2L's MEMORY_SEGMENT declarations (flash, ram or unknown); the A2L tab of Split / Join / Export lists the same segments.",

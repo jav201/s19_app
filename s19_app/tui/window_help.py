@@ -349,7 +349,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Load an A2L (`^L`) to list its tags (measurements and "
             "characteristics) in the tag table, each with its address, "
             "length, values and the memory region it falls in.",
-            "Filter tags narrows the table to the tags that match; All, "
+            "The box that says type part of a name — or paste a list narrows "
+            "the table to the tags that match; All, "
             "Invalid and In-Memory choose which tags it lists; type in "
             "Find in tag table and press Find next to move to the next "
             "matching tag; Page Prev and Page Next turn its pages.",
