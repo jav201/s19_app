@@ -118,6 +118,9 @@ SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     # Inc 10a E4-R3: the widget a focus landing last chose instead of the
     # window's target; a widget reference, never carried across a load-over.
     "_focus_landing_fallback": "the focus landing's fallback widget; UI focus state, not session state (Inc 10a E4-R3)",
+    # Inc 7 (E3A-09, E1-slice 5.2): the two app attributes the A2L list of labels adds.
+    "_a2l_label_ranker": "one worker host per app; not session state (Inc 7)",
+    "_a2l_list_resolution": "derived from the filter text and the enriched tags at every refresh (Inc 7)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
