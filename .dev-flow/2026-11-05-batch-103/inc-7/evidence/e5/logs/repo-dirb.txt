@@ -1,0 +1,8 @@
+label=dirb start=2026-11-14T10:24:38-06:00 load=2.10 2.17 2.07 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 11.30s
+RC=0 end=2026-11-14T10:24:50-06:00 load=2.15 2.17 2.08

@@ -1,0 +1,8 @@
+label=V-vchunk.04 start=2026-11-14T10:11:18-06:00 load=2.50 2.41 1.95 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....................                                                     [100%]
+20 passed in 142.23s (0:02:22)
+RC=0 end=2026-11-14T10:13:41-06:00 load=1.90 2.22 1.95

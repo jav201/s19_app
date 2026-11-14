@@ -1,0 +1,127 @@
+label=r3 start=2026-11-14T10:22:43-06:00 load=2.20 2.21 2.07 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FF...............Fx.xxxx.x.                                              [100%]
+=================================== FAILURES ===================================
+____________ test_tc_b100_09_domain_matches_the_live_source_census _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-17/popen-gw1/test_tc_b100_09_domain_matches0')
+
+    def test_tc_b100_09_domain_matches_the_live_source_census(tmp_path: Path) -> None:
+        """The snapshot domain is the source census minus the declared
+        exclusions: >= 60 names, 0 unclassified (every census name is in the
+        snapshot or in the exclusion list, each with a reason)."""
+    
+        census = _source_census()
+        assert len(census) >= 60, len(census)
+        for name, reason in SNAPSHOT_EXCLUSIONS.items():
+            assert reason.strip(), f"exclusion {name!r} needs its reason"
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                return app._session_snapshot()
+    
+        snapshot = asyncio.run(_drive())
+        covered = set(snapshot) | set(SNAPSHOT_EXCLUSIONS)
+        unclassified = census - covered
+>       assert not unclassified, f"unclassified census names: {sorted(unclassified)}"
+E       AssertionError: unclassified census names: ['_right_gesture']
+E       assert not {'_right_gesture'}
+
+tests/test_b100_session_reset.py:339: AssertionError
+___________ test_tc_b100_08_reset_runs_once_before_the_first_install ___________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-17/popen-gw0/test_tc_b100_08_reset_runs_onc0')
+
+    def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> None:
+        """One call per project load, ordered before the first install; P1's
+        two installs (S19 then MAC) both follow it. A load of the SAME project
+        again is a load-over — still exactly one reset."""
+    
+        async def _drive() -> list[str]:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            events: list[str] = []
+            original_reset = getattr(app, "_reset_project_session", None)
+            # Inc 7 re-pin (LLR-169.6): the project variant now installs through
+            # ``_install_project_image`` (parse first, then apply), the MAC
+            # through ``load_selected_file``; both apply through
+            # ``_apply_loaded_file``, so that is the install marker.
+            original_apply = app._apply_loaded_file
+    
+            def _recording_reset() -> int:
+                events.append("reset")
+                if original_reset is None:
+                    return 0
+                return original_reset()
+    
+            def _recording_apply(loaded, path, load_started) -> None:
+                events.append("install")
+                original_apply(loaded, path, load_started)
+    
+            app._reset_project_session = _recording_reset
+            app._apply_loaded_file = _recording_apply
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+            return events
+    
+        events = asyncio.run(_drive())
+        assert events.count("reset") == 2, events
+        assert events[0] == "reset", events
+>       assert events.index("reset") < events.index("install"), events
+                                       ^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: 'install' is not in list
+
+tests/test_b100_session_reset.py:258: ValueError
+_____________ test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag ______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-17/popen-gw1/test_tc_b100_09_twelve_b_adds_0')
+
+    def test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag(tmp_path: Path) -> None:
+        """LLR-165.2 extension (P1-83, C12b-49): over the Inc 12b base's
+        census, the live source census adds exactly one name,
+        ``_quit_pending``, which the exclusion list classifies with a reason
+        (requests and results are never stored on the app).
+    
+        Why: an unclassified new attribute is session state the snapshot does
+        not see; a stored request would outlive its worker.
+        Negative control: a design that stores the request on the app
+        (``self._project_load_request = request``) → 2 new names → RED; base:
+        0 new names → RED."""
+        census = _source_census()
+>       assert census - _CENSUS_AT_12B_BASE == {"_quit_pending"}, sorted(census - _CENSUS_AT_12B_BASE)
+E       AssertionError: ['_a2l_label_ranker', '_a2l_list_resolution', '_quit_pending', '_right_gesture']
+E       assert {'_a2l_label_...ight_gesture'} == {'_quit_pending'}
+E         
+E         Extra items in the left set:
+E         '_a2l_list_resolution'
+E         '_a2l_label_ranker'
+E         '_right_gesture'
+E         Use -v to get more diff
+
+tests/test_b100_session_reset.py:1164: AssertionError
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m6[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=13115417;file://~/work/zq-x7/repo/snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2;35m~/work/zq-x7/repo/[0m[2;95msnapshot_report.html[0m
+
+=========================== short test summary info ============================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag
+3 failed, 18 passed, 6 xfailed in 86.66s (0:01:26)
+RC=1 end=2026-11-14T10:24:11-06:00 load=1.85 2.13 2.06

@@ -1,0 +1,12 @@
+label=tuiapp start=2026-11-14T10:24:22-06:00 load=1.95 2.14 2.06 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.................                                                        [100%]
+============================= QC-TM timing margins =============================
+94.6%  1.082 s / 20.000 s  stress load s19_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+94.8%  1.030 s / 20.000 s  stress load mac_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+QC-TM: 2 bounds, 0 under 20 % margin
+17 passed in 14.80s
+RC=0 end=2026-11-14T10:24:38-06:00 load=2.10 2.17 2.07

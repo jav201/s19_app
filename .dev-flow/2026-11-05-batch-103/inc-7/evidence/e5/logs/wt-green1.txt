@@ -1,0 +1,9 @@
+fatal: Needed a single revision
+label=green1 start=2026-11-14T09:50:12-06:00 load=1.47 1.75 1.71 head=
+s19_app.__file__=~/work/zq-x7/wt/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.................                                                        [100%]
+17 passed in 90.76s (0:01:30)
+RC=0 end=2026-11-14T09:51:44-06:00 load=1.75 1.82 1.74

@@ -1,0 +1,12 @@
+label=laws1 start=2026-11-14T10:31:50-06:00 load=2.14 2.31 2.19 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+...................................................................      [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+67 passed in 150.16s (0:02:30)
+RC=0 end=2026-11-14T10:34:21-06:00 load=1.97 2.17 2.15

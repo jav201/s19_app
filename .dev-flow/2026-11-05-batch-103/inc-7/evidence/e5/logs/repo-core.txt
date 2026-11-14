@@ -1,0 +1,17 @@
+label=core start=2026-11-14T10:16:18-06:00 load=2.12 2.28 2.02 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 82%]
+..........ss...                                                          [100%]
+============================= QC-TM timing margins =============================
+25.4%  0.242 s / 0.325 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+33.9%  0.195 s / 0.296 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+34.0%  0.196 s / 0.298 s  r_tui_043_10_1_a  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+37.3%  0.181 s / 0.288 s  r_paste_31_a  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+38.5%  0.198 s / 0.321 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+44.0%  0.161 s / 0.287 s  r_paste_27_3  tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+QC-TM: 6 bounds, 0 under 20 % margin
+85 passed, 2 skipped in 137.44s (0:02:17)
+RC=0 end=2026-11-14T10:18:36-06:00 load=2.25 2.26 2.04
