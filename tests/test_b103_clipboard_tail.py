@@ -469,7 +469,7 @@ async def _show_box(app, pilot, kind: str, text: str, *, select: bool = True):
     if kind == "input":
         app.action_show_screen("a2l")
         await _settle(pilot)
-        widget = app.query_one("#a2l_tags_filter_input", Input)
+        widget = app.query_one("#a2l_tag_find_input", Input)
         widget.value = text
         if select:
             widget.selection = (0, len(text))
@@ -2699,7 +2699,7 @@ def _unrelated_view_box_observation(tmp_path: Path, monkeypatch) -> dict:
             _require(bool(unrelated) and unrelated.count("\n") == 2, "unrelated selection did not contain three lines")
             _require(len(set(unrelated.splitlines())) == 3, "unrelated selection lines were not distinct")
             view_selections = dict(app.screen.selections)
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "abc"
             box.selection = (0, 3)
             box.focus()

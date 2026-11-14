@@ -51,7 +51,7 @@ _LINUXH = sys.platform != "win32"
 # The class-pair sources/targets: (source_screen, source_id, target_screen,
 # target_id, target_kind). Box A = a2l filter, Box M = patch paste buffer,
 # Box A' = diff path, Box M' = split/join/export manual ranges.
-_A = ("a2l", "#a2l_tags_filter_input", "input")
+_A = ("a2l", "#a2l_tag_find_input", "input")
 _M = ("patch", "#patch_paste_text", "textarea")
 _A_PRIME = ("diff", "#diff_path_a", "input")
 _M_PRIME = ("sje", "#sje_manual", "textarea")
@@ -207,7 +207,7 @@ def _single_line_places():
     """(screen_key, widget_id, needs_project) for R-TUI-044.1/1-17."""
     return [
         ("workspace", "#search_input", True),
-        ("a2l", "#a2l_tags_filter_input", False),
+        ("a2l", "#a2l_tag_find_input", False),
         ("mac", "#mac_search_input", False),
         ("patch", "#patch_entry_address_input", False),
         ("diff", "#diff_path_a", False),
