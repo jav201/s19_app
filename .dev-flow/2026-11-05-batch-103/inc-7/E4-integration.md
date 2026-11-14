@@ -150,3 +150,20 @@ The first run gave a second gap, `SLICE s19_app/tui/a2l_label_list.py changed si
 - Mutants: the `.084/.085` "after close" arms cannot see a removed `is_running` check, because `_work` swallows `RuntimeError` from `call_from_thread` (and `worker_errors` now ignores Textual's `CancelledError`); expect such mutants to survive unless the `except` goes too.
 - New lines to mutate: the cap line in `_paint_similar`; found = FOUND + HIDDEN in `_counts_line`; `entry.tag is None` in `list_row_cells`; `_paint_a2l_filter_chips()` in the unload branch.
 - Never decide the two timing arms above a 1-min load of 2 (HT-08).
+
+## Pass 4 (MU7 step 0) -- E4 GREEN
+
+Rulings P-094 applied by the mutant worker (tree `bf9a6ecf` -> `7463c9e3`). Runner, isolated environment (HT-02), `<runner-home>`; clone with `main` = origin/main `0c3a6bd4` (HT-03); `s19_app.__file__` printed first (the clone).
+
+**F-I7-5 (`91e5eeab`, DF-04 a).** The A2L help step 2 named `Filter tags`, a name the window no longer paints (D-3 placeholder). Operator-visible help text, old -> new (only the first words change):
+- old: `Filter tags narrows the table to the tags that match; All, Invalid and In-Memory choose ...`
+- new: `The box that says type part of a name — or paste a list narrows the table to the tags that match; All, Invalid and In-Memory choose ...`
+
+The same wording is pinned in 3 test places, which changed with it (a pin follows the copy): `tests/support/help_copy_i14.py` (the I14 copy), `_CONTROLS["a2l"]` and the `checks` negative control in `tests/test_b101_help_legend_docs.py`. Noted, not touched (outside Inc 7, PP-06): the historical I14 requirement text of batch-101 `inc-14/01-requirements.md`, and the user guide `docs/user-guide/ch04-a2l-explorer.md` / `DOSSIER.md`, which still say *Filter tags* (user-facing doc, for the final page).
+RED -> GREEN: `test_r_whelp_12_2_named_controls_exist` on `bf9a6ecf`: `1 failed` (load 1.79); on the clone at `7463c9e3` the file `test_b101_help_legend_docs.py` passes (110 passed with `test_requirements_canon.py` and `test_tui_report_seam.py`, 1 failed = the canon node below).
+
+**F-I7-7 (`7463c9e3`, HT-11).** The runner HOME basename redacted in 8 files of `inc-7/` (13 occurrences; the law counted 21 offenders, the brief said 21 files): `E1-rulings.md`, `E1-slice.md`, `E3-architect.md`, `E3-security.md`, `evidence-remap/i7-remap-collect.txt` -> `<runner-home>`; `evidence-e1/i7e1-run.sh`, `i7e3r1-run.sh`, `i7e3r2-run.sh` read `${RUNNER_HOME_NAME}` (comment in line 2). No `SHA256SUMS` or manifest in `inc-7/`; nothing outside `inc-7/` touched. `test_suite_hygiene.py`: `67 passed` (incl. `test_r_tst_070_2`); 1-min load 1.6-1.9 over the run.
+
+**Laws, clone `7463c9e3` (12 files):** `test_b101_doc_hygiene`, `_help_legend_docs`, `test_batch91_registry_hygiene`, `test_deps_seam_law`, `test_docs_canon`, `test_id_registry`, `test_no_private_tokens`, `test_requirements_canon`, `test_suite_hygiene`, `test_tui_report_seam`, `test_legend_n8`, `test_tui_legend`. Run in three groups (`-n 2`, `timeout 300`): hygiene `67 passed`; help-legend + canon + report-seam `1 failed, 109 passed`; the other 8 files `121 passed`. The one failure is `test_canon_rows_hold_the_obligation_word_once`: R-A2L-DEF.153, R-PICKER-CORRECT.004, .008 -- the 3 base-identical rows (P-105), not Inc 7. A first all-12-in-one run (`-n 2`, 298 s, a second worker's nested pytest on the same host) gave 14 failed (hygiene timing/report nodes and 3 report-seam nodes): none reproduces when the files run apart, so they are load/interference, not results (MD-07, HT-08).
+
+**E4 GREEN** for Inc 7 on `7463c9e3`, apart from the base-identical items of pass 3 (13 Inc 12 card nodes F-I7-6, 3 canon rows, `tc_b100_08` / `_09` / `twelve_b`) and the load-deferred timing arms (-> E5). The mutant steps 1-5 follow.
