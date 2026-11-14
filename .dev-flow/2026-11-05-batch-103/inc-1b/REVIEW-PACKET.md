@@ -2,7 +2,7 @@
 
 Batch 2026-11-05-batch-103, increment 1b: copy from every view (US-103-01). Branch `b103-inc1b-push`, base of the increment `dc44b364`, tree `290d80ae` plus the records of the close-out commit. Draft by the close-out worker (relevo-9, P-003). The validation record is `04-validation.md`; the requirements, `01-requirements.md`; the cases and ledger, `02-test-cases.md`.
 
-**Status: OPEN.** Reason: `redact_e5.py --check` on the current tree fails with residual 1 (a synthetic payload in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). Everything else passes: WinCI round #3 on `b2d6eb25` R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; trace 0 gaps. The status becomes PASS-WITH-NOTES when that residual is cleared and the check is re-run. The 8 captures and AT-I1b-8 await the operator's verdict on the final review page.
+**Status: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25` R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 PASS after the residual fix; trace 0 gaps. The 8 captures and AT-I1b-8 go on the final review page (decided provisionally, P-059).
 
 ## 1. What changed
 
@@ -41,7 +41,7 @@ State words per `/dev-flow`: `executed`, `not-run`, `blocked`, `planned`.
 | WinCI round #3, `b2d6eb25` N=10 (post-fix) | executed; **R-PASTE.13/101 0/10**, every gated node 0/10, 10/10 PASS 108/108; `notice_wait_s` 0.0 to 0.093 s | `E5-winci-b2d6eb25-n10.md` |
 | P-101 re-review | executed: PASS-WITH-NOTES, no HIGH; RR-1 MEDIUM fixed, RR-2..RR-4 LOW open | `E5-rereview-final.md` |
 | DF-06 at 53bd5fc8 | executed: `redact_e5 --check` PASS files=295 residual=0; manifests PASS 6/83 | `E5-rereview-final.md` section 4 |
-| DF-06 on the current tree | executed: `redact_e5 --check` **FAIL** files=305 residual=1; `refresh_manifests --check` PASS 6/83 | `04-validation.md` |
+| DF-06 on the current tree | executed: `redact_e5 --check` FAIL files=305 residual=1, then after the driver rename PASS files=305 residual=0 exceptions=8; `refresh_manifests --check` PASS 6/83 | `04-validation.md` |
 | Trace check | executed: 0 gaps (24 active, 2 withdrawn) | `04-validation.md` |
 | AT-I1b-8 (operator) | not-run; awaiting the operator | PENDING P-004 |
 | GW-W01 ... 04 mutants (WinCI-only) | not-run | PENDING P-005 |
@@ -58,7 +58,7 @@ State words per `/dev-flow`: `executed`, `not-run`, `blocked`, `planned`.
 
 ## 6. Pending items
 
-- **DF-06 residual** (new): clear `capture_i1b_driver.py:110` (reword the payload with a note, or add an exception with a reason), re-run `redact_e5.py --check`, then set the verdict.
+- **DF-06 residual**: CLEARED. Orchestrator ruling (relevo-11, DF-04 a): the driver's tail was renamed to `HIDDEN-TAIL` with an in-file note (the refusal depends only on the NUL; the payload text appears in no capture or sidecar). Not an exception in `redact_e5.py`: that file is pinned in `evidence-e5/SHA256SUMS.txt`. Re-run: `REDACTION_CHECK PASS files=305 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`.
 - **P-001**: cause found (H5), fixed in `b2d6eb25`, post-fix rate 0/10 (`E5-winci-b2d6eb25-n10.md`).
 - **RR-2** (LOW): no Linux test pins the `[t_start, t_end]` tick window. **RR-3** (LOW): `from None` drops the traceback. **RR-4** (LOW, records): `steps.log` 06:31 and 06:32 say `files=304`, the tree says 295; `steps.log` is append-only, corrected by the note in `04-validation.md`.
 - **P-004** (AT-I1b-8, the operator's); **P-005** (GW-W01 ... 04 WinCI-only mutants); canon fold at batch end.

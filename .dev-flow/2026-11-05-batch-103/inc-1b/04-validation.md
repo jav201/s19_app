@@ -2,7 +2,9 @@
 
 Batch 2026-11-05-batch-103, increment 1b. Branch `b103-inc1b-push`, base of the increment `dc44b364`, tree at this write `290d80ae` plus the records of this commit. Written by the close-out worker (relevo-9, P-003). Every outcome below cites a committed record; none is typed from memory.
 
-**Verdict: OPEN.** Reason: `redact_e5.py --check` on the current tree FAILS (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). Everything else passes: WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. It becomes PASS-WITH-NOTES when that one residual is cleared and the check is re-run. Visible items (the 8 captures; AT-I1b-8) are awaiting the operator's verdict on the final review page.
+**Verdict: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25`: R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 checks PASS after the residual was cleared (section below); trace 0 gaps. Visible items (the 8 captures; AT-I1b-8) are decided provisionally on the final review page (P-059).
+
+_Superseded verdict (Z1, 22:37):_ **Verdict: OPEN.** Reason: `redact_e5.py --check` on the current tree FAILS (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). Everything else passes: WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. It becomes PASS-WITH-NOTES when that one residual is cleared and the check is re-run. Visible items (the 8 captures; AT-I1b-8) are awaiting the operator's verdict on the final review page.
 
 ## Final runs
 
@@ -82,7 +84,7 @@ Reading: the `files` count grew 295 -> 305 because the close-out commit c66f467f
 - **RR-3** (LOW): `raise AssertionError(...) from None` in the R-PASTE.13/101 wrappers drops the original traceback (the message stays unique).
 - **RR-4** (LOW, records): `steps.log` entries of 2026-11-13 06:31 and 06:32 say `files=304`; the committed tree reports `files=295` (the earlier count included untracked files). Correction by this note only; `steps.log` is append-only and the lines are not edited (PP-06).
 - **P-004** (AT-I1b-8, the operator's), **P-005** (GW-W01 ... 04 WinCI-only mutants; GC-C14 blocked by design), canon fold at batch end. P-103 does not belong to Inc 1b.
-- New: the DF-06 residual above (`capture_i1b_driver.py`), to clear before the verdict can become PASS-WITH-NOTES.
+- ~~New: the DF-06 residual above~~ — cleared. Orchestrator ruling (relevo-11, DF-04 a): the driver's tail was renamed to `HIDDEN-TAIL` with an in-file note (the refusal depends only on the NUL; the payload text appears in no capture or sidecar). Not an exception in `redact_e5.py`: that file is pinned in `evidence-e5/SHA256SUMS.txt`. Re-run: `REDACTION_CHECK PASS files=305 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`.
 
 ## Trace check
 
