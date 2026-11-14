@@ -7,10 +7,10 @@ commit `aba3b947` (merge `c3760226`). Brief: R11 (P-011 local half).
 
 ## State / next step
 
-- DONE: merge, port, retarget, merge-prediction check, AST identity check.
-- RUNNING: check (a) on rtx (merged and Inc 1b tip, same five files, serial).
-- NEXT: negative controls, check (b) laws on merged and on a95d0ea9, full suite vs the
-  a95d0ea9 baseline, PP-02 scan, scratch deletion.
+- DONE: merge, port, retarget, merge-prediction check, AST identity check, check (a),
+  negative controls NC-1/NC-2, check (b), decision D-R11-1 (fix forward).
+- NEXT: full suite on the final tree vs the a95d0ea9 baseline, compare, PP-02 scan,
+  scratch deletion.
 
 ## Why the merge is small
 
@@ -69,6 +69,78 @@ package root:
   lands on the root re-export, which no product code reads (CLAUDE.md deps seam), and the
   WinCI diagnostic loses its `tail_start`/`tail_end` events. Negative control: see below.
 
-## Checks
+## Checks (rtx, Linux)
 
-Pending.
+Environment for every targeted run: scratch `~/work/zq-base2/`, clones from a bundle
+of named branches, the isolated env of the runner rules (empty env, HOME under the
+scratch, XDG/TMPDIR isolated, `PYTHONDONTWRITEBYTECODE=1`, `-p no:cacheprovider`,
+`< /dev/null`), `s19_app.__file__` printed first, `timeout` per run (`tools/run_t.sh`).
+Captured outputs in `runs/` are redacted: home path -> `~`, pytest temp folder ->
+`pytest-of-<user>`, the isolated HOME basename -> `<iso-home>` (see D-R11-2), CR removed.
+The tool copies in `tools/` carry the same `<iso-home>` redaction.
+
+### (a) Inc 1b's Linux suite: PASS, identical to the Inc 1b tip
+
+Files: `test_b103_copy_views.py`, `test_b103_clipboard_tail.py`,
+`test_b103_copy_quit_dialog.py`, `test_b103_copy_paste_matrix.py`,
+`test_b103_a2l_filter_teardown.py`; serial, both trees at once (load 3 -> 8).
+
+| Tree | Result | QC-TM |
+|---|---|---|
+| merged `c3760226` | 124 passed, 23 skipped (24 min) | 6 bounds, 0 under 20 % margin |
+| Inc 1b tip `99075449` | 124 passed, 23 skipped (24 min) | 6 bounds, 0 under 20 % margin |
+
+`runs/a-tip-vs-merged.txt`: 147 nodes each, **0 differing**. Against `e8f8e3d1`
+(122 passed, 19 skipped, 141 nodes): +1 passed R-COPY.26/1 (the teardown test), +1
+passed and +4 skipped from tail tests added after `e8f8e3d1` (R-PASTE.14 C1 `[key|right|row]`
+and C2 skip on Linux, WinCI-only). The 23 skips: 14 P2 matrix cells (terminal paste, not on
+Linux), 8 WinCI-only tail nodes (R-PASTE.13/101, R-PASTE.14/101-103, C1 x3, C2) and
+AT-I1b-8 (manual).
+
+### Negative controls (scratch clones, never the worktree)
+
+| Id | Mutation | Expected | Result |
+|---|---|---|---|
+| NC-1 | remove the two ported guard lines from `app/a2l_view.py` | R-COPY.26/1 RED | RED: `NoMatches: No nodes match '#a2l_tags_list'` (the P-002 signature), `runs/nc-guard.txt` |
+| NC-2 green | probe `tools/test_zq_nc_diag_seam.py` on the merged tree | GREEN | 1 passed, `runs/nc-diag-green.txt` |
+| NC-2 red | same probe, tuple back to `app_module` | RED | `assert '_mirror_and_..._os_clipboard' == 'tail_mark'`, `runs/nc-diag-red.txt` |
+
+### (b) Laws: merged vs base `a95d0ea9`
+
+`test_no_private_tokens`, `test_package_source_helper`, `test_suite_hygiene`,
+`test_requirements_canon`, `test_import_census`, `test_deps_seam_law`,
+`test_engine_unchanged`, `test_id_registry` (`-n 4`), and `test_tui_directionb.py -k tc031`.
+
+| Tree | Result |
+|---|---|
+| merged `c3760226` | 2 failed, 109 passed; tc031 3 passed |
+| base `a95d0ea9` | 1 failed, 110 passed; tc031 3 passed |
+
+- `test_requirements_canon::test_canon_rows_hold_the_obligation_word_once`: identical on
+  both (R-A2L-DEF.153, R-PICKER-CORRECT.004/.008, PENDING P-031). Pre-existing.
+- `test_no_private_tokens`: GREEN on merged (P-012 condition met).
+- `test_suite_hygiene::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses`:
+  RED on merged only. `runs/l070-*.txt` and the same node on the Inc 1b tip show both causes
+  are inherited from the Inc 1b lineage (the tip fails them too, plus its unredacted
+  inc-12/inc-2 records that main's versions replace on this branch):
+  1. `inc-1b/E5-winci-43438310100-diagnosis.md`: the example path `C:/Users/` + the word "person" (in a
+     negative-control description) matches "user-profile path" with any HOME. Fixed
+     forward, D-R11-1.
+  2. Three Inc 1b records name the isolated HOME basename itself; the law adopts
+     `Path.home().name` as a local identity, so they are RED only under that basename
+     (GREEN with an unused one: `runs/l070-merged-qhome7.txt` lists cause 1 only). Not
+     edited, D-R11-2.
+
+### Decisions
+
+- **D-R11-1 (fix forward, PP-06).** `inc-1b/E5-winci-43438310100-diagnosis.md` line 37:
+  the word after `C:/Users/` becomes `<person>` (the records' placeholder spelling). One
+  word, own commit, meaning unchanged (it describes a control that uses a person-account
+  path). Not covered by any SHA256SUMS manifest.
+- **D-R11-2 (not edited; for the orchestrator).** `inc-1b/E5-rereview-final.md`,
+  `inc-1b/evidence-e5-r2/p001-linux.txt` and `p002-linux.txt` (the last two are captured
+  evidence) name the isolated HOME basename the runner rules prescribe. That name is not
+  an account, so the records are not redacted; but while they exist, law 070_2 is RED
+  under that exact basename on every branch that carries Inc 1b's records. The rule's
+  basename has to change to one no record names (or those records redacted forward);
+  rule change left to the orchestrator. This record and its runs avoid writing the name.

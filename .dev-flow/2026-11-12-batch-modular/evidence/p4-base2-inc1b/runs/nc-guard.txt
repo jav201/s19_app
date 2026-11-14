@@ -1,0 +1,109 @@
+TREE_REV: c3760226ac9e7b99a9eb574321412fcae1c28676
+ARGS: tests/test_b103_a2l_filter_teardown.py
+LOAD_START: 8.41 6.78 5.25 8/703 181826
+~/work/zq-base2/nc-guard/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped _________
+
+tmp_path = PosixPath('~/work/zq-base2/out-nc-guard/state/tmp/pytest-of-<user>/pytest-0/test_r_copy_26_1_filter_refres0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe1fabb44d0>
+
+    def test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped(
+        tmp_path, monkeypatch
+    ) -> None:
+        """R-COPY.26/1: a filter refresh due after the app closed raises nothing."""
+    
+        async def drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            captured = _capture_filter_debounce(app, monkeypatch)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                app.query_one("#a2l_tags_filter_input", Input).value = "KEEP"
+                await pilot.pause()
+                assert len(captured) == 1, "the input change did not schedule the filter debounce"
+                captured[0]()
+                await pilot.pause()
+                live = str(app.query_one("#a2l_tags_summary", Label).render())
+            return app, captured, live
+    
+        app, captured, live = asyncio.run(drive())
+        # Positive arm: while the app runs, the same callback still refreshes.
+        assert live == "No A2L tags match 'KEEP'.", live
+        # The state of the WinCI failure: the app stopped and the table is gone.
+        assert app.is_running is False
+        with pytest.raises(NoMatches):
+            app.query_one("#a2l_tags_list", DataTable)
+>       captured[0]()
+
+tests/test_b103_a2l_filter_teardown.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+s19_app/tui/app/a2l_view.py:1580: in _apply_filter
+    self._refresh_a2l_filtered_tags(preserve_anchor=False)
+s19_app/tui/app/a2l_view.py:864: in _refresh_a2l_filtered_tags
+    self.update_a2l_tags_view(
+s19_app/tui/app/a2l_view.py:1050: in update_a2l_tags_view
+    a2l_table = self.query_one("#a2l_tags_list", DataTable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#a2l_tags_list'
+expect_type = <class 'textual.widgets._data_table.DataTable'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+--- generated xml file: ~/work/zq-base2/out-nc-guard/junit.xml ----
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped
+1 failed in 3.53s
+LOAD_END: 8.78 6.89 5.30 12/701 181903
+RUN_DONE rc=1

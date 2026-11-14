@@ -1,0 +1,56 @@
+TREE_REV: a95d0ea93340d26d8fe55025e9e7c21bef2d4f79
+ARGS: tests/test_no_private_tokens.py tests/test_package_source_helper.py tests/test_suite_hygiene.py tests/test_requirements_canon.py tests/test_import_census.py tests/test_deps_seam_law.py tests/test_engine_unchanged.py tests/test_id_registry.py
+LOAD_START: 7.53 8.15 6.44 6/676 185843
+~/work/zq-base2/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....F................................................................... [ 64%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+________________ test_canon_rows_hold_the_obligation_word_once _________________
+[gw2] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_canon_rows_hold_the_obligation_word_once() -> None:
+        """R-DOC-CANON.4 -- each sentence holds ``shall`` exactly once.
+    
+        Why: one ``shall`` is one obligation is one test case. Two make a row that can be
+        half met; none makes a statement that obliges nothing.
+        """
+        rows = _rows()
+        offenders: List[str] = []
+        for r in rows:
+            n = len(re.findall(r"\bshall\b", r.sentence))
+            if n != 1:
+                offenders.append(f"line {r.line} {r.id}: 'shall' appears {n} times")
+>       _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+
+tests/test_requirements_canon.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rule = 'R-DOC-CANON.4 the obligation word is not used exactly once'
+offenders = ["line 1321 R-A2L-DEF.153: 'shall' appears 2 times", "line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times", "line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times"]
+checked = 2990
+
+    def _report(rule: str, offenders: List[str], checked: int) -> None:
+        if not offenders:
+            return
+        shown = "\n  ".join(offenders[:SHOWN])
+        more = f"\n  ... and {len(offenders) - SHOWN} more" if len(offenders) > SHOWN else ""
+>       pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E       Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2990 checked)
+E         line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+E         line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times
+E         line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times
+
+tests/test_requirements_canon.py:176: Failed
+---- generated xml file: ~/work/zq-base2/out-b-base/junit.xml -----
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+1 failed, 110 passed in 274.82s (0:04:34)
+LOAD_END: 5.56 6.82 6.33 5/663 189021
+RUN_DONE rc=1

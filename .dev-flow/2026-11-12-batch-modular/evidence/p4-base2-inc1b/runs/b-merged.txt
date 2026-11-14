@@ -1,0 +1,88 @@
+TREE_REV: c3760226ac9e7b99a9eb574321412fcae1c28676
+ARGS: tests/test_no_private_tokens.py tests/test_package_source_helper.py tests/test_suite_hygiene.py tests/test_requirements_canon.py tests/test_import_census.py tests/test_deps_seam_law.py tests/test_engine_unchanged.py tests/test_id_registry.py
+LOAD_START: 8.70 6.96 5.35 9/704 182183
+~/work/zq-base2/merged/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....F................................................................... [ 64%]
+.................................F.....                                  [100%]
+=================================== FAILURES ===================================
+________________ test_canon_rows_hold_the_obligation_word_once _________________
+[gw2] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_canon_rows_hold_the_obligation_word_once() -> None:
+        """R-DOC-CANON.4 -- each sentence holds ``shall`` exactly once.
+    
+        Why: one ``shall`` is one obligation is one test case. Two make a row that can be
+        half met; none makes a statement that obliges nothing.
+        """
+        rows = _rows()
+        offenders: List[str] = []
+        for r in rows:
+            n = len(re.findall(r"\bshall\b", r.sentence))
+            if n != 1:
+                offenders.append(f"line {r.line} {r.id}: 'shall' appears {n} times")
+>       _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+
+tests/test_requirements_canon.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rule = 'R-DOC-CANON.4 the obligation word is not used exactly once'
+offenders = ["line 1321 R-A2L-DEF.153: 'shall' appears 2 times", "line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times", "line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times"]
+checked = 2990
+
+    def _report(rule: str, offenders: List[str], checked: int) -> None:
+        if not offenders:
+            return
+        shown = "\n  ".join(offenders[:SHOWN])
+        more = f"\n  ... and {len(offenders) - SHOWN} more" if len(offenders) > SHOWN else ""
+>       pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E       Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2990 checked)
+E         line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+E         line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times
+E         line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times
+
+tests/test_requirements_canon.py:176: Failed
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         inc-1b/E5-rereview-final.md: local account or host name: <iso-home>
+E         inc-1b/E5-winci-43438310100-diagnosis.md: user-profile path: C:/Users/<person>
+E         inc-1b/evidence-e5-r2/p001-linux.txt: local account or host name: <iso-home>
+E         inc-1b/evidence-e5-r2/p002-linux.txt: local account or host name: <iso-home>
+E       assert not ['inc-1b/E5-rereview-final.md: local account or host name: <iso-home>', 'inc-1b/E5-winci-43438310100-diagnosis.md: use...ocal account or host name: <iso-home>', 'inc-1b/evidence-e5-r2/p002-linux.txt: local account or host name: <iso-home>']
+
+tests/test_suite_hygiene.py:2053: AssertionError
+--- generated xml file: ~/work/zq-base2/out-b-merged/junit.xml ----
+============================= QC-TM timing margins =============================
+48.9%  0.204 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+2 failed, 109 passed in 332.09s (0:05:32)
+LOAD_END: 7.53 8.15 6.44 6/672 185773
+RUN_DONE rc=1

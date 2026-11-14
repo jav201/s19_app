@@ -1,0 +1,25 @@
+A {'passed': 124, 'skipped': 23} B {'passed': 124, 'skipped': 23}
+nodes A=147 B=147 differing=0
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_13_101_held_row_copy_warns_within_bound
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_101_view_key_write_stays_responsive
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_102_view_right_write_stays_responsive
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_103_row_right_write_stays_responsive
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_c1_no_write_control_full_app[key]
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_c1_no_write_control_full_app[right]
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_c1_no_write_control_full_app[row]
+  skipped(A): tests.test_b103_clipboard_tail::test_r_paste_14_c2_sleep_poll_control_full_app
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+  skipped(A): tests.test_b103_copy_paste_matrix::test_manual_windows_terminal_operator_acceptance
