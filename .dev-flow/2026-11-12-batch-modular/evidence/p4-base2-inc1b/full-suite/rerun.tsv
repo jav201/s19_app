@@ -1,0 +1,23 @@
+base	load=2.90 3.69 6.75	tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest	rc=0	1 passed in 2.88s
+after	load=2.90 3.69 6.75	tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest	rc=0	1 passed in 2.98s
+base	load=2.99 3.70 6.73	tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0]	rc=0	1 passed in 21.03s
+after	load=2.94 3.62 6.63	tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0]	rc=0	1 passed in 20.83s
+base	load=2.81 3.55 6.54	tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1]	rc=0	1 passed in 19.49s
+after	load=3.10 3.56 6.46	tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1]	rc=0	1 passed in 19.68s
+base	load=3.09 3.52 6.38	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]	rc=0	1 passed in 4.48s
+after	load=3.08 3.51 6.37	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]	rc=1	1 failed in 4.15s
+base	load=3.08 3.50 6.35	tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded	rc=0	1 passed in 3.98s
+after	load=3.07 3.49 6.33	tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded	rc=0	1 passed in 3.92s
+base	load=3.15 3.50 6.32	tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies	rc=0	1 passed in 3.23s
+after	load=3.13 3.49 6.30	tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies	rc=0	1 passed in 3.34s
+base	load=3.20 3.50 6.29	tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags	rc=0	1 passed in 17.91s
+after	load=3.36 3.52 6.23	tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags	rc=0	1 passed in 17.59s
+base	load=3.18 3.47 6.16	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time	rc=0	1 passed in 5.26s
+after	load=3.24 3.48 6.14	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time	rc=0	1 passed in 5.23s
+base	load=3.22 3.47 6.13	tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]	rc=0	1 passed in 10.85s
+after	load=3.32 3.48 6.09	tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]	rc=0	1 passed in 10.89s
+base	load=3.34 3.48 6.06	tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single]	rc=0	1 passed in 2.66s
+after	load=3.39 3.49 6.05	tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single]	rc=0	1 passed in 2.59s
+base	load=3.44 3.50 6.04	tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6	rc=0	1 passed in 13.34s
+after	load=3.57 3.52 6.00	tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6	rc=0	1 passed in 13.21s
+RERUN_DONE

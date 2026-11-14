@@ -7,10 +7,14 @@ commit `aba3b947` (merge `c3760226`). Brief: R11 (P-011 local half).
 
 ## State / next step
 
-- DONE: merge, port, retarget, merge-prediction check, AST identity check, check (a),
-  negative controls NC-1/NC-2, check (b), decision D-R11-1 (fix forward).
-- NEXT: full suite on the final tree vs the a95d0ea9 baseline, compare, PP-02 scan,
-  scratch deletion.
+- DONE (R11 complete): merge, port, retarget, merge-prediction check, AST identity check,
+  check (a), negative controls NC-1/NC-2, check (b), D-R11-1/2, full suite (c) with every
+  difference explained, PP-02 scan, rtx scratch deleted.
+- NEXT (orchestrator): D-R11-2 (HOME basename rule), D-R11-3 (intermittent cap arm, pre-existing);
+  pushing `b103-base2` / rebuilding `batch-modular` needs the operator's OK (P-011, P-012).
+- For Inc 7 E4: base = `b103-base2` tip. App code lives in `s19_app/tui/app/<mixin>.py`, not
+  `app.py`; source-reading tests use `tests/support/package_source.py` (H-12), seam patches go on
+  `app_module.deps`, and every retarget carries a negative control.
 
 ## Why the merge is small
 
@@ -144,3 +148,41 @@ AT-I1b-8 (manual).
   under that exact basename on every branch that carries Inc 1b's records. The rule's
   basename has to change to one no record names (or those records redacted forward);
   rule change left to the orchestrator. This record and its runs avoid writing the name.
+- **D-R11-3 (pre-existing intermittent, not this merge; for the batch close).**
+  `test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]`
+  fails intermittently with `AssertionError: []` (the arm recorded no label), timings well
+  inside the bound. Measured alone, interleaved, load ~3: base `a95d0ea9` 2/10, merged
+  `66544e8e` 1/10 (`full-suite/rep.tsv`), plus 1/1 after in `rerun.tsv`. Same on both
+  trees, so not caused by the merge; not called flaky (HT-07), recorded as an intermittent
+  test defect with its measured rate.
+
+### (c) Full suite vs the a95d0ea9 baseline: COMPARE FAIL, every difference explained
+
+`tools/modularize/run_suite.sh` (the committed copy, byte-identical to the one used for the
+baseline), `-n 8`, bundle of `b103-base2` only (as the baseline: no local `main`, so the
+engine guard skips on both), tree `66544e8e`, shared host (load ~10-13 during the run).
+Baseline = the P-904 run of the split tree (`a95d0ea9` differs from it only in records;
+outputs kept on the runner).
+
+| | failed | passed | skipped (+xfailed) | nodes | rc |
+|---|---|---|---|---|---|
+| before `a95d0ea9` | 75 | 8144 | 289 + 4 | 8512 | 1 |
+| after `66544e8e` | 78 | 8146 | 293 + 4 | 8521 | 1 |
+
+`compare_outcomes.py --before-rc --after-rc` (no flaky excusals): `COMPARE FAIL`,
+missing 0, new 9, outcome_diff 11 (`full-suite/cmp.txt`).
+
+- **9 new nodes, all Inc 1b's own:** R-COPY.26/1 teardown test (passed);
+  R-PASTE.14 C1 `[key|right|row]` and C2 (skipped: WinCI-only); and four
+  `test_b103_winci_gate.py` artifact-scanner nodes for the hosted-runner exception (passed).
+- **11 outcome swaps (B2), each re-run alone on both trees at load ~3 (`full-suite/rerun.tsv`):**
+  4 failed->passed and 6 passed->failed pass alone on both trees: load-sensitive under the
+  shared `-n 8` run (several are timing/perf nodes: R-A2L-READ.52, R-A2L-MATCH.36/1,
+  R-CHG-SYM.13, R-TUI-043.10), not called flaky. The 11th,
+  `test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]`, is D-R11-3 (intermittent on
+  both trees).
+- **Failures common to both:** 71 (75 - 4 = 78 - 7). They include the canon shall-twice row
+  (P-031) and law 070_2, which under `run_suite.sh`'s HOME basename fails on both trees only on
+  that basename (3,943 hits of it, no other form: D-R11-1 removed the placeholder-path hit).
+- WinCI-only nodes skip on Linux by design (R-PASTE.13/101, R-PASTE.14/101-103, C1, C2,
+  `test_b103_clipboard_windows.py`).

@@ -1,0 +1,3 @@
+after 66544e8e: 78 failed, 8146 passed, 293 skipped, 4 xfailed in 6467.53s (1:47:47) rc=1
+before (a95d0ea9 baseline ~/work/zq-i1b/after-pe): 75 failed, 8144 passed, 289 skipped, 4 xfailed in 8134.45s (2:15:34) rc=1
+~/work/zq-base2/after/tree/s19_app/__init__.py
