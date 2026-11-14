@@ -2285,8 +2285,17 @@ def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch, 
                     lambda: bool(ledger.writer_done) and bool(ledger.tail_done),
                     timeout=10.0,
                 )
-                elapsed = time.monotonic() - started
                 diag["events"].append(("wait_returned", round(time.monotonic() - diag["t0"], 4), {}))
+                notice_wait_from = time.monotonic()
+                # RR-1: notify() returns before the Notify message is handled, so
+                # wait for the warning itself; the bound below still covers it.
+                await _wait(
+                    pilot,
+                    lambda: any(row[0] == WRITE_FAIL for row in _notice_rows(app)),
+                    timeout=10.0,
+                )
+                elapsed = time.monotonic() - started
+                diag["notice_wait_s"] = round(time.monotonic() - notice_wait_from, 4)
             finally:
                 _release_clipboard(held)
             diag["snap_pre"] = _r13_diag_snapshot(app, diag, "pre_observe")

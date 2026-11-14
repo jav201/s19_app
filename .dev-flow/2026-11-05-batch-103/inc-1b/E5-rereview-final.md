@@ -89,3 +89,19 @@ The clone's `git status` after both checks showed 0 changed files. `redact_e5.py
 ## 6. Packet §4b cell
 
 `code-reviewer` · OK to advance (PASS-WITH-NOTES) · no HIGH; RR-1 (MEDIUM) and RR-2…RR-4 (LOW) to PENDING; 108 obligations unchanged; DF-06 checks PASS.
+
+## 7. RR-1 fix (relevo-10)
+
+**Ruling:** DF-04 (a), a test defect fixed to the requirement. WinCI evidence `E5-winci-53bd5fc8-n10-2.md` (commit 0dd75cd3): in both failing captures `App.notify` had returned while the Notify message was still queued (`raw_count=0, queue_size=2`) when the test read the notices; the notice appeared at `snap_settled`. H5 (test-side race), not a product defect. Rate 2/19 with the diagnostic.
+
+**What changed** (`tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound`, 9 lines, no product change): after the writer/tail wait, a second `_wait` (the file's own `pilot.pause()` loop, 20 ms sleep + pause, timeout 10 s) polls `_notice_rows(app)` until the `WRITE_FAIL` warning is present. `elapsed` is now taken after that wait, from the same `started`, so the 2.5 s bound covers the notice. The `r13_101_diag` property gains `notice_wait_s`.
+
+**Why not weaker:** the bound, the `report_margin` comparison, `_failure` (text, severity `warning`, timeout 6.0, exactly one warning, no success notice) and the writer count are untouched. A notice that never arrives still fails (wait times out); one that arrives after 2.5 s fails the bound.
+
+**Controls** (rtx scratch `~/work/zq-y1/`, HOME `runner_iso`, `s19_app.__file__` printed, `timeout 300`). The node is WinCI-only (`_winci_ready_or_skip` skips on Linux; the OS holder is Windows), so the controls ran through a scratch-only Linux seam that stubs the Windows holder/probe and forces `writer_result=False`, then calls the unmodified test function:
+- (a) product mutant dropping `app.notify(_WRITE_FAIL_NOTIFICATION…)`: FAIL (`fixture predicate not satisfied before timeout`, `notify=[]`).
+- (b) `App.notify` delayed 3.5 s: FAIL (`elapsed 3.709 s > 2.5`).
+- (c) unmutated: PASS (0.782 s of 2.500 s).
+- (d) notify delayed 0.5 s (inside the bound; the queued-notice case): PASS (0.763 s).
+
+**Not run:** the real WinCI node (held Windows clipboard) cannot run on Linux; it is confirmed only by the next WinCI N>=10 (HT-07).
