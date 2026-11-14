@@ -92,3 +92,7 @@ Result column: killed = by an original node; killed (new) = survived the shipped
 ## Files
 
 New: `tests/test_b103_inc7_mu_survivors.py` (3 nodes). Changed: `tests/test_id_registry.py` `EXPECTED_SCANNED_TEST_FILES` 316 -> 317 (the census counts the new module). Evidence: `evidence-e4-mut/` (driver, mutant definitions, runner lines). No product code changed.
+
+## Laws after the new files
+
+Clone of `ff5df145` with `main` = origin/main `0c3a6bd4` (HT-03), `-n 2`: `test_id_registry.py` + the new file `15 passed`; `test_suite_hygiene.py` + `test_requirements_canon.py` `1 failed, 77 passed` (the failure is the base-identical canon node, rows R-A2L-DEF.153, R-PICKER-CORRECT.004 / .008). Runner scratch deleted (explicit list: the `zq-mu7` folder created for this run).
