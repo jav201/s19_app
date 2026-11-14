@@ -200,11 +200,21 @@ async def release_after_close(holds: list, pause: float = 0.6) -> None:
 
 
 def worker_errors(seen: list) -> list:
-    """The unhandled errors of the captured workers (a missing guard leaves one)."""
+    """The unhandled errors of the captured workers (a missing guard leaves one).
+
+    ``asyncio.CancelledError`` is left out: Textual 8 cancels every worker still running
+    when the app shuts down and stores that cancellation as ``Worker.error``
+    (``textual/worker.py`` ``_run``), whatever the product code does, so a held ranking
+    released after close always carries it (I7, R-A2L-LIST.084/.085).
+    """
     deadline = time.monotonic() + 10
     while time.monotonic() < deadline and not all(w.is_finished for _, w in seen):
         time.sleep(0.05)
-    return [w.error for _, w in seen if w.error is not None]
+    return [
+        w.error
+        for _, w in seen
+        if w.error is not None and not isinstance(w.error, asyncio.CancelledError)
+    ]
 
 
 # ---------------------------------------------------------------------------

@@ -244,8 +244,12 @@ class PasteHost(App):
         yield suggest
 
 
-def drive_paste(route: str, box_id: str, text: str, *, field: str = "name", box_cls=None):
-    """Deliver ``text`` to a box by one paste route; return ``(value, cursor, host)``."""
+def drive_paste(route: str, box_id: str, text: str, *, field: str = "name", box_cls=None, probe: bool = False):
+    """Deliver ``text`` to a box by one paste route; return ``(value, cursor, host)``.
+
+    ``probe`` calls the box's hook once more after the paste (``host.hook_probe``). It is
+    opt-in: that call is itself a hook call, which a spy would record (I7, R-PASTE.1/4).
+    """
 
     async def run():
         host = PasteHost(box_cls, with_filter=box_id == FILTER)
@@ -264,7 +268,8 @@ def drive_paste(route: str, box_id: str, text: str, *, field: str = "name", box_
                 else:
                     await right_click_app_route(host, pilot, box)
                 await pilot.pause(0.2)
-                host.hook_probe = getattr(box, "_take_paste", lambda _t: "no hook")(G2L_NAMES[0])
+                if probe:
+                    host.hook_probe = getattr(box, "_take_paste", lambda _t: "no hook")(G2L_NAMES[0])
                 return box.value, box.cursor_position, host
 
     return asyncio.run(run())
@@ -334,14 +339,14 @@ def test_r_a2l_list_034_3(ll) -> None:
 
 def test_r_paste_1_1() -> None:
     """R-PASTE.1/1: a stock box (the Load box) takes the first line; the default hook is False."""
-    value, _, host = drive_paste("terminal", "plain", G2L_TEXT)
+    value, _, host = drive_paste("terminal", "plain", G2L_TEXT, probe=True)
     assert value == G2L_NAMES[0]
     assert host.hook_probe is False  # the stock hook exists and takes nothing
 
 
 def test_r_paste_1_2(ll) -> None:
     """R-PASTE.1/2: one name pasted into the filter box -> the stock insert; the hook says False."""
-    value, _, host = drive_paste("terminal", FILTER, "VALUE_0002")
+    value, _, host = drive_paste("terminal", FILTER, "VALUE_0002", probe=True)
     assert value == "VALUE_0002"
     assert host.hook_probe is False  # one name: the hook leaves the paste to the stock insert
 
@@ -1091,6 +1096,11 @@ def said(modal, wid: str) -> str:
     return static_text(modal.query_one(f"#{wid}"))
 
 
+def counts_block(modal) -> str:
+    """The counts line and, under it, the ribbon line (built ids: ``#a2l_list_counts``, ``#a2l_list_ribbon``)."""
+    return said(modal, "a2l_list_counts") + "\n" + said(modal, "a2l_list_ribbon")
+
+
 def paste_rows(modal) -> list:
     from textual.widgets import DataTable
 
@@ -1155,7 +1165,7 @@ def test_r_a2l_list_046_1(ll, names, enriched, monkeypatch) -> None:
 
     async def sc(app, pilot, modal, seen):
         await type_text(pilot, modal, G2L_TEXT)
-        return said(modal, "a2l_list_counts")
+        return counts_block(modal)
 
     _, text, _ = run_modal(monkeypatch, enriched, names, sc)
     rows = oracle_rows(G2L_NAMES, tag_set(names))
@@ -1168,7 +1178,7 @@ def test_r_a2l_list_046_2(ll, names, enriched, monkeypatch) -> None:
 
     async def sc(app, pilot, modal, seen):
         await type_text(pilot, modal, "\n".join(sixty))
-        return said(modal, "a2l_list_counts")
+        return counts_block(modal)
 
     _, text, _ = run_modal(monkeypatch, enriched, names, sc)
     assert "order " + "●" * 50 + " +10" in text
@@ -1560,7 +1570,9 @@ def test_r_a2l_list_075_2(ll, names, enriched, monkeypatch) -> None:
     from collections import Counter
 
     per_slot = Counter(call[0][:10] for call in spy.calls)
-    assert len(per_slot) == 11 and max(per_slot.values()) <= 2 and len(spy.calls) <= 20
+    # 10 similar slots: only the first 10 missing names are ranked (R-A2L-LIST.051), so #11 never is (I7).
+    assert len(per_slot) == 10 and "NOSUCH_010" not in per_slot
+    assert max(per_slot.values()) <= 2 and len(spy.calls) <= 20
 
 
 async def type_text_nowait(pilot, modal, text: str) -> None:

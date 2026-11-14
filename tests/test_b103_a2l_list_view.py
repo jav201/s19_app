@@ -593,6 +593,10 @@ def card_text(app) -> str:
 async def highlight(app, pilot, row: int) -> None:
     table = app.query_one("#a2l_tags_list", DataTable)
     table.focus()
+    if table.cursor_row == row - 1 and table.row_count > 1:
+        # A move to the row the cursor is on posts no RowHighlighted (I7): step off it first.
+        table.move_cursor(row=row % table.row_count)
+        await settle(pilot)
     table.move_cursor(row=row - 1)
     await settle(pilot)
     await settle_workers(pilot)
@@ -965,9 +969,17 @@ def _layout(case08, tmp_path, size, scenario=None):
     return run_a2l(tmp_path, case08, sc, size=size)
 
 
+def _paint_card(card, text: str) -> None:
+    """Write ``text`` into the card the way ``show_tag`` does (the card is a RichLog, no ``update``; I7)."""
+    from rich.text import Text
+
+    card._card_text = Text(text)
+    card._rewrite_card_text()
+
+
 async def _seven_line_card(app, pilot) -> dict:
     card = app.query_one("#a2l_detail_card")
-    card.update("\n".join(f"card line {i}" for i in range(7)))
+    _paint_card(card, "\n".join(f"card line {i}" for i in range(7)))
     await settle(pilot, 6)
     return {"card": card.region, "hex": app.query_one("#alt_hex_scroll").region}
 
@@ -980,7 +992,7 @@ def test_r_tui_069_6_1(case08, tmp_path) -> None:
 
 async def _long_card(app, pilot) -> tuple:
     card = app.query_one("#a2l_detail_card")
-    card.update("\n".join(f"card line {i}" for i in range(card.size.height + 4)))
+    _paint_card(card, "\n".join(f"card line {i}" for i in range(card.size.height + 4)))
     await settle(pilot, 4)
     top = card.max_scroll_y
     card.scroll_down(animate=False)
@@ -1352,9 +1364,13 @@ def test_r_a2l_list_072_1(case08, names, monkeypatch, tmp_path) -> None:
         import threading
 
         ui.append(threading.get_ident())
+        # The app prepares an empty list before any A2L (R-A2L-LIST.072/2): read the
+        # preparation the attach starts, not the first one (I7).
+        before = len(spy.calls)
         await open_a2l(app, pilot, case08)
-        await wait_until(pilot, lambda: app._a2l_label_ranker.ready, "the name list was prepared")
-        return list(spy.calls[0][0])
+        await wait_until(pilot, lambda: app._a2l_label_ranker.ready and len(spy.calls) > before,
+                         "the name list was prepared")
+        return list(spy.calls[before][0])
 
     prepared_names = run_a2l(tmp_path, case08, sc, load=False)
     assert len(prepared_names) == len(set(names)) == 462 and set(prepared_names) == set(names)

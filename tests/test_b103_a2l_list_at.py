@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 from textual.widgets import Button, DataTable, Input, Static, TextArea
 
+from s19_app.tui.a2l_parameter_picker import parse_parameter_list
 from s19_app.tui.services.label_match import build_label_index, rank
 from tests.support import b100_projects as projects
 from tests.support.b100_workers import settle_workers
@@ -138,7 +139,9 @@ def test_at_b103_i7_2_window_live_status(case08, names, tmp_path) -> None:
         await settle(pilot, 6)
         table = modal.query_one("#a2l_list_preview", DataTable)
         return {
-            "focus": focus, "counts": static_text(modal.query_one("#a2l_list_counts")),
+            # the ribbon is its own line under the counts (built id ``#a2l_list_ribbon``; I7, P-087 c)
+            "focus": focus, "counts": static_text(modal.query_one("#a2l_list_counts"))
+            + "\n" + static_text(modal.query_one("#a2l_list_ribbon")),
             "rows": [[plain(c) for c in table.get_row_at(i)] for i in range(table.row_count)],
             "missing": static_text(modal.query_one("#a2l_list_missing")),
             "similar": static_text(modal.query_one("#a2l_list_similar")),
@@ -147,7 +150,7 @@ def test_at_b103_i7_2_window_live_status(case08, names, tmp_path) -> None:
 
     out = run_a2l(tmp_path, case08, sc)
     rows = oracle_rows(G2L_NAMES, set(names))
-    assert out["focus"] == "a2l_list_text" and out["text"].split() == G2L_TEXT.replace(",", " ").split()
+    assert out["focus"] == "a2l_list_text" and parse_parameter_list(out["text"]) == G2L_NAMES
     assert oracle_counts(rows) in out["counts"] and "order " + oracle_ribbon(rows, 50) in out["counts"]
     assert len(out["rows"]) == 12 and out["rows"][6][:3] == ["7", "✗ MAP_0024", "not in A2L"]
     assert out["missing"] == oracle_missing(rows)
@@ -177,7 +180,7 @@ def test_at_b103_i7_2_add_from_dropdown(case08, names, tmp_path) -> None:
 
     text = run_a2l(tmp_path, case08, sc)
     chosen = rank("0042 val", build_label_index(names), 20)[0].name
-    assert text.split() == G2L_TEXT.replace(",", " ").split() + [chosen] and len(text.split()) == 13
+    assert parse_parameter_list(text) == G2L_NAMES + [chosen] and len(parse_parameter_list(text)) == 13
 
 
 def test_at_b103_i7_2_apply_to_viewer(case08, names, tmp_path) -> None:
@@ -232,7 +235,7 @@ def test_at_b103_i7_3_tab_completes(case08, names, tmp_path) -> None:
         return box_of(app).value, len(app._a2l_filtered_tags), table_rows(app)
 
     value, n, rows = run_a2l(tmp_path, case08, sc)
-    assert value == "CURVE_0002" and n == 1 and rows[0][2 - 1].endswith("CURVE_0002")
+    assert value == "CURVE_0002" and n == 1 and rows[0][2].endswith("CURVE_0002")  # text-mode columns: Address, Length, Tag (I7)
 
 
 async def _applied_and_jumped(app, pilot) -> dict:

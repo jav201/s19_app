@@ -1649,11 +1649,15 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
 
 def _census_text_box_constructions() -> dict:
     """AST census of the text-box constructions in ``s19_app/`` (the shape of
-    ``evidence-e1/i1a-census.py`` part A): 40 ``OsClipboardInput``, 6
-    ``CappedTextArea`` + 1 ``JsonHighlightTextArea`` subclass (7 multi-line
+    ``evidence-e1/i1a-census.py`` part A): 41 ``OsClipboardInput``, 7
+    ``CappedTextArea`` + 1 ``JsonHighlightTextArea`` subclass (8 multi-line
     boxes), 0 stock ``Input``, 0 **editable** stock ``TextArea`` (the
     read-only ``#patch_json_view`` is excluded, as CTX-PASTE says it is not
-    a multi-line box and is Inc 1b's)."""
+    a multi-line box and is Inc 1b's).
+
+    Inc 7 (I7, ruling P-085 d, counted on the built tree): 40 -> 41 and 7 -> 8, for
+    the paste window's add line (``AddNameInput``, an OsClipboardInput kind) and
+    its text area (``CappedTextArea`` ``#a2l_list_text``); the filter box stays one."""
     import ast
 
     from s19_app.tui import os_clipboard_input  # noqa: F401  (package anchor)
@@ -1712,22 +1716,22 @@ def _census_text_box_constructions() -> dict:
 def test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input() -> None:
     """R-TUI-044.1/18: 0 stock ``Input``; every single-line box an ``OsClipboardInput``."""
     counts = _census_text_box_constructions()
-    assert counts["OsClipboardInput"] == 40, counts
+    assert counts["OsClipboardInput"] == 41, counts
     assert counts["Input"] == 0, counts
 
 
 def test_r_paste_18_8_every_multi_line_box_is_capped_text_area() -> None:
     """R-PASTE.18/8: 0 editable stock ``TextArea``; 7 multi-line boxes capped."""
     counts = _census_text_box_constructions()
-    assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 7, counts
+    assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 8, counts
     assert counts["TextArea"] == 0, counts
 
 
 def test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes() -> None:
-    """R-PASTE.19/1 + .33/1: 47/47 text boxes are the two clipboard classes."""
+    """R-PASTE.19/1 + .33/1: 49/49 text boxes are the two clipboard classes."""
     counts = _census_text_box_constructions()
-    assert counts["OsClipboardInput"] == 40, counts
-    assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 7, counts
+    assert counts["OsClipboardInput"] == 41, counts
+    assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 8, counts
     assert counts["Input"] == 0, counts
     assert counts["TextArea"] == 0, counts
 
