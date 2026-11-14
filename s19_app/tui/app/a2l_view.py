@@ -1309,6 +1309,8 @@ class A2lViewMixin:
             self._a2l_list_resolution = None
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
+            # Text mode again: repaint the mode tag and chips (R-A2L-LIST.008/3, E3A-08).
+            self._paint_a2l_filter_chips()
             self.update_mac_view()
             if not self.current_file:
                 self._validation_report = None
@@ -1923,13 +1925,8 @@ class A2lViewMixin:
         text = (self.a2l_tags_filter_text or "").lower()
         filtered = []
         for tag in tags:
-            if mode == "invalid":
-                show = (not tag.get("schema_ok", True)) or (
-                    tag.get("memory_checked") and tag.get("in_memory") is False
-                )
-                if not show:
-                    continue
-            if mode == "inmem" and tag.get("in_memory") is not True:
+            # One source of truth for the mode test (P-087 b): list mode reads it too.
+            if not self._a2l_mode_keeps(tag, mode):
                 continue
             if text:
                 if not self._tag_matches_filter(tag, text):

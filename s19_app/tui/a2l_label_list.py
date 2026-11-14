@@ -300,10 +300,11 @@ def list_summary_texts(
 def _counts_line(res: LabelListResolution) -> Text:
     """Build the counts line of ``res`` (R-A2L-LIST.017)."""
     n = len(res.entries)
-    found = res.count(FOUND)
+    hidden = res.count(HIDDEN)
+    # Glossary "found count": the names found or hidden (a hidden name is in the A2L).
+    found = res.count(FOUND) + hidden
     missing = res.count(MISSING)
     dup = res.count(DUPLICATE)
-    hidden = res.count(HIDDEN)
     s = "" if dup == 1 else "s"
     text = Text()
     text.append(f"{n} pasted", style=DGRAY)
@@ -413,7 +414,8 @@ def list_row_cells(
         tag_cell,
         Text(_status_word(entry, mode)),
     ]
-    if entry.status == MISSING:
+    if entry.status == MISSING or entry.tag is None:
+        # A duplicate of a missing name has no tag either: blank, as R-A2L-LIST.015.
         cells.append(Text(""))
         cells.extend(Text("") for _ in TEXT_CELL_LABELS)
     else:
@@ -1340,7 +1342,7 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         """Clear and re-request the first 10 missing names' closest names."""
         self.similar = {}
         self._similar_line = self.query_one("#a2l_list_similar", Static)
-        self._similar_line.update(Text(""))
+        self._paint_similar()
         missing = [e for e in self.res.entries if e.status == MISSING][:SIMILAR_MAX]
         ta = self.query_one("#a2l_list_text", TextArea)
 
@@ -1366,7 +1368,8 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         line = self._similar_line
         if line is None or not line.is_attached:
             return
-        missing = [e for e in self.res.entries if e.status == MISSING][:SIMILAR_MAX]
+        all_missing = [e for e in self.res.entries if e.status == MISSING]
+        missing = all_missing[:SIMILAR_MAX]
         parts = []
         for entry in missing:
             matches = self.similar.get(entry.pos)
@@ -1379,6 +1382,10 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
                 )
             else:
                 parts.append(head + "none (digits must match exactly)")
+        if len(all_missing) > SIMILAR_MAX:
+            parts.append(
+                f"  similar names are shown for the first {SIMILAR_MAX} missing names"
+            )
         line.update(Text("\n".join(parts)))
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
