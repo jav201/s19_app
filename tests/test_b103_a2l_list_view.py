@@ -992,7 +992,11 @@ def test_r_tui_069_6_1(case08, tmp_path) -> None:
 
 async def _long_card(app, pilot) -> tuple:
     card = app.query_one("#a2l_detail_card")
-    _paint_card(card, "\n".join(f"card line {i}" for i in range(card.size.height + 4)))
+    # "4 lines longer than its height": an auto-height card grows to its cap first (wide: 8), so
+    # the height to exceed is the cap when the card has one (I7; the 2-line idle card at 220x60).
+    cap = card.styles.max_height
+    limit = max(card.size.height, int(cap.value) if getattr(cap, "is_cells", False) else 0)
+    _paint_card(card, "\n".join(f"card line {i}" for i in range(limit + 4)))
     await settle(pilot, 4)
     top = card.max_scroll_y
     card.scroll_down(animate=False)
@@ -1364,13 +1368,16 @@ def test_r_a2l_list_072_1(case08, names, monkeypatch, tmp_path) -> None:
         import threading
 
         ui.append(threading.get_ident())
-        # The app prepares an empty list before any A2L (R-A2L-LIST.072/2): read the
-        # preparation the attach starts, not the first one (I7).
+        # The app prepares an empty list whenever no A2L is attached (R-A2L-LIST.072/2), also
+        # on the way into the attach: read the preparation that holds names, the attach's (I7).
         before = len(spy.calls)
         await open_a2l(app, pilot, case08)
-        await wait_until(pilot, lambda: app._a2l_label_ranker.ready and len(spy.calls) > before,
-                         "the name list was prepared")
-        return list(spy.calls[before][0])
+        await wait_until(
+            pilot,
+            lambda: app._a2l_label_ranker.ready and any(c[0] for c in spy.calls[before:]),
+            "the name list was prepared",
+        )
+        return list(next(c[0] for c in spy.calls[before:] if c[0]))
 
     prepared_names = run_a2l(tmp_path, case08, sc, load=False)
     assert len(prepared_names) == len(set(names)) == 462 and set(prepared_names) == set(names)
