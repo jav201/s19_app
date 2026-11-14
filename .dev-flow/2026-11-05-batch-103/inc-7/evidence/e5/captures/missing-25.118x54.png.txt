@@ -1,0 +1,107 @@
+scenario=missing-25
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_list
+body=112x39 classes=[]
+region #a2l_tags_pane: Region(x=5, y=4, width=112, height=25) visible=Region(x=5, y=4, width=112, height=25) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=5, y=29, width=112, height=14) visible=Region(x=5, y=29, width=112, height=14) display=True hit_at_centre=alt_hex_controls
+region #a2l_detail_card: Region(x=7, y=31, width=22, height=10) visible=Region(x=7, y=31, width=22, height=10) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=7, y=7, width=108, height=4) visible=Region(x=7, y=7, width=108, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=11, y=7, width=6, height=3) visible=Region(x=11, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=270
+region #a2l_tag_find_input: Region(x=101, y=7, width=6, height=3) visible=Region(x=101, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=17, y=7, width=20, height=3) visible=Region(x=17, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=7, y=11, width=108, height=3) visible=Region(x=7, y=11, width=108, height=3) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=7, y=14, width=108, height=1) visible=Region(x=7, y=14, width=108, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=7, y=15, width=108, height=12) visible=Region(x=7, y=15, width=108, height=12) display=True hit_at_centre=a2l_tags_list rows=27 body_rows=11
+region #alt_hex_scroll: Region(x=29, y=37, width=86, height=10) visible=Region(x=29, y=37, width=86, height=4) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'LIST'
+text #a2l_list_chips[0]: ' LIST   27 pasted  ·  ● 2 found  ·  ✗ 25 missing  ·  = 0 duplicates'
+text #a2l_list_chips[1]: 'order ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ● ●    field ignored in LIST mode · esc back to text filter · alt+p edit the list'
+text #a2l_list_chips[2]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 25 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MAP_9004 · #6 MAP_9005 · #7 MAP_9006 · #8 MAP_9007 · #9 MAP_9008 · #10 MAP_9009 · #11 MAP_9010 · #12 MAP_9011 · #13 MAP_9012 · #14 MAP_9013 · #15 MAP_9014 · #16 MAP_9015 · #17 MAP_9016 · #18 MAP_9017 · #19 MAP_9018 · #20 MAP_901'
+text #a2l_tags_summary[0]: 'LIST  rows 1-27 / 27 in pasted order'
+text #a2l_list_missing[0]: 'Missing 25 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MAP_9004 · #6 MAP_9005 · #7 MAP_9006 · #8 MAP_9007 · #9 MAP_9008 · #10 MAP_9009 · #11 MAP_9010 · #12 MAP_9011 · #13 MAP_9012 · #14 MAP_9013 · #15 MAP_9014 · #16 MAP_9015 · #17 MAP_9016 · #18 MAP_9017 · #19 MAP_9018 · #20 MAP_901'
+text #a2l_detail_card[0]: '✗ MAP_9001  not in'
+text #a2l_detail_card[1]: 'this A2L'
+text #a2l_detail_card[2]: 'pasted #2'
+text #a2l_detail_card[3]: 'closest —'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['#', 'Tag', 'Status', 'Kind', 'Address', 'Len', 'Physical', 'Unit', 'Limits']
+table_cursor_row=1 scroll_x=0.0
+table_row[0]: ['1', '✗ MAP_9000', 'not in A2L', '', '', '']
+table_row[1]: ['2', '✗ MAP_9001', 'not in A2L', '', '', '']
+table_row[2]: ['3', '✗ MAP_9002', 'not in A2L', '', '', '']
+table_row[3]: ['4', '✗ MAP_9003', 'not in A2L', '', '', '']
+table_row[4]: ['5', '✗ MAP_9004', 'not in A2L', '', '', '']
+table_row[5]: ['6', '✗ MAP_9005', 'not in A2L', '', '', '']
+table_row[6]: ['7', '✗ MAP_9006', 'not in A2L', '', '', '']
+table_row[7]: ['8', '✗ MAP_9007', 'not in A2L', '', '', '']
+table_row[8]: ['9', '✗ MAP_9008', 'not in A2L', '', '', '']
+table_row[9]: ['10', '✗ MAP_9009', 'not in A2L', '', '', '']
+table_row[10]: ['11', '✗ MAP_9010', 'not in A2L', '', '', '']
+table_row[11]: ['12', '✗ MAP_9011', 'not in A2L', '', '', '']
+table_row[12]: ['13', '✗ MAP_9012', 'not in A2L', '', '', '']
+table_row[13]: ['14', '✗ MAP_9013', 'not in A2L', '', '', '']
+screen_begin
+| 
+|   ⭘                                                Hex Edit Tool
+|     │                                                A2L Explorer                                                  ?
+|  ▏◫ │
+|  ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏◉ │▊                                                   A2L Tags                                                   ▎
+|  ▏▤ │▊                                                                                                              ▎
+|  ▏! │▊ LIST▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔ ▎
+|  ▏✎ │▊     ▊    ▎ Paste list…  alt+p   Field: name         All           Invalid        In-Memory    ▊    ▎   Find  ▎
+|  ▏✔ │▊     ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁ ▎
+|  ▏⏚ │▊                                                                                                              ▎
+|  ▏✦ │▊  LIST   27 pasted  ·  ● 2 found  ·  ✗ 25 missing  ·  = 0 duplicates                                          ▎
+|  ▏▶ │▊ order ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ● ●    field ignored in LIST mode · esc back to tex… ▎
+|  ▏☑ │▊ mode All · no tag hidden by mode (462 tags)                                                                  ▎
+|  ▏⊕ │▊ Missing 25 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MAP_9004 · #6 MAP_9005 · #7 MAP_900… ▎
+|     │▊  #   Tag           Status      Kind   Address     Len  Physical  Unit    Limits                              ▎
+|     │▊  1   ✗ MAP_9000    not in A2L                                                                                ▎
+|     │▊  2   ✗ MAP_9001    not in A2L                                                                                ▎
+|     │▊  3   ✗ MAP_9002    not in A2L                                                                                ▎
+|     │▊  4   ✗ MAP_9003    not in A2L                                                                                ▎
+|     │▊  5   ✗ MAP_9004    not in A2L                                                                             ▆▆ ▎
+|     │▊  6   ✗ MAP_9005    not in A2L                                                                                ▎
+|     │▊  7   ✗ MAP_9006    not in A2L                                                                                ▎
+|     │▊  8   ✗ MAP_9007    not in A2L                                                                                ▎
+|     │▊  9   ✗ MAP_9008    not in A2L                                                                                ▎
+|     │▊  10  ✗ MAP_9009    not in A2L                                                                                ▎
+|     │▊  11  ✗ MAP_9010    not in A2L                                                                                ▎
+|     │▊  LIST  rows 1-27 / 27 in pasted order                                                                        ▎
+|     │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|     │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|     │▊                                                                                                              ▎
+|     │▊  ✗ MAP_9001  not in                                         Hex Viewer                                       ▎
+|     │▊  this A2L                                                                                                    ▎
+|     │▊  pasted #2            ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|     │▊  closest —            ▊  Search ASCII text      ▎   Find Next    ▊  Goto 0xADDR            ▎      Goto       ▎
+|     │▊                       ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|     │▊                                                                                                              ▎
+|     │▊                       ... window limited to 200 rows ...                                                     ▎
+|     │▊                         0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|      ▎
+|     │▊                         0x00000010  30 00 00 00 A0 BE 00 00 00 00 00 00 00 00 00 00  |0...............|      ▎
+|     │▊ ──────────────────────  0x00000020  00 00 00 00 00 00 00 00 5E 26 03 B4 00 00 00 00  |........^&......|      ▎
+|     │▊                                                                                                              ▎
+|     │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                             (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

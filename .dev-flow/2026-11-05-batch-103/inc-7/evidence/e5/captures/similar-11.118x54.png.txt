@@ -1,0 +1,120 @@
+scenario=similar-11
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+a2l_tags=462
+top_screen=LabelListPasteModal
+focused=a2l_list_text
+body=112x39 classes=[]
+region #a2l_tags_pane: Region(x=5, y=4, width=112, height=25) visible=Region(x=5, y=4, width=112, height=25) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=5, y=29, width=112, height=14) visible=Region(x=5, y=29, width=112, height=14) display=True hit_at_centre=alt_hex_controls
+region #a2l_detail_card: Region(x=7, y=31, width=22, height=10) visible=Region(x=7, y=31, width=22, height=10) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=7, y=7, width=108, height=4) visible=Region(x=7, y=7, width=108, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=13, y=7, width=6, height=3) visible=Region(x=13, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=0
+region #a2l_tag_find_input: Region(x=103, y=7, width=6, height=3) visible=Region(x=103, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=19, y=7, width=20, height=3) visible=Region(x=19, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=7, y=11, width=108, height=2) visible=Region(x=7, y=11, width=108, height=2) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=21, y=33, width=75, height=1) visible=Region(x=21, y=33, width=75, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=7, y=13, width=108, height=14) visible=Region(x=7, y=13, width=108, height=14) display=True hit_at_centre=a2l_tags_list rows=200 body_rows=13
+region #alt_hex_scroll: Region(x=29, y=37, width=86, height=10) visible=Region(x=29, y=37, width=86, height=4) display=True hit_at_centre=alt_hex_view
+region #a2l_list_add_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_add: Region(x=24, y=5, width=37, height=3) visible=Region(x=24, y=5, width=34, height=3) display=True hit_at_centre=a2l_list_add content_width=31 value_len=0
+text #a2l_filter_mode_tag[0]: 'FILTER'
+text #a2l_list_chips[0]: ' TEXT   no text filter  ·  showing 462 of 462   paste several names, or alt+p, to filter by a LIST'
+text #a2l_list_chips[1]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 11 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MAP_9004 · #6 MAP_9005 · #7 MAP_9006 · #8 MAP_9007 · #9 MAP_9008 · #10 MAP_9009 · #11 MAP_9010    Duplicates 0 '
+text #a2l_tags_summary[0]: 'Page 1/3 | tags 1-200 / 462 (page size 200; +/- to change page)  ·  402 in image'
+text #a2l_list_counts[0]: '13 pasted  ·  ● 2 found  ·  ✗ 11 missing  ·  = 0 duplicates'
+text #a2l_list_ribbon[0]: 'order ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ● ● '
+text #a2l_list_missing[0]: 'Missing 11 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MAP_9004 · #6 MAP_9005 · #7 MAP_9006 · #8 MAP_9007 · #9 MAP_9008 · #10 MAP_9009 · #11 MAP_9010    Duplicates 0 '
+text #a2l_list_similar[0]: '  similar to #1 MAP_9000: none (digits must match exactly)'
+text #a2l_list_similar[1]: '  similar to #2 MAP_9001: none (digits must match exactly)'
+text #a2l_list_similar[2]: '  similar to #3 MAP_9002: none (digits must match exactly)'
+text #a2l_list_similar[3]: '  similar to #4 MAP_9003: none (digits must match exactly)'
+text #a2l_list_similar[4]: '  similar to #5 MAP_9004: none (digits must match exactly)'
+text #a2l_list_similar[5]: '  similar to #6 MAP_9005: none (digits must match exactly)'
+text #a2l_list_similar[6]: '  similar to #7 MAP_9006: none (digits must match exactly)'
+text #a2l_list_similar[7]: '  similar to #8 MAP_9007: none (digits must match exactly)'
+text #a2l_list_similar[8]: '  similar to #9 MAP_9008: none (digits must match exactly)'
+text #a2l_list_similar[9]: '  similar to #10 MAP_9009: none (digits must match exactly)'
+text #a2l_list_similar[10]: '  similar names are shown for the first 10 missing names'
+text #a2l_detail_card[0]: 'Highlight a tag to'
+text #a2l_detail_card[1]: 'inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['0x00000000', '1', '✓ VALUE_0001', 'formula', '108', '108']
+table_row[1]: ['0x00000014', '2', '✓ VALUE_0002', 'formula', '48800', '488000.0']
+table_row[2]: ['0x00000028', '4', '✓ VALUE_0003', 'formula', '1579549620', '1579549720.0']
+table_row[3]: ['0x0000003C', '4', '✓ VALUE_0004', 'formula', '510', '970.0']
+table_row[4]: ['0x00000050', '2', '✓ MEASUREMENT_0001', 'formula', '200', '20.0']
+table_row[5]: ['0x00000064', '2', '✓ MEASUREMENT_0002', 'formula', '0', '0.0']
+table_row[6]: ['0x00000078', '1', '✓ MEASUREMENT_0003', 'formula', '234', '234']
+table_row[7]: ['0x0000008C', '4', '✓ MEASUREMENT_0004', 'formula', '707221368', '7072213680.0']
+table_row[8]: ['0x000000A0', '2', '✓ MEASUREMENT_0005', 'formula', '-20410', '-20310.0']
+table_row[9]: ['0x000000B4', '4', '✓ MEASUREMENT_0006', 'formula', '43', '36.0']
+table_row[10]: ['0x000000C8', '2', '✓ MEASUREMENT_0007', 'formula', '400', '40.0']
+table_row[11]: ['0x000000DC', '2', '✓ MEASUREMENT_0008', 'formula', '1', '5.0']
+table_row[12]: ['0x00040000', '1', '✓ VALUE_0005', 'formula', '131', '131']
+table_row[13]: ['0x00040014', '2', '✓ VALUE_0006', 'formula', '-27427', '-274270.0']
+text_area_lines=13 first='MAP_9000'
+screen_begin
+| 
+|                   ╭───────────────────────────────────────────────────────────────────────────────╮
+|    ⭘              │                                                                               │
+|      │            │   Paste a list of labels                                                      │                 ?
+|   ▏◫ │            │                                                                               │
+|   ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔│  add╭─────────────────────────────────13 pasted  ·  ● 2 found  ·  ✗ 11        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|   ▏◉ │▊           │     │  part of a name — start, middle,missing  ·  = 0 duplicates              │
+|   ▏▤ │▊           │     ╰─────────────────────────────────order ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ✗ ● ●         │
+|   ▏! │▊ FILTER▊▔▔▔│                                        #    Name          Status      Kind    │▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔
+|   ▏✎ │▊       ▊   │                                        1    ✗ MAP_9000    not in A2L          │y    ▊    ▎   Fin
+|   ▏✔ │▊       ▊▁▁▁│                                        2    ✗ MAP_9001    not in A2L          │▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁
+|   ▏⏚ │▊           │                                        3    ✗ MAP_9002    not in A2L          │
+|   ▏✦ │▊  TEXT   no│                                        4    ✗ MAP_9003    not in A2L          │ a LIST
+|   ▏▶ │▊ mode All ·│                                        5    ✗ MAP_9004    not in A2L          │
+|   ▏☑ │▊  Address  │                                        6    ✗ MAP_9005    not in A2L          │nMem  Region  L
+|   ▏⊕ │▊  0x0000000│                                        7    ✗ MAP_9006    not in A2L          │es    flash   0
+|      │▊  0x0000001│                                        8    ✗ MAP_9007    not in A2L          │es    flash   0
+|      │▊  0x0000002│                                        9    ✗ MAP_9008    not in A2L          │es    flash   1
+|      │▊  0x0000003│  or paste names — new line , ; space   10   ✗ MAP_9009    not in A2L          │es    flash   0
+|      │▊  0x0000005│  ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 11   ✗ MAP_9010    not in A2L          │es    flash   0
+|      │▊  0x0000006│  ▊ MAP_9001                       ▁▁ ▎ 12   ● VALUE_0002  found       VALUE   │es    flash   0
+|      │▊  0x0000007│  ▊ MAP_9002                          ▎ 13   ● MAP_0003    found       MAP     │es    flash   0
+|      │▊  0x0000008│  ▊ MAP_9003                          ▎                                        │es    flash   0
+|      │▊  0x000000A│  ▊ MAP_9004                          ▎                                        │es    flash   -
+|      │▊  0x000000B│  ▊ MAP_9005                          ▎                                        │es    flash   0
+|      │▊  0x000000C│  ▊ MAP_9006                          ▎                                        │es    flash   0
+|      │▊  0x000000D│  ▊ MAP_9007                          ▎                                        │es    flash   0
+|      │▊           │  ▊ MAP_9008                          ▎                                        │
+|      │▊  Page 1/3 │  ▊ MAP_9009                          ▎                                        │
+|      │▊▁▁▁▁▁▁▁▁▁▁▁│  ▊ MAP_9010                          ▎                                        │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|      │▊▔▔▔▔▔▔▔▔▔▔▔│  ▊ VALUE_0002                        ▎                                        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|      │▊           │  ▊ MAP_0003                          ▎                                        │
+|      │▊  Highlight│  ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎                                        │
+|      │▊  inspect i│  Missing 11 ▸ #1 MAP_9000 · #2 MAP_9001 · #3 MAP_9002 · #4 MAP_9003 · #5 MA…  │
+|      │▊           │    similar to #1 MAP_9000: none (digits must match exactly)                   │▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|      │▊           │    similar to #2 MAP_9001: none (digits must match exactly)                   │▎      Goto
+|      │▊           │    similar to #3 MAP_9002: none (digits must match exactly)                   │▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|      │▊           │    similar to #4 MAP_9003: none (digits must match exactly)                   │
+|      │▊           │    similar to #5 MAP_9004: none (digits must match exactly)                   │
+|      │▊           │    similar to #6 MAP_9005: none (digits must match exactly)                   │OL BOOT v1.|
+|      │▊           │    similar to #7 MAP_9006: none (digits must match exactly)                   │...........|
+|      │▊ ──────────│    similar to #8 MAP_9007: none (digits must match exactly)                   │...^&......|
+|      │▊           │    similar to #9 MAP_9008: none (digits must match exactly)                   │
+|      │▊▁▁▁▁▁▁▁▁▁▁▁│    similar to #10 MAP_9009: none (digits must match exactly)                  │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|   ────────────────│    similar names are shown for the first 10 missing names                     │──────────────────
+|    Loaded firmware│  The list filters the viewer (LIST mode, pasted order); nothing is saved.     │)  |  firmware.a2l
+|                   │  Missing names stay listed so you can fix them.                               │
+|    ━━━━━━━━━━━━━━━│                                                                               │
+|                   │                             ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  │
+|                   │                              Filter viewer by list  alt+f     Cancel  esc     │
+|    Loaded firmware│                             ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  │
+|    A2L loaded: fir│                                                                               │
+|    ^k Palette  ^d ╰───────────────────────────────────────────────────────────────────────────────╯
+| 
+screen_end
+stub_os_writes=0
+surface=ready

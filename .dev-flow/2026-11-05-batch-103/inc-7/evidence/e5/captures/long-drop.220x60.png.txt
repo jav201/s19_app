@@ -1,0 +1,98 @@
+scenario=long-drop
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB); scratch A2L copy: VALUE_0003 renamed (1 occurrences); scratch A2L copy: VALUE_0004 renamed (1 occurrences)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_filter_input
+body=196x45 classes=['-wide']
+region #a2l_tags_pane: Region(x=23, y=4, width=106, height=45) visible=Region(x=23, y=4, width=106, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=129, y=4, width=90, height=45) visible=Region(x=129, y=4, width=90, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=131, y=6, width=86, height=2) visible=Region(x=131, y=6, width=86, height=2) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=102, height=4) visible=Region(x=25, y=7, width=102, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=31, y=7, width=6, height=3) visible=Region(x=31, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=5
+region #a2l_tag_find_input: Region(x=121, y=7, width=6, height=3) visible=Region(x=121, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=37, y=7, width=20, height=3) visible=Region(x=37, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=25, y=11, width=102, height=4) visible=Region(x=25, y=11, width=102, height=4) display=True hit_at_centre=a2l_filter_suggest
+region #a2l_list_chips: Region(x=25, y=11, width=102, height=2) visible=Region(x=25, y=11, width=102, height=2) display=True hit_at_centre=a2l_filter_suggest
+region #a2l_list_missing: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_tags_list: Region(x=25, y=13, width=102, height=34) visible=Region(x=25, y=13, width=102, height=34) display=True hit_at_centre=a2l_tags_list rows=1 body_rows=33
+region #alt_hex_scroll: Region(x=131, y=14, width=86, height=39) visible=Region(x=131, y=14, width=86, height=33) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'FILTER'
+text #a2l_list_chips[0]: " TEXT   'LONG_' in name  ·  showing 1 of 462   paste several names, or alt+p, to filter by a LIST"
+text #a2l_list_chips[1]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_tags_summary[0]: 'Page 1/1 | tags 1-1 / 1 (page size 200; +/- to change page)  ·  1 in image'
+text #a2l_filter_suggest[0]: '1 of 1 similar names'
+text #a2l_filter_suggest[1]: '▸ LONG_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX… prefix'
+text #a2l_filter_suggest[2]: '↑↓ choose  tab complete  esc close'
+text #a2l_filter_suggest[3]: 'rank: exact › prefix › substring › token › fuzzy › subsequence'
+text #a2l_detail_card[0]: 'Highlight a tag to inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['0x0000003C', '4', '✓ LONG_XXXXXXXXXXX…XXXXXXXXXXXXXXXXX', 'formula', '510', '970.0']
+screen_begin
+| 
+|   ⭘                                                                                                   Hex Edit Tool
+|                       │                                                                                          A2L Explorer                                                                                            ?
+|  ▏ ◫  Workspace       │
+|  ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏ ◉  MAC View        │▊                                                A2L Tags                                                ▎▊                                                                                        ▎
+|  ▏ ▤  Memory Map      │▊                                                                                                        ▎▊  Highlight a tag to inspect its fields.                                                ▎
+|  ▏ !  Issues Report   │▊ FILTER▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎ ▎▊ ────────────────────────────────────────────────────────────────────────────────────── ▎
+|  ▏ ✎  Patch Editor    │▊       ▊    ▎ Paste list…  alt+p   Field: name         All           Invalid        In-Memory    ▊    ▎ ▎▊                                       Hex Viewer                                       ▎
+|  ▏ ✔  Check Editor    │▊       ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎ ▎▊                                                                                        ▎
+|  ▏ ⏚  A2B Diff        │▊                                                                                                        ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|  ▏ ✦  Flow Builder    │▊ 1 of 1 similar names                                                                                   ▎▊ ▊  Search ASCII text      ▎   Find Next    ▊  Goto 0xADDR            ▎      Goto       ▎
+|  ▏ ▶  Flow Execution  │▊ ▸ LONG_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX… prefix                              ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|  ▏ ☑  Checks          │▊ ↑↓ choose  tab complete  esc close                                                                     ▎▊                                                                                        ▎
+|  ▏ ⊕  CRC Designer    │▊ rank: exact › prefix › substring › token › fuzzy › subsequence                                         ▎▊ ... window limited to 200 rows ...                                                     ▎
+|                       │▊                                                                                                        ▎▊   0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000010  30 00 00 00 A0 BE 00 00 00 00 00 00 00 00 00 00  |0...............|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000020  00 00 00 00 00 00 00 00 5E 26 03 B4 00 00 00 00  |........^&......|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000030  00 00 00 00 00 00 00 00 00 00 00 00 FE 01 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000050  00 C8 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000060  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|   ▃▃ ▎
+|                       │▊                                                                                                        ▎▊   0x00000070  00 00 00 00 00 00 00 00 EA 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000080  00 00 00 00 00 00 00 00 00 00 00 00 78 57 27 2A  |............xW'*|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000090  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000A0  B0 46 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |.F..............|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000B0  00 00 00 00 2B 00 00 00 00 00 00 00 00 00 00 00  |....+...........|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000C0  00 00 00 00 00 00 00 00 01 90 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000D0  00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000100  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000110  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000120  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000130  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000140  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000150  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000160  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000170  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000180  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000190  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001A0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001C0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                   ▍                                                    ▎▊   0x000001F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊  Page 1/1 | tags 1-1 / 1 (page size 200; +/- to change page)  ·  1 in image                            ▎▊                                                                                        ▎
+|                       │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                                                                                                                                    (none)  |  hostile.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: hostile.a2l
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

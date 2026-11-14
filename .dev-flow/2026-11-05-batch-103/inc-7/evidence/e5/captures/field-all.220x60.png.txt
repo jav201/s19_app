@@ -1,0 +1,98 @@
+scenario=field-all
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_filter_input
+body=196x45 classes=['-wide']
+region #a2l_tags_pane: Region(x=23, y=4, width=106, height=45) visible=Region(x=23, y=4, width=106, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=129, y=4, width=90, height=45) visible=Region(x=129, y=4, width=90, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=131, y=6, width=86, height=2) visible=Region(x=131, y=6, width=86, height=2) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=102, height=4) visible=Region(x=25, y=7, width=102, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=29, y=7, width=6, height=3) visible=Region(x=29, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=14
+region #a2l_tag_find_input: Region(x=119, y=7, width=6, height=3) visible=Region(x=119, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=35, y=7, width=20, height=3) visible=Region(x=35, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=25, y=11, width=102, height=3) visible=Region(x=25, y=11, width=102, height=3) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=25, y=14, width=102, height=1) visible=Region(x=25, y=14, width=102, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=25, y=15, width=102, height=32) visible=Region(x=25, y=15, width=102, height=32) display=True hit_at_centre=a2l_tags_list rows=2 body_rows=31
+region #alt_hex_scroll: Region(x=131, y=14, width=86, height=39) visible=Region(x=131, y=14, width=86, height=33) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'LIST'
+text #a2l_list_chips[0]: ' LIST   2 pasted  ·  ● 0 found  ·  ✗ 2 missing  ·  = 0 duplicates'
+text #a2l_list_chips[1]: 'order ✗ ✗    field ignored in LIST mode · esc back to text filter · alt+p edit the list'
+text #a2l_list_chips[2]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #1 synthetic · #2 demo    Duplicates 0 '
+text #a2l_tags_summary[0]: 'LIST  rows 1-2 / 2 in pasted order'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #1 synthetic · #2 demo    Duplicates 0 '
+text #a2l_detail_card[0]: 'Highlight a tag to inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['#', 'Tag', 'Status', 'Kind', 'Address', 'Len', 'Physical', 'Unit', 'Limits']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['1', '✗ synthetic', 'not in A2L', '', '', '']
+table_row[1]: ['2', '✗ demo', 'not in A2L', '', '', '']
+screen_begin
+| 
+|   ⭘                                                                                                   Hex Edit Tool
+|                       │                                                                                          A2L Explorer                                                                                            ?
+|  ▏ ◫  Workspace       │
+|  ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏ ◉  MAC View        │▊                                                A2L Tags                                                ▎▊                                                                                        ▎
+|  ▏ ▤  Memory Map      │▊                                                                                                        ▎▊  Highlight a tag to inspect its fields.                                                ▎
+|  ▏ !  Issues Report   │▊ LIST▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔ ▎▊ ────────────────────────────────────────────────────────────────────────────────────── ▎
+|  ▏ ✎  Patch Editor    │▊     ▊    ▎ Paste list…  alt+p    Field: all         All           Invalid        In-Memory    ▊    ▎   ▎▊                                       Hex Viewer                                       ▎
+|  ▏ ✔  Check Editor    │▊     ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁ ▎▊                                                                                        ▎
+|  ▏ ⏚  A2B Diff        │▊                                                                                                        ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|  ▏ ✦  Flow Builder    │▊  LIST   2 pasted  ·  ● 0 found  ·  ✗ 2 missing  ·  = 0 duplicates                                      ▎▊ ▊  Search ASCII text      ▎   Find Next    ▊  Goto 0xADDR            ▎      Goto       ▎
+|  ▏ ▶  Flow Execution  │▊ order ✗ ✗    field ignored in LIST mode · esc back to text filter · alt+p edit the list                ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|  ▏ ☑  Checks          │▊ mode All · no tag hidden by mode (462 tags)                                                            ▎▊                                                                                        ▎
+|  ▏ ⊕  CRC Designer    │▊ Missing 2 ▸ #1 synthetic · #2 demo    Duplicates 0                                                     ▎▊ ... window limited to 200 rows ...                                                     ▎
+|                       │▊  #  Tag          Status      Kind  Address  Len  Physical  Unit  Limits                                ▎▊   0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|      ▎
+|                       │▊  1  ✗ synthetic  not in A2L                                                                            ▎▊   0x00000010  30 00 00 00 A0 BE 00 00 00 00 00 00 00 00 00 00  |0...............|      ▎
+|                       │▊  2  ✗ demo       not in A2L                                                                            ▎▊   0x00000020  00 00 00 00 00 00 00 00 5E 26 03 B4 00 00 00 00  |........^&......|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000030  00 00 00 00 00 00 00 00 00 00 00 00 FE 01 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000050  00 C8 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000060  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|   ▃▃ ▎
+|                       │▊                                                                                                        ▎▊   0x00000070  00 00 00 00 00 00 00 00 EA 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000080  00 00 00 00 00 00 00 00 00 00 00 00 78 57 27 2A  |............xW'*|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000090  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000A0  B0 46 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |.F..............|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000B0  00 00 00 00 2B 00 00 00 00 00 00 00 00 00 00 00  |....+...........|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000C0  00 00 00 00 00 00 00 00 01 90 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000D0  00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000000F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000100  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000110  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000120  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000130  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000140  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000150  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000160  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000170  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000180  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00000190  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001A0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001C0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x000001F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|      ▎
+|                       │▊  LIST  rows 1-2 / 2 in pasted order                                                                    ▎▊                                                                                        ▎
+|                       │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                                                                                                                                   (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

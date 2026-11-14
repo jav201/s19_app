@@ -1,0 +1,101 @@
+scenario=drop-0017
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_filter_input
+body=112x39 classes=[]
+region #a2l_tags_pane: Region(x=5, y=4, width=112, height=25) visible=Region(x=5, y=4, width=112, height=25) display=True hit_at_centre=a2l_filter_suggest
+region #a2l_hex_pane: Region(x=5, y=29, width=112, height=14) visible=Region(x=5, y=29, width=112, height=14) display=True hit_at_centre=alt_hex_controls
+region #a2l_detail_card: Region(x=7, y=31, width=22, height=10) visible=Region(x=7, y=31, width=22, height=10) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=7, y=7, width=108, height=4) visible=Region(x=7, y=7, width=108, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=13, y=7, width=6, height=3) visible=Region(x=13, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=4
+region #a2l_tag_find_input: Region(x=103, y=7, width=6, height=3) visible=Region(x=103, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=19, y=7, width=20, height=3) visible=Region(x=19, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=7, y=11, width=108, height=8) visible=Region(x=7, y=11, width=108, height=8) display=True hit_at_centre=a2l_filter_suggest
+region #a2l_list_chips: Region(x=7, y=11, width=108, height=2) visible=Region(x=7, y=11, width=108, height=2) display=True hit_at_centre=a2l_filter_suggest
+region #a2l_list_missing: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_tags_list: Region(x=7, y=13, width=108, height=14) visible=Region(x=7, y=13, width=108, height=14) display=True hit_at_centre=a2l_tags_list rows=5 body_rows=13
+region #alt_hex_scroll: Region(x=29, y=37, width=86, height=10) visible=Region(x=29, y=37, width=86, height=4) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'FILTER'
+text #a2l_list_chips[0]: " TEXT   '0017' in name  ·  showing 5 of 462   paste several names, or alt+p, to filter by a LIST"
+text #a2l_list_chips[1]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_tags_summary[0]: 'Page 1/1 | tags 1-5 / 5 (page size 200; +/- to change page)  ·  4 in image'
+text #a2l_filter_suggest[0]: '5 of 5 similar names'
+text #a2l_filter_suggest[1]: '▸ MAP_0017 substring'
+text #a2l_filter_suggest[2]: '  CURVE_0017 substring'
+text #a2l_filter_suggest[3]: '  VALUE_0017 substring'
+text #a2l_filter_suggest[4]: '  VAL_BLK_0017 substring'
+text #a2l_filter_suggest[5]: '  MEASUREMENT_0017 substring'
+text #a2l_filter_suggest[6]: '↑↓ choose  tab complete  esc close'
+text #a2l_filter_suggest[7]: 'rank: exact › prefix › substring › token › fuzzy › subsequence'
+text #a2l_detail_card[0]: 'Highlight a tag to'
+text #a2l_detail_card[1]: 'inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['0x000400F0', '1', '✓ VALUE_0017', 'formula', '241', '241']
+table_row[1]: ['0x00040EB0', '1', '✓ MEASUREMENT_0017', 'formula', '111', '211.0']
+table_row[2]: ['0x00801080', 'n/a', '· VAL_BLK_0017', 'formula', '', '']
+table_row[3]: ['0x00804260', '64', '✓ CURVE_0017', 'formula', '32163', '32163']
+table_row[4]: ['0x00805740', '128', '✓ MAP_0017', 'formula', '58192', '58192']
+screen_begin
+| 
+|   ⭘                                                Hex Edit Tool
+|     │                                                A2L Explorer                                                  ?
+|  ▏◫ │
+|  ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏◉ │▊                                                   A2L Tags                                                   ▎
+|  ▏▤ │▊                                                                                                              ▎
+|  ▏! │▊ FILTER▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔ ▎
+|  ▏✎ │▊       ▊    ▎ Paste list…  alt+p   Field: name         All           Invalid        In-Memory    ▊    ▎   Fin ▎
+|  ▏✔ │▊       ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁ ▎
+|  ▏⏚ │▊                                                                                                              ▎
+|  ▏✦ │▊ 5 of 5 similar names                                                                                         ▎
+|  ▏▶ │▊ ▸ MAP_0017 substring                                                                                         ▎
+|  ▏☑ │▊   CURVE_0017 substring                                                                                       ▎
+|  ▏⊕ │▊   VALUE_0017 substring                                                                                       ▎
+|     │▊   VAL_BLK_0017 substring                                                                                     ▎
+|     │▊   MEASUREMENT_0017 substring                                                                                 ▎
+|     │▊ ↑↓ choose  tab complete  esc close                                                                           ▎
+|     │▊ rank: exact › prefix › substring › token › fuzzy › subsequence                                               ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                                                                              ▎
+|     │▊                                                              ▊                                               ▎
+|     │▊  Page 1/1 | tags 1-5 / 5 (page size 200; +/- to change page)  ·  4 in image                                  ▎
+|     │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|     │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|     │▊                                                                                                              ▎
+|     │▊  Highlight a tag to                                         Hex Viewer                                       ▎
+|     │▊  inspect its fields.                                                                                         ▎
+|     │▊                       ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|     │▊                       ▊  Search ASCII text      ▎   Find Next    ▊  Goto 0xADDR            ▎      Goto       ▎
+|     │▊                       ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|     │▊                                                                                                              ▎
+|     │▊                       ... window limited to 200 rows ...                                                     ▎
+|     │▊                         0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|      ▎
+|     │▊                         0x00000010  30 00 00 00 A0 BE 00 00 00 00 00 00 00 00 00 00  |0...............|      ▎
+|     │▊ ──────────────────────  0x00000020  00 00 00 00 00 00 00 00 5E 26 03 B4 00 00 00 00  |........^&......|      ▎
+|     │▊                                                                                                              ▎
+|     │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                             (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

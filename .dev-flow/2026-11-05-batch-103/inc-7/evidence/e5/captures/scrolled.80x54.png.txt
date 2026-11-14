@@ -1,0 +1,108 @@
+scenario=scrolled
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=80x54
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_list
+body=74x39 classes=['-short']
+region #a2l_tags_pane: Region(x=5, y=4, width=42, height=39) visible=Region(x=5, y=4, width=42, height=39) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=47, y=4, width=32, height=39) visible=Region(x=47, y=4, width=32, height=39) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=49, y=6, width=28, height=5) visible=Region(x=49, y=6, width=28, height=5) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=7, y=7, width=38, height=4) visible=Region(x=7, y=7, width=38, height=4) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_tags_filter_input: Region(x=11, y=7, width=6, height=3) visible=Region(x=11, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=148
+region #a2l_tag_find_input: Region(x=101, y=7, width=6, height=3) visible=Region(x=101, y=7, width=0, height=3) display=True hit_at_centre=NoneType content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=17, y=7, width=20, height=3) visible=Region(x=17, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=7, y=11, width=38, height=3) visible=Region(x=7, y=11, width=38, height=3) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=7, y=14, width=38, height=1) visible=Region(x=7, y=14, width=38, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=7, y=15, width=38, height=26) visible=Region(x=7, y=15, width=38, height=26) display=True hit_at_centre=a2l_tags_list rows=12 body_rows=25
+region #alt_hex_scroll: Region(x=49, y=17, width=28, height=30) visible=Region(x=49, y=17, width=28, height=24) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'LIST'
+text #a2l_list_chips[0]: ' LIST   12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate'
+text #a2l_list_chips[1]: 'order ● ● ● ● ● ● ✗ ● ● = ✗ ●    field ignored in LIST mode · esc back to text filter · alt+p edit the list'
+text #a2l_list_chips[2]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)'
+text #a2l_tags_summary[0]: 'LIST  rows 1-12 / 12 in pasted order'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)'
+text #a2l_detail_card[0]: '✓ CURVE_0001  0x00803DE0'
+text #a2l_detail_card[1]: 'desc synthetic demo'
+text #a2l_detail_card[2]: 'characteristic'
+text #a2l_detail_card[3]: 'unit — · conv CM_IDENT'
+text #a2l_detail_card[4]: 'layout RL_U16'
+text #a2l_detail_card[5]: 'byteorder big'
+text #a2l_detail_card[6]: 'limits 0..65535'
+hex_rows=202 longest_row=81 hex_scroll_width=26
+table_columns=['#', 'Tag', 'Status', 'Kind', 'Address', 'Len', 'Physical', 'Unit', 'Limits']
+table_cursor_row=1 scroll_x=8
+table_row[0]: ['1', '● VALUE_0002', 'found', 'VALUE', '0x00000014', '2']
+table_row[1]: ['2', '● CURVE_0001', 'found', 'CURVE', '0x00803DE0', '64']
+table_row[2]: ['3', '● MAP_0003', 'found', 'MAP', '0x00804FD0', '128']
+table_row[3]: ['4', '● MEASUREMENT_0005', 'found', 'MEASURE', '0x000000A0', '2']
+table_row[4]: ['5', '● VALUE_0042', 'found', 'VALUE', '0x000402E4', '4']
+table_row[5]: ['6', '● CURVE_0017', 'found', 'CURVE', '0x00804260', '64']
+table_row[6]: ['7', '✗ MAP_0024', 'not in A2L', '', '', '']
+table_row[7]: ['8', '● MAP_0001', 'found', 'MAP', '0x00804EC0', '128']
+table_row[8]: ['9', '● MEASUREMENT_0012', 'found', 'MEASURE', '0x00040E4C', '4']
+table_row[9]: ['10', '= VALUE_0002', 'dup of #1', 'VALUE', '0x00000014', '2']
+table_row[10]: ['11', '✗ CURVE_0071', 'not in A2L', '', '', '']
+table_row[11]: ['12', '● VALUE_0118', 'found', 'VALUE', '0x000408D4', '2']
+screen_begin
+| 
+|   ⭘                             Hex Edit Tool
+|     │                             A2L Explorer                               ?
+|  ▏◫ │
+|  ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏◉ │▊                A2L Tags                ▎▊                              ▎
+|  ▏▤ │▊                                        ▎▊  ✓ CURVE_0001  0x00803DE0    ▎
+|  ▏! │▊ LIST▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  desc synthetic demo         ▎
+|  ▏✎ │▊     ▊    ▎ Paste list…  alt+p   Field: ▎▊  characteristic          ▅▅  ▎
+|  ▏✔ │▊     ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊  unit — · conv CM_IDENT      ▎
+|  ▏⏚ │▊                                        ▎▊ ──────────────────────────── ▎
+|  ▏✦ │▊  LIST   12 pasted  ·  ● 9 found  ·  ✗… ▎▊          Hex Viewer          ▎
+|  ▏▶ │▊ order ● ● ● ● ● ● ✗ ● ● = ✗ ●    fiel… ▎▊                              ▎
+|  ▏☑ │▊ mode All · no tag hidden by mode (462… ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎ ▎
+|  ▏⊕ │▊ Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0… ▎▊ ▊    ▎   Find Next    ▊    ▎ ▎
+|     │▊  #   Tag                     Kind      ▎▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎ ▎
+|     │▊  1   ● VALUE_0002            VALUE     ▎▊                              ▎
+|     │▊  2   ● CURVE_0001            CURVE     ▎▊ ... showing from             ▎
+|     │▊  3   ● MAP_0003              MAP       ▎▊ 0x00803DD0 (context       ▇▇ ▎
+|     │▊  4   ● MEASUREMENT_0005      MEASURE   ▎▊ preserved) ...               ▎
+|     │▊  5   ● VALUE_0042            VALUE     ▎▊ ... window limited to 200    ▎
+|     │▊  6   ● CURVE_0017            CURVE     ▎▊ rows ...                     ▎
+|     │▊  7   ✗ MAP_0024         A2L            ▎▊   0x00803DD0  1A 64 1F 64    ▎
+|     │▊  8   ● MAP_0001              MAP       ▎▊ 24 64 29 64 2A 00 02 00 5A   ▎
+|     │▊  9   ● MEASUREMENT_0012      MEASURE   ▎▊ 00 31 01                     ▎
+|     │▊  10  = VALUE_0002       #1   VALUE     ▎▊ |.d.d$d)d*...Z.1.|           ▎
+|     │▊  11  ✗ CURVE_0071       A2L            ▎▊   0x00803DE0  DF 6F DF 76    ▎
+|     │▊  12  ● VALUE_0118            VALUE     ▎▊ DF 7D DF 84 DF 8B DF 92 DF   ▎
+|     │▊                                        ▎▊ 99 DF A0                     ▎
+|     │▊                                        ▎▊ |.o.v.}..........|           ▎
+|     │▊                                        ▎▊   0x00803DF0  DF A7 DF AE    ▎
+|     │▊                                        ▎▊ DF B5 DF BC DF C3 DF CA DF   ▎
+|     │▊                                        ▎▊ D1 DF D8                     ▎
+|     │▊                                        ▎▊ |................|           ▎
+|     │▊                                        ▎▊   0x00803E00  DF DF DF E6    ▎
+|     │▊                                        ▎▊ DF ED DF F4 DF FB E0 02 E0   ▎
+|     │▊                                        ▎▊ 09 E0 10                     ▎
+|     │▊                                        ▎▊ |................|           ▎
+|     │▊                                        ▎▊   0x00803E10  E0 17 E0 1E    ▎
+|     │▊                                        ▎▊ E0 25 E0 2C E0 33 E0 3A E0   ▎
+|     │▊   ▊             ▎                      ▎▊ 41 E0 48                     ▎
+|     │▊  LIST  rows 1-12 / 12 in pasted order  ▎▊                              ▎
+|     │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ──────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                       (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   Tag at 0x00803DE0
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready
