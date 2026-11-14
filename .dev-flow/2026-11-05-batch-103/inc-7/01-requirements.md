@@ -214,7 +214,7 @@ A2L transition     As Inc 5 defines it (attach, image load with an A2L, project 
 
 ### Deferred work after teardown (US-I7-1 … US-I7-3; E3R1, E3A-05: the R-COPY.26 family, PENDING P-002)
 
-The viewer's own filter debounce (and its new `"filter"` ranking request, issued after the refresh) is covered by R-COPY.26 (Inc 1b, `051d5897`: `if not self.is_running: return` in the debounce callback) once that guard lands on the Inc 7 base before E4, as `E1-rulings.md` §9 D-1 orders. The rows below cover the three entry points Inc 7 adds. Every case follows R-COPY.26/1's form: the deferred work is captured (a held seam, or a spy on `set_timer`), run once while its target is live (positive arm: it paints) and once after the target is gone (no exception, nothing painted), so both a missing guard and an always-drop guard turn RED.
+The viewer's own filter debounce (and its new `"filter"` ranking request, issued after the refresh) is covered by R-COPY.26 (Inc 1b, `051d5897`: `if not self.is_running: return` in the debounce callback); the guard is on the Inc 7 base (`9ffe019d`, `a2l_view.py:1580-1581`), as `E1-rulings.md` §9 D-1 ordered. The rows below cover the three entry points Inc 7 adds. Every case follows R-COPY.26/1's form: the deferred work is captured (a held seam, or a spy on `set_timer`), run once while its target is live (positive arm: it paints) and once after the target is gone (no exception, nothing painted), so both a missing guard and an always-drop guard turn RED.
 
 | Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
 |---|---|---|---|---|---|---|---|

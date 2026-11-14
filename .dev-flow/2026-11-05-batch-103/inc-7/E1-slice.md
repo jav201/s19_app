@@ -1,6 +1,6 @@
 # Inc 7 — E1 slice: the functions to add or change
 
-Base `2dbd7d5a`; lines "as of `2dbd7d5a`". **After E3R1: 44 functions: 33 new, 11 changed** (E1: 40, 29 new; E2: 42), in **5 source files** split into **2 file groups** (D-1; each ≤ 4 files; `app/patch.py` stays out, E3A-07), plus 1 stylesheet rule set. Requirement ids: `01-requirements.md`. Contracts and examples: `codewire/graph-inc7.md` (E2, corrected at E3R1). The existing tests E4 must retarget: §5 (E3R1).
+Base `2dbd7d5a`; lines "as of `2dbd7d5a`" (re-mapped to `9ffe019d`, the base of E4, in §6: only `a2l_view.py:1577` moved, to `:1582`). **After E3R1: 44 functions: 33 new, 11 changed** (E1: 40, 29 new; E2: 42), in **5 source files** split into **2 file groups** (D-1; each ≤ 4 files; `app/patch.py` stays out, E3A-07), plus 1 stylesheet rule set. Requirement ids: `01-requirements.md`. Contracts and examples: `codewire/graph-inc7.md` (E2, corrected at E3R1). The existing tests E4 must retarget: §5 (E3R1).
 
 ## 1. Files and groups (D-1 A)
 
@@ -110,6 +110,8 @@ Reused, unchanged: `A2LDetailCard.show_tag` (`navigation.py:1421`, `a2l_view.py:
 
 ## 5. E4 retarget list (E3R1: E3A-01, E3A-09, E3A-11)
 
+**Relevo-11:** the lines below are as of `2dbd7d5a`; on `9ffe019d` the moved ones, the P-002 test and one wrong premise (F-R11-1) are in §6.3.
+
 **Owner and order (E3-rulings E3A-01, DF-10).** These are Inc 7's E4 edits, because Inc 7 changes R-PASTE.1, R-TUI-043.4 and R-PASTE.29 and the layout rows. Inc 7's E4 starts only after `b103-inc1b` is final (its WinCI rounds closed, PENDING P-001 / P-002) and builds on that final tree; no two writers touch the Inc 1a/1b test files at the same time. The WinCI re-run at Inc 7 E5 (D-5 ruling) covers Box A on Windows, and its FAILED set is compared with Inc 1b's last run **after** this retarget, not before. Snapshots are never regenerated locally (HT-09).
 
 ### 5.1 Box A of the clipboard suite (E3A-01, HIGH): the 13 nodes that go RED (E3 Probe B, Linux)
@@ -150,3 +152,76 @@ The filter box itself gets Inc 7's own cases: a one-name paste still follows R-P
 | `:1607` `test_tc020_a2l_renderers_populate_through_restyled_screen`, `:1647` `test_tc020_a2l_filtering_narrows_through_restyled_screen` | R-A2L-007.1 (text mode) | re-run; expected unaffected |
 | the six `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-{comfortable,compact}-{80x24,120x30,160x40}].svg` | R-TUI-037.1/.2 (split kept), R-A2L-LIST.007/.008 (mode tag), .019–.021 (chips lines), .040 (the button) | the split is the same, the filter row and the chips change: **regenerated only by the canonical CI**, with the batch-47 `xfail(strict=False)` bridge (`tests/test_tui_snapshot.py:604-640`) on these six until it does (HT-09) |
 | `tests/test_b103_inc12_tag_table.py` (R-TUI-042a.5 at 80–118) | R-TUI-042a.4/.5 | re-derived from the measured width (the table is wider at 118×54, a stacked body; unchanged at 80, a short body); never typed |
+
+## 6. Prep onto b103-base2 (relevo-11)
+
+**Base.** `b103-inc7` was rebased onto `b103-base2` tip `9ffe019d` (= a95d0ea9 batch-modular + the `patch_editor` split + Inc 1b final + the P-002 guard): `git rebase --onto 9ffe019d 2dbd7d5a b103-inc7`, 9 record-only commits, no conflict. `git diff 9ffe019d..HEAD --stat -- s19_app tests` is empty. Evidence (read only: `ast` and `git archive` into a scratch folder outside every work tree, nothing from `s19_app` imported): `evidence-remap/i7-remap-census.py` + `i7-remap-census-transcript.txt`; on the runner (`~/work/zq-p7/`, isolated env, `HOME` basename `runner_iso`, `timeout 300`, load 2.4): a `pytest --collect-only` of the four clipboard files + the teardown test (154 nodes collected, `s19_app` imported from the archive, `evidence-remap/i7-remap-collect.txt`); `i7-remap-trace_check.txt`. No Code-Wire extractor re-run: the only changed body is V10 (below), and the graph's callers were extracted at `2dbd7d5a` (§3).
+
+### 6.1 Re-map: what 2dbd7d5a -> 9ffe019d changed for Inc 7
+
+`2dbd7d5a` is already the modular tree (`app/*.py` mixins, `app/a2l_view.py`, `app/compose_screens.py`); the slice and graph never cited the monolithic `app.py` or `patch_editor.py` (Inc 7 touches neither). Files whose bytes differ: **one source file**, `s19_app/tui/app/a2l_view.py` (+5 lines), the `patch_editor` split (9 files, not read by Inc 7) and 15 test files (§6.3).
+
+| Item | Result |
+|---|---|
+| Graph nodes | 44 (33 new, 11 changed), as at E3R2. **33 new:** 28 in `a2l_label_list.py` (the module is absent at both bases; L1–L25, L6b, L29, L30), `OsClipboardInput._take_paste` (class at `os_clipboard_input.py:849-1112`), V2, V5, V11, V13 (`A2lViewMixin` at `a2l_view.py:239-1584`; V13 `ListAwareDetailCard` is a new module-level class in the same file). No new name clashes with an existing one at either base. |
+| 11 changed nodes at 9ffe019d | `OsClipboardInput._on_paste` `os_clipboard_input.py:926-951`, `.action_paste` `:1038-1112`; `ComposeScreensMixin._compose_screen_a2l` `compose_screens.py:629-742`; `A2lViewMixin`: `_refresh_a2l_filtered_tags` `a2l_view.py:827-869`, `_refresh_a2l_dependent_views` `:871-936`, `update_a2l_view` `:938-998`, `update_a2l_tags_view` `:1000-1113`, `_fit_a2l_tag_cells` `:1163-1217`, `_repaint_a2l_tag_cells` `:1246-1333`, `_filter_a2l_tags` `:1437-1454`, `_schedule_a2l_filter_refresh` `:1548-1584` |
+| **DIFF (body differs between the bases)** | **One: `A2lViewMixin._schedule_a2l_filter_refresh`** (V10), +5 lines: the docstring bullet "Drop the refresh when it comes due after the app stopped running (Inc 1b E5, R-COPY.26)" and, in the closure `_apply_filter`, `if not self.is_running: return` after the token check (`a2l_view.py:1580-1581`; the closure's last line `:1577` -> `:1582`). The other 10 changed nodes have the same AST (docstring included) at both bases; only lines after `:1560` moved, by +3 / +5, and no other function sits there. |
+| Citations | 237 `file:line` citations of the Inc 7 records that name a file under `s19_app/` or `tests/` (the Base cells of `01-requirements.md` included; the script lists the 83 in changed files): 154 are in files whose bytes did not change; the other 83 map by their enclosing def to a line with the same text. 13 moved: 2 source citations (`a2l_view.py:1577` -> `:1582`, E1-slice §3, the `_apply_filter` closure) and 11 test-site citations (§6.3). The Base cells need no change (their behaviours are on both bases); `01-requirements.md` §"Deferred work after teardown" now says the P-002 guard **is** on the base (edited). |
+| `compose_screens.py` | `#a2l_tag_find_input` is still `OsClipboardInput(placeholder="Find in tag table", id="a2l_tag_find_input")` at `:679-681`, no `restrict`: the Box A target of §5.1 holds. |
+
+### 6.2 Constraint the P-002 guard adds to V10
+
+`tests/test_b103_a2l_filter_teardown.py` (new, Inc 1b: `test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped`) names `#a2l_tags_filter_input` (`:4`, `:51`) and captures the debounce callback by `getattr(callback, "__name__", "") == "_apply_filter"` through a spy on `app.set_timer`, expects exactly one call per input change, runs it live (`No A2L tags match 'KEEP'.`) and again after the app closed (no exception). V10 therefore keeps the closure named `_apply_filter`, keeps one `set_timer(0.15, _apply_filter)` per change, keeps the `is_running` guard before everything V10 adds (the `"filter"` ranking request included), and the live run with `KEEP` (one name: text mode) must still end in the R-A2L-007 summary. No edit to that test; it joins the E4 re-run set.
+
+### 6.3 §5 retarget list re-checked on 9ffe019d
+
+**§5.1: exact.** All 13 nodes exist on 9ffe019d (collect-only, 154 nodes: core 7 + matrix `[a2l]` 1 + the five `AT-I1b-{1,2,3,6,7}/1-T1-P1` cells; `i7-remap-collect.txt`), none changed in body. The `core` and `matrix` files are byte-identical to 2dbd7d5a; `test_b103_clipboard_windows.py` (+4 lines after `:1715`), `test_b103_clipboard_tail.py` (+461) and `test_b103_copy_paste_matrix.py` (+19) differ, and their Box A sites moved:
+
+| Site (E3A-01) | at 2dbd7d5a | at 9ffe019d |
+|---|---|---|
+| `_box_a` helpers | core `:92` (query `:100`); windows `:97` (query `:99`) | same |
+| matrix box map, TC-B102-01 map | `test_b103_clipboard_matrix.py:54`, `:210`; `test_b102_clipboard.py:86` | same |
+| `test_b103_clipboard_tail.py` | `:463` (`_show_box`), `:2303` (`_unrelated_view_box_observation.drive`) | **`:472`**, **`:2702`** |
+| `test_b103_copy_paste_matrix.py` | `:298` (`_prepare_target`) | **`:317`** |
+| windows inline, WinCI-only (14) | `:99 :294 :366 :1055 :1095 :1250 :1287 :1550` | same |
+| | `:2072 :2105 :2138 :2183 :2220 :2498` | **`:2076 :2109 :2142 :2187 :2224 :2502`** |
+| core inline (Linux-run) | 34 + the helper | same (35 hits in the file) |
+| WinCI manifest `b103_winci_manifest.json` | listed by E3A-01 | **names no box id** (the cell `a2l` only, `"ids": ["workspace","a2l",...]`): no manifest edit is owed; its counts (260 / 216) change only if E4 adds or removes nodes of the six clipboard families, and Inc 7's new test files are not in them |
+
+New site, no edit: the teardown test above (65 inline `#a2l_tags_filter_input` hits in `tests/` now, 63 at 2dbd7d5a). Other tests that set the box by `.value` (`test_b103_a2l_refresh.py:665,725`, `test_b102_a2l_refresh.py:207`, `test_b101_inplace_views.py:588`, `test_b103_copy_quit_dialog.py:579`) use one-name texts (`"  Alpha  "`, `"  32  "`, `Missing`, `[red]`, `225`) and stay in text mode: re-run only.
+
+**§5.2 (E3A-09): exact.** `tests/test_b100_session_reset.py` (unchanged): `SNAPSHOT_EXCLUSIONS` `:111`, the census assertions `:324-336`.
+
+**§5.3 (E3A-11): one finding.**
+- **F-R11-1 (MINOR, wrong premise).** The "batch-47 `xfail(strict=False)` bridge (`tests/test_tui_snapshot.py:604-640`)" is **retired**: `_batch47_a2l_drift_marks` (`:616-640`) returns `()` before any mark ("RETIRED (batch-47 regen PR)"), as does the latest one, `_batch94_inc001_drift_marks` (`:1055-1075`). There is no live bridge to reuse. The rule that applies is §5.3's own (the six `a2l-*` cells are regenerated only by the canonical CI, HT-09): E4 adds a **live** `_batch103_inc7_a2l_drift_marks(screen, density, size_key)` (`xfail(strict=False)`, `screen == "a2l"` only, reason citing R-A2L-LIST.007/.008/.019–.021/.040 and "canonical-CI regen pending", with a retirement note, since a stale mark XPASSes silently) and appends it to the `marks=` sum of `_RESTYLED_CELLS` (`:1100-1115`). That puts `tests/test_tui_snapshot.py` in the E4 retarget set (G-T-R3).
+- The remaining items exist unchanged at the same lines (`test_tui_directionb.py` `:1373 :1415 :1451 :1607 :1647`, the six `test_tc016s_density_layout_snapshot[a2l-…]` SVGs, `test_b103_inc12_tag_table.py`): re-run only.
+
+### 6.4 E4 groups (Inc 1b is final and merged into the base, so no other writer holds these files)
+
+Implementation: 5 source files plus the stylesheet; each group at most 3 files (cap 4); `app/patch.py` stays out (E3A-07). The unit of one DeepSeek call is at most 6 functions and one file (MD-03): units of one file run in order, units of different files may run in parallel.
+
+| Group | Files | Units (functions, slice ids) |
+|---|---|---|
+| **G-L** (31 nodes: 28 new in the module, 1 new + 2 changed in the hook) | `s19_app/tui/a2l_label_list.py` (new), `s19_app/tui/os_clipboard_input.py` (2 files) | **U-L1** `is_list_text`, `display_text`, `resolve_label_list`, `list_summary_texts`, `list_row_cells`, `list_card_text` (L1–L5, L22; with the constants and the `LabelListEntry` / `LabelListResolution` dataclasses). **U-L2** `LabelRanker.prepare`, `._install`, `.request`, `._deliver`, `._work` (L6, L6b, L7, L8, L30). **U-L3** `LabelSuggestBox.show_ranked`, `.move`; `ListAwareFilterInput._take_paste`, `.action_esc`, `.action_complete`, `.action_move_choice` (L9–L13, L29). **U-L4** `LabelListPasteModal.compose`, `.on_mount`, `._preview`, `._on_similar`, `.on_input_submitted`, `.action_apply` (L14–L19). **U-L5** `LabelListPasteModal.action_cancel`, `.refresh_tags`; `A2LExplorerBody.on_resize`, `.action_paste_list`, `.action_mode_all` (L20, L21, L23–L25). **U-L6** (other file, parallel with U-L1…U-L5) `OsClipboardInput._take_paste` (new), `._on_paste` (`:926-951`), `.action_paste` (`:1038-1112`) (L26–L28) |
+| **G-V** (13 nodes: 4 new + 9 changed) | `s19_app/tui/app/a2l_view.py`, `s19_app/tui/app/compose_screens.py`, `s19_app/tui/styles.tcss` (3 files) | **U-V1** `_a2l_list_names` (V2, new), `_filter_a2l_tags` (V3, `:1437-1454`), `_refresh_a2l_filtered_tags` (V4, `:827-869`), `_paint_a2l_filter_chips` (V5, new). **U-V2** `update_a2l_tags_view` (V6, `:1000-1113`), `_fit_a2l_tag_cells` (V7, `:1163-1217`), `_repaint_a2l_tag_cells` (V8, `:1246-1333`), `update_a2l_view` (V9, `:938-998`). **U-V3** `_schedule_a2l_filter_refresh` (V10, `:1548-1584`, the guard of §6.2 kept), `a2l_open_label_list` (V11, new), `_refresh_a2l_dependent_views` (V12, `:871-936`), `ListAwareDetailCard.show_tag` (V13, new). **U-V4** (files 2 and 3, parallel with U-V1…U-V3) `_compose_screen_a2l` (V1, `compose_screens.py:629-742`) and the `#a2l_panes` / `#a2l_tags_pane` / `#a2l_hex_pane` rules of `styles.tcss` |
+
+G-V needs G-L's module to run its examples; U-V4 and U-L6 depend on nothing else. Order inside E4: G-L and G-V in parallel against the pinned I-7, then the integrator (§1).
+
+Tests (not capped; counted from the case files: L 105, V 116, AT 10 = 231; the graph's "103" for L is the E1 figure):
+
+| Group | Files | Covers |
+|---|---|---|
+| **G-T-L** | `tests/test_b103_label_list.py` (new; R-A2L-LIST.078/3 `serial_timing`) | `02-test-cases-L.md` (105 cases), I-7 checks |
+| **G-T-V** | `tests/test_b103_a2l_list_view.py` (new; R-A2L-LIST.035 `serial_timing`) | `02-test-cases-V.md` (116 cases) |
+| **G-T-AT** | `tests/test_b103_a2l_list_at.py` (new) | `02-test-cases-AT.md` (10 cases) |
+| **G-T-R1** (retarget, clipboard core) | `tests/test_b103_clipboard_core.py` (`_box_a` + 34 inline sites; rows 1-7), `tests/test_b103_clipboard_windows.py` (`_box_a` + 14 WinCI-only sites) | §5.1 rows 1-7 and the windows sites; Box A -> `#a2l_tag_find_input`; the census rows 6, 7 by `isinstance` |
+| **G-T-R2** (retarget, matrix) | `tests/test_b103_clipboard_matrix.py` (`:54`, `:210`; row 8), `tests/test_b103_copy_paste_matrix.py` (`:317`; rows 9-13), `tests/test_b103_clipboard_tail.py` (`:472`, `:2702`), `tests/test_b102_clipboard.py` (`:86`, docstring `:9`) | §5.1 rows 8-13, the tail and TC-B102-01 box maps |
+| **G-T-R3** (census, layout) | `tests/test_b100_session_reset.py` (`:111`), `tests/test_tui_snapshot.py` (F-R11-1: the new live mark, `:1100-1115`) | §5.2, §5.3 |
+| re-run only | `tests/test_tui_directionb.py` (5 nodes), `tests/test_b103_inc12_tag_table.py`, `tests/test_b103_a2l_filter_teardown.py`, the one-name filter tests of §6.3 | no edit |
+
+R-PASTE.1/3, R-TUI-043.4/3, R-PASTE.29/3 and R-A2L-LIST.033 (/1–/3) on the filter box are Inc 7's own cases (G-T-L / G-T-V), not retargets.
+
+### 6.5 trace_check on 9ffe019d
+
+`python trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-7/01-requirements.md --base 9ffe019d --src s19_app`:
+`trace_check: 4 US, 96 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 93 gap(s)` = 92 TEST (rows no test names before E4) + 1 EVID (no `04-validation.md` before E5); US 0, CASE 0, SLICE 0. Identical to E3R2's run (`evidence-e1/trace_check-e3r2.txt`, base 2dbd7d5a). Output: `evidence-remap/i7-remap-trace_check.txt`.
