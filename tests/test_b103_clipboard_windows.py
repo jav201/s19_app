@@ -1715,10 +1715,12 @@ async def _held_clipboard_tick_lateness(
         original = mod.read_os_clipboard
 
         def _wrap(*args, **kwargs):
+            marker["t_start"] = time.monotonic()
             marker["started"] = True
             try:
                 return original(*args, **kwargs)
             finally:
+                marker["t_end"] = time.monotonic()
                 marker["ended"] = True
 
         mod.read_os_clipboard = _wrap
@@ -1726,10 +1728,12 @@ async def _held_clipboard_tick_lateness(
         original = mod.write_os_clipboard
 
         def _wrap(text, *args, **kwargs):
+            marker["t_start"] = time.monotonic()
             marker["started"] = True
             try:
                 return original(text, *args, **kwargs)
             finally:
+                marker["t_end"] = time.monotonic()
                 marker["ended"] = True
 
         mod.write_os_clipboard = _wrap

@@ -1,0 +1,7 @@
+scenario=copy-notice
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+notice severity=information message=Copied 1 line to the clipboard.
+top_screen=Screen
+stub_os_writes=1 lengths=[48]
+surface=ready

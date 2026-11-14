@@ -1,0 +1,68 @@
+# P-001 control R-PASTE.14/C1 + diagnostics: Linux runs on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename runner_iso).
+# tree = clone at 8e778f8a + the working changes of this commit (file md5 checked equal to the PC worktree); base = an untouched worktree at 8e778f8a.
+# Host load (uptime) during these runs: 1.4 (collect, first tail run), 7.0-9.8 (base tail, probe, final runs): no timing number here decides anything (HT-08).
+# t2-collect2 ran before the last diagnostics-only edit of the tail file; node names did not change (t2-tail2 ran on the final bytes).
+=== manifest: python tests/support/b103_winci_gate.py --validate-manifest
+WINCI_MANIFEST_OK tests=259 obligations=108 at_p1=14 at_p2=14
+
+=== t2-collect2
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=7
+ARGS: --collect-only tests/test_b103_clipboard_tail.py
+tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice
+tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive
+tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive
+tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive
+tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[key]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[right]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[row]
+rc=0
+=== t2-tail-base
+s19_app.__file__ = ~/work/zq-r2/base/s19_app/__init__.py
+HEAD 8e778f8a dirty=0
+ARGS: -n 2 tests/test_b103_clipboard_tail.py
+SKIPPED [4] tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+27 passed, 4 skipped in 255.43s (0:04:15)
+rc=0
+=== t2-tail2
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=8
+ARGS: -n 2 tests/test_b103_clipboard_tail.py tests/test_b103_a2l_filter_teardown.py
+SKIPPED [7] tests/test_b103_clipboard_tail.py:1451: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+28 passed, 7 skipped in 288.65s (0:04:48)
+rc=0
+=== t2-gate3
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=8
+ARGS: -n 2 tests/test_b103_winci_gate.py tests/test_id_registry.py
+226 passed in 10.79s
+rc=0
+=== t2-070-base
+s19_app.__file__ = ~/work/zq-r2/base/s19_app/__init__.py
+HEAD 8e778f8a dirty=0
+ARGS: tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+1 failed in 10.34s
+rc=1
+=== t2-070
+s19_app.__file__ = ~/work/zq-r2/tree/s19_app/__init__.py
+HEAD 8e778f8a dirty=8
+ARGS: tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+1 failed in 10.92s
+rc=1
+=== t2-070 offender list identical to base: yes
+=== control probe (scratch script, WinCI skip bypassed, Linux recorder writer; load ~7: NOT a timing decision, HT-08)
+key write_s=1.505 n=12 max_late=0.215 spans=0 msgs=1964 report_chars=661
+  assert: FAIL responsive writer exceeded its tick bound: max_late=0.215 n=12 t_end=+1.505 | ticks(due/late)=['+0.048/0.001', '+0.098/0
+  forced late tick: caught; responsive writer exceeded its tick bound: max_late=0.500 n=13 t_end=+1.505 | ticks(due/la
+right write_s=1.505 n=20 max_late=0.199 spans=2 msgs=1989 report_chars=1239
+  assert: FAIL responsive writer exceeded its tick bound: max_late=0.199 n=20 t_end=+1.505 | ticks(due/late)=['-0.022/0.081', '+0.109/0
+  forced late tick: caught; responsive writer exceeded its tick bound: max_late=0.500 n=21 t_end=+1.505 | ticks(due/la
+row write_s=1.505 n=22 max_late=0.085 spans=10 msgs=1787 report_chars=1492
+  assert: PASS
+  forced late tick: caught; responsive writer exceeded its tick bound: max_late=0.500 n=23 t_end=+1.505 | ticks(due/la
+--- last report ---
+max_late=0.085 n=22 t_end=+1.505 | ticks(due/late)=['-0.022/0.285', '+0.314/0.085', '+0.449/0.072', '+0.571/-0.034', '+0.587/0.009', '+0.646/0.021', '+0.717/-0.030', '+0.737/0.009', '+0.796/-0.009', '+0.837/0.012', '+0.899/-0.011', '+0.938/0.015', '+1.003/-0.016', '+1.037/0.010', '+1.097/-0.011', '+1.137/0.003', '+1.189/0.045', '+1.284/-0.047', '+1.287/0.039', '+1.376/-0.039', '+1.387/0.038', '+1.476/-0.039', '+1.487/0.032', '+1.569/-0.031', '+1.588/0.006'] | spans>=5ms(start/dur)=['P-0.005/0.267', 'P+0.286/0.014', 'L+0.283/0.018', 'P+0.326/0.009', 'L+0.323/0.013', 'P+0.390/0.008', 'L+0.387/0.011', 'P+0.422/0.006', 'L+0.418/0.009'] paint_s=0.308 layout_s=0.051 | msgs_in_write={'Callback': 10596, 'Update': 26, 'Layout': 10, 'DescendantFocus': 7, 'MouseDown': 7, 'MouseUp': 7, 'Click': 7, 'RowHighlighted': 7} | callbacks_per_100ms=[0, 0, 0, 834, 429, 1239, 871, 797, 834, 834, 908, 942, 976, 847, 984, 101] | events=['-0.063 MouseDown', '-0.056 MouseUp', '-0.056 StateChanged', '-0.056 StateChanged', '-0.055 InvokeLater', '-0.055 TextSelected', '-0.045 Blur', '-0.041 Focus', '-0.037 MouseDown', '-0.037 MouseUp', '-0.037 Click', '-0.037 RowHighlighted', '-0.005 TextSelected', '+0.262 DescendantBlur', '+0.263 DescendantFocus', '+0.263 MouseDown', '+0.263 MouseUp', '+0.263 Click', '+0.263 RowHighlighted', '+0.263 DescendantBlur', '+0.264 DescendantFocus', '+0.264 MouseDown', '+0.264 MouseUp', '+0.264 Click', '+0.264 RowHighlighted'] | notices=['+1.519 warning Clipboard write']
+=== the probe output above, scanned by tests/support/b103_artifact_safety.py _scan_text (canaries, credentials, personal paths)
+chars 2585 violations: []

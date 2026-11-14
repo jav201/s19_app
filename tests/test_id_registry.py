@@ -216,7 +216,9 @@ from tools.id_registry import (
 # batch-modular E5 F2 seam law: +1 (tests/test_deps_seam_law.py); 309 -> 310.
 # Squash onto main: main's tests/test_no_private_tokens.py (efeb69f2) was added
 # without a bump; 310 -> 311.
-EXPECTED_SCANNED_TEST_FILES = 311
+# Merge of b103-inc1b-push into the modular base (b103-base2): +1
+# (tests/test_b103_a2l_filter_teardown.py, Inc 1b E5 WinCI round 2); 311 -> 312.
+EXPECTED_SCANNED_TEST_FILES = 312
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

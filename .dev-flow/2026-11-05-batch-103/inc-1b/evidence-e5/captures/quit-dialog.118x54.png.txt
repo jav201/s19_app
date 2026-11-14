@@ -1,0 +1,6 @@
+scenario=quit-dialog
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+top_screen=_CopyQuitScreen
+stub_os_writes=0 lengths=[]
+surface=ready
