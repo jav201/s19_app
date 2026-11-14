@@ -24,14 +24,16 @@ from __future__ import annotations
 import functools
 import logging
 from dataclasses import dataclass
-from typing import Callable, Mapping, Sequence
+from typing import Callable, Mapping, Protocol, Sequence, cast
 
 from rich.text import Text
+from textual import events
 from textual.actions import SkipAction
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
 from textual.screen import ModalScreen
+from textual.widget import Widget
 from textual.widgets import Button, DataTable, Input, Label, Static, TextArea
 
 from s19_app.tui.os_clipboard_input import OsClipboardInput
@@ -1106,6 +1108,17 @@ class AddNameInput(OsClipboardInput):
     """
 
 
+class LabelListHost(Protocol):
+    """The app as the A2L Explorer body sees it (I-7, E3A-03 (b)).
+
+    ``A2lViewMixin`` implements it; the body holds no import edge to
+    ``s19_app.tui.app``, so it types ``self.app`` as this protocol and calls
+    ``a2l_open_label_list()`` to open the paste window.
+    """
+
+    def a2l_open_label_list(self) -> None: ...
+
+
 class LabelListPasteModal(ModalScreen[list[str] | None]):
     """The paste window: resolve a pasted name list against the A2L (I-7).
 
@@ -1124,6 +1137,7 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
 
     BINDINGS = [
         Binding("alt+f", "apply", "Filter viewer by list", priority=True, show=False),
+        Binding("escape", "cancel", "Cancel", show=False),
     ]
 
     res: LabelListResolution | None
@@ -1384,10 +1398,14 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         suggest.close()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Route the apply button to ``action_apply`` (R-A2L-LIST.053)."""
+        """Route the apply and cancel buttons to their actions
+        (R-A2L-LIST.053, .055)."""
         if event.button.id == "a2l_list_apply":
             event.stop()
             self.action_apply()
+        elif event.button.id == "a2l_list_cancel":
+            event.stop()
+            self.action_cancel()
 
     def action_apply(self) -> None:
         """Dismiss with the pasted names, or ``None`` when there are none
@@ -1395,3 +1413,172 @@ class LabelListPasteModal(ModalScreen[list[str] | None]):
         text = self.query_one("#a2l_list_text", TextArea).text
         names = parse_parameter_list(text)
         self.dismiss(names if names else None)
+
+    def action_cancel(self) -> None:
+        """
+        Summary:
+            Close the add line's open dropdown, or dismiss the window with
+            ``None`` when none is open (R-A2L-LIST.055, .070).
+
+        Returns:
+            None
+
+        Data Flow:
+            - With ``#a2l_list_add_suggest`` open, close it and keep the box
+              text (the window stays open).
+            - Otherwise ``dismiss(None)``; the viewer's filter text is kept.
+
+        Dependencies:
+            Uses:
+                - LabelSuggestBox.close
+            Used by:
+                - the ``escape`` binding and the ``Cancel`` button
+        """
+        suggest = self.query_one("#a2l_list_add_suggest", LabelSuggestBox)
+        if suggest.is_open:
+            suggest.close()
+            return
+        self.dismiss(None)
+
+    def refresh_tags(self, tags: Sequence[dict]) -> None:
+        """
+        Summary:
+            Replace the window's tags and re-resolve the unchanged text at
+            once (R-A2L-LIST.056).
+
+        Args:
+            tags (Sequence[dict]): The enriched tags of the new A2L, in
+                order.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Keep the new ``tags`` on the window.
+            - Run ``_preview``, which re-reads the text area and re-resolves
+              it against the new tags, repainting the counts / rows / missing
+              / similar lines.
+
+        Dependencies:
+            Uses:
+                - _preview
+            Used by:
+                - (Inc 7) the app's A2L-transition refresh
+        """
+        self._tags = tags
+        self._preview()
+
+
+class A2LExplorerBody(Container):
+    """The A2L Explorer body: two panes in one of three regimes (I-7, D-2 A).
+
+    Holds the tags pane (``#a2l_tags_pane``) and the hex pane
+    (``#a2l_hex_pane``) it was given and toggles ``-wide`` / ``-short`` /
+    neither (the stacked body) from its own size on resize
+    (R-A2L-LIST.080-.083, R-TUI-037.1/.2, R-TUI-069.6/.7). ``alt+p`` opens
+    the paste window; ``alt+a`` sets the filter mode to ``All``.
+    """
+
+    BINDINGS = [
+        Binding("alt+p", "paste_list", "Paste list…", priority=True, show=False),
+        Binding("alt+a", "mode_all", "All", priority=True, show=False),
+    ]
+
+    def __init__(self, tags_pane: Widget, hex_pane: Widget, *, id: str) -> None:
+        """
+        Summary:
+            Create the body holding the given tags and hex panes under ``id``
+            (I-7, E3A-03 (d)).
+
+        Args:
+            tags_pane (Widget): The tags pane (``#a2l_tags_pane``).
+            hex_pane (Widget): The hex pane (``#a2l_hex_pane``).
+            id (str): The widget id (``a2l_panes``).
+
+        Returns:
+            None
+        """
+        super().__init__(id=id)
+        self._tags_pane = tags_pane
+        self._hex_pane = hex_pane
+
+    def compose(self) -> ComposeResult:
+        """Yield the two panes given at construction (I-7)."""
+        yield self._tags_pane
+        yield self._hex_pane
+
+    def on_resize(self, event: events.Resize) -> None:
+        """
+        Summary:
+            Toggle the body regime from its own size (R-A2L-LIST.080-.083,
+            R-TUI-037.1/.2, R-TUI-069.6/.7).
+
+        Args:
+            event (events.Resize): The resize event (its size is the body's).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read the body's own ``size``.
+            - ``-wide`` exactly when width >= :data:`WIDE_AT` (180).
+            - Else ``-short`` exactly when width < :data:`STACK_MIN_WIDTH`
+              (110) or height < :data:`STACK_MIN_HEIGHT` (32).
+            - Else neither class (the stacked body); the stylesheet lays out.
+        """
+        wide = self.size.width >= WIDE_AT
+        short = self.size.width < STACK_MIN_WIDTH or self.size.height < STACK_MIN_HEIGHT
+        if wide:
+            short = False
+        self.set_class(wide, "-wide")
+        self.set_class(short, "-short")
+
+    def action_paste_list(self) -> None:
+        """
+        Summary:
+            Open the paste window (R-A2L-LIST.040).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Call ``app.a2l_open_label_list()`` (the :class:`LabelListHost`
+              protocol; ``A2lViewMixin`` pushes the ``LabelListPasteModal``).
+
+        Dependencies:
+            Uses:
+                - LabelListHost.a2l_open_label_list
+            Used by:
+                - the ``alt+p`` binding and the ``#a2l_paste_list_button``
+                  press
+        """
+        cast(LabelListHost, self.app).a2l_open_label_list()
+
+    def action_mode_all(self) -> None:
+        """
+        Summary:
+            Set the filter mode to ``All`` by pressing ``#a2l_filter_all``
+            (R-A2L-LIST.026).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Press the shipped ``#a2l_filter_all`` button; its handler
+              (``core.py:1108``) sets ``a2l_tags_filter_mode`` to ``all`` and
+              refreshes.
+
+        Dependencies:
+            Uses:
+                - textual.widgets.Button.press
+            Used by:
+                - the ``alt+a`` binding
+        """
+        self.query_one("#a2l_filter_all", Button).press()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Route the ``#a2l_paste_list_button`` press to ``action_paste_list``
+        (R-A2L-LIST.040)."""
+        if event.button.id == "a2l_paste_list_button":
+            event.stop()
+            self.action_paste_list()
