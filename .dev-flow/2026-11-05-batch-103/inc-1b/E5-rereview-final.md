@@ -98,7 +98,7 @@ The clone's `git status` after both checks showed 0 changed files. `redact_e5.py
 
 **Why not weaker:** the bound, the `report_margin` comparison, `_failure` (text, severity `warning`, timeout 6.0, exactly one warning, no success notice) and the writer count are untouched. A notice that never arrives still fails (wait times out); one that arrives after 2.5 s fails the bound.
 
-**Controls** (rtx scratch `~/work/zq-y1/`, HOME `runner_iso`, `s19_app.__file__` printed, `timeout 300`). The node is WinCI-only (`_winci_ready_or_skip` skips on Linux; the OS holder is Windows), so the controls ran through a scratch-only Linux seam that stubs the Windows holder/probe and forces `writer_result=False`, then calls the unmodified test function:
+**Controls** (rtx scratch `~/work/zq-y1/`, HOME `<runner-home>`, `s19_app.__file__` printed, `timeout 300`). The node is WinCI-only (`_winci_ready_or_skip` skips on Linux; the OS holder is Windows), so the controls ran through a scratch-only Linux seam that stubs the Windows holder/probe and forces `writer_result=False`, then calls the unmodified test function:
 - (a) product mutant dropping `app.notify(_WRITE_FAIL_NOTIFICATION…)`: FAIL (`fixture predicate not satisfied before timeout`, `notify=[]`).
 - (b) `App.notify` delayed 3.5 s: FAIL (`elapsed 3.709 s > 2.5`).
 - (c) unmutated: PASS (0.782 s of 2.500 s).
