@@ -4,7 +4,7 @@
 
 Reviewer: Opus 5.5 (architect agent, security lens), not the author. Base `2dbd7d5a`, branch `b103-inc7` at `8e98ea87`. Read: `01-requirements.md`, `02-test-cases-{L,V,AT}.md`, `E1-rulings.md` (§9 orchestrator rulings override the PROPOSED rows), `E1-slice.md`, `codewire/graph-inc7.md`, `evidence-e1/`, PLAN I-1/I-3/I-5, Inc 4's I-3 consumer note (`inc-4/codewire/graph-inc4.md:60`), the shipped paste code (`s19_app/tui/os_clipboard_input.py:505-576`, `:926-951`, `:1038-1112`) and Inc 1b's in-flight tree `s19_app-b103-inc1b-push` (read only). The architecture lens is `E3-architect.md`; findings are not repeated there, only cross-referenced.
 
-## Evidence (runs on <runner>, exact clone of `b103-inc7` at `8e98ea87`, HT-02 environment, `HOME` …`/runner_iso`, no clipboard)
+## Evidence (runs on <runner>, exact clone of `b103-inc7` at `8e98ea87`, HT-02 environment, `HOME` …`/<runner-home>`, no clipboard)
 
 **Probe A** — `~/work/zq-e3-7/ev/probe-a.txt` (scratch, deleted after the review; the lines below are pasted from it). Python 3.11.18, textual 8.2.8, `s19_app.__file__` = the clone. `uptime` before: load 8.57, 7.90, 6.44; after: 8.88, 8.02, 6.52 (16 cores; HT-08: the timings below are orders of magnitude, not decisions).
 

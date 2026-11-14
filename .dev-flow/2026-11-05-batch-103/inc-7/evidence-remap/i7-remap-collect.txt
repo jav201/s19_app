@@ -1,4 +1,4 @@
-# runner: ~/work/zq-p7 (isolated env, HOME basename runner_iso, timeout 300), tree = git archive of b103-inc7 at the 9ffe019d content; pytest --collect-only -q on 4 files (clipboard core, matrix, copy_paste_matrix, a2l_filter_teardown)
+# runner: ~/work/zq-p7 (isolated env, HOME basename <runner-home>, timeout 300), tree = git archive of b103-inc7 at the 9ffe019d content; pytest --collect-only -q on 4 files (clipboard core, matrix, copy_paste_matrix, a2l_filter_teardown)
 # 2026-11-14T01:38:12-06:00 host load 2.41 2.59 3.60; s19_app imported from ~/work/zq-p7/tree/s19_app/__init__.py
 tests/test_b103_clipboard_core.py::test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard
 tests/test_b103_clipboard_core.py::test_r_tui_043_7_1_and_043_8_1_neither_clipboard_warns_and_selects[single]

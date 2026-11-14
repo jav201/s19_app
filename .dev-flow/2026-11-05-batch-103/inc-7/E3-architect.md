@@ -4,7 +4,7 @@
 
 Reviewer: Opus 5.5 (architect agent), not the author. Base `2dbd7d5a`, branch `b103-inc7` at `8e98ea87`. Read: `s19-RULES.md`, skill `dev-flow` (E1–E4) and `roles/reviewer.md`, `design/E3-brief-common.md` (with the brief's overrides), all of `inc-7/` (`E1-rulings.md` §9 overrides the PROPOSED rows; D-2…D-12 reviewed as provisional option A), PLAN I-1/I-3/I-4/I-5, `inc-4/codewire/graph-inc4.md:60` (I-3 consumer note), the base code of every changed node and its callers, Inc 1b's in-flight tree `C:\Users\<user>\Github\s19_app-b103-inc1b-push` (read only; HEAD `051d5897`, the P-002 guard). Security lens: `E3-security.md`.
 
-## Evidence (runs on <runner>, exact clones of `b103-inc7` at `8e98ea87`, HT-02 environment, `HOME` …`/runner_iso`, no clipboard; scratch `~/work/zq-e3-7/`, volatile, deleted after; excerpts pasted)
+## Evidence (runs on <runner>, exact clones of `b103-inc7` at `8e98ea87`, HT-02 environment, `HOME` …`/<runner-home>`, no clipboard; scratch `~/work/zq-e3-7/`, volatile, deleted after; excerpts pasted)
 
 **Probe A** (`probe-a.txt`; Python 3.11.18, textual 8.2.8; load 8.57 before, 8.88 after, 16 cores — HT-08: orders of magnitude only):
 
@@ -109,7 +109,7 @@ The marks hold for the rows they cover, with these exceptions: R-A2L-LIST.050/1 
 
 Scope: one pass over the parts E3R1 corrected (`6f8e2362`; `E3-rulings.md` §E3R1 corrections), plus the new rows .075, .078, .082–.086, the re-pinned I-7 and the I-1 placement. As the orchestrator directed, the short body is judged from 15 body rows up; the 80×24 floor goes to CV-1 / BL-I7-6.
 
-**Probe C** (<runner>, a throwaway clone of `b103-inc7` at `6f8e2362`, HT-02 environment, `HOME` …`/runner_iso`, scratch `~/work/zq-e3-7/`, deleted after; load 1.23 before, 3.78 after). I re-ran the P3 pilot (`evidence-e1/i7e3r1-layout-pilot.py`) with one change, a class toggle, on a tree where a 13-line patch gave the tags pane exactly the height parts `_compose_screen_a2l` pins (`graph-inc7.md:526`). The patch put the find box and its three buttons in their own row under the filter row (same CSS as `#a2l_tags_filters`: `height: auto; padding-bottom: 1`) and added a 3-line `#a2l_list_chips` and a 1-line `#a2l_list_missing` (list mode). The 118×54 run used the stacked CSS of `[Config]` (`#a2l_panes` vertical, hex pane 14 rows). Excerpt:
+**Probe C** (<runner>, a throwaway clone of `b103-inc7` at `6f8e2362`, HT-02 environment, `HOME` …`/<runner-home>`, scratch `~/work/zq-e3-7/`, deleted after; load 1.23 before, 3.78 after). I re-ran the P3 pilot (`evidence-e1/i7e3r1-layout-pilot.py`) with one change, a class toggle, on a tree where a 13-line patch gave the tags pane exactly the height parts `_compose_screen_a2l` pins (`graph-inc7.md:526`). The patch put the find box and its three buttons in their own row under the filter row (same CSS as `#a2l_tags_filters`: `height: auto; padding-bottom: 1`) and added a 3-line `#a2l_list_chips` and a 1-line `#a2l_list_missing` (list mode). The 118×54 run used the stacked CSS of `[Config]` (`#a2l_panes` vertical, hex pane 14 rows). Excerpt:
 
 ```text
 ######## size 120x30   #a2l_tags_pane: region=(23, 4, 54, 15)
