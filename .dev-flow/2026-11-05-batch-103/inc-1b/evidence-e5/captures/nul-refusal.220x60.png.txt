@@ -1,0 +1,7 @@
+scenario=nul-refusal
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+notice severity=warning message=Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.
+top_screen=Screen
+stub_os_writes=0 lengths=[]
+surface=ready

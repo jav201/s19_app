@@ -1,0 +1,7 @@
+scenario=write-fail
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+notice severity=warning message=Clipboard write failed — copied inside the app only.
+top_screen=Screen
+stub_os_writes=1 lengths=[48]
+surface=ready
