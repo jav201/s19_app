@@ -1,9 +1,10 @@
 """s19_app.tui.app.compose_screens — S19TuiApp mixin: compose_screens (moved verbatim from s19_app/tui/app.py at 4f721985)."""
 from __future__ import annotations
 
-from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.containers import Container, Horizontal, ScrollableContainer, Vertical
 from textual.widgets import Button, DataTable, ListView, Static
 from ..os_clipboard_input import OsClipboardInput
+from ..a2l_label_list import A2LExplorerBody, LabelSuggestBox, ListAwareFilterInput
 from ..flow_screens import FlowBuilderPanel, FlowExecutionPanel
 from ..screens_directionb import (
     AbDiffPanel,
@@ -21,6 +22,7 @@ from ..window_help import WindowHelpChip, WindowSection
 from ..segment_split_view import SplitJoinWindow
 from . import deps
 from .shared import (_CopyRowTable, A2LTagTable, A2LDetailCard)
+from .a2l_view import ListAwareDetailCard
 
 
 class ComposeScreensMixin:
@@ -630,65 +632,61 @@ class ComposeScreensMixin:
         """
         Summary:
             Build the Direction B A2L Explorer rail screen (``#screen_a2l``)
-            as a two-pane horizontal layout — a ``1fr`` tags-table pane on
-            the left and a fixed/proportional hex pane on the right
-            (LLR-009.1).
+            as an :class:`A2LExplorerBody` over a ``Vertical`` tags pane and a
+            hex pane (R-A2L-LIST.080-.083). The tags pane holds the shipped
+            title, the list-mode filter row (``#a2l_tags_filters``), the
+            ``#a2l_filter_suggest`` overlay, the ``#a2l_filter_menu`` field
+            menu, the ``#a2l_list_chips`` / ``#a2l_list_missing`` lines, the
+            ``A2LTagTable`` and the summary; the hex pane holds a
+            ``ListAwareDetailCard`` above the ``#a2l_hexbox`` controls and hex
+            scroll.
 
         Args:
             None
 
         Returns:
-            Container: ``#screen_a2l`` holding ``#a2l_panes`` (the two-pane
-            ``Horizontal``). Hidden at startup.
+            Container: ``#screen_a2l`` holding ``#a2l_panes``. Hidden at
+            startup.
 
         Data Flow:
-            - Replaces the pre-batch ``#alt_layout`` 2x2 grid with a
-              ``Horizontal`` of a left tags pane (``#a2l_tags_pane``,
-              ``1fr``) and a right hex pane (``#a2l_hex_pane``, fixed-40 at
-              >=120 cols / 35% under ``width-narrow`` — LLR-009.1).
-            - The widget ids are kept as the A2L renderers' mount targets: the
-              tags pane keeps ``#a2l_tags_list``, ``#a2l_tags_summary``, the
-              filter row inputs/buttons, the ``#a2l_filter_menu`` overlay and
-              its list; the hex pane keeps ``#alt_hex_view`` /
-              ``#alt_hex_scroll`` / ``#alt_search_input`` / ``#alt_goto_input``
-              and the find/goto buttons.
+            - The filter row leads with the mode tag (``#a2l_filter_mode_tag``,
+              initial ``FILTER``), the ``ListAwareFilterInput``
+              (``#a2l_tags_filter_input``) — built with its sibling
+              ``#a2l_filter_suggest`` dropdown (``suggest``) and a
+              ``list_enabled`` gate on the filter field — then ``Paste list…
+              alt+p``, ``Field: name``, ``All``, ``Invalid``, ``In-Memory`` and
+              the find box with ``Find next`` / ``Page Prev`` / ``Page Next``
+              (one row).
+            - ``#a2l_filter_suggest`` (an overlay, no height), ``#a2l_filter_menu``,
+              ``#a2l_list_chips`` and ``#a2l_list_missing`` sit between the
+              filter row and the table; ``#a2l_list_missing`` is hidden in text
+              mode.
+            - The ``A2LTagTable`` keeps ``cell_padding=1`` and
+              ``fixed_columns=2`` (R-A2L-LIST.010); the pane keeps the
+              ``density-compact`` class.
+            - ``A2LExplorerBody`` toggles its ``-wide`` / ``-short`` / stacked
+              classes from its own size (I-7); the stylesheet does the layout.
 
         Dependencies:
+            Uses:
+                - ``A2LExplorerBody`` / ``LabelSuggestBox`` /
+                  ``ListAwareFilterInput`` / ``ListAwareDetailCard`` /
+                  ``A2LTagTable``
             Used by:
                 - ``compose``
-
-        US-038 polish (LLR-042.2): the tags pane carries the queryable
-        ``density-compact`` class (tightened pane padding, mirroring the
-        ``#workspace_body.density-compact`` precedent). The tag table is an
-        ``A2LTagTable`` with ``cell_padding=1`` (at least one blank column
-        between adjacent cells, R-TUI-042a.2) and ``fixed_columns=2`` (the
-        Address and Length columns stay at their own x under a horizontal
-        scroll while the other columns scroll under them, R-TUI-042a.4); the
-        fixed column header is the Textual ``DataTable`` default
-        (LLR-042.1, verify-not-build). Tag enrichment, paging and per-row
-        severity colouring layer on the same widget ids.
         """
-        _tags_pane = Container(
+        suggest = LabelSuggestBox(accept="tab complete", id="a2l_filter_suggest")
+        _tags_pane = Vertical(
             deps.Label("A2L Tags", id="a2l_tags_title"),
-            Container(
-                OsClipboardInput(placeholder="Filter tags", id="a2l_tags_filter_input"),
-                Button("Field: name", id="a2l_filter_field"),
-                Button("All", id="a2l_filter_all"),
-                Button("Invalid", id="a2l_filter_invalid"),
-                Button("In-Memory", id="a2l_filter_inmem"),
-                OsClipboardInput(
-                    placeholder="Find in tag table", id="a2l_tag_find_input"
-                ),
-                Button("Find next", id="a2l_tag_find_next"),
-                Button("Page Prev", id="a2l_page_prev_button"),
-                Button("Page Next", id="a2l_page_next_button"),
-                id="a2l_tags_filters",
-            ),
+            self._compose_a2l_filter_row(suggest),
+            suggest,
             Container(
                 ListView(id="a2l_filter_menu_list"),
                 id="a2l_filter_menu",
                 classes="hidden",
             ),
+            Static("", id="a2l_list_chips", markup=False),
+            Static("", id="a2l_list_missing", markup=False),
             A2LTagTable(
                 id="a2l_tags_list",
                 zebra_stripes=True,
@@ -700,34 +698,9 @@ class ComposeScreensMixin:
             id="a2l_tags_pane",
             classes="db-pane density-compact",
         )
-        _hex_pane = Container(
-            A2LDetailCard(
-                id="a2l_detail_card",
-                markup=False,
-                wrap=True,
-                min_width=1,
-                auto_scroll=False,
-            ),
-            deps.Label("Hex Viewer", id="alt_hex_title"),
-            Container(
-                OsClipboardInput(
-                    placeholder="Search ASCII text", id="alt_search_input"
-                ),
-                Button("Find Next", id="alt_search_button"),
-                OsClipboardInput(placeholder="Goto 0xADDR", id="alt_goto_input"),
-                Button("Goto", id="alt_goto_button"),
-                id="alt_hex_controls",
-            ),
-            ScrollableContainer(
-                Static("", id="alt_hex_view", markup=False),
-                id="alt_hex_scroll",
-            ),
-            id="a2l_hex_pane",
-            classes="db-pane",
-        )
-        _panes = Horizontal(
+        _panes = A2LExplorerBody(
             _tags_pane,
-            _hex_pane,
+            self._compose_a2l_hex_pane(),
             id="a2l_panes",
         )
         # The change-3 header row (title + the `?` usage-help chip, HLR-140)
@@ -739,6 +712,61 @@ class ComposeScreensMixin:
             _panes,
             id="screen_a2l",
             classes="db-screen hidden",
+        )
+
+    def _compose_a2l_filter_row(self, suggest: LabelSuggestBox) -> Container:
+        """Build the A2L Explorer filter row (``#a2l_tags_filters``)."""
+        return Container(
+            deps.Label("FILTER", id="a2l_filter_mode_tag"),
+            ListAwareFilterInput(
+                suggest=suggest,
+                list_enabled=lambda: self.a2l_tags_filter_field in ("name", "all"),
+                placeholder="type part of a name — or paste a list (new line , ; space)",
+                id="a2l_tags_filter_input",
+            ),
+            Button("Paste list…  alt+p", id="a2l_paste_list_button"),
+            Button("Field: name", id="a2l_filter_field"),
+            Button("All", id="a2l_filter_all"),
+            Button("Invalid", id="a2l_filter_invalid"),
+            Button("In-Memory", id="a2l_filter_inmem"),
+            OsClipboardInput(
+                placeholder="Find in tag table", id="a2l_tag_find_input"
+            ),
+            Button("Find next", id="a2l_tag_find_next"),
+            Button("Page Prev", id="a2l_page_prev_button"),
+            Button("Page Next", id="a2l_page_next_button"),
+            id="a2l_tags_filters",
+        )
+
+    def _compose_a2l_hex_pane(self) -> Container:
+        """Build the A2L Explorer hex pane (``#a2l_hex_pane``)."""
+        return Container(
+            ListAwareDetailCard(
+                id="a2l_detail_card",
+                markup=False,
+                wrap=True,
+                min_width=1,
+                auto_scroll=False,
+            ),
+            Container(
+                deps.Label("Hex Viewer", id="alt_hex_title"),
+                Container(
+                    OsClipboardInput(
+                        placeholder="Search ASCII text", id="alt_search_input"
+                    ),
+                    Button("Find Next", id="alt_search_button"),
+                    OsClipboardInput(placeholder="Goto 0xADDR", id="alt_goto_input"),
+                    Button("Goto", id="alt_goto_button"),
+                    id="alt_hex_controls",
+                ),
+                ScrollableContainer(
+                    Static("", id="alt_hex_view", markup=False),
+                    id="alt_hex_scroll",
+                ),
+                id="a2l_hexbox",
+            ),
+            id="a2l_hex_pane",
+            classes="db-pane",
         )
 
     def _compose_screen_mac(self) -> Container:
