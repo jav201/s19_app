@@ -21,15 +21,18 @@ Later units add ``LabelRanker``, ``LabelSuggestBox``, ``ListAwareFilterInput``,
 
 from __future__ import annotations
 
+import functools
 import logging
 from dataclasses import dataclass
 from typing import Callable, Mapping, Sequence
 
 from rich.text import Text
 from textual.actions import SkipAction
-from textual.app import App
+from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Static
+from textual.containers import Container, Horizontal, Vertical
+from textual.screen import ModalScreen
+from textual.widgets import Button, DataTable, Input, Label, Static, TextArea
 
 from s19_app.tui.os_clipboard_input import OsClipboardInput
 from s19_app.tui.services.label_match import (
@@ -40,6 +43,7 @@ from s19_app.tui.services.label_match import (
     rank,
 )
 from .a2l_parameter_picker import parse_parameter_list
+from .capped_text_area import CappedTextArea
 from .insight_style import DGRAY, GREEN, HILITE, RED, YELLOW
 
 FOUND, MISSING, DUPLICATE, HIDDEN = "found", "missing", "duplicate", "hidden"
@@ -1055,3 +1059,339 @@ class ListAwareFilterInput(OsClipboardInput):
         self.value = ", ".join(names)
         self.cursor_position = 0
         return True
+
+
+def _tag_text_cells(tag: dict) -> dict[str, Text]:
+    """Build the five text-mode cells of ``tag`` keyed by ``TEXT_CELL_LABELS``.
+
+    Address is ``0x%08X`` (``n/a`` when absent), Length the declared length
+    (``n/a`` when absent), Physical the physical value (``n/a`` when the raw
+    bytes refuse the COMPU method, empty with no bytes), Unit the explicit
+    unit or the COMPU-method unit, and Limits ``lower..upper``. The modal
+    reads ``Value`` (Physical) and ``Unit``; the other three keep
+    :func:`list_row_cells` whole.
+    """
+    addr = tag.get("address")
+    addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
+    length = tag.get("length")
+    len_text = str(length) if isinstance(length, int) else "n/a"
+    if tag.get("physical_value") is not None:
+        physical = str(tag.get("physical_value"))
+    elif tag.get("raw_value") is not None:
+        physical = "n/a"
+    else:
+        physical = ""
+    unit = tag.get("unit")
+    if unit in (None, ""):
+        unit = tag.get("compu_method_unit")
+    unit_text = "" if unit in (None, "") else str(unit)
+    limits = ""
+    if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
+        limits = f"{tag.get('lower_limit', '')}..{tag.get('upper_limit', '')}"
+    return {
+        "Address": Text(addr_text),
+        "Length": Text(len_text),
+        "Physical": Text(physical),
+        "Unit": Text(unit_text),
+        "Limits": Text(limits),
+    }
+
+
+class AddNameInput(OsClipboardInput):
+    """The paste window's add line — a plain ``OsClipboardInput``.
+
+    No I-1 override and no ``restrict``: a single-line box the modal composes
+    as ``#a2l_list_add``, whose ``enter`` drives the sibling
+    ``#a2l_list_add_suggest`` dropdown.
+    """
+
+
+class LabelListPasteModal(ModalScreen[list[str] | None]):
+    """The paste window: resolve a pasted name list against the A2L (I-7).
+
+    ``alt+f`` (or the ``Filter viewer by list`` button) dismisses with the
+    text area's pasted names, or ``None`` when it holds none (R-A2L-LIST.053,
+    .054). A debounced preview — 0.15 s after the last text edit, on the
+    screen's own token-checked timer — keeps the counts / ribbon / preview
+    rows / missing line / closest-name lines in step with the text, and the
+    add line's dropdown ranks as the operator types (R-A2L-LIST.057).
+    """
+
+    _NOTE = (
+        "The list filters the viewer (LIST mode, pasted order); nothing is "
+        "saved. Missing names stay listed so you can fix them."
+    )
+
+    BINDINGS = [
+        Binding("alt+f", "apply", "Filter viewer by list", priority=True, show=False),
+    ]
+
+    res: LabelListResolution | None
+    similar: dict[int, list[LabelMatch]]
+
+    def __init__(
+        self,
+        *,
+        tags: Sequence[dict],
+        ranker: LabelRanker,
+        names: Sequence[str],
+        wide: bool,
+    ) -> None:
+        """
+        Summary:
+            Create the paste window with the current tags, ranker, pasted
+            names and width regime (I-7 block).
+
+        Args:
+            tags (Sequence[dict]): The enriched tags of the current A2L.
+            ranker (LabelRanker): The shared label ranker.
+            names (Sequence[str]): The viewer's pasted names in list mode
+                (empty in text mode); loaded one per line into the text area.
+            wide (bool): Whether the preview shows the ``Value`` / ``Unit``
+                columns; fixed when the window opens (E3A-14).
+
+        Returns:
+            None
+        """
+        super().__init__()
+        self._tags = tags
+        self._ranker = ranker
+        self._names = names
+        self._wide = wide
+        self.res: LabelListResolution | None = None
+        self.similar: dict[int, list[LabelMatch]] = {}
+        self._similar_line: Static | None = None
+        self._preview_token = 0
+
+    def compose(self) -> ComposeResult:
+        """The dialog: left add/text, right counts/ribbon/preview/more, then
+        the missing / similar / note lines and the button row (R-A2L-LIST.043
+        -.045, .047)."""
+        suggest = LabelSuggestBox(
+            accept="enter add to the list", id="a2l_list_add_suggest"
+        )
+        more = Static("", id="a2l_list_more", markup=False)
+        more.display = False
+        with Container(id="a2l_list_dialog", classes="modal-dialog"):
+            yield Label("Paste a list of labels", classes="modal-title")
+            with Horizontal():
+                with Vertical():
+                    with Horizontal():
+                        yield Label("add", classes="ce-label")
+                        yield AddNameInput(
+                            placeholder="part of a name — start, middle, end, a typo",
+                            id="a2l_list_add",
+                        )
+                    yield suggest
+                    yield Label("or paste names — new line , ; space")
+                    yield CappedTextArea("", id="a2l_list_text")
+                with Vertical():
+                    yield Static("", id="a2l_list_counts", markup=False)
+                    yield Static("", id="a2l_list_ribbon", markup=False)
+                    yield DataTable(
+                        id="a2l_list_preview",
+                        zebra_stripes=True,
+                        cursor_type="row",
+                    )
+                    yield more
+            yield Static("", id="a2l_list_missing", markup=False)
+            yield Static("", id="a2l_list_similar", markup=False)
+            yield Static(self._NOTE, id="a2l_list_note", markup=False)
+            with Container(id="a2l_list_buttons", classes="modal-buttons"):
+                yield Button(
+                    "Filter viewer by list  alt+f",
+                    id="a2l_list_apply",
+                    classes="modal-confirm",
+                )
+                yield Button("Cancel  esc", id="a2l_list_cancel")
+
+    def on_mount(self) -> None:
+        """Load the names, focus the text area and paint the first preview
+        (R-A2L-LIST.041, .042)."""
+        self._set_columns()
+        ta = self.query_one("#a2l_list_text", TextArea)
+        names = self._names
+        ta.text = ("\n".join(names) + "\n") if names else ""
+        ta.focus()
+        self._preview()
+
+    def _set_columns(self) -> None:
+        """Add the preview columns once, from ``wide`` (R-A2L-LIST.047)."""
+        table = self.query_one("#a2l_list_preview", DataTable)
+        table.add_column("#", width=3, key="#")
+        table.add_column("Name", key="Name")
+        table.add_column("Status", key="Status")
+        table.add_column("Kind", key="Kind")
+        table.add_column("Address", key="Address")
+        if self._wide:
+            table.add_column("Value", key="Value")
+            table.add_column("Unit", key="Unit")
+
+    def on_text_area_changed(self, event: TextArea.Changed) -> None:
+        """Schedule a token-checked preview 0.15 s after the last edit."""
+        if event.text_area.id != "a2l_list_text":
+            return
+        self._preview_token += 1
+        token = self._preview_token
+
+        def run_preview() -> None:
+            if token != self._preview_token:
+                return
+            self._preview()
+
+        self.set_timer(0.15, run_preview)
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Rank the add line's text and open its dropdown (R-A2L-LIST.057)."""
+        if event.input.id != "a2l_list_add":
+            return
+        self._rank_add(event.value)
+
+    def _rank_add(self, text: str) -> None:
+        """Rank ``text`` for the add line and open (or close) its dropdown."""
+        add = self.query_one("#a2l_list_add", Input)
+        suggest = self.query_one("#a2l_list_add_suggest", LabelSuggestBox)
+        if not text.strip():
+            suggest.close()
+            return
+
+        def current() -> bool:
+            return add.is_attached and add.value == text
+
+        self._ranker.request(
+            "add",
+            text,
+            RANK_LIMIT,
+            deliver=functools.partial(suggest.show_ranked, text),
+            current=current,
+        )
+
+    def _preview(self) -> None:
+        """Resolve the text and repaint the whole preview (R-A2L-LIST.046
+        -.048, .051, .056, .059, .075-.078, .086)."""
+        if not self.is_attached or not self.app.is_running:
+            return
+        ta = self.query_one("#a2l_list_text", TextArea)
+        text = ta.text
+        self.res = resolve_label_list(parse_parameter_list(text), self._tags)
+        self._paint_counts()
+        self._paint_rows()
+        self._paint_more()
+        self._paint_missing()
+        self._request_similar(text)
+
+    def _paint_counts(self) -> None:
+        """Paint the counts line and the ``order`` ribbon (budget 50)."""
+        counts, ribbon, _ = list_summary_texts(self.res, WINDOW_RIBBON)
+        self.query_one("#a2l_list_counts", Static).update(counts)
+        ribbon_line = Text("order ")
+        ribbon_line.append(ribbon)
+        self.query_one("#a2l_list_ribbon", Static).update(ribbon_line)
+
+    def _paint_rows(self) -> None:
+        """Paint the first ``PREVIEW_MAX`` preview rows (R-A2L-LIST.047)."""
+        table = self.query_one("#a2l_list_preview", DataTable)
+        table.clear()
+        for entry in self.res.entries[:PREVIEW_MAX]:
+            text_cells = (
+                _tag_text_cells(entry.tag) if entry.tag is not None else None
+            )
+            cells = list_row_cells(entry, text_cells, "all")
+            row = [cells[0], cells[1], cells[2], cells[3], cells[4]]
+            if self._wide:
+                row.extend([cells[6], cells[7]])
+            table.add_row(*row, key=str(entry.pos))
+
+    def _paint_more(self) -> None:
+        """Show the ``+k more names`` line, or hide it (R-A2L-LIST.078)."""
+        more = self.query_one("#a2l_list_more", Static)
+        count = len(self.res.entries)
+        if count > PREVIEW_MAX:
+            more.update(
+                Text(
+                    f"  +{count - PREVIEW_MAX} more names "
+                    f"(the counts above cover all {count})"
+                )
+            )
+            more.display = True
+        else:
+            more.display = False
+
+    def _paint_missing(self) -> None:
+        """Paint the missing line (R-A2L-LIST.048)."""
+        _, _, missing = list_summary_texts(self.res, WINDOW_RIBBON)
+        self.query_one("#a2l_list_missing", Static).update(missing)
+
+    def _request_similar(self, text: str) -> None:
+        """Clear and re-request the first 10 missing names' closest names."""
+        self.similar = {}
+        self._similar_line = self.query_one("#a2l_list_similar", Static)
+        self._similar_line.update(Text(""))
+        missing = [e for e in self.res.entries if e.status == MISSING][:SIMILAR_MAX]
+        ta = self.query_one("#a2l_list_text", TextArea)
+
+        def current() -> bool:
+            return ta.is_attached and ta.text == text
+
+        for slot, entry in enumerate(missing, start=1):
+            self._ranker.request(
+                f"similar:{slot}",
+                entry.name,
+                CLOSEST_LIMIT,
+                deliver=functools.partial(self._on_similar, entry),
+                current=current,
+            )
+
+    def _on_similar(self, entry: LabelListEntry, matches: list[LabelMatch]) -> None:
+        """Set one missing entry's closest names and repaint the similar lines."""
+        self.similar[entry.pos] = list(matches)
+        self._paint_similar()
+
+    def _paint_similar(self) -> None:
+        """Repaint the closest-name lines in pasted order (R-A2L-LIST.049-.052)."""
+        line = self._similar_line
+        if line is None or not line.is_attached:
+            return
+        missing = [e for e in self.res.entries if e.status == MISSING][:SIMILAR_MAX]
+        parts = []
+        for entry in missing:
+            matches = self.similar.get(entry.pos)
+            if matches is None:
+                continue
+            head = f"  similar to #{entry.pos} {display_text(entry.name, SHORT_AT)}: "
+            if matches:
+                parts.append(
+                    head + " · ".join(display_text(m.name, SHORT_AT) for m in matches)
+                )
+            else:
+                parts.append(head + "none (digits must match exactly)")
+        line.update(Text("\n".join(parts)))
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Append the chosen name on the add line (R-A2L-LIST.057, .058)."""
+        if event.input.id != "a2l_list_add":
+            return
+        suggest = self.query_one("#a2l_list_add_suggest", LabelSuggestBox)
+        if not suggest.is_open or suggest.choice is None:
+            return
+        name = suggest.choice
+        ta = self.query_one("#a2l_list_text", TextArea)
+        text = ta.text
+        if text and not text.endswith("\n"):
+            text += "\n"
+        ta.text = text + name + "\n"
+        self.query_one("#a2l_list_add", Input).value = ""
+        suggest.close()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Route the apply button to ``action_apply`` (R-A2L-LIST.053)."""
+        if event.button.id == "a2l_list_apply":
+            event.stop()
+            self.action_apply()
+
+    def action_apply(self) -> None:
+        """Dismiss with the pasted names, or ``None`` when there are none
+        (R-A2L-LIST.053, .054)."""
+        text = self.query_one("#a2l_list_text", TextArea).text
+        names = parse_parameter_list(text)
+        self.dismiss(names if names else None)
