@@ -26,16 +26,21 @@ from dataclasses import dataclass
 from typing import Callable, Mapping, Sequence
 
 from rich.text import Text
+from textual.actions import SkipAction
 from textual.app import App
+from textual.binding import Binding
+from textual.widgets import Static
 
+from s19_app.tui.os_clipboard_input import OsClipboardInput
 from s19_app.tui.services.label_match import (
     LabelIndex,
     LabelMatch,
+    MatchRule,
     build_label_index,
     rank,
 )
 from .a2l_parameter_picker import parse_parameter_list
-from .insight_style import DGRAY, GREEN, RED, YELLOW
+from .insight_style import DGRAY, GREEN, HILITE, RED, YELLOW
 
 FOUND, MISSING, DUPLICATE, HIDDEN = "found", "missing", "duplicate", "hidden"
 GLYPH = {FOUND: "●", MISSING: "✗", DUPLICATE: "=", HIDDEN: "◐"}
@@ -731,3 +736,322 @@ class LabelRanker:
             exit_on_error=False,
             group="a2l_label_list",
         )
+
+
+def _rule_tag(match: LabelMatch) -> str:
+    """Return the rule tag of ``match`` (``fuzzy · <k> edit(s)``, else the word)."""
+    if match.rule is MatchRule.FUZZY:
+        if match.edits == 1:
+            return "fuzzy · 1 edit"
+        return f"fuzzy · {match.edits} edits"
+    return match.rule.value
+
+
+def _highlight_name(match: LabelMatch) -> Text:
+    """Paint ``match``'s short display text with its match spans highlighted.
+
+    The spans index the original name; ``display_text(name, 64)`` keeps the
+    offsets one-for-one but clips a longer name to 63 characters plus ``…``, so
+    a span past that cut is dropped and one that straddles it is clipped.
+    """
+    shown = display_text(match.name, SHORT_AT)
+    cut = SHORT_AT - 1 if len(match.name) > SHORT_AT else len(shown)
+    text = Text(shown)
+    for start, end in match.spans:
+        if end > cut:
+            end = cut
+        if start > cut:
+            start = cut
+        if end > start:
+            text.stylize(HILITE, start, end)
+    return text
+
+
+class LabelSuggestBox(Static):
+    """The filter / add-line suggestion dropdown (R-A2L-LIST.060-.070, .076, .077).
+
+    A ``Static`` the host composes under its filter box or paste-window add
+    line. It shows at most ``DROPDOWN_ROWS`` (8) ranked names, one per row:
+    ``▸ `` for the highlighted row or two spaces otherwise, the name's short
+    display text with its match spans highlighted, a space, and the rule tag.
+    It is open while the ``-open`` class is set; ``choice`` holds the real
+    ``LabelMatch.name`` of the highlighted row (never its display text).
+    """
+
+    # Closed: not shown and no height. Open: a overlay under its box.
+    DEFAULT_CSS = """
+    LabelSuggestBox {
+        display: none;
+        height: auto;
+        max-height: 14;
+        overlay: screen;
+    }
+    LabelSuggestBox.-open {
+        display: block;
+    }
+    """
+
+    is_open: bool
+    choice: str | None
+
+    def __init__(self, *, accept: str, id: str) -> None:
+        """
+        Summary:
+            Create a closed suggestion box with ``accept`` as its key-line
+            accept phrase.
+
+        Args:
+            accept (str): The accept phrase — ``tab complete`` under the filter
+                box or ``enter add to the list`` under the add line.
+            id (str): The widget id — ``a2l_filter_suggest`` or
+                ``a2l_list_add_suggest``.
+
+        Returns:
+            None
+        """
+        super().__init__(id=id, markup=False)
+        self._accept = accept
+        self._rows: list[LabelMatch] = []
+        self._total = 0
+        self._choice_index = 0
+        self._query = ""
+        self.is_open = False
+        self.choice = None
+
+    def show_ranked(self, query: str, matches: Sequence[LabelMatch]) -> None:
+        """
+        Summary:
+            Open the dropdown and paint the first ``DROPDOWN_ROWS`` ranked names
+            of ``query``, or the ``no similar name`` empty state when there are
+            none (R-A2L-LIST.060-.067, .076, .077).
+
+        Args:
+            query (str): The text the names were ranked for.
+            matches (Sequence[LabelMatch]): The ranked names, best first (at
+                most ``RANK_LIMIT``); only the first 8 are shown.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Keep the first 8 matches, remember the total, set the choice to
+              row 1 and open (``is_open`` True, class ``-open`` added).
+            - Paint the title, the rows and the key line; with no match paint
+              the ``no similar name`` state and set the choice to ``None``.
+
+        Dependencies:
+            Uses:
+                - _rows_text
+            Used by:
+                - (Inc 7) the viewer / paste-window ranking deliver callback
+        """
+        self._rows = list(matches[:DROPDOWN_ROWS])
+        self._total = len(matches)
+        self._choice_index = 0
+        self._query = query
+        self.choice = self._rows[0].name if self._rows else None
+        self.is_open = True
+        self.add_class("-open")
+        self.update(self._rows_text())
+
+    def close(self) -> None:
+        """
+        Summary:
+            Close the dropdown: drop the ``-open`` class and clear the open
+            flag, leaving the box text untouched (R-A2L-LIST.070).
+
+        Returns:
+            None
+        """
+        self.is_open = False
+        self.remove_class("-open")
+
+    def move(self, step: int) -> None:
+        """
+        Summary:
+            Move the choice by ``step`` rows, clamped to the shown rows, and
+            repaint (R-A2L-LIST.068). No-op while closed or with no rows.
+
+        Args:
+            step (int): The signed number of rows to move (+1 down, -1 up).
+
+        Returns:
+            None
+        """
+        if not self.is_open or not self._rows:
+            return
+        last = len(self._rows) - 1
+        self._choice_index = max(0, min(last, self._choice_index + step))
+        self.choice = self._rows[self._choice_index].name
+        self.update(self._rows_text())
+
+    def _rows_text(self) -> Text:
+        """Paint the open dropdown from the shown rows, total and accept phrase."""
+        if not self._rows:
+            return self._empty_text()
+        text = Text()
+        total = "20+" if self._total == RANK_LIMIT else str(self._total)
+        text.append(f"{len(self._rows)} of {total} similar names\n")
+        for index, match in enumerate(self._rows):
+            text.append("▸ " if index == self._choice_index else "  ")
+            text.append(_highlight_name(match))
+            text.append(" ")
+            text.append(_rule_tag(match))
+            text.append("\n")
+        text.append(f"↑↓ choose  {self._accept}  esc close\n")
+        text.append("rank: exact › prefix › substring › token › fuzzy › subsequence")
+        return text
+
+    def _empty_text(self) -> Text:
+        """Paint the ``no similar name`` empty state for the last query."""
+        text = Text()
+        text.append("no similar name\n")
+        text.append(f"nothing matches '{display_text(self._query, SHORT_AT)}'\n")
+        text.append("digits must match exactly; a word may have 1–2 typos")
+        return text
+
+
+class ListAwareFilterInput(OsClipboardInput):
+    """The A2L Explorer filter box, aware of list mode (R-A2L-LIST.032-.034, .068-.070).
+
+    An ``OsClipboardInput`` whose paste hook takes a whole multi-name paste and
+    joins it into list text, and whose ``escape`` / ``up`` / ``down`` / ``tab``
+    bindings drive its sibling :class:`LabelSuggestBox` dropdown, raising
+    ``SkipAction`` whenever they do not apply so the shipped handling runs.
+    """
+
+    BINDINGS = [
+        Binding("escape", "esc", "Close", show=False),
+        Binding("up", "move_choice(-1)", show=False),
+        Binding("down", "move_choice(1)", show=False),
+        Binding("tab", "complete", show=False),
+    ]
+
+    def __init__(
+        self,
+        *,
+        suggest: LabelSuggestBox,
+        list_enabled: Callable[[], bool],
+        placeholder: str,
+        id: str,
+    ) -> None:
+        """
+        Summary:
+            Create the filter box bound to its sibling ``suggest`` dropdown and
+            a ``list_enabled`` gate that is True while the filter field is
+            ``name`` or ``all``.
+
+        Args:
+            suggest (LabelSuggestBox): The sibling dropdown the box drives.
+            list_enabled (Callable[[], bool]): True while the filter field is
+                ``name`` or ``all``.
+            placeholder (str): The box placeholder.
+            id (str): The widget id (``a2l_tags_filter_input``).
+
+        Returns:
+            None
+        """
+        super().__init__(placeholder=placeholder, id=id)
+        self._suggest = suggest
+        self._list_enabled = list_enabled
+
+    def action_move_choice(self, step: int) -> None:
+        """
+        Summary:
+            Move the open dropdown's choice by ``step`` rows; with no dropdown
+            raise ``SkipAction`` so the box's shipped Up/Down handling runs
+            (R-A2L-LIST.068).
+
+        Args:
+            step (int): The signed number of rows (-1 up, +1 down).
+
+        Returns:
+            None
+
+        Raises:
+            textual.actions.SkipAction: When the dropdown is closed.
+        """
+        if self._suggest.is_open:
+            self._suggest.move(step)
+            return
+        raise SkipAction()
+
+    def action_esc(self) -> None:
+        """
+        Summary:
+            Close an open dropdown (keep the box text); else clear the box text
+            when it is a list text; else raise ``SkipAction`` so the shipped
+            Esc handling runs (R-A2L-LIST.032, .070).
+
+        Returns:
+            None
+
+        Raises:
+            textual.actions.SkipAction: When there is no dropdown and the value
+                is not a list text.
+        """
+        if self._suggest.is_open:
+            self._suggest.close()
+            return
+        if is_list_text(self.value):
+            self.value = ""
+            return
+        raise SkipAction()
+
+    def action_complete(self) -> None:
+        """
+        Summary:
+            Replace the box text with the open dropdown's chosen name (the real
+            ``LabelMatch.name``, never its display text), put the cursor at its
+            end and close the dropdown; else raise ``SkipAction`` so the app's
+            tab moves the focus on (R-A2L-LIST.069).
+
+        Returns:
+            None
+
+        Raises:
+            textual.actions.SkipAction: When no dropdown is open with a choice.
+        """
+        if self._suggest.is_open and self._suggest.choice is not None:
+            self.value = self._suggest.choice
+            self.cursor_position = len(self.value)
+            self._suggest.close()
+            return
+        raise SkipAction()
+
+    def _take_paste(self, text: str) -> bool:
+        """
+        Summary:
+            Override the I-1 paste hook: when the filter field is ``name`` or
+            ``all`` and the stripped paste holds two or more names, replace the
+            box text with the names joined by ``, `` and put the cursor at its
+            start (R-A2L-LIST.033, .034, R-PASTE.1, R-TUI-043.4, R-PASTE.29).
+
+        Args:
+            text (str): The paste text, already stripped by the route (I-1).
+
+        Returns:
+            bool: ``True`` once the joined names replaced the box text;
+                ``False`` when the field gate is closed or the paste holds one
+                name, so the stock first-line insert runs.
+
+        Data Flow:
+            - The field gate closed → ``False`` (the stock route inserts).
+            - Parse the names; fewer than two → ``False``.
+            - Otherwise set ``value`` to the names joined by ``, `` and the
+              cursor to 0, and return ``True``.
+
+        Dependencies:
+            Uses:
+                - parse_parameter_list (I-5)
+            Used by:
+                - OsClipboardInput._on_paste / action_paste (I-1)
+        """
+        if not self._list_enabled():
+            return False
+        names = parse_parameter_list(text)
+        if len(names) < 2:
+            return False
+        self.value = ", ".join(names)
+        self.cursor_position = 0
+        return True
