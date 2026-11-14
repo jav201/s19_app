@@ -23,7 +23,7 @@ python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-7/01-requ
 trace_check: 96 active requirements match --ids, checks run: CASE, TEST, 0 gap(s)
 ```
 
-## RED on base 63791549 (rtx, HT-02 env, `-n 2`, `timeout 300` per run, HOME basename `runner_iso`)
+## RED on base 63791549 (rtx, HT-02 env, `-n 2`, `timeout 300` per run, HOME basename `<runner-home>`)
 
 First line of every transcript: `s19_app.__file__ = <runner-home>/work/zq-e4-7-t7/tree/s19_app/__init__.py` (the base tree). Host load during the V run: `load average: 8.91, 8.78, 7.66` (shared host; the two timing arms were not decided there).
 

@@ -1,6 +1,6 @@
 # Inc 7 E4 — implementation record (conductor C7, Sonnet driving DeepSeek v4-pro)
 
-Tree `b103-inc7`, base `63791549`. One DeepSeek call per unit, fresh session, `timeout 2700`; at most two calls at once, on different files. Verification on <runner> (isolated env, `HOME` basename `runner_iso`, `timeout 300`, load 3-7, nothing timed). Examples were run as asserts in scratch scripts (not committed; deleted). The conductor wrote product code only to fix verified DeepSeek defects (listed).
+Tree `b103-inc7`, base `63791549`. One DeepSeek call per unit, fresh session, `timeout 2700`; at most two calls at once, on different files. Verification on <runner> (isolated env, `HOME` basename `<runner-home>`, `timeout 300`, load 3-7, nothing timed). Examples were run as asserts in scratch scripts (not committed; deleted). The conductor wrote product code only to fix verified DeepSeek defects (listed).
 
 | Unit | Commit | DeepSeek outcome | Verification (<runner>) |
 |---|---|---|---|
