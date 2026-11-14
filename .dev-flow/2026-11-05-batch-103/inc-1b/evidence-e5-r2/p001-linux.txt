@@ -1,4 +1,4 @@
-# P-001 control R-PASTE.14/C1 + diagnostics: Linux runs on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename runner_iso).
+# P-001 control R-PASTE.14/C1 + diagnostics: Linux runs on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename <runner-home>).
 # tree = clone at 8e778f8a + the working changes of this commit (file md5 checked equal to the PC worktree); base = an untouched worktree at 8e778f8a.
 # Host load (uptime) during these runs: 1.4 (collect, first tail run), 7.0-9.8 (base tail, probe, final runs): no timing number here decides anything (HT-08).
 # t2-collect2 ran before the last diagnostics-only edit of the tail file; node names did not change (t2-tail2 ran on the final bytes).

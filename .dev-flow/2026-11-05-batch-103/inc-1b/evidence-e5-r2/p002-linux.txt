@@ -1,4 +1,4 @@
-# P-002 / R-COPY.26/1 on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename runner_iso).
+# P-002 / R-COPY.26/1 on the LAN Linux host (<host>), textual 8.2.8, isolated env (HOME basename <runner-home>).
 # Excerpts of each run.txt (grep of header, loci, E lines, summary). Tree = clone of b103-inc1b-push 8e778f8a.
 # dirty = git status --porcelain -- s19_app tests: 1 = the new untracked test only; 2 = the test + the app.py guard (or the mutant).
 # p002-mutant-revert = guard removed; p002-mutant-always = 'if not self.is_running' replaced by 'if True'.
