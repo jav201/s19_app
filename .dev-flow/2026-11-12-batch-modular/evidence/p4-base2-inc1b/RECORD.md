@@ -186,3 +186,13 @@ missing 0, new 9, outcome_diff 11 (`full-suite/cmp.txt`).
   that basename (3,943 hits of it, no other form: D-R11-1 removed the placeholder-path hit).
 - WinCI-only nodes skip on Linux by design (R-PASTE.13/101, R-PASTE.14/101-103, C1, C2,
   `test_b103_clipboard_windows.py`).
+
+### Final re-check on the record tip `422a836d` and PP-02
+
+- Laws `test_no_private_tokens`, `test_suite_hygiene`, `test_id_registry`,
+  `test_requirements_canon`, `test_deps_seam_law` (`-n 4`): with an unused HOME basename
+  97 passed, 1 failed (canon shall-twice, P-031, pre-existing); with the runner rules'
+  basename 96 passed, 2 failed (plus 070_2, hits only the three Inc 1b records of D-R11-2;
+  none from this folder).
+- PP-02 on `git diff a95d0ea9..HEAD` and its commit messages: pattern hits 0 / 0; needle
+  hits 0 / 0 (7 needles, counts only). Added lines with CR: 0. No push made.
