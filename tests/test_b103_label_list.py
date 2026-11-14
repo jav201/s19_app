@@ -264,6 +264,7 @@ def drive_paste(route: str, box_id: str, text: str, *, field: str = "name", box_
                 else:
                     await right_click_app_route(host, pilot, box)
                 await pilot.pause(0.2)
+                host.hook_probe = getattr(box, "_take_paste", lambda _t: "no hook")(G2L_NAMES[0])
                 return box.value, box.cursor_position, host
 
     return asyncio.run(run())
@@ -312,7 +313,7 @@ def test_r_a2l_list_034_1(ll) -> None:
 
 def test_r_a2l_list_034_2(ll) -> None:
     """R-A2L-LIST.034/2: a bidi control (U+202E) is removed before the names are taken."""
-    value, _, _ = drive_paste("terminal", FILTER, "A‮B\nC")
+    value, _, _ = drive_paste("terminal", FILTER, "A\u202eB\nC")
     assert value == "AB, C"
 
 
@@ -335,14 +336,14 @@ def test_r_paste_1_1() -> None:
     """R-PASTE.1/1: a stock box (the Load box) takes the first line; the default hook is False."""
     value, _, host = drive_paste("terminal", "plain", G2L_TEXT)
     assert value == G2L_NAMES[0]
-    assert host.query_one("#plain", OsClipboardInput)._take_paste("x\ny") is False
+    assert host.hook_probe is False  # the stock hook exists and takes nothing
 
 
 def test_r_paste_1_2(ll) -> None:
     """R-PASTE.1/2: one name pasted into the filter box -> the stock insert; the hook says False."""
     value, _, host = drive_paste("terminal", FILTER, "VALUE_0002")
     assert value == "VALUE_0002"
-    assert host.query_one(f"#{FILTER}")._take_paste("VALUE_0002") is False
+    assert host.hook_probe is False  # one name: the hook leaves the paste to the stock insert
 
 
 def test_r_paste_1_3(ll) -> None:
@@ -737,7 +738,7 @@ def dropdown(names, query: str, scenario=None, limit: int = 20):
     async def sc(host, pilot, box, suggest):
         suggest.show_ranked(query, expect(names, query, limit))
         await settle(pilot, 2)
-        return shown(suggest), suggest
+        return shown(suggest), suggest.render()
 
     return drive_box(sc)
 
@@ -767,9 +768,8 @@ def test_r_a2l_list_065_2(ll, names) -> None:
     assert dropdown(names, "cuvre_00")[0][0] == "8 of 20+ similar names"
 
 
-def _highlighted(suggest, row_index: int, spans: list, prefix: int = 2) -> tuple:
+def _highlighted(content, row_index: int, spans: list, prefix: int = 2) -> tuple:
     """The characters of one row inside / outside its match spans that carry the highlight style."""
-    content = suggest.render()
     text = content.plain
     lines = text.split("\n")
     start = sum(len(line) + 1 for line in lines[:row_index]) + prefix
@@ -781,8 +781,8 @@ def _highlighted(suggest, row_index: int, spans: list, prefix: int = 2) -> tuple
 
 def test_r_a2l_list_064_1(ll, names) -> None:
     """R-A2L-LIST.064/1: ``CURVE_0001`` for ``cuvre_00`` -> chars (0,5) and (6,10) highlighted, (5,6) not."""
-    _, suggest = dropdown(names, "cuvre_00")
-    start, inside, marks, covered = _highlighted(suggest, 1, [(0, 5), (6, 10)])
+    _, content = dropdown(names, "cuvre_00")
+    start, inside, marks, covered = _highlighted(content, 1, [(0, 5), (6, 10)])
     assert all(marks), "every span character must carry a style"
     common = set.intersection(*(set(m) for m in marks))
     assert common, "the spans share one highlight style"
@@ -791,17 +791,22 @@ def test_r_a2l_list_064_1(ll, names) -> None:
 
 def test_r_a2l_list_064_2(ll, names) -> None:
     """R-A2L-LIST.064/2: ``MAP_0017`` for ``0017`` -> chars (4,8) highlighted, (0,4) not."""
-    _, suggest = dropdown(names, "0017")
-    start, inside, marks, covered = _highlighted(suggest, 1, [(4, 8)])
+    _, content = dropdown(names, "0017")
+    start, inside, marks, covered = _highlighted(content, 1, [(4, 8)])
     common = set.intersection(*(set(m) for m in marks))
     assert common and not (set(covered(start + 1)) & common)
 
 
 def test_r_a2l_list_066_1(ll, names) -> None:
     """R-A2L-LIST.066/1: ``zzzz`` -> title ``no similar name`` and the two hint lines, no choice."""
-    lines, suggest = dropdown(names, "zzzz")
+    async def sc(host, pilot, box, suggest):
+        suggest.show_ranked("zzzz", [])
+        await settle(pilot, 2)
+        return shown(suggest), suggest.choice
+
+    lines, choice = drive_box(sc)
     assert lines[0] == "no similar name" and lines[1] == "nothing matches 'zzzz'"
-    assert lines[2] == "digits must match exactly; a word may have 1–2 typos" and suggest.choice is None
+    assert lines[2] == "digits must match exactly; a word may have 1–2 typos" and choice is None
 
 
 def test_r_a2l_list_066_2(ll, names) -> None:
@@ -975,7 +980,7 @@ def test_r_a2l_list_076_6(ll) -> None:
 
 def test_r_a2l_list_076_7(ll) -> None:
     """R-A2L-LIST.076/7 (E3S-06, E3S-R1): bidi and zero-width controls -> U+FFFD one for one, length kept."""
-    name = "A‮B⁦C​D﻿"
+    name = "A\u202eB\u2066C\u200bD\ufeff"
     assert ll.display_text(name) == "A�B�C�D�" and len(name) == 8
 
 

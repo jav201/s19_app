@@ -679,6 +679,8 @@ def _jump(case08, tmp_path, row: int, name: str | None, mode: str | None = None)
         if mode:
             await press(app, pilot, mode)
         await set_filter(app, pilot, G2L_JOINED)
+        listed = table_rows(app)
+        assert len(listed) == 12 and listed[6][1] == "✗ MAP_0024", "the viewer is not in list mode"
         sent, before, after = await _enter_row(app, pilot, log, row)
         want = None if name is None else f"Tag at 0x{tag_by_name(app)[name]['address']:08X}"
         return sent, want, before, after
@@ -875,50 +877,62 @@ def test_r_a2l_list_085_2(case08, monkeypatch, tmp_path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _text_mode(case08, tmp_path, text: str, field: str = "name", mode=None):
+def _text_mode(case08, tmp_path, text: str, field: str = "name", mode=None) -> dict:
+    """Text-mode state for ``text``; then, in the same mode, the scope probe: a LIST text typed
+    into the box is list mode (rows kept, ``LIST``), never a substring filter (R-A2L-007.x "text mode only")."""
     async def sc(app, pilot):
         app._set_a2l_filter_field(field)
         if mode:
             await press(app, pilot, mode)
         await set_filter(app, pilot, text)
-        return (len(app._a2l_filtered_tags), summary(app), app._a2l_list_names(), list(app._a2l_enriched_tags))
+        out = {"count": len(app._a2l_filtered_tags), "summary": summary(app),
+               "tags": list(app._a2l_enriched_tags), "tag": mode_tag(app)}
+        await set_filter(app, pilot, "VALUE_0002 CURVE_0001")
+        out["probe_rows"], out["probe_tag"] = len(table_rows(app)), mode_tag(app)
+        return out
 
     return run_a2l(tmp_path, case08, sc)
 
 
+def _scoped(out: dict) -> bool:
+    return out["probe_rows"] == 2 and out["probe_tag"] == "LIST" and out["tag"] == "FILTER"
+
+
 def test_r_a2l_007_1_1(case08, names, tmp_path) -> None:
-    """R-A2L-007.1/1: ``value_00`` shows the tags whose name holds it, ignoring case."""
-    count, _, listed, _ = _text_mode(case08, tmp_path, "value_00")
-    assert count == sum(1 for n in names if "value_00" in n.lower()) > 0 and listed is None
+    """R-A2L-007.1/1: ``value_00`` shows the tags whose name holds it, ignoring case (text mode only)."""
+    out = _text_mode(case08, tmp_path, "value_00")
+    assert out["count"] == sum(1 for n in names if "value_00" in n.lower()) > 0 and _scoped(out)
 
 
 def test_r_a2l_007_1_2(case08, tmp_path) -> None:
-    """R-A2L-007.1/2: ``cuvre_00`` -> 0 rows."""
-    count, text, _, _ = _text_mode(case08, tmp_path, "cuvre_00")
-    assert count == 0 and text == "No A2L tags match 'cuvre_00'."
+    """R-A2L-007.1/2: ``cuvre_00`` -> 0 rows (text mode)."""
+    out = _text_mode(case08, tmp_path, "cuvre_00")
+    assert out["count"] == 0 and out["summary"] == "No A2L tags match 'cuvre_00'." and _scoped(out)
 
 
 def test_r_a2l_007_2_1(case08, tmp_path) -> None:
     """R-A2L-007.2/1: ``synthetic`` in field ``all`` -> the tags whose description holds it (one name: text mode)."""
-    count, _, listed, tags = _text_mode(case08, tmp_path, "synthetic", "all")
-    want = sum(1 for t in tags if "synthetic" in str(t.get("description") or "").lower())
-    assert count == want > 0 and listed is None
+    out = _text_mode(case08, tmp_path, "synthetic", "all")
+    want = sum(1 for t in out["tags"] if "synthetic" in str(t.get("description") or "").lower())
+    assert out["count"] == want > 0 and _scoped(out)
 
 
 def test_r_a2l_007_6_1(case08, names, tmp_path) -> None:
-    """R-A2L-007.6/1: ``All`` in text mode shows every tag."""
-    assert _text_mode(case08, tmp_path, "", mode="#a2l_filter_all")[0] == len(names)
+    """R-A2L-007.6/1: ``All`` in text mode shows every tag; with a list typed, the list keeps its rows."""
+    out = _text_mode(case08, tmp_path, "", mode="#a2l_filter_all")
+    assert out["count"] == len(names) and _scoped(out)
 
 
 def test_r_a2l_007_7_1(case08, tmp_path) -> None:
-    """R-A2L-007.7/1: ``Invalid`` in text mode -> only red rows (none in case 08)."""
-    assert _text_mode(case08, tmp_path, "", mode="#a2l_filter_invalid")[0] == 0
+    """R-A2L-007.7/1: ``Invalid`` in text mode -> only red rows (none in case 08); a list marks, never removes."""
+    out = _text_mode(case08, tmp_path, "", mode="#a2l_filter_invalid")
+    assert out["count"] == 0 and _scoped(out)
 
 
 def test_r_a2l_007_8_1(case08, tmp_path) -> None:
-    """R-A2L-007.8/1: ``In-Memory`` in text mode -> only the tags in the image."""
-    count, _, _, tags = _text_mode(case08, tmp_path, "", mode="#a2l_filter_inmem")
-    assert count == sum(1 for t in tags if t.get("in_memory")) > 0
+    """R-A2L-007.8/1: ``In-Memory`` in text mode -> only the tags in the image; a list marks, never removes."""
+    out = _text_mode(case08, tmp_path, "", mode="#a2l_filter_inmem")
+    assert out["count"] == sum(1 for t in out["tags"] if t.get("in_memory")) > 0 and _scoped(out)
 
 
 def test_r_tui_042a_4_1(case08, tmp_path) -> None:
@@ -951,10 +965,17 @@ def _layout(case08, tmp_path, size, scenario=None):
     return run_a2l(tmp_path, case08, sc, size=size)
 
 
+async def _seven_line_card(app, pilot) -> dict:
+    card = app.query_one("#a2l_detail_card")
+    card.update("\n".join(f"card line {i}" for i in range(7)))
+    await settle(pilot, 6)
+    return {"card": card.region, "hex": app.query_one("#alt_hex_scroll").region}
+
+
 def test_r_tui_069_6_1(case08, tmp_path) -> None:
-    """R-TUI-069.6/1: at 220x60 the card is at most 8 lines, above the hex view."""
-    r = _layout(case08, tmp_path, (220, 60))["regions"]
-    assert r["#a2l_detail_card"].height <= 8 and r["#a2l_detail_card"].bottom <= r["#alt_hex_scroll"].y
+    """R-TUI-069.6/1: at 220x60 a 7-line card is shown whole (the old 5-line cap clips it), at most 8, above the hex view."""
+    extra = _layout(case08, tmp_path, (220, 60), _seven_line_card)["extra"]
+    assert 6 <= extra["card"].height <= 8 and extra["card"].bottom <= extra["hex"].y
 
 
 async def _long_card(app, pilot) -> tuple:
@@ -1071,6 +1092,7 @@ def test_r_a2l_list_082_2(case08, tmp_path) -> None:
 
 def _table_rows_shown(case08, tmp_path, size) -> int:
     async def shown(app, pilot):
+        assert mode_tag(app) == "LIST", "the viewer is not in list mode"
         table = app.query_one("#a2l_tags_list", DataTable)
         return table.size.height - table.header_height
 
