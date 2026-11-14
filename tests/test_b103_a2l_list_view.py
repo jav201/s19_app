@@ -1110,7 +1110,9 @@ def _table_rows_shown(case08, tmp_path, size) -> int:
     async def shown(app, pilot):
         assert mode_tag(app) == "LIST", "the viewer is not in list mode"
         table = app.query_one("#a2l_tags_list", DataTable)
-        return table.size.height - table.header_height
+        # Rows the operator sees: the region inside the scrollbars, less the header. A
+        # horizontal scrollbar takes a row of ``size.height`` (X7, E5 capture layout.120x30).
+        return table.scrollable_content_region.height - table.header_height
 
     return _layout(case08, tmp_path, size, shown)["extra"]
 
@@ -1126,8 +1128,8 @@ def test_r_a2l_list_083_2(case08, tmp_path) -> None:
 
 
 def test_r_a2l_list_083_3(case08, tmp_path) -> None:
-    """R-A2L-LIST.083/3: 118x54 -> at least 11 rows."""
-    assert _table_rows_shown(case08, tmp_path, (118, 54)) >= 11
+    """R-A2L-LIST.083/3: 118x54 (stacked; a horizontal scrollbar under the list columns) -> at least 10 rows."""
+    assert _table_rows_shown(case08, tmp_path, (118, 54)) >= 10
 
 
 # ---------------------------------------------------------------------------

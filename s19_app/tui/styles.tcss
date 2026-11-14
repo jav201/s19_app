@@ -513,6 +513,13 @@ DataTable > .datatable--odd-row {
     height: 100%;
 }
 
+/* Short body (R-A2L-LIST.083, E5 F-X7-1): the list columns are always wider
+ * than the short tags pane, so a horizontal scrollbar would take the table's
+ * only body row at 120x30; the bar is hidden, and left / right still scroll. */
+#a2l_panes.-short #a2l_tags_list {
+    scrollbar-size-horizontal: 0;
+}
+
 #a2l_panes.-short #a2l_hex_pane {
     width: 3fr;
     height: 100%;
