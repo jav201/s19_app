@@ -1,3 +1,17 @@
+# Batch-103 full-suite gate
+
+**STATE: RUNNING — this is not a PASS or a completed gate.**
+
+**NEXT STEP:** wait for the eight sequential chunks on `<HOST>` to finish, collect the complete logs and summary, classify every failure against `origin/main` `0c3a6bd4674c3f2df90a7399898fc98429f5a200` and the batch records, then make any required test-first corrections and rerun the complete suite if product or tests change.
+
+- Candidate and running clone HEAD: `18f2d92344d090049262be89343084bd45a582ec`; tree `8f2e388f1c6b38e5b6f96035c1a6d442e8a288c7`; clean detached fresh clone under `<HOME>/work/b103-close/repo`.
+- Runner: the existing unmodified `run_sequential.py`, eight sequential chunks, `-I -B`, closed stdin, no bytecode or pytest cache, HT-02 paths under `<HOME>/work/b103-close`, never `/tmp`, and no whole-suite timeout.
+- Initial load: `0.13 0.14 0.33`; `s19_app.__file__` resolves inside the fresh clone. Full details are in `run-18f2d92344d090049262be89343084bd45a582ec/environment.txt`.
+- `chunk-01.txt` is a partial in-progress checkpoint, not a tally or failure classification. `launcher.txt` is empty because the runner has not completed a chunk. No gate verdict is claimed.
+- `run_candidate.sh` is the evidence launcher. No product, test, canon, E2, push, or CI change has been made.
+
+---
+
 # Batch-103 full-suite attempt after Inc 6
 
 **Outcome: FAILED — infrastructure; G3 is not PASS.** The attempt ran on the detached Linux clone at `c062293be6c122ecceca5701ea8afd0c6700f008`. The launcher exited 1 after `/tmp` reached 100% usage and Python raised `OSError: [Errno 28] No space left on device` while writing `summary.json`.
