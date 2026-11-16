@@ -1,6 +1,8 @@
 # Runner mecánico E5 — Inc 1b
 
-Estado: **listo para validación y ejecución posterior en copias Linux; 0/71 mutantes de producto ejecutados**.
+Estado actual: **73 mutantes cerrados como 71 KILLED (67 Linux + 4 WinCI), 1 SURVIVED equivalente (GA-A11) y 1 BAD/bloqueado por diseño (GC-C14)**. Véase `VALIDATION.md`, incluida su sección WinCI.
+
+_Estado histórico de la preparación inicial:_ **listo para validación y ejecución posterior en copias Linux; 0/71 mutantes de producto ejecutados**. Esta cifra describe sólo aquella validación estática, no el resultado final.
 
 ## Contenido
 
@@ -60,4 +62,4 @@ Veredictos: KILLED = assertion failure en el conjunto completo; SURVIVED = todos
 - **GC-C14:** no se aplica hasta disponer de una cota externa concreta de tiempo y workers/iteraciones, captura `override/tail` al alcanzarla y cancelación del árbol. El runner devuelve BAD con `applied_count=0`; un timeout desnudo no cierra este bloqueo.
 - **GW-W01–W04:** el runner Linux los rechaza. Requieren el ejecutor WinCI aislado y no convierten sus skips Linux en muertes.
 
-Los resultados futuros se escriben por grupo/ID en `result.json`, con `baseline.json` por grupo y `summary.json` agregado. Ninguno de esos resultados existe todavía: los reportes actuales sólo certifican la mecánica y la colección estática.
+_En el diseño original, los resultados futuros se escribirían por grupo/ID en `result.json`, con `baseline.json` por grupo y `summary.json` agregado. En aquel punto ninguno existía todavía y los reportes sólo certificaban mecánica y colección estática._ Actualmente sí existen resultados Linux y WinCI; `VALIDATION.md` es el índice vigente y enlaza `linux/run-287b9dc3/`, `winci-tail/` y el directorio de repo `evidence-e5/mutants/winci-paste/`.

@@ -1,0 +1,12 @@
+{
+  "bytecode_disabled": true,
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "lane_head": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+  "manifest_sha256": "6a41d7c6702d9f7aa82d33b4cf04ec76f77ce458039f7af1e976ef5eb0aea47a",
+  "platform": "Windows-10-10.0.26100-SP0",
+  "pytest": "9.2.0",
+  "pytest_cache": "no:cacheprovider",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "stdin": "DEVNULL",
+  "textual": "8.2.8"
+}

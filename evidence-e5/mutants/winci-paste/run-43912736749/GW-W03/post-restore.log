@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- C:\hostedtoolcache\windows\Python\3.11.9\x64\python.exe
+rootdir: [CI_GITHUB_WORKSPACE]
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5
+collecting ... collected 1 item
+
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2] PASSED [100%]
+
+---- generated xml file: [CI_RUNNER_TEMP]\e5-paste-winci\GW-W03\post-restore.xml ----
+============================= 1 passed in 14.61s ==============================

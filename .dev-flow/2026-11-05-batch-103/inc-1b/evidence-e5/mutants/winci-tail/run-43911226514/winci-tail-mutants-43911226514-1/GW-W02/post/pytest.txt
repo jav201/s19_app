@@ -1,0 +1,81 @@
+s19_app.__file__=[repo]\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_r_paste_13_101_held_row_copy_warns_within_bound _____________
+
+tmp_path = WindowsPath('[evidence]/GW-W02/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_13_101_held_row_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017A9F8006D0>
+record_property = <function record_property.<locals>.append_property at 0x0000017AA1586520>
+
+    @pytest.mark.serial_timing
+    def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch, record_property) -> None:
+        """R-PASTE.13/101: held row write ends within 2.5 s, one cascade."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        diag: dict = {}
+        async def drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await _settle(pilot)
+                table, expected = await _a2l_third_row(app, pilot, tmp_path)
+                real_run = clipboard_module.subprocess.run
+                ledger = _instrument(app, monkeypatch, writer_result=None)
+                _allow_real_processes(monkeypatch, ledger, real_run)
+                diag.update(_r13_diag_install(app, ledger, monkeypatch))
+                held = _hold_clipboard()
+                try:
+                    started = time.monotonic()
+                    await _right_click(app, pilot, table, (4, table.header_height + 2))
+                    await _wait(
+                        pilot,
+                        lambda: bool(ledger.writer_done) and bool(ledger.tail_done),
+                        timeout=10.0,
+                    )
+                    diag["events"].append(("wait_returned", round(time.monotonic() - diag["t0"], 4), {}))
+                    notice_wait_from = time.monotonic()
+                    # RR-1: notify() returns before the Notify message is handled, so
+                    # wait for the warning itself; the bound below still covers it.
+                    await _wait(
+                        pilot,
+                        lambda: any(row[0] == WRITE_FAIL for row in _notice_rows(app)),
+                        timeout=10.0,
+                    )
+                    elapsed = time.monotonic() - started
+                    diag["notice_wait_s"] = round(time.monotonic() - notice_wait_from, 4)
+                finally:
+                    _release_clipboard(held)
+                diag["snap_pre"] = _r13_diag_snapshot(app, diag, "pre_observe")
+                obs = _observe(app, ledger, expected=expected)
+                diag["snap_observe"] = _r13_diag_snapshot(app, diag, "post_observe")
+                await _settle(pilot, 2)
+                diag["snap_settled"] = _r13_diag_snapshot(app, diag, "settled")
+                return elapsed, obs
+        try:
+            elapsed, obs = asyncio.run(drive())
+        except AssertionError as exc:
+            record_property("r13_101_diag", _r13_diag_text(diag))
+            raise AssertionError(f"{exc} | r13_diag={_r13_diag_text(diag)}") from None
+        record_property("r13_101_diag", _r13_diag_text(diag))
+        try:
+            _failure(obs, obs["expected"], view=True)
+            _require(obs["counts"]["writer"] == 1, "held copy did not perform exactly one writer call")
+            bound = timing_bound(2.5)
+            assert elapsed <= report_margin("r_paste_13_101_row", elapsed, bound), elapsed
+        except AssertionError as exc:
+>           raise AssertionError(f"{exc} | r13_diag={_r13_diag_text(diag)}") from None
+E           AssertionError: unexpected writer call count | r13_diag={"events":[["tail_start",0.094,{"same_app":true}],["writer_start",0.094,{}],["writer_end",1.563,{}],["writer_start",1.563,{}],["writer_end",2.938,{}],["tail_end",2.938,{}],["wait_returned",3.0,{}]],"notify":[{"mono":2.938,"wall":1794847762.97616,"msg":"Clipboard write failed \u2014 copied inside t","sev":"warning","timeout":6.0,"screen":"Screen","app_id":1626173633744,"returned_mono":2.938}],"added":[{"mono":2.938,"msg":"Clipboard write failed \u2014 copied inside t","raised_at":1794847762.97616,"timeout":6.0}],"writer":["written=False","written=False"],"notice_wait_s":0.0,"snap_pre":{"label":"pre_observe","mono":3.0,"wall":1794847763.0329132,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.9432,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744},"snap_observe":{"label":"post_observe","mono":3.203,"wall":1794847763.237239,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.7389,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744},"snap_settled":{"label":"settled","mono":3.422,"wall":1794847763.4530156,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.5231,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744}}
+
+tests\test_b103_clipboard_tail.py:2319: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:845 OS clipboard write failed; retained Textual internal clipboard only
+============================== warnings summary ===============================
+tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound
+  tests\test_b103_clipboard_tail.py:2264: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.serial_timing
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound - AssertionError: unexpected writer call count | r13_diag={"events":[["tail_start",0.094,{"same_app":true}],["writer_start",0.094,{}],["writer_end",1.563,{}],["writer_start",1.563,{}],["writer_end",2.938,{}],["tail_end",2.938,{}],["wait_returned",3.0,{}]],"notify":[{"mono":2.938,"wall":1794847762.97616,"msg":"Clipboard write failed \u2014 copied inside t","sev":"warning","timeout":6.0,"screen":"Screen","app_id":1626173633744,"returned_mono":2.938}],"added":[{"mono":2.938,"msg":"Clipboard write failed \u2014 copied inside t","raised_at":1794847762.97616,"timeout":6.0}],"writer":["written=False","written=False"],"notice_wait_s":0.0,"snap_pre":{"label":"pre_observe","mono":3.0,"wall":1794847763.0329132,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.9432,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744},"snap_observe":{"label":"post_observe","mono":3.203,"wall":1794847763.237239,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.7389,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744},"snap_settled":{"label":"settled","mono":3.422,"wall":1794847763.4530156,"raw_count":1,"raw":[["Clipboard write failed \u2014 copied inside t",1794847762.97616,6.0,5.5231,false]],"reaped_rows":[["Clipboard write failed \u2014 copied inside t","warning",6.0]],"queue_size":0,"screen":"Screen","app_id":1626173633744}}
+1 failed, 1 warning in 8.49s

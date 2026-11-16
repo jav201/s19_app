@@ -1,0 +1,27 @@
+{
+  "check_count": 18,
+  "checks": {
+    "artifact_scanner_known_bad": true,
+    "bytecode_detector_known_bad": true,
+    "known_bad_assertion_is_killed": true,
+    "known_bad_baseline_skip_is_bad": true,
+    "known_bad_collection_is_crash": true,
+    "known_bad_error_is_crash": true,
+    "known_bad_infra_is_crash": true,
+    "known_bad_internal_timeout_is_crash": true,
+    "known_bad_malformed_junit_is_crash": true,
+    "known_bad_skip_is_bad": true,
+    "known_bad_survivor": true,
+    "known_bad_timeout_is_crash": true,
+    "known_good_baseline": true,
+    "known_good_restore": true,
+    "mutation_round_trips_and_one_at_a_time": false,
+    "w01_mechanism_known_bad": true,
+    "w02_mechanism_known_bad": true,
+    "zero_and_duplicate_anchors_rejected": true
+  },
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "lane": "winci-tail",
+  "schema_version": 1,
+  "verdict": "FAIL"
+}

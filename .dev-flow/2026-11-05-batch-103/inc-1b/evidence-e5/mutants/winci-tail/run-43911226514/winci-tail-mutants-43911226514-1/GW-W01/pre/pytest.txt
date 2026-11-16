@@ -1,0 +1,8 @@
+s19_app.__file__=[repo]\s19_app\__init__.py
+...                                                                      [100%]
+============================ QC-TM timing margins =============================
+70.5%  0.059 s / 0.200 s  r_paste_14_102_right  tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive
+78.0%  0.044 s / 0.200 s  r_paste_14_101_key  tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive
+78.0%  0.044 s / 0.200 s  r_paste_14_103_row  tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive
+QC-TM: 3 bounds, 0 under 20 % margin
+3 passed in 29.65s

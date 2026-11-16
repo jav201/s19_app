@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="28.537" timestamp="2026-11-16T16:48:05.390451+00:00" hostname="<HOST>"><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_101_view_key_write_stays_responsive" time="9.593"><failure message="AssertionError: responsive writer ran on the UI thread">tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_101_view_key_w0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEB890D10&gt;
+
+    def test_r_paste_14_101_view_key_write_stays_responsive(tmp_path, monkeypatch) -&gt; None:
+        """R-PASTE.14/101: view-key writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "key")
+&gt;       _assert_responsive(marker, lateness, obs, "r_paste_14_101_key", diag)
+
+tests\test_b103_clipboard_tail.py:2614: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_102_view_right_write_stays_responsive" time="10.267"><failure message="AssertionError: responsive writer ran on the UI thread">tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_102_view_right0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEE0D8B90&gt;
+
+    def test_r_paste_14_102_view_right_write_stays_responsive(tmp_path, monkeypatch) -&gt; None:
+        """R-PASTE.14/102: view-right writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "right")
+&gt;       _assert_responsive(marker, lateness, obs, "r_paste_14_102_right", diag)
+
+tests\test_b103_clipboard_tail.py:2622: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError</failure></testcase><testcase classname="tests.test_b103_clipboard_tail" name="test_r_paste_14_103_row_right_write_stays_responsive" time="8.095"><failure message="AssertionError: responsive writer ran on the UI thread">tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_103_row_right_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEDCD8390&gt;
+
+    def test_r_paste_14_103_row_right_write_stays_responsive(tmp_path, monkeypatch) -&gt; None:
+        """R-PASTE.14/103: row-right writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "row")
+&gt;       _assert_responsive(marker, lateness, obs, "r_paste_14_103_row", diag)
+
+tests\test_b103_clipboard_tail.py:2630: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -&gt; None:
+        if not condition:
+&gt;           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "lane": "winci-tail",
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "final_run": {
+    "id": 43911226514,
+    "url": "https://github.com/jav201/s19_app/actions/runs/43911226514",
+    "head_sha": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+    "conclusion": "success",
+    "meaning": "harness PASS: GW-W01 and GW-W02 KILLED; intentional mutant pytest exits were 1"
+  },
+  "discarded_attempts": [
+    {
+      "id": 43910346197,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43910346197",
+      "head_sha": "2ab6b1de140f3ec5c740dc637cfb00f51c91e189",
+      "reason": "executor self-test RED on CRLF anchor handling; dynamic mutants not run"
+    },
+    {
+      "id": 43910832774,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43910832774",
+      "head_sha": "106a805854a82f42f19b4d7370f8cef9257363d6",
+      "reason": "shallow checkout lacked pinned closure commit; dynamic mutants not run"
+    }
+  ],
+  "archive_processing": {
+    "removed_environment_directories": [
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/pre/environment",
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post-restore/environment",
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post/environment",
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/pre/environment",
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post-restore/environment",
+      "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post/environment"
+    ],
+    "redacted_files": 8,
+    "replacements": [
+      "repository path",
+      "evidence path",
+      "runner temp/home",
+      "Python executable path",
+      "hosted runner account",
+      "hosted runner hostname"
+    ],
+    "pre_upload_safety": "65 files, 3191579 bytes, zero violations in final run",
+    "note": "archive hashes describe the pruned, redacted bytes at their committed paths",
+    "post_archive_low_tail_redaction": {
+      "files": [
+        "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/result.json",
+        "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/result.json"
+      ],
+      "occurrences": 6,
+      "placeholder": "[CI_PYTHON]",
+      "reason": "Six standard hosted-toolcache Python executable paths remained in stored result.json bytes despite the earlier path-grep-clean summary.",
+      "scope": "Only command executable strings changed; verdicts, JUnit and observed mechanisms are unchanged. archive-hashes.json was recomputed from the resulting stored bytes."
+    }
+  }
+}

@@ -1,0 +1,90 @@
+name: e5-paste-winci-mutants
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - b103-inc1b-gw-paste
+    paths:
+      - .github/workflows/e5-paste-winci-mutants.yml
+      - tools/e5_paste_winci_mutants.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e5-paste-winci-mutants-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  paste-mutants:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out the unique PASTE lane
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the pinned test environment without caches
+        run: |
+          python -B -m pip install --no-cache-dir --upgrade pip
+          python -B -m pip install --no-cache-dir -r requirements.txt pytest "textual==8.2.8"
+          python -B -m pip install --no-cache-dir -e . "textual==8.2.8"
+
+      - name: Verify the toolkit version
+        run: python -B -c "import sys, textual; print(sys.version); print(textual.__version__); assert textual.__version__ == '8.2.8'"
+
+      - name: Run self-tests and isolated pre-mutate-post-restore-post-restore attempts
+        id: execute
+        shell: bash
+        timeout-minutes: 28
+        run: |
+          set +e
+          python -B -m tools.e5_paste_winci_mutants execute --output "$RUNNER_TEMP/e5-paste-winci"
+          code=$?
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          echo "PASTE_EXECUTE_EXIT=$code"
+          exit 0
+
+      - name: Redact and scan every artifact before upload
+        id: safety
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          python -B -m tools.e5_paste_winci_mutants publish --output "$RUNNER_TEMP/e5-paste-winci"
+          code=$?
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          echo "PASTE_SAFETY_EXIT=$code"
+          exit 0
+
+      - name: Upload redacted PASTE evidence only after a clean safety scan
+        if: always() && steps.safety.outputs.exit == '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e5-paste-winci-${{ github.run_id }}
+          path: ${{ runner.temp }}/e5-paste-winci/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Preserve executor and artifact-safety exit codes
+        if: always()
+        shell: bash
+        run: |
+          execute="${{ steps.execute.outputs.exit }}"
+          safety="${{ steps.safety.outputs.exit }}"
+          echo "PASTE_EXECUTE_EXIT=${execute:-missing} PASTE_SAFETY_EXIT=${safety:-missing}"
+          if [ -z "$execute" ] || [ -z "$safety" ]; then exit 2; fi
+          if [ "$execute" -ne 0 ]; then exit "$execute"; fi
+          exit "$safety"

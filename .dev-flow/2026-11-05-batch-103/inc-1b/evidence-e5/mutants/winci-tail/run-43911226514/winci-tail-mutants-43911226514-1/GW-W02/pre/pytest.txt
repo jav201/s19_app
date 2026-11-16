@@ -1,0 +1,12 @@
+s19_app.__file__=[repo]\s19_app\__init__.py
+.                                                                        [100%]
+============================== warnings summary ===============================
+tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound
+  tests\test_b103_clipboard_tail.py:2264: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.serial_timing
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================ QC-TM timing margins =============================
+69.4%  1.531 s / 5.000 s  r_paste_13_101_row  tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed, 1 warning in 7.33s

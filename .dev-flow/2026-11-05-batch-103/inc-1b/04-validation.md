@@ -1,10 +1,12 @@
 # Inc 1b — Clipboard: copy from every view: validation record (E5)
 
-Batch 2026-11-05-batch-103, increment 1b. Branch `b103-inc1b-push`, base of the increment `dc44b364`, tree at this write `290d80ae` plus the records of this commit. Written by the close-out worker (relevo-9, P-003). Every outcome below cites a committed record; none is typed from memory.
+Batch 2026-11-05-batch-103, increment 1b. _Registro previo, conservado como contexto histórico:_ rama `b103-inc1b-push`, base del incremento `dc44b364`, tree `290d80ae` más los registros de aquel commit (relevo-9, P-003).
 
-**Verdict: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25`: R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 checks PASS after the residual was cleared (section below); trace 0 gaps. Visible items (the 8 captures; AT-I1b-8) are decided provisionally on the final review page (P-059).
+**Cierre documental WinCI posterior.** La rama de integración es `b103-inc1b-close`, desde el cierre publicado `caae1bf9`. Commit y tree probado no se confunden: el árbol WinCI de la corrección P-001 fue `b2d6eb25`; los árboles de ejecutores de mutantes fueron `db4a8ebc` (run 43911226514) y `0271fe71` (run 43912736749). Este cierre añade tooling/workflows/evidencia y registros; no es otro árbol de producto probado ni una ejecución nueva de la suite.
 
-_Superseded verdict (Z1, 22:37):_ **Verdict: OPEN.** Reason: `redact_e5.py --check` on the current tree FAILS (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). Everything else passes: WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. It becomes PASS-WITH-NOTES when that one residual is cleared and the check is re-run. Visible items (the 8 captures; AT-I1b-8) are awaiting the operator's verdict on the final review page.
+**Verdict: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25`: R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 is CLEARED after the historical residual was fixed; trace 0 gaps. P-005 is executed: GW-W01/W02/W03/W04 **4/4 KILLED**; final mutation total **71 KILLED / 1 SURVIVED equivalent / 1 BAD blocked by design**. AT-I1b-8 remains manual `not_run`; P-059 and the eight captures still await the operator's final verdict. This is not a full-release acceptance.
+
+_Superseded verdict (Z1, 22:37), historical pre-fix output:_ **Verdict: OPEN.** Reason: `redact_e5.py --check` on the then-current tree FAILED (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). The residual was subsequently cleared as recorded below. WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. AT-I1b-8 and the captures remain pending the operator's final verdict.
 
 ## Final runs
 
@@ -17,6 +19,8 @@ _Superseded verdict (Z1, 22:37):_ **Verdict: OPEN.** Reason: `redact_e5.py --che
 | E5 law guards (Linux) | **6 failed, 671 passed, 3 skipped in 1665.99 s** (serial battery); the base before E4 (`e2e93548`) had 5 failed and the corrected tree rechecked at 5 failed / 1 passed; the 6th, TC-B97-69, was seen once, ruled not an Inc 1b regression and not labelled flaky (20/20 isolated on head and base), an open intermittent of the law battery (`E5-law-rulings.md`, `E5-b97-69-ruling.md`) | `evidence-e5/laws-final.txt` |
 | PowerShell static check | **1 passed** | `evidence-e5/powershell-static-green.txt` |
 | Linux mutants on `287b9dc3` | 69 L mutants: **67 KILLED, 1 SURVIVED (GA-A11, equivalent), 1 blocked by design (GC-C14)**; GT-T06 survived run 3 and was KILLED in run 4 after the manifest selection was corrected | `evidence-e5/mutants/VALIDATION.md` |
+| WinCI P-005 tail, run 43911226514 (`db4a8ebc`) | **GW-W01 and GW-W02 KILLED** by `writer_ui_thread` and `double_writer`; self-tests 18/18; baseline/post-restore PASS, applied once, restore hashes and artifact safety PASS | `evidence-e5/mutants/winci-tail/` |
+| WinCI P-005 paste, run 43912736749 (`0271fe71`) | **GW-W03 and GW-W04 KILLED** by multiline and duplicate oracles; self-tests 13/13; baseline/post-restore PASS, applied once, restore hashes and artifact safety PASS | `evidence-e5/mutants/winci-paste/` (repo root), indexed by `evidence-e5/mutants/VALIDATION.md` |
 | WinCI N=10 on `7804b500` | R-PASTE.14/101 /102 /103 and C1[key\|right\|row] **0/10 failures**; R-PASTE.13/101 failed 1/10; C2 (control) failed 7/10 (it asserted then) | `E5-winci-7804b500-n10.md` |
 | WinCI N=10 on `3c064348` | gated R-PASTE.14 nodes **0/10**; 8 success, 2 failure; R-PASTE.13/101 **2/10**; C2 report-only, lateness over 0.200 s in 6/10, each with one gen-2 GC; `at_passed=28/28` in every run | `E5-winci-3c064348-n10.md` |
 | WinCI N=10 on `53bd5fc8` (test-only diagnostic) | 9 valid runs all green (216 passed, 108/108 obligations, `at_passed=28/28`); run 43540344655 is infrastructure (runner clipboard probe `powershell-read-exception`), not a test result; the diagnostic caught no failing run, so the cause of R-PASTE.13/101 stays open | `E5-winci-53bd5fc8-n10.md`, `E5-winci-r13-101-diagnostic.md` |
@@ -63,7 +67,7 @@ See "Trace check" at the end of this record (the output of the skill's `trace_ch
 
 Record `E5-rereview-final.md` (code-reviewer, one pass, commit 265df693): **PASS-WITH-NOTES**, no HIGH. DF-06 checks PASS at 53bd5fc8 (`REDACTION_CHECK PASS files=295 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`). RR-1 (MEDIUM) was confirmed by round #2 and fixed test-only in b2d6eb25 (section 7 of that record; controls on the Linux seam: drop-notify FAIL, +3.5 s FAIL, unmutated PASS, +0.5 s PASS). RR-2, RR-3, RR-4 (LOW) stay open items (below).
 
-**DF-06 re-run on the current tree** (records changed after 53bd5fc8; `python -I -B` on the PC, read-only `--check` modes, the E4 refresh script not run), at tip 11610b70:
+**Historical DF-06 re-run, before the fix** (records changed after 53bd5fc8; `python -I -B` on the PC, read-only `--check` modes, the E4 refresh script not run), at then-tip 11610b70:
 
 ```text
 PRE_RULE canary_prefix hits=1
@@ -75,16 +79,17 @@ REDACTION_CHECK FAIL files=305 residual=1 exceptions=8
 MANIFEST_VERIFY_RESULT PASS manifests=6 files=83
 ```
 
-Reading: the `files` count grew 295 -> 305 because the close-out commit c66f467f added `evidence-e5/captures/` (8 PNG, 8 sidecars, driver, wrapper). The one residual is the string `VISIBLE<NUL>SECRET-SUFFIX` at `capture_i1b_driver.py:110`, a synthetic test payload that matches rule `canary_prefix` (`SECRET-[A-Z0-9-]+`). It is not a leak (it is the copy-with-NUL test input), but the check is a gate and it fails. This record does not edit the driver (it produced the committed captures; changing it is a decision for the orchestrator: reword the payload and note it, or add the file to the exceptions with a reason). The manifests pass.
+Historical reading: the `files` count grew 295 -> 305 because close-out commit c66f467f added `evidence-e5/captures/` (8 PNG, 8 sidecars, driver, wrapper). The one residual was the string `VISIBLE<NUL>SECRET-SUFFIX` at `capture_i1b_driver.py:110`, a synthetic test payload matching rule `canary_prefix` (`SECRET-[A-Z0-9-]+`). It was not a leak, but the gate correctly failed before the rename. The FAIL above is retained only as the pre-fix transcript; DF-06 is CLEARED by the subsequent PASS recorded below.
 
-## Other open items (not this record's to close)
+## Status and other open items
 
-- **P-001** (R-PASTE.13/101): cause found (test-side race, H5), fixed in b2d6eb25, post-fix rate 0/10 (`E5-winci-b2d6eb25-n10.md`); pre-fix 5/39.
+- **P-001** (R-PASTE.13/101): cause found (test-side race, H5), fixed in b2d6eb25; the diagnosed pre-fix round was 2/10 and post-fix was 0/10 (`E5-winci-b2d6eb25-n10.md`), not a zero-rate claim. The ledger conservatively stays `partial` / `intermittent`, not a current failure.
+- **P-005**: **executed 4/4 KILLED** on runs 43911226514 and 43912736749. Final total 71 KILLED / 1 equivalent SURVIVED / 1 BAD by design. GC-C14 remains blocked by design, not killed.
 - **RR-2** (LOW): no Linux test pins the `[t_start, t_end]` tick window; narrowing it is caught only on WinCI by the >= 10 ticks rule.
 - **RR-3** (LOW): `raise AssertionError(...) from None` in the R-PASTE.13/101 wrappers drops the original traceback (the message stays unique).
 - **RR-4** (LOW, records): `steps.log` entries of 2026-11-13 06:31 and 06:32 say `files=304`; the committed tree reports `files=295` (the earlier count included untracked files). Correction by this note only; `steps.log` is append-only and the lines are not edited (PP-06).
-- **P-004** (AT-I1b-8, the operator's), **P-005** (GW-W01 ... 04 WinCI-only mutants; GC-C14 blocked by design), canon fold at batch end. P-103 does not belong to Inc 1b.
-- ~~New: the DF-06 residual above~~ — cleared. Orchestrator ruling (relevo-11, DF-04 a): the driver's tail was renamed to `HIDDEN-TAIL` with an in-file note (the refusal depends only on the NUL; the payload text appears in no capture or sidecar). Not an exception in `redact_e5.py`: that file is pinned in `evidence-e5/SHA256SUMS.txt`. Re-run: `REDACTION_CHECK PASS files=305 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`.
+- **P-004** (AT-I1b-8) remains manual and `not_run`; **P-059 and the captures await the operator's final verdict**. The canon fold and G3 batch-end gate remain separate. P-103 does not belong to Inc 1b.
+- **DF-06: CLEARED.** Orchestrator ruling (relevo-11, DF-04 a): the driver's tail was renamed to `HIDDEN-TAIL` with an in-file note (the refusal depends only on the NUL; the payload text appears in no capture or sidecar). Not an exception in `redact_e5.py`: that file is pinned in `evidence-e5/SHA256SUMS.txt`. Historical pre-fix FAIL above was followed by `REDACTION_CHECK PASS files=305 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`.
 
 ## Trace check
 

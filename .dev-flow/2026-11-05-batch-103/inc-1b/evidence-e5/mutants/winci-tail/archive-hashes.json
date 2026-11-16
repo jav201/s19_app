@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "archive-metadata.json",
+      "sha256": "90a73a926a5ab82dd6c4ace8c8fc888c1e224c99600f9f2191bee2b4f375cbc3",
+      "bytes": 2581
+    },
+    {
+      "path": "run-43910346197/winci-tail-mutants-43910346197-1/artifact-safety.json",
+      "sha256": "19e5af750bfa86ba6dd678f01f4b418b06fef71620265fb0a4e497dd4f45a397",
+      "bytes": 97
+    },
+    {
+      "path": "run-43910346197/winci-tail-mutants-43910346197-1/self-tests.json",
+      "sha256": "ba6f411d4b13bad5231853c81a290e6c57bf6c7ee8bfd6787f97f4608c6899f5",
+      "bytes": 906
+    },
+    {
+      "path": "run-43910832774/winci-tail-mutants-43910832774-1/artifact-safety.json",
+      "sha256": "7df5a52339d8742b0343e4ca25ec8369ae3c6ca7a5995d5b2109c8cb9617088f",
+      "bytes": 97
+    },
+    {
+      "path": "run-43910832774/winci-tail-mutants-43910832774-1/self-tests.json",
+      "sha256": "8ee7357f9be32d8c7e7d04412465c1ebd160842db1781b33ac43f8e383bba673",
+      "bytes": 905
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/artifact-safety.json",
+      "sha256": "6ae24863b2792c0646d2148865e173c5d2e8565c6a007401e85e00e48f7fc62d",
+      "bytes": 102
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/environment.json",
+      "sha256": "4e4fa0e2810cdf799dd9df3a67a97dca1672db8dd7f1d4a10b5321ee916d978b",
+      "bytes": 486
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post/junit.xml",
+      "sha256": "338b7c90de3cc39d9759e20860415101d59e676c793b3d06948a5f59305d5b1f",
+      "bytes": 5009
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post/pytest.txt",
+      "sha256": "dace2fb8881c2487ae5934974da7e6dd6eb67c0c82c6ccb6b7d315ea139a0b45",
+      "bytes": 12051
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post-restore/junit.xml",
+      "sha256": "718c9c3fb6fdbd8d5508acf84550b42d3abb0ef1d6969867ca2b0205e39f166c",
+      "bytes": 938
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/post-restore/pytest.txt",
+      "sha256": "2bb88eea3543f09657f56684cd829ddfb00ded4f0ff5f142d1d5f1964af744e6",
+      "bytes": 672
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/pre/junit.xml",
+      "sha256": "bca522eac208bfef76a1068e97894a4d0fafb61c177ea705bd159c5c4e2251f7",
+      "bytes": 939
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/pre/pytest.txt",
+      "sha256": "cd44dc98aa6d6aaca6f891ce9cb7f3b72c5c3130e44b828e1e94acfed3be2fee",
+      "bytes": 672
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/result.json",
+      "sha256": "db1f7ff696ae0beba436cc943c9fd7b3d20f32c82dfde6cf0311aea8b353b0fe",
+      "bytes": 9835
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post/junit.xml",
+      "sha256": "9ec3aa041a7d0b921105f4823af0d5013ba6ac571bf6c91a5b437420e2018094",
+      "bytes": 8721
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post/pytest.txt",
+      "sha256": "9da24955dfb67f65efa33a5b925165f58ad0a0817c688b58d384dab614338e62",
+      "bytes": 8147
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post-restore/junit.xml",
+      "sha256": "5c295c6dff6a36c5a4531625738293cddf4a8ae1a1b74bbdd10735362dddcd56",
+      "bytes": 2713
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/post-restore/pytest.txt",
+      "sha256": "1c1209eceffc8990c81e4217b2aec3f2a9b42c7fab34491d37e73aed32d73833",
+      "bytes": 831
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/pre/junit.xml",
+      "sha256": "aae49d15a0c9c7e01cfa32bb6eef394b783fcef9c320bd8dd4d778459045c3da",
+      "bytes": 2723
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/pre/pytest.txt",
+      "sha256": "3eda6e46dd3046c8474afd6b7bfc2496e133755d0a7ac0453fb1b037931d9993",
+      "bytes": 831
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/result.json",
+      "sha256": "2a1b1279854b8f866a64e514f6f9faa1264d49a5a28eae82d1d5b97e54e38f3c",
+      "bytes": 5600
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/self-tests.json",
+      "sha256": "8ee7357f9be32d8c7e7d04412465c1ebd160842db1781b33ac43f8e383bba673",
+      "bytes": 905
+    },
+    {
+      "path": "run-43911226514/winci-tail-mutants-43911226514-1/summary.json",
+      "sha256": "2a38d74f38534cb356a57e2dec24c323ee56a58fd84eb94bae19ae532e077b73",
+      "bytes": 909
+    },
+    {
+      "path": "verdicts.json",
+      "sha256": "3a595a2729c6fef7d637f084f850a66f3e37429c75a0a327f5a7450f45f9438c",
+      "bytes": 3517
+    }
+  ],
+  "file_count": 24
+}

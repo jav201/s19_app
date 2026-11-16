@@ -13,7 +13,7 @@ Baseline fijado y comprobado en el clon aislado: `0d4d4e7c800b27040769a1a10117e6
 - `linux/harness-self-test-final/self-test.json`: **PASS**. Fixtures desechables observaron KILLED, SURVIVED, CRASH y BAD; `applied_count=1` en los tres cambios aplicables, `applied_count=0` en el anchor ausente, todos los restores SHA-256 correctos, objetivos verdes tras restore y cero bytecode nuevo.
 - `linux/empty-group-control.txt`: un grupo desconocido devuelve BAD exit 2; una selección vacía ya no puede producir un PASS vacío.
 
-Alcance real: **0/71 mutantes de producto ejecutados, 0 tests de producto ejecutados, 0 accesos a clipboard**. La colección importa los módulos de tests pero no ejecuta los tests. No se repitió la admisión 122 passed/19 skipped y no se ejecutó WinCI.
+_Alcance histórico de la validación estática inicial, antes de las ejecuciones E5 posteriores:_ **0/71 mutantes de producto ejecutados, 0 tests de producto ejecutados, 0 accesos a clipboard**. La colección importaba los módulos de tests pero no ejecutaba los tests. No se había repetido la admisión 122 passed/19 skipped ni ejecutado WinCI. El estado ejecutado actual está en las secciones Linux y WinCI posteriores.
 
 ## RED del propio tooling conservados
 
@@ -35,11 +35,11 @@ Las copias locales están redactadas con `<SCRATCH>`, `<S19CI>`, `<BASE_REPO>`, 
 
 Los hashes del manifiesto, runner y validador coinciden con los registrados dentro del reporte estático final.
 
-## Pendiente
+## Pendiente histórico de la validación estática inicial
 
-- Ejecutar la admisión pristine 122/19 una vez por grupo antes de cualquier mutante.
-- GC-C14 permanece BAD/pendiente, sin aplicar, hasta tener cota de tiempo y workers/iteraciones con captura `override/tail` al alcanzarla.
-- GW-W01–W04 permanecen fuera de Linux y sujetos al ejecutor WinCI aislado; su NO-GO no se altera aquí.
+- Entonces faltaba ejecutar la admisión pristine 122/19 una vez por grupo antes de cualquier mutante; la ejecución Linux posterior usó el baseline actualizado 123/19 de 142 nodos.
+- GC-C14 permanece BAD/pendiente, sin aplicar, hasta tener cota de tiempo y workers/iteraciones con captura `override/tail` al alcanzarla. Sigue bloqueado por diseño y no se convierte en kill.
+- GW-W01–W04 permanecen fuera de Linux. En aquella pasada estaban sujetos a un ejecutor WinCI aislado todavía no corrido; la sección WinCI posterior registra sus cuatro kills. Nunca se convirtieron en mutantes Linux.
 
 ## Ejecución Linux de mutantes sobre 287b9dc3 (E5)
 
@@ -80,3 +80,24 @@ Evidencia en `linux/run-287b9dc3/` (redactada). Árbol de harness con `manifest.
 - Veredicto: **GT-T06 KILLED** (`summary.json`: KILLED 1, SURVIVED 0, CRASH 0, BAD 0). Total Linux L: **67 KILLED, 1 SURVIVED (GA-A11, equivalente), 1 bloqueado (GC-C14)**.
 - Evidencia: `linux/run-287b9dc3/run4-GT-T06/` (`summary.json`, `GT/baseline.json`, `GT/baseline-junit.xml`, `GT/baseline-pytest.txt`, `GT/GT-T06/result.json`); el `.log` del lanzador (`run4-GT-T06.log`) queda ignorado por git, igual que los anteriores.
 - Redacción de la corrida 4: `redact_e5.py` reemplazó 44 ocurrencias en 5 archivos nuevos; `redact_e5.py --check` PASS (`files=304 residual=0 exceptions=8`). `redaction-census.json` se conserva como el censo de la redacción original (102 archivos); la pasada de la corrida 4 no lo reescribe, porque una segunda pasada sin cambios lo había sobrescrito con un censo vacío.
+
+## Ejecución WinCI de GW-W01–W04 (P-005)
+
+Los dos carriles parten del cierre publicado `caae1bf9a0b97266731753fc9dc0a38f3762f222`. El run definitivo **43911226514** usó el commit de ejecutor `db4a8ebc97b0786127e61cc8ee34ae2fe5604f31`; el run **43912736749** usó `0271fe710a1e0e5b49aa472684cedbf9b56ce485`. Son árboles de ejecutor WinCI, distintos del árbol `b2d6eb25` probado para P-001 y del cierre meramente documental.
+
+| Mutante | Run / commit | Veredicto | Mecanismo observado | Baseline y restore | Artefactos |
+|---|---|---|---|---|---|
+| GW-W01 | 43911226514 / `db4a8ebc` | **KILLED** | `writer_ui_thread`: 3 assertion failures; no se reclama kill del tick-bound | pre 3 PASS; `applied_count=1`; post-restore 3 PASS; SHA-256 restaurado; 0 skips/errors | `winci-tail/run-43911226514/winci-tail-mutants-43911226514-1/GW-W01/` |
+| GW-W02 | 43911226514 / `db4a8ebc` | **KILLED** | `double_writer`: dos pares writer start/end; no se reclama kill del warning-bound | pre 1 PASS; `applied_count=1`; post-restore 1 PASS; SHA-256 restaurado; 0 skips/errors | `winci-tail/run-43911226514/winci-tail-mutants-43911226514-1/GW-W02/` |
+| GW-W03 | 43912736749 / `0271fe71` | **KILLED** | `multiline`: T1 expone líneas adicionales del artefacto OS | pre-probe/pre 1 PASS; `applied_count=1`; post-restore 1 PASS; SHA-256 restaurado; 0 skips/errors | repo `evidence-e5/mutants/winci-paste/run-43912736749/GW-W03/` |
+| GW-W04 | 43912736749 / `0271fe71` | **KILLED** | `duplicate`: la primera línea queda duplicada por stock handler + dispatch | pre-probe/pre 1 PASS; `applied_count=1`; post-restore 1 PASS; SHA-256 restaurado; 0 skips/errors | repo `evidence-e5/mutants/winci-paste/run-43912736749/GW-W04/` |
+
+Self-tests del ejecutor tail: **18/18 PASS** (`winci-tail/verdicts.json`, `run-43911226514/.../self-tests.json`). Self-tests del ejecutor paste: **13/13 PASS** (`evidence-e5/mutants/winci-paste/run-43912736749/self-tests.json`). En los cuatro kills, los fallos post son `AssertionError` intencionales con exit 1, sin errores ni skips; baseline y post-restore vuelven a PASS, el restore SHA-256 coincide y no aparece bytecode nuevo. La seguridad de artefactos fue PASS; los JUnit/transcripts permanecen en los directorios enlazados. Índices: [`winci-tail/`](winci-tail/) y [`winci-paste/`](../../../../../evidence-e5/mutants/winci-paste/).
+
+Runs históricos **BAD/INFRA no contados**: tail 43910346197 (self-test RED por CRLF, sin mutantes dinámicos) y 43910832774 (checkout shallow sin commit fijado, sin mutantes dinámicos); paste 43910310628 y 43910644194 (INFRA), 43910911914 (`applied_count=0`) y 43911750441 (clasificador BAD). Ninguno aporta kills ni cambia el total.
+
+**Total final de 73:** **71 KILLED = 67 Linux + 4 WinCI**, **1 SURVIVED equivalente = GA-A11**, **1 BAD/bloqueado por diseño = GC-C14**. GC-C14 no se convierte en kill y los cuatro GW no se reclaman como ejecuciones Linux.
+
+Corrección LOW de divulgación posterior al archivo: seis rutas estándar del ejecutable Python alojado quedaron en los dos `result.json` tail. Se sustituyeron únicamente esas cadenas por `[CI_PYTHON]`, se documentó en `winci-tail/archive-metadata.json` y `winci-tail/verdicts.json`, y `winci-tail/archive-hashes.json` se recalculó desde los 24 blobs almacenados. Veredictos, JUnit y mecanismos no cambiaron.
+
+**Censo C-14 previo a esta reconciliación:** búsqueda recursiva en el batch por las categorías P-005, GW-W01–W04, «0 ejecutados»/«0/71», resultados inexistentes y DF-06. Se clasificaron seis documentos vigentes para corrección (`02-test-cases.md`, `04-validation.md`, `REVIEW-PACKET.md`, `E5-mutant-plan.md`, `evidence-e5/mutants/README.md` y este archivo). Las afirmaciones de `E5-mutant-plan-review.md`, `E5-mutant-plan-update-report.md` y `E5-rereview-disclosure.md` son reportes/reviews históricas y se conservaron sin reescritura; el HANDOFF WinCI no contenía esas afirmaciones.

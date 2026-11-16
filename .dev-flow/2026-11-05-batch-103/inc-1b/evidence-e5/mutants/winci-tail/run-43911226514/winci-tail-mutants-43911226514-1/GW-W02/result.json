@@ -1,0 +1,171 @@
+{
+  "applied_count": 1,
+  "bytecode_disabled": true,
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "group": "GW",
+  "id": "GW-W02",
+  "lane_head": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+  "manifest_baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "pinned_tree_restored": true,
+  "post": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 1,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 9.656,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": {
+        "infra_signature": false,
+        "mechanisms": [
+          "double_writer"
+        ],
+        "qc_tm": [],
+        "status": "failed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "post_restore": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0
+    },
+    "elapsed_seconds": 8.063,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 5.0,
+            "label": "r_paste_13_101_row",
+            "margin": 70.0,
+            "measured": 1.5
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "post_restore_target_green": true,
+  "post_restore_verdict": "PASS",
+  "pre": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0
+    },
+    "elapsed_seconds": 8.438,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 5.0,
+            "label": "r_paste_13_101_row",
+            "margin": 69.4,
+            "measured": 1.531
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "pre_verdict": "PASS",
+  "reason": "assertion failure with no errors, skips or timeouts",
+  "restore_ok": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_newline": "CRLF",
+  "source_sha256_before": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+  "source_sha256_mutated": "e4cdde350e01e04360ef6f82be07adf3a09764d6f5441a208ee412db9285e54f",
+  "source_sha256_restored": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound"
+  ],
+  "verdict": "KILLED"
+}

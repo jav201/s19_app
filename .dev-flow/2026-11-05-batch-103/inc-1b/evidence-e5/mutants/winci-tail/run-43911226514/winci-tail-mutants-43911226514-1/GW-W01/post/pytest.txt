@@ -1,0 +1,141 @@
+s19_app.__file__=[repo]\s19_app\__init__.py
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_r_paste_14_101_view_key_write_stays_responsive _____________
+
+tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_101_view_key_w0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEB890D10>
+
+    def test_r_paste_14_101_view_key_write_stays_responsive(tmp_path, monkeypatch) -> None:
+        """R-PASTE.14/101: view-key writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "key")
+>       _assert_responsive(marker, lateness, obs, "r_paste_14_101_key", diag)
+
+tests\test_b103_clipboard_tail.py:2614: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+____________ test_r_paste_14_102_view_right_write_stays_responsive ____________
+
+tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_102_view_right0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEE0D8B90>
+
+    def test_r_paste_14_102_view_right_write_stays_responsive(tmp_path, monkeypatch) -> None:
+        """R-PASTE.14/102: view-right writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "right")
+>       _assert_responsive(marker, lateness, obs, "r_paste_14_102_right", diag)
+
+tests\test_b103_clipboard_tail.py:2622: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError
+------------------------------ Captured log call ------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0 workarea=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\.s19tool\workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:16728 Load phase boundary: dialog_callback_entry path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\prg.s19
+INFO     s19tui:app.py:16749 Load phase boundary: copy_started path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\prg.s19
+INFO     s19tui:app.py:16762 Load phase boundary: copy_done path=prg.s19 elapsed=0.002s
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:16799 File copied to temp: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\.s19tool\workarea\temp\prg.s19 size_bytes=9544 copy_seconds=0.002
+INFO     s19tui:app.py:16805 Load phase boundary: worker_spawned path=prg.s19
+INFO     s19tui:app.py:20055 Load phase boundary: worker_parse_start path=prg.s19
+INFO     s19tui:app.py:19197 Loading file: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\.s19tool\workarea\temp\prg.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15389 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:20322 Load summary: file_type=s19 path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\.s19tool\workarea\temp\prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:15406 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:20074 Load phase boundary: worker_parse_done path=prg.s19 elapsed=0.012s
+INFO     s19tui:app.py:19898 Load phase boundary: prepare_entry path=prg.s19 file_type=s19
+INFO     s19tui:app.py:19933 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:19050 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:19942 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19962 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19969 Load phase boundary: prepare_bases_done row_bases=252
+INFO     s19tui:app.py:19979 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19985 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:20102 Load phase boundary: worker_compute_done path=prg.s19 precomputed=True elapsed=0.003s
+INFO     s19tui:app.py:20109 Load phase boundary: call_from_thread_apply_dispatched path=prg.s19
+INFO     s19tui:app.py:19730 Load phase boundary: apply_install_state path=prg.s19 precomputed=True
+INFO     s19tui:app.py:21620 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.006
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.006
+INFO     s19tui:app.py:20677 Memory Map updated. ranges=11
+INFO     s19tui:app.py:20450 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19751 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:19765 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19786 Loaded file successfully: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_102_view_right0\.s19tool\workarea\temp\prg.s19 file_type=s19 elapsed_seconds=0.482 has_mac=False precomputed=True
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+____________ test_r_paste_14_103_row_right_write_stays_responsive _____________
+
+tmp_path = WindowsPath('[evidence]/GW-W01/post/environment/temp/pytest-of-<USER>/pytest-0/test_r_paste_14_103_row_right_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020BEDCD8390>
+
+    def test_r_paste_14_103_row_right_write_stays_responsive(tmp_path, monkeypatch) -> None:
+        """R-PASTE.14/103: row-right writer is off-thread and ticks stay bounded."""
+        _winci_ready_or_skip()
+        other_program_write(SEED_OS)
+        marker, lateness, obs, diag = _responsive_copy(tmp_path, monkeypatch, "row")
+>       _assert_responsive(marker, lateness, obs, "r_paste_14_103_row", diag)
+
+tests\test_b103_clipboard_tail.py:2630: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_clipboard_tail.py:2602: in _assert_responsive
+    _require(obs["writer_threads"] and obs["writer_threads"][0] != threading.get_ident(), "responsive writer ran on the UI thread")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False, message = 'responsive writer ran on the UI thread'
+
+    def _require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise AssertionError(message)
+E           AssertionError: responsive writer ran on the UI thread
+
+tests\test_b103_clipboard_tail.py:284: AssertionError
+------------------------------ Captured log call ------------------------------
+INFO     s19tui:app.py:3343 App initialized. base_dir=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0 workarea=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea
+INFO     s19tui:app.py:9166 Workarea refreshed. files=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.006
+INFO     s19tui:app.py:17079 A2L copy complete: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea\temp\ASAP2_Demo_V171.a2l size_bytes=247667 copy_seconds=0.005
+INFO     s19tui:app.py:992 A2L cache miss: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea\temp\ASAP2_Demo_V171.a2l size_bytes=247667
+INFO     s19tui:app.py:9166 Workarea refreshed. files=1
+INFO     s19tui:app.py:20269 A2L parse summary: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea\temp\ASAP2_Demo_V171.a2l elapsed_seconds=0.061 sections=1 tags=118 errors=0
+INFO     s19tui:app.py:17947 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:21059 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.006
+INFO     s19tui:app.py:21663 Load phase boundary: populate_a2l_table_done rows=118 total=118 elapsed=0.006
+INFO     s19tui:app.py:17159 A2L view refresh complete: path=[evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea\temp\ASAP2_Demo_V171.a2l elapsed_seconds=0.063
+INFO     s19tui:app.py:17167 A2L loaded: [evidence]\GW-W01\post\environment\temp\pytest-of-<USER>\pytest-0\test_r_paste_14_103_row_right_0\.s19tool\workarea\temp\ASAP2_Demo_V171.a2l
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ===========================
+FAILED tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive - AssertionError: responsive writer ran on the UI thread
+FAILED tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive - AssertionError: responsive writer ran on the UI thread
+FAILED tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive - AssertionError: responsive writer ran on the UI thread
+3 failed in 28.54s

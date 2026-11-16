@@ -1,0 +1,265 @@
+{
+  "applied_count": 1,
+  "bytecode_disabled": true,
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "group": "GW",
+  "id": "GW-W01",
+  "lane_head": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+  "manifest_baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "pinned_tree_restored": true,
+  "post": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 3,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 30.063,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [
+          "writer_ui_thread"
+        ],
+        "qc_tm": [],
+        "status": "failed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [
+          "writer_ui_thread"
+        ],
+        "qc_tm": [],
+        "status": "failed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [
+          "writer_ui_thread"
+        ],
+        "qc_tm": [],
+        "status": "failed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": "failed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": "failed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "post_restore": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    },
+    "elapsed_seconds": 28.141,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_101_key",
+            "margin": 86.0,
+            "measured": 0.028
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_102_right",
+            "margin": 70.0,
+            "measured": 0.06
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_103_row",
+            "margin": 78.0,
+            "measured": 0.044
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "post_restore_target_green": true,
+  "post_restore_verdict": "PASS",
+  "pre": {
+    "command": [
+      "[CI_PYTHON]",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "[repo]",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=[evidence]\\junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    },
+    "elapsed_seconds": 31.187,
+    "expected_nodes": [
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+    ],
+    "new_bytecode": [],
+    "node_details": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_101_key",
+            "margin": 78.0,
+            "measured": 0.044
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_102_right",
+            "margin": 70.5,
+            "measured": 0.059
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      },
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": {
+        "infra_signature": false,
+        "mechanisms": [],
+        "qc_tm": [
+          {
+            "bound": 0.2,
+            "label": "r_paste_14_103_row",
+            "margin": 78.0,
+            "measured": 0.044
+          }
+        ],
+        "status": "passed",
+        "timeout_signature": false
+      }
+    },
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "taskkill_returncode": null,
+    "timeout": false,
+    "transcript": "pytest.txt"
+  },
+  "pre_verdict": "PASS",
+  "reason": "assertion failure with no errors, skips or timeouts",
+  "restore_ok": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_newline": "CRLF",
+  "source_sha256_before": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+  "source_sha256_mutated": "5b3a2cc62bd9a377d636a1401f6891313745dbf65651fcaa0d4a7b22c878447e",
+  "source_sha256_restored": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive",
+    "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive",
+    "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive"
+  ],
+  "verdict": "KILLED"
+}

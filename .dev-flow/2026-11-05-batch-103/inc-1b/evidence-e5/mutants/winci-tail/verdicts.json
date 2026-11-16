@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "lane": "winci-tail",
+  "run_id": 43911226514,
+  "run_url": "https://github.com/jav201/s19_app/actions/runs/43911226514",
+  "run_head_sha": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_newline_on_winci": "CRLF",
+  "source_sha256_before_and_restored": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+  "self_tests": {
+    "verdict": "PASS",
+    "passed": 18,
+    "failed": 0
+  },
+  "mutants": {
+    "GW-W01": {
+      "verdict": "KILLED",
+      "applied_count": 1,
+      "source_sha256_mutated": "5b3a2cc62bd9a377d636a1401f6891313745dbf65651fcaa0d4a7b22c878447e",
+      "restore_ok": true,
+      "no_new_bytecode": true,
+      "pre": {
+        "pytest_exit": 0,
+        "passed": 3,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "post": {
+        "pytest_exit": 1,
+        "passed": 0,
+        "failed": 3,
+        "errors": 0,
+        "skipped": 0,
+        "timeout": false,
+        "mechanism": "writer_ui_thread",
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive": "failed: writer_ui_thread",
+          "tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive": "failed: writer_ui_thread",
+          "tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive": "failed: writer_ui_thread"
+        }
+      },
+      "post_restore": {
+        "pytest_exit": 0,
+        "passed": 3,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "limit": "The UI-thread assertion fires before the tick-bound assertion; no tick-bound kill is claimed."
+    },
+    "GW-W02": {
+      "verdict": "KILLED",
+      "applied_count": 1,
+      "source_sha256_mutated": "e4cdde350e01e04360ef6f82be07adf3a09764d6f5441a208ee412db9285e54f",
+      "restore_ok": true,
+      "no_new_bytecode": true,
+      "pre": {
+        "pytest_exit": 0,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "post": {
+        "pytest_exit": 1,
+        "passed": 0,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "timeout": false,
+        "mechanism": "double_writer",
+        "writer_start_end_pairs": 2,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound": "failed: double_writer"
+        }
+      },
+      "post_restore": {
+        "pytest_exit": 0,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "limit": "The exactly-one-writer assertion fires before the timing-bound assertion; no warning-bound kill is claimed. RR-1 and the existing bound were unchanged."
+    }
+  },
+  "artifact_safety": {
+    "pre_upload_verdict": "PASS",
+    "violations": 0,
+    "archive": "pruned runtime environment directories; redacted runner identity and paths; JUnit XML re-parsed; canary/credential/path grep clean",
+    "post_archive_low_tail_redaction": {
+      "occurrences": 6,
+      "files": ["GW-W01/result.json", "GW-W02/result.json"],
+      "placeholder": "[CI_PYTHON]",
+      "note": "Post-archive disclosure correction for six standard hosted-toolcache Python paths left in stored command arrays; the earlier path-grep-clean sentence describes the pre-correction check. No verdict, JUnit or mechanism changed."
+    }
+  }
+}

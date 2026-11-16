@@ -1,0 +1,94 @@
+{
+  "lane": "PASTE",
+  "branch": "b103-inc1b-gw-paste",
+  "base_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "executor_commit": "0271fe710a1e0e5b49aa472684cedbf9b56ce485",
+  "selector": "tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]",
+  "valid_run": {
+    "id": 43912736749,
+    "url": "https://github.com/jav201/s19_app/actions/runs/43912736749",
+    "head_sha": "0271fe710a1e0e5b49aa472684cedbf9b56ce485",
+    "conclusion": "success",
+    "status": "COMPLETE",
+    "evidence": "run-43912736749/",
+    "self_tests": "13/13 passed",
+    "artifact_safety": "21 files scanned; 0 violations"
+  },
+  "mutants": {
+    "GW-W03": {
+      "verdict": "KILLED",
+      "observed_mechanism": "La entrada T1 expone las líneas adicionales del artefacto OS en vez de sólo la primera línea.",
+      "pre_probe": "1 passed, 0 skipped, exit 0",
+      "pre": "1 passed, 0 skipped, exit 0",
+      "applied_count": 1,
+      "post": "1 failed por AssertionError en el oráculo T1, 0 errors, 0 skipped, exit 1",
+      "restore_sha256": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+      "restore_matches_original": true,
+      "post_restore": "1 passed, 0 skipped, exit 0",
+      "bytecode_unchanged": true,
+      "result": "run-43912736749/GW-W03/result.json",
+      "junit": "run-43912736749/GW-W03/post.xml",
+      "transcript": "run-43912736749/GW-W03/post.log"
+    },
+    "GW-W04": {
+      "verdict": "KILLED",
+      "observed_mechanism": "La primera línea queda duplicada por la llamada al stock handler y el dispatch posterior.",
+      "pre_probe": "1 passed, 0 skipped, exit 0",
+      "pre": "1 passed, 0 skipped, exit 0",
+      "applied_count": 1,
+      "post": "1 failed por AssertionError en el oráculo exactamente-una-vez T1, 0 errors, 0 skipped, exit 1",
+      "restore_sha256": "11584dcc99d04283ec63242e64216065147ee7c283640b9484b7b406d5fe195e",
+      "restore_matches_original": true,
+      "post_restore": "1 passed, 0 skipped, exit 0",
+      "bytecode_unchanged": true,
+      "result": "run-43912736749/GW-W04/result.json",
+      "junit": "run-43912736749/GW-W04/post.xml",
+      "transcript": "run-43912736749/GW-W04/post.log"
+    }
+  },
+  "os_artifact": {
+    "reader": "tests.support.b103_clipboard.other_program_read",
+    "separation": "El test copia desde la app, lee el artefacto mediante otro proceso PowerShell y alimenta events.Paste con esa lectura independiente.",
+    "oracle_t1": "expected.split(\"\\n\", 1)[0]",
+    "payload_archived": false
+  },
+  "superseded_runs": [
+    {
+      "id": 43910310628,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43910310628",
+      "head_sha": "2115aaa423a24a5962575c79bbc5a0e629cb29b2",
+      "classification": "INFRA/BAD; sin veredicto de mutante",
+      "reason": "ModuleNotFoundError antes del probe; invocación corregida a python -m."
+    },
+    {
+      "id": 43910644194,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43910644194",
+      "head_sha": "136e98b5da6d1f87021f893dd721aba871745e5b",
+      "classification": "INFRA/BAD; sin veredicto de mutante",
+      "reason": "Checkout shallow sin caae1bf9; autocontroles verdes, pruebas objetivo no iniciadas."
+    },
+    {
+      "id": 43910911914,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43910911914",
+      "head_sha": "31cf3a24bc5591d9b01d07db92dc45bac9707c01",
+      "classification": "BAD para W03/W04; no son kills",
+      "reason": "applied_count=0 por anchors LF contra checkout CRLF; baseline y post-restore verdes.",
+      "evidence": "run-43910911914/"
+    },
+    {
+      "id": 43911750441,
+      "url": "https://github.com/jav201/s19_app/actions/runs/43911750441",
+      "head_sha": "7626ca07d9b0f610afa6b8e233d167250ecb5aea",
+      "classification": "BAD para W03/W04; veredictos sustituidos por el run válido",
+      "reason": "pytest 9.2 omitió failure/@type y el clasificador anterior no leía AssertionError de failure/@message.",
+      "evidence": "run-43911750441/"
+    }
+  ],
+  "limits": [
+    "Sólo GW-W03/GW-W04 y el selector P2/T1 exacto fueron ejecutados en este carril; W01/W02 quedan fuera.",
+    "El GREEN del workflow certifica autocontroles, integridad y publicación; los fallos intencionales post conservan exit 1 y se clasifican por JUnit.",
+    "Los runs BAD/INFRA no se contabilizan como kills ni como resultado final.",
+    "No se ejecutaron pytest, app, PowerShell ni portapapeles en el Windows local; sólo validación estática y py_compile.",
+    "No se repitió la suite general de integración en este carril."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "closure_commit": "caae1bf9a0b97266731753fc9dc0a38f3762f222",
+  "counts": {
+    "BAD": 0,
+    "CRASH": 0,
+    "KILLED": 2,
+    "SURVIVED": 0
+  },
+  "lane": "winci-tail",
+  "lane_head": "db4a8ebc97b0786127e61cc8ee34ae2fe5604f31",
+  "results": [
+    {
+      "applied_count": 1,
+      "id": "GW-W01",
+      "no_new_bytecode": true,
+      "post_restore_verdict": "PASS",
+      "pre_verdict": "PASS",
+      "reason": "assertion failure with no errors, skips or timeouts",
+      "restore_ok": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "id": "GW-W02",
+      "no_new_bytecode": true,
+      "post_restore_verdict": "PASS",
+      "pre_verdict": "PASS",
+      "reason": "assertion failure with no errors, skips or timeouts",
+      "restore_ok": true,
+      "verdict": "KILLED"
+    }
+  ],
+  "schema_version": 1,
+  "selected": [
+    "GW-W01",
+    "GW-W02"
+  ],
+  "verdict": "PASS"
+}

@@ -1,0 +1,90 @@
+name: winci-tail-mutants
+
+on:
+  push:
+    branches:
+      - b103-inc1b-gw-tail
+    paths:
+      - ".github/workflows/winci-tail-mutants.yml"
+      - "tools/winci_tail_mutants.py"
+  workflow_dispatch:
+    inputs:
+      mutants:
+        description: Comma-separated GW-W01 and/or GW-W02
+        required: true
+        default: GW-W01,GW-W02
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  tail-mutants:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - name: Check out the unique tail lane
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the pinned test environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest "textual==8.2.8"
+          python -m pip install -e . "textual==8.2.8"
+
+      - name: Verify toolkit version
+        run: python -c "import sys, textual; print(sys.version, textual.__version__); assert textual.__version__ == '8.2.8', textual.__version__"
+
+      - name: Prove the executor on known-bad controls
+        id: self_tests
+        timeout-minutes: 5
+        run: python -B tools/winci_tail_mutants.py --self-test --output "$env:RUNNER_TEMP/winci-tail-evidence"
+
+      - name: Run pre, mutate, post, restore and post-restore for each mutant
+        id: mutants
+        continue-on-error: true
+        timeout-minutes: 25
+        run: python -B tools/winci_tail_mutants.py --run --mutants "${{ inputs.mutants || 'GW-W01,GW-W02' }}" --timeout 240 --output "$env:RUNNER_TEMP/winci-tail-evidence"
+
+      - name: Scan every artifact before upload
+        id: artifact_safety
+        if: always()
+        timeout-minutes: 5
+        run: python -B tools/winci_tail_mutants.py --scan --output "$env:RUNNER_TEMP/winci-tail-evidence"
+
+      - name: Preserve structured outcomes, JUnit and transcripts
+        if: always() && steps.artifact_safety.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: winci-tail-mutants-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/winci-tail-evidence/
+          if-no-files-found: error
+
+      - name: Enforce self-tests, artifact safety and mutant verdicts
+        if: always()
+        run: |
+          if ("${{ steps.self_tests.outcome }}" -ne "success") {
+            Write-Host "Executor self-tests did not pass"
+            exit 2
+          }
+          if ("${{ steps.artifact_safety.outcome }}" -ne "success") {
+            Write-Host "Artifact safety did not pass"
+            exit 2
+          }
+          if ("${{ steps.mutants.outcome }}" -ne "success") {
+            Write-Host "A mutant is SURVIVED, CRASH or BAD; inspect summary.json"
+            exit 1
+          }
+          Write-Host "Both requested mutants are KILLED with green pre and post-restore targets"

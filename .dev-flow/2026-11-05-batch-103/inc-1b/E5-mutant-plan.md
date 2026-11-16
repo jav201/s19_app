@@ -1,6 +1,6 @@
 # Inc 1b — E5 mutant plan
 
-Base fijada para todas las copias: **`287b9dc3c5e18614ea50a053ef183d80dac59dfc` (HEAD solicitado)**. Fuentes: `01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc1b.md`, `E3-rulings.md` y los cuatro tests de ese commit. **No se ejecutaron tests ni mutantes en Windows; no se ejecutó WinCI; tampoco se afirma un GREEN nuevo.** Este documento sólo prescribe trabajo posterior en copias aisladas.
+Base fijada para todas las copias: **`287b9dc3c5e18614ea50a053ef183d80dac59dfc` (HEAD solicitado)**. Fuentes: `01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc1b.md`, `E3-rulings.md` y los cuatro tests de ese commit. _Contexto histórico de redacción del plan:_ **no se habían ejecutado tests ni mutantes en Windows, ni WinCI; tampoco se afirmaba un GREEN nuevo.** El plan y sus anchors se conservan abajo; el addendum final y `evidence-e5/mutants/VALIDATION.md` registran la ejecución posterior.
 
 ## Reglas de ejecución y baselines
 
@@ -114,7 +114,7 @@ Todos los cambios son en `s19_app/tui/os_clipboard_input.py`, `_mirror_and_write
 
 ## GW — mutantes cuyo oráculo actual es WinCI-only (4; baseline W)
 
-**No ejecutar en el Windows de trabajo ni en Linux.** Estas filas quedan planificadas, no ejecutadas.
+**No ejecutar en el Windows de trabajo ni en Linux.** _En el plan original estas filas quedaban planificadas, no ejecutadas;_ posteriormente se ejecutaron sólo en runners WinCI aislados, como registra el addendum final. Sigue prohibido presentarlas como mutantes Linux.
 
 | Id | Requirement/case | Archivo/símbolo | Cambio mínimo exacto | Test WinCI que debe morir |
 |---|---|---|---|---|
@@ -141,8 +141,12 @@ Estas exclusiones **no cuentan entre los 73 mutantes**. No se les asigna un test
 
 ## Conteos
 
-- **73 mutantes planificados, 0 ejecutados:** GA 16 + GT 8 + GQ 15 + GC 21 + GN 9 + GW 4.
+- _Conteo histórico al redactar el plan:_ **73 mutantes planificados, 0 ejecutados:** GA 16 + GT 8 + GQ 15 + GC 21 + GN 9 + GW 4. El addendum siguiente sustituye ese estado, no el plan ni sus anchors.
 - **69 con baseline L**, todos sobre `app.py` o `os_clipboard_input.py`; **4 con baseline W**, reservados al runner aislado.
 - Los 23 requisitos R-COPY activos tienen al menos un mutante; también R-PASTE.1/.9/.10/.12/.13/.14, R-TUI-043.13, R-DLG.1/.2/.6/.9/.11/.12/.14 y R-QUIT.8.
 - **9 coberturas dudosas/exclusiones** documentadas arriba; no se convierten en kills ni en evidencia WinCI.
 - La batería de referencia (cuatro familias V/Tail/Q/AT) tiene **142 nodos nominales**; el baseline L exigido es **123 passed + 19 skipped**, sin contar los skips como comportamiento verificado. Las seis familias suman **256 nodos** (160 passed + 96 skipped).
+
+## Addendum de ejecución posterior
+
+El estado vigente y sus artefactos están en `evidence-e5/mutants/VALIDATION.md`: **71 KILLED (67 Linux + 4 WinCI), 1 SURVIVED equivalente (GA-A11), 1 BAD/bloqueado por diseño (GC-C14)**. Los cuatro GW se ejecutaron únicamente en WinCI aislado (runs 43911226514 y 43912736749); no se convirtieron en mutantes Linux. GC-C14 conserva su bloqueo y no cuenta como kill.
