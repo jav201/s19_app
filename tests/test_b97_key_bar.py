@@ -1510,7 +1510,15 @@ def test_at_b97_26_keys_only_help_and_hidden_view(tmp_path: Path) -> None:
             for _ in range(40):
                 await pilot.press("tab")
                 await settle(pilot, 1)
-                if app.focused is not None and app.query_one("#screen_patch") in app.focused.ancestors:
+                # Inc 8 R-TUI-063.1: the filter row's input is the section's first stop, and `?`
+                # typed there is text, so the operator tabs past it (E4 integration finding K-1).
+                from textual.widgets import Input
+
+                if (
+                    app.focused is not None
+                    and app.query_one("#screen_patch") in app.focused.ancestors
+                    and not isinstance(app.focused, Input)
+                ):
                     break
             out["inside"] = app.focused is not None and app.query_one("#screen_patch") in app.focused.ancestors
             assert out["inside"], "the focus reached the Patch Editor's section"

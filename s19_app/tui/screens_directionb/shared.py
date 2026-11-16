@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import ceil
+from operator import ne
 from typing import List, NamedTuple, Optional, Sequence, Tuple
 from rich.cells import cell_len, set_cell_size
 from rich.text import Text
@@ -527,13 +528,18 @@ def before_after_card_text(
     span = len(after)
     start = address - len(lead)
     # One cell per painted position: (image byte, written byte, in the span).
-    cells: list = [(byte, byte, False) for byte in lead]
-    cells += [
-        (before[i] if i < len(before) else None, after[i], True) for i in range(span)
-    ]
-    cells += [(byte, byte, False) for byte in trail]
-    rows = -(-len(cells) // per_row) if cells else 0
+    total = len(lead) + span + len(trail)
+    rows = -(-total // per_row) if total else 0
     shown = min(rows, row_cap)
+    # batch-103 Inc 9 FX9c (O-C): cells only for the painted rows; a 1 MiB
+    # span paints at most row_cap rows (the count below covers the span).
+    painted = shown * per_row
+    cells: list = [(byte, byte, False) for byte in lead[:painted]]
+    cells += [
+        (before[i] if i < len(before) else None, after[i], True)
+        for i in range(min(span, max(0, painted - len(lead))))
+    ]
+    cells += [(byte, byte, False) for byte in trail[: max(0, painted - len(lead) - span)]]
 
     def token(value: Optional[int]) -> str:
         return CARD_UNMAPPED_TOKEN if value is None else f"{value:02X}"
@@ -565,11 +571,9 @@ def before_after_card_text(
         span_shown = max(0, shown * per_row - len(lead))
         text.append("\n" if shown else "")
         text.append(f"showing {span_shown} of {span} bytes", style=DGRAY)
-    changed_count = sum(
-        1
-        for i in range(span)
-        if (before[i] if i < len(before) else None) is None or before[i] != after[i]
-    )
+    # Same rule in one C-level pass: None != byte, and a position past the
+    # end of ``before`` is unmapped.
+    changed_count = sum(map(ne, before, after)) + max(0, span - len(before))
     if rows:
         text.append("\n")
     text.append(f"{span} B @ ", style=LABEL)

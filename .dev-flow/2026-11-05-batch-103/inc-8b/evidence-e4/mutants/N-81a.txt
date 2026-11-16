@@ -1,0 +1,369 @@
+# mutant N-81a  rows: R-PE-DEF.81
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:427
+# -k: r_pe_def_81_
+# uptime: 01:57:36 up 2 days, 10:46,  3 users,  load average: 0.97, 0.74, 1.23
+s19_app.__file__ = ~/work/zq-m8b/m/N-81a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.........FFFFFF.                                                         [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body(softa_page):
+        """R-PE-DEF.81/1 (changed at Inc 8b E1: visible = body - 2, the header rule takes a line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                assert sheet.selected_name == names[40]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert lines[at][lines[0].index("Parameter"):].startswith(names[40][:12])
+                assert at >= 2, "the header line and the rule come first"
+                assert lines[1].startswith("━"), "the header rule is the body's second line (R-PE-DEF.91)"
+                first_painted = 40 - (at - 2)
+                assert first_painted > 0  # the window scrolled: row 0 is no longer painted
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            assert sheet.selected_name == names[40]
+            lines, height = _inside(sheet)
+>           assert len(lines) <= height, (len(lines), height)
+E           AssertionError: (23, 22)
+E           assert 23 <= 22
+E            +  where 23 = len(['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...LUE     │-0.000              │·               │P       │     0  ├●───────────────┤    300 │                    │', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:305: AssertionError
+_ test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '~/work/zq-m8b/tmp/pytest-of-<user>/pytest-20/popen-gw1/s2_defc0/definitions.a2l', 's...())}, path=PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-20/popen-gw1/s2_defc0/definitions.a2l'))
+
+    def test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines(defc):
+        """R-PE-DEF.81/3 (changed at Inc 8b E1) - an enum row on the window's last line: its definition line and its 4-line card fit the grid body (8)."""
+        clones = {f"DISP_{i:02d}": dataclasses.replace(defc.defs["DISPLAY_0001"], name=f"DISP_{i:02d}") for i in range(8)}
+        defs = {**clones, "ENUM_0001": defc.defs["ENUM_0001"]}
+        names = list(defs)
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+                sheet.show_page(names, defs, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(len(names) - 1):
+                    await pilot.press("down")
+                assert sheet.selected_name == "ENUM_0001"
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert len(lines) - at - 1 == 5, lines  # the definition line and the four card lines, none cut
+                assert "choose" in lines[-2] and lines[-1].lstrip().startswith("┊ ╰")
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+            sheet.show_page(names, defs, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(len(names) - 1):
+                await pilot.press("down")
+            assert sheet.selected_name == "ENUM_0001"
+            lines, height = _inside(sheet)
+>           assert len(lines) <= height, (len(lines), height)
+E           AssertionError: (9, 8)
+E           assert 9 <= 8
+E            +  where 9 = len(['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...──────────────────────────────────────────────────╮                                                             ', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:359: AssertionError
+_ test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says(softa_page):
+        """R-PE-DEF.81/5 (E3-8b-05) - the host at 118x54 (no chrome): grid 53, body 52, visible 50 (`W.harness_118x54.*`).
+    
+        Why: the body must fill the scroller less its scrollbar row, and the window must paint exactly
+        visible = body - 2 sheet lines; a body as tall as its own text would leave the window shorter
+        than the room the operator has. The harness gives the body no height of its own.
+        """
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                grids = list(sheet.query("#patch_sheet_grid"))
+                assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+                body = sheet.query_one("#patch_sheet_body")
+                assert grids[0].outer_size.height == fact("W.harness_118x54.grid")
+                assert body.outer_size.height == fact("W.harness_118x54.body")
+                lines = body_lines(sheet)
+                assert len(lines) == fact("W.harness_118x54.visible") + 2
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:416: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            await pilot.pause()
+            grids = list(sheet.query("#patch_sheet_grid"))
+            assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+            body = sheet.query_one("#patch_sheet_body")
+            assert grids[0].outer_size.height == fact("W.harness_118x54.grid")
+            assert body.outer_size.height == fact("W.harness_118x54.body")
+            lines = body_lines(sheet)
+>           assert len(lines) == fact("W.harness_118x54.visible") + 2
+E           AssertionError: assert 53 == (50 + 2)
+E            +  where 53 = len(['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...LUE     │0                   │·               │        │     0  ├●───────────────┤    255 │                    │', ...])
+E            +  and   50 = fact('W.harness_118x54.visible')
+
+tests/test_b103_inc8_s2_sheet_keys.py:414: AssertionError
+_ test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row(softa_page):
+        """R-PE-DEF.81/2 (changed at Inc 8b E1: the first painted row is the third body line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                lines, _height = _inside(sheet)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                first_painted = 40 - (at - 2)
+                for _ in range(40 - first_painted + 1):
+                    await pilot.press("up")
+                assert sheet.selected_name == names[first_painted - 1]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height
+                assert lines[2].startswith("▶")  # the selected row is the first painted row (after the header and its rule)
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            lines, _height = _inside(sheet)
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+            first_painted = 40 - (at - 2)
+            for _ in range(40 - first_painted + 1):
+                await pilot.press("up")
+            assert sheet.selected_name == names[first_painted - 1]
+            lines, height = _inside(sheet)
+>           assert len(lines) <= height
+E           AssertionError: assert 23 <= 22
+E            +  where 23 = len(['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...LUE     │-0.000000           │·               │        │     0  ◀────────────────┤    100 │                    │', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:336: AssertionError
+_ test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '~/work/zq-m8b/tmp/pytest-of-<user>/pytest-20/popen-gw0/s2_defc0/definitions.a2l', 's...())}, path=PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-20/popen-gw0/s2_defc0/definitions.a2l'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdb7d339650>
+
+    def test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted(defc, monkeypatch):
+        from s19_app.tui import definition_sheet as ds
+    
+        ops = ds.ops_for("number")._replace(
+            detail=lambda row, preview, width, state, room: [Text(f"detail {i}") for i in range(10)]
+        )
+        monkeypatch.setitem(ds._KIND_OPS, "standin", ops)
+        standin = dataclasses.replace(defc.defs["DISPLAY_0001"], name="STANDIN_0001", kind="standin")
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):  # the 12-row minimum: visible 6
+                sheet.show_page(["STANDIN_0001"], {"STANDIN_0001": standin}, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                assert sheet.selected_name == "STANDIN_0001"
+                lines, height = _inside(sheet)
+                visible = height - 2  # the header line and the header rule are not row lines (R-PE-DEF.81)
+                assert visible == 6 and fact("W.standin_10_detail.h8.painted") == visible - 1
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))  # the row is painted
+                assert len(lines) <= height
+                assert len(lines) - at - 1 == visible - 1  # the detail cut to room = visible - 1
+                assert lines[-1].strip().endswith(f"detail {visible - 2}")  # the cut keeps the first lines
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:390: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):  # the 12-row minimum: visible 6
+            sheet.show_page(["STANDIN_0001"], {"STANDIN_0001": standin}, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            assert sheet.selected_name == "STANDIN_0001"
+            lines, height = _inside(sheet)
+            visible = height - 2  # the header line and the header rule are not row lines (R-PE-DEF.81)
+            assert visible == 6 and fact("W.standin_10_detail.h8.painted") == visible - 1
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))  # the row is painted
+>           assert len(lines) <= height
+E           AssertionError: assert 9 <= 8
+E            +  where 9 = len(['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...                                                                                                                ', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:386: AssertionError
+____ test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row(softa_page):
+        """R-PE-DEF.81/5 (E3-8b-05) - the host at 118x54 with no chrome and no body rule: the sheet is
+        `W.harness_118x54.sheet` rows, the grid scroller `.grid`, the body `.body`, and 200 names paint
+        `.visible` rows under the header and its rule. Why: without a height rule for the body under the
+        scroller it is as tall as its own text, the window paints every row and the selection runs off screen."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with grid_ctx(SIZE_118) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                body = sheet.query_one("#patch_sheet_body")
+                grids = list(sheet.query("#patch_sheet_grid"))
+                return (sheet.size.height, grids[0].size.height if grids else None, body.size.height,
+                        len(body_lines(sheet)))
+    
+        sheet_h, grid_h, body_h, painted = asyncio.run(drive())
+        assert body_h == T["W.harness_118x54.body"], body_h
+>       assert painted - 2 == T["W.harness_118x54.visible"], (painted, "lines: header, rule and the visible rows")
+E       AssertionError: (53, 'lines: header, rule and the visible rows')
+E       assert (53 - 2) == 50
+
+tests/test_b103_inc8b_bw.py:305: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row
+6 failed, 10 passed in 18.47s
+
+# exit=1

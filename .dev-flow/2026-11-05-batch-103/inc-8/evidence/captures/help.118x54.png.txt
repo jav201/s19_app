@@ -1,0 +1,116 @@
+scenario=help
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+help #window_help_body:
+  1. Edit a change-set: the filter row narrows the loaded A2L's parameters, the STAGING SHEET lists them one row each to stage an edit, and LANDS IN holds the Patch script, Inspector, JSON and Checks tabs. Load an S19/HEX image first (`^L`) to see the bytes an entry replaces.
+  
+  2. Patch script — the ledger of the document's entries, one row each, with the highlighted entry's BEFORE → AFTER bytes.
+  
+  3. STAGING SHEET — ↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.
+  
+  4. new = — the formula input of a number row; enter stages the typed value.
+  
+  5. field = — the formula input of a bit mask row; enter stages the typed field value.
+  
+  6. text = — the formula input of a text row; enter stages the typed text.
+  
+  7. Inspector — shows the highlighted entry's BEFORE → AFTER bytes, the entry form and the DOCUMENT tally.
+  
+  8. JSON — shows the loaded document as read-only JSON under its stamp, and the editable paste buffer.
+  
+  9. Checks — shows the declaration faults and the check results, with Run checks.
+  
+  10. Filter — narrows the filter row's parameter list, and so the staging sheet, to the names that contain the typed text.
+  
+  11. Prev — turns the filter row's list to the previous page; disabled on the first page.
+  
+  12. Next — turns the list to the next page; disabled on the last page, so a long A2L is walked page by page.
+  
+  13. Pick — includes the staging sheet's selected row in the shared parameter selection, or removes it when it is already included (the Check Editor's Include parameter).
+  
+  14. Add list — opens the bulk-add popup: paste many A2L names at once, separated by new lines, commas, semicolons or spaces; Include matches includes every listed name found in the A2L; esc closes the popup.
+  
+  15. Use parameter — on the Inspector tab, uses the staging sheet's selected row: copies its address and the loaded image's current bytes into the entry form; the document changes only through Add or Edit.
+  
+  16. Address — the entry's start address, `0x…` hex.
+  
+  17. String — a text value, written in the document's encoding.
+  
+  18. Bytes — every token is a hex byte (1–2 digits, `0x` optional); decimals are not accepted, e.g. `DE AD BE EF`.
+  
+  19. Add — appends the entry typed in the form.
+  
+  20. Edit — replaces the entry at the typed address with the form's value.
+  
+  21. Remove — removes the entry at the typed address.
+  
+  22. Edit JSON — on the Inspector tab, edits the highlighted entry as JSON; on the JSON tab, opens the paste buffer full size. Both are off for a document loaded from a file.
+  
+  23. Parse pasted — loads the paste buffer as the document.
+  
+  24. Undo — steps the document back one edit (a pasted or typed document only).
+  
+  25. Redo — steps it forward again.
+  
+  26. Scope — cycles which variants Execute scope runs over.
+  
+  27. Execute scope — applies the document over the chosen variants.
+  
+  28. Save patched image as — the file name an applied image is written under.
+  
+  29. Width — cycles the S19 record width of that file (32 or 16 bytes per line).
+  
+  30. Write file — writes the patched image.
+  
+  31. Don't save — closes the prompt without writing.
+  
+  32. Write before/after report — writes the report of the last save.
+  
+  33. Run checks — runs a check document's entries against the loaded image; uncheckable rows name their reason.
+  
+  34. File — picks a change file in the project's `checks/` and `patches/` then the common `library/`, or a typed path for Load.
+  
+  35. Load — loads the typed path (a pick in the list loads at once).
+  
+  36. Refresh — re-reads the file list (project files, then the library).
+  
+  37. Validate — checks the document against the loaded image.
+  
+  38. Apply loaded changes — writes the entries into the loaded image and offers to save it.
+  
+  39. Save — writes the document as a change-set file.
+  
+  40. Open patches/ — opens the folder change-set files live in: the project's, or the common `workarea\patches\` without a project.
+  
+  41. ? — opens this help.
+  
+  42. space — on a tab chip, opens its tab.
+  
+  43. enter — presses the focused chip or button.
+  
+  44. arrow keys — move the ledger highlight, and scroll the read-only JSON view.
+  
+  45. ✓ — the entry's check passed.
+  
+  46. ✗ — the entry's check failed.
+  
+  47. ◐ — the entry could not be checked; Checks names the reason.
+  
+  48. · — the entry has not been checked yet.
+  
+  49. -- — in the BEFORE → AFTER bytes, an address the image does not hold.
+help #window_help_keys:
+  ^z — Undo
+  ^y — Redo
+  v — Select variant
+  k — Legend
+top_screen=WindowHelpScreen
+focused=window_help_close
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+ledger_entries=0
+stub_os_writes=0
+surface=ready

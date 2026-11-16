@@ -1,0 +1,36 @@
+uptime:  13:33:13 up 22:21,  3 users,  load average: 6.90, 7.82, 8.19
+s19_app.__file__ = ~/work/zq-e3r1-8/clone/s19_app/__init__.py
+loadavg = (6.90234375, 7.8203125, 8.18896484375)
+W.row_window(40, 0, 20, 1) = 22
+W.row_window(39, 22, 20, 1) = 22
+W.row_window(21, 22, 20, 1) = 21
+W.row_window(5, 0, 20, 3) = 0
+W.row_window(18, 0, 20, 3) = 2
+W.row_window(3, 0, 3, 3) = 3
+W.down_x40_from_0.visible20.detail1 = top 22; selected line 18; detail line 19
+W.negative_control.top0.selected40.visible20 = selected line 40 (outside 0..19)
+C.name.w18.cells = '温度温度温度温度…' (17 cells); len_clip = '温度温度温度温度温度温度' (24 cells)
+C.unit.w7.cells = '温度温…' (7 cells); len_clip = '温度温度' (8 cells)
+L.limits_5_5.cell = 5 … 5; pending_25.5.delta = -118.0
+L.limits_9_1.cell = 9 … 1; pending_25.5.delta = -118.0
+L.negative_control.plain_division = ZeroDivisionError(float division by zero)
+T.span_42.text_rows = 3; cut_line = (none); detail_lines = 4; editable = True
+T.span_64.text_rows = 4; cut_line = (none); detail_lines = 5; editable = True
+T.span_65.text_rows = 4; cut_line = … 1 more B; detail_lines = 6; editable = True
+T.span_4096.text_rows = 4; cut_line = … 4032 more B; detail_lines = 6; editable = True
+T.span_4097.text_rows = 4; cut_line = … 4033 more B; detail_lines = 6; editable = False
+T.span_1048576.text_rows = 4; cut_line = … 1048512 more B; detail_lines = 6; editable = False
+T.negative_control.span_1048576.all_text_rows = 65536
+T.fill_cap.enum_text_5000 = 4096
+F.page200.(kind, char_type, element_count, byte_length, refused) = ('array', 'VAL_BLK', 4, 8, False) × 4
+F.page200.(kind, char_type, element_count, byte_length, refused) = ('curve', 'CURVE', 5, 20, False) × 1
+F.page200.(kind, char_type, element_count, byte_length, refused) = ('curve', 'CURVE', 8, 32, False) × 6
+M.e1 = Encoded(0x800010, 1F F7, len=2); image2.word = 1A E6
+M.MASK_BIT.current_over_image2 = Decoded(stored=0, text='0')
+M.MASK_BIT.staged_over_overlay = Decoded(stored=1, text='1')
+M.MASK_FIELD.staged_over_overlay = Decoded(stored=255, text='255')
+X.encode_XYZ = Encoded(0x810200, 58 59 5A 00 00 00 00 00…, len=42)
+X.kept_string_entry (negative control).wire_type = string; reload_decode = Decoded(stored=None, text='QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
+X.replaced_by_bytes_entry.wire_type = bytes; reload_decode = Decoded(stored=None, text='XYZ')
+PROBE_DONE
+exit=0

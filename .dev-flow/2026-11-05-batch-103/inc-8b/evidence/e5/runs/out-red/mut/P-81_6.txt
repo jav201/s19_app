@@ -1,0 +1,48 @@
+## mutant P-81_6: s19_app/tui/screens_directionb/patch_editor/sheet.py
+## - '    def on_resize(self, event: events.Resize) -> None:\n        """A width-only resize leaves the body at 143 x h and sends it no event: repaint here."""\n        self._paint()\n\n'
+## + ''
+## uptime:  03:02:36 up 2 days, 11:51,  2 users,  load average: 0.73, 0.85, 0.98
+## date: 2026-11-15T09:02:36Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-P-81_6/s19_app/__init__.py
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_81_6_b_a_width_only_resize_with_no_scrollbar_change_relays_the_expanded_bench _
+
+tmp_path = PosixPath('~/work/zq-x8b/tmp/pytest-of-<user>/pytest-17/test_r_pe_def_81_6_b_a_width_o0')
+defc_dir = PosixPath('~/work/zq-x8b/tmp/pytest-of-<user>/pytest-17/b103_inc9_w_defc0')
+
+    def test_r_pe_def_81_6_b_a_width_only_resize_with_no_scrollbar_change_relays_the_expanded_bench(tmp_path, defc_dir):
+        """R-PE-DEF.81/6 (E5, X8b) - MAP_DEF_0001 expanded at 200x54, then widened to 220x54: both views are wider
+        than the grid, so no scrollbar shows either side and the body keeps its height; every expanded line then runs
+        on the ground to the new V. Why: the node above also drops the scrollbar (118 -> 220), so the body's own
+        height change repaints it and deleting `StagingSheet.on_resize` survived it; here only that handler can."""
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            grid, sheet_body = grid_of(sheet), sheet.query_one("#patch_sheet_body")
+            await open_bench(pilot, sheet, MAP)
+            await pilot.pause()
+            v1, h1 = grid.scrollable_content_region.width, sheet_body.size.height
+            check_bench_lines(sheet, v1)
+            await pilot.resize_terminal(220, 54)
+            for _ in range(4):
+                await pilot.pause()
+            v2, h2 = grid.scrollable_content_region.width, sheet_body.size.height
+            return v1, h1, v2, h2, sorted({cell_len(line.plain) for line in expanded_lines(sheet)})
+    
+        v1, h1, v2, h2, widths = run(tmp_path, defc_dir, body, size=(200, 54))
+        assert T["G.grid_width"] < v1 < v2, (v1, v2, "both views wider than the grid: no scrollbar on either side")
+        assert h1 == h2, (h1, h2, "the body's height is unchanged, so the body itself gets no resize")
+>       assert widths == [v2], (widths, v2, "every expanded line runs on the ground to the new view width")
+E       AssertionError: ([174], 194, 'every expanded line runs on the ground to the new view width')
+E       assert [174] == [194]
+E         
+E         At index 0 diff: 174 != 194
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_bw.py:442: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_81_6_b_a_width_only_resize_with_no_scrollbar_change_relays_the_expanded_bench
+1 failed, 1 passed, 30 deselected in 13.41s
+## rc=1
+## end: 2026-11-15T09:02:51Z  uptime:  03:02:51 up 2 days, 11:51,  2 users,  load average: 0.79, 0.86, 0.98

@@ -1,0 +1,233 @@
+# mutant N-B108  rows: R-PE-BENCH.108
+# edits: s19_app/tui/definition_bench.py:531
+# -k: r_pe_bench_108_
+# uptime: 02:00:47 up 2 days, 10:49,  3 users,  load average: 1.66, 1.13, 1.28
+s19_app.__file__ = ~/work/zq-m8b/m/N-B108/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.FF.FF.FF.FF...                                                          [100%]
+=================================== FAILURES ===================================
+___ test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[VAL_BLK_DEF_0001] ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground(defc, name):
+        """R-PE-BENCH.108/1 - the three strips: colour #969aad and no background."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT]
+        strip = cell.plain.rstrip().rsplit(" ", 1)[0]
+        painted = [index for index, char in enumerate(strip) if char != " "]
+        assert painted, "the strip has blocks to read"
+        for index in painted:
+>           assert fg(cell, index) == DGRAY and bg(cell, index) is None, (name, index)
+E           AssertionError: ('VAL_BLK_DEF_0001', 0)
+E           assert ('#101828' == '#969aad'
+E             
+E             - #969aad
+E             + #101828)
+
+tests/test_b103_inc8b_s1.py:902: AssertionError
+_____ test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[MAP_DEF_0001] ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground(defc, name):
+        """R-PE-BENCH.108/1 - the three strips: colour #969aad and no background."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT]
+        strip = cell.plain.rstrip().rsplit(" ", 1)[0]
+        painted = [index for index, char in enumerate(strip) if char != " "]
+        assert painted, "the strip has blocks to read"
+        for index in painted:
+>           assert fg(cell, index) == DGRAY and bg(cell, index) is None, (name, index)
+E           AssertionError: ('MAP_DEF_0001', 0)
+E           assert ('#101828' == '#969aad'
+E             
+E             - #969aad
+E             + #101828)
+
+tests/test_b103_inc8b_s1.py:902: AssertionError
+_ test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-MAP_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001', selected = True, odd = None, ground = '#1c2547'
+
+    @pytest.mark.parametrize("name", BENCH)
+    @pytest.mark.parametrize(("selected", "odd", "ground"), [(True, None, SELECTED_GROUND), (False, True, ODD_GROUND)])
+    def test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip(defc, name, selected, odd, ground):
+        """R-PE-BENCH.108/2 - on the selected row and on a zebra row the strip cells show the row's ground.
+    
+        The zebra case passes ``odd``, which the base ``row_line`` does not have (RED = absent keyword)."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        extra = {} if odd is None else {"odd": odd}
+        line = ds.row_line(row, ds.sheet_widths(111), selected, None, None, state=state, **extra)
+        current = cell_slice(line.plain, START["Current"], WIDTH["Current"])
+        blocks = [offset for offset, char in enumerate(current) if char in EX8.BLOCKS7]
+        assert len(blocks) == len(TR[f"S.after.current.{name}"].rsplit(" ", 1)[0].strip()), (
+            "every strip block is found in the Current column (no vacuous pass)", current)
+        for offset in blocks:
+>           assert bg(line, START["Current"] + offset) == ground, (name, offset)
+E           AssertionError: ('MAP_DEF_0001', 0)
+E           assert '#869fdc' == '#1c2547'
+E             
+E             - #1c2547
+E             + #869fdc
+
+tests/test_b103_inc8b_s1.py:920: AssertionError
+_ test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-VAL_BLK_DEF_0001] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001', selected = True, odd = None, ground = '#1c2547'
+
+    @pytest.mark.parametrize("name", BENCH)
+    @pytest.mark.parametrize(("selected", "odd", "ground"), [(True, None, SELECTED_GROUND), (False, True, ODD_GROUND)])
+    def test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip(defc, name, selected, odd, ground):
+        """R-PE-BENCH.108/2 - on the selected row and on a zebra row the strip cells show the row's ground.
+    
+        The zebra case passes ``odd``, which the base ``row_line`` does not have (RED = absent keyword)."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        extra = {} if odd is None else {"odd": odd}
+        line = ds.row_line(row, ds.sheet_widths(111), selected, None, None, state=state, **extra)
+        current = cell_slice(line.plain, START["Current"], WIDTH["Current"])
+        blocks = [offset for offset, char in enumerate(current) if char in EX8.BLOCKS7]
+        assert len(blocks) == len(TR[f"S.after.current.{name}"].rsplit(" ", 1)[0].strip()), (
+            "every strip block is found in the Current column (no vacuous pass)", current)
+        for offset in blocks:
+>           assert bg(line, START["Current"] + offset) == ground, (name, offset)
+E           AssertionError: ('VAL_BLK_DEF_0001', 0)
+E           assert '#5c6e9a' == '#1c2547'
+E             
+E             - #1c2547
+E             + #5c6e9a
+
+tests/test_b103_inc8b_s1.py:920: AssertionError
+_ test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-MAP_DEF_0001] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001', selected = False, odd = True, ground = '#131a2c'
+
+    @pytest.mark.parametrize("name", BENCH)
+    @pytest.mark.parametrize(("selected", "odd", "ground"), [(True, None, SELECTED_GROUND), (False, True, ODD_GROUND)])
+    def test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip(defc, name, selected, odd, ground):
+        """R-PE-BENCH.108/2 - on the selected row and on a zebra row the strip cells show the row's ground.
+    
+        The zebra case passes ``odd``, which the base ``row_line`` does not have (RED = absent keyword)."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        extra = {} if odd is None else {"odd": odd}
+        line = ds.row_line(row, ds.sheet_widths(111), selected, None, None, state=state, **extra)
+        current = cell_slice(line.plain, START["Current"], WIDTH["Current"])
+        blocks = [offset for offset, char in enumerate(current) if char in EX8.BLOCKS7]
+        assert len(blocks) == len(TR[f"S.after.current.{name}"].rsplit(" ", 1)[0].strip()), (
+            "every strip block is found in the Current column (no vacuous pass)", current)
+        for offset in blocks:
+>           assert bg(line, START["Current"] + offset) == ground, (name, offset)
+E           AssertionError: ('MAP_DEF_0001', 0)
+E           assert '#869fdc' == '#131a2c'
+E             
+E             - #131a2c
+E             + #869fdc
+
+tests/test_b103_inc8b_s1.py:920: AssertionError
+_ test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-VAL_BLK_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001', selected = False, odd = True, ground = '#131a2c'
+
+    @pytest.mark.parametrize("name", BENCH)
+    @pytest.mark.parametrize(("selected", "odd", "ground"), [(True, None, SELECTED_GROUND), (False, True, ODD_GROUND)])
+    def test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip(defc, name, selected, odd, ground):
+        """R-PE-BENCH.108/2 - on the selected row and on a zebra row the strip cells show the row's ground.
+    
+        The zebra case passes ``odd``, which the base ``row_line`` does not have (RED = absent keyword)."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        extra = {} if odd is None else {"odd": odd}
+        line = ds.row_line(row, ds.sheet_widths(111), selected, None, None, state=state, **extra)
+        current = cell_slice(line.plain, START["Current"], WIDTH["Current"])
+        blocks = [offset for offset, char in enumerate(current) if char in EX8.BLOCKS7]
+        assert len(blocks) == len(TR[f"S.after.current.{name}"].rsplit(" ", 1)[0].strip()), (
+            "every strip block is found in the Current column (no vacuous pass)", current)
+        for offset in blocks:
+>           assert bg(line, START["Current"] + offset) == ground, (name, offset)
+E           AssertionError: ('VAL_BLK_DEF_0001', 0)
+E           assert '#5c6e9a' == '#131a2c'
+E             
+E             - #131a2c
+E             + #5c6e9a
+
+tests/test_b103_inc8b_s1.py:920: AssertionError
+_ test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own[VAL_BLK_DEF_0001] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"])
+    def test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own(defc, name):
+        """R-PE-BENCH.108/1 - every strip cell is #969aad and has no background: the strip takes the row's
+        ground (selected, zebra) instead of painting its own patch over it."""
+        o = defc_obj(defc, name)
+        strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+        shown = [i for i, ch in enumerate(strip.plain) if ch != " "]
+        assert shown, name
+        for offset, (colour, ground) in zip(shown, [cell_styles(strip, i, 1)[0] for i in shown]):
+>           assert (colour, ground) == (DIM, None), (name, offset, colour, ground)
+E           AssertionError: ('VAL_BLK_DEF_0001', 0, '#101828', '#5c6e9a')
+E           assert ('#101828', '#5c6e9a') == ('#969aad', None)
+E             
+E             At index 0 diff: '#101828' != '#969aad'
+E             Use -v to get more diff
+
+tests/test_b103_inc8b_bw.py:174: AssertionError
+_ test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own[MAP_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"])
+    def test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own(defc, name):
+        """R-PE-BENCH.108/1 - every strip cell is #969aad and has no background: the strip takes the row's
+        ground (selected, zebra) instead of painting its own patch over it."""
+        o = defc_obj(defc, name)
+        strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+        shown = [i for i, ch in enumerate(strip.plain) if ch != " "]
+        assert shown, name
+        for offset, (colour, ground) in zip(shown, [cell_styles(strip, i, 1)[0] for i in shown]):
+>           assert (colour, ground) == (DIM, None), (name, offset, colour, ground)
+E           AssertionError: ('MAP_DEF_0001', 0, '#101828', '#869fdc')
+E           assert ('#101828', '#869fdc') == ('#969aad', None)
+E             
+E             At index 0 diff: '#101828' != '#969aad'
+E             Use -v to get more diff
+
+tests/test_b103_inc8b_bw.py:174: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground_of_its_own[MAP_DEF_0001]
+8 failed, 7 passed in 2.24s
+
+# exit=1

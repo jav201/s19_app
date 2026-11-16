@@ -1,0 +1,15 @@
+start Sat Nov 14 10:02:11 AM CST 2026
+card_diff: base 3002 lines, oc 3002 lines, diff (minus the __file__ line): 0
+parts base nobracket=0 (load before 1.94): ======================== 1 passed in 176.41s (0:02:56) =========================
+parts oc nobracket=0 (load before 1.94): ======================== 1 passed in 165.34s (0:02:45) =========================
+parts od nobracket=0 (load before 1.98): ======================== 1 passed in 171.97s (0:02:51) =========================
+parts od nobracket=1 (load before 1.88): ======================== 1 passed in 164.96s (0:02:44) =========================
+od 29_1 (load before 1.99): ================= 1 passed, 9 deselected in 116.05s (0:01:56) ================== | 
+od 29_2 (load before 1.85): ================= 1 failed, 9 deselected in 119.37s (0:01:59) ================== | slowest press 0.539 s (load 2.69 2.34 2.14); load-sensitive
+od 82_1 (load before 1.99): ================= 1 failed, 9 deselected in 170.27s (0:02:50) ================== | slowest press 1.659 s (load 2.78 2.44 2.22); load-sensitive
+od 20_1 (load before 1.86): ======================= 1 passed, 9 deselected in 7.44s ======================== | 
+marr 29_2 (load before 1.87): ================= 1 failed, 9 deselected in 121.10s (0:02:01) ================== | slowest press 0.886 s (load 2.55 2.33 2.21); load-sensitive
+mstall 29_2 (load before 1.86): ================== 1 failed, 9 deselected in 99.44s (0:01:39) ================== | slowest press 1.112 s (load 1.10 1.82 2.04); load-sensitive
+mstall 82_1 (load before 1.10): ================= 1 failed, 9 deselected in 141.12s (0:02:21) ================== | slowest press 2.256 s (load 1.09 1.52 1.89); load-sensitive
+end Sat Nov 14 10:42:04 AM CST 2026
+CHAIN1_DONE

@@ -1,0 +1,14 @@
+# WIDE re-run of mutant N-103  rows: R-PE-DEF.103
+# edits: s19_app/tui/definition_sheet.py:1035
+# uptime: 02:07:07 up 2 days, 10:55,  3 users,  load average: 3.06, 1.96, 1.55
+s19_app.__file__ = ~/work/zq-m8b/m/W-N-103/s19_app/__init__.py
+## group fast+bench: exit=1 | 15 failed, 501 passed in 116.62s (0:01:56)
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_24_a_pending_enum_shows_stored_value_and_text
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_24_a_pending_number_shows_the_diamond_and_the_previews_text_not_the_typed_one
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_24_a_pending_text_equal_to_the_rows_own_text_is_not_pending
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_47_n_right_and_left_choose_table_entries_without_wrapping
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_48_1_escape_in_the_input_clears_the_row_and_returns_to_the_sheet
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_82_1_select_after_clears_the_staged_rows_pending_text
+   FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_23_5_a_pending_rows_new_cell_belongs_to_its_own_text_after_the_selection_moves
+# verdict: KILLED-WIDE fast+bench: tests/test_b103_inc8_s1.py::test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides

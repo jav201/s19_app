@@ -1,0 +1,81 @@
+m10 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_10_the_kind_cell[MAP_DEF_0001-MAP 4x3]
+m11 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks
+m12 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_12_1_a_large_row_whose_values_are_not_decoded
+m13 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_13_1_a_running_summary_shows_dots_and_the_count
+m14 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_14_a_refused_decode_shows_two_dashes[no image]
+m14b killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_14_a_refused_decode_shows_two_dashes[no image]
+m15 killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells
+m15b killed 5 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_15_3_a_curve_counts_points
+m16 killed 5 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_16_1_the_delta_is_the_largest_magnitude
+m16b survived 141 192 passed in 139.13s (0:02:19)
+m17 survived 136 192 passed in 134.76s (0:02:14)
+m18a killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_18_1_a_pending_edit_shows_the_diamond
+m18b killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_18_2_staged_without_an_edit_shows_the_dot
+m19a killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_2_a_curve_strip_leaves_a_space_for_a_point_that_is_not_finite
+m19b killed 4 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_19_2_a_point_that_is_not_finite_has_no_bar_and_a_question_mark
+m19c killed 4 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_2_a_curve_strip_leaves_a_space_for_a_point_that_is_not_finite
+m26 survived 129 192 passed in 127.88s (0:02:07)
+m30 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_30_1_the_chart_has_five_columns_and_the_fourth_is_tallest
+m30b killed 4 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_30_2_the_chart_labels_hi_on_top_and_lo_at_the_bottom
+m31 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_31_1_map_cells_in_element_order_with_their_ramp_steps
+m32 killed 4 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_33_1_an_axis_with_no_points_is_labelled_by_index
+m33 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_33_1_an_axis_with_no_points_is_labelled_by_index
+m34 survived 103 192 passed in 102.12s (0:01:42)
+m34b killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_34_the_unit_word_follows_the_range
+m35 killed 2 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_35_2_the_tool_row_selects_the_current_tool
+m36 killed 2 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_36_1_the_window_moves_one_row_when_the_cursor_leaves_it
+m36b killed 3 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_36_window_for_answers_row_then_column
+m37a killed 2 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_37_2_a_grid_that_fits_has_no_window_line
+m37b survived 100 192 passed in 99.34s (0:01:39)
+m38 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_38_2_one_changed_run
+m38b killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_3_the_bench_lines_come_in_order[CURVE_DEF_0001]
+m39 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_39_1_2_a_long_bytes_line_is_cut_with_an_ellipsis[76]
+m41 killed 3 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_41_4_left_at_column_zero_stays
+m41b killed 3 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_41_1_right_moves_one_cell
+m42 killed 3 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_42_1_shift_arrows_keep_the_anchor
+m43 killed 3 FAILED tests/test_b103_inc9_b_model.py::test_r_pe_bench_36_2_pagedown_moves_the_window_the_least
+m50 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_50_1_the_map_op_line
+m51 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_52_1_set_on_curve_points_one_and_three
+m52 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_52_1_set_on_curve_points_one_and_three
+m53 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_1_delta_adds_to_the_physical_value
+m54 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_66_3_a_percent_refusal_names_the_element
+m55 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_55_1_interpolate_runs_between_the_end_columns
+m56 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_56_1_smooth_averages_three_columns
+m57 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_66_3_a_percent_refusal_names_the_element
+m57b survived 101 192 passed in 99.96s (0:01:39)
+m58a killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_58_2_a_zero_delta_on_a_rounded_cell_leaves_the_edit_empty
+m58b survived 102 192 passed in 101.01s (0:01:41)
+m59 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_59_1_undo_restores_the_edit_before_each_apply
+m59b killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_59_2_the_undo_stack_keeps_thirty_two_edits
+m59c killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_59_2_the_undo_stack_keeps_thirty_two_edits
+m61 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_59_2_the_undo_stack_keeps_thirty_two_edits
+m62a killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_62_parse_operand_rejects_everything_else[0x10]
+m62b killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_62_parse_operand_rejects_everything_else[1e999]
+m63 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_63_1_a_tool_on_texts_needs_numbers
+m64a killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_64_2_a_nan_element_has_no_value_to_change
+m64b killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_64_1_a_refused_element_has_no_value_to_change
+m65a killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_55_2_interpolate_on_one_column_changes_nothing
+m65b killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_65_2_smooth_needs_three_columns
+m66a killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_66_2_a_refused_preview_shows_its_message
+m66b killed 101 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_66_the_kind_preview_gives_no_result
+m93 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge[118]
+w1 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i]
+w2 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[d]
+w3 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i]
+w4 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[m]
+w5 killed 3 FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i]
+w6 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_19_1_a_nan_cell_is_unshaded
+w7 killed 3 FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip
+w8 survived 100 192 passed in 98.64s (0:01:38)
+w8b survived 100 192 passed in 99.39s (0:01:39)
+w9 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_5_the_grid_paints_nothing_without_room
+w9b killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_5_the_chart_paints_nothing_without_room
+w9c killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_5_no_more_bench_lines_than_the_room[MAP_DEF_0001]
+w9d survived 103 192 passed in 101.67s (0:01:41)
+w9e survived 103 192 passed in 101.53s (0:01:41)
+ 22:53:57 up 1 day,  7:42,  3 users,  load average: 2.66, 3.18, 4.17
+ 22:21:34 up 1 day,  7:10,  5 users,  load average: 7.39, 7.50, 6.97
+# second batch (same driver, after the 15 new nodes were added; the three kills below are by ORIGINAL nodes)
+m21 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_21_1_a_decoding_row_says_so_in_place_of_the_canvas
+m07 killed 3 FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_7_1_2_a_map_under_the_bench_minimum_width[10]
+m90 killed 3 FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_91_a_control_character_in_an_axis_text_becomes_fffd

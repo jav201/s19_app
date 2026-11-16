@@ -1,0 +1,4 @@
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor
+FAILED tests/test_tui_patch_json.py::test_tc079_5c_hue_census_is_complete

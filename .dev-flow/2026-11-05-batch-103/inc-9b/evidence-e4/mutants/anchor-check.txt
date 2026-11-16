@@ -1,0 +1,24 @@
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+G01 ANCHORS_OK replacements=1
+G02 ANCHORS_OK replacements=1
+G03 ANCHORS_OK replacements=1
+G04 ANCHORS_OK replacements=2
+G05 ANCHORS_OK replacements=1
+G06 ANCHORS_OK replacements=1
+G07 ANCHORS_OK replacements=1
+G08 ANCHORS_OK replacements=2
+G09 ANCHORS_OK replacements=1
+G10 ANCHORS_OK replacements=1
+G11 ANCHORS_OK replacements=1
+G12 ANCHORS_OK replacements=1
+G13 ANCHORS_OK replacements=3
+G14 ANCHORS_OK replacements=1
+G15 ANCHORS_OK replacements=1
+G16 ANCHORS_OK replacements=1
+G17 ANCHORS_OK replacements=1
+G18 ANCHORS_OK replacements=1
+G19 ANCHORS_OK replacements=1
+G20 ANCHORS_OK replacements=1
+G21 ANCHORS_OK replacements=1
+G22 ANCHORS_OK replacements=1
+G23 ANCHORS_OK replacements=1

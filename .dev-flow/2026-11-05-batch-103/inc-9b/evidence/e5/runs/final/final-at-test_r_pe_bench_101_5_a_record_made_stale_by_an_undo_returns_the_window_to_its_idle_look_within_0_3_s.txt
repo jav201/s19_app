@@ -1,0 +1,25 @@
+DATE 2026-11-15T21:17:34-06:00
+HEAD 6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+TREE <runner-home>/work/zq-x9b/final-exact
+DIRTY_BEGIN
+DIRTY_END
+ 21:17:34 up 3 days,  6:06,  2 users,  load average: 0.91, 0.89, 0.67
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/final-exact/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/final-exact
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+64.5%  0.107 s / 0.300 s  R-PE-BENCH.101/5 idle after a stale record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 11.30s ==============================
+EXIT_CODE 0

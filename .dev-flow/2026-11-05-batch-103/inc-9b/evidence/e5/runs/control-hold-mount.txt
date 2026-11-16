@@ -1,0 +1,120 @@
+Cloning into '<runner-home>/work/zq-x9b/mount-base'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at 0acff83a batch-103 Inc 9b E5: test staging-sheet mount exactly once
+Cloning into '<runner-home>/work/zq-x9b/mount-red'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at 0acff83a batch-103 Inc 9b E5: test staging-sheet mount exactly once
+APPLIED hold-mount s19_app/tui/screens_directionb/patch_editor/bench_sheet.py anchors=1
+PHASE baseline
+DATE 2026-11-15T20:10:18-06:00
+HEAD 0acff83ade458dc09dbb2d3e209b50c6599a4ce5
+TREE <runner-home>/work/zq-x9b/mount-base
+DIRTY_BEGIN
+DIRTY_END
+ 20:10:19 up 3 days,  4:59,  2 users,  load average: 0.21, 0.18, 0.23
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/mount-base/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_w.py::test_e5_9b_staging_sheet_on_mount_runs_exactly_once
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/mount-base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_w.py .                                             [100%]
+
+============================== 1 passed in 4.30s ===============================
+EXIT_CODE 0
+BASELINE_RC 0
+PHASE hold-mount
+DATE 2026-11-15T20:10:24-06:00
+HEAD 0acff83ade458dc09dbb2d3e209b50c6599a4ce5
+TREE <runner-home>/work/zq-x9b/mount-red
+DIRTY_BEGIN
+ M s19_app/tui/screens_directionb/patch_editor/bench_sheet.py
+DIRTY_END
+ 20:10:25 up 3 days,  4:59,  2 users,  load average: 0.28, 0.19, 0.24
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/mount-red/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_w.py::test_e5_9b_staging_sheet_on_mount_runs_exactly_once
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/mount-red
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_w.py F                                             [100%]
+
+=================================== FAILURES ===================================
+_____________ test_e5_9b_staging_sheet_on_mount_runs_exactly_once ______________
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-mount-red/tmp/pytest-of-<runner>/pytest-0/test_e5_9b_staging_sheet_on_mo0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-mount-red/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f015f17d450>
+
+    def test_e5_9b_staging_sheet_on_mount_runs_exactly_once(tmp_path, defc_dir, monkeypatch):
+        """E5 / HOLD-MOUNT: framework MRO dispatch calls the base mount once.
+    
+        Counting the actual base method distinguishes this from a cue test: an
+        added ``super().on_mount()`` in ArrayBenchSheet runs it a second time.
+        """
+        from s19_app.tui.screens_directionb.patch_editor.sheet import StagingSheet
+    
+        calls = []
+        real_mount = StagingSheet.on_mount
+    
+        def counted_mount(self):
+            calls.append(self)
+            return real_mount(self)
+    
+        monkeypatch.setattr(StagingSheet, "on_mount", counted_mount)
+    
+        async def body(app, pilot, panel):
+            await pilot.pause()
+            sheet = sheet_of(panel)
+            return len(calls), calls[0] is sheet, sheet._busy_timer is not None
+    
+>       assert run(tmp_path, defc_dir, body) == (1, True, True)
+E       assert (2, True, True) == (1, True, True)
+E         
+E         At index 0 diff: 2 != 1
+E         Use -v to get more diff
+
+tests/test_b103_inc9b_w.py:979: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_e5_9b_staging_sheet_on_mount_runs_exactly_once
+============================== 1 failed in 4.19s ===============================
+EXIT_CODE 1
+MUTANT_RC 1

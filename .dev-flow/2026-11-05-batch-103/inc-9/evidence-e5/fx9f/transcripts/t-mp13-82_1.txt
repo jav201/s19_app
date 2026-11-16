@@ -1,0 +1,52 @@
+tree: mp13  | load before: 0.88 0.85 0.53 1/645 671207
+~/work/zq-fx9f/mp13/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9f/mp13
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 10 items / 9 deselected / 1 selected
+
+tests/test_b103_inc9_w_jobs.py F                                         [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs _
+
+tmp_path = PosixPath('~/work/zq-fx9f/tmp/pytest-of-<user>/pytest-7/test_r_pe_bench_82_1_a_key_is_0')
+defc_dir = PosixPath('~/work/zq-fx9f/tmp/pytest-of-<user>/pytest-7/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs(tmp_path, defc_dir):
+        """LARGE, Set `7` on 256 x 16 cells, alt+s: `down` / `up` pressed until the record is written, each <= 1.0 s (relaxed from 0.5 s, operator decision F-X9-2)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_with_selection(pilot, sheet)
+            await wait_for(pilot, lambda: previewed(sheet), "the preview result", 240)
+            await pilot.press("alt+s")
+            times = await keys_until(pilot, sheet, "down", lambda: len(entries_of(app)) == 1)
+            return times, entries_of(app)
+    
+        times, entries = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        assert len(entries) == 1 and len(entries[0][1]) == LARGE_COUNT
+        assert len(times) >= 1, "no press was measured while the record was written"
+>       assert max(times) <= report_margin(
+            "R-PE-BENCH.82/1 key during a record encode", max(times), RELAXED_KEY_LIMIT_S
+        ), f"slowest press {max(times):.3f} s ({load()}); load-sensitive"
+E       AssertionError: slowest press 2.282 s (load 0.90 0.86 0.58); load-sensitive
+E       assert 2.28183158300817 <= 1.0
+E        +  where 2.28183158300817 = max([1.4895695520099252, 1.5872440040111542, 1.551252585981274, 1.6062048869789578, 1.5602984549768735, 1.612969712994527, ...])
+E        +  and   1.0 = report_margin('R-PE-BENCH.82/1 key during a record encode', 2.28183158300817, 1.0)
+E        +    where 2.28183158300817 = max([1.4895695520099252, 1.5872440040111542, 1.551252585981274, 1.6062048869789578, 1.5602984549768735, 1.612969712994527, ...])
+
+tests/test_b103_inc9_w_jobs.py:393: AssertionError
+============================= QC-TM timing margins =============================
+LOW -128.2%  2.282 s / 1.000 s  R-PE-BENCH.82/1 key during a record encode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+================= 1 failed, 9 deselected in 138.48s (0:02:18) ==================
+rc=1
+load after: 0.90 0.86 0.58 1/644 671793

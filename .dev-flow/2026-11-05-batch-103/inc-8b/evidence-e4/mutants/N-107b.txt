@@ -1,0 +1,74 @@
+# mutant N-107b  rows: R-PE-DEF.107
+# edits: s19_app/tui/definition_sheet.py:1120
+# -k: r_pe_def_107_
+# uptime: 01:59:37 up 2 days, 10:48,  3 users,  load average: 1.37, 0.95, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/N-107b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF.F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_107_1_the_one_line_of_a_number_row_is_on_the_bar_and_the_expanded_ground _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_107_1_the_one_line_of_a_number_row_is_on_the_bar_and_the_expanded_ground(defc):
+        """R-PE-DEF.107/1 (EX-8B-E1) - DISPLAY_0001 at V = 111 -> `  ┊ └ LINEAR …`, ground #1b233a over cells 0..142.
+    
+        V-11: the expanded object stands apart from the table; a ground that stops with the text leaves a ragged edge.
+        """
+        d = defc["defs"]["DISPLAY_0001"]
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+        found = painted(row)
+        assert len(found) == 1, [ln.plain for ln in found]
+        (line,) = found
+>       assert line.plain.startswith(
+            BAR + f"└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x{d.address:08X} · {d.byte_length} B"
+        )
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7f9a1e9a1000>(('  ┊ ' + '└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B'))
+E        +    where <built-in method startswith of str object at 0x7f9a1e9a1000> = '    └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B                                                                          '.startswith
+E        +      where '    └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B                                                                          ' = <text '    └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B                                                                          ' [Span(0, 143, 'on #1b233a'), Span(4, 69, '#91abec'), Span(5, 69, '#969aad')] '#91abec'>.plain
+
+tests/test_b103_inc8b_s2.py:492: AssertionError
+_____ test_r_pe_def_107_3_every_bench_line_of_an_array_row_follows_the_bar _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_107_3_every_bench_line_of_an_array_row_follows_the_bar(defc):
+        """R-PE-DEF.107/3 (EX-8B-E1) - MAP_DEF_0001 (bench) -> every bench line after `  ┊ `, the first being `└ `."""
+        o = defc_obj(defc, "MAP_DEF_0001")
+        lines = painted(sheet_row(o.d, o.a2l, o.image), None, V, ROOM, view_state(o))
+>       assert len(lines) > 1 and at(lines, 0).startswith(BAR + "└ ")
+E       AssertionError: assert (11 > 1 and False)
+E        +  where 11 = len([<text '    └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                            ...                                                                        ' [Span(0, 143, 'on #1b233a')] '#91abec'>, ...])
+E        +  and   False = <built-in method startswith of str object at 0x7f5ecb4bd000>(('  ┊ ' + '└ '))
+E        +    where <built-in method startswith of str object at 0x7f5ecb4bd000> = '    └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                                                             '.startswith
+E        +      where '    └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                                                             ' = at([<text '    └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                            ...                                                                        ' [Span(0, 143, 'on #1b233a')] '#91abec'>, ...], 0)
+
+tests/test_b103_inc8b_s2.py:512: AssertionError
+______ test_r_pe_def_107_2_every_card_line_of_a_mask_row_follows_the_bar _______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_107_2_every_card_line_of_a_mask_row_follows_the_bar(defc):
+        """R-PE-DEF.107/2 (EX-8B-E1) - MASK_FIELD_0001 -> the definition line and every card line start with the bar."""
+        row, pv = with_pending(defc, "MASK_FIELD_0001", "255")
+        lines = painted(row, pv)
+        assert len(lines) == 7
+>       assert all(ln.plain.startswith(BAR) and cell_len(ln.plain) == 143 for ln in lines)
+E       assert False
+E        +  where False = all(<generator object test_r_pe_def_107_2_every_card_line_of_a_mask_row_follows_the_bar.<locals>.<genexpr> at 0x7f9a1ea45460>)
+
+tests/test_b103_inc8b_s2.py:505: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_107_1_the_one_line_of_a_number_row_is_on_the_bar_and_the_expanded_ground
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_107_3_every_bench_line_of_an_array_row_follows_the_bar
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_107_2_every_card_line_of_a_mask_row_follows_the_bar
+3 failed, 1 passed in 1.79s
+
+# exit=1

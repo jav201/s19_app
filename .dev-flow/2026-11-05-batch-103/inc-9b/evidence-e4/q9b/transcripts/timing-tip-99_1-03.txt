@@ -1,0 +1,21 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=timing Q9B_SIDE=tip Q9B_LABEL=99_1 Q9B_RUN=03
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 17:59:38 up 3 days,  2:48,  3 users,  load average: 0.89, 0.79, 0.80
+Q9B_LOAD1=0.89
+Q9B_NODE=tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second PASSED
+============================= QC-TM timing margins =============================
+33.6%  0.664 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 156.85s (0:02:36) =========================
+Q9B_RC=0
+Q9B_VALID=PASS

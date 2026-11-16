@@ -1,0 +1,16 @@
+# mutant BASELINE-fast-union  rows: all rows (fast files)
+# edits: none (unmutated baseline)
+# -k: r_pe_def_5_ or r_pe_def_89_ or r_pe_def_90_ or r_pe_def_91_ or r_pe_def_92_ or r_pe_def_33_ or r_pe_def_93_ or r_pe_def_94_ or r_pe_def_95_ or r_pe_def_96_ or r_pe_def_81_ or r_pe_def_97_ or r_pe_def_98_ or r_pe_def_99_ or r_pe_def_100_ or r_pe_def_101_ or r_pe_def_102_ or r_pe_def_103_ or r_pe_def_21_ or r_pe_def_104_ or r_pe_def_105_ or r_pe_def_106_ or r_pe_def_114_ or r_pe_def_76_ or r_pe_bench_17_ or r_pe_def_107_ or r_pe_bench_5_ or r_pe_def_108_ or r_pe_def_34_ or r_pe_def_35_ or r_pe_def_109_ or r_pe_def_110_ or r_pe_def_111_ or r_pe_def_112_ or r_pe_def_115_ or r_pe_def_116_ or r_pe_def_117_ or r_pe_def_113_ or r_pe_def_85_ or r_pe_bench_11_ or r_pe_bench_107_ or r_pe_bench_108_ or r_pe_bench_36_
+# uptime: 01:46:11 up 2 days, 10:34,  2 users,  load average: 0.59, 0.70, 1.83
+s19_app.__file__ = ~/work/zq-m8b/m/BASELINE-fast-union/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 88%]
+.............................                                            [100%]
+245 passed in 78.08s (0:01:18)
+
+# exit=0

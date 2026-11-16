@@ -230,7 +230,13 @@ async def attach_a2l(pilot, app, case: Path) -> None:
 
 
 async def click(pilot, target, what: str) -> None:
-    """A mouse click that must land on ``target`` (a selector or a widget)."""
+    """A mouse click that must land on ``target`` (a selector or a widget).
+
+    Inc 8 R-PE-DEF.1.1: the tab contents live in the 9-row landing pane and scroll inside it, so the
+    target is scrolled into view first, as the operator would (E4 integration, test side)."""
+    widget = pilot.app.screen.query_one(target) if isinstance(target, str) else target
+    widget.scroll_visible(animate=False)
+    await pilot.pause()
     assert await pilot.click(target), f"click missed {what}"
 
 
@@ -382,7 +388,10 @@ async def entry_json_confirm(pilot, app, log, row: int, replacement=None) -> lis
 
     from s19_app.tui.screens import EntryJsonScreen
 
-    await show_tab(pilot, app, "patch_tab_inspector", "patch_entry_edit_json_button")
+    # Inc 8 R-TUI-063.3: the ledger lives in the Patch script tab and Edit JSON in the
+    # Inspector tab (was: both shown at once), so the row is chosen on the first tab and
+    # the button is clicked on the second.
+    await show_tab(pilot, app, "patch_tab_script", "patch_doc_entries_table")
     table = app.query_one("#patch_doc_entries_table", DataTable)
     await click(pilot, table, "the ledger")
     await wait_until(pilot, lambda: app.focused is table, "timed out focusing the ledger")
@@ -393,6 +402,7 @@ async def entry_json_confirm(pilot, app, log, row: int, replacement=None) -> lis
         await settle(pilot, 1)
     assert table.cursor_row == row, (table.cursor_row, row)
     await settle(pilot, 2)
+    await show_tab(pilot, app, "patch_tab_inspector", "patch_entry_edit_json_button")
     button = app.query_one("#patch_entry_edit_json_button", Button)
     await wait_until(pilot, lambda: not button.disabled, "timed out: per-entry Edit JSON disabled")
     await click(pilot, button, "per-entry Edit JSON")

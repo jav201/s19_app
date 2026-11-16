@@ -1,0 +1,16 @@
+# load: 2.01
+~/work/zq-mw9/mt2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 93%]
+.....                                                                    [100%]
+============================= slowest 5 durations ==============================
+23.41s call     tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_3_a_page_holding_large_decodes_nothing_on_the_ui_thread
+14.75s call     tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_1_at_most_one_bench_job_runs_at_any_time
+12.64s call     tests/test_b103_inc9_a9.py::test_r_pe_bench_70_4_a_second_stage_asked_during_the_first_ones_held_encode_is_staged_too
+11.57s call     tests/test_b103_inc9_a9.py::test_r_pe_bench_78_1_an_undo_during_the_held_encode_makes_the_result_stale
+10.71s call     tests/test_b103_inc9_a9.py::test_r_pe_bench_71_1_and_2_the_second_stage_encodes_over_the_first_one
+77 passed in 283.75s (0:04:43)
+rc=0
+# load end: 2.49

@@ -1,0 +1,480 @@
+Cloning into '<runner-home>/work/zq-x9b/residual-base'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+Cloning into '<runner-home>/work/zq-x9b/residual-sync'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+Cloning into '<runner-home>/work/zq-x9b/residual-later'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+Cloning into '<runner-home>/work/zq-x9b/residual-stall'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+Cloning into '<runner-home>/work/zq-x9b/residual-chain'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+APPLIED sync-worker-valid s19_app/tui/screens_directionb/patch_editor/bench_sheet.py anchors=1
+APPLIED sync-worker-valid s19_app/tui/screens_directionb/patch_editor/bench_sheet.py anchors=1
+APPLIED later-raise-valid s19_app/tui/app/patch.py anchors=1
+APPLIED stall-sheet s19_app/tui/app/patch.py anchors=1
+APPLIED chain s19_app/tui/app/patch.py anchors=1
+
+CONTROL_PHASE baseline-98
+DATE 2026-11-15T20:15:24-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-base
+DIRTY_BEGIN
+DIRTY_END
+ 20:15:24 up 3 days,  5:04,  2 users,  load average: 0.50, 0.27, 0.25
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-base/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+25.5%  0.372 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 150.11s (0:02:30) =========================
+EXIT_CODE 0
+CONTROL_RC baseline-98 0
+
+CONTROL_PHASE baseline-99
+DATE 2026-11-15T20:17:56-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-base
+DIRTY_BEGIN
+DIRTY_END
+ 20:17:56 up 3 days,  5:06,  2 users,  load average: 0.92, 0.53, 0.35
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-base/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+33.6%  0.664 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 158.38s (0:02:38) =========================
+EXIT_CODE 0
+CONTROL_RC baseline-99 0
+
+CONTROL_PHASE stall-98
+DATE 2026-11-15T20:20:35-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-stall
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:20:36 up 3 days,  5:09,  2 users,  load average: 0.94, 0.69, 0.45
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-stall/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-stall
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py F                                            [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record _
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-stall-98/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_98_1_the_cue_k0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-stall-98/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record(tmp_path, defc_dir):
+        """R-PE-BENCH.98/1. LARGE, Set `7` on 256 x 16 cells, alt+s: from the moment the record's write lands in the
+        change document until the cue leaves, the painted busy title changes at least once (a tick runs between the
+        write and the end of the refresh) and no gap between the write, the changed titles and the leave exceeds 0.5 s.
+        Operator need (P-127): the 0.67 s one-call refresh froze the cue at its end; the user must see it alive.
+        Negative control: the write and refresh in one UI-thread call (base: 0.674 s) -> max gap >= 0.67 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_record_ready(pilot, sheet)
+            watcher = WriteWatch(app).start()
+            mark: dict = {}
+    
+            def until(s: Snap, out: list) -> bool:
+                if s.entries >= 1:
+                    mark.setdefault("t", s.t)
+                busy = any("BUSY" in o.row for o in out)
+                return s.entries >= 1 and is_idle(s) and (busy or s.t - mark["t"] > 1.5)
+    
+            try:
+                send(app, "alt+s")
+                return await watch(app, until, time.monotonic() + 180.0), watcher
+            finally:
+                watcher.stop()
+    
+        snaps, watcher = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        assert watcher.t_write is not None, "the record was never written"
+        after = [s for s in snaps if s.t >= watcher.t_write]
+        assert any("BUSY" in s.row for s in after), f"no busy title after the write; last top row {after[-1].row!r} ({load()})"
+        changes = title_changes(after, "stage", LARGE)
+        assert len(changes) >= 1, f"no tick ran between the write and the end of the refresh ({load()})"
+        leave = next((s.t for s in after if is_idle(s)), after[-1].t)
+        marks = [watcher.t_write] + [t for t, _ in changes] + [leave]
+        gaps = [b - a for a, b in zip(marks, marks[1:])]
+        worst = max(gaps)
+>       assert worst <= report_margin("R-PE-BENCH.98/1 max gap write-to-leave", worst, timing_bound(0.5)), (
+            f"max gap {worst:.3f} s over {len(gaps)} gaps from the write to the leave ({load()}); load-sensitive"
+        )
+E       AssertionError: max gap 1.671 s over 5 gaps from the write to the leave (load 1.08 0.83 0.54); load-sensitive
+E       assert 1.6713722149725072 <= 0.5
+E        +  where 0.5 = report_margin('R-PE-BENCH.98/1 max gap write-to-leave', 1.6713722149725072, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_inc9b_at.py:421: AssertionError
+============================= QC-TM timing margins =============================
+LOW -234.3%  1.671 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+======================== 1 failed in 151.33s (0:02:31) =========================
+EXIT_CODE 1
+CONTROL_RC stall-98 1
+
+CONTROL_PHASE stall-99
+DATE 2026-11-15T20:23:09-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-stall
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:23:09 up 3 days,  5:11,  2 users,  load average: 1.07, 0.84, 0.54
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-stall/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-stall
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+33.8%  0.662 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 163.26s (0:02:43) =========================
+EXIT_CODE 0
+CONTROL_RC stall-99 0
+
+CONTROL_PHASE chain-98
+DATE 2026-11-15T20:25:53-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-chain
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:25:54 up 3 days,  5:14,  2 users,  load average: 1.00, 0.92, 0.63
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-chain/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-chain
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+43.7%  0.281 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 149.30s (0:02:29) =========================
+EXIT_CODE 0
+CONTROL_RC chain-98 0
+
+CONTROL_PHASE chain-99
+DATE 2026-11-15T20:28:24-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-chain
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:28:24 up 3 days,  5:17,  2 users,  load average: 0.96, 0.93, 0.68
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-chain/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-chain
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py F                                            [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second _
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-chain-99/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_99_1_a_key_pre0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-chain-99/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second(tmp_path, defc_dir):
+        """R-PE-BENCH.99/1. R-PE-BENCH.98/1's scenario, `down` sent the moment the record's write lands in the change
+        document: the bench handles it (the sheet's key action returns) within 1.0 s of that write.
+        Operator need (P-127): the pill says "keys still work"; a window that ignores keys through the refresh makes
+        the user force the app closed. The base's one-call block is 0.67 s, inside the bound, so this node is a
+        guard on base; its negative control is a 1.3 s stall added to one refresh step (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_record_ready(pilot, sheet)
+            handled: list = []
+            real = sheet.action_move
+    
+            def timed(*args):
+                real(*args)
+                handled.append(time.monotonic())
+    
+            sheet.action_move = timed
+            watcher = WriteWatch(app, "down").start()
+            try:
+                send(app, "alt+s")
+                await wait_for(pilot, lambda: bool(handled), "the `down` sent at the write to be handled", 180)
+            finally:
+                watcher.stop()
+                del sheet.action_move
+            return watcher.t_write, handled[0]
+    
+        t_write, t_handled = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        latency = t_handled - t_write
+>       assert latency <= report_margin("R-PE-BENCH.99/1 key at the write step", latency, timing_bound(1.0)), (
+            f"`down` handled {latency:.3f} s after the write ({load()}); load-sensitive, unverified on a loaded host"
+        )
+E       AssertionError: `down` handled 1.074 s after the write (load 0.97 0.94 0.73); load-sensitive, unverified on a loaded host
+E       assert 1.0744779369561002 <= 1.0
+E        +  where 1.0 = report_margin('R-PE-BENCH.99/1 key at the write step', 1.0744779369561002, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b103_inc9b_at.py:458: AssertionError
+============================= QC-TM timing margins =============================
+LOW -7.4%  1.074 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+======================== 1 failed in 176.33s (0:02:56) =========================
+EXIT_CODE 1
+CONTROL_RC chain-99 1
+
+CONTROL_PHASE sync-97
+DATE 2026-11-15T20:31:22-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-sync
+DIRTY_BEGIN
+ M s19_app/tui/screens_directionb/patch_editor/bench_sheet.py
+DIRTY_END
+ 20:31:23 up 3 days,  5:20,  2 users,  load average: 0.97, 0.94, 0.73
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-sync/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-sync
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py F                                            [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds __
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-sync-97/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_97_3_the_gaps_0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-sync-97/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds(tmp_path, defc_dir):
+        """R-PE-BENCH.97/3. LARGE's real decode, 5 s from the cue's first tick: the gaps between successive changed
+        painted titles have a median <= 0.2 s and a maximum <= 0.5 s (prototype: median 0.12-0.17, max 0.38-0.45).
+        Operator need (P-127): the spinner must move steadily so the user can see the window is alive.
+        Negative control: the decode run on the UI thread -> max gap about 10 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            return await large_decode_window(pilot, app, sheet_of(panel), 5.0)
+    
+        _, snaps, first = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+>       assert first is not None, f"no `decode LARGE` busy title within 6 s of the key; last top row {snaps[-1].row!r} ({load()})"
+E       AssertionError: no `decode LARGE` busy title within 6 s of the key; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 0.99 0.95 0.75)
+E       assert None is not None
+
+tests/test_b103_inc9b_at.py:358: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+============================== 1 failed in 36.53s ==============================
+EXIT_CODE 1
+CONTROL_RC sync-97 1
+
+CONTROL_PHASE later-raise
+DATE 2026-11-15T20:32:00-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-later
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:32:01 up 3 days,  5:20,  2 users,  load average: 0.99, 0.95, 0.75
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-later/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-later
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py F                                             [100%]
+
+=================================== FAILURES ===================================
+__ test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once ___
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-later-raise/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_98_2_a_later_s0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-later-raise/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fafa4420090>
+
+    def test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.98/2 scheduler contract: a raise in a timer step calls on_done once and re-raises."""
+    
+        async def body(app, pilot, panel):
+            callbacks, calls = [], []
+            monkeypatch.setattr(app, "set_timer", lambda _delay, callback: callbacks.append(callback))
+    
+            def raises():
+                calls.append("raise")
+                raise RuntimeError("later refresh step")
+    
+            try:
+                app._run_refresh_steps(
+                    [lambda: calls.append("first"), raises, lambda: calls.append("unreached")],
+                    lambda: calls.append("done"),
+                )
+                assert len(callbacks) == 1
+                with pytest.raises(RuntimeError, match="later refresh step"):
+                    callbacks.pop(0)()
+            finally:
+                app.__dict__.pop("set_timer", None)
+            return calls, callbacks
+    
+        calls, callbacks = run(tmp_path, defc_dir, body)
+>       assert calls == ["first", "raise", "done"], calls
+E       AssertionError: ['first', 'raise']
+E       assert ['first', 'raise'] == ['first', 'raise', 'done']
+E         
+E         Right contains one more item: 'done'
+E         Use -v to get more diff
+
+tests/test_b103_inc9b_s.py:459: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once
+============================== 1 failed in 4.31s ===============================
+EXIT_CODE 1
+CONTROL_RC later-raise 1

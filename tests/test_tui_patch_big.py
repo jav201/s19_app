@@ -364,7 +364,9 @@ def test_at075a_titles(tmp_path: Path) -> None:
             # batch-97 Inc-4 (named supersession, HLR-144): the CHECKS and
             # JSON windows became tabs of ONE bordered inspector, whose title
             # and subtitle follow the active tab — read them per tab.
-            outcomes["script"] = _window_chrome(app, "patch_win_script")
+            # Inc 8 R-TUI-063.6 / R-PE-041: the ledger has no border; its title and subtitle
+            # are the landing pane's (title LANDS IN; subtitle = the ledger's while Patch script shows).
+            outcomes["script"] = _window_chrome(app, "patch_inspector")
             panel = app.query_one("#patch_editor_panel")
             for key, chip in (("checks", "#patch_tab_checks"), ("json", "#patch_tab_json")):
                 panel.query_one(chip, Button).press()
@@ -376,7 +378,11 @@ def test_at075a_titles(tmp_path: Path) -> None:
             app.query_one("#patch_entry_value_input", Input).value = "added"
             app.query_one("#patch_entry_add_button", Button).press()
             await pilot.pause()
-            outcomes["script_after_add"] = _window_chrome(app, "patch_win_script")
+            # Inc 8 R-PE-041: the entry count shows on the landing pane while Patch script
+            # (or Inspector) is the shown tab, so the tab is selected again before the read.
+            panel.query_one("#patch_tab_script", Button).press()
+            await pilot.pause()
+            outcomes["script_after_add"] = _window_chrome(app, "patch_inspector")
         return outcomes
 
     outcomes = asyncio.run(_drive())
@@ -386,9 +392,10 @@ def test_at075a_titles(tmp_path: Path) -> None:
     json_title, json_subtitle = outcomes["json"]
 
     # Every window self-describes with a non-empty border title.
-    assert "PATCH SCRIPT" in script_title, script_title
-    assert "CHECKS" in checks_title, checks_title
-    assert "JSON" in json_title, json_title
+    # Inc 8 R-TUI-063.6: PATCH SCRIPT / CHECKS / JSON -> LANDS IN on every tab.
+    assert "LANDS IN" in script_title, script_title
+    assert "LANDS IN" in checks_title, checks_title
+    assert "LANDS IN" in json_title, json_title
 
     # The subtitles carry CONTENT, not decoration.
     assert "3" in script_subtitle, (
@@ -523,6 +530,9 @@ def test_at075c_variant_scope_line(tmp_path: Path) -> None:
             # real (C-10(a) — the operator's actual path to this control).
             # batch-97 Inc-4 (named supersession): the execute row lives on
             # the inspector's JSON tab — open it first, as the operator does.
+            # Inc 8 R-PE-DEF.74 / R-PE-DEF.1.1: at 120x30 the 12-row staging sheet fills the
+            # first screenful, so the landing pane's chip is reached by scrolling too.
+            await _reach(app, pilot, app.query_one("#patch_tab_json"))
             await pilot.click("#patch_tab_json")
             await pilot.pause()
             button = app.query_one("#patch_execute_scope_button", Button)

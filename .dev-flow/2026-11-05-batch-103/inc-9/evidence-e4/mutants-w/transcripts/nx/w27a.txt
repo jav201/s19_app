@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+...F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/s19_app/tui/definition_bench.py:382: AttributeError: 'NoneType' object has no attribute 'texts'
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_27_3_a_tool_applied_to_a_row_whose_decode_was_refused_changes_nothing_and_does_not_fail
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 5 passed in 46.82s

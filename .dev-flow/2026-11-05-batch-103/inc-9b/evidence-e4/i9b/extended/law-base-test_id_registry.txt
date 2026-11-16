@@ -1,0 +1,24 @@
+### LABEL: law-base-test_id_registry
+### CLONE: ~/work/zq-i9b/base
+### DATE: 2026-11-15T13:22:54-06:00
+### UPTIME:  13:22:54 up 2 days, 22:11,  3 users,  load average: 1.66, 1.61, 1.35
+### HEAD: e4485817d7ac3706c77f14a4c2a8cf784fe35038
+### STATUS-BEGIN
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/base/s19_app/__init__.py
+### HEADER-END
+### PYTEST jobs=2
+### ARGS: tests/test_id_registry.py
+--- begin ---
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [12 items]
+
+............                                                             [100%]
+============================== 12 passed in 7.80s ==============================
+--- end rc=0 ---

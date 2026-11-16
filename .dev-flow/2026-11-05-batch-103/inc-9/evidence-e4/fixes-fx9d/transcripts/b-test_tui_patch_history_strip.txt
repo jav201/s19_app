@@ -1,0 +1,195 @@
+load before: 1.40 1.46 1.41 1/638 586221
+~/work/zq-fx9d/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....F.F.                                                                 [100%]
+=================================== FAILURES ===================================
+_________________________ test_tc081_4_no_binding_diff _________________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_tc081_4_no_binding_diff() -> None:
+        """The batch adds no App-level `Binding(` — C-28's census does not fire.
+    
+        Intent (LLR-081.4): the key hints are panel-local TEXT. C-28 fires when an
+        increment adds/removes/changes an App-level ``Binding(show=True)`` or any
+        shared-chrome element, which drifts EVERY screen's snapshot (the batch-45
+        F-1 lesson: 18 unexpected cells). Recording the disposition as an executable
+        guard keeps the snapshot census bounded to the 2 patch cells instead of
+        re-opening it at a gate.
+    
+        The ``ctrl+z`` / ``ctrl+y`` bindings already exist (batch-40 S2); this
+        increment DISPLAYS them and does not touch them.
+    
+        After the modularization the App bindings moved from ``app.py`` into the
+        ``app/`` package, so the diff is taken over BOTH paths and judged as the
+        NET multiset of ``Binding(` lines (added minus removed, compared as
+        stripped text): a binding moved verbatim from ``app.py`` into the package
+        nets to zero; a new or changed one does not.
+        """
+        try:
+            completed = subprocess.run(
+                [
+                    "git",
+                    "diff",
+                    "main",
+                    "--",
+                    "s19_app/tui/app.py",
+                    "s19_app/tui/app/",
+                ],
+>               cwd=_repo_root(),
+                    ^^^^^^^^^^^^
+                capture_output=True,
+                text=True,
+                # batch-79 Inc-11: `encoding` is EXPLICIT, and it is a real defect
+                # fix rather than tidiness. `text=True` alone decodes with
+                # `locale.getpreferredencoding()` -- **cp1252** on this Windows
+                # host -- so any non-cp1252 codepoint anywhere in the diff of
+                # the app paths raises `UnicodeDecodeError` on a subprocess reader
+                # thread, `completed.stdout` comes back `None`, and this guard dies
+                # with `AttributeError: 'NoneType' object has no attribute
+                # 'splitlines'` instead of reporting a binding change.
+                #
+                # Observed exactly that way: adding a CJK string to another test
+                # module put byte 0x8f in the diff and took this node down. The
+                # guard greps for `Binding(`, which is pure ASCII, so
+                # `errors="replace"` cannot hide a real hit -- it only stops
+                # unrelated prose from silencing the guard.
+                encoding="utf-8",
+                errors="replace",
+                check=True,
+            )
+
+tests/test_tui_patch_history_strip.py:707: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _repo_root() -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory holding ``pyproject.toml``
+            and the ``.git`` directory — by walking up from the installed
+            ``s19_app`` package.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: If no ancestor of the ``s19_app`` package carries both a
+                ``.git`` entry and a ``pyproject.toml`` — i.e. the test is running
+                from an installed wheel detached from its source checkout.
+    
+        Data Flow:
+            - Starts at ``s19_app.__file__``'s parent and walks upward until an
+              ancestor has both ``.git`` and ``pyproject.toml``.
+    
+        Dependencies:
+            Used by:
+                - test_tc027_engine_modules_unchanged_vs_main
+        """
+        here = Path(s19_app.__file__).resolve().parent
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (
+                candidate / "pyproject.toml"
+            ).exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root from the s19_app package — "
+            "TC-027 needs the source checkout, not an installed wheel"
+        )
+E       RuntimeError: could not locate the repository root from the s19_app package — TC-027 needs the source checkout, not an installed wheel
+
+tests/test_engine_unchanged.py:70: RuntimeError
+______________________________ test_tc081_2_strip ______________________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9d/tmp/pytest-of-<user>/pytest-83/popen-gw1/test_tc081_2_strip0')
+
+    def test_tc081_2_strip(tmp_path: Path) -> None:
+        """The strip resolves once, above its buttons, fed by a defaulted parameter.
+    
+        Intent (LLR-081.2, C-7): DOM order is asserted because "the strip labels
+        the Undo/Redo row" is a reading-order claim no functional AT can see (the
+        Inc-4 M-5 lesson). The panel is a VIEW: it must not import the service layer
+        nor reach ``self.app``, or the Patch screen stops being testable without a
+        full app.
+    
+        The ``_nodes``/``_context`` arm is §2.4-10 — those names shadow Textual
+        ``Widget`` internals and produce a silent mount crash / idle boot deadlock
+        with NO traceback. The literal is BOUND to the class first (the Inc-4 F3
+        fix): a bare ``names & set(dir(Widget))`` check is constant-true and passes
+        without importing anything.
+        """
+    
+        async def _drive() -> tuple[int, list[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                strips = list(app.query("#patch_history_strip").results())
+                # batch-94 (the pe_b rework): the strip/controls moved OUT of
+                # ``#patch_win_script`` to the JSON window's docked rows
+                # (siblings of its body, never inside the scrolling body — the
+                # B2 invariant). The walk re-aims at the rework's home; the
+                # intent is unchanged: the strip exists, docked directly ABOVE
+                # the Undo/Redo row it describes, in DOM order.
+                window = app.query_one("#patch_win_json")
+                order = [
+                    child.id
+                    for child in window.children
+                    if child.id in ("patch_history_strip", "patch_history_controls")
+                ]
+                return len(strips), order
+    
+        count, order = asyncio.run(_drive())
+    
+        assert count == 1, f"the strip must resolve EXACTLY once; got {count} nodes"
+        assert order == ["patch_history_strip", "patch_history_controls"], (
+            "the strip must sit directly ABOVE the Undo/Redo row it describes, as "
+            f"a docked sibling (never inside the scrolling body); DOM order is {order!r}"
+        )
+    
+        signature = inspect.signature(PatchEditorPanel.set_undo_redo_enabled)
+        parameter = signature.parameters.get("depths")
+        assert parameter is not None, (
+            "set_undo_redo_enabled must take a `depths` parameter — the strip and "
+            f"the buttons ride ONE seam (LLR-081.3); signature is {signature!r}"
+        )
+        assert parameter.default is None, (
+            "the parameter must be DEFAULTED so no existing caller breaks; its "
+            f"default is {parameter.default!r}"
+        )
+    
+        # C-7 purity over the panel's own AST — 0 `self.app`, 0 service imports.
+        # AST, not `"self.app" not in source`: a substring probe matches the phrase
+        # inside this batch's own docstrings and reports on prose, not code (the
+        # Inc-4 finding, three oracles deep).
+        from tests.support import package_source as ps
+    
+        panel_tree = ps.mro_class_tree(
+            PatchEditorPanel,
+            "s19_app.tui.screens_directionb.patch_editor",
+            ps.MIN_PATCH_EDITOR_CLASSES,
+        )
+        self_app = [
+            node
+            for node in ast.walk(panel_tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert not self_app, (
+            "the panel must not reach `self.app` — it is a view widget and its "
+            f"data is threaded in (C-7); found {len(self_app)} access(es)"
+        )
+E       AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es)
+E       assert not [<ast.Attribute object at 0x7efd91047ac0>, <ast.Attribute object at 0x7efd9246f580>]
+
+tests/test_tui_patch_history_strip.py:544: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff - ...
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE...
+2 failed, 6 passed in 20.24s
+rc=1
+load after: 1.47 1.48 1.41 1/638 586311

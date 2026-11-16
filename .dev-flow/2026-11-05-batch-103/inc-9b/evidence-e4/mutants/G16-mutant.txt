@@ -1,0 +1,76 @@
+DATE 2026-11-15T19:22:32.292185-06:00
+GROUP G16
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:22:15 up 3 days,  4:10,  3 users,  load average: 0.75, 0.79, 0.70
+LOAD_ONE 0.75
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 2
+S19_APP_FILE ~/work/zq-m9b/groups/G16/tree/s19_app/__init__.py
+PID 1032439
+SID 1032439
+TIMEOUT_S 300
+XDIST_N 0
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd _____
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-28/test_r_pe_bench_104_1_an_escap0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-28/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f459931b950>
+
+    def test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.104/1, EX-BC12: a row named `A` + ESC + `[2J` with its decode held: the title shows `A` U+FFFD
+        `[2J` and no ESC is painted. Operator need (P-127): a hostile A2L name cannot clear or repaint the terminal.
+        Negative control: the raw name in the title."""
+        name = "A\x1b[2J"
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            try:
+                return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+            finally:
+                gate.release()
+    
+        row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert "decode A�[2J · " in row, f"the title does not show `A\\ufffd[2J`: {row!r}"
+E       AssertionError: the title does not show `A\ufffd[2J`: '╭─ STAGING SHEET   ◒ BUSY · decode A\x1b[2J · 0.6 s · keys still work  ────────────────────────────────────────────╮'
+E       assert 'decode A�[2J · ' in '╭─ STAGING SHEET   ◒ BUSY · decode A\x1b[2J · 0.6 s · keys still work  ────────────────────────────────────────────╮'
+
+tests/test_b103_inc9b_w.py:828: AssertionError
+_______ test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd ________
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-28/test_r_pe_bench_104_2_a_c1_con0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-28/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4594936690>
+
+    def test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.104/2, EX-BC12: a row named `B` + U+0085 + `C` with its decode held: the title shows `B` U+FFFD `C`.
+        Operator need (P-127): C1 controls are as hostile as ESC. Negative control: the raw name in the title."""
+        name = "B\x85C"
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            try:
+                return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+            finally:
+                gate.release()
+    
+        row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert "decode B�C · " in row, f"the title does not show `B\\ufffdC`: {row!r}"
+E       AssertionError: the title does not show `B\ufffdC`: '╭─ STAGING SHEET   ◒ BUSY · decode B\x85C · 0.5 s · keys still work  ──────────────────────────────────────────────╮'
+E       assert 'decode B�C · ' in '╭─ STAGING SHEET   ◒ BUSY · decode B\x85C · 0.5 s · keys still work  ──────────────────────────────────────────────╮'
+
+tests/test_b103_inc9b_w.py:848: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G16/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd
+2 failed in 15.01s
+EXIT_CODE 1

@@ -1,0 +1,30 @@
+cwd=~/work/zq-e4-8-int/wt
+ 16:54:26 up 1 day,  1:43,  3 users,  load average: 1.14, 1.37, 1.83
+~/work/zq-e4-8-int/wt/s19_app/__init__.py
+NAME.SheetRow.name = present
+NAME.SheetRow.definition = present
+NAME.SheetRow.kind = present
+NAME.SheetRow.current = present
+NAME.SheetRow.staged = present
+NAME.SheetRow.is_staged = present
+NAME.SheetWidths.kind = int
+NAME.SheetWidths.current = int
+NAME.SheetWidths.new = int
+NAME.SheetWidths.limits = int
+NAME.SheetWidths.delta = int
+NAME.Preview = (result, decoded)
+NAME.short_number, plain, name_echo = callables (str -> str)
+NAME.KindOps._fields = ('label', 'editable', 'decode', 'value_text', 'staged', 'preview', 'detail', 'submit', 'cells', 'bar', 'mark')
+NAME._KIND_OPS = ['bit mask', 'enum', 'number', 'text']; ops_for('array') is _FALLBACK_OPS
+NAME._FALLBACK_OPS.detail(row, None, 118, None, 1)[0] = '└ IDENTICAL phys = raw · UBYTE u8 little-endian · 0x00810200 · 42 B'
+.COST.array.equal.build_row_lookups = 1048576
+COST.array.equal.staged_lookups = 1048576 (is_staged False)
+COST.array.last_differs.build_row_lookups = 1048576
+COST.array.last_differs.staged_lookups = 1048576 (is_staged True)
+COST.text.equal.build_row_lookups = 1048576
+COST.text.equal.staged_lookups = 1048576 (is_staged False)
+COST.text.last_differs.build_row_lookups = 1048576
+COST.text.last_differs.staged_lookups = 1048576 (is_staged True)
+.
+2 passed in 2.52s
+exit=0

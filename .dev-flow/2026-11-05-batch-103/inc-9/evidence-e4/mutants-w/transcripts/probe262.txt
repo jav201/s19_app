@@ -1,0 +1,32 @@
+held=18331581 after=8419601
+~/work/zq-mw9/mt/s19_app/tui/definition_bench_view.py:392: size=4068 KiB (+4068 KiB), count=65576 (+65576), average=64 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/cache.py:233: size=411 KiB (+411 KiB), count=6579 (+6579), average=64 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message.py:57: size=400 KiB (+400 KiB), count=1898 (+1898), average=216 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:504: size=252 KiB (+252 KiB), count=3796 (+3796), average=68 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_queue.py:37: size=208 KiB (+208 KiB), count=949 (+949), average=224 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:641: size=200 KiB (+200 KiB), count=949 (+949), average=216 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:349: size=185 KiB (+185 KiB), count=949 (+949), average=200 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/filter.py:283: size=175 KiB (+175 KiB), count=1767 (+1767), average=102 B
+<string>:1: size=135 KiB (+135 KiB), count=1858 (+1858), average=74 B
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:428: size=134 KiB (+134 KiB), count=952 (+952), average=144 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/style.py:495: size=124 KiB (+124 KiB), count=1058 (+1058), average=120 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:684: size=111 KiB (+111 KiB), count=1898 (+1898), average=60 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:128: size=103 KiB (+103 KiB), count=122 (+122), average=864 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/strip.py:600: size=82.9 KiB (+82.9 KiB), count=733 (+733), average=116 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/rich/style.py:202: size=77.9 KiB (+77.9 KiB), count=1058 (+1058), average=75 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/strip.py:97: size=71.2 KiB (+71.2 KiB), count=1884 (+1884), average=39 B
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/events.py:84: size=67.2 KiB (+67.2 KiB), count=954 (+954), average=72 B
+~/miniconda3/envs/s19ci/lib/python3.11/functools.py:1003: size=66.0 KiB (+66.0 KiB), count=88 (+88), average=768 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/rich/style.py:200: size=65.1 KiB (+65.1 KiB), count=1058 (+1058), average=63 B
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:34: size=59.4 KiB (+59.4 KiB), count=951 (+951), average=64 B
+--- by traceback top 3
+4165152 65576
+  File "~/work/zq-mw9/mt/s19_app/tui/definition_bench_view.py", line 392
+    return [f"+{c}" for c in range(grid.nx)], [str(grid.nx * r) for r in range(grid.ny)]
+421056 6579
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/cache.py", line 233
+    self._cache: dict[CacheKey, CacheValue] = {}
+409968 1898
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message.py", line 57
+    self._prevent: set[type[Message]] = set()
+LARGE state: values=True staged=True axes=0 strip=16 labels=True

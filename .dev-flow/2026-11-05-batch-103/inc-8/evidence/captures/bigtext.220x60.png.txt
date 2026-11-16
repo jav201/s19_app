@@ -1,0 +1,27 @@
+scenario=bigtext
+fixture=public example A2L examples/case_00_public/ASAP2_Demo_V171.a2l with the ASCII object widened to NUMBER 5000 (scratch copy) and a hand image of 'Hello ASAM' + NUL (5000 B) at 0x810200 (scratch S19)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+top_screen=Screen
+focused=patch_sheet_body
+status_lines_this_run=2
+status: A2L loaded: V171_text5000.a2l
+status: Loaded hand_image.s19
+ledger_entries=0
+selected_rows=[▶ ] ASAM.C.ASCII.UBYTE.NUMB…ASCII     5000 B
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+  ▶ ASAM.C.ASCII.UBYTE.NUMB…ASCII     5000 B                                      ·                   hours   -                                                                                    
+  └ text · 0x00810200 · 5000 B
+  +00 48 65 6C 6C 6F 20 41 53 41 4D 00 00 00 00 00 00
+  +10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  +20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  +30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  … 4936 more B
+  ASAM.C.ASCII.UBYTE.NUMBER_42
+  text =
+  edit ASCII objects in the Inspector tab
+sheet_text_end
+stub_os_writes=0
+surface=ready

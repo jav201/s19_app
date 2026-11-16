@@ -1,0 +1,121 @@
+# mutant N-34  rows: R-PE-DEF.34
+# edits: s19_app/tui/definition_sheet.py:655
+# -k: r_pe_def_34_
+# uptime: 01:59:53 up 2 days, 10:48,  3 users,  load average: 1.51, 1.00, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-34/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_34_3_a_single_bit_mask_marks_one_bit_and_keeps_the_other_bits __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_3_a_single_bit_mask_marks_one_bit_and_keeps_the_other_bits(defc):
+        """R-PE-DEF.34/3 (EX-8B-B1) - MASK_BIT_0001 pending 0 -> mask row with one `■` (bit 0), after `… 1A E6`."""
+        row, pv = with_pending(defc, "MASK_BIT_0001", "0")
+        lines = painted(row, pv)
+        for n in (2, 3):
+>           assert at(lines, 2 + n).startswith(BAR + "│ " + OT[f"B.MASK_BIT_0001.pending0.line{n}"]), at(lines, 2 + n)
+E           AssertionError:   ┊ │ mask     ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ■ 0001  │                                                                          
+E           assert False
+E            +  where False = <built-in method startswith of str object at 0x7fb899b395c0>((('  ┊ ' + '│ ') + 'mask     ·  ·  ·  · │  ·  ·  ·  · │  ·  ·  ·  · │  ·  ·  ·  ■ │ 0001'))
+E            +    where <built-in method startswith of str object at 0x7fb899b395c0> = '  ┊ │ mask     ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ■ 0001  │                                                                          '.startswith
+E            +      where '  ┊ │ mask     ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ■ 0001  │                                                                          ' = at([<text '  ┊ └ IDENTICAL phys = (word & 0x0001) >> 0 · UWORD u16 big-endian · 0x00800010 · 2 B                         ... '#969aad'), Span(60, 61, 'bold #b565f3 underline'), Span(61, 67, '#e9e9e9'), Span(67, 69, '#91abec')] '#91abec'>, ...], (2 + 2))
+
+tests/test_b103_inc8b_s2.py:252: AssertionError
+______ test_r_pe_def_34_1_the_bit_table_at_start_shows_before_mask_after _______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_1_the_bit_table_at_start_shows_before_mask_after(defc):
+        """R-PE-DEF.34/1 (EX-8B-B1) - MASK_FIELD_0001 at start -> `B.MASK_FIELD_0001.start.line0..3` inside the card."""
+        row, _ = make_row(defc["defs"]["MASK_FIELD_0001"], defc["a2l"], defc["image"])
+        lines = painted(row)
+        for n in range(4):
+>           assert at(lines, 2 + n).startswith(BAR + "│ " + OT[f"B.MASK_FIELD_0001.start.line{n}"]), (n, at(lines, 2 + n))
+E           AssertionError: (0, '  ┊ │ bit     15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0 hex   │                                                                          ')
+E           assert False
+E            +  where False = <built-in method startswith of str object at 0x7fbee77c92e0>((('  ┊ ' + '│ ') + 'bit     15 14 13 12 │ 11 10  9  8 │  7  6  5  4 │  3  2  1  0 │ hex'))
+E            +    where <built-in method startswith of str object at 0x7fbee77c92e0> = '  ┊ │ bit     15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0 hex   │                                                                          '.startswith
+E            +      where '  ┊ │ bit     15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0 hex   │                                                                          ' = at([<text '  ┊ └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B                         ...), Span(57, 58, '#969aad'), Span(60, 61, '#969aad'), Span(61, 67, '#e9e9e9'), Span(67, 69, '#91abec')] '#91abec'>, ...], (2 + 0))
+
+tests/test_b103_inc8b_s2.py:235: AssertionError
+_____ test_r_pe_def_34_2_the_after_row_reads_the_whole_word_not_the_field ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_2_the_after_row_reads_the_whole_word_not_the_field(defc):
+        """R-PE-DEF.34/2 (EX-8B-B1) - pending 255 -> `after … │ 1F F7` (the unmasked word, not the field value)."""
+        row, pv = with_pending(defc, "MASK_FIELD_0001", "255")
+        lines = painted(row, pv)
+        after = next((ln.plain for ln in lines if ln.plain.startswith(BAR + "│ after")), "")
+>       assert after.startswith(BAR + "│ " + OT["B.MASK_FIELD_0001.pending255.line3"])
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7fbee77ca2b0>((('  ┊ ' + '│ ') + 'after    0  0  0  1 │  1  1  1  1 │  1  1  1  1 │  0  1  1  1 │ 1F F7'))
+E        +    where <built-in method startswith of str object at 0x7fbee77ca2b0> = '  ┊ │ after    0  0  0  1  1  1  1  1  1  1  1  1  0  1  1  1 1F F7 │                                                                          '.startswith
+
+tests/test_b103_inc8b_s2.py:243: AssertionError
+__________ test_r_pe_def_34_bit_strip_shows_the_word_before_and_after __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_bit_strip_shows_the_word_before_and_after(defc):
+        """R-PE-DEF.34/1 (changed at Inc 8b E1) - MASK_FIELD_0001 at start -> the bit table in its card (`B.MASK_FIELD_0001.start.line0..3`).
+    
+        Why: bit by bit the operator must see the word before, the mask and the word after, with nibble guides;
+        Inc 8's one-line strip (`bit 15…0 …   word 1A E7 → 1A E7`) is retired.
+        """
+        d, a2l, img = defc["defs"]["MASK_FIELD_0001"], defc["a2l"], defc["image"]
+        row, _ = make_row(d, a2l, img)
+        lines = lines_of(row, None)
+        word = span_bytes(d, img)
+        assert hex_bytes(word) == "1A E7"
+        table = [fact(f"B.MASK_FIELD_0001.start.line{n}") for n in range(4)]
+>       assert lines[1] == _mask_card(d, word, word)[0] and lines[0].startswith("└ ")
+E       AssertionError: assert ('╭─ MASK_FIEL...────────────╮' == '╭─ MASK_FIEL...────────────╮'
+E         
+E         Skipping 54 identical leading characters in diff, use -v to show
+E         - ──────────────────╮
+E         + ──────────╮)
+
+tests/test_b103_inc8_s1_detail.py:225: AssertionError
+_ test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field(defc):
+        """R-PE-DEF.34/2 (changed at Inc 8b E1) - pending 255 -> the card `B.card.MASK_FIELD_0001.line0..5`, its after row ending `1F F7`.
+    
+        Why: the after row is the whole word with the field replaced and the other bits kept (1F F7), never the
+        field alone (the Inc 8 negative control: reading the unmasked word only gives 1A E7).
+        """
+        d, a2l, img = defc["defs"]["MASK_FIELD_0001"], defc["a2l"], defc["image"]
+        row, pv = row_and_preview(d, a2l, img, "255")
+        after = f"{EX.after_field:04X}"
+        expect_after = f"{after[:2]} {after[2:]}"
+        lines = lines_of(row, pv)
+        assert expect_after == "1F F7"
+>       assert lines[1:] == [fact(f"B.card.MASK_FIELD_0001.line{n}") for n in range(6)]
+E       AssertionError: assert ['╭─ MASK_FIE...───────────╯'] == ['╭─ MASK_FIE...───────────╯']
+E         
+E         At index 0 diff: '╭─ MASK_FIELD_0001 · bit editor · other bits kept ──────────────╮' != '╭─ MASK_FIELD_0001 · bit editor · other bits kept ──────────────────────╮'
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1_detail.py:242: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_34_3_a_single_bit_mask_marks_one_bit_and_keeps_the_other_bits
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_34_1_the_bit_table_at_start_shows_before_mask_after
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_34_2_the_after_row_reads_the_whole_word_not_the_field
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_34_bit_strip_shows_the_word_before_and_after
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field
+5 failed in 1.90s
+
+# exit=1

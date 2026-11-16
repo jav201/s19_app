@@ -1,0 +1,133 @@
+scene=preview
+capture_seq=3
+phase=idle
+png_name=preview.118x54.idle.png
+commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+fixture=defc
+capture_timestamp=2026-11-16T02:46:47.190416+00:00
+monotonic=422087.984000
+requested_size=118x54
+app_size=118x54
+patch_sheet_win_region=5,6,112x28
+patch_sheet_win_size=110x26
+title_room_B=106
+body=143x24;content=143x24
+grid=scroll_x=0.0;size=110x25;virtual=143x24
+sheet_top=1
+focused=patch_sheet_body
+selected=VAL_BLK_DEF_0001
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+sheet_subtitle=None
+painted_sheet_top_row=╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+painted_top_left_border_color=#91abec
+border_title_plain=STAGING SHEET
+pill_bold=None
+pill_foreground=None
+pill_background=None
+spinner_glyph=
+job_word=
+busy_name=
+pending_seconds=
+different_from_f1=not-applicable
+same_job_name=not-applicable
+elapsed_nondecreasing=not-applicable
+frame_pair_valid=not-applicable
+frame_delta_s=not-applicable
+idle_title=True
+busy_absent=True
+idle_border_not_busy=True
+active_job=None
+record_hold=False
+record_stage_name=None
+bench_state=cursor:(0, 0);anchor:(0, 0);tool:d;focus:True;edit:{(0, 0): '41.9'};undo:1;job:None
+values_present=True
+preview_result_kind=Encoded
+document_entry_count_before=0
+document_entry_count=0
+document_entries=
+ledger_row_count=0
+staged_mark=False
+write_landed_before_busy=False
+held_refresh_callbacks=0
+held_refresh_callback_invocations=0
+capture_frame_hold=False
+presentation_settle_s=0.2
+frame_hold_painted_stable=True
+decode_gate_target=[]
+encode_gate_target=['VAL_BLK_DEF_0001']
+decode_gate_entered=[]
+encode_gate_entered=['VAL_BLK_DEF_0001']
+decode_gate_released=False
+encode_gate_released=True
+capture_interposition=I-2 result-preserving gate; released after f2 ACK
+keys_sent=<type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down | enter | d enter | <set operand '5'> | enter | escape
+stub_os_writes=0
+app_is_running=True
+widget_#patch_sheet=size:110x26;classes:[];subtitle:None
+widget_#patch_inspector=size:108x4;classes:[];subtitle:'0 entries'
+widget_#patch_editor_panel=size:112x39;classes:['-bench'];subtitle:None
+status=A2L loaded: definitions.a2l
+status=Loaded definitions.s19
+screen_text_begin
+
+  ⭘                                                Hex Edit Tool
+    │                                       Patch Editor                                         ?  📂 Open patches/
+ ▏◫ │
+ ▏≡ │ draft · change
+ ▏◉ │ Filter _0001                                            7 of 7 shown  <    Page 1/1   >    ▽ Pick   Add list
+ ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+ ▏! ││  Parameter                 │Kind      │Current             │New             │Unit    │Limits                 │
+ ▏✎ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━│
+ ▏✔ ││  MASK_BIT_0001             │VALUE     │1 (0x01)            │·               │        │     0  ├──────────────│
+ ▏⏚ ││  MASK_FIELD_0001           │VALUE     │174 (0xAE)          │·               │        │     0  ├──────────●───│
+ ▏✦ ││  DISPLAY_0001              │VALUE     │143.5               │·               │deg C   │   -40  ├──────────────│
+ ▏▶ ││  CURVE_DEF_0001            │CURVE     │▄▆▃▇▁ 5             │·               │        │     0          …      │
+ ▏☑ ││  MAP_DEF_0001              │MAP 4x3   │▆▃▅▃ 12             │·               │        │ -1.00k         …      │
+ ▏⊕ ││▶◆VAL_BLK_DEF_0001          │VAL_BLK   │▄▃▄ 6               │1 cell          │units   │   -50          …      │
+    ││  ┊ └ LINEAR phys = 0.05*raw · SWORD s16 big-endian · RL_DEF_S16_ROW · 0x00800090 · 12 B                      │
+    ││  ┊                0                    1                    2                                                │
+    ││  ┊      0       ▸41.9*                11.0                 31.8                                              │
+    ││  ┊       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                │
+    ││  ┊      1       -20.7                -19.8                -10.7                                              │
+    ││  ┊                                                                                                           │
+    ││  ┊ shade ████████████ -20.7 … 36.9 units   sel x0,y0   * / bold = edited                                     │
+    ││  ┊  s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                     │
+    ││  ┊ 2 of 12 B differ  +0x00 02 E1 → 03 46                                                                     │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                    ▋                         │
+    ││VAL_BLK_DEF_0001[x0,y0] op =  5                units  +Δ on 1 cell ✓   enter apply  alt+s stage record        │
+    │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+    │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+    ││   Patch script    Inspector    JSON    Checks                                                                │
+    ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+    │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+    │  Validate   Apply loaded changes   Save
+    │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Loaded definitions.s19 (S19 only)                                                       (none)  |  definitions.a2l
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+
+  A2L loaded: definitions.a2l
+  Loaded definitions.s19 (S19 only)
+  Loaded definitions.s19
+  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+
+screen_text_end
+surface=ready
+
+png_width=1111
+png_height=1091
+capture_method=PrintWindow
+png_bytes=98011
+png_captured_at=2026-11-15T20:46:47.2896443-06:00

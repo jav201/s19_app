@@ -1,0 +1,201 @@
+tree: head ab62093b | load before: 1.73 1.56 1.45 1/637 604083
+~/work/zq-x9r/head/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x9r/head
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [17 items]
+
+......F...F...F.F                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_tc079_5c_hue_census_is_complete _____________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_tc079_5c_hue_census_is_complete() -> None:
+        """Every colour literal in ``s19_app/`` is CLAIMED or EXCLUDED-with-a-reason.
+    
+        ⚠ **This test exists because Inc-5's census was hand-curated and wrong, and
+        nothing could see it.** ``test_tc079_5_magenta_hue_distance`` certifies a
+        universal ("MAGENTA is far from EVERY claimant"), and a universal is only as
+        true as its input set. Mutating the code under test cannot catch a missing
+        input — the mutant passes. The only oracle for a census is a sweep of the
+        thing being censused, so that is what this is.
+    
+        It does NOT replace the hand-written census: a sweep cannot tell a live rule
+        from a commented-out one (``styles.tcss`` says ``was #4ec9d4`` right next to
+        a live ``#4ec9d4``), and it cannot see rich's NAMED colours at all. What it
+        CAN do is make the hand-curation checkable — a new colour literal lands in
+        neither dict and this fails, forcing a human to classify it rather than
+        letting it be omitted in silence.
+    
+        ⚠ **Known gap, stated rather than papered over:** rich named styles
+        (``"orange3"``, ``"green"``, ``"red"``, ``"grey50"``) are invisible to a hex
+        sweep. They are enumerated in ``_CLAIMED_HUES`` by hand from
+        ``app.py::_SEVERITY_TO_RICH_STYLE`` and the ``_MAC_GLYPH_*`` pairs, and a new
+        named chromatic style would NOT be caught here. Widening the sweep to resolve
+        named colours is the honest next step; it is out of Inc-5b's scope.
+    
+        # TC-79c
+        """
+        source_root = pathlib.Path(__file__).resolve().parents[1] / "s19_app"
+        assert source_root.is_dir(), f"cannot locate the package at {source_root}"
+    
+        literal = re.compile(r"#[0-9a-fA-F]{6}\b")
+        swept: dict[str, list[str]] = {}
+        for path in sorted(source_root.rglob("*")):
+            if path.suffix not in (".py", ".tcss"):
+                continue
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                for match in literal.findall(line):
+                    swept.setdefault(match.lower(), []).append(
+                        f"{path.relative_to(source_root).as_posix()}:{number}"
+                    )
+        assert swept, "the sweep found no colour literals at all — it is broken"
+    
+        # MAGENTA is the SUBJECT of the census, not a claimant against itself.
+        accounted = (
+            {c.lower() for c in _CLAIMED_HUES.values()}
+            | set(_EXCLUDED_LITERALS)
+            | {MAGENTA.lower()}
+        )
+        unaccounted = {c: sites for c, sites in swept.items() if c not in accounted}
+>       assert not unaccounted, (
+            f"colour literals in s19_app/ are in NEITHER _CLAIMED_HUES nor "
+            f"_EXCLUDED_LITERALS: { {c: s[:2] for c, s in unaccounted.items()} }. "
+            f"Add each to _CLAIMED_HUES (if it paints a foreground cue an analyst "
+            f"could confuse with the gauge) or to _EXCLUDED_LITERALS WITH A REASON. "
+            f"Do not omit it — an omitted claimant is exactly the Inc-5 defect this "
+            f"guard exists to prevent: it makes the hue test certify a universal "
+            f"that is false. If you add a claimant, re-run "
+            f"test_tc079_5_magenta_hue_distance: MAGENTA may need to move."
+        )
+E       AssertionError: colour literals in s19_app/ are in NEITHER _CLAIMED_HUES nor _EXCLUDED_LITERALS: {'#1c2438': ['tui/definition_bench.py:469'], '#101828': ['tui/definition_bench.py:477'], '#f5c26b': ['tui/definition_bench_view.py:54']}. Add each to _CLAIMED_HUES (if it paints a foreground cue an analyst could confuse with the gauge) or to _EXCLUDED_LITERALS WITH A REASON. Do not omit it — an omitted claimant is exactly the Inc-5 defect this guard exists to prevent: it makes the hue test certify a universal that is false. If you add a claimant, re-run test_tc079_5_magenta_hue_distance: MAGENTA may need to move.
+E       assert not {'#101828': ['tui/definition_bench.py:477'], '#1c2438': ['tui/definition_bench.py:469'], '#f5c26b': ['tui/definition_bench_view.py:54']}
+
+tests/test_tui_patch_json.py:1070: AssertionError
+______________ test_ac1_editor_fills_json_window_when_room_exists ______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+        """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    
+        C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+        region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+        is 26 rows and its bottom is flush with the JSON body's content region; under
+        a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+        by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+        which also fails the ``> 8`` assertion — so this arm cannot green on an
+        invisible widget.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+>       assert editor_h > 8, (
+            f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+            f"has free vertical space (120x50); painted region.height is {editor_h}"
+        )
+E       AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1281: AssertionError
+________________ test_ac3_fill_does_not_leak_to_sibling_windows ________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+        """Each tab's scroll body fills ITS tab; the JSON fill stays JSON-scoped.
+    
+        batch-97 Inc-4 (named supersession, HLR-144 / design §3): the three windows
+        became the ledger and two tabs of one inspector. By design every body now
+        fills its own region — the ledger body (the hero), the JSON body (the paste
+        buffer's share of the JSON tab) and the Checks body (the Checks tab's scroll
+        view). What this arm keeps from the batch-48 C-30 intent: the JSON body
+        never claims the read-only view's share (it ends where the tab's docked
+        rows begin, below the view), and no Patch rule leaks to another screen
+        (the scope arm of TC-B97-04, ``tests/test_b97_patch_editor.py``).
+        """
+    
+        async def _run() -> dict[str, object]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                bodies = _json_window_bodies(app)
+                view = app.query_one("#patch_json_view", TextArea)
+                controls = app.query_one("#patch_paste_controls")
+                out = {
+                    "json": (bodies["patch_win_json"].region, view.region, controls.region),
+                    "script": (
+                        app.query_one("#patch_win_script").content_region.height,
+                        bodies["patch_win_script"].region.height,
+                    ),
+                }
+                app.query_one("#patch_tab_checks", Button).press()
+                await pilot.pause()
+                out["checks"] = (
+                    app.query_one("#patch_win_checks").content_region.height,
+                    bodies["patch_win_checks"].region.height,
+                    app.query_one("#patch_checks_controls").region.height,
+                )
+                return out
+    
+        dims = asyncio.run(_run())
+        json_body, view, controls = dims["json"]
+        assert json_body.y >= view.bottom, (
+            f"the JSON body must sit below the read-only view, not claim it: "
+            f"body {json_body} vs view {view}"
+        )
+        assert json_body.bottom <= controls.y, (
+            f"the JSON body must end where the docked paste controls begin: "
+            f"body {json_body} vs controls {controls}"
+        )
+>       assert view.height >= 8 and json_body.height >= 8, (view, json_body)
+E       AssertionError: (Region(x=7, y=35, width=106, height=3), Region(x=7, y=38, width=106, height=9))
+E       assert (3 >= 8)
+E        +  where 3 = Region(x=7, y=35, width=106, height=3).height
+
+tests/test_tui_patch_json.py:1417: AssertionError
+______________________ test_ac5_gauge_stays_above_editor _______________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac5_gauge_stays_above_editor() -> None:
+        """The cap gauge renders above the (now taller) editor and is not overlapped.
+    
+        MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+        region sits strictly above the editor's, so the editor's growth pushes DOWN
+        from the gauge rather than displacing or overlapping it.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                gauge = app.query_one("#patch_paste_gauge", Static)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                return gauge.region.bottom, editor.region.y, editor.region.height
+    
+        gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+>       assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+E       AssertionError: precondition: the editor must have grown at 120x50
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1490: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_json.py::test_tc079_5c_hue_census_is_complete - A...
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+======================== 4 failed, 13 passed in 15.33s =========================
+rc=1
+load after: 1.71 1.57 1.46 1/637 604155

@@ -14,6 +14,8 @@ shared picker's ``set_parameters`` seam for the 10 000-row mount arm). No
 
 Contract pinned here (ids the implementer ships):
 - Fourth inspector tab: chip ``#patch_tab_a2l`` / pane ``#patch_pane_a2l``.
+  (Inc 8 R-TUI-063.3 / R-PE-DEF.2 / R-PE-DEF.3: the A2L tab is retired; the picker sits in
+  the filter row and the Use row in the Inspector tab, so ``A2L_TAB`` below is the Inspector chip.)
 - The shared picker mounted in ``pick`` mode with ``id_prefix="patch_param"``:
   ``#patch_param_filter``, ``#patch_param_table``, ``#patch_param_status``,
   ``#patch_param_full_name_line``, ``#patch_param_page_prev_button`` /
@@ -77,7 +79,10 @@ ADDRESS_INPUT = "#patch_entry_address_input"
 BYTES_INPUT = "#patch_entry_bytes_input"
 
 #: The pinned tab/pane/picker/action/status ids of the increment (see docstring).
-A2L_TAB = "#patch_tab_a2l"
+# Inc 8 R-TUI-063.3 / R-PE-DEF.3: the A2L chip ``#patch_tab_a2l`` -> the Inspector chip
+# ``#patch_tab_inspector`` (the picker is always in the filter row; the Use row and its
+# status line sit in the Inspector pane).
+A2L_TAB = "#patch_tab_inspector"
 PICKER_TABLE = "#patch_param_table"
 PICKER_FILTER = "#patch_param_filter"
 PICKER_STATUS = "#patch_param_status"
@@ -166,7 +171,10 @@ def patch_picker(panel):
 
 
 async def show_a2l_tab(panel, pilot) -> None:
-    """Select the A2L inspector tab through the shipped chip."""
+    """Select the tab that holds the Use row through the shipped chip.
+
+    Inc 8 R-TUI-063.3: the A2L tab is retired, so this presses the Inspector chip.
+    """
     need(panel, A2L_TAB).press()
     await settle(pilot, 3)
 
@@ -479,9 +487,17 @@ def test_tc_b102_pe_02_id_isolation_and_highlight_mode(tmp_path: Path) -> None:
                 leaked.append(wid)
         include = list(panel.query("#patch_param_include_button"))
         bulk = list(panel.query("#patch_param_bulk_button"))
-        table = need(panel, PICKER_TABLE, DataTable)
-        table.focus()
+        need(panel, PICKER_TABLE, DataTable)
+        # Inc 8 R-PE-DEF.2 (ruling RR-4): the table is hidden and outside the focus chain; the
+        # keyboard include route is the filter row's include control, reached by Tab.
+        need(panel, "#patch_param_filter", Input).focus()
         await settle(pilot, 2)
+        for _ in range(8):
+            if getattr(app.focused, "id", None) == "patch_param_include_button":
+                break
+            await pilot.press("tab")
+            await settle(pilot, 1)
+        assert getattr(app.focused, "id", None) == "patch_param_include_button", app.focused
         await pilot.press("space")
         await settle(pilot, 2)
         await pilot.press("enter")
@@ -699,8 +715,6 @@ def test_tc_b102_pe_06_shared_grammar_surfaces(tmp_path: Path) -> None:
         await settle(pilot, 2)
         surfaces = [
             need(panel, PICKER_FILTER, Input),
-            need(panel, PICKER_TABLE, DataTable),
-            need(panel, FULL_NAME_LINE),
             need(panel, PICKER_STATUS),
             need(panel, PAGE_PREV, Button),
             need(panel, PAGE_LABEL),
@@ -708,10 +722,18 @@ def test_tc_b102_pe_06_shared_grammar_surfaces(tmp_path: Path) -> None:
             need(panel, USE_BUTTON, Button),
         ]
         displayed = all(is_displayed(w) for w in surfaces)
-        return displayed, table_rows(panel), page_tuple(panel)
+        # Inc 8 R-PE-DEF.2: the picker's own table and full-name line stay mounted but
+        # are not shown (was: displayed with the A2L tab); every other surface is shown.
+        hidden = [
+            need(panel, PICKER_TABLE, DataTable),
+            need(panel, FULL_NAME_LINE),
+        ]
+        still_hidden = not any(is_displayed(w) for w in hidden)
+        return displayed, table_rows(panel), page_tuple(panel), still_hidden
 
-    displayed, rows, pages = run(tmp_path, SIZE, body)
+    displayed, rows, pages, still_hidden = run(tmp_path, SIZE, body)
     assert displayed, "every Patch A2L grammar surface is displayed"
+    assert still_hidden, "the picker's table and full-name line are hidden (R-PE-DEF.2)"
     assert rows == PAGE_SIZE, rows
     assert pages == (1, 2), pages
 

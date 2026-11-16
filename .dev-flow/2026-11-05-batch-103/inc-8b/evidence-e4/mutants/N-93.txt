@@ -1,0 +1,46 @@
+# mutant N-93  rows: R-PE-DEF.93
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:70
+# -k: r_pe_def_92_ or r_pe_def_93_
+# uptime: 01:55:13 up 2 days, 10:43,  3 users,  load average: 0.81, 0.54, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-93/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_92_93_the_scrollbar_shows_only_when_the_grid_is_wider_than_the_view[93-1-220x60] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-12/popen-gw1/test_r_pe_def_92_93_the_scroll1')
+defc_dir = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-12/popen-gw1/b103_inc9_w_defc0')
+size = (220, 60), key = '220cols', case = '0'
+
+    @pytest.mark.parametrize(
+        ("size", "key", "case"),
+        [(SIZE_118, "118cols", "1"), (SIZE_80, "80cols", "2"), (SIZE_220, "220cols", "0")],
+        ids=["92-1-118x54", "92-2-80x24", "93-1-220x60"],
+    )
+    def test_r_pe_def_92_93_the_scrollbar_shows_only_when_the_grid_is_wider_than_the_view(
+        tmp_path, defc_dir, size, key, case
+    ):
+        """R-PE-DEF.92/1, /2 and .93/1 (EX-8B-G3, G4) - through the Patch Editor as the operator opens it, on
+        DEFC: at 118x54 and 80x24 the grid scroller shows its horizontal scrollbar and the grid is 143 cells
+        wide; at 220x60 it shows none. The scroll range is the grid minus the view (`G.end.*`: 33, 73, 0; E4 measured V = 110, 70, 194)."""
+    
+        async def body(app, pilot, panel):
+            await pilot.pause()
+            grid = grid_of(need(panel, "#patch_sheet"))
+            return grid.show_horizontal_scrollbar, grid.virtual_size.width, grid.max_scroll_x
+    
+        shown, virtual, end = run(tmp_path, defc_dir, body, size=size)
+>       assert shown is T[f"G.scrollbar.{key}"], (key, shown)
+E       AssertionError: ('220cols', True)
+E       assert True is False
+
+tests/test_b103_inc8b_bw.py:333: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_92_93_the_scrollbar_shows_only_when_the_grid_is_wider_than_the_view[93-1-220x60]
+1 failed, 4 passed in 16.05s
+
+# exit=1

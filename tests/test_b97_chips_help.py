@@ -1006,7 +1006,9 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
 # batch-102 Inc 5 (E3 ruling 8): the Patch A2L tab joins the census; the
 # guarded presses keep this green on the pre-integration tree and exercise the
 # tab (and its controls' help lines) once it ships.
-PATCH_TABS = ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks", "patch_tab_a2l")
+# Inc 8 R-TUI-063.3: ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks", "patch_tab_a2l")
+# -> the chips Patch script, Inspector, JSON, Checks (the A2L chip leaves; TC-B97-32 stays as is).
+PATCH_TABS = ("patch_tab_script", "patch_tab_inspector", "patch_tab_json", "patch_tab_checks")
 
 
 def _help_lines(key: str, keys_text: str = "") -> dict:
@@ -1151,6 +1153,14 @@ def test_tc_b97_33_patch_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None
             kinds = [row[x0:x0 + 1] for row in painted_rows(app, table)[1:] if row.strip()]
             table.move_cursor(row=6)
             await settle(pilot, 3)
+            # Inc 8 R-PE-DEF.1.1: the 9-row landing pane paints 5 ledger rows; the cursor's move
+            # scrolls row 6 in, so its Kind cell is read too.
+            kinds += [row[x0:x0 + 1] for row in painted_rows(app, table)[1:] if row.strip()]
+            # Inc 8 R-TUI-063.3 / R-TUI-063.4: the strip is on the Inspector tab (F-P1), not beside
+            # the ledger; it still follows the ledger's highlighted row.
+            if panel.query("#patch_tab_inspector"):
+                panel.query_one("#patch_tab_inspector").press()
+                await settle(pilot, 3)
             card = panel.query_one("#patch_before_after_card")
             strip = [row[10:] for row in painted_rows(app, card) if row[3:6] in ("was", "now")]
             tokens = {tok for row in strip for tok in row.split()}
@@ -1213,7 +1223,14 @@ def test_tc_b97_58_patch_editor_region_states(tmp_path: Path, arm: str) -> None:
                 "json_no_document": "#patch_json_view",
                 "checks_no_run": "#patch_checks_status",
             }[arm]
-            tab = {"json_no_document": "patch_tab_json", "checks_no_run": "patch_tab_checks"}.get(arm)
+            # Inc 8 R-TUI-063.3 / R-TUI-063.4: the strip is on the Inspector tab (F-P1), and the
+            # Patch Editor opens on the Patch script tab (was: the Inspector tab, so no chip press).
+            tab = {
+                "json_no_document": "patch_tab_json",
+                "checks_no_run": "patch_tab_checks",
+                "strip_no_image": "patch_tab_inspector",
+                "strip_no_entries": "patch_tab_inspector",
+            }.get(arm)
             if tab and panel.query(f"#{tab}"):
                 panel.query_one(f"#{tab}").press()
                 await settle(pilot, 3)

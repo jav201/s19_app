@@ -1120,6 +1120,31 @@ def _batch103_inc7_a2l_drift_marks(screen: str, density: str, size_key: str) -> 
     )
 
 
+def _batch103_inc8_patch_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-103 Inc 8 Patch Editor drift marks (the 2 ``patch`` cells).
+
+    Inc 8 R-TUI-063.1 / R-TUI-063.3 / R-PE-DEF.1.1: the Patch Editor re-composes (filter row,
+    staging sheet, landing pane with four tabs), so both ``patch`` scaffold cells (comfortable
+    x {80x24, 120x30}) drift. Marked ``xfail(strict=False)`` until the canonical-CI baseline
+    regen lands (HT-09: the two SVGs are regenerated only by the canonical CI, never locally),
+    then RETIRED - the batch-46/48 pattern. Remove this mark in the regen PR.
+    """
+    del density
+    if screen == "patch" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-103 Inc 8 R-TUI-063.1/.3, R-PE-DEF.1.1: the Patch Editor "
+                    "layout is the approved mix (filter row, STAGING SHEET, LANDS IN); "
+                    "the two patch SVG baselines wait for the canonical-CI regen (HT-09); "
+                    "tracked as PENDING P-048: remove this mark in the regen PR"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -1192,7 +1217,8 @@ _SCAFFOLD_CELLS = [
         + _batch48_patch_drift_marks(screen, "comfortable", size_key)
         + _fdf_json_height_drift_marks(screen, "comfortable", size_key)
         + _batch77_map_drift_marks(screen, "comfortable", size_key)
-        + _batch94_inc001_drift_marks(screen, "comfortable", size_key),
+        + _batch94_inc001_drift_marks(screen, "comfortable", size_key)
+        + _batch103_inc8_patch_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

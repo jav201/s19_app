@@ -1,0 +1,209 @@
+load before: 1.70 1.67 1.80 2/650 475773
+~/work/zq-fx9b/red/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9b/red
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [8 items]
+
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+________ test_r_pe_bench_21_a_refused_decode_says_refused_not_decoding _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9b/tmp/pytest-of-<user>/pytest-6/popen-gw0/test_r_pe_bench_21_a_refused_d0')
+
+    def test_r_pe_bench_21_a_refused_decode_says_refused_not_decoding(tmp_path):
+        """FX9b W-8 (X9 F-X9-4, capture `x-refused-decode`): once the decode is refused, `decoding <n> values …` would
+        state a decode that no longer runs, so the operator waits for values that never come. The line says
+        `✗ refused: <message>`, the message painted literally (markup off, controls cleaned, as the bytes line). A new
+        decode of the row (job "decode" again) shows the decoding line again (control)."""
+        a2l, d = large_definition(tmp_path)
+        row = sheet_row(d, a2l, {})
+        refusal = Refusal("A2L-DEF-BYTES", "[b]LARGE[/b] needs\x1b 1048576 bytes")
+        lines = dv.bench_detail(row, None, 114, blank_state(refusal=refusal, job=None), 50)
+>       assert lines[1].plain == "✗ refused: [b]LARGE[/b] needs� 1048576 bytes"
+E       AssertionError: assert 'decoding 1048576 values …' == '✗ refused: [...1048576 bytes'
+E         
+E         - ✗ refused: [b]LARGE[/b] needs� 1048576 bytes
+E         + decoding 1048576 values …
+
+tests/test_b103_inc9_b_detail.py:186: AssertionError
+____________________ test_r_pe_bench_50_2_the_curve_op_line ____________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_50_2_the_curve_op_line(defc):
+        """R-PE-BENCH.50/2 - CURVE_DEF_0001 point 3, tool Set: `CURVE_DEF_0001[3]` ... `Set on 1 pts`."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        name, tail = tail_of(o, view_state(o, cursor=(3, 0), anchor=(3, 0), tool="s"))
+        assert name == "CURVE_DEF_0001[3]"
+>       assert re.search(r"Set on 1 pt(?!s)", tail.plain), tail.plain  # FX9b F-X9-7: k = 1 is singular
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Set on 1 pts   enter apply  alt+s stage record
+E       assert None
+E        +  where None = <function search at 0x7f83087b67a0>('Set on 1 pt(?!s)', 'Set on 1 pts   enter apply  alt+s stage record')
+E        +    where <function search at 0x7f83087b67a0> = re.search
+E        +    and   'Set on 1 pts   enter apply  alt+s stage record' = <text 'Set on 1 pts   enter apply  alt+s stage record' [] ''>.plain
+
+tests/test_b103_inc9_b_detail.py:273: AssertionError
+_______________ test_r_pe_bench_50_3_the_unit_follows_the_input ________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_50_3_the_unit_follows_the_input(defc):
+        """R-PE-BENCH.50/3 - VAL_BLK_DEF_0001: the unit `units` opens the tail; the tool label follows it."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        _name, tail = tail_of(o, view_state(o, tool="p"))
+        assert tail.plain.lstrip().startswith("units")
+>       assert re.search(r"×% on 1 cell(?!s)", tail.plain), tail.plain  # FX9b F-X9-7: k = 1 is singular
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: units  ×% on 1 cells   enter apply  alt+s stage record
+E       assert None
+E        +  where None = <function search at 0x7f83087b67a0>('×% on 1 cell(?!s)', 'units  ×% on 1 cells   enter apply  alt+s stage record')
+E        +    where <function search at 0x7f83087b67a0> = re.search
+E        +    and   'units  ×% on 1 cells   enter apply  alt+s stage record' = <text 'units  ×% on 1 cells   enter apply  alt+s stage record' [] ''>.plain
+
+tests/test_b103_inc9_b_detail.py:281: AssertionError
+__________ test_r_pe_bench_50_the_2d_array_name_keeps_its_where_whole __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_50_the_2d_array_name_keeps_its_where_whole(defc):
+        """FX9b F-X9-6 (X9 capture `v5b`): VAL_BLK_DEF_0001 (2-D) selection x0..1, y0..1. Inc 8's bar paints the name
+        label in at most the cells its CSS gives it (``#patch_sheet_name`` max-width, read here from Inc 8's sheet), and
+        `VAL_BLK_DEF_0001[x0..1,y0..1]` is one cell more: the label lost its closing `]`, so the where read as an open
+        range. The where is the bar's own news (the selection), so it stays whole and the name gives way with one `…`;
+        a name that fits (MAP_DEF_0001, 50/1) is untouched."""
+        from s19_app.tui.screens_directionb.patch_editor.sheet import StagingSheet
+    
+        cap = int(re.search(r"#patch_sheet_name \{[^}]*max-width: (\d+)", StagingSheet.DEFAULT_CSS).group(1))
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        name, _tail = tail_of(o, view_state(o, cursor=(1, 1), anchor=(0, 0)))
+        assert name.endswith("[x0..1,y0..1]"), name
+>       assert cell_len(name) <= cap, (name, cap)
+E       AssertionError: ('VAL_BLK_DEF_0001[x0..1,y0..1]', 28)
+E       assert 29 <= 28
+E        +  where 29 = cell_len('VAL_BLK_DEF_0001[x0..1,y0..1]')
+
+tests/test_b103_inc9_b_detail.py:297: AssertionError
+__________________ test_r_pe_bench_66_one_notice_is_singular ___________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_66_one_notice_is_singular(defc):
+        """FX9b F-X9-7 (X9 capture `v9-notice`): one notice reads ` ▲ 1 notice`, not `1 notices`."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        noisy = Encoded(o.d.address, bytes(o.d.byte_length), ("only notice",))
+        _name, tail = tail_of(o, view_state(o, preview=noisy, edit={(0, 0): "41.9"}), width=200)
+>       assert re.search(r" ▲ 1 notice(?!s)", tail.plain), tail.plain
+E       AssertionError: units  Set on 1 cells ▲ 1 notices   enter apply  alt+s stage record
+E       assert None
+E        +  where None = <function search at 0x7f9d5c2127a0>(' ▲ 1 notice(?!s)', 'units  Set on 1 cells ▲ 1 notices   enter apply  alt+s stage record')
+E        +    where <function search at 0x7f9d5c2127a0> = re.search
+E        +    and   'units  Set on 1 cells ▲ 1 notices   enter apply  alt+s stage record' = <text 'units  Set on 1 cells ▲ 1 notices   enter apply  alt+s stage record' [] ''>.plain
+
+tests/test_b103_inc9_b_detail.py:350: AssertionError
+___________ test_r_pe_bench_15_one_changed_cell_or_point_is_singular ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_15_one_changed_cell_or_point_is_singular(defc):
+        """FX9b F-X9-7 (X9 captures `v2`, `v12-staged`): k = 1 reads `1 cell` / `1 pt`, not `1 cells` / `1 pts`."""
+        vb = defc_obj(defc, "VAL_BLK_DEF_0001")
+>       assert cells_of(vb, summarised(vb, edit={(0, 0): "41.9"}))[0][NEW] == "1 cell"
+E       AssertionError: assert '1 cells' == '1 cell'
+E         
+E         - 1 cell
+E         + 1 cells
+E         ?       +
+
+tests/test_b103_inc9_b_cells.py:180: AssertionError
+_ test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9b/tmp/pytest-of-<user>/pytest-6/popen-gw0/test_r_pe_bench_11_a_strip_of_0')
+defc_dir = PosixPath('~/work/zq-fx9b/tmp/pytest-of-<user>/pytest-6/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible(tmp_path, defc_dir):
+        """FX9b F-X9-5 (X9 capture `v2`): a 40-element 1-D array (16 grid columns) on the sheet. CTX-PE-BENCH array row
+        cells: strip width = the Current width - 1 - the count's width - 1, every k-th column, k = ceil(nx / that width).
+        The painted Current cell is that many `█` then ` 40`: the count is the operator's only size cue, so a strip
+        drawn at the whole Current width (16 `█`, the count cut away) is the defect."""
+        a2l, s19 = hand_case(tmp_path, [valblk_block("VB1D", 0x100000, 40)], [(0x100000, bytes(range(40)))])
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await wait_for(pilot, lambda: st(sheet, "VB1D") is not None and st(sheet, "VB1D").strip is not None,
+                           "the summary of VB1D", 30)
+            await pilot.pause(0.2)
+            row = next(r for r in sheet.rows if r.name == "VB1D")
+            width = need(panel, "#patch_sheet_body").content_size.width
+            return row_text(app, "VB1D"), db.bench_grid(row.definition).nx, ds.sheet_widths(width).current
+    
+        painted, nx, current = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        room = current - 1 - len("40") - 1
+        k = -(-nx // room)
+        blocks = len(range(0, nx, k))
+        assert nx > room, f"the case needs more grid columns ({nx}) than the strip's room ({room})"
+>       assert "█" * blocks + " 40" in painted, painted
+E       AssertionError: ▶ VB1D              VAL_BLK  ████████████████ …·                   0 … 255                                    
+E       assert (('█' * 8) + ' 40') in '▶ VB1D              VAL_BLK  ████████████████ …·                   0 … 255                                    '
+
+tests/test_b103_inc9_w_select.py:231: AssertionError
+_ test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9b/tmp/pytest-of-<user>/pytest-6/popen-gw1/test_r_pe_bench_15_16_18_the_p0')
+defc_dir = PosixPath('~/work/zq-fx9b/tmp/pytest-of-<user>/pytest-6/popen-gw1/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage(tmp_path, defc_dir):
+        """R-PE-BENCH.15 / .16 / .18 end to end (I9, ruling C9b F-W1: the sheet hands the row's bench state to the
+        row cells, I-8.5 unchanged). VAL_BLK_DEF_0001 at 220x60 (the Δ column holds `max |Δ| … staged`), Set `10`
+        on (0,0): the painted row's mark (its second cell; the first is the selection `▶`) is `◆`, with `1 cell` and `max |Δ| <|10 - 36.85|>`; after alt+s it shows `●` and
+        `max |Δ| <the same> staged`. Control: before the apply the row has no mark and no Δ."""
+        delta = ds.short_number(abs(10 - EX.VB[0]))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await open_bench(pilot, sheet, VB)
+            await pilot.pause(0.3)
+            before = _row_of(app, VB)
+            await apply_tool(pilot, sheet, "s", "10")
+            await wait_for(pilot, lambda: dict(st(sheet, VB).edit) == {(0, 0): "10"}, "the Set edit")
+            await pilot.pause(0.3)
+            edited = _row_of(app, VB)
+            await pilot.press("alt+s")
+            await wait_for(pilot, lambda: len(entries_of(app)) == 1, "the stage", 60)
+            await wait_for(pilot, lambda: not st(sheet, VB).edit and st(sheet, VB).staged is not None, "the staged decode", 30)
+            await pilot.pause(0.3)
+            return before, edited, _row_of(app, VB)
+    
+        before, edited, staged = run(tmp_path, defc_dir, body, size=WIDE)
+        assert before[1] == " " and "max |Δ|" not in before, before
+        assert edited[1] == "◆", edited
+>       assert " 1 cell " in edited and "1 cells" not in edited, edited  # FX9b F-X9-7: k = 1 is singular
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ▶◆VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       1 cells             units   -50 … 50                                                       max |Δ| 26.9           
+E       assert (' 1 cell ' in '▶◆VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       1 cells             units   -50 … 50                                                       max |Δ| 26.9           ')
+
+tests/test_b103_inc9_w_stage.py:274: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_21_a_refused_decode_says_refused_not_decoding
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_50_2_the_curve_op_line
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_50_3_the_unit_follows_the_input
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_50_the_2d_array_name_keeps_its_where_whole
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_66_one_notice_is_singular
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_15_one_changed_cell_or_point_is_singular
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible
+FAILED tests/test_b103_inc9_w_stage.py::test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage
+============================== 8 failed in 9.76s ===============================
+rc=1
+load after: 1.82 1.70 1.80 2/650 475833

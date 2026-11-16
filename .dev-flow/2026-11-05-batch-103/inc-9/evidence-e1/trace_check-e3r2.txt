@@ -1,0 +1,5 @@
+ 16:11:38 up 1 day,  1:00,  3 users,  load average: 1.89, 1.86, 2.24
+$ python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-9/01-requirements.md --tests ~/work/zq-e3r1-9/tests_empty --ids "R-PE-BENCH.*"   (E3R2: no test exists yet; every TEST gap is expected until E4)
+trace_check: 82 active requirements match --ids, checks run: CASE, TEST, 82 gap(s)
+exit=1
+# note (E3R2 corrector): piped through `grep -v '^TEST '`; the 82 gaps are the 82 TEST lines (no test before E4). No CASE line printed: 0 CASE gaps.

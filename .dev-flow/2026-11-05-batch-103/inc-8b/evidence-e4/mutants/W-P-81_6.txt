@@ -1,0 +1,13 @@
+# WIDE re-run of mutant P-81_6  rows: R-PE-DEF.81/6 (proposed)
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:272
+# uptime: 02:31:45 up 2 days, 11:20,  3 users,  load average: 1.46, 1.79, 2.07
+s19_app.__file__ = ~/work/zq-m8b/m/W-P-81_6/s19_app/__init__.py
+## group fast+bench: exit=0 | 516 passed in 111.78s (0:01:51)
+## group inc8b_bw: exit=0 | 30 passed in 43.71s
+## group inc8b_at: exit=0 | 12 passed in 97.53s (0:01:37)
+## group inc8_a2_app: exit=0 | 23 passed in 74.57s (0:01:14)
+## group inc8_at: exit=0 | 11 passed in 51.59s
+## group inc8_p_layout+p_wiring: exit=0 | 43 passed in 108.18s (0:01:48)
+## group inc9_w_keys+w_select: exit=0 | 33 passed in 109.93s (0:01:49)
+## group inc9_w_stage+w_mutants: exit=0 | 40 passed in 180.80s (0:03:00)
+# verdict: SURVIVED-WIDE 

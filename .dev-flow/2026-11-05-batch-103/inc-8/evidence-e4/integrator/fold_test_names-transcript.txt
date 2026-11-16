@@ -1,0 +1,3 @@
+rows folded: 210 of 210
+rows with no E4 test name (0): -
+tester-added cases kept in their group files (20): R-PE-041/5, R-PE-DEF.11/4, R-PE-DEF.11/5, R-PE-DEF.11/6, R-PE-DEF.11/7, R-PE-DEF.11/8, R-PE-DEF.11/9, R-PE-DEF.18/3, R-PE-DEF.42/4, R-PE-DEF.45/5, R-PE-DEF.47/4, R-PE-DEF.50/5, R-PE-DEF.50/6, R-PE-DEF.50/7, R-PE-DEF.50/8, R-PE-DEF.50/9, R-PE-DEF.60/5, R-TUI-063.1/3, R-TUI-063.1/4, R-TUI-063.1/5

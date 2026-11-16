@@ -1,0 +1,54 @@
+# run f-i8a tree=fin 2026-11-13T23:47:48-06:00 load: load average: 10.84, 10.37, 9.37
+~/work/zq-e4-9w-int/fin/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/fin
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [216 items]
+
+........................................................................ [ 33%]
+...............F...................................F.................... [ 66%]
+........................................................................ [100%]
+=================================== FAILURES ===================================
+__ test_r_pe_def_36_unknown_kinds_take_the_fallback_operations_with_no_editor __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_36_unknown_kinds_take_the_fallback_operations_with_no_editor(defc):
+        """R-PE-DEF.36/1, /2 - cuboid, curve, none: label empty, never editable; one shared fallback entry."""
+        display = defc["defs"]["DISPLAY_0001"]
+        for kind in ("cuboid", "curve", "map", "array", "none", "no such kind"):
+            ops = ds.ops_for(kind)
+>           assert ops.label == ""
+E           AssertionError: assert 'op =' == ''
+E             
+E             + op =
+
+tests/test_b103_inc8_s1.py:251: AssertionError
+_ test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f16bbe05cd0>
+
+    def test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides(defc, monkeypatch):
+        """I-8.5 amendment (Inc 9 E3A-05, ruled at Inc 8 E4): `KindOps.mark(row, state)` is optional.
+    
+        Why: Inc 9's bench rows paint `◆`/`●` from their bench state, not from the formula text; Inc 8's
+        own kinds must keep the R-PE-DEF.23/.24 rule. A `row_line` that ignores the field fails the override
+        half; a default other than None (or a mark set on an Inc 8 kind) fails the first half.
+        """
+>       assert all(ops.mark is None for ops in ds._KIND_OPS.values()), "Inc 8 kinds keep their mark rule"
+E       AssertionError: Inc 8 kinds keep their mark rule
+E       assert False
+E        +  where False = all(<generator object test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides.<locals>.<genexpr> at 0x7f16b859d150>)
+
+tests/test_b103_inc8_s1.py:574: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_36_unknown_kinds_take_the_fallback_operations_with_no_editor
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides
+================== 2 failed, 214 passed in 173.83s (0:02:53) ===================
+# rc=1 end 2026-11-13T23:50:44-06:00 load: load average: 9.60, 10.14, 9.47

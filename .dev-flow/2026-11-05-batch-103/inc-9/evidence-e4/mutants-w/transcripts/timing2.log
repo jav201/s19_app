@@ -1,0 +1,11 @@
+window start Sat Nov 14 05:48:43 AM CST 2026 deadline +45 min
+05:48:43 test_r_pe_bench_29_1 load 1.73
+05:48:43 RUN test_r_pe_bench_29_1 load-before 1.73
+05:50:34 END test_r_pe_bench_29_1 load-after 1.93 ================= 1 passed, 9 deselected in 109.27s (0:01:49) ==================|rc=0|# load end: 1.93|
+05:50:34 test_r_pe_bench_29_2 load 1.93
+05:50:34 RUN test_r_pe_bench_29_2 load-before 1.93
+05:52:10 END test_r_pe_bench_29_2 load-after 1.22 ================== 1 failed, 9 deselected in 95.15s (0:01:35) ==================|rc=1|# load end: 1.22|
+05:52:10 test_r_pe_bench_82_1 load 1.22
+05:52:10 RUN test_r_pe_bench_82_1 load-before 1.22
+05:54:29 END test_r_pe_bench_82_1 load-after 1.00 ================= 1 failed, 9 deselected in 137.40s (0:02:17) ==================|rc=1|# load end: 1.00|
+DONE

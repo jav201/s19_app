@@ -1,0 +1,38 @@
+Cloning into '<runner-home>/work/zq-x9b/green-unicode'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at d05b5180 batch-103 Inc 9b E5: fit busy names by terminal cells
+DATE 2026-11-15T20:07:19-06:00
+HEAD d05b5180e5f48d4a167d13e7fb45b24586293eb6
+TREE <runner-home>/work/zq-x9b/green-unicode
+DIRTY_BEGIN
+DIRTY_END
+ 20:07:19 up 3 days,  4:56,  2 users,  load average: 0.16, 0.12, 0.23
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/green-unicode/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_cuts_wide_names_by_painted_cells tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_does_not_cut_combining_text_that_fits tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits tests/test_b103_inc9b_w.py::test_r_pe_bench_105_4_a_one_character_name_is_not_cut
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/green-unicode
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 6 items
+
+tests/test_b103_inc9b_w.py ......                                        [100%]
+
+============================== 6 passed in 44.74s ==============================
+EXIT_CODE 0

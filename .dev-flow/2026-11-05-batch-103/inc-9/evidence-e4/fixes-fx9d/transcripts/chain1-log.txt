@@ -1,0 +1,9 @@
+start Sat Nov 14 12:22:41 PM CST 2026
+probe red (load before 0.50): ======================== 1 passed in 166.48s (0:02:46) =========================
+probe green (load before 0.94): ======================== 1 passed in 165.23s (0:02:45) =========================
+29_1 (load before 1.00): ================= 1 passed, 9 deselected in 108.38s (0:01:48) ================== | 
+29_2 (load before 0.98): ================= 1 failed, 9 deselected in 114.47s (0:01:54) ================== | slowest press 0.505 s (load 0.96 0.95 1.12); load-sensitive
+82_1 (load before 0.96): ================= 1 failed, 9 deselected in 162.44s (0:02:42) ================== | slowest press 0.988 s (load 0.97 0.95 1.08); load-sensitive
+20_1 (load before 0.97): ======================= 1 passed, 9 deselected in 7.27s ======================== | 
+end Sat Nov 14 12:34:52 PM CST 2026
+CHAIN1_DONE

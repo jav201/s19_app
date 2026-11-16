@@ -1,0 +1,81 @@
+DATE 2026-11-15T21:36:53-06:00
+HEAD 6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+TREE <runner-home>/work/zq-x9b/final-exact
+DIRTY_BEGIN
+DIRTY_END
+ 21:36:53 up 3 days,  6:25,  2 users,  load average: 1.21, 1.34, 1.21
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/final-exact/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_suite_hygiene.py
+XDIST_N 2
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/final-exact
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [67 items]
+
+..................s.........................s...............F......      [100%]
+=================================== FAILURES ===================================
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+[gw1] linux -- Python 3.11.18 <runner-home>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         inc-8b/04-validation.md: posix home path outside the runner image: /home/end
+E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-8b/steps.log: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-9b/steps.log: posix home path outside the runner image: /home/end
+E         steps.log: posix home path outside the runner image: /home/end
+E       assert not ['inc-8b/04-validation.md: posix home path outside the runner image: /home/end', 'inc-8b/evidence/e5/runs/out-green/la...9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: /home/end', ...]
+
+tests/test_suite_hygiene.py:2053: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.6%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+============= 1 failed, 64 passed, 2 skipped in 154.49s (0:02:34) ==============
+EXIT_CODE 1

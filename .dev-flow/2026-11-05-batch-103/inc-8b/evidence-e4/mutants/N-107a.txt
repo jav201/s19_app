@@ -1,0 +1,34 @@
+# mutant N-107a  rows: R-PE-DEF.107
+# edits: s19_app/tui/definition_sheet.py:1121
+# -k: r_pe_def_107_
+# uptime: 01:59:34 up 2 days, 10:48,  3 users,  load average: 1.31, 0.93, 1.23
+s19_app.__file__ = ~/work/zq-m8b/m/N-107a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_107_4_a_definition_line_wider_than_the_cut_is_cut_at_139_cells _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_107_4_a_definition_line_wider_than_the_cut_is_cut_at_139_cells(defc):
+        """R-PE-DEF.107/4 (EX-8B-E1) - a 250-character record layout name -> the content is 139 cells and ends `…`."""
+        d = replace(defc["defs"]["DISPLAY_0001"], record_layout="R" * 250)
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+        found = painted(row)
+        assert len(found) == 1
+        (line,) = found
+        content = line.plain[len(BAR):].rstrip()
+>       assert cell_len(content) == OT["G.detail_cap.V111"] == 139
+E       AssertionError: assert 318 == 139
+E        +  where 318 = cell_len('└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR...RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR · 0x00800020 · 2 B')
+
+tests/test_b103_inc8b_s2.py:525: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_107_4_a_definition_line_wider_than_the_cut_is_cut_at_139_cells
+1 failed, 3 passed in 1.79s
+
+# exit=1

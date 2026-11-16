@@ -1,0 +1,209 @@
+## mutant N-103: s19_app/tui/definition_sheet.py
+## - 'mark.append(glyph, style=_GLYPH_STYLES.get(glyph, ""))'
+## + 'mark.append(" " if glyph == "◆" else glyph, style=f"on {_PENDING}" if glyph == "◆" else _GLYPH_STYLES.get(glyph, ""))'
+## uptime:  03:01:40 up 2 days, 11:50,  2 users,  load average: 1.10, 0.91, 1.01
+## date: 2026-11-15T09:01:40Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-N-103/s19_app/__init__.py
+..............................FFF.....F................................. [ 73%]
+..FF......................                                               [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[25.5-25.5--118.0 (-62.1%)] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+text = '25.5', new = '25.5', delta_prefix = '-118.0 (-62.1%)'
+
+    @pytest.mark.parametrize(
+        ("text", "new", "delta_prefix"), [("25.5", "25.5", "-118.0 (-62.1%)"), ("175", "175.0", "")]
+    )
+    def test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond(defc, text, new, delta_prefix):
+        """R-PE-DEF.99/1, /2 - a pending row (an encode with a notice included): New, Δ, ``◆`` bold #b565f3, not YELLOW."""
+        line, _, _ = paint(defc, display(defc), text=text)
+        shown_new, shown_delta = _new_delta_cells(line)
+        # New shows the preview's value text (R-PE-DEF.24): `175` decodes to `175.0`.
+        assert shown_new == new and shown_delta.startswith(delta_prefix) and shown_delta
+        _assert_style_over(line, START["New"], shown_new, PURPLE)
+        _assert_style_over(line, START["Δ"], shown_delta, PURPLE)
+        # The mark column is 2 cells: the selector at 0, the glyph at 1.
+>       assert line.plain[1] == "◆" and fg(line, 1) == PURPLE and bold(line, 1)
+E       AssertionError: assert (' ' == '◆'
+E         
+E         Strings contain only whitespace, escaping them using repr()
+E         - '◆'
+E         + ' ')
+
+tests/test_b103_inc8b_s1.py:515: AssertionError
+_ test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[175-175.0-] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+text = '175', new = '175.0', delta_prefix = ''
+
+    @pytest.mark.parametrize(
+        ("text", "new", "delta_prefix"), [("25.5", "25.5", "-118.0 (-62.1%)"), ("175", "175.0", "")]
+    )
+    def test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond(defc, text, new, delta_prefix):
+        """R-PE-DEF.99/1, /2 - a pending row (an encode with a notice included): New, Δ, ``◆`` bold #b565f3, not YELLOW."""
+        line, _, _ = paint(defc, display(defc), text=text)
+        shown_new, shown_delta = _new_delta_cells(line)
+        # New shows the preview's value text (R-PE-DEF.24): `175` decodes to `175.0`.
+        assert shown_new == new and shown_delta.startswith(delta_prefix) and shown_delta
+        _assert_style_over(line, START["New"], shown_new, PURPLE)
+        _assert_style_over(line, START["Δ"], shown_delta, PURPLE)
+        # The mark column is 2 cells: the selector at 0, the glyph at 1.
+>       assert line.plain[1] == "◆" and fg(line, 1) == PURPLE and bold(line, 1)
+E       AssertionError: assert (' ' == '◆'
+E         
+E         Strings contain only whitespace, escaping them using repr()
+E         - '◆'
+E         + ' ')
+
+tests/test_b103_inc8b_s1.py:515: AssertionError
+______________ test_r_pe_def_99_3_a_pending_bench_edit_is_purple _______________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_99_3_a_pending_bench_edit_is_purple(defc):
+        """R-PE-DEF.99/3 - VAL_BLK_DEF_0001 with a bench edit: ``◆`` and New ``2 cells`` in the pending style."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(o.d, o.a2l, o.image)
+        state = view_state(o, edit={(0, 0): "41.9", (1, 0): "16.0"})
+        line = ds.row_line(row, ds.sheet_widths(111), False, None, None, state=state)
+>       assert line.plain[1] == "◆" and fg(line, 1) == PURPLE and bold(line, 1)
+E       AssertionError: assert (' ' == '◆'
+E         
+E         Strings contain only whitespace, escaping them using repr()
+E         - '◆'
+E         + ' ')
+
+tests/test_b103_inc8b_s1.py:528: AssertionError
+____________ test_r_pe_def_103_1_every_cue_survives_without_colour _____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_103_1_every_cue_survives_without_colour(defc):
+        """R-PE-DEF.103/1 (partial: the row model; ``■`` and underlines are the card's, S2 / AT) - with ``NO_COLOR``
+        the staged, pending and refused rows still carry ``●``, ``◆``, ``▶`` and ``✗ refused`` and keep bold.
+    
+        Operator need: the meaning must survive a terminal that paints no colour. Plain text is equal with and
+        without colour; the glyphs are in it; the selected name is still bold in the no-colour render."""
+        lines = [
+            _staged_line(defc, "DISPLAY_0001", "25.5")[0],
+            paint(defc, display(defc), text="25.5")[0],
+            paint(defc, display(defc), text="250", selected=True)[0],
+        ]
+        plain = "\n".join(line.plain for line in lines)
+        for cue in ("●", "◆", "▶", "✗ refused"):
+            assert cue in plain, cue
+        shown = {}
+        for label, no_color in (("colour", False), ("mono", True)):
+            sink = io.StringIO()
+            console = Console(file=sink, color_system="truecolor", force_terminal=True, width=400, no_color=no_color)
+            for line in lines:
+                console.print(line, end="\n")
+            shown[label] = sink.getvalue()
+        strip_ansi = re.compile(r"\x1b\[[0-9;]*m")
+        assert strip_ansi.sub("", shown["mono"]) == strip_ansi.sub("", shown["colour"])
+        assert "38;2;" in shown["colour"], "the colour render does paint colour (the control is live)"
+        assert "38;2;" not in shown["mono"] and "48;2;" not in shown["mono"], "no colour escape under NO_COLOR"
+        assert "\x1b[1m" in shown["mono"], "bold survives NO_COLOR (the selected name)"
+        mono_lines = strip_ansi.sub("", shown["mono"]).split("\n")
+>       assert [line[1] for line in mono_lines[:3]] == ["●", "◆", "◆"], (
+            "E5 (X8b): the mark column itself carries the glyph; the track's own ● and ◆ do not stand for it",
+            [line[:3] for line in mono_lines[:3]],
+        )
+E       AssertionError: ("E5 (X8b): the mark column itself carries the glyph; the track's own ● and ◆ do not stand for it", [' ●D', '  D', '▶ D'])
+E       assert ['●', ' ', ' '] == ['●', '◆', '◆']
+E         
+E         At index 1 diff: ' ' != '◆'
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_s1.py:629: AssertionError
+_ test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[0.0-9] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+current = 0.0, mark = 9
+
+    @pytest.mark.parametrize(("current", "mark"), [(0.0, 9), (5e-324, 24)])
+    def test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion(defc, current, mark):
+        """R-PE-DEF.117/4 (E5, X8b finding) - limits 0 .. 5e-324 (the smallest subnormal span: its halves are both 0):
+        current 0 -> ``●`` at 9, current 5e-324 -> ``●`` at 24; no ``?``, no exception.
+    
+        Operator need: a hostile A2L limit pair must never stop the paint. Computing the position on halves only
+        divides by 0 here (``ZeroDivisionError`` in the paint path); the span itself is finite and nonzero."""
+>       cell = limits_of(defc, "DISPLAY_0001", lower=0.0, upper=5e-324, current=current).plain
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8b_s1.py:903: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8b_s1.py:198: in limits_of
+    return ds.limits_cell(row, value, limits_width)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in limits_cell
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in <genexpr>
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:934: in _has_position
+    return isfinite(_position(value, lower, upper))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0.0, lower = 0.0, upper = 5e-324
+
+    def _position(value: float, lower: float, upper: float) -> float:
+        """(value - lower) / (upper - lower) on halves, so a finite span never overflows (R-PE-DEF.117)."""
+>       return (value / 2 - lower / 2) / (upper / 2 - lower / 2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ZeroDivisionError: float division by zero
+
+s19_app/tui/definition_sheet.py:925: ZeroDivisionError
+_ test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[5e-324-24] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+current = 5e-324, mark = 24
+
+    @pytest.mark.parametrize(("current", "mark"), [(0.0, 9), (5e-324, 24)])
+    def test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion(defc, current, mark):
+        """R-PE-DEF.117/4 (E5, X8b finding) - limits 0 .. 5e-324 (the smallest subnormal span: its halves are both 0):
+        current 0 -> ``●`` at 9, current 5e-324 -> ``●`` at 24; no ``?``, no exception.
+    
+        Operator need: a hostile A2L limit pair must never stop the paint. Computing the position on halves only
+        divides by 0 here (``ZeroDivisionError`` in the paint path); the span itself is finite and nonzero."""
+>       cell = limits_of(defc, "DISPLAY_0001", lower=0.0, upper=5e-324, current=current).plain
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8b_s1.py:903: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8b_s1.py:198: in limits_of
+    return ds.limits_cell(row, value, limits_width)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in limits_cell
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in <genexpr>
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:934: in _has_position
+    return isfinite(_position(value, lower, upper))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 5e-324, lower = 0.0, upper = 5e-324
+
+    def _position(value: float, lower: float, upper: float) -> float:
+        """(value - lower) / (upper - lower) on halves, so a finite span never overflows (R-PE-DEF.117)."""
+>       return (value / 2 - lower / 2) / (upper / 2 - lower / 2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ZeroDivisionError: float division by zero
+
+s19_app/tui/definition_sheet.py:925: ZeroDivisionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[25.5-25.5--118.0 (-62.1%)]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[175-175.0-]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_3_a_pending_bench_edit_is_purple
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[0.0-9]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[5e-324-24]
+6 failed, 92 passed in 0.57s
+## rc=1
+## end: 2026-11-15T09:01:41Z  uptime:  03:01:41 up 2 days, 11:50,  2 users,  load average: 1.09, 0.91, 1.01

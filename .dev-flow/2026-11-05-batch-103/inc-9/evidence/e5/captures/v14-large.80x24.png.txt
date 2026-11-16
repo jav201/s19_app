@@ -1,0 +1,47 @@
+scene=v14-large
+fixture=large
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=80x24
+time=2026-11-14 08:22:53
+app_size=80x24
+focused=patch_sheet_body
+selected=LARGE
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=True edit={} undo=0
+page_rows=LARGE
+subtitle=None
+widget #patch_sheet: size=70x10 classes=[] subtitle=None
+widget #patch_inspector: size=68x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=74x9 classes=['-bench'] subtitle=None
+keys_sent: <type filter 'LARGE'> | tab | tab | tab | enter
+status_lines_this_run=2
+status: A2L loaded: large.a2l
+status: Loaded large.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                             Hex Edit Tool
+      │                    Patch Editor                      ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ ││  Parameter       Current       New         Limits         Δ          │
+   ▏◉ ││▶ LARGE           ████████ 1048…·           0 … 255                   │▇▇
+   ▏▤ ││└ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x001000…│
+   ▏! ││       +0    +1    +2    +3    +4    +5    +6    +7    +8    +9       │
+   ▏✎ ││     0 ▸0     0     0     0     0     0     0     0     0     0       │▂▂
+   ▏✔ ││rows 0..0 of 65536 · cols 0..9 of 16 · pgup/pgdn page                 │
+   ▏⏚ ││shade ████████████ 0 … 0   sel 0   * / bold = edited                  │
+   ▏✦ ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shi…│
+      ││no edit yet · bytes appear here                                       │
+   ──────────────────────────────────────────────────────────────────────────────
+    Loaded large.s19 (S19 only)                             (none)  |  large.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: large.a2l
+    Loaded large.s19 (S19 only)
+    Loaded large.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+  
+screen_text_end
+surface=ready

@@ -1,0 +1,20 @@
+engine_unchanged 1 passed in 1.24s # exit=0
+deps_seam_law 6 passed in 9.03s # exit=0
+docs_canon 2 passed in 1.27s # exit=0
+no_private_tokens 2 passed in 43.32s # exit=0
+filename_markup_safety 2 passed in 3.64s # exit=0
+id_registry 12 passed in 9.09s # exit=0
+suite_hygiene 1 failed, 66 passed in 163.03s (0:02:43) # exit=1
+requirements_canon 1 failed, 10 passed in 1.50s # exit=1
+address_census 1 failed, 22 passed in 33.88s # exit=1
+b101_doc_hygiene 45 passed in 3.46s # exit=0
+b101_help_legend_docs 71 passed in 54.84s # exit=0
+report_markup_safety 166 passed in 1.41s # exit=0
+b97_key_bar 38 passed in 222.37s (0:03:42) # exit=0
+b97_width  
+tui_patch_layout 9 passed in 28.45s # exit=0
+tui_directionb 184 passed in 252.02s (0:04:12) # exit=0
+tui_patch_json 3 failed, 14 passed in 17.68s # exit=1
+b97_chips_help 1 failed, 78 passed in 226.02s (0:03:46) # exit=1
+tui_snapshot 6 failed, 25 passed, 2 xfailed in 70.22s (0:01:10) # exit=1
+BATCH_DONE

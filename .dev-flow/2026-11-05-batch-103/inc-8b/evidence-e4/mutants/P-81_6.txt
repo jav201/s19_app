@@ -1,0 +1,13 @@
+# mutant P-81_6  rows: R-PE-DEF.81/6 (proposed)
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:272
+# -k: r_pe_def_81_
+# uptime: 02:01:52 up 2 days, 10:50,  3 users,  load average: 1.64, 1.22, 1.30
+s19_app.__file__ = ~/work/zq-m8b/m/P-81_6/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+................                                                         [100%]
+16 passed in 18.22s
+
+# exit=0

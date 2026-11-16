@@ -1,0 +1,12 @@
+scene=name-brackets
+capture_seq=1
+phase=error
+commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+requested_size=118x54
+keys_sent=
+painted_sheet_top_row=
+surface=error TimeoutError: image load
+Traceback (most recent call last):
+  File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 493, in _drive
+    raise TimeoutError("image load")
+TimeoutError: image load

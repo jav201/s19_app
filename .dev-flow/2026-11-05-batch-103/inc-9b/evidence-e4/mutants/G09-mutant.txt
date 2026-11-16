@@ -1,0 +1,95 @@
+DATE 2026-11-15T19:10:25.366501-06:00
+GROUP G09
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:07:46 up 3 days,  3:56,  2 users,  load average: 0.95, 0.77, 0.48
+LOAD_ONE 0.95
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 2
+S19_APP_FILE ~/work/zq-m9b/groups/G09/tree/s19_app/__init__.py
+PID 1028745
+SID 1028745
+TIMEOUT_S 300
+XDIST_N 0
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-15/test_r_pe_bench_98_1_the_cue_k0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-15/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record(tmp_path, defc_dir):
+        """R-PE-BENCH.98/1. LARGE, Set `7` on 256 x 16 cells, alt+s: from the moment the record's write lands in the
+        change document until the cue leaves, the painted busy title changes at least once (a tick runs between the
+        write and the end of the refresh) and no gap between the write, the changed titles and the leave exceeds 0.5 s.
+        Operator need (P-127): the 0.67 s one-call refresh froze the cue at its end; the user must see it alive.
+        Negative control: the write and refresh in one UI-thread call (base: 0.674 s) -> max gap >= 0.67 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_record_ready(pilot, sheet)
+            watcher = WriteWatch(app).start()
+            mark: dict = {}
+    
+            def until(s: Snap, out: list) -> bool:
+                if s.entries >= 1:
+                    mark.setdefault("t", s.t)
+                busy = any("BUSY" in o.row for o in out)
+                return s.entries >= 1 and is_idle(s) and (busy or s.t - mark["t"] > 1.5)
+    
+            try:
+                send(app, "alt+s")
+                return await watch(app, until, time.monotonic() + 180.0), watcher
+            finally:
+                watcher.stop()
+    
+        snaps, watcher = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        assert watcher.t_write is not None, "the record was never written"
+        after = [s for s in snaps if s.t >= watcher.t_write]
+>       assert any("BUSY" in s.row for s in after), f"no busy title after the write; last top row {after[-1].row!r} ({load()})"
+E       AssertionError: no busy title after the write; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 1.01 0.89 0.57)
+E       assert False
+E        +  where False = any(<generator object test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record.<locals>.<genexpr> at 0x7f210a442400>)
+
+tests/test_b103_inc9b_at.py:414: AssertionError
+_ test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-15/test_r_pe_bench_98_2_the_stepp0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-15/b103_inc9_w_defc1')
+
+    def test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh(tmp_path, defc_dir):
+        """R-PE-BENCH.98/2 (EX-BC6). Operator need: the stage must not freeze the screen (P-127, forced termination otherwise).
+        VAL_BLK_DEF_0001 Set `10`, alt+s: (a) the entry written is byte-equal to I-2's encode, one 12-byte `bytes` entry at
+        0x800090 (the bytes base writes, R-PE-BENCH.70); (b) the event loop runs BETWEEN the write and the refresh: a sample
+        taken while the document already holds the entry still finds the ledger without it; (c) the refresh ends complete: the
+        ledger shows the entry and the sheet marks the row staged. Negative control: write and refresh in one call (base) never
+        shows the half state (b); a wrong byte or address fails (a); a chain that stops early fails (c)."""
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await make_edit(pilot, sheet, VB, "s", "10")
+            want = model_encode(app, VB, {(0, 0): "10"})
+            assert isinstance(want, Encoded), want
+            rows_at_write = await alt_s_and_catch_the_write(pilot, app, panel)
+            written = entries_of(app)
+            after = await quiet_digest(pilot, panel, sheet)
+            return want, rows_at_write, written, after
+    
+        want, rows_at_write, written, (ledger, _json, marks) = run(tmp_path, defc_dir, body)
+        assert written == [(VB_ADDRESS, bytes(want.data))] and len(want.data) == 12, written
+>       assert rows_at_write == 0, (
+            f"the ledger already held {rows_at_write} row(s) when the entry appeared: the write and the refresh ran in one call"
+        )
+E       AssertionError: the ledger already held 1 row(s) when the entry appeared: the write and the refresh ran in one call
+E       assert 1 == 0
+
+tests/test_b103_inc9b_s.py:160: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G09/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh
+2 failed in 157.89s (0:02:37)
+EXIT_CODE 1

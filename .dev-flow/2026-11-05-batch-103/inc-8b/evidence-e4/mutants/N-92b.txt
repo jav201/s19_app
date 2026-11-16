@@ -1,0 +1,88 @@
+# mutant N-92b  rows: R-PE-DEF.92,33
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:16; s19_app/tui/screens_directionb/patch_editor/sheet.py:135
+# -k: r_pe_def_92_ or r_pe_def_33_
+# uptime: 01:54:56 up 2 days, 10:43,  3 users,  load average: 0.68, 0.49, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-92b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+....F...F                                                                [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_92_scroller_is_a_plain_container_that_takes_no_focus_and_no_key _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_92_scroller_is_a_plain_container_that_takes_no_focus_and_no_key():
+        """R-PE-DEF.92 / E3-8b-03 - `#patch_sheet_grid` is a plain `Container`: not focusable, no bindings,
+        holding the body, with the formula bar outside it. Why: the prototype's focusable `ScrollableContainer`
+        added a Tab stop and its own `right` binding scrolled the grid instead of choosing an enum entry."""
+    
+        async def drive():
+            async with grid_ctx(SIZE_118) as (app, pilot, sheet):
+                grid = grid_of(sheet)
+                assert type(grid) is Container, type(grid)
+                assert grid.can_focus is False and grid.focusable is False
+                assert not list(grid.BINDINGS), list(grid.BINDINGS)
+                assert grid.parent is sheet
+                body = sheet.query_one("#patch_sheet_body")
+                assert body.parent is grid
+                bar = sheet.query_one("#patch_sheet_bar")
+                assert grid not in bar.ancestors and bar not in grid.ancestors
+    
+>       asyncio.run(drive())
+
+tests/test_b103_inc8b_bw.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with grid_ctx(SIZE_118) as (app, pilot, sheet):
+            grid = grid_of(sheet)
+>           assert type(grid) is Container, type(grid)
+E           AssertionError: <class 'textual.containers.ScrollableContainer'>
+E           assert <class 'textual.containers.ScrollableContainer'> is Container
+E            +  where <class 'textual.containers.ScrollableContainer'> = type(ScrollableContainer(id='patch_sheet_grid'))
+
+tests/test_b103_inc8b_bw.py:273: AssertionError
+_____________ test_r_pe_def_92_3_the_scroller_is_never_a_tab_stop ______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-11/popen-gw0/test_r_pe_def_92_3_the_scrolle0')
+defc_dir = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-11/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_def_92_3_the_scroller_is_never_a_tab_stop(tmp_path, defc_dir):
+        """R-PE-DEF.92/3 (EX-8B-G6) - 118x54 with the scrollbar shown: the focus ring of the screen never lists
+        `#patch_sheet_grid`, Tab through the whole ring never lands on it, and the sheet body stays in the ring
+        (the control: the test can see a stop). PARTIAL: it compares to the rule, not to a base Tab list."""
+    
+        async def body(app, pilot, panel):
+            grid = grid_of(need(panel, "#patch_sheet"))
+            ring = list(app.screen.focus_chain)
+            stops = []
+            for _ in range(len(ring) + 2):
+                await pilot.press("tab")
+                stops.append(app.focused)
+            return grid in ring, [w.id for w in ring], [w.id for w in stops if w is not None], grid in stops
+    
+        in_ring, ring_ids, stop_ids, landed = run(tmp_path, defc_dir, body, size=SIZE_118)
+        assert "patch_sheet_body" in ring_ids, ring_ids
+>       assert not in_ring and not landed, (ring_ids, stop_ids)
+E       AssertionError: (['rail_item_workspace', 'rail_item_a2l', 'rail_item_mac', 'rail_item_map', 'rail_item_issues', 'rail_item_patch', ......ch_param_include_button', 'patch_param_bulk_button', 'patch_sheet_grid', 'patch_sheet_body', 'patch_sheet_input', ...])
+E       assert (not True)
+
+tests/test_b103_inc8b_bw.py:355: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_92_scroller_is_a_plain_container_that_takes_no_focus_and_no_key
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_92_3_the_scroller_is_never_a_tab_stop
+2 failed, 7 passed in 15.83s
+
+# exit=1

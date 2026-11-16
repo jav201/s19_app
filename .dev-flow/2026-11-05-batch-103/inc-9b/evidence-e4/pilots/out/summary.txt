@@ -1,0 +1,85 @@
+== p-quick.txt
+P2 focus outside: _paint calls while toggling = 0
+   outside: idle                                    computed ('round', Color(27, 35, 58))         painted #1b233a inline=0 size=[110, 23] 
+   outside: busy before A                           computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   outside: after A clear_rule('border')            computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] False
+   outside: after A, then focus within              computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   outside: busy before B                           computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   outside: after B clear four edges                computed ('round', Color(27, 35, 58))         painted #f5c26b inline=0 size=[110, 23] [True, True, True, True]
+   outside: after B, then focus within              computed ('round', Color(145, 171, 236))      painted #91abec inline=0 size=[110, 23] 
+   outside: busy before C                           computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   outside: after C set ('round', rule colour)      computed ('round', Color(27, 35, 58))         painted #1b233a inline=4 size=[110, 23] set
+   outside: after C, then focus within              computed ('round', Color(27, 35, 58))         painted #1b233a inline=4 size=[110, 23] 
+   outside: busy before D                           computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   outside: after D clear four edges + refresh()    computed ('round', Color(27, 35, 58))         painted #1b233a inline=0 size=[110, 23] [True, True, True, True]
+   outside: after D, then focus within              computed ('round', Color(145, 171, 236))      painted #91abec inline=0 size=[110, 23] 
+P2 focus within: _paint calls while toggling = 0
+   within: idle                                     computed ('round', Color(145, 171, 236))      painted #91abec inline=0 size=[110, 23] 
+   within: busy before A                            computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   within: after A clear_rule('border')             computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] False
+   within: busy before B                            computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   within: after B clear four edges                 computed ('round', Color(145, 171, 236))      painted #f5c26b inline=0 size=[110, 23] [True, True, True, True]
+   within: busy before C                            computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   within: after C set ('round', rule colour)       computed ('round', Color(27, 35, 58))         painted #1b233a inline=4 size=[110, 23] set
+   within: busy before D                            computed ('round', Color(245, 194, 107))      painted #f5c26b inline=4 size=[110, 23] 
+   within: after D clear four edges + refresh()     computed ('round', Color(145, 171, 236))      painted #91abec inline=0 size=[110, 23] [True, True, True, True]
+P3 [80, 24] win=70 B=65 title_col=3 after='… ─╮' whole_by_len=None pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='uvwx… ─╮' len=72 idle[:24]='╭─ STAGING SHEET ───────'
+P3 [118, 54] win=110 B=105 title_col=3 after='… ─╮' whole_by_len=None pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='ijkl… ─╮' len=112 idle[:24]='╭─ STAGING SHEET ───────'
+P3 [220, 60] win=194 B=189 title_col=3 after='… ─╮' whole_by_len=None pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='opqr… ─╮' len=196 idle[:24]='╭─ STAGING SHEET ───────'
+EX-BC12 {"esc": "A�[2J", "nel": "B�C", "ok": [true, true]}
+EX-BC10 {"selected": "DISPLAY_0001", "state": null}
+
+== p1-run1.txt
+P1 after_refresh t1 load=0.35 paints=9 ticks=8 app_key=None body_key=None key_at=[1.4072] ends={'1': 0.7047, '2': 1.017, '3': 1.3904} | 1->2 0.0122s ticks=0 paints=0 key=False titles=[]; 2->3 0.0733s ticks=1 paints=0 key=False titles=[]
+P1 after_refresh_tick t1 load=0.4 paints=10 ticks=10 app_key=None body_key=None key_at=[1.4176] ends={'1': 0.7043, '2': 1.0174, '3': 1.3996} | 1->2 0.0126s ticks=1 paints=0 key=False titles=[]; 2->3 0.0821s ticks=2 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 timer0 t1 load=0.54 paints=97 ticks=95 app_key=None body_key=None key_at=[0.8273] ends={'1': 0.7557} | 1->2 Nones ticks=0 paints=0 key=False titles=[]; 2->3 Nones ticks=0 paints=0 key=False titles=[]
+P1 timer_20ms t1 load=0.53 paints=9 ticks=8 app_key=None body_key=None key_at=[1.5127] ends={'1': 0.7726, '2': 1.1394, '3': 1.5052} | 1->2 0.0667s ticks=1 paints=1 key=False titles=['STAGING SHEET  tick 004']; 2->3 0.0653s ticks=1 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 after_refresh t2 load=0.56 paints=9 ticks=8 app_key=None body_key=None key_at=[1.4052] ends={'1': 0.7036, '2': 1.016, '3': 1.3879} | 1->2 0.012s ticks=0 paints=0 key=False titles=[]; 2->3 0.0714s ticks=1 paints=0 key=False titles=[]
+P1 after_refresh_tick t2 load=0.52 paints=9 ticks=10 app_key=None body_key=None key_at=[1.4153] ends={'1': 0.7036, '2': 1.0157, '3': 1.3982} | 1->2 0.0121s ticks=1 paints=0 key=False titles=[]; 2->3 0.0825s ticks=2 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 timer0 t2 load=0.63 paints=88 ticks=86 app_key=None body_key=None key_at=[0.7993] ends={'1': 0.7057} | 1->2 Nones ticks=0 paints=0 key=False titles=[]; 2->3 Nones ticks=0 paints=0 key=False titles=[]
+P1 timer_20ms t2 load=0.6 paints=10 ticks=9 app_key=None body_key=None key_at=[1.4667] ends={'1': 0.7048, '2': 1.0831, '3': 1.462} | 1->2 0.078s ticks=1 paints=0 key=False titles=[]; 2->3 0.0788s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 004', 'STAGING SHEET  tick 005']
+P1 after_refresh t3 load=0.64 paints=9 ticks=8 app_key=None body_key=None key_at=[1.4065] ends={'1': 0.7048, '2': 1.0171, '3': 1.3888} | 1->2 0.0122s ticks=0 paints=0 key=False titles=[]; 2->3 0.0716s ticks=1 paints=0 key=False titles=[]
+P1 after_refresh_tick t3 load=0.67 paints=10 ticks=10 app_key=None body_key=None key_at=[1.4167] ends={'1': 0.7049, '2': 1.0171, '3': 1.4017} | 1->2 0.0121s ticks=1 paints=0 key=False titles=[]; 2->3 0.0845s ticks=2 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 timer0 t3 load=0.61 paints=92 ticks=90 app_key=None body_key=None key_at=[0.8016] ends={'1': 0.7059} | 1->2 Nones ticks=0 paints=0 key=False titles=[]; 2->3 Nones ticks=0 paints=0 key=False titles=[]
+P1 timer_20ms t3 load=0.64 paints=10 ticks=9 app_key=None body_key=None key_at=[1.47] ends={'1': 0.7051, '2': 1.083, '3': 1.4624} | 1->2 0.0779s ticks=1 paints=0 key=False titles=[]; 2->3 0.0794s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 004', 'STAGING SHEET  tick 005']
+
+== p1.txt
+P1 after_refresh t1 load=0.47 paints=9 ticks=8 app_key=[1.0856, 1.3991] body_key=[1.3864] key_at=[1.4048] ends={'1': 0.7036, '2': 1.0161, '3': 1.3863} | 1->2 0.0121s ticks=0 paints=0 key=False titles=[]; 2->3 0.0701s ticks=1 paints=0 key=False titles=[]
+P1 after_refresh_tick t1 load=0.51 paints=10 ticks=10 app_key=[1.0881, 1.4111] body_key=[1.4001] key_at=[1.4151] ends={'1': 0.7043, '2': 1.018, '3': 1.3998} | 1->2 0.0132s ticks=1 paints=0 key=False titles=[]; 2->3 0.0814s ticks=2 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 timer_20ms t1 load=0.55 paints=10 ticks=9 app_key=[0.7818, 1.4614] body_key=[0.7821] key_at=[1.4662] ends={'1': 0.7035, '2': 1.0827, '3': 1.461} | 1->2 0.0788s ticks=1 paints=0 key=False titles=[]; 2->3 0.0782s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 004', 'STAGING SHEET  tick 005']
+P1 timer_100ms t1 load=0.54 paints=12 ticks=10 app_key=[0.7827, 0.7945] body_key=[0.783] key_at=[0.7986] ends={'1': 0.7039, '2': 1.3308, '3': 1.7787} | 1->2 0.3268s ticks=2 paints=3 key=True titles=['STAGING SHEET  tick 004']; 2->3 0.1478s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 005', 'STAGING SHEET  tick 006']
+P1 after_refresh t2 load=0.58 paints=9 ticks=8 app_key=[1.0916, 1.4048] body_key=[1.3922] key_at=[1.4108] ends={'1': 0.7056, '2': 1.0187, '3': 1.3921} | 1->2 0.0127s ticks=0 paints=0 key=False titles=[]; 2->3 0.0734s ticks=1 paints=0 key=False titles=[]
+P1 after_refresh_tick t2 load=0.61 paints=10 ticks=10 app_key=[1.1467, 1.4701] body_key=[1.4591] key_at=[1.4742] ends={'1': 0.7915, '2': 1.0997, '3': 1.459} | 1->2 0.0078s ticks=2 paints=0 key=False titles=[]; 2->3 0.0592s ticks=1 paints=1 key=False titles=['STAGING SHEET  tick 006']
+P1 timer_20ms t2 load=0.59 paints=10 ticks=9 app_key=[0.7833, 1.4624] body_key=[0.7837] key_at=[1.4672] ends={'1': 0.7042, '2': 1.0839, '3': 1.4622} | 1->2 0.0797s ticks=1 paints=0 key=False titles=[]; 2->3 0.0782s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 004', 'STAGING SHEET  tick 005']
+P1 timer_100ms t2 load=0.62 paints=11 ticks=9 app_key=[0.7831, 0.7951] body_key=[0.7834] key_at=[0.7992] ends={'1': 0.7046, '2': 1.1931, '3': 1.6445} | 1->2 0.1884s ticks=1 paints=3 key=True titles=['STAGING SHEET  tick 004']; 2->3 0.1514s ticks=1 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 after_refresh t3 load=0.65 paints=10 ticks=8 app_key=[1.1745, 1.5514] body_key=[1.1866] key_at=[1.5568] ends={'1': 0.8197, '2': 1.1276, '3': 1.4871} | 1->2 0.0074s ticks=1 paints=0 key=False titles=[]; 2->3 0.0591s ticks=0 paints=1 key=False titles=['STAGING SHEET  tick 004']
+P1 after_refresh_tick t3 load=0.63 paints=10 ticks=10 app_key=[1.0578, 1.383] body_key=[1.3697] key_at=[1.3871] ends={'1': 0.704, '2': 1.0118, '3': 1.3696} | 1->2 0.0077s ticks=1 paints=0 key=False titles=[]; 2->3 0.0577s ticks=2 paints=1 key=False titles=['STAGING SHEET  tick 005']
+P1 timer_20ms t3 load=0.66 paints=10 ticks=9 app_key=[0.7834, 1.6679] body_key=[0.7837] key_at=[1.6726] ends={'1': 0.7045, '2': 1.084, '3': 1.6601} | 1->2 0.0794s ticks=1 paints=0 key=False titles=[]; 2->3 0.276s ticks=1 paints=2 key=False titles=['STAGING SHEET  tick 004', 'STAGING SHEET  tick 005']
+P1 timer_100ms t3 load=0.63 paints=12 ticks=10 app_key=[0.8052, 0.8192] body_key=[0.8056] key_at=[0.8233] ends={'1': 0.7283, '2': 1.2145, '3': 1.6649} | 1->2 0.1862s ticks=1 paints=3 key=True titles=['STAGING SHEET  tick 005']; 2->3 0.1504s ticks=1 paints=1 key=False titles=['STAGING SHEET  tick 006']
+
+== p3.txt
+P3 [80, 24] win=70 B=65 title_col=3 after='… ─╮' whole_by_len={'64': True, '65': True, '66': True, '67': False} pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='uvwx… ─╮' len=72 idle[:24]='╭─ STAGING SHEET ───────'
+P3 [118, 54] win=110 B=105 title_col=3 after='… ─╮' whole_by_len={'104': True, '105': True, '106': True, '107': False} pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='ijkl… ─╮' len=112 idle[:24]='╭─ STAGING SHEET ───────'
+P3 [220, 60] win=194 B=189 title_col=3 after='… ─╮' whole_by_len={'188': True, '189': True, '190': True, '191': False} pill_whole=True pill bg=#f5c26b fg=#0a0e1b bold=True
+   line[:20]='╭─ STAGING SHEET  ab' line[-8:]='opqr… ─╮' len=196 idle[:24]='╭─ STAGING SHEET ───────'
+
+== ex-small.txt
+EX-BC12 {"esc": "A�[2J", "nel": "B�C", "ok": [true, true]}
+EX-BC1/BC10 {"names": ["LARGE", "SMALL_BLK"], "job_after_key": "decode", "active_after_key": ["decode", "LARGE", 2, "Definition(name='LARGE', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=1048576, byte_length=1048576, datatype='UBYTE', byte_order='big', bit_mask=None, bit_mask_text=None, conversion_type=None, method_name='NO_COMPU_METHOD', display_format=None, decimals=None, unit='', limits=Limits(lower=0.0, upper=255.0, lower_text='0', upper_text='255'), extended_limits=None, enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, shared_with=None, refusal=None, shape=(1048576,), element_count=1048576, index_mode='ROW_DIR', values_offset=0, record_layout='RL_U8', axes=())", null], "job_while_running": "decode", "job_of_large_after_leaving": "decode", "small_state": "decode"}
+EX-BC10 {"selected": "DISPLAY_0001", "state": null}
+EX-BC6/BC14 {"entry_address": "0x800090", "entry_len": 12, "stage_changes_token": true, "stable": true, "undo_changes_token": true, "entries_after_undo": 0, "depths": ["{\"back\": 0, \"bound\": 20, \"forward\": 0}", "{\"back\": 1, \"bound\": 20, \"forward\": 0}", "{\"back\": 0, \"bound\": 20, \"forward\": 1}"]}
+
+== ex-bc6-t1.txt
+EX-BC6 t1 load=0.92 write=0.0412 s1=0.1604 s2=0.2118 s3=0.256 s4=0.004 block=0.6734 calls={'stage_record': [0.02], '_patch_document_view': [0.1604], 'set_document': [0.256], 'refresh_entries': [0.4678], '_refresh_patch_history_view': [0.6322], '_stage_bench_record': [0.6734]}
+
+== ex-bc6-t2.txt
+EX-BC6 t2 load=0.95 write=0.0409 s1=0.1631 s2=0.2211 s3=0.2578 s4=0.0039 block=0.6868 calls={'stage_record': [0.0203], '_patch_document_view': [0.1631], 'set_document': [0.2578], 'refresh_entries': [0.4789], '_refresh_patch_history_view': [0.6459], '_stage_bench_record': [0.6868]}
+
+== ex-bc6-t3.txt
+EX-BC6 t3 load=0.95 write=0.0414 s1=0.1613 s2=0.2193 s3=0.2563 s4=0.0041 block=0.6824 calls={'stage_record': [0.0195], '_patch_document_view': [0.1613], 'set_document': [0.2563], 'refresh_entries': [0.4756], '_refresh_patch_history_view': [0.641], '_stage_bench_record': [0.6824]}
+

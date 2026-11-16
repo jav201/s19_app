@@ -1,0 +1,35 @@
+clone 77f73c2c start 09:33:45 load 0.59 1.11 1.50 1/638 483839
+test_b103_inc9_a9 29 passed in 101.88s (0:01:41)
+test_b103_inc9_b_canvas 42 passed in 1.18s
+test_b103_inc9_b_cells 39 passed in 1.67s
+test_b103_inc9_b_detail 54 passed in 1.31s
+test_b103_inc9_b_model 20 passed in 1.07s
+test_b103_inc9_b_tools 59 passed in 1.15s
+test_b103_inc9_i 3 passed in 9.33s
+test_b103_inc9_w_jobs 2 passed in 22.48s
+test_b103_inc9_w_keys 19 passed in 65.28s (0:01:05)
+test_b103_inc9_w_mutants 29 passed in 136.06s (0:02:16)
+test_b103_inc9_w_select 14 passed in 43.46s
+test_b103_inc9_w_stage 11 passed in 43.51s
+test_b103_inc8_a1_service 23 passed in 1.28s
+test_b103_inc8_a2_app 23 passed in 73.08s (0:01:13)
+test_b103_inc8_a3_help 9 passed in 1.04s
+test_b103_inc8_at_help 2 passed in 5.28s
+test_b103_inc8_at 11 passed in 50.20s
+test_b103_inc8_p_layout 31 passed in 75.84s (0:01:15)
+test_b103_inc8_p_ledger 10 passed in 32.99s
+test_b103_inc8_p_wiring 12 passed in 34.74s
+test_b103_inc8_s1_detail 43 passed in 1.16s
+test_b103_inc8_s1 118 passed in 1.33s
+test_b103_inc8_s2_picker_definitions 6 passed in 1.10s
+test_b103_inc8_s2_sheet_formula 27 passed in 9.05s
+test_b103_inc8_s2_sheet_keys 21 passed in 10.95s
+test_b103_inc8_s2_sheet_rows 35 passed in 6.79s
+test_id_registry 12 passed in 7.68s
+test_suite_hygiene 65 passed, 2 skipped in 153.16s (0:02:33)
+test_requirements_canon 1 failed, 10 passed in 1.32s
+test_address_census 1 failed, 22 passed in 30.50s
+test_deps_seam_law 6 passed in 8.03s
+test_no_private_tokens 2 passed in 40.32s
+test_engine_unchanged 
+CHAIN5_DONE 09:50:32 load 1.91 1.83 1.74 3/653 491585

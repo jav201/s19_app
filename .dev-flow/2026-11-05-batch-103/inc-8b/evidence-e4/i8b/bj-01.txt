@@ -1,0 +1,8 @@
+# tree: base @ 48af05ff
+# uptime:  01:14:02 up 2 days, 10:02,  3 users,  load average: 8.96, 5.87, 4.88
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/base/s19_app/__init__.py
+# pytest -n 2 -q tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_1_at_most_one_bench_job_runs_at_any_time tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_2_twenty_large_rows_and_twenty_down_keys_stay_within_320_mib tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+bringing up nodes...
+bringing up nodes...
+
+..# exit=124

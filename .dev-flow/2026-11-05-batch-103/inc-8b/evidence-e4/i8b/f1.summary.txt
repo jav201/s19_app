@@ -1,0 +1,32 @@
+b103_inc8_a1_service 23 passed in 1.73s # exit=0
+b103_inc8_a2_app 23 passed in 102.69s (0:01:42) # exit=0
+b103_inc8_a3_help 9 passed in 1.96s # exit=0
+b103_inc8_at_help 2 passed in 6.81s # exit=0
+b103_inc8_at 11 passed in 62.92s (0:01:02) # exit=0
+b103_inc8b_at 12 passed in 104.77s (0:01:44) # exit=0
+b103_inc8b_bw 30 passed in 47.96s # exit=0
+b103_inc8b_s1 95 passed in 1.47s # exit=0
+b103_inc8b_s2 36 passed in 1.43s # exit=0
+b103_inc8_p_layout 31 passed in 83.58s (0:01:23) # exit=0
+b103_inc8_p_ledger 10 passed in 37.32s # exit=0
+b103_inc8_p_wiring 12 passed in 38.96s # exit=0
+b103_inc8_s1_detail 43 passed in 1.44s # exit=0
+b103_inc8_s1 122 passed in 1.44s # exit=0
+b103_inc8_s2_picker_definitions 6 passed in 1.26s # exit=0
+b103_inc8_s2_sheet_formula 27 passed in 14.04s # exit=0
+b103_inc8_s2_sheet_keys 22 passed in 13.11s # exit=0
+b103_inc8_s2_sheet_rows 35 passed in 8.21s # exit=0
+b103_inc9_a9 29 passed in 114.98s (0:01:54) # exit=0
+b103_inc9_b_canvas 42 passed in 1.39s # exit=0
+b103_inc9_b_cells 40 passed in 100.17s (0:01:40) # exit=0
+b103_inc9_b_detail 54 passed in 1.36s # exit=0
+b103_inc9_b_model 20 passed in 1.21s # exit=0
+b103_inc9_b_tools 59 passed in 1.26s # exit=0
+b103_inc9_i 3 passed in 9.96s # exit=0
+b103_inc9_ob_json_view 2 passed in 4.96s # exit=0
+b103_inc9_w_jobs  
+b103_inc9_w_keys 19 passed in 69.16s (0:01:09) # exit=0
+b103_inc9_w_mutants 29 passed in 144.32s (0:02:24) # exit=0
+b103_inc9_w_select 14 passed in 61.61s (0:01:01) # exit=0
+b103_inc9_w_stage 1 failed, 10 passed in 62.33s (0:01:02) # exit=1
+BATCH_DONE

@@ -1,0 +1,26 @@
+scenario=mask
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+top_screen=Screen
+focused=patch_sheet_input
+status_lines_this_run=4
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: MASK_FIELD_0001 staged as 255 (2 B at 0x800010).
+status: Patch Editor: MASK_BIT_0001 staged as 0 (2 B at 0x800010).
+ledger_entries=1
+selected_rows=[ ●] MASK_BIT_0001     VALUE    1 (0x01)          0 (0x00)            0 ├ | [▶●] MASK_FIELD_0001   VALUE    174 (0xAE)        255 (0xFF)          0 ├
+sheet_text_begin
+    Parameter         Kind     Current           New          Unit   Limits                    Δ               
+   ●MASK_BIT_0001     VALUE    1 (0x01)          0 (0x00)            0 ├◆──────────●┤ 1        -1              
+  ▶●MASK_FIELD_0001   VALUE    174 (0xAE)        255 (0xFF)          0 ├────────●──◆┤ 255      +81             
+  └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B
+  bit 15…0 0001111111110110   word 1A E7 → 1F F6
+  mask 0x0FF0 · field = (word & mask) >> 4 · other bits kept
+  MASK_FIELD_0001
+  field =
+sheet_text_end
+stub_os_writes=0
+surface=ready

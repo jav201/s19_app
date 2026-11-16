@@ -1,0 +1,41 @@
+# mutant P-113b  rows: R-PE-DEF.113 (proposed)
+# edits: s19_app/tui/styles.tcss: appended at line 4058
+# -k: r_pe_def_113_
+# uptime: 02:01:41 up 2 days, 10:50,  3 users,  load average: 1.57, 1.20, 1.29
+s19_app.__file__ = ~/work/zq-m8b/m/P-113b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_r_pe_def_113_2_at_80x24_the_seven_filter_row_controls_keep_a_region ___
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-69/popen-gw1/test_r_pe_def_113_2_at_80x24_t0')
+defc_dir = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-69/popen-gw1/b103_inc9_w_defc0')
+
+    def test_r_pe_def_113_2_at_80x24_the_seven_filter_row_controls_keep_a_region(tmp_path, defc_dir):
+        """R-PE-DEF.113/2 (R-PICKER-CORRECT.020) - 80x24: the longer label `▽ Pick` must not squeeze a control
+        off the filter row: all seven keep a non-zero region and stay on the row's own lines."""
+    
+        async def body(app, pilot, panel):
+            row = need(panel, "#patch_filter_row")
+            out = {}
+            for control_id in FILTER_ROW_CONTROLS:
+                widget = need(panel, f"#{control_id}")
+                out[control_id] = (widget.region.area, widget.size.width,
+                                   row.region.y <= widget.region.y < row.region.y + row.region.height)
+            return out
+    
+        for control_id, (area, width, on_row) in run(tmp_path, defc_dir, body, size=SIZE_80).items():
+>           assert area > 0 and width > 0, (control_id, area, width)
+E           AssertionError: ('patch_param_bulk_button', 0, 0)
+E           assert (0 > 0)
+
+tests/test_b103_inc8b_bw.py:508: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_113_2_at_80x24_the_seven_filter_row_controls_keep_a_region
+1 failed, 1 passed in 6.20s
+
+# exit=1

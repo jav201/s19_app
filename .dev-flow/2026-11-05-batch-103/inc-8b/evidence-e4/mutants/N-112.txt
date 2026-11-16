@@ -1,0 +1,58 @@
+# mutant N-112  rows: R-PE-DEF.112
+# edits: s19_app/tui/definition_sheet.py:599
+# -k: r_pe_def_112_
+# uptime: 02:00:11 up 2 days, 10:48,  3 users,  load average: 1.51, 1.03, 1.26
+s19_app.__file__ = ~/work/zq-m8b/m/N-112/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_def_112_2_a_300_character_name_cuts_the_title_not_the_frame _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_112_2_a_300_character_name_cuts_the_title_not_the_frame(defc):
+        """R-PE-DEF.112/2 (EX-8B-K3) - a 300-character name -> the card's top line is 139 cells, the title ends `…`."""
+        row = enum_row(defc, name="N" * 300)
+        top = at(painted(row), 1)
+        assert top.startswith(BAR + "╭─ NNN")
+        card = top[len(BAR):].rstrip()
+        assert cell_len(card) == OT["E.card.cap.V111"] == 139
+>       assert card.endswith("─╮") and "… ─" in card and card.count("…") == 1
+E       AssertionError: assert (False)
+E        +  where False = <built-in method endswith of str object at 0x7f740d271bb0>('─╮')
+E        +    where <built-in method endswith of str object at 0x7f740d271bb0> = '╭─ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN…'.endswith
+
+tests/test_b103_inc8b_s2.py:417: AssertionError
+_ test_r_pe_def_112_1_a_300_entry_enum_is_cut_at_the_card_cap_with_one_ellipsis _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_112_1_a_300_entry_enum_is_cut_at_the_card_cap_with_one_ellipsis(defc):
+        """R-PE-DEF.112/1 (EX-8B-K3) - an enum of 300 entries -> the options row is 139 cells and ends `… │`.
+    
+        Without a cap the row is thousands of cells and the sheet's scroller would run to the end of it.
+        """
+        d = defc["defs"]["ENUM_0001"]
+        entries = tuple(EnumEntry(float(i), None, f"STATE_{i}") for i in range(300))
+        row = enum_row(defc, name="BIG_ENUM", enum_entries=entries, default_text=None)
+        lines = painted(row)
+        expected = OT["E.card.300_entries.line1"].replace("( ) 1 STATE_1", "(●) 1 STATE_1")  # ENUM_0001's image holds 1
+        assert expected != OT["E.card.300_entries.line1"] and d.enum_entries
+>       assert at(lines, 2).startswith(BAR + expected)
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7fbd81035170>(('  ┊ ' + '│ ( ) 0 STATE_0   (●) 1 STATE_1   ( ) 2 STATE_2   ( ) 3 STATE_3   ( ) 4 STATE_4   ( ) 5 STATE_5   ( ) 6 STATE_6   ( ) 7 STATE_7   ( ) 8 … │'))
+E        +    where <built-in method startswith of str object at 0x7fbd81035170> = '  ┊ │ ( ) 0 STATE_0   (●) 1 STATE_1   ( ) 2 STATE_2   ( ) 3 STATE_3   ( ) 4 STATE_4   ( ) 5 STATE_5   ( ) 6 STATE_6   ( ) 7 STATE_7   ( ) 8 ST…'.startswith
+E        +      where '  ┊ │ ( ) 0 STATE_0   (●) 1 STATE_1   ( ) 2 STATE_2   ( ) 3 STATE_3   ( ) 4 STATE_4   ( ) 5 STATE_5   ( ) 6 STATE_6   ( ) 7 STATE_7   ( ) 8 ST…' = at([<text '  ┊ └ TAB_VERB 300 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B                                             ...───────────────────────…' [Span(0, 143, 'on #1b233a'), Span(4, 143, '#91abec'), Span(4, 143, 'on #0f1525')] '#91abec'>], 2)
+
+tests/test_b103_inc8b_s2.py:404: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_112_2_a_300_character_name_cuts_the_title_not_the_frame
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_112_1_a_300_entry_enum_is_cut_at_the_card_cap_with_one_ellipsis
+2 failed in 1.82s
+
+# exit=1

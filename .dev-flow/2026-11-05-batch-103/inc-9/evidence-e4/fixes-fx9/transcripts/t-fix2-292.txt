@@ -1,0 +1,9 @@
+# uptime before: 1.12 1.90 1.80 1/638 422302
+s19_app.__file__ = ~/work/zq-fx9/fix2/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+57.6%  0.212 s / 0.500 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 98.31s (0:01:38)
+# rc=0
+# uptime after: 0.92 1.61 1.70 1/639 422798

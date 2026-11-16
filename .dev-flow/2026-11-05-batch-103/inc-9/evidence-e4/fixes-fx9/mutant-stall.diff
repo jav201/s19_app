@@ -1,0 +1,13 @@
+diff --git a/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py b/mutant/bench_sheet.py
+index 99be9ca7..35dc0223 100644
+--- a/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py
++++ b/mutant/bench_sheet.py
+@@ -97,6 +97,8 @@ class ArrayBenchSheet(StagingSheet):
+         self._held: bool = False
+ 
+     def _paint(self) -> None:
++        if self._active_job is not None:
++            __import__("time").sleep(0.8)  # FX9 MUTANT: UI-thread work while a bench job runs
+         row = self._bench_row()
+         if row is not None:
+             self._state_for(row.name)

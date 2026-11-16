@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+..........F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:366: assert [17, 18, 19, 20, 21, 22, ...] == []
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_5_2_the_cursor_stays_on_a_painted_row_while_it_walks_down_a_tall_grid
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 12 passed in 81.45s (0:01:21)

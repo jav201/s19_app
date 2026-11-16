@@ -1,0 +1,2 @@
+not read=0 nodes=47 entities=7 edges=13
+exit=0

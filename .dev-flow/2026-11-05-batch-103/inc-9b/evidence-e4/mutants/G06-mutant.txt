@@ -1,0 +1,61 @@
+DATE 2026-11-15T19:02:23.797254-06:00
+GROUP G06
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:02:14 up 3 days,  3:50,  3 users,  load average: 0.74, 0.50, 0.29
+LOAD_ONE 0.74
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G06/tree/s19_app/__init__.py
+PID 1027325
+SID 1027325
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-10/test_r_pe_bench_96_2_the_pill_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-10/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7e8fdf7410>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.96/2, EX-BC4: the painted pill is bold, foreground #0a0e1b on background #f5c26b; `STAGING SHEET`
+        keeps the title colour it has in the idle look and does not take the pill's background. Operator need (P-127):
+        amber on dark is what shows from across the room that the window is working. Negative control: a pill without its
+        background."""
+        a2l, s19 = case(tmp_path, "LARGE", "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, "LARGE", "OTHER")
+            await pilot.pause(0.2)
+            idle_title = cell_style(app, IDLE_TITLE)
+            try:
+                gate.hold.add("LARGE")
+                await reselect(pilot, sheet, "LARGE", "OTHER")
+                await cue_shown(pilot, app, "decode", "LARGE")
+                await pilot.pause(0.15)
+                return idle_title, cell_style(app, "BUSY"), cell_style(app, IDLE_TITLE), top_row(app)
+            finally:
+                gate.release()
+    
+        idle_title, pill, title, row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        assert idle_title is not None and idle_title.color is not None, "the idle title was not painted"
+        assert pill is not None and pill.bgcolor is not None and pill.color is not None, f"no painted pill: {row!r}"
+>       assert pill.bgcolor.triplet.hex.lower() == BUSY_HEX, (pill, row)
+E       AssertionError: (Style(color=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), bgcolor=Color('#0...e), '╭─ STAGING SHEET   ◒ BUSY · decode LARGE · 0.5 s · keys still work  ───────────────────────────────────────────╮')
+E       assert '#0a0e1b' == '#f5c26b'
+E         
+E         - #f5c26b
+E         + #0a0e1b
+
+tests/test_b103_inc9b_w.py:456: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G06/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour
+1 failed in 7.68s
+EXIT_CODE 1

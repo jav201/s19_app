@@ -1,0 +1,99 @@
+# mutant N-95  rows: R-PE-DEF.95
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:73
+# -k: r_pe_def_95_ or at_b103_i8b_9_
+# uptime: 01:56:17 up 2 days, 10:44,  3 users,  load average: 1.20, 0.72, 1.26
+s19_app.__file__ = ~/work/zq-m8b/m/N-95/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis[80x24] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw0/test_at_b103_i8b_9_formula_bar0')
+defc = {'a2l': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw0/defc0/definitions.a2l'), 'nam... ...], 's19': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw0/defc0/definitions.s19')}
+size = (80, 24)
+
+    @pytest.mark.parametrize("size", [SIZE_80, SIZE_118, SIZE_220], ids=["80x24", "118x54", "220x60"])
+    def test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis(
+        tmp_path: Path, defc, size
+    ) -> None:
+        """AT-B103-I8B-9 (R-PE-DEF.95/1 ... /3, R-PE-DEF.41). Typing 300 `x` into the formula input of DISPLAY_0001
+        shows a refusal tail that ends in `…`, and the formula bar is no wider than the sheet window at 80, 118 and
+        220 columns, outside the scrolling grid (so it never has the grid's 143 cells and never scrolls away). The
+        bar-outside-grid check is the part that needs the new scroller."""
+    
+        async def body(app, pilot, panel):
+            names = defc["names"]
+            await open_sheet(pilot, app, panel, names)
+            grid, sheet, bar, tail = need(panel, GRID), need(panel, SHEET), need(panel, BAR), need(panel, TAIL)
+            await select_row(pilot, panel, names, "DISPLAY_0001")
+            await pilot.press("enter")
+            await settle(pilot, 2)
+            await pilot.press(*("x" * 300))
+            await settle(pilot, 3)
+            return {
+                "inside_grid": grid in bar.ancestors,
+                "bar_width": bar.region.width,
+                "sheet_content_width": sheet.content_region.width,
+                "bar_right": bar.region.right,
+                "sheet_right": sheet.content_region.right,
+                "tail": plain(tail),
+            }
+    
+        out = run(tmp_path, defc, body, size=size)
+        assert out["inside_grid"] is False, "the formula bar must sit outside the scrolling grid"
+>       assert out["bar_width"] <= out["sheet_content_width"], out
+E       AssertionError: {'bar_right': 149, 'bar_width': 143, 'inside_grid': False, 'sheet_content_width': 70, ...}
+E       assert 143 <= 70
+
+tests/test_b103_inc8b_at.py:637: AssertionError
+_ test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis[118x54] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw1/test_at_b103_i8b_9_formula_bar0')
+defc = {'a2l': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw1/defc0/definitions.a2l'), 'nam... ...], 's19': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-16/popen-gw1/defc0/definitions.s19')}
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [SIZE_80, SIZE_118, SIZE_220], ids=["80x24", "118x54", "220x60"])
+    def test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis(
+        tmp_path: Path, defc, size
+    ) -> None:
+        """AT-B103-I8B-9 (R-PE-DEF.95/1 ... /3, R-PE-DEF.41). Typing 300 `x` into the formula input of DISPLAY_0001
+        shows a refusal tail that ends in `…`, and the formula bar is no wider than the sheet window at 80, 118 and
+        220 columns, outside the scrolling grid (so it never has the grid's 143 cells and never scrolls away). The
+        bar-outside-grid check is the part that needs the new scroller."""
+    
+        async def body(app, pilot, panel):
+            names = defc["names"]
+            await open_sheet(pilot, app, panel, names)
+            grid, sheet, bar, tail = need(panel, GRID), need(panel, SHEET), need(panel, BAR), need(panel, TAIL)
+            await select_row(pilot, panel, names, "DISPLAY_0001")
+            await pilot.press("enter")
+            await settle(pilot, 2)
+            await pilot.press(*("x" * 300))
+            await settle(pilot, 3)
+            return {
+                "inside_grid": grid in bar.ancestors,
+                "bar_width": bar.region.width,
+                "sheet_content_width": sheet.content_region.width,
+                "bar_right": bar.region.right,
+                "sheet_right": sheet.content_region.right,
+                "tail": plain(tail),
+            }
+    
+        out = run(tmp_path, defc, body, size=size)
+        assert out["inside_grid"] is False, "the formula bar must sit outside the scrolling grid"
+>       assert out["bar_width"] <= out["sheet_content_width"], out
+E       AssertionError: {'bar_right': 149, 'bar_width': 143, 'inside_grid': False, 'sheet_content_width': 110, ...}
+E       assert 143 <= 110
+
+tests/test_b103_inc8b_at.py:637: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_at.py::test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis[80x24]
+FAILED tests/test_b103_inc8b_at.py::test_at_b103_i8b_9_formula_bar_stays_inside_the_sheet_window_and_the_long_refusal_ends_in_an_ellipsis[118x54]
+2 failed, 1 passed in 67.92s (0:01:07)
+
+# exit=1

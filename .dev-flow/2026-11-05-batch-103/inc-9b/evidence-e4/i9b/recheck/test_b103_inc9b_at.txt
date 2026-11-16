@@ -1,0 +1,181 @@
+### LABEL: test_b103_inc9b_at
+### CLONE: ~/work/zq-i9b/tip
+### DATE: 2026-11-15T14:03:14-06:00
+### UPTIME:  14:03:14 up 2 days, 22:51,  2 users,  load average: 1.08, 0.94, 0.77
+### HEAD: c19503f0f786e85cf4fffc6a9359b5f3947cdf0b
+### STATUS-BEGIN
+ M .dev-flow/2026-11-05-batch-103/inc-9b/E4-roster.md
+ M tests/test_b103_inc9b_at.py
+ M tests/test_b103_inc9b_s.py
+ M tests/test_b103_inc9b_w.py
+ M tests/test_id_registry.py
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/tip/s19_app/__init__.py
+### HEADER-END
+### COLLECT: tests/test_b103_inc9b_at.py
+### COLLECT rc=0
+tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter
+tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title
+tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+
+10 tests collected in 0.07s
+### COLLECTED_NODE_COUNT: 10
+=== NODE 1/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+48.2%  0.259 s / 0.500 s  R-PE-BENCH.94/1 cue after the key  tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 43.61s ==============================
+--- NODE_RC 1/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+=== NODE 2/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+54.7%  0.226 s / 0.500 s  R-PE-BENCH.94/2 preview cue after Enter  tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 6.83s ===============================
+--- NODE_RC 2/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter
+=== NODE 3/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+39.0%  0.305 s / 0.500 s  R-PE-BENCH.94/3 stage cue after alt+s  tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 7.61s ===============================
+--- NODE_RC 3/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+=== NODE 4/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+
+============================== 1 passed in 44.45s ==============================
+--- NODE_RC 4/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title
+=== NODE 5/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+51.0%  0.098 s / 0.200 s  R-PE-BENCH.97/3 median gap  tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+72.9%  0.135 s / 0.500 s  R-PE-BENCH.97/3 max gap  tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+QC-TM: 2 bounds, 0 under 20 % margin
+
+============================== 1 passed in 46.63s ==============================
+--- NODE_RC 5/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+=== NODE 6/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+22.6%  0.387 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 152.19s (0:02:32) =========================
+--- NODE_RC 6/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+=== NODE 7/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+71.9%  0.281 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 165.35s (0:02:45) =========================
+--- NODE_RC 7/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+=== NODE 8/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+90.5%  0.029 s / 0.300 s  R-PE-BENCH.100/3 idle after the last step  tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 7.91s ===============================
+--- NODE_RC 8/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+=== NODE 9/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+94.6%  0.016 s / 0.300 s  R-PE-BENCH.101/2 idle after a refused record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 8.04s ===============================
+--- NODE_RC 9/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+=== NODE 10/10: tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py .                                            [100%]
+============================= QC-TM timing margins =============================
+64.2%  0.107 s / 0.300 s  R-PE-BENCH.101/5 idle after a stale record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 11.15s ==============================
+--- NODE_RC 10/10 rc=0 node=tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+--- end at rc=0 nodes=10 ---
+### END-DATE: 2026-11-15T14:11:40-06:00
+### END-UPTIME:  14:11:40 up 2 days, 23:00,  2 users,  load average: 0.98, 1.00, 0.89

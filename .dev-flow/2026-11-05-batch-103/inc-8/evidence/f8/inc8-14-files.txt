@@ -1,0 +1,14 @@
+bat-test_b103_inc8_a1_service.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 23 passed in 2.32s ============================== RC=0 
+bat-test_b103_inc8_a2_app.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ======================== 23 passed in 119.26s (0:01:59) ======================== RC=0 
+bat-test_b103_inc8_a3_help.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 9 passed in 1.83s =============================== RC=0 
+bat-test_b103_inc8_at_help.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 2 passed in 8.30s =============================== RC=0 
+bat-test_b103_inc8_at.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ======================== 11 passed in 73.66s (0:01:13) ========================= RC=0 
+bat-test_b103_inc8_p_layout.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ======================== 31 passed in 127.72s (0:02:07) ======================== RC=0 
+bat-test_b103_inc8_p_ledger.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================= 10 passed in 54.55s ============================== RC=0 
+bat-test_b103_inc8_p_wiring.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================= 12 passed in 51.79s ============================== RC=0 
+bat-test_b103_inc8_s1_detail.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 43 passed in 2.49s ============================== RC=0 
+bat-test_b103_inc8_s1.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================= 118 passed in 1.91s ============================== RC=0 
+bat-test_b103_inc8_s2_picker_definitions.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 6 passed in 1.70s =============================== RC=0 
+bat-test_b103_inc8_s2_sheet_formula.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================= 27 passed in 11.88s ============================== RC=0 
+bat-test_b103_inc8_s2_sheet_keys.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================= 21 passed in 13.03s ============================== RC=0 
+bat-test_b103_inc8_s2_sheet_rows.txt: ~/work/zq-f8/clone8/s19_app/__init__.py ============================== 35 passed in 8.34s ============================== RC=0 

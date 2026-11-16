@@ -1,0 +1,29 @@
+scenario=status-staged
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+top_screen=Screen
+focused=patch_sheet_body
+status_lines_this_run=3
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: DISPLAY_0001 staged as 25.5 (2 B at 0x800020).
+ledger_entries=1
+selected_rows=[ ●] DISPLAY_0001            VALUE     143.5 | [▶ ] CURVE_DEF_0001          CURVE     5 values
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+    ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                              
+    MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                              
+    MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                            
+   ●DISPLAY_0001            VALUE     143.5                                       25.5                deg C   -40 ├─────────────────◆────────────────────────────●──┤ 150    -118.0 staged         
+  ▶ CURVE_DEF_0001          CURVE     5 values                                    ·                           -                                                                                    
+  └ IDENTICAL phys = raw · UWORD u16 big-endian · RL_U16 · 0x00800050 · 10 B
+    MAP_DEF_0001            MAP       12 values                                   ·                           -                                                                                    
+    VAL_BLK_DEF_0001        VAL_BLK   6 values                                    ·                   units   -                                                                                    
+  CURVE_DEF_0001
+  
+  edit CURVE objects in the Inspector tab
+sheet_text_end
+stub_os_writes=0
+surface=ready

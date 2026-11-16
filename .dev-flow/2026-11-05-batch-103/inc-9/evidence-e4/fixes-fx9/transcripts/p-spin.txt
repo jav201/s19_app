@@ -1,0 +1,21 @@
+# uptime before: 0.73 0.58 0.53 1/636 410626
+s19_app.__file__ = ~/work/zq-fx9/base/s19_app/__init__.py
+PROBE spin load 0.84 0.68 0.57
+APPLY_S 7.358
+PRESS [7.358, 2.218, "spin", 168]
+PRESS [9.576, 2.21, "spin", 170]
+PRESS [11.786, 2.229, "spin", 164]
+PRESS [14.016, 2.217, "encode", 156]
+PRESS [16.233, 2.227, "encode", 162]
+PRESS [18.459, 2.302, "encode", 170]
+PRESS [20.761, 2.234, "encode", 158]
+PRESS [22.995, 2.263, "encode", 162]
+PRESS [25.257, 2.227, "encode", 174]
+PRESS [27.484, 1.467, "encode", 118]
+AFTER [0.223, 26]
+AFTER [0.13, 26]
+AFTER [0.131, 26]
+.
+1 passed in 111.74s (0:01:51)
+# rc=0
+# uptime after: 0.84 0.68 0.57 1/632 411026

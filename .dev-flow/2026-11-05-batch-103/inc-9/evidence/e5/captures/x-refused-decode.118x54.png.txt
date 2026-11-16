@@ -1,0 +1,77 @@
+scene=x-refused-decode
+fixture=hand
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=118x54
+time=2026-11-14 08:21:51
+app_size=118x54
+focused=patch_sheet_body
+selected=REF_BLK
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=True edit={} undo=0
+page_rows=REF_BLK
+subtitle=None
+widget #patch_sheet: size=110x26 classes=[] subtitle=None
+widget #patch_inspector: size=108x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=112x39 classes=['-bench'] subtitle=None
+keys_sent: <type filter 'REF_BLK'> | tab | tab | tab | enter
+status_lines_this_run=2
+status: A2L loaded: hand.a2l
+status: Loaded hand.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                Hex Edit Tool
+      │                                       Patch Editor                                         ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ │ draft · change
+   ▏◉ │ Filter REF_BLK                                            1 of 1 shown  <    Page 1/1   >    Pick   Add list
+   ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏! ││  Parameter         Kind     Current           New          Unit   Limits                    Δ                │
+   ▏✎ ││▶ REF_BLK           VAL_BLK  --                ·                   0 … 255                                    │
+   ▏✔ ││└ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x00400000 · 6 B                                 │
+   ▏⏚ ││decoding 6 values …                                                                                           │
+   ▏✦ ││                                                                                                              │
+   ▏▶ ││                                                                                                              │
+   ▏☑ ││                                                                                                              │
+   ▏⊕ ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││REF_BLK[0] op =                   Set on 1 cells   enter apply  alt+s stage record                            │
+      │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+      │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+      ││   Patch script    Inspector    JSON    Checks                                                                │
+      ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+      │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+      │  Validate   Apply loaded changes   Save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded hand.s19 (S19 only)                                                                     (none)  |  hand.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: hand.a2l
+    Loaded hand.s19 (S19 only)
+    Loaded hand.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

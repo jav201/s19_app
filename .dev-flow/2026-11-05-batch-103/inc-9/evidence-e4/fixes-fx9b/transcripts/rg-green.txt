@@ -1,0 +1,14 @@
+load before: 1.82 1.70 1.80 3/650 475840
+~/work/zq-fx9b/green/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9b/green
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [8 items]
+
+........                                                                 [100%]
+============================== 8 passed in 9.80s ===============================
+rc=0
+load after: 2.01 1.74 1.82 2/648 475949

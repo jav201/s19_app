@@ -1,0 +1,2 @@
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-8b/01-requirements.md
+trace_check: 1 US, 43 active requirements (2 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 1 gap(s)

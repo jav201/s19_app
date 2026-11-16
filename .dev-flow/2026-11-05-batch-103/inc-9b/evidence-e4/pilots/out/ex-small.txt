@@ -1,0 +1,11 @@
+## uptime:  03:58:40 up 2 days, 12:47,  2 users,  load average: 0.41, 0.47, 0.64
+## date: 2026-11-15T09:58:40Z  head: e4485817
+## s19_app.__file__ = ~/work/zq-p9b/tree/s19_app/__init__.py  textual 8.2.8
+P9B EX-BC12 {"esc": "A�[2J", "nel": "B�C", "ok": [true, true]}
+.P9B EX-BC1/BC10 {"names": ["LARGE", "SMALL_BLK"], "job_after_key": "decode", "active_after_key": ["decode", "LARGE", 2, "Definition(name='LARGE', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=1048576, byte_length=1048576, datatype='UBYTE', byte_order='big', bit_mask=None, bit_mask_text=None, conversion_type=None, method_name='NO_COMPU_METHOD', display_format=None, decimals=None, unit='', limits=Limits(lower=0.0, upper=255.0, lower_text='0', upper_text='255'), extended_limits=None, enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, shared_with=None, refusal=None, shape=(1048576,), element_count=1048576, index_mode='ROW_DIR', values_offset=0, record_layout='RL_U8', axes=())", null], "job_while_running": "decode", "job_of_large_after_leaving": "decode", "small_state": "decode"}
+.P9B EX-BC10 {"selected": "DISPLAY_0001", "state": null}
+.P9B EX-BC6/BC14 {"entry_address": "0x800090", "entry_len": 12, "stage_changes_token": true, "stable": true, "undo_changes_token": true, "entries_after_undo": 0, "depths": ["{\"back\": 0, \"bound\": 20, \"forward\": 0}", "{\"back\": 1, \"bound\": 20, \"forward\": 0}", "{\"back\": 0, \"bound\": 20, \"forward\": 1}"]}
+.
+4 passed, 22 deselected in 20.36s
+## rc=0
+## end: 2026-11-15T09:59:01Z  uptime:  03:59:01 up 2 days, 12:47,  2 users,  load average: 0.61, 0.52, 0.65

@@ -1,0 +1,225 @@
+DATE 2026-11-15T19:18:28.687073-06:00
+GROUP G12
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:17:32 up 3 days,  4:06,  3 users,  load average: 0.62, 0.81, 0.67
+LOAD_ONE 0.62
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 3
+S19_APP_FILE ~/work/zq-m9b/groups/G12/tree/s19_app/__init__.py
+PID 1031150
+SID 1031150
+TIMEOUT_S 300
+XDIST_N 0
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/test_r_pe_bench_100_1_the_cue_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6650f781d0>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.100/1, EX-BC8: LARGE's gated decode is released: within 0.3 s of the result's handling the window is
+        in its idle look (border back to the rule colour, title `STAGING SHEET`) and the bench shows the values.
+        Operator need (P-127): an amber border that stays after the job ends is the lie that makes users kill the app.
+        Negative control: the inline border left, or the last busy title left."""
+        a2l, s19 = case(tmp_path, "LARGE", "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, "LARGE", "OTHER")
+            stamps = Stamps(sheet)
+            try:
+                gate.hold.add("LARGE")
+                await reselect(pilot, sheet, "LARGE", "OTHER")
+                await cue_shown(pilot, app, "decode", "LARGE")
+                gate.release()
+                lag = await idle_after_result(pilot, app, stamps, ("decode", "LARGE"), timing_bound(0.3))
+                await pilot.pause(0.2)
+                return lag, has_values(sheet, "LARGE"), top_row(app), border_hex(app)
+            finally:
+                gate.release()
+                stamps.close()
+    
+>       lag, values, row, colour = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9b_w.py:575: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:568: in body
+    lag = await idle_after_result(pilot, app, stamps, ("decode", "LARGE"), timing_bound(0.3))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+stamps = <tests.test_b103_inc9b_w.Stamps object at 0x7f664dacfc50>
+key = ('decode', 'LARGE'), bound = 0.3
+
+    async def idle_after_result(pilot, app, stamps, key, bound: float) -> float:
+        """Seconds from the entry of ``_job_done(*key)`` to the first poll that sees the idle look (the job must have
+        ended: the caller released its gate). The stamp is taken BEFORE the sheet handles the result, so the figure is
+        never shorter than the truth."""
+        await wait_for(pilot, lambda: key in stamps.done, f"the result of {key}", 60)
+        done_at = stamps.done[key]
+        took = await until(pilot, lambda: idle_now(app), max(0.0, done_at + bound - time.monotonic()) + 0.5)
+        seen_at = time.monotonic()
+>       assert took is not None and seen_at - done_at <= report_margin(
+            f"R-PE-BENCH idle after {key[0]} {key[1]}", seen_at - done_at, bound
+        ), (
+            f"the idle look came {seen_at - done_at:.3f} s after the result of {key} (bound {bound} s, {load()}); "
+            f"top border {top_row(app)!r}, painted corner {border_hex(app)}"
+        )
+E       AssertionError: the idle look came 0.803 s after the result of ('decode', 'LARGE') (bound 0.3 s, load 0.68 0.82 0.67); top border '╭─ STAGING SHEET   ◓ BUSY · decode LARGE · 0.5 s · keys still work  ───────────────────────────────────────────╮', painted corner #91abec
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:225: AssertionError
+____ test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result _____
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/test_r_pe_bench_100_2_the_cue_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f664cd47e50>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.100/2, EX-BC8: VAL_BLK_DEF_0001's gated preview (Set `10`) is released: within 0.3 s of the
+        result's handling the idle look is back and the title is `STAGING SHEET`. Operator need (P-127): the same lie
+        after a preview. Negative control: the cue cleared only for decodes."""
+        gate = Gate(monkeypatch, "encode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await open_bench(pilot, sheet, VB)
+            stamps = Stamps(sheet)
+            try:
+                gate.hold.add(VB)
+                await apply_tool(pilot, sheet, "s", "10")
+                await cue_shown(pilot, app, "preview", VB)
+                gate.release()
+                lag = await idle_after_result(pilot, app, stamps, ("preview", VB), timing_bound(0.3))
+                return lag, top_row(app), border_hex(app)
+            finally:
+                gate.release()
+                stamps.close()
+    
+>       lag, row, colour = run(tmp_path, defc_dir, body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9b_w.py:603: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:597: in body
+    lag = await idle_after_result(pilot, app, stamps, ("preview", VB), timing_bound(0.3))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+stamps = <tests.test_b103_inc9b_w.Stamps object at 0x7f664de52450>
+key = ('preview', 'VAL_BLK_DEF_0001'), bound = 0.3
+
+    async def idle_after_result(pilot, app, stamps, key, bound: float) -> float:
+        """Seconds from the entry of ``_job_done(*key)`` to the first poll that sees the idle look (the job must have
+        ended: the caller released its gate). The stamp is taken BEFORE the sheet handles the result, so the figure is
+        never shorter than the truth."""
+        await wait_for(pilot, lambda: key in stamps.done, f"the result of {key}", 60)
+        done_at = stamps.done[key]
+        took = await until(pilot, lambda: idle_now(app), max(0.0, done_at + bound - time.monotonic()) + 0.5)
+        seen_at = time.monotonic()
+>       assert took is not None and seen_at - done_at <= report_margin(
+            f"R-PE-BENCH idle after {key[0]} {key[1]}", seen_at - done_at, bound
+        ), (
+            f"the idle look came {seen_at - done_at:.3f} s after the result of {key} (bound {bound} s, {load()}); "
+            f"top border {top_row(app)!r}, painted corner {border_hex(app)}"
+        )
+E       AssertionError: the idle look came 0.843 s after the result of ('preview', 'VAL_BLK_DEF_0001') (bound 0.3 s, load 0.73 0.83 0.68); top border '╭─ STAGING SHEET   ◑ BUSY · preview VAL_BLK_DEF_0001 · 0.5 s · keys still work  ───────────────────────────────╮', painted corner #91abec
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:225: AssertionError
+_ test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/test_r_pe_bench_100_3_a_writte0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-20/b103_inc9_w_defc1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f664d5d8590>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.100/3. VAL_BLK_DEF_0001 with Set `10` previewed, alt+s with its encode held past the grace (the
+        `stage VAL_BLK_DEF_0001` cue is painted), then released: the document gets its entry and the window is idle
+        (border not amber, title exactly `STAGING SHEET`) within 0.3 s of the last change the screen painted before it.
+        Operator need (P-127): a cue left on after the job ended says the window is still working.
+        Negative control: the inline border left or the last busy title left -> never idle (RED)."""
+        gate = Gate(monkeypatch, "encode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await vb_edit(pilot, sheet, "s", "10")
+                gate.hold.add(VB)
+                t_key = send(app, "alt+s")
+                cue = await watch(app, lambda s, o: titled(s, "stage", VB), t_key + 2.0)
+                held = gate.entered.is_set()
+                if not titled(cue[-1], "stage", VB):
+                    return cue, [], entries_of(app), held
+            finally:
+                gate.release()
+            done = await watch(app, lambda s, o: s.entries >= 1 and is_idle(s), time.monotonic() + 30.0, full=True)
+            return cue, done, entries_of(app), held
+    
+        cue, done, entries, held = run(tmp_path, defc_dir, body)
+        assert held, "control: the record's encode never reached the gate, so no record stage was running"
+        assert titled(cue[-1], "stage", VB), f"precondition: no `stage {VB}` cue while held; last top row {cue[-1].row!r} ({load()})"
+        assert cue[-1].corner == BUSY_HEX, f"precondition: cue title without the busy corner: {cue[-1].corner}"
+        assert len(entries) == 1, f"the record was not written: {entries}"
+        leave = done[-1]
+>       assert is_idle(leave), f"the window never returned to its idle look; last top row {leave.row!r}, corner {leave.corner}"
+E       AssertionError: the window never returned to its idle look; last top row '╭─ STAGING SHEET   ◒ BUSY · stage VAL_BLK_DEF_0001 · 0.5 s · keys still work  ─────────────────────────────────╮', corner #91abec
+E       assert False
+E        +  where False = is_idle(Snap(t=274029.741699729, row='╭─ STAGING SHEET   ◒ BUSY · stage VAL_BLK_DEF_0001 · 0.5 s · keys still work  ──────────...                                                                                                                    ')))
+
+tests/test_b103_inc9b_at.py:496: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G12/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+3 failed in 54.50s
+EXIT_CODE 1

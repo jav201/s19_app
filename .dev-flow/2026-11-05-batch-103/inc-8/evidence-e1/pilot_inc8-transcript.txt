@@ -1,0 +1,160 @@
+a2l            3816  definitions.a2l
+s19             698  definitions.s19
+s19_app.__file__ = ~/work/zq-i8/clone/s19_app/__init__.py
+DEFC.ENUM_0001.kind = 'enum'
+DEFC.ENUM_0001.section = 'CHARACTERISTIC'
+DEFC.ENUM_0001.char_type = 'VALUE'
+DEFC.ENUM_0001.address = 8388608
+DEFC.ENUM_0001.byte_length = 1
+DEFC.ENUM_0001.datatype = 'UBYTE'
+DEFC.ENUM_0001.byte_order = 'big'
+DEFC.ENUM_0001.bit_mask = None
+DEFC.ENUM_0001.bit_mask_text = None
+DEFC.ENUM_0001.conversion_type = 'TAB_VERB'
+DEFC.ENUM_0001.method_name = 'CM_DEF_ENUM'
+DEFC.ENUM_0001.display_format = '%.0'
+DEFC.ENUM_0001.decimals = 0
+DEFC.ENUM_0001.unit = ''
+DEFC.ENUM_0001.limits = Limits(lower=0.0, upper=3.0, lower_text='0', upper_text='3')
+DEFC.ENUM_0001.extended_limits = None
+DEFC.ENUM_0001.enum_table = 'VT_DEF_STATE'
+DEFC.ENUM_0001.enum_entries = (EnumEntry(raw=0.0, raw_max=None, text='OFF'), EnumEntry(raw=1.0, raw_max=None, text='IDLE'), EnumEntry(raw=2.0, raw_max=None, text='RUN'), EnumEntry(raw=3.0, raw_max=None, text='FAULT'))
+DEFC.ENUM_0001.default_text = 'UNKNOWN_STATE'
+DEFC.ENUM_0001.coeffs_linear = None
+DEFC.ENUM_0001.coeffs = None
+DEFC.ENUM_0001.record_layout = None
+DEFC.ENUM_0001.shared_with = None
+DEFC.ENUM_0001.refusal = None
+DEFC.ENUM_0001.decode = Decoded(stored=1, value='IDLE', text='IDLE')
+DEFC.MASK_BIT_0001.kind = 'number'
+DEFC.MASK_BIT_0001.section = 'CHARACTERISTIC'
+DEFC.MASK_BIT_0001.char_type = 'VALUE'
+DEFC.MASK_BIT_0001.address = 8388624
+DEFC.MASK_BIT_0001.byte_length = 2
+DEFC.MASK_BIT_0001.datatype = 'UWORD'
+DEFC.MASK_BIT_0001.byte_order = 'big'
+DEFC.MASK_BIT_0001.bit_mask = 1
+DEFC.MASK_BIT_0001.bit_mask_text = '0x0001'
+DEFC.MASK_BIT_0001.conversion_type = 'IDENTICAL'
+DEFC.MASK_BIT_0001.method_name = 'CM_DEF_IDENT'
+DEFC.MASK_BIT_0001.display_format = '%.0'
+DEFC.MASK_BIT_0001.decimals = 0
+DEFC.MASK_BIT_0001.unit = ''
+DEFC.MASK_BIT_0001.limits = Limits(lower=0.0, upper=1.0, lower_text='0', upper_text='1')
+DEFC.MASK_BIT_0001.extended_limits = None
+DEFC.MASK_BIT_0001.enum_table = None
+DEFC.MASK_BIT_0001.enum_entries = ()
+DEFC.MASK_BIT_0001.default_text = None
+DEFC.MASK_BIT_0001.coeffs_linear = None
+DEFC.MASK_BIT_0001.coeffs = None
+DEFC.MASK_BIT_0001.record_layout = None
+DEFC.MASK_BIT_0001.shared_with = None
+DEFC.MASK_BIT_0001.refusal = None
+DEFC.MASK_BIT_0001.decode = Decoded(stored=1, value=1, text='1')
+DEFC.MASK_FIELD_0001.kind = 'number'
+DEFC.MASK_FIELD_0001.section = 'CHARACTERISTIC'
+DEFC.MASK_FIELD_0001.char_type = 'VALUE'
+DEFC.MASK_FIELD_0001.address = 8388624
+DEFC.MASK_FIELD_0001.byte_length = 2
+DEFC.MASK_FIELD_0001.datatype = 'UWORD'
+DEFC.MASK_FIELD_0001.byte_order = 'big'
+DEFC.MASK_FIELD_0001.bit_mask = 4080
+DEFC.MASK_FIELD_0001.bit_mask_text = '0x0FF0'
+DEFC.MASK_FIELD_0001.conversion_type = 'IDENTICAL'
+DEFC.MASK_FIELD_0001.method_name = 'CM_DEF_IDENT'
+DEFC.MASK_FIELD_0001.display_format = '%.0'
+DEFC.MASK_FIELD_0001.decimals = 0
+DEFC.MASK_FIELD_0001.unit = ''
+DEFC.MASK_FIELD_0001.limits = Limits(lower=0.0, upper=255.0, lower_text='0', upper_text='255')
+DEFC.MASK_FIELD_0001.extended_limits = None
+DEFC.MASK_FIELD_0001.enum_table = None
+DEFC.MASK_FIELD_0001.enum_entries = ()
+DEFC.MASK_FIELD_0001.default_text = None
+DEFC.MASK_FIELD_0001.coeffs_linear = None
+DEFC.MASK_FIELD_0001.coeffs = None
+DEFC.MASK_FIELD_0001.record_layout = None
+DEFC.MASK_FIELD_0001.shared_with = None
+DEFC.MASK_FIELD_0001.refusal = None
+DEFC.MASK_FIELD_0001.decode = Decoded(stored=174, value=174, text='174')
+DEFC.DISPLAY_0001.kind = 'number'
+DEFC.DISPLAY_0001.section = 'CHARACTERISTIC'
+DEFC.DISPLAY_0001.char_type = 'VALUE'
+DEFC.DISPLAY_0001.address = 8388640
+DEFC.DISPLAY_0001.byte_length = 2
+DEFC.DISPLAY_0001.datatype = 'SWORD'
+DEFC.DISPLAY_0001.byte_order = 'big'
+DEFC.DISPLAY_0001.bit_mask = None
+DEFC.DISPLAY_0001.bit_mask_text = None
+DEFC.DISPLAY_0001.conversion_type = 'LINEAR'
+DEFC.DISPLAY_0001.method_name = 'CM_DEF_LIN'
+DEFC.DISPLAY_0001.display_format = '%.1'
+DEFC.DISPLAY_0001.decimals = 1
+DEFC.DISPLAY_0001.unit = 'deg C'
+DEFC.DISPLAY_0001.limits = Limits(lower=-40.0, upper=150.0, lower_text='-40', upper_text='150')
+DEFC.DISPLAY_0001.extended_limits = Limits(lower=-50.0, upper=200.0, lower_text='-50', upper_text='200')
+DEFC.DISPLAY_0001.enum_table = None
+DEFC.DISPLAY_0001.enum_entries = ()
+DEFC.DISPLAY_0001.default_text = None
+DEFC.DISPLAY_0001.coeffs_linear = (0.5, 0.0)
+DEFC.DISPLAY_0001.coeffs = None
+DEFC.DISPLAY_0001.record_layout = None
+DEFC.DISPLAY_0001.shared_with = None
+DEFC.DISPLAY_0001.refusal = None
+DEFC.DISPLAY_0001.decode = Decoded(stored=287, value=143.5, text='143.5')
+DEFC.word.image = 1a e7
+ENC.DISPLAY_0001.'25.5' = Encoded(0x800020, 00 33, notices=())
+ENC.DISPLAY_0001.'150' = Encoded(0x800020, 01 2c, notices=())
+ENC.DISPLAY_0001.'175' = Encoded(0x800020, 01 5e, notices=('DISPLAY_0001: 175 is outside the limits -40..150 and inside the extended limits -50..200',))
+ENC.DISPLAY_0001.'250' = Refusal('A2L-DEF-EXTENDED', 'DISPLAY_0001: 250 is outside the extended limits -50..200')
+ENC.DISPLAY_0001.'250'.message_len = 57
+ENC.DISPLAY_0001.'abc' = Refusal('A2L-DEF-NUMBER', "DISPLAY_0001: 'abc' is not a number")
+ENC.DISPLAY_0001.'abc'.message_len = 35
+ENC.DISPLAY_0001."<300 x 'x'>" = Refusal('A2L-DEF-NUMBER', "DISPLAY_0001: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…' is not a number")
+ENC.DISPLAY_0001."<300 x 'x'>".message_len = 289
+ENC.ENUM_0001.'RUN' = Encoded(0x800000, 02, notices=())
+ENC.ENUM_0001.'WALK' = Refusal('A2L-DEF-ENUM', "ENUM_0001: 'WALK' is not a text of VT_DEF_STATE")
+ENC.ENUM_0001.'WALK'.message_len = 47
+ENC.ENUM_0001.'2' = Refusal('A2L-DEF-ENUM', "ENUM_0001: '2' is not a text of VT_DEF_STATE")
+ENC.ENUM_0001.'2'.message_len = 44
+ENC.MASK_FIELD_0001.'255' = Encoded(0x800010, 1f f7, notices=())
+ENC.MASK_FIELD_0001.'256' = Refusal('A2L-DEF-LIMITS', 'MASK_FIELD_0001: 256 is outside the limits 0..255')
+ENC.MASK_FIELD_0001.'256'.message_len = 49
+ENC.MASK_BIT_0001.'0' = Encoded(0x800010, 1a e6, notices=())
+ENC.MASK_BIT_0001.'2' = Refusal('A2L-DEF-LIMITS', 'MASK_BIT_0001: 2 is outside the limits 0..1')
+ENC.MASK_BIT_0001.'2'.message_len = 43
+ENC.DISPLAY_0001.'A[b]\x1b[2J' = Refusal('A2L-DEF-NUMBER', "DISPLAY_0001: 'A[b]�[2J' is not a number")
+ENC.DISPLAY_0001.'A[b]\x1b[2J'.message_len = 40
+ORDER.MASK_FIELD_0001->MASK_BIT_0001.e1 = Encoded(0x800010, 1f f7, notices=())
+ORDER.MASK_FIELD_0001->MASK_BIT_0001.e2 = Encoded(0x800010, 1f f6, notices=())
+ORDER.MASK_FIELD_0001->MASK_BIT_0001.decode.MASK_FIELD_0001 = Decoded(stored=255, value=255, text='255')
+ORDER.MASK_FIELD_0001->MASK_BIT_0001.decode.MASK_BIT_0001 = Decoded(stored=0, value=0, text='0')
+ORDER.MASK_FIELD_0001->MASK_BIT_0001.no_overlay.decode.MASK_FIELD_0001 = Decoded(stored=174, value=174, text='174')
+ORDER.MASK_BIT_0001->MASK_FIELD_0001.e1 = Encoded(0x800010, 1a e6, notices=())
+ORDER.MASK_BIT_0001->MASK_FIELD_0001.e2 = Encoded(0x800010, 1f f6, notices=())
+ORDER.MASK_BIT_0001->MASK_FIELD_0001.decode.MASK_FIELD_0001 = Decoded(stored=255, value=255, text='255')
+ORDER.MASK_BIT_0001->MASK_FIELD_0001.decode.MASK_BIT_0001 = Decoded(stored=0, value=0, text='0')
+ORDER.MASK_BIT_0001->MASK_FIELD_0001.no_overlay.decode.MASK_BIT_0001 = Decoded(stored=1, value=1, text='1')
+UNSTAGE.combined = 1ff6; UNSTAGE.image = 1ae7; UNSTAGE.bit_restored = 1ff7
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.kind = 'text'
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.char_type = 'ASCII'
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.byte_length = 42
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.record_layout = None
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.shared_with = None
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.refusal = None
+V171.ASAM.C.ASCII.UBYTE.NUMBER_42.decode = Decoded(stored=None, value='Hello ASAM', text='Hello ASAM')
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.kind = 'number'
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.char_type = 'VALUE'
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.byte_length = 2
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.record_layout = None
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.shared_with = 'ASAM.C.SCALAR.UWORD.IDENTICAL'
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.refusal = None
+V171.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0.decode = Decoded(stored=35, value=35, text='35')
+V171.ENC.ASCII.'ABC' = Encoded(0x810200, 41 42 43 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00, notices=())
+V171.ENC.ASCII."<43 x 'x'>" = Refusal('A2L-DEF-TEXT-LENGTH', 'ASAM.C.ASCII.UBYTE.NUMBER_42: the text has 43 characters — at most 42 fit')
+V171.ENC.ASCII.'été' = Refusal('A2L-DEF-TEXT-CHAR', "ASAM.C.ASCII.UBYTE.NUMBER_42: 'é' is not a printable ASCII character")
+V171.ENC.MASK = Refusal('A2L-DEF-OVERLAP', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: its bytes at 0x810002 are shared with ASAM.C.SCALAR.UWORD.IDENTICAL')
+COST.page_names = 200; COST.tags = 13990
+COST.describe_200.median_s = 0.1301; COST.describe_200.max_s = 0.2086
+COST.decode_200.median_s = 0.0002; COST.decode_200.max_s = 0.0003
+COST.page_kinds = {'array': 4, 'curve': 7, 'enum': 17, 'number': 170, 'text': 2}
+exit=0

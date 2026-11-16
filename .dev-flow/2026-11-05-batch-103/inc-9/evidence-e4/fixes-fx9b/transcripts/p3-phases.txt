@@ -1,0 +1,15 @@
+load before: 1.86 1.72 1.81 2/647 476095
+~/work/zq-fx9b/probe/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9b/probe
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_fx9b_probe3.py FX9BPHASES {"spin": {"n": 19, "p50": 0.161, "max": 0.345, "wait_p50": 0.104, "wait_max": 0.289}, "encode": {"n": 148, "p50": 0.159, "max": 0.425, "wait_p50": 0.117, "wait_max": 0.376}, "idle": {"n": 59, "p50": 0.015, "max": 0.11, "wait_p50": 0.001, "wait_max": 0.056}, "spin0": -6.71, "enc0": 5.29, "arrived": 49.06}
+.
+
+======================== 1 passed in 141.65s (0:02:21) =========================
+rc=0
+load after: 1.82 1.77 1.82 4/654 477051

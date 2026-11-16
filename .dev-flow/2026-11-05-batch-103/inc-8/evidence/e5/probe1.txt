@@ -1,0 +1,20 @@
+== 2026-11-14T03:27:57Z  21:27:57 up 1 day,  6:16,  3 users,  load average: 1.10, 0.95, 1.01
+s19_app.__file__ = ~/work/zq-e5-8/t0/s19_app/__init__.py
+s19_app.__file__ = ~/work/zq-e5-8/t0/s19_app/__init__.py
+PROBE.R12.factor_one.text = '287.0'
+PROBE.D4.175.decoded_text = '175.0'
+.PROBE.encode_empty = Encoded
+PROBE.cleared.pending = ''
+PROBE.cleared.cells = {'Parameter': 'ASAM.C.ASCII.UBYTE.NUMB…', 'Kind': 'ASCII', 'Current': '"Hello ASAM"', 'New': '·', 'Unit': 'hours', 'Limits': '-', 'Δ': '', 'mark': '▶ '}
+PROBE.cleared.tail = '0/42 chars · NUL-padded  enter stage ↓'
+.PROBE.118.body_width = 118 bar_width = 118 tail_width = 81
+PROBE.118.tail = 'deg C  raw 287→51 · 01 1F → 00 33  ✓ in limits  enter stage ↓'
+.PROBE.first.disabled = False
+PROBE. NO_SUCH_PARAMETER_0001 disabled = True value = '' tail = 'edit ? objects in the Inspector tab'
+PROBE.first.disabled = False
+PROBE. CUBOID_0001 disabled = True value = '' tail = 'edit VALUE objects in the Inspector tab'
+.PROBE.bidi.unit_cell = 'deg\u202eC'
+.
+5 passed in 1.45s
+RC 0
+== 2026-11-14T03:27:59Z

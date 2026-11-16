@@ -1,0 +1,51 @@
+load before: 1.14 1.02 1.31 3/654 494215
+~/work/zq-fx9c/pre/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..............F......................................................... [ 83%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_________________________ test_tc080_2_c7_purity_probe _________________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_tc080_2_c7_purity_probe() -> None:
+        """TC-080.2 — the panel obtains ``mem_map`` from the PARAMETER alone.
+    
+        Intent: LLR-080.2 / C-7 / risk R4 — "the card's data need is the exact
+        pressure that produces a ``self.app`` reach". The panel is presentational:
+        0 ``self.app``, 0 service imports. AST-walked over the real class source, so
+        it cannot be satisfied by a comment claiming purity.
+        """
+        from tests.support import package_source as ps
+    
+        tree = ps.mro_class_tree(
+            PatchEditorPanel,
+            "s19_app.tui.screens_directionb.patch_editor",
+            ps.MIN_PATCH_EDITOR_CLASSES,
+        )
+    
+        app_reaches = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert app_reaches == [], (
+            f"PatchEditorPanel reaches self.app at {len(app_reaches)} site(s) — "
+            "the card must be fed by parameter, not by reaching for the app"
+        )
+E       AssertionError: PatchEditorPanel reaches self.app at 2 site(s) — the card must be fed by parameter, not by reaching for the app
+E       assert [<ast.Attribu...7ff7ed551fc0>] == []
+E         
+E         Left contains 2 more items, first extra item: <ast.Attribute object at 0x7ff7eeb3d6c0>
+E         Use -v to get more diff
+
+tests/test_tui_patch_card.py:784: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe - Assertion...
+1 failed, 85 passed in 125.62s (0:02:05)
+rc=1
+load after: 1.86 1.34 1.39 2/657 494963

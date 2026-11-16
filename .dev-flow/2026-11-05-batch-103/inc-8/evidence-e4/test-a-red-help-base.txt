@@ -1,0 +1,126 @@
+$ [base tree d5d48685 + group A tests] python -c "import s19_app;print(s19_app.__file__)" ; python -m pytest -p no:cacheprovider -n 2 -q -rf tests/test_b103_inc8_a3_help.py   (RED on base; ~ = runner scratch)
+ 15:25:07 up 1 day, 13 min,  4 users,  load average: 4.86, 3.19, 1.96
+~/work/zq-e4-8-test-a/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFF.                                                                [100%]
+=================================== FAILURES ===================================
+______________ test_r_pe_def_84_1_patch_script_line_names_entries ______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_84_1_patch_script_line_names_entries():
+        lines = patch_lines()
+>       assert "Patch script" in lines, sorted(lines)
+E       AssertionError: ['--', '?', 'A2L', 'Add', 'Address', 'Apply loaded changes', ...]
+E       assert 'Patch script' in {'--': 'in the BEFORE → AFTER bytes, an address the image does not hold.', '?': 'opens this help.', 'A2L': "lists the ...the highlighted row's full name and address sit under the ledger.", 'Add': 'appends the entry typed in the form.', ...}
+
+tests/test_b103_inc8_a3_help.py:57: AssertionError
+_________ test_r_pe_def_83_1_step_one_names_the_regions_and_four_tabs __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_83_1_step_one_names_the_regions_and_four_tabs():
+        first = step_one()
+        missing = [word for word in REGIONS + TABS if word not in first]
+>       assert not missing, f"step 1 does not name {missing}: {first!r}"
+E       AssertionError: step 1 does not name ['filter row', 'STAGING SHEET', 'LANDS IN', 'Patch script']: 'Edit a change-set: the PATCH SCRIPT ledger on the left lists its entries; the inspector on the right shows the highlighted entry and holds the Inspector, JSON, Checks and A2L tabs. Load an S19/HEX image first (`^L`) to see the bytes an entry replaces.'
+E       assert not ['filter row', 'STAGING SHEET', 'LANDS IN', 'Patch script']
+
+tests/test_b103_inc8_a3_help.py:44: AssertionError
+_____________ test_r_pe_def_85_1_staging_sheet_line_names_the_keys _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_85_1_staging_sheet_line_names_the_keys():
+        lines = patch_lines()
+>       assert "STAGING SHEET" in lines, sorted(lines)
+E       AssertionError: ['--', '?', 'A2L', 'Add', 'Address', 'Apply loaded changes', ...]
+E       assert 'STAGING SHEET' in {'--': 'in the BEFORE → AFTER bytes, an address the image does not hold.', '?': 'opens this help.', 'A2L': "lists the ...the highlighted row's full name and address sit under the ledger.", 'Add': 'appends the entry typed in the form.', ...}
+
+tests/test_b103_inc8_a3_help.py:64: AssertionError
+____________ test_r_pe_def_83_2_no_step_names_the_a2l_tab_or_a_side ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_83_2_no_step_names_the_a2l_tab_or_a_side():
+        body = section_body_text("patch")
+        found = [phrase for phrase in STALE_PHRASES if phrase in body]
+>       assert not found, f"the help still names {found}"
+E       AssertionError: the help still names ['A2L tab', 'A2L PARAMETERS', 'on the left', 'on the right']
+E       assert not ['A2L tab', 'A2L PARAMETERS', 'on the left', 'on the right']
+
+tests/test_b103_inc8_a3_help.py:50: AssertionError
+_____________________ test_r_pe_def_86_2_field_label_line ______________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_86_2_field_label_line():
+>       _formula_label_line("field =")
+
+tests/test_b103_inc8_a3_help.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'field ='
+
+    def _formula_label_line(label: str):
+        lines = patch_lines()
+>       assert label in lines, f"no `{label} — …` line: {sorted(lines)}"
+E       AssertionError: no `field = — …` line: ['--', '?', 'A2L', 'Add', 'Address', 'Apply loaded changes', 'Bytes', 'Checks', "Don't save", 'Edit', 'Edit JSON', 'Execute scope', 'File', 'Filter', 'Inspector', 'JSON', 'Load', 'Next', 'Open patches/', 'Parse pasted', 'Prev', 'Redo', 'Refresh', 'Remove', 'Run checks', 'Save', 'Save patched image as', 'Scope', 'String', 'Undo', 'Use parameter', 'Validate', 'Width', 'Write before/after report', 'Write file', 'arrow keys', 'enter', 'space', '·', '◐', '✓', '✗']
+E       assert 'field =' in {'--': 'in the BEFORE → AFTER bytes, an address the image does not hold.', '?': 'opens this help.', 'A2L': "lists the ...the highlighted row's full name and address sit under the ledger.", 'Add': 'appends the entry typed in the form.', ...}
+
+tests/test_b103_inc8_a3_help.py:74: AssertionError
+______________________ test_r_pe_def_86_1_new_label_line _______________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_86_1_new_label_line():
+>       _formula_label_line("new =")
+
+tests/test_b103_inc8_a3_help.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'new ='
+
+    def _formula_label_line(label: str):
+        lines = patch_lines()
+>       assert label in lines, f"no `{label} — …` line: {sorted(lines)}"
+E       AssertionError: no `new = — …` line: ['--', '?', 'A2L', 'Add', 'Address', 'Apply loaded changes', 'Bytes', 'Checks', "Don't save", 'Edit', 'Edit JSON', 'Execute scope', 'File', 'Filter', 'Inspector', 'JSON', 'Load', 'Next', 'Open patches/', 'Parse pasted', 'Prev', 'Redo', 'Refresh', 'Remove', 'Run checks', 'Save', 'Save patched image as', 'Scope', 'String', 'Undo', 'Use parameter', 'Validate', 'Width', 'Write before/after report', 'Write file', 'arrow keys', 'enter', 'space', '·', '◐', '✓', '✗']
+E       assert 'new =' in {'--': 'in the BEFORE → AFTER bytes, an address the image does not hold.', '?': 'opens this help.', 'A2L': "lists the ...the highlighted row's full name and address sit under the ledger.", 'Add': 'appends the entry typed in the form.', ...}
+
+tests/test_b103_inc8_a3_help.py:74: AssertionError
+____________ test_r_pe_def_87_1_use_parameter_uses_the_selected_row ____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_87_1_use_parameter_uses_the_selected_row():
+        lines = patch_lines()
+        assert "Use parameter" in lines, sorted(lines)
+        effect = lines["Use parameter"]
+>       assert "Inspector" in effect and "selected row" in effect, effect
+E       AssertionError: on the A2L tab, copies the highlighted parameter's address and the loaded image's current bytes into the entry form; the document changes only through Add or Edit.
+E       assert ('Inspector' in "on the A2L tab, copies the highlighted parameter's address and the loaded image's current bytes into the entry form; the document changes only through Add or Edit.")
+
+tests/test_b103_inc8_a3_help.py:94: AssertionError
+______________________ test_r_pe_def_86_3_text_label_line ______________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_86_3_text_label_line():
+>       _formula_label_line("text =")
+
+tests/test_b103_inc8_a3_help.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'text ='
+
+    def _formula_label_line(label: str):
+        lines = patch_lines()
+>       assert label in lines, f"no `{label} — …` line: {sorted(lines)}"
+E       AssertionError: no `text = — …` line: ['--', '?', 'A2L', 'Add', 'Address', 'Apply loaded changes', 'Bytes', 'Checks', "Don't save", 'Edit', 'Edit JSON', 'Execute scope', 'File', 'Filter', 'Inspector', 'JSON', 'Load', 'Next', 'Open patches/', 'Parse pasted', 'Prev', 'Redo', 'Refresh', 'Remove', 'Run checks', 'Save', 'Save patched image as', 'Scope', 'String', 'Undo', 'Use parameter', 'Validate', 'Width', 'Write before/after report', 'Write file', 'arrow keys', 'enter', 'space', '·', '◐', '✓', '✗']
+E       assert 'text =' in {'--': 'in the BEFORE → AFTER bytes, an address the image does not hold.', '?': 'opens this help.', 'A2L': "lists the ...the highlighted row's full name and address sit under the ledger.", 'Add': 'appends the entry typed in the form.', ...}
+
+tests/test_b103_inc8_a3_help.py:74: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_84_1_patch_script_line_names_entries
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_83_1_step_one_names_the_regions_and_four_tabs
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_85_1_staging_sheet_line_names_the_keys
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_83_2_no_step_names_the_a2l_tab_or_a_side
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_86_2_field_label_line
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_86_1_new_label_line - A...
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_87_1_use_parameter_uses_the_selected_row
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_86_3_text_label_line - ...
+8 failed, 1 passed in 1.23s

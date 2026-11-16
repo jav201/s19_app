@@ -221,7 +221,20 @@ from tools.id_registry import (
 # batch-103 Inc 7 E4: +4 (tests/test_b103_label_list.py, tests/test_b103_a2l_list_view.py,
 # tests/test_b103_a2l_list_at.py, tests/support/b103_label_list.py); 312 -> 316.
 # batch-103 Inc 7 E4 MU7: +1 (tests/test_b103_inc7_mu_survivors.py); 316 -> 317.
-EXPECTED_SCANNED_TEST_FILES = 317
+# batch-103 Inc 8 E4 integration: +18 (the 14 tests/test_b103_inc8_*.py modules and
+# the four support modules tests/b103_inc8_a_support.py, tests/support/b103_inc8_{p,s1,s2}.py);
+# 311 -> 329 on the Inc 8 branch.
+# batch-103 Inc 9 E4 group B integration: +6 (tests/test_b103_inc9_b_{model,tools,cells,canvas,detail}.py
+# and the support module tests/support/b103_inc9_b.py); 329 -> 335.
+# batch-103 Inc 9 E4 widget / A9 / I integration: +7 (tests/test_b103_inc9_{a9,i,w_jobs,w_keys,w_select,w_stage}.py
+# and the support module tests/support/b103_inc9_w.py); 335 -> 342.
+# batch-103 Inc 9 MW9 mutant run: +1 (tests/test_b103_inc9_w_mutants.py); 342 -> 343.
+# batch-103 Inc 9 FX9d O-B: +1 (tests/test_b103_inc9_ob_json_view.py); 343 -> 344.
+# batch-103 Inc 8b E4: +5 (tests/test_b103_inc8b_s1.py, _s2.py, _bw.py, _at.py and the support module
+# tests/support/b103_inc8b_r.py); 344 -> 349.
+# batch-103 Inc 9b E4 correction: +3 (tests/test_b103_inc9b_at.py, _s.py, _w.py); 349 -> 352, measured.
+# Final content merge of Inc 7 and Inc 9b: measured 358 (312 + 5 + 41).
+EXPECTED_SCANNED_TEST_FILES = 358
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

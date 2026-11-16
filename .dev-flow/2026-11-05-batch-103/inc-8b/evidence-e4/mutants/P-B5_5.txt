@@ -1,0 +1,13 @@
+# mutant P-B5_5  rows: R-PE-BENCH.5 (proposed)
+# edits: s19_app/tui/definition_bench_view.py:293
+# -k: r_pe_bench_5_
+# uptime: 02:01:49 up 2 days, 10:50,  3 users,  load average: 1.61, 1.21, 1.30
+s19_app.__file__ = ~/work/zq-m8b/m/P-B5_5/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.................                                                        [100%]
+17 passed in 2.14s
+
+# exit=0

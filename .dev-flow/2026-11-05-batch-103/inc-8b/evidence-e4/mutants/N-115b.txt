@@ -1,0 +1,13 @@
+# mutant N-115b  rows: R-PE-DEF.115
+# edits: s19_app/tui/definition_sheet.py:573
+# -k: r_pe_def_115_
+# uptime: 02:00:17 up 2 days, 10:48,  3 users,  load average: 1.55, 1.05, 1.26
+s19_app.__file__ = ~/work/zq-m8b/m/N-115b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 1.76s
+
+# exit=0

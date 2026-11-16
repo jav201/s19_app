@@ -1,0 +1,1 @@
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface

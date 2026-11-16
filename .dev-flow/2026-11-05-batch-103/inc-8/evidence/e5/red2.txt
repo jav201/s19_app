@@ -1,0 +1,153 @@
+== 2026-11-14T03:30:24Z  21:30:24 up 1 day,  6:19,  3 users,  load average: 1.76, 1.27, 1.12
+s19_app.__file__ = ~/work/zq-e5-8/t0m/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input[36-2-cuboid] ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '~/work/zq-e5-8/tmp/pytest-of-<runner>/pytest-2/popen-gw1/s2_defc0/definitions.a2l', 's...())}, path=PosixPath('~/work/zq-e5-8/tmp/pytest-of-<runner>/pytest-2/popen-gw1/s2_defc0/definitions.a2l'))
+case_id = '36-2-cuboid'
+
+    @pytest.mark.parametrize("case_id", ["36-1-refused", "36-2-cuboid"])
+    def test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input(defc, case_id):
+        """R-PE-DEF.36/1, /2 (E5: the "input disabled" half had no sheet assertion): a refused row and the
+        `cuboid` copy have no editor, so the input is disabled and empty; the editable row before them
+        enables it again, so the assertion cannot hold for a sheet that always disables the input."""
+        from s19_app.tui.a2l_definition import describe_definition
+    
+        if case_id == "36-1-refused":
+            name = "NO_SUCH_PARAMETER_0001"
+            other = describe_definition(name, defc.a2l)
+            assert other.refusal is not None
+        else:
+            name = "CUBOID_0001"
+            other = dataclasses.replace(
+                defc.defs["DISPLAY_0001"], name=name, kind="cuboid", element_count=24
+            )
+        defs = {"DISPLAY_0001": defc.defs["DISPLAY_0001"], name: other}
+    
+        async def drive():
+            async with sheet_ctx() as (app, pilot, sheet):
+                sheet.show_page(["DISPLAY_0001", name], defs, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                assert sheet.selected_name == "DISPLAY_0001"
+                assert formula_input(sheet).disabled is False
+                await select(pilot, sheet, name)
+                assert formula_input(sheet).disabled is True
+                assert formula_input(sheet).value == ""
+                assert bar_tail(sheet).startswith("edit ") and "objects in the Inspector tab" in bar_tail(sheet)
+                await select(pilot, sheet, "DISPLAY_0001")
+                assert formula_input(sheet).disabled is False
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_formula.py:335: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_formula.py:46: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx() as (app, pilot, sheet):
+            sheet.show_page(["DISPLAY_0001", name], defs, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            assert sheet.selected_name == "DISPLAY_0001"
+            assert formula_input(sheet).disabled is False
+            await select(pilot, sheet, name)
+>           assert formula_input(sheet).disabled is True
+E           AssertionError: assert False is True
+E            +  where False = OsClipboardInput(id='patch_sheet_input').disabled
+E            +    where OsClipboardInput(id='patch_sheet_input') = formula_input(StagingSheet(id='patch_sheet'))
+
+tests/test_b103_inc8_s2_sheet_formula.py:329: AssertionError
+___ test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input[36-1-refused] ___
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '~/work/zq-e5-8/tmp/pytest-of-<runner>/pytest-2/popen-gw0/s2_defc0/definitions.a2l', 's...())}, path=PosixPath('~/work/zq-e5-8/tmp/pytest-of-<runner>/pytest-2/popen-gw0/s2_defc0/definitions.a2l'))
+case_id = '36-1-refused'
+
+    @pytest.mark.parametrize("case_id", ["36-1-refused", "36-2-cuboid"])
+    def test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input(defc, case_id):
+        """R-PE-DEF.36/1, /2 (E5: the "input disabled" half had no sheet assertion): a refused row and the
+        `cuboid` copy have no editor, so the input is disabled and empty; the editable row before them
+        enables it again, so the assertion cannot hold for a sheet that always disables the input."""
+        from s19_app.tui.a2l_definition import describe_definition
+    
+        if case_id == "36-1-refused":
+            name = "NO_SUCH_PARAMETER_0001"
+            other = describe_definition(name, defc.a2l)
+            assert other.refusal is not None
+        else:
+            name = "CUBOID_0001"
+            other = dataclasses.replace(
+                defc.defs["DISPLAY_0001"], name=name, kind="cuboid", element_count=24
+            )
+        defs = {"DISPLAY_0001": defc.defs["DISPLAY_0001"], name: other}
+    
+        async def drive():
+            async with sheet_ctx() as (app, pilot, sheet):
+                sheet.show_page(["DISPLAY_0001", name], defs, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                assert sheet.selected_name == "DISPLAY_0001"
+                assert formula_input(sheet).disabled is False
+                await select(pilot, sheet, name)
+                assert formula_input(sheet).disabled is True
+                assert formula_input(sheet).value == ""
+                assert bar_tail(sheet).startswith("edit ") and "objects in the Inspector tab" in bar_tail(sheet)
+                await select(pilot, sheet, "DISPLAY_0001")
+                assert formula_input(sheet).disabled is False
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_formula.py:335: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_formula.py:46: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx() as (app, pilot, sheet):
+            sheet.show_page(["DISPLAY_0001", name], defs, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            assert sheet.selected_name == "DISPLAY_0001"
+            assert formula_input(sheet).disabled is False
+            await select(pilot, sheet, name)
+>           assert formula_input(sheet).disabled is True
+E           AssertionError: assert False is True
+E            +  where False = OsClipboardInput(id='patch_sheet_input').disabled
+E            +    where OsClipboardInput(id='patch_sheet_input') = formula_input(StagingSheet(id='patch_sheet'))
+
+tests/test_b103_inc8_s2_sheet_formula.py:329: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input[36-2-cuboid]
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_36_n_a_row_with_no_editor_disables_the_input[36-1-refused]
+2 failed in 1.56s
+RC 1
+== 2026-11-14T03:30:27Z

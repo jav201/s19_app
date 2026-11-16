@@ -1,0 +1,51 @@
+# mutant N-96a  rows: R-PE-DEF.96
+# edits: s19_app/tui/definition_sheet.py:114
+# -k: r_pe_def_96_
+# uptime: 01:57:27 up 2 days, 10:46,  3 users,  load average: 0.87, 0.72, 1.22
+s19_app.__file__ = ~/work/zq-m8b/m/N-96a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+....FF                                                                   [100%]
+=================================== FAILURES ===================================
+________________ test_r_pe_def_96_1_a_wide_name_is_cut_by_cells ________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_96_1_a_wide_name_is_cut_by_cells(defc):
+        """R-PE-DEF.96/1 - a name of 14 x ``温度`` (56 cells) -> ``C.name_wide.fit26`` (25 cells + ``…``, 26 with the pad)."""
+        line, _, _ = paint(defc, display(defc, name="温度" * 14))
+>       assert cell_slice(line.plain, START["Parameter"], WIDTH["Parameter"]) == TR["C.name_wide.fit26"]
+E       AssertionError: assert '温度温度温度温度温度温度 …' == '温度温度温度温度温度温度… '
+E         
+E         - 温度温度温度温度温度温度… 
+E         ?              -
+E         + 温度温度温度温度温度温度 …
+E         ?             +
+
+tests/test_b103_inc8b_s1.py:308: AssertionError
+________________ test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells ________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells(defc):
+        """R-PE-DEF.96/2 - a unit ``温度温度温度`` -> ``C.unit_wide.fit8``."""
+        line, _, _ = paint(defc, display(defc, unit="温度温度温度"))
+>       assert cell_slice(line.plain, START["Unit"], WIDTH["Unit"]) == TR["C.unit_wide.fit8"]
+E       AssertionError: assert '温度温 …' == '温度温… '
+E         
+E         - 温度温… 
+E         ?     -
+E         + 温度温 …
+E         ?    +
+
+tests/test_b103_inc8b_s1.py:315: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_1_a_wide_name_is_cut_by_cells
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells
+2 failed, 4 passed in 1.80s
+
+# exit=1

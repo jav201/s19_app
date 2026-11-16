@@ -1,0 +1,33 @@
+# mutant N-114b  rows: R-PE-DEF.114
+# edits: s19_app/tui/definition_sheet.py:930
+# -k: r_pe_def_114_
+# uptime: 01:59:25 up 2 days, 10:48,  3 users,  load average: 1.37, 0.93, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/N-114b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow(defc):
+        """R-PE-DEF.114/3 - current 143.5, new +inf -> ``L.cell.DISPLAY_0001.new_inf`` (``?`` at 16, no ``▶``)."""
+        cell = _the_cell(defc, "DISPLAY_0001.new_inf").plain
+>       assert cell == TR["L.cell.DISPLAY_0001.new_inf"]
+E       AssertionError: assert '   -40  ├───...──●─▶    150 ' == '   -40  ├───...────┤    150 '
+E         
+E         -    -40  ├───────?────────┤    150 
+E         ?                 -        ^
+E         +    -40  ├──────────────●─▶    150 
+E         ?                        + ^
+
+tests/test_b103_inc8b_s1.py:830: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow
+1 failed, 1 passed in 1.80s
+
+# exit=1

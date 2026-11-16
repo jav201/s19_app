@@ -1,0 +1,272 @@
+TREE -n 2026-11-14T06:14:00Z load: 10.23 10.08 9.80
+~/work/zq-f8/m2/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-f8/m2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [6 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+[gw1] [ 16%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+[gw0] [ 33%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+[gw1] [ 50%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+[gw0] [ 66%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+[gw1] [ 83%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+[gw0] [100%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+
+=================================== FAILURES ===================================
+_ test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw0/test_r_pe_021_a_click_on_the_p0')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw0/inc8_p_layout_defc0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+                assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+                await pilot.press(*text)
+            add = need(panel, "#patch_entry_add_button")
+            add.scroll_visible(animate=False)
+            await settle(pilot)
+            seen = app.screen.find_widget(add).visible_region
+            assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+            assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+            for _ in range(60):
+                await pilot.pause()
+                if app._change_service.document.entries:
+                    break
+            statuses = list(app.log_lines)
+            assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+            assert not [line for line in statuses if line.startswith("Validate:")], f"{size}: Validate ran: {statuses}"
+            assert [(e.address, bytes(e.encoded_bytes)) for e in app._change_service.document.entries] == [
+                (0x800021, b"\x11")
+            ]
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await show_tab(pilot, "patch_tab_inspector")
+        for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+            assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+            await pilot.press(*text)
+        add = need(panel, "#patch_entry_add_button")
+        add.scroll_visible(animate=False)
+        await settle(pilot)
+        seen = app.screen.find_widget(add).visible_region
+        assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+        assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+        for _ in range(60):
+            await pilot.pause()
+            if app._change_service.document.entries:
+                break
+        statuses = list(app.log_lines)
+>       assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+E       AssertionError: (118, 54): last status 'Validate: 0 entries, 0 error(s), 0 warning(s)'
+E       assert 'Validate: 0 ... 0 warning(s)' == 'Patch Editor: entry added.'
+E         
+E         - Patch Editor: entry added.
+E         + Validate: 0 entries, 0 error(s), 0 warning(s)
+
+tests/test_b103_inc8_p_layout.py:429: AssertionError
+_ test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw1/test_r_pe_021_a_click_on_the_p0')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw1/inc8_p_layout_defc0')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+                assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+                await pilot.press(*text)
+            add = need(panel, "#patch_entry_add_button")
+            add.scroll_visible(animate=False)
+            await settle(pilot)
+            seen = app.screen.find_widget(add).visible_region
+            assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+            assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+            for _ in range(60):
+                await pilot.pause()
+                if app._change_service.document.entries:
+                    break
+            statuses = list(app.log_lines)
+            assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+            assert not [line for line in statuses if line.startswith("Validate:")], f"{size}: Validate ran: {statuses}"
+            assert [(e.address, bytes(e.encoded_bytes)) for e in app._change_service.document.entries] == [
+                (0x800021, b"\x11")
+            ]
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await show_tab(pilot, "patch_tab_inspector")
+        for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+            assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+            await pilot.press(*text)
+        add = need(panel, "#patch_entry_add_button")
+        add.scroll_visible(animate=False)
+        await settle(pilot)
+        seen = app.screen.find_widget(add).visible_region
+        assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+        assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+        for _ in range(60):
+            await pilot.pause()
+            if app._change_service.document.entries:
+                break
+        statuses = list(app.log_lines)
+>       assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+E       AssertionError: (220, 60): last status 'Validate: 0 entries, 0 error(s), 0 warning(s)'
+E       assert 'Validate: 0 ... 0 warning(s)' == 'Patch Editor: entry added.'
+E         
+E         - Patch Editor: entry added.
+E         + Validate: 0 entries, 0 error(s), 0 warning(s)
+
+tests/test_b103_inc8_p_layout.py:429: AssertionError
+_ test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw0/test_r_pe_021_a_click_on_the_p1')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-6/popen-gw0/inc8_p_layout_defc0')
+size = (80, 24)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+                assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+                await pilot.press(*text)
+            add = need(panel, "#patch_entry_add_button")
+            add.scroll_visible(animate=False)
+            await settle(pilot)
+            seen = app.screen.find_widget(add).visible_region
+            assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+            assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+            for _ in range(60):
+                await pilot.pause()
+                if app._change_service.document.entries:
+                    break
+            statuses = list(app.log_lines)
+            assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+            assert not [line for line in statuses if line.startswith("Validate:")], f"{size}: Validate ran: {statuses}"
+            assert [(e.address, bytes(e.encoded_bytes)) for e in app._change_service.document.entries] == [
+                (0x800021, b"\x11")
+            ]
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        await show_tab(pilot, "patch_tab_inspector")
+        for selector, text in (("#patch_entry_address_input", "0x800021"), ("#patch_entry_bytes_input", "11")):
+            assert await click_visible(pilot, selector), f"{size}: click missed {selector}"
+            await pilot.press(*text)
+        add = need(panel, "#patch_entry_add_button")
+        add.scroll_visible(animate=False)
+        await settle(pilot)
+        seen = app.screen.find_widget(add).visible_region
+        assert seen.area, f"{size}: Add is not painted after scrolling the Inspector pane"
+        assert await pilot.click(offset=seen.center), f"{size}: the click at {seen.center} reached no widget"
+        for _ in range(60):
+            await pilot.pause()
+            if app._change_service.document.entries:
+                break
+        statuses = list(app.log_lines)
+>       assert statuses[-1] == "Patch Editor: entry added.", f"{size}: last status {statuses[-1]!r}"
+E       AssertionError: (80, 24): last status 'Validate: 0 entries, 0 error(s), 0 warning(s)'
+E       assert 'Validate: 0 ... 0 warning(s)' == 'Patch Editor: entry added.'
+E         
+E         - Patch Editor: entry added.
+E         + Validate: 0 entries, 0 error(s), 0 warning(s)
+
+tests/test_b103_inc8_p_layout.py:429: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24]
+========================= 3 failed, 3 passed in 52.38s =========================
+RC=1

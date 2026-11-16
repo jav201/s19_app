@@ -516,27 +516,53 @@ def test_tc_b97_34_patch_layout_monotonic_in_its_inputs() -> None:
     assert large.value > small.value
 
 
-def _patch_reading(app, panel) -> dict:
-    from tests.test_b97_patch_editor import strip_reading
+async def _patch_reading(app, panel, pilot) -> dict:
+    """Inc 8 R-TUI-063.3: the ledger lives in the Patch script tab and the strip in the
+    Inspector tab (was: both shown at once), so each is read with its own tab shown.
+    Inc 8 R-PE-DEF.1.1 / R-TUI-064.3: below 118x54 the panel scrolls, so the landing pane is
+    scrolled into view first; the reading also carries the widths the measured layout derives
+    (the Value column, the strip's bytes per row) and the landing pane's and table's heights."""
+    from tests.test_b97_patch_editor import strip_reading, strip_row_bytes
 
+    landing = panel.query_one("#patch_inspector")
+    landing.scroll_visible(animate=False)
+    await settle(pilot, 2)
+    panel.query_one("#patch_tab_script").press()
+    await settle(pilot, 3)
     table = panel.query_one("#patch_doc_entries_table", DataTable)
     rows = painted_rows(app, table)
     span = column_span(table, 2)
+    msx = table.max_scroll_x
+    values = [r[span[0]:span[1]].rstrip() for r in rows[1:] if r.strip()]
+    panel.query_one("#patch_tab_inspector").press()
+    await settle(pilot, 3)
+    strip = [len(r["offsets"]) for r in strip_reading(app, panel)]
+    panel.query_one("#patch_tab_script").press()
+    await settle(pilot, 3)
     return {
-        "msx": table.max_scroll_x,
-        "values": [r[span[0]:span[1]].rstrip() for r in rows[1:] if r.strip()],
-        "strip": [len(r["offsets"]) for r in strip_reading(app, panel)],
-        "rows": rows,
+        "msx": msx, "values": values, "strip": strip, "rows": rows,
+        "value_w": panel._widths().value, "strip_bytes": strip_row_bytes(panel),
+        "landing_h": landing.region.height, "table_h": table.region.height,
     }
+
+
+def _blank_outside(app, panel, *bands) -> list:
+    """Blank panel rows outside every one of ``bands`` (Inc 8 R-PE-DEF.1.1: the growing
+    region is two windows now, the sheet window and LANDS IN; was: ``#patch_main``).
+    ``blank_panel_rows`` takes one band, so a row blank outside all of them is blank
+    outside each one."""
+    sets = [set(blank_panel_rows(app, panel, outside=band)) for band in bands]
+    return sorted(set.intersection(*sets))
 
 
 def test_tc_b97_34_patch_painted_widths_follow_four_resizes(tmp_path: Path) -> None:
     """TC-B97-34 (LLR-149.1, Patch painted arm, PC-19): in one session 118x54,
-    160x56, 220x60, 260x70 and back to 118x54 the ledger and the strip repaint
-    at every step — no horizontal scroll, the 8-byte ``A5`` run clipped with
-    one ``…`` at 118 and whole from 220, the strip 8 bytes per row at 118 and
-    16 from 220 — and back at 118x54 the painted ledger equals the first
-    reading.
+    160x56, 220x60, 260x70, 80x24 and back to 118x54 the ledger and the strip
+    repaint at every step — no horizontal scroll, the 8-byte ``A5`` run whole
+    where the measured Value column holds it and clipped with one ``…`` where
+    it does not, the strip at the bytes per row the measured width gives (Inc 8
+    R-PE-DEF.1.1: was clipped at 118, 8 then 16 bytes per row) — and back at
+    118x54 the painted ledger equals the first reading.
 
     RED: the strip not re-rendered on resize (M15); ``Column.width`` +
     ``refresh(layout=True)`` alone (the PC-8 vacuous path, M22).
@@ -547,10 +573,10 @@ def test_tc_b97_34_patch_painted_widths_follow_four_resizes(tmp_path: Path) -> N
         table.move_cursor(row=3)
         await settle(pilot, 3)
         out = []
-        for size in ((118, 54), (160, 56), (220, 60), (260, 70), (118, 54)):
+        for size in ((118, 54), (160, 56), (220, 60), (260, 70), (80, 24), (118, 54)):
             await pilot.resize_terminal(*size)
             await settle(pilot, 6)
-            out.append((size, _patch_reading(app, panel)))
+            out.append((size, await _patch_reading(app, panel, pilot)))
         return out
 
     readings = run_patch(tmp_path, (118, 54), body)
@@ -559,11 +585,16 @@ def test_tc_b97_34_patch_painted_widths_follow_four_resizes(tmp_path: Path) -> N
         assert reading["msx"] == 0, (size, reading["msx"])
         assert len(reading["values"]) >= 4, (size, reading["values"])
         value = reading["values"][3]
-        if size[0] >= 220:
-            assert value == run_a5 and reading["strip"] == [16], (size, value, reading["strip"])
-        if size[0] == 118:
+        # Inc 8 R-PE-DEF.1.1 supersedes "clipped at 118, whole from 220; strip 8 at 118, 16 from
+        # 220": the ledger and the Inspector pane take the landing pane's full width, so the clip
+        # and the bytes per row are derived from the measured widths at each size (ruling RR-2).
+        if len(run_a5) <= reading["value_w"]:
+            assert value == run_a5, (size, value, reading["value_w"])
+        else:
             assert value.count("…") == 1 and run_a5.startswith(value[:-1]), (size, value)
-            assert reading["strip"] == [8], (size, reading["strip"])
+        assert reading["strip"] == [reading["strip_bytes"]], (size, reading["strip"], reading["strip_bytes"])
+    # The 80x24 arm keeps a resize that changes the strip's rows (M15).
+    assert len({tuple(r["strip"]) for _s, r in readings}) > 1, [r["strip"] for _s, r in readings]
     assert readings[0][1]["rows"] == readings[-1][1]["rows"]
 
 
@@ -580,7 +611,8 @@ def test_tc_b97_35_patch_no_horizontal_overflow(tmp_path: Path, size) -> None:
         found = []
         # batch-102 Inc 5 (E3 ruling 8): the A2L tab joins the census; the
         # query guard keeps this green on the pre-integration tree.
-        for chip in ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks", "patch_tab_a2l"):
+        # Inc 8 R-TUI-063.3: the A2L chip leaves and Patch script joins.
+        for chip in ("patch_tab_script", "patch_tab_inspector", "patch_tab_json", "patch_tab_checks"):
             if panel.query(f"#{chip}"):
                 panel.query_one(f"#{chip}").press()
                 await settle(pilot, 3)
@@ -624,19 +656,24 @@ def test_tc_b97_37_patch_no_wrapped_row_and_clips(tmp_path: Path, size) -> None:
     path = write_changeset(tmp_path / LONG_FILE, [_bytes_entry(a, r) for a, r in CALIB_ENTRIES])
 
     async def body(app, pilot, panel):
-        if panel.query("#patch_tab_json"):
-            panel.query_one("#patch_tab_json").press()  # the inspector headings live there
-        await settle(pilot, 4)
-        members = {c: [w for w in panel.query(f".{c}") if is_displayed(w)] for c in PATCH_CATEGORIES}
-        wrapped = []
-        for category, widgets in members.items():
-            for w in widgets:
-                if isinstance(w, Static):
-                    lines = str(w.render()).count("\n") + 1
-                    height = w.get_content_height(w.size, app.size, w.content_region.width)
-                    if height != lines:
-                        wrapped.append((category, w.id, height, lines))
-        reading = _patch_reading(app, panel)
+        # Inc 8 R-TUI-063.3: the ledger shows on the Patch script tab and the inspector
+        # headings on the JSON tab (was: JSON tab with the ledger beside it), so the
+        # members are collected on both tabs and merged per category.
+        members, wrapped = {c: [] for c in PATCH_CATEGORIES}, []
+        for chip in ("patch_tab_script", "patch_tab_json"):
+            if panel.query(f"#{chip}"):
+                panel.query_one(f"#{chip}").press()
+            await settle(pilot, 4)
+            tab_members = {c: [w for w in panel.query(f".{c}") if is_displayed(w)] for c in PATCH_CATEGORIES}
+            for category, widgets in tab_members.items():
+                members[category] += [w for w in widgets if w not in members[category]]
+                for w in widgets:
+                    if isinstance(w, Static):
+                        lines = str(w.render()).count("\n") + 1
+                        height = w.get_content_height(w.size, app.size, w.content_region.width)
+                        if height != lines:
+                            wrapped.append((category, w.id, height, lines))
+        reading = await _patch_reading(app, panel, pilot)
         holder = panel.query_one("#patch_identity_ribbon")
         ribbon = painted_rows(app, holder)[0].rstrip()
         return {c: len(ws) for c, ws in members.items()}, wrapped, reading, (ribbon, holder.content_region.width)
@@ -647,7 +684,11 @@ def test_tc_b97_37_patch_no_wrapped_row_and_clips(tmp_path: Path, size) -> None:
     for value in reading["values"]:
         if "…" in value:
             assert value.count("…") == 1 and value.endswith("…"), value
-    assert len(set(reading["rows"][1:7])) == 6
+    # Inc 8 R-PE-DEF.1.1 supersedes "the 6 painted ledger rows": the 9-row landing pane paints
+    # the rows its table height leaves under the header; they stay pairwise distinct (ruling RR-1).
+    assert reading["landing_h"] == 9, reading["landing_h"]
+    ledger = reading["rows"][1:7]
+    assert len(ledger) == min(6, reading["table_h"] - 1) and len(set(ledger)) == len(ledger), ledger
     ribbon, ribbon_w = ribbon
     assert ribbon.endswith("_TAIL_MARK.json · change"), ribbon
     # The name is clipped exactly where it does not fit (it fits from 220 on;
@@ -686,8 +727,9 @@ def test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card(tmp_path: Path, si
     """
 
     async def body(app, pilot, panel):
-        main = panel.query("#patch_main")
-        return blank_panel_rows(app, panel, outside=main.first() if main else None)
+        # Inc 8 R-PE-DEF.1.1: the exclusion moves from #patch_main to the sheet window and
+        # LANDS IN (the two regions that take the spare rows); the assertion below is unchanged.
+        return _blank_outside(app, panel, panel.query_one("#patch_sheet_win"), panel.query_one("#patch_inspector"))
 
     assert run_patch(tmp_path, size, body) == []
 
@@ -1656,7 +1698,7 @@ async def _at_16_reading(app, pilot, key: str) -> dict:
         table = panel.query_one("#patch_doc_entries_table", DataTable)
         void, _header = _header_void(app, table)
         reading.update(width=table.ordered_columns[2].width, void=void, clipped=0,
-                       blank=blank_panel_rows(app, panel, outside=panel.query_one("#patch_main")))
+                       blank=_blank_outside(app, panel, panel.query_one("#patch_sheet_win"), panel.query_one("#patch_inspector")))  # Inc 8 R-PE-DEF.1.1: was #patch_main
     elif key == "flow":
         rows = painted_rows(app, panel.query_one("#flow_pipeline"))
         content = panel.query_one("#flow_pipeline_scroll").scrollable_content_region

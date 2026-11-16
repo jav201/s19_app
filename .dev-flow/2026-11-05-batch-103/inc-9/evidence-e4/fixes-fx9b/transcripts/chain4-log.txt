@@ -1,0 +1,10 @@
+start Sat Nov 14 09:19:49 AM CST 2026
+head 29_1 (load before 1.57): ================= 1 passed, 9 deselected in 108.01s (0:01:48) ================== | 
+head 29_2 (load before 1.06): ================= 1 failed, 9 deselected in 116.03s (0:01:56) ================== | slowest press 0.560 s (load 1.91 1.65 1.74); load-sensitive
+head 82_1 (load before 1.91): ================= 1 failed, 9 deselected in 169.21s (0:02:49) ================== | slowest press 1.872 s (load 2.66 2.17 1.93); load-sensitive
+head 20_1 (load before 1.61): ======================= 1 passed, 9 deselected in 7.49s ======================== | 
+marr 29_2 (load before 1.52): ================= 1 failed, 9 deselected in 111.37s (0:01:51) ================== | slowest press 0.959 s (load 1.00 1.61 1.75); load-sensitive
+mstall 29_2 (load before 1.00): ================== 1 failed, 9 deselected in 95.25s (0:01:35) ================== | slowest press 1.122 s (load 0.98 1.42 1.66); load-sensitive
+mstall 82_1 (load before 0.98): ================= 1 failed, 9 deselected in 142.95s (0:02:22) ================== | slowest press 2.861 s (load 1.08 1.27 1.57); load-sensitive
+end Sat Nov 14 09:32:58 AM CST 2026
+CHAIN4_DONE

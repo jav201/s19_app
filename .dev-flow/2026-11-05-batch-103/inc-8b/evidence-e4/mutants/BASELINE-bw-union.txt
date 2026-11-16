@@ -1,0 +1,13 @@
+# mutant BASELINE-bw-union  rows: bw rows
+# edits: none (unmutated baseline)
+# -k: r_pe_def_101_ or r_pe_def_113_ or r_pe_def_81_ or r_pe_def_85_ or r_pe_def_92_ or r_pe_bench_36_ or r_pe_bench_107_ or r_pe_bench_108_ or r_pe_bench_11_ or r_pe_bench_17_
+# uptime: 01:47:30 up 2 days, 10:36,  2 users,  load average: 0.86, 0.80, 1.77
+s19_app.__file__ = ~/work/zq-m8b/m/BASELINE-bw-union/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+..............................                                           [100%]
+30 passed in 43.74s
+
+# exit=0

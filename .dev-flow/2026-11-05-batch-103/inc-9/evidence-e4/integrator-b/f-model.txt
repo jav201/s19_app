@@ -1,0 +1,8 @@
+== f-model  Fri Nov 13 09:41:22 PM CST 2026  load: 5.13 4.58 3.09
+s19_app.__file__ = ~/work/zq-e4-9-int/fin2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....................                                                     [100%]
+20 passed in 1.43s
+rc=0

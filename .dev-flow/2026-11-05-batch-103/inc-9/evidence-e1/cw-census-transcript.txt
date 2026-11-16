@@ -1,0 +1,4 @@
+code-wire: v3.1.0-8-gb6cd30d
+12 marks written, 0 nodes without code
+marks=12 graph_nodes=12 calls=6 findings=6 parse_failures=0
+extract exit=1

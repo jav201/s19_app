@@ -1,0 +1,84 @@
+scene=grid
+fixture=grid8b
+os_clipboard=stubbed (never touched)
+commit=7c4e377c
+requested_size=220x60
+time=2026-11-15 03:01:11
+app_size=220x60
+focused=patch_sheet_body
+selected=DISPLAY_0001
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, MAP_DEF_0001, TEXT_0001, NAN_0001
+body: size=194x28 content_size=194x28 sheet_top=0
+grid: scroll_x=0.0 size=194x28 virtual_size=194x28 max_scroll_x=0 show_horizontal_scrollbar=False
+subtitle=None
+widget #patch_sheet: size=194x29 classes=[] subtitle=None
+widget #patch_inspector: size=192x7 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=196x45 classes=[] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | up
+status_lines_this_run=2
+status: A2L loaded: grid8b.a2l
+status: Loaded grid8b.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                                                                   Hex Edit Tool
+                        │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/
+   ▏ ◫  Workspace       │
+   ▏ ≡  A2L Explorer    │ draft · change
+   ▏ ◉  MAC View        │ Filter _0001                                                                                                                                7 of 7 shown  <    Page 1/1   >    ▽ Pick   Add list
+   ▏ ▤  Memory Map      │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏ !  Issues Report   ││  Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │                                                   │
+   ▏ ✎  Patch Editor    ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿                                                   │
+   ▏ ✔  Check Editor    ││  ENUM_0001                 │VALUE     │1 IDLE              │·               │        │     0  ├─────●──────────┤      3 │                    │                                                   │
+   ▏ ⏚  A2B Diff        ││  MASK_BIT_0001             │VALUE     │1 (0x01)            │·               │        │     0  ├───────────────●┤      1 │                    │                                                   │
+   ▏ ✦  Flow Builder    ││  MASK_FIELD_0001           │VALUE     │174 (0xAE)          │·               │        │     0  ├──────────●─────┤    255 │                    │                                                   │
+   ▏ ▶  Flow Execution  ││▶ DISPLAY_0001              │VALUE     │143.5               │·               │deg C   │   -40  ├──────────────●─┤    150 │                    │                                                   │
+   ▏ ☑  Checks          ││  ┊ └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B                                                                                                                             │
+   ▏ ⊕  CRC Designer    ││  MAP_DEF_0001              │MAP 4x3   │▆▃▅▃ 12             │·               │        │ -1.00k         …            1.00k│                    │                                                   │
+                        ││  TEXT_0001                 │ASCII     │"Hello ASAM, ASCII …│·               │        │                -                 │                    │                                                   │
+                        ││  NAN_0001                  │VALUE     │nan                 │·               │deg C   │   -40  ├───────?────────┤    150 │                    │                                                   │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││DISPLAY_0001 new =                   deg C  (-40 … 150)                                                                                                                                           │
+                        │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+                        │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+                        ││   Patch script    Inspector    JSON    Checks                                                                                                                                                    │
+                        ││  No entries yet: Add one, paste a change-set or Load a file.                                                                                                                                     │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        │╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+                        │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh
+                        │  Validate   Apply loaded changes   Save
+                        │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded grid8b.s19 (S19 only)                                                                                                                                                                       (none)  |  grid8b.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: grid8b.a2l
+    Loaded grid8b.s19 (S19 only)
+    Loaded grid8b.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

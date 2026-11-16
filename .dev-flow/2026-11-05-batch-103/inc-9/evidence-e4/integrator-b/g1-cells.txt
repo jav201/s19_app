@@ -1,0 +1,146 @@
+== g1-cells  Fri Nov 13 09:14:19 PM CST 2026  load: 1.41 0.79 0.85
+s19_app.__file__ = ~/work/zq-e4-9-int/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..............FF.............FF..                                        [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001--1.00k \u2026 1.00k] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001', limits = '-1.00k … 1.00k'
+
+    @pytest.mark.parametrize("name, limits", [("CURVE_DEF_0001", "0 … 65.5k"), ("MAP_DEF_0001", "-1.00k … 1.00k")])
+    def test_r_pe_bench_17_the_limits_cell(defc, name, limits):
+        """R-PE-BENCH.17/1,2 - CURVE_DEF_0001 `0 … 65.5k`; MAP_DEF_0001 `-1.00k … 1.00k` (EX-G10)."""
+        o = defc_obj(defc, name)
+>       assert cells_of(o, summarised(o))[0][LIMITS] == limits
+E       AssertionError: assert '-1k … 1k' == '-1.00k … 1.00k'
+E         
+E         - -1.00k … 1.00k
+E         + -1k … 1k
+
+tests/test_b103_inc9_b_cells.py:192: AssertionError
+__________ test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells(defc):
+        """R-PE-BENCH.15/2 - VAL_BLK_DEF_0001 +Δ 5 on (0,0), (1,0) -> `2 cells`; a cell whose text is unchanged is not counted."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        edit = {(0, 0): "41.9", (1, 0): "16.0"}
+        assert cells_of(o, summarised(o, edit=edit))[0][NEW] == "2 cells"
+        same_text = {**edit, (2, 0): "31.8"}  # 31.8 is the current text of (2,0)
+>       assert cells_of(o, summarised(o, edit=same_text))[0][NEW] == "2 cells", "count the changed cells, not the selection"
+E       AssertionError: count the changed cells, not the selection
+E       assert '3 cells' == '2 cells'
+E         
+E         - 2 cells
+E         ? ^
+E         + 3 cells
+E         ? ^
+
+tests/test_b103_inc9_b_cells.py:151: AssertionError
+___________ test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-3/popen-gw0/test_r_pe_bench_19_1_nan_colum0')
+
+    def test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip(tmp_path):
+        """R-PE-BENCH.19/1 - EX-N1: F32_BLK `1`, `nan`, `3` -> the strip: block, space, block, no exception."""
+        o = hand_object(tmp_path, "F32_BLK", "RL_F32", 3, bytes.fromhex("3F800000FFFFFFFF40400000"))
+>       strip = db.summary_strip(o.values, o.grid, 40)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+values = BenchValues(numbers=array('d', [1.0, nan, 3.0]), texts=None, missing=frozenset())
+grid = Grid(mode='grid', nx=16, ny=1, count=3, layout='flat'), width = 40
+
+    def summary_strip(values: BenchValues, grid: Grid, width: int) -> Text:
+        """A one-line summary of the values, at most ``width`` cells: a chart shows
+        an eighth block per k-th point (k = ceil(n/width)); a grid shows a styled █
+        per k-th column in the ramp step of its finite mean; lo/hi over the finite
+        values only (a non-finite point or an all-missing column is a space)."""
+        if width <= 0:
+            return Text()
+        lo, hi = finite_range(values.numbers, values.missing)
+        line = Text()
+        if grid.mode == "chart":
+            k = max(1, math.ceil(grid.nx / width))
+            for point in range(0, grid.nx, k):
+                value = values.numbers[point]
+                if point in values.missing or not math.isfinite(value):
+                    line.append(" ")
+                    continue
+                t = 0.0 if lo == hi else (value - lo) / (hi - lo)
+                line.append(_BLOCKS[round(t * 7)])
+            return line
+        k = max(1, math.ceil(grid.nx / width))
+        for column in range(0, grid.nx, k):
+            total = 0.0
+            count = 0
+            for row in range(grid.ny):
+                index = column + grid.nx * row
+>               value = values.numbers[index]
+                        ^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:507: IndexError
+_______ test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-3/popen-gw0/test_r_pe_bench_19_3_every_val0')
+
+    def test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip(tmp_path):
+        """R-PE-BENCH.19/3 - three `FFFFFFFF` floats: no exception, nothing shaded (lo = hi = 0)."""
+        o = hand_object(tmp_path, "F32_BLK", "RL_F32", 3, bytes.fromhex("FFFFFFFF" * 3))
+>       strip = db.summary_strip(o.values, o.grid, 40)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+values = BenchValues(numbers=array('d', [nan, nan, nan]), texts=None, missing=frozenset())
+grid = Grid(mode='grid', nx=16, ny=1, count=3, layout='flat'), width = 40
+
+    def summary_strip(values: BenchValues, grid: Grid, width: int) -> Text:
+        """A one-line summary of the values, at most ``width`` cells: a chart shows
+        an eighth block per k-th point (k = ceil(n/width)); a grid shows a styled █
+        per k-th column in the ramp step of its finite mean; lo/hi over the finite
+        values only (a non-finite point or an all-missing column is a space)."""
+        if width <= 0:
+            return Text()
+        lo, hi = finite_range(values.numbers, values.missing)
+        line = Text()
+        if grid.mode == "chart":
+            k = max(1, math.ceil(grid.nx / width))
+            for point in range(0, grid.nx, k):
+                value = values.numbers[point]
+                if point in values.missing or not math.isfinite(value):
+                    line.append(" ")
+                    continue
+                t = 0.0 if lo == hi else (value - lo) / (hi - lo)
+                line.append(_BLOCKS[round(t * 7)])
+            return line
+        k = max(1, math.ceil(grid.nx / width))
+        for column in range(0, grid.nx, k):
+            total = 0.0
+            count = 0
+            for row in range(grid.ny):
+                index = column + grid.nx * row
+>               value = values.numbers[index]
+                        ^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:507: IndexError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001--1.00k \u2026 1.00k]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip
+4 failed, 29 passed in 101.75s (0:01:41)
+rc=1

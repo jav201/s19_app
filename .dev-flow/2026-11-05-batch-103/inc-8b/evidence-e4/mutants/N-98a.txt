@@ -1,0 +1,95 @@
+# mutant N-98a  rows: R-PE-DEF.98
+# edits: s19_app/tui/definition_sheet.py:1017
+# -k: r_pe_def_98_
+# uptime: 01:58:39 up 2 days, 10:47,  3 users,  load average: 1.14, 0.82, 1.22
+s19_app.__file__ = ~/work/zq-m8b/m/N-98a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[MASK_FIELD_0001-255-255 (0xFF)-+81] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MASK_FIELD_0001', text = '255', new = '255 (0xFF)', delta = '+81'
+
+    @pytest.mark.parametrize(
+        ("name", "text", "new", "delta"),
+        [("DISPLAY_0001", "25.5", "25.5", "-118.0 staged"), ("MASK_FIELD_0001", "255", "255 (0xFF)", "+81")],
+    )
+    def test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot(defc, name, text, new, delta):
+        """R-PE-DEF.98/1, /2 - a staged, not pending row: New, Δ, the mark's ``●`` and the track's ``◆`` bold #54efae.
+    
+        Operator need: staged edits read as staged without colour (``●``, ``staged``) and with the operator's green."""
+        line, _, _ = _staged_line(defc, name, text)
+        shown_new, shown_delta = _new_delta_cells(line)
+        assert shown_new == new and shown_delta.startswith(delta)
+        _assert_style_over(line, START["New"], new, GREEN)
+        _assert_style_over(line, START["Δ"], delta, GREEN)
+>       assert line.plain[1] == "●" and fg(line, 1) == GREEN and bold(line, 1)
+E       AssertionError: assert ('\u25cf' == '\u25cf'
+E         
+E           ● and '#008000' == '#54efae'
+E         
+E         - #54efae
+E         + #008000)
+
+tests/test_b103_inc8b_s1.py:485: AssertionError
+_ test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[DISPLAY_0001-25.5-25.5--118.0 staged] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'DISPLAY_0001', text = '25.5', new = '25.5', delta = '-118.0 staged'
+
+    @pytest.mark.parametrize(
+        ("name", "text", "new", "delta"),
+        [("DISPLAY_0001", "25.5", "25.5", "-118.0 staged"), ("MASK_FIELD_0001", "255", "255 (0xFF)", "+81")],
+    )
+    def test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot(defc, name, text, new, delta):
+        """R-PE-DEF.98/1, /2 - a staged, not pending row: New, Δ, the mark's ``●`` and the track's ``◆`` bold #54efae.
+    
+        Operator need: staged edits read as staged without colour (``●``, ``staged``) and with the operator's green."""
+        line, _, _ = _staged_line(defc, name, text)
+        shown_new, shown_delta = _new_delta_cells(line)
+        assert shown_new == new and shown_delta.startswith(delta)
+        _assert_style_over(line, START["New"], new, GREEN)
+        _assert_style_over(line, START["Δ"], delta, GREEN)
+>       assert line.plain[1] == "●" and fg(line, 1) == GREEN and bold(line, 1)
+E       AssertionError: assert ('\u25cf' == '\u25cf'
+E         
+E           ● and '#008000' == '#54efae'
+E         
+E         - #54efae
+E         + #008000)
+
+tests/test_b103_inc8b_s1.py:485: AssertionError
+_ test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta(defc):
+        """R-PE-DEF.98/3 - VAL_BLK_DEF_0001 staged, no bench edit: ``●`` green and Δ ``max |Δ| … staged`` green."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        staged, entry = staged_values(o, {(0, 0): "10"})
+        row = sheet_row(o.d, o.a2l, o.image, [entry])
+        # The bench reads the staged Δ from the state's values and staged decode (R-PE-BENCH.16/2).
+        line = ds.row_line(row, ds.sheet_widths(111), False, None, None, state=view_state(o, staged=staged))
+>       assert line.plain[1] == "●" and fg(line, 1) == GREEN
+E       AssertionError: assert ('\u25cf' == '\u25cf'
+E         
+E           ● and '#008000' == '#54efae'
+E         
+E         - #54efae
+E         + #008000)
+
+tests/test_b103_inc8b_s1.py:497: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[MASK_FIELD_0001-255-255 (0xFF)-+81]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[DISPLAY_0001-25.5-25.5--118.0 staged]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta
+3 failed in 1.82s
+
+# exit=1

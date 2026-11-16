@@ -1,0 +1,7 @@
+# tree: fin @ 0bf2373b
+# uptime:  01:28:40 up 2 days, 10:17,  2 users,  load average: 1.08, 2.88, 4.37
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/fin/s19_app/__init__.py
+# pytest -p no:xdist -q tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_1_at_most_one_bench_job_runs_at_any_time
+.                                                                        [100%]
+1 passed in 13.62s
+# exit=0

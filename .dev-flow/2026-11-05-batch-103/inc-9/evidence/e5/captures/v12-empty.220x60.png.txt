@@ -1,0 +1,84 @@
+scene=v12-empty
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=220x60
+time=2026-11-14 08:17:52
+app_size=220x60
+focused=patch_sheet_body
+selected=MAP_DEF_0001
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=True edit={} undo=0
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=194x32 classes=[] subtitle=None
+widget #patch_inspector: size=192x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=196x45 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | enter | alt+s
+status_lines_this_run=3
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: MAP_DEF_0001 has no bench edit to stage.
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                                                                   Hex Edit Tool
+                        │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/
+   ▏ ◫  Workspace       │
+   ▏ ≡  A2L Explorer    │ draft · change
+   ▏ ◉  MAC View        │ Filter _0001                                                                                                                                  7 of 7 shown  <    Page 1/1   >    Pick   Add list
+   ▏ ▤  Memory Map      │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏ !  Issues Report   ││  Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                      │
+   ▏ ✎  Patch Editor    ││  ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                               │
+   ▏ ✔  Check Editor    ││  MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                               │
+   ▏ ⏚  A2B Diff        ││  MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                             │
+   ▏ ✦  Flow Builder    ││  DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                           │
+   ▏ ▶  Flow Execution  ││  CURVE_DEF_0001          CURVE     ▅▇▄█▁ 5                                     ·                           0 … 65.5k                                                                             │
+   ▏ ☑  Checks          ││▶ MAP_DEF_0001            MAP 4x3   ████ 12                                     ·                           -1.00k … 1.00k                                                                        │
+   ▏ ⊕  CRC Designer    ││└ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                                                                                                                    │
+                        ││              224                  577                  648                  909                                                                                                                  │
+                        ││    10        ▸472                 132                  610                  330                                                                                                                  │
+                        ││      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                                                                                                        │
+                        ││    15        709                  -890                 -383                 -636                                                                                                                 │
+                        ││                                                                                                                                                                                                  │
+                        ││    20        843                  -485                 730                  -556                                                                                                                 │
+                        ││                                                                                                                                                                                                  │
+                        ││shade ████████████ -890 … 843   sel x0,y0   * / bold = edited                                                                                                                                     │
+                        ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                                                                                                             │
+                        ││no edit yet · bytes appear here                                                                                                                                                                   │
+                        ││  VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       ·                   units   -50 … 50                                                                              │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││MAP_DEF_0001[x0,y0] op =                   Set on 1 cells   enter apply  alt+s stage record                                                                                                       │
+                        │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+                        │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+                        ││   Patch script    Inspector    JSON    Checks                                                                                                                                                    │
+                        ││  No entries yet: Add one, paste a change-set or Load a file.                                                                                                                                     │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        │╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+                        │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh
+                        │  Validate   Apply loaded changes   Save
+                        │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                                                                                                                                                             (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    Patch Editor: MAP_DEF_0001 has no bench edit to stage.
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

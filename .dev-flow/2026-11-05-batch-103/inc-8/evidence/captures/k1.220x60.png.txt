@@ -1,0 +1,33 @@
+scenario=k1
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+key bar #key_bar_global:  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette 
+key bar #key_bar_window:  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks 
+top_screen=Screen
+focused=patch_param_filter
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+ledger_entries=0
+selected_rows=[▶ ] ENUM_0001               VALUE     1 IDLE
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+  ▶ ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                              
+  └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B
+  ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE"
+  ↔ choose · enter stage
+    MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                              
+    MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                            
+    DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                          
+    CURVE_DEF_0001          CURVE     5 values                                    ·                           -                                                                                    
+    CURVE_DEF_0002          CURVE     5 values                                    ·                           -                                                                                    
+    MAP_DEF_0001            MAP       12 values                                   ·                           -                                                                                    
+    VAL_BLK_DEF_0001        VAL_BLK   6 values                                    ·                   units   -                                                                                    
+  ENUM_0001
+  new =
+  (0 … 3)
+sheet_text_end
+stub_os_writes=0
+surface=ready

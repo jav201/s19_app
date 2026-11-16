@@ -1,0 +1,27 @@
+WIDTHS.W96 = {'mark': 2, 'name': 16, 'kind': 0, 'current': 14, 'new': 12, 'unit': 0, 'limits': 41, 'delta': 10}
+WIDTHS.W118 = {'mark': 2, 'name': 18, 'kind': 9, 'current': 18, 'new': 13, 'unit': 7, 'limits': 34, 'delta': 16}
+WIDTHS.W200 = {'mark': 2, 'name': 24, 'kind': 10, 'current': 44, 'new': 20, 'unit': 8, 'limits': 64, 'delta': 22}
+WIDTHS.W80 = {'mark': 2, 'name': 16, 'kind': 0, 'current': 14, 'new': 12, 'unit': 0, 'limits': 25, 'delta': 10}
+SHORT.-40 = -40
+SHORT.150 = 150
+SHORT.0 = 0
+SHORT.255 = 255
+SHORT.655350 = 655k
+SHORT.4294967295 = 4.29G
+SHORT.65.349 = 65.3
+SHORT.-50 = -50
+SHORT.200 = 200
+SHORT.1000 = 1.00k
+SHORT.-1000 = -1.00k
+SHORT.999500 = 1.00M
+DELTA.DISPLAY_0001.pending_25.5 = -118.0 (-62.1%)
+DELTA.DISPLAY_0001.staged_25.5 = -118.0 staged
+DELTA.DISPLAY_0001.p_over_extended (negative control) = -47.2%
+DELTA.MASK_FIELD_0001.255 = +81
+RULER.DISPLAY_0001.W118.track = 22; current at 19; 25.5 at 8; 175 at right end ▶
+MASK.field_at_start = 174 (0xAE); bit_at_start = 1
+MASK.word_after_field_255 = 1FF7; after_both = 1FF6
+MASK.bit_strip_bits_high_first = 0001101011100111
+TEXT.changed_positions = 10; rows = ['+00', '+10', '+20']
+TEXT.formula_tail_count = 3/42
+exit=0

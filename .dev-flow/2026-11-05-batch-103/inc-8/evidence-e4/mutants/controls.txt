@@ -1,0 +1,89 @@
+R-TUI-063.1	Compose the landing pane before the sheet → order RED.
+R-PE-DEF.1.1	Give the sheet a fixed height → the 220×60 case RED.
+R-PE-DEF.1.2	No `-bench` rule → height 9 RED.
+R-PE-DEF.74	No minimum height → the 80×24 case RED.
+R-TUI-063.3	Keep the A2L chip → RED.
+R-TUI-063.4	Initial pane `patch_pane_inspector` → RED.
+R-TUI-063.6	Keep the per-tab titles → RED.
+R-PE-041	Drop the subtitle with the ledger border → RED.
+R-PE-DEF.2	Compose the picker inside a tab → RED.
+R-PICKER-CORRECT.011	Highlight mode or a duplicate id → RED.
+R-PICKER-CORRECT.020	A fixed-width filter row wider than 80 → RED.
+R-PE-DEF.3	Leave them on a hidden container → RED.
+R-PE-DEF.4	Remove the `:focus-within` rule → RED.
+R-PE-DEF.5	Swap New and Current → RED.
+R-PE-DEF.6	A fixed 118-column table → W = 96 RED.
+R-PE-DEF.7	Drop the Limits cap → 220 RED; a `len()`-based clip → the wide-character case RED (24 and 8 cells).
+R-PE-DEF.10	Rows from `filtered_params` → page-turn RED.
+R-PE-DEF.11	A describe at each page change → the spy counts 1 → RED; definitions kept across a signature change → the reload case RED; the app's A2L read at paint time with the old definitions → `287` before the repopulation RED.
+R-PE-DEF.12	One `describe_definition` per row (200 × ≈ 0.12 s) → RED; a full decode of each hostile span over the image and the overlay (≈ 400 × the `S.decode_1MiB` time) → RED.
+R-PE-DEF.13	Paint an empty sheet → RED.
+R-PE-DEF.14	Paint the no-page line → RED.
+R-PE-DEF.15	Markup on → the `[b]` case RED.
+R-PE-DEF.16	Show the I-2 `kind` (`enum`) → RED.
+R-PE-DEF.17	Show the stored value for a number → `287` RED.
+R-PE-DEF.18	Zero-fill the missing byte → RED.
+R-PE-DEF.75	Decode it through I-2 → `--` from `A2L-DEF-ELEMENTS` for the first case RED.
+R-PE-DEF.88	Decode the span → `"AAAA…` RED.
+R-PE-DEF.19	Decode a refused definition → exception or a value RED.
+R-PE-DEF.20	Raw unit → the ESC case RED.
+R-PE-DEF.21	Place `●` by stored value → RED.
+R-PE-DEF.76	The plain division → `ZeroDivisionError` RED.
+R-PE-DEF.77	The plain division → `ZeroDivisionError` RED.
+R-PE-DEF.22	Mark every row → RED.
+R-PE-DEF.23	Read New from the formula text → RED after the selection moves; staged state from a decode for the fallback → the `cuboid` case RED.
+R-PE-DEF.24	Echo the typed text: typed `25.50` shows `25.50` where the preview's text is `25.5` → RED; pending = any formula text → the V171 case RED.
+R-PE-DEF.25	Show the refusal code → RED.
+R-PE-DEF.26	p over the extended limits → `-47.2%` RED.
+R-PE-DEF.27	Show the previous Δ → RED.
+R-PE-DEF.28	Show the current value in New → RED.
+R-PE-DEF.30	Keep every expanded row → RED.
+R-PE-DEF.31	Leave out `>> <shift>` → MASK RED; drop the layout word → the `RL_U16` case RED.
+R-PE-DEF.32	Show the definition line → RED.
+R-PE-DEF.33	Mark the current entry after a choice → RED.
+R-PE-DEF.34	Strip from the unmasked word only → RED.
+R-PE-DEF.35	8 bytes per row → RED.
+R-PE-DEF.36	Enable the input → RED; no span bound → the 4,097 case RED.
+R-PE-DEF.37	One label for all → RED.
+R-PE-DEF.38	Leave it empty → RED; always the current text → the `ABC` case RED.
+R-PE-DEF.39	Clear pending text on move → RED.
+R-PE-DEF.40	Preview over the image, not the overlay → the masked case of .51 RED.
+R-PE-DEF.41	Wrap the tail → RED.
+R-PE-DEF.42	No `max_length` → RED.
+R-PE-DEF.78	Fill the current text → 4,097 characters RED.
+R-PE-DEF.79	Paint every text row → 65,536 rows for the 1 MiB case RED.
+R-PE-DEF.80	A direct `value =` → 5,000 characters RED.
+R-PE-DEF.45	Wrap around → RED.
+R-PE-DEF.46	No binding → RED.
+R-PE-DEF.47	Set the stored value as text → `2` RED (A2L-DEF-ENUM, `ENC.ENUM_0001.'2'`).
+R-PE-DEF.48	Keep the text → RED.
+R-PE-DEF.49	Leave the picker cursor at 0 → RED.
+R-PE-DEF.81	Paint every row from row 0 → the first case RED (the selected row on body line 40); no cut → the stand-in case paints no row RED.
+R-PE-DEF.50	Stage through `add_symbol_entry` (the pre-I-2 encode) → the masked case RED.
+R-PE-DEF.51	Encode over the image → first-staged field reverts (`174` or `1`) RED; encode over the live (applied) map → `1F F6`, the removed field back, RED.
+R-PE-DEF.52	Append a second entry → `CHG-COLLISION` RED; replace only the bytes of a `string` entry → the reload decodes the old text RED.
+R-PE-DEF.53	Symbol `None` → RED.
+R-PE-DEF.54	Overwrite the symbol → RED.
+R-PE-DEF.55	Replace the partial entry → RED.
+R-PE-DEF.56	Stage the image bytes → RED.
+R-PE-DEF.57	Show the code only → RED.
+R-PE-DEF.58	Show `entry added.` → RED; an unbounded `<text>` → the 300-character case RED.
+R-PE-DEF.59	Drop the notice → RED; report it as an issue → the line reads `[…] warning: …` RED.
+R-PE-DEF.60	Keep the selection → RED; select from the current selection → the third case RED.
+R-PE-DEF.82	Keep the pending text → `◆` after the Undo RED.
+R-PE-DEF.61	No `_push_history` → RED.
+R-PE-034	No writer for the stage → RED.
+R-PE-035	Set the flag before the encode → RED.
+R-PE-DEF.62	Track staged rows in the sheet only → the Undo case RED; keep the rows of the old image → the new-image case RED.
+R-PE-110	No busy check in the stage → RED.
+R-PE-DEF.63	Stage with the old definition → RED.
+R-PE-DEF.64	Use the page's definition → 0x800020 RED.
+R-PE-DEF.70	Render one cell as a markup `str` → RED; the bar's name as a markup `Label` → the last case RED.
+R-PE-DEF.71	Paint the raw word → RED.
+R-PE-DEF.72	Unbounded name → RED.
+R-PE-DEF.73	`markup=True` status → RED.
+R-PE-DEF.83	Keep today's step 1 → RED.
+R-PE-DEF.84	No line → TC-B97-32 lists `Patch script` as missing RED.
+R-PE-DEF.85	Drop the line → RED.
+R-PE-DEF.86	Only a `new =` line → the `field =` case RED.
+R-PE-DEF.87	Today's line → RED.

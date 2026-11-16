@@ -1,0 +1,17 @@
+$ python -I -B <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-9b/01-requirements.md --base e4485817 --src s19_app
+TEST   R-PE-BENCH.100 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.101 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.102 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.103 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.104 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.105 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.106 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.94 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.95 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.96 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.97 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.98 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.99 is named by no file under tests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-9b/01-requirements.md
+trace_check: 1 US, 13 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 14 gap(s)
+exit=1

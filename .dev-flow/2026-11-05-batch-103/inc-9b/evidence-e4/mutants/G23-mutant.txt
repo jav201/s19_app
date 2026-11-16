@@ -1,0 +1,54 @@
+DATE 2026-11-15T19:30:28.151518-06:00
+GROUP G23
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:30:22 up 3 days,  4:19,  3 users,  load average: 0.83, 0.88, 0.79
+LOAD_ONE 0.83
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G23/tree/s19_app/__init__.py
+PID 1034488
+SID 1034488
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-40/test_r_pe_bench_98_2_a_panel_g0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-40/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f84da3bfa90>
+
+    def test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.98/2 teardown contract: no panel skips later steps and still calls on_done once."""
+    
+        async def body(app, pilot, panel):
+            callbacks, calls = [], []
+            monkeypatch.setattr(app, "set_timer", lambda _delay, callback: callbacks.append(callback))
+            monkeypatch.setattr(app, "query", lambda _selector: [])
+            try:
+                app._run_refresh_steps(
+                    [lambda: calls.append("first"), lambda: calls.append("unreached")],
+                    lambda: calls.append("done"),
+                )
+                assert len(callbacks) == 1
+                callbacks.pop(0)()
+            finally:
+                app.__dict__.pop("set_timer", None)
+                app.__dict__.pop("query", None)
+            return calls, callbacks
+    
+        calls, callbacks = run(tmp_path, defc_dir, body)
+>       assert calls == ["first", "done"], calls
+E       AssertionError: ['first']
+E       assert ['first'] == ['first', 'done']
+E         
+E         Right contains one more item: 'done'
+E         Use -v to get more diff
+
+tests/test_b103_inc9b_s.py:414: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G23/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once
+1 failed in 4.15s
+EXIT_CODE 1

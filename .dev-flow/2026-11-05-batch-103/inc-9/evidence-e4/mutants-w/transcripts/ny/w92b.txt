@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+...................F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt3/tests/test_b103_inc9_w_mutants.py:610: AssertionError: ['A2L loaded: definitions.a2l', 'Loaded definitions.s19', 'Patch Editor: Vxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx']
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_92_3_the_still_decoding_status_of_a_stage_echoes_a_300_character_name_in_256
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 21 passed in 126.62s (0:02:06)

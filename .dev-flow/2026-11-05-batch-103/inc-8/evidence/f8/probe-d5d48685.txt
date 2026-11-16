@@ -1,0 +1,199 @@
+TREE -n 2026-11-14T06:08:04Z load: 9.75 9.35 9.51
+~/work/zq-f8/base-d5d48685/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-f8/base-d5d48685
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 3 items
+
+tests/probe_f8.py PROBE (118, 54) screen Region(x=0, y=0, width=118, height=54) panel Region(x=5, y=4, width=112, height=39) panel.scroll_y 0.0 pane Region(x=74, y=7, width=41, height=32) content Region(x=74, y=7, width=41, height=32) scroll_y 0.0 max 0 virtual Size(width=40, height=32)
+PROBE (118, 54) OUT patch_doc_file_row Region(x=5, y=40, width=112, height=1)
+PROBE (118, 54) OUT patch_doc_path_input Region(x=42, y=40, width=56, height=1)
+PROBE (118, 54) OUT patch_doc_controls Region(x=5, y=41, width=112, height=1)
+PROBE (118, 54) OUT patch_doc_validate_button Region(x=6, y=41, width=10, height=1)
+PROBE (118, 54) IN patch_before_after_card BeforeAfterCard Region(x=74, y=7, width=40, height=2) inside_pane True hit patch_before_after_card
+PROBE (118, 54) IN patch_doc_entry_inputs Vertical Region(x=74, y=10, width=40, height=5) inside_pane True hit patch_entry_value_input
+PROBE (118, 54) IN patch_entry_address_input OsClipboardInput Region(x=82, y=10, width=32, height=1) inside_pane True hit patch_entry_address_input
+PROBE (118, 54) IN patch_entry_value_input OsClipboardInput Region(x=82, y=12, width=32, height=1) inside_pane True hit patch_entry_value_input
+PROBE (118, 54) IN patch_entry_bytes_input OsClipboardInput Region(x=82, y=14, width=32, height=1) inside_pane True hit patch_entry_bytes_input
+PROBE (118, 54) IN patch_doc_entry_buttons Horizontal Region(x=74, y=15, width=40, height=1) inside_pane True hit patch_entry_remove_button
+PROBE (118, 54) IN patch_entry_add_button Button Region(x=74, y=15, width=5, height=1) inside_pane True hit patch_entry_add_button
+PROBE (118, 54) IN patch_entry_edit_button Button Region(x=80, y=15, width=6, height=1) inside_pane True hit patch_entry_edit_button
+PROBE (118, 54) IN patch_entry_remove_button Button Region(x=87, y=15, width=8, height=1) inside_pane True hit patch_entry_remove_button
+PROBE (118, 54) IN patch_entry_edit_json_button Button Region(x=96, y=15, width=11, height=1) inside_pane True hit patch_entry_edit_json_button
+PROBE (118, 54) IN patch_doc_tally Static Region(x=74, y=17, width=40, height=2) inside_pane True hit patch_doc_tally
+ROW 00|                                                                                                                      
+ROW 01|  ⭘                                                Hex Edit Tool                                                      
+ROW 02|    │                                       Patch Editor                                         ?  📂 Open patches/  
+ROW 03| ▏◫ │                                                                                                                 
+ROW 04| ▏≡ │ draft · change                                                                                                  
+ROW 05| ▏◉ │╭─ PATCH SCRIPT ──────────────────────────────────────────────────╮╭─ INSPECTOR ───────────────────────────────╮ 
+ROW 06| ▏▤ ││ No entries yet: Add one, paste a change-set or Load a file.     ││   Inspector    JSON    Checks    A2L      │ 
+ROW 07| ▏! ││                                                                 ││ ─BEFORE → AFTER─────────────────────────  │ 
+ROW 08| ▏✎ ││                                                                 ││  No entry yet: Add one or Load a file.    │ 
+ROW 09| ▏✔ ││                                                                 ││                                           │ 
+ROW 10| ▏⏚ ││                                                                 ││ Address 0x100                             │ 
+ROW 11| ▏✦ ││                                                                 ││                                           │ 
+ROW 12| ▏▶ ││                                                                 ││ String  text (document encoding)          │ 
+ROW 13| ▏☑ ││                                                                 ││                                           │ 
+ROW 14| ▏⊕ ││                                                                 ││ Bytes   hex bytes, e.g. DE AD BE EF       │ 
+ROW 15|    ││                                                                 ││  Add   Edit   Remove   Edit JSON          │ 
+ROW 16|    ││                                                                 ││                                           │ 
+ROW 17|    ││                                                                 ││ DOCUMENT                                  │ 
+ROW 18|    ││                                                                 ││ 0 entries                                 │ 
+ROW 19|    ││                                                                 ││                                           │ 
+ROW 20|    ││                                                                 ││                                           │ 
+ROW 21|    ││                                                                 ││                                           │ 
+ROW 22|    ││                                                                 ││                                           │ 
+ROW 23|    ││                                                                 ││                                           │ 
+ROW 24|    ││                                                                 ││                                           │ 
+ROW 25|    ││                                                                 ││                                           │ 
+ROW 26|    ││                                                                 ││                                           │ 
+ROW 27|    ││                                                                 ││                                           │ 
+ROW 28|    ││                                                                 ││                                           │ 
+ROW 29|    ││                                                                 ││                                           │ 
+ROW 30|    ││                                                                 ││                                           │ 
+ROW 31|    ││                                                                 ││                                           │ 
+ROW 32|    ││                                                                 ││                                           │ 
+ROW 33|    ││                                                                 ││                                           │ 
+ROW 34|    ││                                                                 ││                                           │ 
+ROW 35|    ││                                                                 ││                                           │ 
+ROW 36|    ││                                                                 ││                                           │ 
+ROW 37|    ││                                                                 ││                                           │ 
+ROW 38|    ││                                                                 ││                                           │ 
+ROW 39|    │╰───────────────────────────────────────────────────── 0 entries ─╯╰───────────────────────────────────────────╯ 
+ROW 40|    │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh    
+ROW 41|    │  Validate   Apply loaded changes   Save                                                                         
+ROW 42|    │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                      
+ROW 43| ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ROW 44|  Loaded definitions.s19 (S19 only)                                                       (none)  |  definitions.a2l  
+ROW 45|                                                                                                                      
+ROW 46|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                                                               
+ROW 47|                                                                                                                      
+ROW 48|  A2L loaded: definitions.a2l                                                                                         
+ROW 49|  Loaded definitions.s19 (S19 only)                                                                                   
+ROW 50|  Loaded definitions.s19                                                                                              
+ROW 51|  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette                          
+ROW 52|  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks                           
+ROW 53|                                                                                                                      
+.PROBE (220, 60) screen Region(x=0, y=0, width=220, height=60) panel Region(x=23, y=4, width=196, height=45) panel.scroll_y 0.0 pane Region(x=142, y=7, width=75, height=38) content Region(x=142, y=7, width=75, height=38) scroll_y 0.0 max 0 virtual Size(width=74, height=38)
+PROBE (220, 60) OUT patch_doc_file_row Region(x=23, y=46, width=196, height=1)
+PROBE (220, 60) OUT patch_doc_path_input Region(x=88, y=46, width=112, height=1)
+PROBE (220, 60) OUT patch_doc_controls Region(x=23, y=47, width=196, height=1)
+PROBE (220, 60) OUT patch_doc_validate_button Region(x=24, y=47, width=10, height=1)
+PROBE (220, 60) IN patch_before_after_card BeforeAfterCard Region(x=142, y=7, width=74, height=2) inside_pane True hit patch_before_after_card
+PROBE (220, 60) IN patch_doc_entry_inputs Vertical Region(x=142, y=10, width=74, height=5) inside_pane True hit patch_entry_value_input
+PROBE (220, 60) IN patch_entry_address_input OsClipboardInput Region(x=150, y=10, width=66, height=1) inside_pane True hit patch_entry_address_input
+PROBE (220, 60) IN patch_entry_value_input OsClipboardInput Region(x=150, y=12, width=66, height=1) inside_pane True hit patch_entry_value_input
+PROBE (220, 60) IN patch_entry_bytes_input OsClipboardInput Region(x=150, y=14, width=66, height=1) inside_pane True hit patch_entry_bytes_input
+PROBE (220, 60) IN patch_doc_entry_buttons Horizontal Region(x=142, y=15, width=74, height=1) inside_pane True hit patch_doc_entry_buttons
+PROBE (220, 60) IN patch_entry_add_button Button Region(x=142, y=15, width=5, height=1) inside_pane True hit patch_entry_add_button
+PROBE (220, 60) IN patch_entry_edit_button Button Region(x=148, y=15, width=6, height=1) inside_pane True hit patch_entry_edit_button
+PROBE (220, 60) IN patch_entry_remove_button Button Region(x=155, y=15, width=8, height=1) inside_pane True hit patch_entry_remove_button
+PROBE (220, 60) IN patch_entry_edit_json_button Button Region(x=164, y=15, width=11, height=1) inside_pane True hit patch_entry_edit_json_button
+PROBE (220, 60) IN patch_doc_tally Static Region(x=142, y=17, width=74, height=2) inside_pane True hit patch_doc_tally
+ROW 00|                                                                                                                                                                                                                            
+ROW 01|  ⭘                                                                                                   Hex Edit Tool                                                                                                         
+ROW 02|                      │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/  
+ROW 03| ▏ ◫  Workspace       │                                                                                                                                                                                                     
+ROW 04| ▏ ≡  A2L Explorer    │ draft · change                                                                                                                                                                                      
+ROW 05| ▏ ◉  MAC View        │╭─ PATCH SCRIPT ────────────────────────────────────────────────────────────────────────────────────────────────────╮╭─ INSPECTOR ─────────────────────────────────────────────────────────────────╮ 
+ROW 06| ▏ ▤  Memory Map      ││ No entries yet: Add one, paste a change-set or Load a file.                                                       ││   Inspector    JSON    Checks    A2L                                        │ 
+ROW 07| ▏ !  Issues Report   ││                                                                                                                   ││ ─BEFORE → AFTER───────────────────────────────────────────────────────────  │ 
+ROW 08| ▏ ✎  Patch Editor    ││                                                                                                                   ││  No entry yet: Add one or Load a file.                                      │ 
+ROW 09| ▏ ✔  Check Editor    ││                                                                                                                   ││                                                                             │ 
+ROW 10| ▏ ⏚  A2B Diff        ││                                                                                                                   ││ Address 0x100                                                               │ 
+ROW 11| ▏ ✦  Flow Builder    ││                                                                                                                   ││                                                                             │ 
+ROW 12| ▏ ▶  Flow Execution  ││                                                                                                                   ││ String  text (document encoding)                                            │ 
+ROW 13| ▏ ☑  Checks          ││                                                                                                                   ││                                                                             │ 
+ROW 14| ▏ ⊕  CRC Designer    ││                                                                                                                   ││ Bytes   hex bytes, e.g. DE AD BE EF                                         │ 
+ROW 15|                      ││                                                                                                                   ││  Add   Edit   Remove   Edit JSON                                            │ 
+ROW 16|                      ││                                                                                                                   ││                                                                             │ 
+ROW 17|                      ││                                                                                                                   ││ DOCUMENT                                                                    │ 
+ROW 18|                      ││                                                                                                                   ││ 0 entries                                                                   │ 
+ROW 19|                      ││                                                                                                                   ││                                                                             │ 
+ROW 20|                      ││                                                                                                                   ││                                                                             │ 
+ROW 21|                      ││                                                                                                                   ││                                                                             │ 
+ROW 22|                      ││                                                                                                                   ││                                                                             │ 
+ROW 23|                      ││                                                                                                                   ││                                                                             │ 
+ROW 24|                      ││                                                                                                                   ││                                                                             │ 
+ROW 25|                      ││                                                                                                                   ││                                                                             │ 
+ROW 26|                      ││                                                                                                                   ││                                                                             │ 
+ROW 27|                      ││                                                                                                                   ││                                                                             │ 
+ROW 28|                      ││                                                                                                                   ││                                                                             │ 
+ROW 29|                      ││                                                                                                                   ││                                                                             │ 
+ROW 30|                      ││                                                                                                                   ││                                                                             │ 
+ROW 31|                      ││                                                                                                                   ││                                                                             │ 
+ROW 32|                      ││                                                                                                                   ││                                                                             │ 
+ROW 33|                      ││                                                                                                                   ││                                                                             │ 
+ROW 34|                      ││                                                                                                                   ││                                                                             │ 
+ROW 35|                      ││                                                                                                                   ││                                                                             │ 
+ROW 36|                      ││                                                                                                                   ││                                                                             │ 
+ROW 37|                      ││                                                                                                                   ││                                                                             │ 
+ROW 38|                      ││                                                                                                                   ││                                                                             │ 
+ROW 39|                      ││                                                                                                                   ││                                                                             │ 
+ROW 40|                      ││                                                                                                                   ││                                                                             │ 
+ROW 41|                      ││                                                                                                                   ││                                                                             │ 
+ROW 42|                      ││                                                                                                                   ││                                                                             │ 
+ROW 43|                      ││                                                                                                                   ││                                                                             │ 
+ROW 44|                      ││                                                                                                                   ││                                                                             │ 
+ROW 45|                      │╰─────────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯╰─────────────────────────────────────────────────────────────────────────────╯ 
+ROW 46|                      │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh    
+ROW 47|                      │  Validate   Apply loaded changes   Save                                                                                                                                                             
+ROW 48|                      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                                                                                                          
+ROW 49| ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ROW 50|  Loaded definitions.s19 (S19 only)                                                                                                                                                             (none)  |  definitions.a2l  
+ROW 51|                                                                                                                                                                                                                            
+ROW 52|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                                                                                                                                                                     
+ROW 53|                                                                                                                                                                                                                            
+ROW 54|  A2L loaded: definitions.a2l                                                                                                                                                                                               
+ROW 55|  Loaded definitions.s19 (S19 only)                                                                                                                                                                                         
+ROW 56|  Loaded definitions.s19                                                                                                                                                                                                    
+ROW 57|  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette                                                                                                                                
+ROW 58|  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks                                                                                                                                 
+ROW 59|                                                                                                                                                                                                                            
+.PROBE (80, 24) screen Region(x=0, y=0, width=80, height=24) panel Region(x=5, y=4, width=74, height=9) panel.scroll_y 0.0 pane Region(x=34, y=7, width=41, height=9) content Region(x=34, y=7, width=41, height=9) scroll_y 0.0 max 3 virtual Size(width=40, height=12)
+PROBE (80, 24) OUT patch_doc_file_row Region(x=5, y=17, width=72, height=1)
+PROBE (80, 24) OUT patch_doc_path_input Region(x=29, y=17, width=29, height=1)
+PROBE (80, 24) OUT patch_doc_controls Region(x=5, y=18, width=72, height=1)
+PROBE (80, 24) OUT patch_doc_validate_button Region(x=6, y=18, width=10, height=1)
+PROBE (80, 24) IN patch_before_after_card BeforeAfterCard Region(x=34, y=7, width=40, height=2) inside_pane True hit patch_before_after_card
+PROBE (80, 24) IN patch_doc_entry_inputs Vertical Region(x=34, y=10, width=40, height=5) inside_pane True hit patch_entry_value_input
+PROBE (80, 24) IN patch_entry_address_input OsClipboardInput Region(x=42, y=10, width=32, height=1) inside_pane True hit patch_entry_address_input
+PROBE (80, 24) IN patch_entry_value_input OsClipboardInput Region(x=42, y=12, width=32, height=1) inside_pane True hit patch_entry_value_input
+PROBE (80, 24) IN patch_entry_bytes_input OsClipboardInput Region(x=42, y=14, width=32, height=1) inside_pane True hit status_context
+PROBE (80, 24) IN patch_doc_entry_buttons Horizontal Region(x=34, y=15, width=40, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_add_button Button Region(x=34, y=15, width=5, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_edit_button Button Region(x=40, y=15, width=6, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_remove_button Button Region(x=47, y=15, width=8, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_edit_json_button Button Region(x=56, y=15, width=11, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_doc_tally Static Region(x=34, y=17, width=40, height=2) inside_pane False hit workspace_status_bar
+ROW 00|                                                                                
+ROW 01|  ⭘                             Hex Edit Tool                                   
+ROW 02|    │                    Patch Editor                      ?  📂 Open patches/  
+ROW 03| ▏◫ │                                                                           
+ROW 04| ▏≡ │ draft · change                                                            
+ROW 05| ▏◉ │╭─ PATCH SCRIPT ──────────╮╭─ INSPECTOR ───────────────────────────────╮   
+ROW 06| ▏▤ ││ No entries yet: Add on… ││   Inspector    JSON    Checks    A2L      │   
+ROW 07| ▏! ││                         ││ ─BEFORE → AFTER─────────────────────────  │   
+ROW 08| ▏✎ ││                         ││  No entry yet: Add one or Load a file.    │   
+ROW 09| ▏✔ ││                         ││                                           │▇▇ 
+ROW 10| ▏⏚ ││                         ││ Address 0x100                             │   
+ROW 11| ▏✦ ││                         ││                                           │   
+ROW 12|    ││                         ││ String  text (document encoding)          │   
+ROW 13| ────────────────────────────────────────────────────────────────────────────── 
+ROW 14|  Loaded definitions.s19 (S19 only)                 (none)  |  definitions.a2l  
+ROW 15|                                                                                
+ROW 16|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                         
+ROW 17|                                                                                
+ROW 18|  A2L loaded: definitions.a2l                                                   
+ROW 19|  Loaded definitions.s19 (S19 only)                                             
+ROW 20|  Loaded definitions.s19                                                        
+ROW 21|  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help        
+ROW 22|  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more            
+ROW 23|                                                                                
+.
+
+============================== 3 passed in 21.61s ==============================
+RC=0

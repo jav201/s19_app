@@ -11,10 +11,12 @@ from ...a2l_parameter_picker import A2LParameterPicker
 from ...screens import BulkParameterAddScreen
 from ....utils import safe_text
 from ..shared import CheckLayout, check_layout
+from .sheet import StagingSheet
 
 
 class A2lPickerMixin:
-    """Mixin: the panel's A2L tab (the shared parameter picker in pick mode)."""
+    """Mixin: the shared parameter picker in pick mode (batch-103 Inc 8: on
+    the filter row, its shown page feeding the staging sheet)."""
 
     # ------------------------------------------------------------------
     # A2L tab (batch-102 Inc 5, US-102-05 — the shared picker in pick mode)
@@ -213,14 +215,44 @@ class A2lPickerMixin:
         re-assert the host's use-status surface and re-derive the tab widths
         (the measured table width exists only while the tab is shown). The
         document rows and the entry inputs are never touched here
-        (R-B102-PE-005, R-B102-PE-006)."""
+        (R-B102-PE-005, R-B102-PE-006).
+
+        batch-103 Inc 8 (R-PE-DEF.10, .11): the staging sheet shows one row
+        per name of the page, built from the picker's own population
+        describe and the A2L it came from — no describe here."""
         self._apply_a2l_layout()
         if self._a2l_use_status:
             self._paint_a2l_use_status(self._a2l_use_status)
+        picker = self._a2l_picker
+        self._sheet.show_page(
+            picker.visible_params,
+            picker.definitions,
+            picker.definitions_source,
+            self._mem_map,
+        )
 
-    def _compose_a2l_tab(self) -> ComposeResult:
-        """Compose helper: the A2L tab's picker, Use-parameter row and status line."""
+    def _on_staging_sheet_selection_changed(
+        self, event: StagingSheet.SelectionChanged
+    ) -> None:
+        """The sheet's selected row changed: move the picker's cursor onto that
+        row, so ``highlighted_parameter`` (and ``Use parameter``) names it
+        (R-PE-DEF.49). A name not on the shown page moves nothing."""
+        names = self._a2l_picker.visible_params
+        if event.name not in names:
+            return
+        self.query_one("#patch_param_table", DataTable).move_cursor(
+            row=names.index(event.name)
+        )
+
+    def _compose_filter_row(self) -> ComposeResult:
+        """Compose helper: the filter row's picker (batch-103 Inc 8,
+        R-PE-DEF.2; its table and full-name line are hidden by CSS and stay
+        mounted)."""
         yield self._a2l_picker
+
+    def _compose_use_row(self) -> ComposeResult:
+        """Compose helper: the ``Use parameter`` row and its status line, in
+        the Inspector tab under the entry form (batch-103 Inc 8, R-PE-DEF.3)."""
         with Horizontal(
             id="patch_param_use_row",
             classes="patch-docked-row patch-chip-entry",

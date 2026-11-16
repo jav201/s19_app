@@ -1,0 +1,27 @@
+TREE -n 2026-11-14T06:12:30Z load: 10.36 10.02 9.75
+~/work/zq-f8/tip/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-f8/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [6 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+[gw0] [ 16%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+[gw1] [ 33%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+[gw1] [ 50%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+[gw0] [ 66%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+[gw1] [ 83%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+[gw0] [100%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+
+============================== 6 passed in 38.21s ==============================
+RC=0

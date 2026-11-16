@@ -1,0 +1,18 @@
+== m1 diff
+diff -r tip/s19_app/tui/styles.tcss m1/s19_app/tui/styles.tcss
+4057a4058,4061
+> 
+> #patch_editor_panel #patch_doc_file_row {
+>     offset: 0 -2;
+> }
+== m2 diff
+diff -r tip/s19_app/tui/screens_directionb/patch_editor/actions.py m2/s19_app/tui/screens_directionb/patch_editor/actions.py
+213c213
+<             "patch_entry_add_button": "add_entry",
+---
+>             "patch_entry_add_button": "validate_doc",
+== m3 diff
+362c362
+<             region = app.screen.find_widget(widget).visible_region
+---
+>             region = app.screen.find_widget(widget).region

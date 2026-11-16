@@ -1,0 +1,131 @@
+tree: fin = bundle clone of b103-inc8 a2af8da4 (+main)
+cwd=~/work/zq-e4-8-int/fin
+ 19:29:02 up 1 day,  4:17,  3 users,  load average: 3.09, 3.07, 1.99
+~/work/zq-e4-8-int/fin/s19_app/__init__.py
+== test_b103_inc8_s1
+95 passed in 1.40s
+== test_b103_inc8_s1_detail
+43 passed in 1.28s
+== test_b103_inc8_s2_picker_definitions
+6 passed in 1.24s
+== test_b103_inc8_a1_service
+23 passed in 1.37s
+== test_b103_inc8_a3_help
+9 passed in 1.14s
+== test_b103_inc8_s2_sheet_rows
+33 passed in 6.09s
+== test_b103_inc8_s2_sheet_keys
+21 passed in 11.13s
+== test_b103_inc8_s2_sheet_formula
+24 passed in 8.77s
+== test_b103_inc8_a2_app
+23 passed in 74.53s (0:01:14)
+== test_b103_inc8_at
+11 passed in 51.40s
+== test_b103_inc8_at_help
+2 passed in 5.39s
+== test_b103_inc8_p_layout
+25 passed in 53.20s
+== test_b103_inc8_p_ledger
+10 passed in 35.46s
+== test_b103_inc8_p_wiring
+12 passed in 37.62s
+== test_b97_flow_execution
+75 passed in 267.13s (0:04:27)
+== test_b101_symbol_reads
+24 passed in 258.84s (0:04:18)
+== test_b97_patch_editor
+38 passed in 201.57s (0:03:21)
+== test_b97_chips_help
+1 failed, 78 passed in 211.99s (0:03:31)
+== test_tui_patch_editor_v2
+52 passed in 85.88s (0:01:25)
+== test_tui_patch_layout
+9 passed in 24.66s
+== test_tui_patch_big
+24 passed in 32.06s
+== test_tui_patch_card
+1 failed, 25 passed in 29.80s
+CHUNK_DONE
+== test_b103_picker_model
+44 passed in 128.34s (0:02:08)
+== test_b103_picker_editor
+33 passed in 79.87s (0:01:19)
+== test_b102_patch_picker
+17 passed in 47.65s
+== test_b102_bulk_add
+12 passed in 30.05s
+== test_b102_parameter_picker
+10 passed in 25.95s
+== test_b97_check_editor
+2 failed, 34 passed in 114.18s (0:01:54)
+== test_b100_session_reset
+3 failed, 17 passed in 69.91s (0:01:09)
+== test_tui_snapshot
+6 failed, 25 passed, 2 xfailed in 69.92s (0:01:09)
+== test_engine_unchanged
+1 skipped in 1.10s
+== test_deps_seam_law
+6 passed in 7.95s
+== test_docs_canon
+2 passed in 1.15s
+== test_b101_doc_hygiene
+45 passed in 3.29s
+== test_b101_help_legend_docs
+71 passed in 52.17s
+== test_no_private_tokens
+2 passed in 39.85s
+== test_filename_markup_safety
+2 passed in 3.34s
+== test_report_markup_safety
+166 passed in 1.34s
+== test_id_registry
+12 passed in 8.16s
+== test_requirements_canon
+1 failed, 10 passed in 1.38s
+== test_address_census
+1 failed, 22 passed in 31.11s
+== test_suite_hygiene
+67 passed in 155.29s (0:02:35)
+== test_b97_key_bar
+38 passed in 210.19s (0:03:30)
+CHUNK_DONE
+== d00
+37 passed in 71.22s (0:01:11)
+== d01
+37 passed in 32.29s
+== d02
+37 passed in 50.93s
+== d03
+37 passed in 43.10s
+== d04
+36 passed in 50.18s
+CHUNK_DONE
+== w00
+37 passed in 121.29s (0:02:01)
+== w01
+37 passed in 108.97s (0:01:48)
+== w02
+37 passed in 133.73s (0:02:13)
+== w03
+34 passed in 260.49s (0:04:20)
+CHUNK_DONE
+== test_engine_unchanged
+1 passed in 0.99s
+CHUNK_DONE
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+FAILED tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe - Assertion...
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag
+FAILED tests/test_b97_check_editor.py::test_tc_b97_12_hostile_names_render_literally
+FAILED tests/test_b97_check_editor.py::test_at_b97_05_hostile_parameter_reads_literally
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+~/work/zq-e4-8-int/fin/s19_app/__init__.py

@@ -1,0 +1,77 @@
+scene=v1
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=118x54
+time=2026-11-14 08:04:21
+app_size=118x54
+focused=patch_sheet_body
+selected=VAL_BLK_DEF_0001
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=False edit={} undo=0
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=110x26 classes=[] subtitle=None
+widget #patch_inspector: size=108x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=112x39 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                Hex Edit Tool
+      │                                       Patch Editor                                         ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ │ draft · change
+   ▏◉ │ Filter _0001                                              7 of 7 shown  <    Page 1/1   >    Pick   Add list
+   ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏! ││  Parameter         Kind     Current           New          Unit   Limits                    Δ                │
+   ▏✎ ││  MASK_BIT_0001     VALUE    1 (0x01)          ·                   0 ├───────────●┤ 1                         │
+   ▏✔ ││  MASK_FIELD_0001   VALUE    174 (0xAE)        ·                   0 ├────────●───┤ 255                       │
+   ▏⏚ ││  DISPLAY_0001      VALUE    143.5             ·            deg C  -40 ├───────────●┤ 150                     │
+   ▏✦ ││  CURVE_DEF_0001    CURVE    ▅▇▄█▁ 5           ·                   0 … 65.5k                                  │
+   ▏▶ ││  MAP_DEF_0001      MAP 4x3  ████ 12           ·                   -1.00k … 1.00k                             │
+   ▏☑ ││▶ VAL_BLK_DEF_0001  VAL_BLK  ███ 6             ·            units  -50 … 50                                   │
+   ▏⊕ ││└ LINEAR phys = 0.05*raw · SWORD s16 big-endian · RL_DEF_S16_ROW · 0x00800090 · 12 B                          │
+      ││               0                    1                    2                                                    │
+      ││     0        36.9                 11.0                 31.8                                                  │
+      ││      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                    │
+      ││     1       -20.7                -19.8                -10.7                                                  │
+      ││                                                                                                              │
+      ││shade ████████████ -20.7 … 36.9 units   sel x0,y0   * / bold = edited                                         │
+      ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                         │
+      ││no edit yet · bytes appear here                                                                               │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││VAL_BLK_DEF_0001[x0,y0] op =                   units  Set on 1 cells   enter apply  alt+s stage record        │
+      │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+      │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+      ││   Patch script    Inspector    JSON    Checks                                                                │
+      ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+      │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+      │  Validate   Apply loaded changes   Save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                                                       (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

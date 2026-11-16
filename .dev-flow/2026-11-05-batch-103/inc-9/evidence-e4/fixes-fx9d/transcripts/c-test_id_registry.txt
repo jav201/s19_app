@@ -1,0 +1,36 @@
+load before: 1.67 1.61 1.65 1/667 575521
+~/work/zq-fx9d/clone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.........F..                                                             [100%]
+=================================== FAILURES ===================================
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7f91d32cac90>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 344 test modules, not the declared 343. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 344 == 343
+
+tests/test_id_registry.py:571: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 11 passed in 8.25s
+rc=1
+load after: 1.72 1.62 1.65 1/667 575580

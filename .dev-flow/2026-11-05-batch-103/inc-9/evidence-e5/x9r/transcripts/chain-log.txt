@@ -1,0 +1,92 @@
+start Sat Nov 14 02:51:01 PM CST 2026
+A 29_1 (load before 0.29): ================= 1 passed, 9 deselected in 106.15s (0:01:46) ================== |  | 
+A 29_2 (load before 1.08): ================= 1 failed, 9 deselected in 109.25s (0:01:49) ================== | slowest press 0.543 s | 
+A 82_1 (load before 1.06): ================= 1 failed, 9 deselected in 159.19s (0:02:39) ================== | slowest press 0.937 s | 
+A 20_1 (load before 0.99): ======================= 1 passed, 9 deselected in 7.19s ======================== |  | 
+B start Sat Nov 14 02:57:28 PM CST 2026
+B fx9b red (4c891ea9 product + head tests): ============================== 8 failed in 9.69s ===============================
+B fx9d red (b21d5517 product + O-B test): ========================= 1 failed, 1 passed in 7.20s ==========================
+B card_diff moc1 vs head: 395 differing digests of 3001
+B card_diff moc2 vs head: 554 differing digests of 3001
+B oc1 test_tui_patch_card: ======================== 1 failed, 25 passed in 29.95s =========================
+B od1 w_stage+b_cells: =================== 1 failed, 50 passed in 136.89s (0:02:16) ===================
+B od2 w_stage+b_cells+w_select+w_mutants+w_keys: ======================= 112 passed in 281.85s (0:04:41) ========================
+C start Sat Nov 14 03:05:23 PM CST 2026
+C test_b103_inc9_a9: ======================== 29 passed in 102.33s (0:01:42) ========================
+C test_b103_inc9_b_canvas: ============================== 42 passed in 1.24s ==============================
+C test_b103_inc9_b_cells: ============================== 39 passed in 1.67s ==============================
+C test_b103_inc9_b_detail: ============================== 54 passed in 1.24s ==============================
+C test_b103_inc9_b_model: ============================== 20 passed in 1.08s ==============================
+C test_b103_inc9_b_tools: ============================== 59 passed in 1.19s ==============================
+C test_b103_inc9_i: ============================== 3 passed in 9.47s ===============================
+C test_b103_inc9_ob_json_view: ============================== 2 passed in 4.72s ===============================
+C test_b103_inc9_w_jobs: ============================== 2 passed in 22.96s ==============================
+C test_b103_inc9_w_keys: ======================== 19 passed in 64.87s (0:01:04) =========================
+C test_b103_inc9_w_mutants: ======================== 29 passed in 130.61s (0:02:10) ========================
+C test_b103_inc9_w_select: ============================= 14 passed in 43.07s ==============================
+C test_b103_inc9_w_stage: ============================= 11 passed in 42.99s ==============================
+C inc9 slow (not timing): ================ 4 passed, 328 deselected in 656.77s (0:10:56) =================
+C test_b103_inc8_a1_service: ============================== 23 passed in 1.18s ==============================
+C test_b103_inc8_a2_app: ======================== 23 passed in 71.73s (0:01:11) =========================
+C test_b103_inc8_a3_help: ============================== 9 passed in 1.03s ===============================
+C test_b103_inc8_at_help: ============================== 2 passed in 4.89s ===============================
+C test_b103_inc8_at: ============================= 11 passed in 49.05s ==============================
+C test_b103_inc8_p_layout: ======================== 31 passed in 76.87s (0:01:16) =========================
+C test_b103_inc8_p_ledger: ============================= 10 passed in 33.12s ==============================
+C test_b103_inc8_p_wiring: ============================= 12 passed in 34.68s ==============================
+C test_b103_inc8_s1_detail: ============================== 43 passed in 1.17s ==============================
+C test_b103_inc8_s1: ============================= 118 passed in 1.27s ==============================
+C test_b103_inc8_s2_picker_definitions: ============================== 6 passed in 1.12s ===============================
+C test_b103_inc8_s2_sheet_formula: ============================== 27 passed in 9.18s ==============================
+C test_b103_inc8_s2_sheet_keys: ============================= 21 passed in 10.80s ==============================
+C test_b103_inc8_s2_sheet_rows: ============================== 35 passed in 6.52s ==============================
+C law test_id_registry: ============================== 12 passed in 7.73s ============================== | 
+C law test_suite_hygiene: ======================== 67 passed in 151.43s (0:02:31) ======================== | 
+C law test_requirements_canon: ========================= 1 failed, 10 passed in 1.34s ========================= | FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once 
+C law test_address_census: ======================== 1 failed, 22 passed in 30.56s ========================= | FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors 
+C law test_deps_seam_law: ============================== 6 passed in 8.08s =============================== | 
+C law test_no_private_tokens: ============================== 2 passed in 41.20s ============================== | 
+C law test_engine_unchanged: ============================== 1 passed in 1.03s =============================== | 
+D start Sat Nov 14 03:33:06 PM CST 2026
+D history_strip head: ========================= 1 failed, 7 passed in 30.67s ========================= | FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE... 
+D history_strip cb21d5517: ========================= 1 failed, 7 passed in 31.32s ========================= | FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE... 
+D history_strip c16b00234: ========================= 1 failed, 7 passed in 30.68s ========================= | FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE... 
+D history_strip c6c4fd21f: ========================= 1 failed, 7 passed in 31.46s ========================= | FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE... 
+D test_tui_patch_card head: ======================== 1 failed, 25 passed in 28.94s ========================= | failed 1
+D test_tui_patch_card c16b00234: ======================== 1 failed, 25 passed in 29.17s ========================= | failed 1
+D test_tui_patch_card c6c4fd21f: ======================== 1 failed, 25 passed in 30.14s ========================= | failed 1
+D test_tui_patch_card head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_tui_patch_json head: ======================== 4 failed, 13 passed in 15.33s ========================= | failed 4
+D test_tui_patch_json c16b00234: ======================== 4 failed, 13 passed in 16.28s ========================= | failed 4
+D test_tui_patch_json c6c4fd21f: ======================== 3 failed, 14 passed in 15.47s ========================= | failed 3
+D test_tui_patch_json head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 1
+D test_b100_session_reset head: =================== 3 failed, 17 passed in 67.58s (0:01:07) ==================== | failed 3
+D test_b100_session_reset c16b00234: =================== 3 failed, 17 passed in 66.35s (0:01:06) ==================== | failed 3
+D test_b100_session_reset c6c4fd21f: =================== 3 failed, 17 passed in 66.49s (0:01:06) ==================== | failed 3
+D test_b100_session_reset head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_b103_clipboard_core head: ============= 2 failed, 83 passed, 2 skipped in 137.04s (0:02:17) ============== | failed 2
+D test_b103_clipboard_core c16b00234: ============= 2 failed, 83 passed, 2 skipped in 137.89s (0:02:17) ============== | failed 2
+D test_b103_clipboard_core c6c4fd21f: ============= 2 failed, 83 passed, 2 skipped in 137.26s (0:02:17) ============== | failed 2
+D test_b103_clipboard_core head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_b103_copy_paste_matrix head: ============= 7 failed, 7 passed, 15 skipped in 119.49s (0:01:59) ============== | failed 7
+D test_b103_copy_paste_matrix c16b00234: ============= 7 failed, 7 passed, 15 skipped in 120.58s (0:02:00) ============== | failed 7
+D test_b103_copy_paste_matrix c6c4fd21f: ============= 7 failed, 7 passed, 15 skipped in 119.41s (0:01:59) ============== | failed 7
+D test_b103_copy_paste_matrix head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_b97_chips_help head: =================== 1 failed, 78 passed in 206.52s (0:03:26) =================== | failed 1
+D test_b97_chips_help c16b00234: =================== 1 failed, 78 passed in 210.71s (0:03:30) =================== | failed 1
+D test_b97_chips_help c6c4fd21f: =================== 1 failed, 78 passed in 208.97s (0:03:28) =================== | failed 1
+D test_b97_chips_help head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_b99_editor_image head: ========================= 2 failed, 6 passed in 32.74s ========================= | failed 2
+D test_b99_editor_image c16b00234: ========================= 2 failed, 6 passed in 32.68s ========================= | failed 2
+D test_b99_editor_image c6c4fd21f: ========================= 2 failed, 6 passed in 32.72s ========================= | failed 2
+D test_b99_editor_image head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_tui_patch_editor_b94 head: ======================== 1 failed, 16 passed in 30.72s ========================= | failed 1
+D test_tui_patch_editor_b94 c16b00234: ======================== 1 failed, 16 passed in 30.63s ========================= | failed 1
+D test_tui_patch_editor_b94 c6c4fd21f: ======================== 1 failed, 16 passed in 30.71s ========================= | failed 1
+D test_tui_patch_editor_b94 head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+D test_tui_snapshot head: ============== 6 failed, 25 passed, 2 xfailed in 65.26s (0:01:05) ============== | failed 6
+D test_tui_snapshot c16b00234: ============== 6 failed, 25 passed, 2 xfailed in 65.64s (0:01:05) ============== | failed 6
+D test_tui_snapshot c6c4fd21f: ============== 6 failed, 25 passed, 2 xfailed in 65.54s (0:01:05) ============== | failed 6
+D test_tui_snapshot head-vs-16b00234 diff lines: 0; head-vs-6c4fd21f: 0
+end Sat Nov 14 04:11:03 PM CST 2026
+CHAIN_DONE

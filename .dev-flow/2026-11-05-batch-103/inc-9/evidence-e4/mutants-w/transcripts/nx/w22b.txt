@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+....F...
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:162: AssertionError: BIG is no longer selected: no second decode, got 2
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_22_4_a_stale_decode_of_a_row_no_longer_selected_is_not_run_again
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 7 passed in 50.61s

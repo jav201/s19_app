@@ -1,0 +1,642 @@
+## uptime:  03:53:57 up 2 days, 12:42,  2 users,  load average: 0.29, 0.35, 0.67
+## date: 2026-11-15T09:53:57Z  head: e4485817
+## s19_app.__file__ = ~/work/zq-p9b/tree/s19_app/__init__.py  textual 8.2.8
+P9B P1 {"chain": "after_refresh", "trial": 1, "load": [0.35, 0.36, 0.67], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0122, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0733, "ticks": 1, "paints": 0, "titles": [], "key": false}], "key_at": [1.4072], "paints_total": 9, "ticks_total": 8, "step_starts": {"1": 0.4037, "2": 0.7169, "3": 1.0903}, "step_ends": {"1": 0.7047, "2": 1.017, "3": 1.3904}}
+.P9B P1 {"chain": "after_refresh_tick", "trial": 1, "load": [0.4, 0.37, 0.67], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0126, "ticks": 1, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0821, "ticks": 2, "paints": 1, "titles": ["STAGING SHEET  tick 005"], "key": false}], "key_at": [1.4176], "paints_total": 10, "ticks_total": 10, "step_starts": {"1": 0.4037, "2": 0.7169, "3": 1.0995}, "step_ends": {"1": 0.7043, "2": 1.0174, "3": 1.3996}}
+.P9B P1 {"chain": "timer0", "trial": 1, "load": [0.54, 0.41, 0.68], "steps": 1, "gaps": [{"gap": "1->2", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}], "key_at": [0.8273], "paints_total": 97, "ticks_total": 95, "step_starts": {"1": 0.4552}, "step_ends": {"1": 0.7557}}
+FP9B P1 {"chain": "timer_20ms", "trial": 1, "load": [0.53, 0.41, 0.67], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0667, "ticks": 1, "paints": 1, "titles": ["STAGING SHEET  tick 004"], "key": false}, {"gap": "2->3", "s": 0.0653, "ticks": 1, "paints": 1, "titles": ["STAGING SHEET  tick 005"], "key": false}], "key_at": [1.5127], "paints_total": 9, "ticks_total": 8, "step_starts": {"1": 0.4718, "2": 0.8393, "3": 1.2047}, "step_ends": {"1": 0.7726, "2": 1.1394, "3": 1.5052}}
+.P9B P1 {"chain": "after_refresh", "trial": 2, "load": [0.56, 0.42, 0.68], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.012, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0714, "ticks": 1, "paints": 0, "titles": [], "key": false}], "key_at": [1.4052], "paints_total": 9, "ticks_total": 8, "step_starts": {"1": 0.4033, "2": 0.7156, "3": 1.0874}, "step_ends": {"1": 0.7036, "2": 1.016, "3": 1.3879}}
+.P9B P1 {"chain": "after_refresh_tick", "trial": 2, "load": [0.52, 0.41, 0.67], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0121, "ticks": 1, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0825, "ticks": 2, "paints": 1, "titles": ["STAGING SHEET  tick 005"], "key": false}], "key_at": [1.4153], "paints_total": 9, "ticks_total": 10, "step_starts": {"1": 0.4032, "2": 0.7157, "3": 1.0982}, "step_ends": {"1": 0.7036, "2": 1.0157, "3": 1.3982}}
+.P9B P1 {"chain": "timer0", "trial": 2, "load": [0.63, 0.44, 0.68], "steps": 1, "gaps": [{"gap": "1->2", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}], "key_at": [0.7993], "paints_total": 88, "ticks_total": 86, "step_starts": {"1": 0.405}, "step_ends": {"1": 0.7057}}
+FP9B P1 {"chain": "timer_20ms", "trial": 2, "load": [0.6, 0.44, 0.68], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.078, "ticks": 1, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0788, "ticks": 1, "paints": 2, "titles": ["STAGING SHEET  tick 004", "STAGING SHEET  tick 005"], "key": false}], "key_at": [1.4667], "paints_total": 10, "ticks_total": 9, "step_starts": {"1": 0.4043, "2": 0.7828, "3": 1.1619}, "step_ends": {"1": 0.7048, "2": 1.0831, "3": 1.462}}
+.P9B P1 {"chain": "after_refresh", "trial": 3, "load": [0.64, 0.45, 0.68], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0122, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0716, "ticks": 1, "paints": 0, "titles": [], "key": false}], "key_at": [1.4065], "paints_total": 9, "ticks_total": 8, "step_starts": {"1": 0.4041, "2": 0.717, "3": 1.0887}, "step_ends": {"1": 0.7048, "2": 1.0171, "3": 1.3888}}
+.P9B P1 {"chain": "after_refresh_tick", "trial": 3, "load": [0.67, 0.46, 0.68], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0121, "ticks": 1, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0845, "ticks": 2, "paints": 1, "titles": ["STAGING SHEET  tick 005"], "key": false}], "key_at": [1.4167], "paints_total": 10, "ticks_total": 10, "step_starts": {"1": 0.4045, "2": 0.717, "3": 1.1016}, "step_ends": {"1": 0.7049, "2": 1.0171, "3": 1.4017}}
+.P9B P1 {"chain": "timer0", "trial": 3, "load": [0.61, 0.46, 0.68], "steps": 1, "gaps": [{"gap": "1->2", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": null, "ticks": 0, "paints": 0, "titles": [], "key": false}], "key_at": [0.8016], "paints_total": 92, "ticks_total": 90, "step_starts": {"1": 0.405}, "step_ends": {"1": 0.7059}}
+FP9B P1 {"chain": "timer_20ms", "trial": 3, "load": [0.64, 0.47, 0.68], "steps": 3, "gaps": [{"gap": "1->2", "s": 0.0779, "ticks": 1, "paints": 0, "titles": [], "key": false}, {"gap": "2->3", "s": 0.0794, "ticks": 1, "paints": 2, "titles": ["STAGING SHEET  tick 004", "STAGING SHEET  tick 005"], "key": false}], "key_at": [1.47], "paints_total": 10, "ticks_total": 9, "step_starts": {"1": 0.4047, "2": 0.783, "3": 1.1624}, "step_ends": {"1": 0.7051, "2": 1.083, "3": 1.4624}}
+.
+=================================== FAILURES ===================================
+____________________ test_p1_frame_between_steps[1-timer0] _____________________
+
+tmp_path = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/test_p1_frame_between_steps_1_2')
+defc_dir = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/b103_inc9_w_defc0')
+chain = 'timer0', trial = 1
+
+    @pytest.mark.parametrize("chain", ["after_refresh", "after_refresh_tick", "timer0", "timer_20ms"])
+    @pytest.mark.parametrize("trial", [1, 2, 3])
+    def test_p1_frame_between_steps(tmp_path, defc_dir, chain, trial):
+        async def body(app, pilot, panel):
+            sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+            sheet.query_one(BODY).focus()
+            await pilot.pause(0.2)
+            t0, log, n = time.monotonic(), [], [0]
+    
+            def stamp(kind, **extra):
+                log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+            screen = app.screen
+            real_refresh = screen._compositor_refresh
+    
+            def compositor_refresh():
+                real_refresh()
+                stamp("paint", title=top_line(app, win)[:40])
+    
+            screen._compositor_refresh = compositor_refresh
+            real_move = sheet.action_move
+    
+            def move(*a):
+                real_move(*a)
+                stamp("key")
+    
+            sheet.action_move = move
+    
+            def tick():
+                n[0] += 1
+                win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+                stamp("tick", n=n[0])
+    
+            timer = app.set_interval(0.1, tick)
+            done = threading.Event()
+    
+            def step(k):
+                stamp("step_start", k=k)
+                if k == 1:
+                    threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+                time.sleep(0.3)
+                stamp("step_end", k=k)
+                if k < 3:
+                    if chain == "after_refresh":
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                        tick()
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "timer0":
+                        app.set_timer(0, lambda: step(k + 1))
+                    else:
+                        app.set_timer(0.02, lambda: step(k + 1))
+                else:
+                    done.set()
+    
+            await pilot.pause(0.35)
+            step(1)
+            end = time.monotonic() + 10
+            while not done.is_set() and time.monotonic() < end:
+                await pilot.pause(0.02)
+            await pilot.pause(0.3)
+            timer.stop()
+            del screen._compositor_refresh
+            del sheet.action_move
+            ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+            starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+            gaps = []
+            for k in (1, 2):
+                a, b = ends.get(k), starts.get(k + 1)
+                inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+                gaps.append(dict(
+                    gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                    ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                    titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                    key=any(e["kind"] == "key" for e in inside)))
+            keys = [e["t"] for e in log if e["kind"] == "key"]
+            out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                           paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                           step_starts=starts, step_ends=ends))
+            assert len(ends) == 3, "the chain did not run its three steps"
+    
+>       run(tmp_path, defc_dir, body)
+
+tests/test_zq_p9b_pilots.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+        sheet.query_one(BODY).focus()
+        await pilot.pause(0.2)
+        t0, log, n = time.monotonic(), [], [0]
+    
+        def stamp(kind, **extra):
+            log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+        screen = app.screen
+        real_refresh = screen._compositor_refresh
+    
+        def compositor_refresh():
+            real_refresh()
+            stamp("paint", title=top_line(app, win)[:40])
+    
+        screen._compositor_refresh = compositor_refresh
+        real_move = sheet.action_move
+    
+        def move(*a):
+            real_move(*a)
+            stamp("key")
+    
+        sheet.action_move = move
+    
+        def tick():
+            n[0] += 1
+            win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+            stamp("tick", n=n[0])
+    
+        timer = app.set_interval(0.1, tick)
+        done = threading.Event()
+    
+        def step(k):
+            stamp("step_start", k=k)
+            if k == 1:
+                threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+            time.sleep(0.3)
+            stamp("step_end", k=k)
+            if k < 3:
+                if chain == "after_refresh":
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                    tick()
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "timer0":
+                    app.set_timer(0, lambda: step(k + 1))
+                else:
+                    app.set_timer(0.02, lambda: step(k + 1))
+            else:
+                done.set()
+    
+        await pilot.pause(0.35)
+        step(1)
+        end = time.monotonic() + 10
+        while not done.is_set() and time.monotonic() < end:
+            await pilot.pause(0.02)
+        await pilot.pause(0.3)
+        timer.stop()
+        del screen._compositor_refresh
+        del sheet.action_move
+        ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+        starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+        gaps = []
+        for k in (1, 2):
+            a, b = ends.get(k), starts.get(k + 1)
+            inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+            gaps.append(dict(
+                gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                key=any(e["kind"] == "key" for e in inside)))
+        keys = [e["t"] for e in log if e["kind"] == "key"]
+        out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                       paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                       step_starts=starts, step_ends=ends))
+>       assert len(ends) == 3, "the chain did not run its three steps"
+E       AssertionError: the chain did not run its three steps
+E       assert 1 == 3
+E        +  where 1 = len({1: 0.7557})
+
+tests/test_zq_p9b_pilots.py:139: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+future: <Task finished name='set_timer#1' coro=<Timer._run_timer() done, defined at ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py:143> exception=ZeroDivisionError('float division by zero')>
+Traceback (most recent call last):
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 146, in _run_timer
+    await self._run()
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 163, in _run
+    count = int((now - start) / _interval + 1)
+                ~~~~~~~~~~~~~~^~~~~~~~~~~
+ZeroDivisionError: float division by zero
+____________________ test_p1_frame_between_steps[2-timer0] _____________________
+
+tmp_path = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/test_p1_frame_between_steps_2_2')
+defc_dir = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/b103_inc9_w_defc0')
+chain = 'timer0', trial = 2
+
+    @pytest.mark.parametrize("chain", ["after_refresh", "after_refresh_tick", "timer0", "timer_20ms"])
+    @pytest.mark.parametrize("trial", [1, 2, 3])
+    def test_p1_frame_between_steps(tmp_path, defc_dir, chain, trial):
+        async def body(app, pilot, panel):
+            sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+            sheet.query_one(BODY).focus()
+            await pilot.pause(0.2)
+            t0, log, n = time.monotonic(), [], [0]
+    
+            def stamp(kind, **extra):
+                log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+            screen = app.screen
+            real_refresh = screen._compositor_refresh
+    
+            def compositor_refresh():
+                real_refresh()
+                stamp("paint", title=top_line(app, win)[:40])
+    
+            screen._compositor_refresh = compositor_refresh
+            real_move = sheet.action_move
+    
+            def move(*a):
+                real_move(*a)
+                stamp("key")
+    
+            sheet.action_move = move
+    
+            def tick():
+                n[0] += 1
+                win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+                stamp("tick", n=n[0])
+    
+            timer = app.set_interval(0.1, tick)
+            done = threading.Event()
+    
+            def step(k):
+                stamp("step_start", k=k)
+                if k == 1:
+                    threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+                time.sleep(0.3)
+                stamp("step_end", k=k)
+                if k < 3:
+                    if chain == "after_refresh":
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                        tick()
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "timer0":
+                        app.set_timer(0, lambda: step(k + 1))
+                    else:
+                        app.set_timer(0.02, lambda: step(k + 1))
+                else:
+                    done.set()
+    
+            await pilot.pause(0.35)
+            step(1)
+            end = time.monotonic() + 10
+            while not done.is_set() and time.monotonic() < end:
+                await pilot.pause(0.02)
+            await pilot.pause(0.3)
+            timer.stop()
+            del screen._compositor_refresh
+            del sheet.action_move
+            ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+            starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+            gaps = []
+            for k in (1, 2):
+                a, b = ends.get(k), starts.get(k + 1)
+                inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+                gaps.append(dict(
+                    gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                    ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                    titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                    key=any(e["kind"] == "key" for e in inside)))
+            keys = [e["t"] for e in log if e["kind"] == "key"]
+            out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                           paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                           step_starts=starts, step_ends=ends))
+            assert len(ends) == 3, "the chain did not run its three steps"
+    
+>       run(tmp_path, defc_dir, body)
+
+tests/test_zq_p9b_pilots.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+        sheet.query_one(BODY).focus()
+        await pilot.pause(0.2)
+        t0, log, n = time.monotonic(), [], [0]
+    
+        def stamp(kind, **extra):
+            log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+        screen = app.screen
+        real_refresh = screen._compositor_refresh
+    
+        def compositor_refresh():
+            real_refresh()
+            stamp("paint", title=top_line(app, win)[:40])
+    
+        screen._compositor_refresh = compositor_refresh
+        real_move = sheet.action_move
+    
+        def move(*a):
+            real_move(*a)
+            stamp("key")
+    
+        sheet.action_move = move
+    
+        def tick():
+            n[0] += 1
+            win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+            stamp("tick", n=n[0])
+    
+        timer = app.set_interval(0.1, tick)
+        done = threading.Event()
+    
+        def step(k):
+            stamp("step_start", k=k)
+            if k == 1:
+                threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+            time.sleep(0.3)
+            stamp("step_end", k=k)
+            if k < 3:
+                if chain == "after_refresh":
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                    tick()
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "timer0":
+                    app.set_timer(0, lambda: step(k + 1))
+                else:
+                    app.set_timer(0.02, lambda: step(k + 1))
+            else:
+                done.set()
+    
+        await pilot.pause(0.35)
+        step(1)
+        end = time.monotonic() + 10
+        while not done.is_set() and time.monotonic() < end:
+            await pilot.pause(0.02)
+        await pilot.pause(0.3)
+        timer.stop()
+        del screen._compositor_refresh
+        del sheet.action_move
+        ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+        starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+        gaps = []
+        for k in (1, 2):
+            a, b = ends.get(k), starts.get(k + 1)
+            inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+            gaps.append(dict(
+                gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                key=any(e["kind"] == "key" for e in inside)))
+        keys = [e["t"] for e in log if e["kind"] == "key"]
+        out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                       paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                       step_starts=starts, step_ends=ends))
+>       assert len(ends) == 3, "the chain did not run its three steps"
+E       AssertionError: the chain did not run its three steps
+E       assert 1 == 3
+E        +  where 1 = len({1: 0.7057})
+
+tests/test_zq_p9b_pilots.py:139: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+future: <Task finished name='set_timer#1' coro=<Timer._run_timer() done, defined at ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py:143> exception=ZeroDivisionError('float division by zero')>
+Traceback (most recent call last):
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 146, in _run_timer
+    await self._run()
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 163, in _run
+    count = int((now - start) / _interval + 1)
+                ~~~~~~~~~~~~~~^~~~~~~~~~~
+ZeroDivisionError: float division by zero
+____________________ test_p1_frame_between_steps[3-timer0] _____________________
+
+tmp_path = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/test_p1_frame_between_steps_3_2')
+defc_dir = PosixPath('~/work/zq-p9b/tmp/pytest-of-<user>/pytest-4/b103_inc9_w_defc0')
+chain = 'timer0', trial = 3
+
+    @pytest.mark.parametrize("chain", ["after_refresh", "after_refresh_tick", "timer0", "timer_20ms"])
+    @pytest.mark.parametrize("trial", [1, 2, 3])
+    def test_p1_frame_between_steps(tmp_path, defc_dir, chain, trial):
+        async def body(app, pilot, panel):
+            sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+            sheet.query_one(BODY).focus()
+            await pilot.pause(0.2)
+            t0, log, n = time.monotonic(), [], [0]
+    
+            def stamp(kind, **extra):
+                log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+            screen = app.screen
+            real_refresh = screen._compositor_refresh
+    
+            def compositor_refresh():
+                real_refresh()
+                stamp("paint", title=top_line(app, win)[:40])
+    
+            screen._compositor_refresh = compositor_refresh
+            real_move = sheet.action_move
+    
+            def move(*a):
+                real_move(*a)
+                stamp("key")
+    
+            sheet.action_move = move
+    
+            def tick():
+                n[0] += 1
+                win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+                stamp("tick", n=n[0])
+    
+            timer = app.set_interval(0.1, tick)
+            done = threading.Event()
+    
+            def step(k):
+                stamp("step_start", k=k)
+                if k == 1:
+                    threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+                time.sleep(0.3)
+                stamp("step_end", k=k)
+                if k < 3:
+                    if chain == "after_refresh":
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                        tick()
+                        app.call_after_refresh(step, k + 1)
+                    elif chain == "timer0":
+                        app.set_timer(0, lambda: step(k + 1))
+                    else:
+                        app.set_timer(0.02, lambda: step(k + 1))
+                else:
+                    done.set()
+    
+            await pilot.pause(0.35)
+            step(1)
+            end = time.monotonic() + 10
+            while not done.is_set() and time.monotonic() < end:
+                await pilot.pause(0.02)
+            await pilot.pause(0.3)
+            timer.stop()
+            del screen._compositor_refresh
+            del sheet.action_move
+            ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+            starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+            gaps = []
+            for k in (1, 2):
+                a, b = ends.get(k), starts.get(k + 1)
+                inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+                gaps.append(dict(
+                    gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                    ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                    titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                    key=any(e["kind"] == "key" for e in inside)))
+            keys = [e["t"] for e in log if e["kind"] == "key"]
+            out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                           paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                           step_starts=starts, step_ends=ends))
+            assert len(ends) == 3, "the chain did not run its three steps"
+    
+>       run(tmp_path, defc_dir, body)
+
+tests/test_zq_p9b_pilots.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        sheet, win = sheet_of(panel), app.screen.query_one(WIN)
+        sheet.query_one(BODY).focus()
+        await pilot.pause(0.2)
+        t0, log, n = time.monotonic(), [], [0]
+    
+        def stamp(kind, **extra):
+            log.append(dict(kind=kind, t=round(time.monotonic() - t0, 4), **extra))
+    
+        screen = app.screen
+        real_refresh = screen._compositor_refresh
+    
+        def compositor_refresh():
+            real_refresh()
+            stamp("paint", title=top_line(app, win)[:40])
+    
+        screen._compositor_refresh = compositor_refresh
+        real_move = sheet.action_move
+    
+        def move(*a):
+            real_move(*a)
+            stamp("key")
+    
+        sheet.action_move = move
+    
+        def tick():
+            n[0] += 1
+            win.border_title = Text(f"STAGING SHEET  tick {n[0]:03d}")
+            stamp("tick", n=n[0])
+    
+        timer = app.set_interval(0.1, tick)
+        done = threading.Event()
+    
+        def step(k):
+            stamp("step_start", k=k)
+            if k == 1:
+                threading.Timer(0.05, lambda: app._driver.send_message(events.Key("down", None))).start()
+            time.sleep(0.3)
+            stamp("step_end", k=k)
+            if k < 3:
+                if chain == "after_refresh":
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "after_refresh_tick":  # the step ends with a cue tick (the window dirty), as the product would
+                    tick()
+                    app.call_after_refresh(step, k + 1)
+                elif chain == "timer0":
+                    app.set_timer(0, lambda: step(k + 1))
+                else:
+                    app.set_timer(0.02, lambda: step(k + 1))
+            else:
+                done.set()
+    
+        await pilot.pause(0.35)
+        step(1)
+        end = time.monotonic() + 10
+        while not done.is_set() and time.monotonic() < end:
+            await pilot.pause(0.02)
+        await pilot.pause(0.3)
+        timer.stop()
+        del screen._compositor_refresh
+        del sheet.action_move
+        ends = {e["k"]: e["t"] for e in log if e["kind"] == "step_end"}
+        starts = {e["k"]: e["t"] for e in log if e["kind"] == "step_start"}
+        gaps = []
+        for k in (1, 2):
+            a, b = ends.get(k), starts.get(k + 1)
+            inside = [e for e in log if a is not None and b is not None and a <= e["t"] <= b]
+            gaps.append(dict(
+                gap=f"{k}->{k + 1}", s=None if a is None or b is None else round(b - a, 4),
+                ticks=sum(e["kind"] == "tick" for e in inside), paints=sum(e["kind"] == "paint" for e in inside),
+                titles=sorted({e["title"].strip("╭─╮ ") for e in inside if e["kind"] == "paint"}),
+                key=any(e["kind"] == "key" for e in inside)))
+        keys = [e["t"] for e in log if e["kind"] == "key"]
+        out("P1", dict(chain=chain, trial=trial, load=load(), steps=len(ends), gaps=gaps, key_at=keys,
+                       paints_total=sum(e["kind"] == "paint" for e in log), ticks_total=n[0],
+                       step_starts=starts, step_ends=ends))
+>       assert len(ends) == 3, "the chain did not run its three steps"
+E       AssertionError: the chain did not run its three steps
+E       assert 1 == 3
+E        +  where 1 = len({1: 0.7059})
+
+tests/test_zq_p9b_pilots.py:139: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+future: <Task finished name='set_timer#1' coro=<Timer._run_timer() done, defined at ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py:143> exception=ZeroDivisionError('float division by zero')>
+Traceback (most recent call last):
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 146, in _run_timer
+    await self._run()
+  File "~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/timer.py", line 163, in _run
+    count = int((now - start) / _interval + 1)
+                ~~~~~~~~~~~~~~^~~~~~~~~~~
+ZeroDivisionError: float division by zero
+=========================== short test summary info ============================
+FAILED tests/test_zq_p9b_pilots.py::test_p1_frame_between_steps[1-timer0] - A...
+FAILED tests/test_zq_p9b_pilots.py::test_p1_frame_between_steps[2-timer0] - A...
+FAILED tests/test_zq_p9b_pilots.py::test_p1_frame_between_steps[3-timer0] - A...
+3 failed, 9 passed, 11 deselected in 106.24s (0:01:46)
+## rc=1
+## end: 2026-11-15T09:55:45Z  uptime:  03:55:45 up 2 days, 12:44,  2 users,  load average: 0.64, 0.47, 0.68

@@ -1,0 +1,13 @@
+# run g2-fm9 tree=g2 2026-11-13T23:06:04-06:00 load: load average: 7.71, 5.94, 4.81
+~/work/zq-e4-9w-int/g2/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/g2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [4 items]
+
+....                                                                     [100%]
+============================== 4 passed in 1.84s ===============================
+# rc=0 end 2026-11-13T23:06:07-06:00 load: load average: 7.66, 5.96, 4.82

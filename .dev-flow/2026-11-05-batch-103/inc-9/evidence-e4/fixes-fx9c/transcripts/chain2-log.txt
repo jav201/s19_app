@@ -1,0 +1,55 @@
+clone f5cb522e start 10:42:07 load 1.08 1.51 1.88 1/641 514162
+test_b103_inc9_a9 29 passed in 102.51s (0:01:42)
+test_b103_inc9_b_canvas 42 passed in 1.20s
+test_b103_inc9_b_cells 39 passed in 1.64s
+test_b103_inc9_b_detail 54 passed in 1.24s
+test_b103_inc9_b_model 20 passed in 1.08s
+test_b103_inc9_b_tools 59 passed in 1.14s
+test_b103_inc9_i 3 passed in 9.28s
+test_b103_inc9_w_jobs 2 passed in 22.55s
+test_b103_inc9_w_keys 19 passed in 65.46s (0:01:05)
+test_b103_inc9_w_mutants 29 passed in 134.85s (0:02:14)
+test_b103_inc9_w_select 14 passed in 44.87s
+test_b103_inc9_w_stage 11 passed in 43.73s
+test_b103_inc8_a1_service 23 passed in 1.19s
+test_b103_inc8_a2_app 23 passed in 71.66s (0:01:11)
+test_b103_inc8_a3_help 9 passed in 1.06s
+test_b103_inc8_at_help 2 passed in 5.02s
+test_b103_inc8_at 11 passed in 50.02s
+test_b103_inc8_p_layout 31 passed in 77.16s (0:01:17)
+test_b103_inc8_p_ledger 10 passed in 33.85s
+test_b103_inc8_p_wiring 12 passed in 35.49s
+test_b103_inc8_s1_detail 43 passed in 1.22s
+test_b103_inc8_s1 118 passed in 1.43s
+test_b103_inc8_s2_picker_definitions 6 passed in 1.18s
+test_b103_inc8_s2_sheet_formula 27 passed in 9.00s
+test_b103_inc8_s2_sheet_keys 21 passed in 10.93s
+test_b103_inc8_s2_sheet_rows 35 passed in 6.70s
+test_b100_session_reset 3 failed, 17 passed in 68.34s (0:01:08)
+test_b101_symbol_reads 24 passed in 255.45s (0:04:15)
+test_b103_clipboard_core 2 failed, 83 passed, 2 skipped in 140.41s (0:02:20)
+test_b103_clipboard_tail 27 passed, 4 skipped in 190.60s (0:03:10)
+test_b103_copy_paste_matrix 7 failed, 7 passed, 15 skipped in 118.91s (0:01:58)
+test_b103_copy_quit_dialog 28 passed in 139.60s (0:02:19)
+test_b103_copy_views 54 passed in 229.32s (0:03:49)
+test_b97_chips_help 1 failed, 78 passed in 214.99s (0:03:34)
+test_b97_flow_execution 75 passed in 255.51s (0:04:15)
+test_b97_patch_editor 38 passed in 191.15s (0:03:11)
+test_b97_width 
+test_b99_editor_image 2 failed, 6 passed in 32.71s
+test_tui_patch_big 24 passed in 31.35s
+test_tui_patch_card 1 failed, 25 passed in 29.78s
+test_tui_patch_editor_b94 1 failed, 16 passed in 30.66s
+test_tui_patch_editor_v2 52 passed in 81.87s (0:01:21)
+test_tui_patch_history_strip 1 failed, 6 passed, 1 skipped in 19.97s
+test_tui_patch_json 4 failed, 13 passed in 16.17s
+test_tui_patch_layout 9 passed in 24.73s
+test_tui_snapshot 6 failed, 25 passed, 2 xfailed in 65.56s (0:01:05)
+test_id_registry 12 passed in 8.21s
+test_suite_hygiene 65 passed, 2 skipped in 151.05s (0:02:31)
+test_requirements_canon 1 failed, 10 passed in 1.30s
+test_address_census 1 failed, 22 passed in 30.53s
+test_deps_seam_law 6 passed in 7.93s
+test_no_private_tokens 2 passed in 41.74s
+test_engine_unchanged 
+CHAIN2_DONE 11:44:51 load 1.43 1.68 1.76 1/634 533855

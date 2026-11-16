@@ -1,0 +1,50 @@
+cwd=~/work/zq-e4-8-int/wt2
+ 17:20:16 up 1 day,  2:08,  3 users,  load average: 1.37, 1.25, 1.58
+~/work/zq-e4-8-int/wt2/s19_app/__init__.py
+GEO.80x24.landing.h = 9
+GEO.80x24.landing.content = (68, 7)
+GEO.80x24.table.h = 6
+GEO.80x24.table.rows = 6
+GEO.80x24.chips.h = 1
+GEO.80x24.strip_bytes = 16
+GEO.80x24.pane.content = (68, 6)
+GEO.80x24.pane.max_scroll_y = 12
+GEO.80x24.capped.card.h = 5
+GEO.80x24.capped.pane.max_scroll_y = 12
+GEO.80x24.capped.children = [('patch_before_after_card', 0, 5), ('patch_doc_entry_inputs', 6, 5), ('patch_doc_entry_buttons', 11, 1), ('patch_param_use_row', 12, 1), ('patch_param_use_status', -20, 0), ('patch_doc_tally', 14, 4)]
+.GEO.118x53.landing.h = 9
+GEO.118x53.landing.content = (108, 7)
+GEO.118x53.table.h = 6
+GEO.118x53.table.rows = 6
+GEO.118x53.chips.h = 1
+GEO.118x53.strip_bytes = 32
+GEO.118x53.pane.content = (108, 6)
+GEO.118x53.pane.max_scroll_y = 12
+GEO.118x53.capped.card.h = 5
+GEO.118x53.capped.pane.max_scroll_y = 12
+GEO.118x53.capped.children = [('patch_before_after_card', 0, 5), ('patch_doc_entry_inputs', 6, 5), ('patch_doc_entry_buttons', 11, 1), ('patch_param_use_row', 12, 1), ('patch_param_use_status', -32, 0), ('patch_doc_tally', 14, 4)]
+.GEO.118x54.landing.h = 9
+GEO.118x54.landing.content = (108, 7)
+GEO.118x54.table.h = 6
+GEO.118x54.table.rows = 6
+GEO.118x54.chips.h = 1
+GEO.118x54.strip_bytes = 32
+GEO.118x54.pane.content = (108, 6)
+GEO.118x54.pane.max_scroll_y = 12
+GEO.118x54.capped.card.h = 5
+GEO.118x54.capped.pane.max_scroll_y = 12
+GEO.118x54.capped.children = [('patch_before_after_card', 0, 5), ('patch_doc_entry_inputs', 6, 5), ('patch_doc_entry_buttons', 11, 1), ('patch_param_use_row', 12, 1), ('patch_param_use_status', -33, 0), ('patch_doc_tally', 14, 4)]
+.GEO.220x60.landing.h = 9
+GEO.220x60.landing.content = (192, 7)
+GEO.220x60.table.h = 6
+GEO.220x60.table.rows = 6
+GEO.220x60.chips.h = 1
+GEO.220x60.strip_bytes = 32
+GEO.220x60.pane.content = (192, 6)
+GEO.220x60.pane.max_scroll_y = 12
+GEO.220x60.capped.card.h = 5
+GEO.220x60.capped.pane.max_scroll_y = 12
+GEO.220x60.capped.children = [('patch_before_after_card', 0, 5), ('patch_doc_entry_inputs', 6, 5), ('patch_doc_entry_buttons', 11, 1), ('patch_param_use_row', 12, 1), ('patch_param_use_status', -39, 0), ('patch_doc_tally', 14, 4)]
+.
+4 passed in 22.69s
+exit=0

@@ -1,0 +1,14 @@
+load before: 1.61 1.28 1.10 3/655 455650
+~/work/zq-x9/head/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x9/head
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [29 items]
+
+.............................                                            [100%]
+======================== 29 passed in 107.09s (0:01:47) ========================
+rc=0
+load after: 3.19 1.94 1.36 3/653 456686

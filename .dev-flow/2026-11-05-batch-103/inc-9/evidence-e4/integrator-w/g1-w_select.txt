@@ -1,0 +1,798 @@
+# run g1-w_select tree=-n 2026-11-13T23:00:36-06:00 load: load average: 5.02, 3.58, 3.89
+~/work/zq-e4-9w-int/g1/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/g1
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [13 items]
+
+F.FFFFFFFFFF.                                                            [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_1_2_2_a_bench_row_sets_the_bench_class_and_the_landing_pane_gets_6_rows _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_def_1_2_2_a_bench_ro0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/b103_inc9_w_defc0')
+
+    def test_r_pe_def_1_2_2_a_bench_row_sets_the_bench_class_and_the_landing_pane_gets_6_rows(tmp_path, defc_dir):
+        """118x54: a number row -> LANDS IN 9 rows, no `-bench`; MAP_DEF_0001 -> `-bench`, LANDS IN 6, the sheet window
+        3 rows taller; back on the number row the class leaves."""
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+    
+            def read():
+                return (panel.has_class("-bench"), need(panel, "#patch_inspector").region.height,
+                        need(panel, "#patch_sheet_win").region.height)
+    
+            await pick(pilot, sheet, DISPLAY)
+            await pilot.pause()
+            number = read()
+            await pick(pilot, sheet, MAP)
+            await pilot.pause()
+            bench = read()
+            await pick(pilot, sheet, DISPLAY)
+            await pilot.pause()
+            return number, bench, read()
+    
+>       number, bench, back = run(tmp_path, defc_dir, body)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:60: in body
+    await pick(pilot, sheet, DISPLAY)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'DISPLAY_0001'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select DISPLAY_0001
+
+tests/support/b103_inc9_w.py:109: AssertionError
+__ test_r_pe_bench_9_1_a_filter_keystroke_that_keeps_the_row_keeps_its_state ___
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_9_1_a_filter_k0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_9_1_a_filter_keystroke_that_keeps_the_row_keeps_its_state(tmp_path, defc_dir):
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            want = await bench_with_edit(pilot, sheet)
+            await set_filter(pilot, panel, sheet, "MAP_DEF")
+            return want, [row.name for row in sheet.rows], dict(st(sheet, MAP).edit), st(sheet, MAP).cursor
+    
+>       want, rows, edit, cursor = run(tmp_path, defc_dir, body)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:113: in body
+    want = await bench_with_edit(pilot, sheet)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:100: in bench_with_edit
+    await open_bench(pilot, sheet, MAP)
+tests/support/b103_inc9_w.py:119: in open_bench
+    await pick(pilot, sheet, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'MAP_DEF_0001'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select MAP_DEF_0001
+
+tests/support/b103_inc9_w.py:109: AssertionError
+__________ test_r_pe_bench_9_3_a_page_without_the_row_drops_its_state __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_bench_9_3_a_page_wit0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_9_3_a_page_without_the_row_drops_its_state(tmp_path, defc_dir):
+        """A page whose definitions no longer hold MAP_DEF_0001, then the row back -> cursor (0,0), tool Set, edit {};
+        control: before the page the state held the edit, so the fresh state is not the default of a never-used row."""
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            want = await bench_with_edit(pilot, sheet)
+            held = dict(st(sheet, MAP).edit)
+            await set_filter(pilot, panel, sheet, "CURVE")
+            assert MAP not in [row.name for row in sheet.rows]
+            await set_filter(pilot, panel, sheet, "")
+            await pick(pilot, sheet, MAP)
+            await wait_for(pilot, lambda: st(sheet, MAP) is not None, "the fresh state of MAP_DEF_0001")
+            state = st(sheet, MAP)
+            return want, held, state.cursor, state.tool, dict(state.edit)
+    
+>       want, held, cursor, tool, edit = run(tmp_path, defc_dir, body)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:139: in body
+    want = await bench_with_edit(pilot, sheet)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:100: in bench_with_edit
+    await open_bench(pilot, sheet, MAP)
+tests/support/b103_inc9_w.py:119: in open_bench
+    await pick(pilot, sheet, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'MAP_DEF_0001'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select MAP_DEF_0001
+
+tests/support/b103_inc9_w.py:109: AssertionError
+______ test_r_pe_bench_9_2_selecting_another_row_and_back_keeps_the_state ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_9_2_selecting_0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_9_2_selecting_another_row_and_back_keeps_the_state(tmp_path, defc_dir):
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            want = await bench_with_edit(pilot, sheet)
+            await pick(pilot, sheet, DISPLAY)
+            await pick(pilot, sheet, MAP)
+            return want, dict(st(sheet, MAP).edit), st(sheet, MAP).cursor, st(sheet, MAP).tool
+    
+>       want, edit, cursor, tool = run(tmp_path, defc_dir, body)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:124: in body
+    want = await bench_with_edit(pilot, sheet)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:100: in bench_with_edit
+    await open_bench(pilot, sheet, MAP)
+tests/support/b103_inc9_w.py:119: in open_bench
+    await pick(pilot, sheet, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'MAP_DEF_0001'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select MAP_DEF_0001
+
+tests/support/b103_inc9_w.py:109: AssertionError
+_ test_r_pe_bench_22_1_and_2_a_decode_ended_after_the_selection_moved_is_discarded _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_bench_22_1_and_2_a_d0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fef1b1f2410>
+
+    def test_r_pe_bench_22_1_and_2_a_decode_ended_after_the_selection_moved_is_discarded(tmp_path, defc_dir, monkeypatch):
+        """BIG selected and held, SMALL_BLK selected, BIG's decode released: SMALL_BLK's values show, BIG's are
+        dropped (22/1). BIG selected again: a second decode of BIG starts (22/2). PARTIAL: BIG for LARGE."""
+        gate = Gate(monkeypatch, "decode_values", hold={BIG})
+        a2l, s19 = big_case(tmp_path, BIG_COUNT, rows=(BIG,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await pick(pilot, sheet, BIG)
+                await wait_for(pilot, gate.entered.is_set, "BIG's decode held in the worker")
+                await pick(pilot, sheet, "SMALL_BLK")
+            finally:
+                gate.release()
+            await wait_for(pilot, lambda: has_values(sheet, "SMALL_BLK"), "SMALL_BLK's values")
+            await pilot.pause(0.3)
+            first = (has_values(sheet, BIG), all(str(v) in body_text(app) for v in (1, 2, 3, 4)),
+                     f"decoding {BIG_COUNT}" in body_text(app))
+            before = gate.names("decode_values").count(BIG)
+            await pick(pilot, sheet, BIG)
+            await wait_for(pilot, lambda: has_values(sheet, BIG), "BIG's second decode", 60)
+            return first, before, gate.names("decode_values").count(BIG)
+    
+>       (big_values, small_shown, stale_row), before, after = run(tmp_path, None, body, a2l=a2l, image=s19)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:168: in body
+    await pick(pilot, sheet, "SMALL_BLK")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'SMALL_BLK'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select SMALL_BLK
+
+tests/support/b103_inc9_w.py:109: AssertionError
+_ test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order __
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_23_1_the_page_0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc9441d0d10>
+
+    def test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order(tmp_path, defc_dir, monkeypatch):
+        """The three DEFC bench rows show their strips and counts; every decode ran off the UI thread; the page order
+        holds (the selected row's own decode may go first)."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            want = {CURVE: EX.strip_chart(EX.CURVE, 15) + " 5", MAP: "████ 12", VB: "███ 6"}
+            await wait_for(pilot, lambda: all(text in body_text(app) for text in want.values()), "the three strips", 30)
+            return [row.name for row in sheet.rows], want, {n: row_text(app, n) for n in want}
+    
+>       page, want, painted = run(tmp_path, defc_dir, body)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:197: in body
+    await wait_for(pilot, lambda: all(text in body_text(app) for text in want.values()), "the three strips", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order.<locals>.body.<locals>.<lambda> at 0x7fc946c9f740>
+what = 'the three strips', timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the three strips
+
+tests/support/b103_inc9_w.py:92: AssertionError
+______ test_r_pe_bench_25_1_undo_of_a_record_stage_removes_the_staged_dot ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_25_1_undo_of_a0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_25_1_undo_of_a_record_stage_removes_the_staged_dot(tmp_path, defc_dir):
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await open_bench(pilot, sheet, VB)
+            await apply_tool(pilot, sheet, "s", "10")
+            await wait_for(pilot, lambda: dict(st(sheet, VB).edit) == {(0, 0): "10"}, "the edit")
+            await pilot.press("alt+s")
+            await wait_for(pilot, lambda: len(entries_of(app)) == 1, "the stage", 60)
+            await wait_for(pilot, lambda: "●" in mark_of(app, VB), "the staged dot", 30)
+            need(panel, "#patch_undo_button").press()
+            await wait_for(pilot, lambda: entries_of(app) == [], "the undo")
+            await wait_for(pilot, lambda: "●" not in mark_of(app, VB), "the dot leaving", 30)
+            return mark_of(app, VB)
+    
+>       assert "●" not in run(tmp_path, defc_dir, body)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:244: in body
+    await open_bench(pilot, sheet, VB)
+tests/support/b103_inc9_w.py:119: in open_bench
+    await pick(pilot, sheet, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'VAL_BLK_DEF_0001'
+
+    async def pick(pilot, sheet, name: str) -> None:
+        """Select the row ``name`` with the arrow keys the operator uses (never by poking ``selected``)."""
+        state = st(sheet, sheet.selected_name) if sheet.selected_name else None
+        if state is not None and state.focus:
+            await pilot.press("escape")
+        elif getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+        names = [row.name for row in sheet.rows]
+        assert name in names, f"{name} is not on the page {names}"
+        for _ in range(len(names) + 2):
+            if sheet.selected_name == name:
+                return
+            await pilot.press("down" if names.index(name) > names.index(sheet.selected_name) else "up")
+            await pilot.pause()
+>       assert sheet.selected_name == name, f"could not select {name}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: could not select VAL_BLK_DEF_0001
+
+tests/support/b103_inc9_w.py:109: AssertionError
+__ test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip ___
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_bench_24_1_a_page_tu0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fef2b3331d0>
+
+    def test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip(tmp_path, defc_dir, monkeypatch):
+        """CURVE_DEF_0001's summary is held, the page turns to [VAL_BLK_DEF_0001], the decode is released: the new page
+        shows VAL_BLK_DEF_0001's own strip and nothing of CURVE_DEF_0001's (`▅▇▄█▁`)."""
+        gate = Gate(monkeypatch, "decode_values", hold={CURVE})
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            a2l, image = app.current_a2l_data, app.current_file.mem_map
+            try:
+                sheet.show_page([CURVE, VB, MAP], describe_definitions([CURVE, VB, MAP], a2l), a2l, image)
+                await wait_for(pilot, gate.entered.is_set, "CURVE_DEF_0001's summary held")
+                sheet.show_page([VB], describe_definitions([VB], a2l), a2l, image)
+                await pilot.pause()
+            finally:
+                gate.release()
+            await wait_for(pilot, lambda: "███ 6" in body_text(app), "the new page's strip", 30)
+            await pilot.pause(0.3)
+            return body_text(app)
+    
+>       painted = run(tmp_path, defc_dir, body)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:224: in body
+    await wait_for(pilot, lambda: "███ 6" in body_text(app), "the new page's strip", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip.<locals>.body.<locals>.<lambda> at 0x7fef29bf6ac0>
+what = "the new page's strip", timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the new page's strip
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_ test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status[apply] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_27_apply_or_st0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc946707ed0>
+route = 'apply'
+
+    @pytest.mark.parametrize("route", ["apply", "stage"])
+    def test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status(
+        tmp_path, defc_dir, monkeypatch, route
+    ):
+        """27/1 Enter in the op input; 27/2 alt+s: `Patch Editor: BIG is still decoding - try again ...`; the bench
+        edit and the document are unchanged. PARTIAL: BIG for LARGE."""
+        gate = Gate(monkeypatch, "decode_values", hold={BIG})
+        statuses = record_statuses(monkeypatch)
+        a2l, s19 = big_case(tmp_path, BIG_COUNT, rows=(BIG,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await open_bench(pilot, sheet, BIG, decoded=False)
+                await wait_for(pilot, gate.entered.is_set, "BIG's decode held")
+                if route == "apply":
+                    await pilot.press("d", "enter")
+                    need(sheet, "#patch_sheet_input").value = "5"
+                    await pilot.pause()
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("alt+s")
+                await pilot.pause(0.3)
+                return dict(st(sheet, BIG).edit), entries_of(app)
+            finally:
+                gate.release()
+    
+>       edit, entries = run(tmp_path, None, body, a2l=a2l, image=s19)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:294: in body
+    await open_bench(pilot, sheet, BIG, decoded=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'BIG'
+
+    async def open_bench(pilot, sheet, name: str, *, decoded: bool = True) -> None:
+        """Select ``name`` and press Enter: the bench holds the focus; wait for its values unless ``decoded`` is False."""
+        await pick(pilot, sheet, name)
+        await wait_for(pilot, lambda: st(sheet, name) is not None, f"the bench state of {name}", 10)
+        if not st(sheet, name).focus:
+            await pilot.press("enter")
+            await pilot.pause()
+>       assert st(sheet, name).focus, f"Enter did not give the bench of {name} the focus"
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Enter did not give the bench of BIG the focus
+
+tests/support/b103_inc9_w.py:124: AssertionError
+_ test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status[stage] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_bench_27_apply_or_st1')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc93feed250>
+route = 'stage'
+
+    @pytest.mark.parametrize("route", ["apply", "stage"])
+    def test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status(
+        tmp_path, defc_dir, monkeypatch, route
+    ):
+        """27/1 Enter in the op input; 27/2 alt+s: `Patch Editor: BIG is still decoding - try again ...`; the bench
+        edit and the document are unchanged. PARTIAL: BIG for LARGE."""
+        gate = Gate(monkeypatch, "decode_values", hold={BIG})
+        statuses = record_statuses(monkeypatch)
+        a2l, s19 = big_case(tmp_path, BIG_COUNT, rows=(BIG,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await open_bench(pilot, sheet, BIG, decoded=False)
+                await wait_for(pilot, gate.entered.is_set, "BIG's decode held")
+                if route == "apply":
+                    await pilot.press("d", "enter")
+                    need(sheet, "#patch_sheet_input").value = "5"
+                    await pilot.pause()
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("alt+s")
+                await pilot.pause(0.3)
+                return dict(st(sheet, BIG).edit), entries_of(app)
+            finally:
+                gate.release()
+    
+>       edit, entries = run(tmp_path, None, body, a2l=a2l, image=s19)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:294: in body
+    await open_bench(pilot, sheet, BIG, decoded=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+sheet = ArrayBenchSheet(id='patch_sheet'), name = 'BIG'
+
+    async def open_bench(pilot, sheet, name: str, *, decoded: bool = True) -> None:
+        """Select ``name`` and press Enter: the bench holds the focus; wait for its values unless ``decoded`` is False."""
+        await pick(pilot, sheet, name)
+        await wait_for(pilot, lambda: st(sheet, name) is not None, f"the bench state of {name}", 10)
+        if not st(sheet, name).focus:
+            await pilot.press("enter")
+            await pilot.pause()
+>       assert st(sheet, name).focus, f"Enter did not give the bench of {name} the focus"
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Enter did not give the bench of BIG the focus
+
+tests/support/b103_inc9_w.py:124: AssertionError
+_ test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_bench_25_2_a_raw_ent0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fef1ad90ed0>
+
+    def test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other(tmp_path, defc_dir, monkeypatch):
+        """A raw bytes entry at 0x800090 (inside VAL_BLK_DEF_0001 only): `●` on that row, MAP_DEF_0001 not decoded again."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await wait_for(pilot, lambda: "███ 6" in body_text(app) and "████ 12" in body_text(app), "the page summaries", 30)
+            await pilot.pause(0.5)
+            before = gate.names("decode_values").count(MAP)
+            service_of(app).add_entry("0x800090", "", "AA 55")
+            app._refresh_patch_history_view()
+            await wait_for(pilot, lambda: "●" in mark_of(app, VB), "the dot on VAL_BLK_DEF_0001", 30)
+            await pilot.pause(0.5)
+            return mark_of(app, MAP), before, gate.names("decode_values").count(MAP), gate.names("decode_values").count(VB)
+    
+>       map_mark, before, after, vb_calls = run(tmp_path, defc_dir, body)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:273: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:264: in body
+    await wait_for(pilot, lambda: "███ 6" in body_text(app) and "████ 12" in body_text(app), "the page summaries", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other.<locals>.body.<locals>.<lambda> at 0x7fef2a98e020>
+what = 'the page summaries', timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the page summaries
+
+tests/support/b103_inc9_w.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_def_1_2_2_a_bench_row_sets_the_bench_class_and_the_landing_pane_gets_6_rows
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_9_1_a_filter_keystroke_that_keeps_the_row_keeps_its_state
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_9_3_a_page_without_the_row_drops_its_state
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_9_2_selecting_another_row_and_back_keeps_the_state
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_22_1_and_2_a_decode_ended_after_the_selection_moved_is_discarded
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_25_1_undo_of_a_record_stage_removes_the_staged_dot
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status[apply]
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_27_apply_or_stage_while_the_values_decode_shows_the_still_decoding_status[stage]
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other
+=================== 11 failed, 2 passed in 95.84s (0:01:35) ====================
+# rc=1 end 2026-11-13T23:02:13-06:00 load: load average: 5.32, 4.15, 4.07

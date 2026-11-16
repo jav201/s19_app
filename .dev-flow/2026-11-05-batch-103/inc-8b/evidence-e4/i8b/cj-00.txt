@@ -1,0 +1,14 @@
+# tree: fin @ 0bf2373b
+# uptime:  01:12:10 up 2 days, 10:00,  3 users,  load average: 3.92, 3.92, 4.19
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/fin/s19_app/__init__.py
+# pytest -n 2 -q tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_3_a_page_holding_large_decodes_nothing_on_the_ui_thread tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+============================= QC-TM timing margins =============================
+65.1%  0.174 s / 0.500 s  R-PE-BENCH.20/1 key during a LARGE decode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+96.9%  0.015 s / 0.500 s  R-PE-BENCH.23/2 page paint of 200 names  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+QC-TM: 2 bounds, 0 under 20 % margin
+4 passed in 105.33s (0:01:45)
+# exit=0

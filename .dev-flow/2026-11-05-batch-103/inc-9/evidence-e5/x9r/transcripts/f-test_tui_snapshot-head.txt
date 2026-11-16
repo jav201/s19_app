@@ -1,0 +1,6 @@
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24]

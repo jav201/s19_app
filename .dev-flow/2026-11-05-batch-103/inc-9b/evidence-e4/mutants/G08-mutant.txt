@@ -1,0 +1,38 @@
+DATE 2026-11-15T19:05:01.365244-06:00
+GROUP G08
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:05:00 up 3 days,  3:53,  3 users,  load average: 0.78, 0.68, 0.39
+LOAD_ONE 0.78
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G08/tree/s19_app/__init__.py
+PID 1028027
+SID 1028027
+TIMEOUT_S 300
+XDIST_N 0
+ImportError while loading conftest '~/work/zq-m9b/groups/G08/tree/tests/conftest.py'.
+tests/conftest.py:46: in <module>
+    from tests.support.b103_clipboard import (  # noqa: E402
+tests/support/b103_clipboard.py:58: in <module>
+    from s19_app.tui.capped_text_area import CappedTextArea
+s19_app/tui/__init__.py:16: in <module>
+    from .app import S19TuiApp, main
+s19_app/tui/app/__init__.py:122: in <module>
+    from ..screens_directionb import (
+s19_app/tui/screens_directionb/__init__.py:187: in <module>
+    from .patch_editor import (
+s19_app/tui/screens_directionb/patch_editor/__init__.py:66: in <module>
+    from .panel import PatchEditorPanel  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/screens_directionb/patch_editor/panel.py:15: in <module>
+    from .bench_sheet import ArrayBenchSheet
+s19_app/tui/screens_directionb/patch_editor/bench_sheet.py:61: in <module>
+    class ArrayBenchSheet(StagingSheet):
+s19_app/tui/screens_directionb/patch_editor/bench_sheet.py:192: in ArrayBenchSheet
+    @work(thread=False, group="bench", exit_on_error=False)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_work_decorator.py:113: in decorator
+    raise WorkerDeclarationError(
+E   textual._work_decorator.WorkerDeclarationError: Can not create a worker from a non-async function unless `thread=True` is set on the work decorator.
+EXIT_CODE 4

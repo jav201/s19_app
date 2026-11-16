@@ -1,0 +1,81 @@
+DATE 2026-11-15T19:21:57.634567-06:00
+GROUP G15
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:21:41 up 3 days,  4:10,  3 users,  load average: 0.70, 0.78, 0.69
+LOAD_ONE 0.70
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 2
+S19_APP_FILE ~/work/zq-m9b/groups/G15/tree/s19_app/__init__.py
+PID 1032268
+SID 1032268
+TIMEOUT_S 300
+XDIST_N 0
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link ______
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-26/test_r_pe_bench_103_1_a_markup0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-26/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f043b409950>
+
+    def test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.103/1, EX-BC11: a row named `[@click=app.quit]X[/]` with its decode held: the title shows the name
+        literally, a click on it runs no action and the app keeps running. Operator need (P-127): a row name from an A2L is
+        data, never a link that quits the window. Negative control: the title set as a markup `str` parses the name."""
+        name = "[@click=app.quit]X[/]"
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            try:
+                row = await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+                at = row.find("[@click")
+                if at >= 0:
+                    await pilot.click(WIN, offset=(at + 2, 0))
+                    await pilot.pause(0.3)
+                return row, top_row(app), app.is_running, getattr(app, "_exit", False)
+            finally:
+                gate.release()
+    
+        row, after, running, exited = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert f"decode {name} · " in row, f"the name is not shown literally: {row!r}"
+E       AssertionError: the name is not shown literally: '╭─ STAGING SHEET   ◑ BUSY · decode X · 0.5 s · keys still work  ───────────────────────────────────────────────╮'
+E       assert 'decode [@click=app.quit]X[/] · ' in '╭─ STAGING SHEET   ◑ BUSY · decode X · 0.5 s · keys still work  ───────────────────────────────────────────────╮'
+
+tests/test_b103_inc9b_w.py:787: AssertionError
+_________ test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally _________
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-26/test_r_pe_bench_103_2_brackets0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-26/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f04382ec0d0>
+
+    def test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.103/2, EX-BC11: a row named `A[b]B`: the title shows `A[b]B`, not `AB` in bold. Operator need
+        (P-127): the name the user reads is the name in the A2L. Negative control: the name parsed as markup."""
+        name = "A[b]B"
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            try:
+                return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+            finally:
+                gate.release()
+    
+        row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert f"decode {name} · " in row, f"the name is not shown literally: {row!r}"
+E       AssertionError: the name is not shown literally: '╭─ STAGING SHEET   ◑ BUSY · decode AB · 0.4 s · keys still work  ──────────────────────────────────────────────╮'
+E       assert 'decode A[b]B · ' in '╭─ STAGING SHEET   ◑ BUSY · decode AB · 0.4 s · keys still work  ──────────────────────────────────────────────╮'
+
+tests/test_b103_inc9b_w.py:808: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G15/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally
+2 failed in 14.92s
+EXIT_CODE 1

@@ -1,0 +1,7 @@
+F
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/support/b103_inc9_w.py:92: AssertionError: did not settle within 240 s: LARGE's values
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 318.21s (0:05:18)

@@ -1,0 +1,17 @@
+# uptime before: 1.90 0.97 0.68 2/651 412276
+s19_app.__file__ = ~/work/zq-fx9/base/s19_app/__init__.py
+PROBE2 spin load 2.68 1.54 0.93
+PRESS {"t": 7.33, "phase": "spin", "handle_s": 0.0692, "frame_s": 0.1542, "press_s": 2.171}
+PRESS {"t": 9.76, "phase": "spin", "handle_s": 0.1636, "frame_s": 0.2058, "press_s": 2.22}
+PRESS {"t": 12.23, "phase": "spin", "handle_s": 0.0638, "frame_s": 0.1489, "press_s": 2.242}
+PRESS {"t": 14.72, "phase": "encode", "handle_s": 0.0624, "frame_s": 0.2621, "press_s": 2.203}
+PRESS {"t": 17.12, "phase": "encode", "handle_s": 0.057, "frame_s": 0.134, "press_s": 2.277}
+PRESS {"t": 19.65, "phase": "encode", "handle_s": 0.0702, "frame_s": 0.153, "press_s": 2.221}
+PRESS {"t": 22.12, "phase": "encode", "handle_s": 0.0571, "frame_s": 0.1348, "press_s": 2.217}
+PRESS {"t": 24.59, "phase": "encode", "handle_s": 0.0566, "frame_s": 0.1395, "press_s": 2.223}
+PRESS {"t": 27.07, "phase": "encode", "handle_s": 0.0568, "frame_s": 0.1345, "press_s": 2.234}
+PRESS {"t": 29.55, "phase": "encode", "handle_s": 0.0768, "frame_s": 0.1627, "press_s": 0.767}
+.
+1 passed in 109.12s (0:01:49)
+# rc=0
+# uptime after: 2.68 1.54 0.93 2/652 412901

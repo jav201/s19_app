@@ -1,0 +1,122 @@
+Cloning into '<runner-home>/work/zq-x9b/load-base'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+Cloning into '<runner-home>/work/zq-x9b/load-red'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+APPLIED hold-load s19_app/tui/app/patch.py anchors=1
+PHASE load-base
+DATE 2026-11-15T20:13:17-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/load-base
+DIRTY_BEGIN
+DIRTY_END
+ 20:13:18 up 3 days,  5:02,  2 users,  load average: 0.30, 0.23, 0.24
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/load-base/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_e5_9b_hold_load_repaints_ledger_json_and_sheet_in_the_same_call
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/load-base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py .                                             [100%]
+
+============================== 1 passed in 4.16s ===============================
+EXIT_CODE 0
+PHASE_RC_load-base 0
+PHASE load-red
+DATE 2026-11-15T20:13:24-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/load-red
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:13:24 up 3 days,  5:02,  2 users,  load average: 0.36, 0.24, 0.25
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/load-red/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_e5_9b_hold_load_repaints_ledger_json_and_sheet_in_the_same_call
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/load-red
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py F                                             [100%]
+
+=================================== FAILURES ===================================
+_____ test_e5_9b_hold_load_repaints_ledger_json_and_sheet_in_the_same_call _____
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-load-red/tmp/pytest-of-<runner>/pytest-0/test_e5_9b_hold_load_repaints_0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-load-red/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    def test_e5_9b_hold_load_repaints_ledger_json_and_sheet_in_the_same_call(tmp_path, defc_dir):
+        """E5 / HOLD-LOAD: ``_patch_editor_load`` completes its visible tail.
+    
+        No event-loop turn occurs between the real load caller and the digest.
+        An early return from ``_patch_editor_load_tail`` therefore leaves the
+        previous ledger, JSON text and sheet marks and fails this exact oracle.
+        """
+        document = write_bytes_change(tmp_path / "hold-load.json")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            before = digest(panel, sheet)
+            app._patch_editor_load(panel, str(document))
+            same_call = digest(panel, sheet)
+            loaded_entries = entries_of(app)
+            app._refresh_patch_history_view()
+            return before, same_call, loaded_entries, digest(panel, sheet)
+    
+        before, same_call, loaded_entries, full = run(tmp_path, defc_dir, body)
+        assert loaded_entries == [(VB_ADDRESS, bytes(range(1, 13)))], loaded_entries
+>       assert before[0] == () and before[1] != same_call[1], (before, same_call)
+E       AssertionError: (((), '{
+E           "format": "s19app-changeset",
+E           "version": "2.0",
+E           "kind": "change",
+E           "encoding": "utf-8",
+E           "value_...ue=143.5, text='143.5')"), ('CURVE_DEF_0001', False, 'None', 'None'), ('CURVE_DEF_0002', False, 'None', 'None'), ...)))
+E       assert (() == ()
+E         
+E         Use -v to get more diff and '{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": []\n}' != '{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": []\n}')
+
+tests/test_b103_inc9b_s.py:389: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_e5_9b_hold_load_repaints_ledger_json_and_sheet_in_the_same_call
+============================== 1 failed in 4.20s ===============================
+EXIT_CODE 1
+PHASE_RC_load-red 1

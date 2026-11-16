@@ -1,0 +1,9 @@
+# uptime before: 1.56 1.57 1.52 1/635 435269
+s19_app.__file__ = ~/work/zq-fx9/clone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......                                                                   [100%]
+6 passed in 1.10s
+# rc=0
+# uptime after: 1.56 1.57 1.52 1/635 435294

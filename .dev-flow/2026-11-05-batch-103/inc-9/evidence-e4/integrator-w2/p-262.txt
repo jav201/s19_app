@@ -1,0 +1,15 @@
+# run p-262 tree=fin 2026-11-14T01:15:18-06:00 load: load average: 3.22, 3.47, 6.13
+~/work/zq-e4-9w-int2/fin/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/fin
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_zz_probe_262.py PROBE traced=False values after 49.3 s load=3.58
+.PROBE traced=True values after 418.9 s load=5.42
+.
+
+======================== 2 passed in 503.72s (0:08:23) =========================
+# rc=0 end 2026-11-14T01:23:43-06:00 load: load average: 5.42, 4.47, 5.39

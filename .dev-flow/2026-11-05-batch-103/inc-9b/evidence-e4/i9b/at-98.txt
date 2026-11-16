@@ -1,0 +1,9 @@
+2026-11-15T12:05:47-06:00
+ 12:05:47 up 2 days, 20:54,  2 users,  load average: 0.60, 0.72, 0.46
+~/work/zq-i9b/tree/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+25.4%  0.373 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 147.07s (0:02:27)
+exit=0

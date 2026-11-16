@@ -1,0 +1,9 @@
+2026-11-15T12:08:16-06:00
+ 12:08:16 up 2 days, 20:56,  3 users,  load average: 0.87, 0.78, 0.52
+~/work/zq-i9b/tree/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+72.6%  0.274 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 156.39s (0:02:36)
+exit=0

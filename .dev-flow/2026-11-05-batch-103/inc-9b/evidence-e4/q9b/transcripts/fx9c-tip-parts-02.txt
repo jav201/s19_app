@@ -1,0 +1,20 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=fx9c Q9B_SIDE=tip Q9B_LABEL=parts Q9B_RUN=02
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 18:14:10 up 3 days,  3:02,  3 users,  load average: 1.00, 0.69, 0.74
+ 18:16:10 up 3 days,  3:04,  3 users,  load average: 0.13, 0.45, 0.64
+Q9B_LOAD1=0.13
+Q9B_NODE=tests/test_fx9c_q9b_probe.py::test_probe_parts
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_fx9c_q9b_probe.py::test_probe_parts FX9CPARTS {"nobracket": false, "n_keys": 109, "max": 0.686, "refresh_block": 1.1460000000000008, "keys_over_0.3": [[1.029, 0.252, 0.052], [1.496, 0.287, 0.065], [2.74, 0.367, 0.077], [3.255, 0.273, 0.057], [3.672, 0.265, 0.062], [4.091, 0.396, 0.057], [5.368, 0.264, 0.049], [5.747, 0.309, 0.043], [6.486, 0.27, 0.064], [6.922, 0.25, 0.053], [7.317, 0.346, 0.046], [8.441, 0.262, 0.057], [10.668, 0.25, 0.058], [11.067, 0.323, 0.049], [13.128, 0.153, 0.239], [14.017, 0.258, 0.057], [14.414, 0.257, 0.063], [14.821, 0.258, 0.06], [16.371, 0.256, 0.052], [16.76, 0.267, 0.062], [17.706, 0.486, 0.03], [23.265, 0.647, 0.039], [26.489, 0.413, 0.069], [28.177, 0.239, 0.062], [28.538, 0.318, 0.061], [29.766, 0.476, 0.008], [30.412, 0.32, 0.009]], "after_stage": {"n": 22, "p50": 0.048, "max": 0.29100000000000004}, "cards": [{"digest": "6daf5484e8d5bfd6", "lines": 26, "last": "1048576 B @ 0x00100000 \u00b7 4096 changed"}, {"digest": "6daf5484e8d5bfd6", "lines": 26, "last": "1048576 B @ 0x00100000 \u00b7 4096 changed"}], "parts": [["_paint", 0.262, 0.062], ["_paint", 1.281, 0.052], ["_paint", 1.783, 0.065], ["_paint", 2.168, 0.059], ["_paint", 2.566, 0.062], ["_paint", 3.107, 0.077], ["_paint", 3.528, 0.057], ["_paint", 3.937, 0.062], ["_paint", 4.487, 0.057], ["_paint", 4.877, 0.052], ["_paint", 5.234, 0.062], ["_paint", 6.36, 0.065], ["_paint", 6.756, 0.064], ["_paint", 7.172, 0.053], ["_paint", 7.966, 0.062], ["_paint", 8.329, 0.06], ["_paint", 8.704, 0.057], ["_paint", 9.086, 0.058], ["_paint", 9.543, 0.051], ["_paint", 10.113, 0.062], ["_paint", 10.51, 0.057], ["_paint", 10.918, 0.058], ["_paint", 12.213, 0.053], ["_paint", 12.978, 0.063], ["_paint", 13.281, 0.239], ["_paint", 13.863, 0.058], ["_paint", 14.275, 0.057], ["_paint", 14.672, 0.063], ["_paint", 15.08, 0.06], ["_paint", 15.466, 0.052], ["_paint", 16.217, 0.057], ["_paint", 16.627, 0.052], ["_paint", 17.028, 0.062], ["_paint", 19.813, 0.058], ["_paint", 20.194, 0.069], ["_paint", 20.581, 0.059], ["_paint", 22.118, 0.051], ["_paint", 23.143, 0.066], ["_paint", 24.976, 0.054], ["_paint", 25.849, 0.077], ["_paint", 26.282, 0.063], ["_paint", 26.903, 0.069], ["_paint", 27.285, 0.063], ["_paint", 27.648, 0.061], ["_paint", 28.029, 0.056], ["_paint", 28.416, 0.061], ["_paint", 28.857, 0.061], ["stage_record", 29.993, 0.026], ["_stage_bench_record", 29.992, 0.042], ["serialize_change_document", 30.034, 0.167], ["_render_before_after_card", 30.438, 0.069], ["find_matching_bracket", 30.569, 0.0], ["load_text", 30.508, 0.141], ["_show_document", 30.506, 0.144], ["refresh_entries", 30.432, 0.218], ["_render_before_after_card", 30.665, 0.066], ["set_document", 30.772, 0.254], ["_patch_refresh_tail", 31.135, 0.004], ["record_done", 31.138, 0.046]]}
+PASSED
+
+======================== 1 passed in 159.74s (0:02:39) =========================
+Q9B_RC=0
+Q9B_VALID=PASS

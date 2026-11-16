@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+F...
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:219: AssertionError: the first page's summary was painted after the page turned
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_24_2_a_summary_ended_after_the_page_turned_is_not_painted
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 3 passed in 43.96s

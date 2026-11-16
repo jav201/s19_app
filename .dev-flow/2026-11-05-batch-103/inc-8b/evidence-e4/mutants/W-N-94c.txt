@@ -1,0 +1,13 @@
+# WIDE re-run of mutant N-94c  rows: R-PE-DEF.94
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:281
+# uptime: 02:07:07 up 2 days, 10:55,  3 users,  load average: 3.06, 1.96, 1.55
+s19_app.__file__ = ~/work/zq-m8b/m/W-N-94c/s19_app/__init__.py
+## group fast+bench: exit=0 | 516 passed in 116.95s (0:01:56)
+## group inc8b_bw: exit=0 | 30 passed in 44.82s
+## group inc8b_at: exit=0 | 12 passed in 107.59s (0:01:47)
+## group inc8_a2_app: exit=0 | 23 passed in 76.16s (0:01:16)
+## group inc8_at: exit=0 | 11 passed in 54.76s
+## group inc8_p_layout+p_wiring: exit=0 | 43 passed in 116.78s (0:01:56)
+## group inc9_w_keys+w_select: exit=0 | 33 passed in 114.21s (0:01:54)
+## group inc9_w_stage+w_mutants: exit=0 | 40 passed in 184.13s (0:03:04)
+# verdict: SURVIVED-WIDE 

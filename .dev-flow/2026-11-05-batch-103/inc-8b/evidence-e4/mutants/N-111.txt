@@ -1,0 +1,38 @@
+# mutant N-111  rows: R-PE-DEF.111
+# edits: s19_app/tui/definition_sheet.py:719
+# -k: r_pe_def_111_
+# uptime: 02:00:08 up 2 days, 10:48,  3 users,  load average: 1.47, 1.02, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-111/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_111_1_a_byte_outside_the_printable_range_shows_a_dot_in_the_ascii_column _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_111_1_a_byte_outside_the_printable_range_shows_a_dot_in_the_ascii_column(v171):
+        """R-PE-DEF.111/1 (EX-8B-T3) - bytes `00 1B 7F 80 FF 41 20 7E` -> `·····A ~`; no ESC or DEL reaches the screen."""
+        d = widen(v171["def"], 8)
+        hostile = bytes([0x00, 0x1B, 0x7F, 0x80, 0xFF, 0x41, 0x20, 0x7E])
+        image = {d.address + i: b for i, b in enumerate(hostile)}
+        row, _ = make_row(d, v171["a2l"], image)
+        lines = painted(row)
+        found = hex_rows(lines)
+        assert len(found) == 1, [ln.plain for ln in lines]
+        (offset, guide, cols, ascii_col, ln), = found
+>       assert ln.plain[ascii_col:ascii_col + 8] == OT["T.hostile.ascii"] == "·····A ~"
+E       AssertionError: assert '����ÿA ~' == '·····A ~'
+E         
+E         - ·····A ~
+E         + ����ÿA ~
+
+tests/test_b103_inc8b_s2.py:375: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_111_1_a_byte_outside_the_printable_range_shows_a_dot_in_the_ascii_column
+1 failed in 1.86s
+
+# exit=1

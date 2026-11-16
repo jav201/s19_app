@@ -1,0 +1,77 @@
+DATE 2026-11-15T19:33:31.508957-06:00
+GROUP G03
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:33:21 up 3 days,  4:22,  2 users,  load average: 0.19, 0.54, 0.67
+LOAD_ONE 0.19
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G03/tree/s19_app/__init__.py
+PID 1035281
+SID 1035281
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-42/test_r_pe_bench_95_1_a_decode_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-42/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc39f742150>
+
+    def test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.95/1, EX-BC3: MAP_DEF_0001's decode is gated 0.15 s after its ask, then released: at no paint
+        of the screen (the cue tick is every 0.1 s) nor 0.6 s later is the border the busy colour or the title anything but `STAGING SHEET`.
+        Operator need (P-127): a blink of amber on every quick selection would teach the user to ignore the cue.
+        Negative control: grace 0 shows the cue at the 0.1 s tick."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, MAP)
+            screen, seen = app.screen, []
+            real_refresh = screen._compositor_refresh
+    
+            def hooked():  # every paint of the screen from the ask on: the cue would have to be painted to be seen
+                real_refresh()
+                seen.append((time.monotonic(), top_row(app), border_hex(app)))
+    
+            timer = threading.Timer(0.15, gate.release)
+            stamps = Stamps(sheet, on_ask={("decode", MAP): lambda: None if timer.is_alive() or timer.finished.is_set() else timer.start()})
+            try:
+                gate.hold.add(MAP)
+                screen._compositor_refresh = hooked
+                await reselect(pilot, sheet, MAP, DISPLAY)
+                await wait_for(pilot, lambda: ("decode", MAP) in stamps.done, "the decode's result", 30)
+                asked, done = stamps.asked[("decode", MAP)], stamps.done[("decode", MAP)]
+                end = time.monotonic() + 0.6  # the cue's tick would have shown by 0.3 s of pending time
+                while time.monotonic() < end:
+                    await pilot.pause(0.01)
+                final = (time.monotonic(), top_row(app), border_hex(app))
+                return asked, done, [s for s in seen if s[0] >= asked] + [final]
+            finally:
+                screen.__dict__.pop("_compositor_refresh", None)
+                timer.cancel()
+                gate.release()
+                stamps.close()
+    
+        asked, done, seen = run(tmp_path, defc_dir, body)
+        assert done - asked < GRACE_S, f"the decode lasted {done - asked:.3f} s, not inside the 0.2 s grace ({load()})"
+        for at, row, colour in seen:
+>           assert "BUSY" not in row and IDLE_TITLE in row and colour != BUSY_HEX, (
+                f"cue painted {at - asked:.3f} s after the ask of a decode that lasted {done - asked:.3f} s: {row!r}, corner {colour}"
+            )
+E           AssertionError: cue painted 0.014 s after the ask of a decode that lasted 0.191 s: '╭─ STAGING SHEET   ◓ BUSY · decode MAP_DEF_0001 · 0.0 s · keys still work  ────────────────────────────────────╮', corner #f5c26b
+E           assert ('BUSY' not in '╭─ STAGING ...───────────╮'
+E             
+E             'BUSY' is contained here:
+E               ╭─ STAGING SHEET   ◓ BUSY · decode MAP_DEF_0001 · 0.0 s · keys still work  ────────────────────────────────────╮
+E             ?                      ++++)
+
+tests/test_b103_inc9b_w.py:354: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G03/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue
+1 failed in 8.50s
+EXIT_CODE 1

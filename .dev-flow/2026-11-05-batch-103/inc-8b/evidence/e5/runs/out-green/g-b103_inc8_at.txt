@@ -1,0 +1,10 @@
+## uptime:  03:08:08 up 2 days, 11:56,  2 users,  load average: 1.68, 1.17, 1.05
+## date: 2026-11-15T09:08:08Z  head: ab0aa3d0
+## s19_app.__file__ = ~/work/zq-x8b/t2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+...........                                                              [100%]
+11 passed in 51.85s
+## rc=0
+## end: 2026-11-15T09:09:00Z  uptime:  03:09:00 up 2 days, 11:57,  2 users,  load average: 1.77, 1.28, 1.10

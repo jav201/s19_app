@@ -1,0 +1,56 @@
+tree: mod1  | load before: 1.33 1.00 1.03 1/634 591241
+~/work/zq-x9r/mod1/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x9r/mod1
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [51 items]
+
+........F..........................................                      [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x9r/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_bench_15_16_18_the_p0')
+defc_dir = PosixPath('~/work/zq-x9r/tmp/pytest-of-<user>/pytest-7/popen-gw1/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage(tmp_path, defc_dir):
+        """R-PE-BENCH.15 / .16 / .18 end to end (I9, ruling C9b F-W1: the sheet hands the row's bench state to the
+        row cells, I-8.5 unchanged). VAL_BLK_DEF_0001 at 220x60 (the Δ column holds `max |Δ| … staged`), Set `10`
+        on (0,0): the painted row's mark (its second cell; the first is the selection `▶`) is `◆`, with `1 cell` and `max |Δ| <|10 - 36.85|>`; after alt+s it shows `●` and
+        `max |Δ| <the same> staged`. Control: before the apply the row has no mark and no Δ."""
+        delta = ds.short_number(abs(10 - EX.VB[0]))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await open_bench(pilot, sheet, VB)
+            await pilot.pause(0.3)
+            before = _row_of(app, VB)
+            await apply_tool(pilot, sheet, "s", "10")
+            await wait_for(pilot, lambda: dict(st(sheet, VB).edit) == {(0, 0): "10"}, "the Set edit")
+            await pilot.pause(0.3)
+            edited = _row_of(app, VB)
+            await pilot.press("alt+s")
+            await wait_for(pilot, lambda: len(entries_of(app)) == 1, "the stage", 60)
+            await wait_for(pilot, lambda: not st(sheet, VB).edit and st(sheet, VB).staged is not None, "the staged decode", 30)
+            await pilot.pause(0.3)
+            return before, edited, _row_of(app, VB)
+    
+        before, edited, staged = run(tmp_path, defc_dir, body, size=WIDE)
+        assert before[1] == " " and "max |Δ|" not in before, before
+        assert edited[1] == "◆", edited
+        assert " 1 cell " in edited and "1 cells" not in edited, edited  # FX9b F-X9-7: k = 1 is singular
+        assert f"max |Δ| {delta}" in edited, edited
+        assert staged[1] == "●", staged
+>       assert f"max |Δ| {delta} staged" in staged, staged
+E       AssertionError: ▶●VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       ·                   units   -50 … 50                                                       max |Δ| 0 staged       
+E       assert 'max |Δ| 26.9 staged' in '▶●VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       ·                   units   -50 … 50                                                       max |Δ| 0 staged       '
+
+tests/test_b103_inc9_w_stage.py:277: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_stage.py::test_r_pe_bench_15_16_18_the_painted_row_shows_mark_new_count_and_delta_after_an_apply_and_a_stage
+=================== 1 failed, 50 passed in 136.89s (0:02:16) ===================
+rc=1
+load after: 1.08 1.05 1.04 1/633 591840

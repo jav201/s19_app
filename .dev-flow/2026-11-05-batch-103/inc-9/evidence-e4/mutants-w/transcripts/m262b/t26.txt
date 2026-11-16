@@ -1,0 +1,7 @@
+F
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_jobs.py:212: AssertionError: 12.3 MiB allocated by s19_app are still retained after deselecting LARGE (all allocations: 16.1 MiB)
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 571.27s (0:09:31)

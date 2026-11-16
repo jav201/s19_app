@@ -1,0 +1,11 @@
+2026-11-15T12:10:53-06:00
+ 12:10:53 up 2 days, 20:59,  4 users,  load average: 1.15, 0.94, 0.62
+~/work/zq-i9b/tree/s19_app/__init__.py
+...                                                                      [100%]
+============================= QC-TM timing margins =============================
+72.5%  0.082 s / 0.300 s  R-PE-BENCH.101/5 idle after a stale record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+90.4%  0.029 s / 0.300 s  R-PE-BENCH.100/3 idle after the last step  tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+94.5%  0.016 s / 0.300 s  R-PE-BENCH.101/2 idle after a refused record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+QC-TM: 3 bounds, 0 under 20 % margin
+3 passed in 28.00s
+exit=0

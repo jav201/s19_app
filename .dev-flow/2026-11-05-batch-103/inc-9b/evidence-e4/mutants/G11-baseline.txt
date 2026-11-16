@@ -1,0 +1,22 @@
+DATE 2026-11-15T19:16:09.825121-06:00
+GROUP G11
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:15:44 up 3 days,  4:04,  3 users,  load average: 0.93, 0.91, 0.68
+LOAD_ONE 0.93
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 3
+S19_APP_FILE ~/work/zq-m9b/groups/G11/tree/s19_app/__init__.py
+PID 1030683
+SID 1030683
+TIMEOUT_S 300
+XDIST_N 0
+...                                                                      [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G11/baseline.xml ----
+============================= QC-TM timing margins =============================
+62.9%  0.111 s / 0.300 s  R-PE-BENCH.100/3 idle after the last step  tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+74.1%  0.078 s / 0.300 s  R-PE-BENCH idle after decode LARGE  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+81.0%  0.057 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+QC-TM: 3 bounds, 0 under 20 % margin
+3 passed in 23.60s
+EXIT_CODE 0

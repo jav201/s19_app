@@ -1,0 +1,13 @@
+load before: 2.16 1.72 1.77 1/634 532688
+~/work/zq-fx9c/clone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..................s.........................s......................      [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+65 passed, 2 skipped in 151.05s (0:02:31)
+rc=0
+load after: 1.79 1.78 1.79 1/635 533402

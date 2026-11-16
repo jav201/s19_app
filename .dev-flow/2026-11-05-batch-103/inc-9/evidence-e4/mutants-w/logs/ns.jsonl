@@ -1,0 +1,1 @@
+{"id": "s08", "req": "CODE _staged_pair: staged decoded over the image", "status": "rc2", "rc": 2, "sec": 141, "load0": "0.93", "load1": "2.52", "first": "FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_22_6_a_selected_row_over_a_raw_entry_shows_the_staged_delta_of_that_entry", "tail": "1 failed, 23 passed in 140.14s (0:02:20)"}

@@ -1,0 +1,15 @@
+## uptime:  02:55:09 up 2 days, 11:43,  2 users,  load average: 0.67, 0.47, 1.01
+## date: 2026-11-15T08:55:09Z  head: 7c4e377c
+## s19_app.__file__ = ~/work/zq-x8b/t0/s19_app/__init__.py
+.
+============================= QC-TM timing margins =============================
+46.9%  0.531 s / 1.000 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+============================== slowest durations ===============================
+113.59s call     tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+0.05s setup    tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+1 passed in 113.70s (0:01:53)
+## rc=0
+## end: 2026-11-15T08:57:04Z  uptime:  02:57:04 up 2 days, 11:45,  2 users,  load average: 0.91, 0.63, 1.00

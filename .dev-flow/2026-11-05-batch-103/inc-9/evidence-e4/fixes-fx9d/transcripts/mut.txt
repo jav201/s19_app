@@ -1,0 +1,40 @@
+load before: 0.40 0.77 1.28 1/641 544989
+~/work/zq-fx9d/mut/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9d/mut
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_b103_inc9_ob_json_view.py .F                                  [100%]
+
+=================================== FAILURES ===================================
+____________ test_ob_2_an_editable_text_area_still_matches_brackets ____________
+
+tmp_path = PosixPath('~/work/zq-fx9d/tmp/pytest-of-<user>/pytest-2/test_ob_2_an_editable_text_are0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff2e4adfd90>
+
+    def test_ob_2_an_editable_text_area_still_matches_brackets(tmp_path, monkeypatch):
+        """The paste buffer (editable) with the cursor on a `{`: the scan runs and finds the closing `}` (no leak)."""
+        calls = _count_base_scans(monkeypatch)
+    
+        async def body(app, pilot, panel):
+            buffer = panel.query_one("#patch_paste_text", TextArea)
+            buffer.load_text(TEXT)
+            buffer.move_cursor((0, 6))
+            await pilot.pause(0.1)
+            buffer.move_cursor((0, 0))
+            await pilot.pause(0.1)
+            return buffer.find_matching_bracket("{", (0, 0))
+    
+>       assert drive(tmp_path, SIZE, body) == (0, len(TEXT.rstrip("\n")) - 1)
+E       AssertionError: assert None == (0, 27)
+E        +  where None = drive(PosixPath('~/work/zq-fx9d/tmp/pytest-of-<user>/pytest-2/test_ob_2_an_editable_text_are0'), (118, 54), <function test_ob_2_an_editable_text_area_still_matches_brackets.<locals>.body at 0x7ff2e4ad8fe0>)
+
+tests/test_b103_inc9_ob_json_view.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_ob_json_view.py::test_ob_2_an_editable_text_area_still_matches_brackets
+========================= 1 failed, 1 passed in 7.14s ==========================
+rc=1
+load after: 0.50 0.78 1.28 2/647 545032

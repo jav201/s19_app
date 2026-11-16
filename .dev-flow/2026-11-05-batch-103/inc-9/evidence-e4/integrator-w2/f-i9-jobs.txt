@@ -1,0 +1,87 @@
+# run f-i9-jobs tree=fin 2026-11-14T00:44:01-06:00 load: load average: 13.16, 12.40, 11.52
+~/work/zq-e4-9w-int2/fin/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/fin
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [5 items]
+
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int2/tmp/pytest-of-<user>/pytest-14/popen-gw1/test_r_pe_bench_26_2_a_deselec0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int2/tmp/pytest-of-<user>/pytest-14/popen-gw1/b103_inc9_w_defc0')
+
+    @slow
+    def test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values(tmp_path, defc_dir):
+        """LARGE decoded, then SMALL_BLK selected: LARGE's values and staged values are None and the retained memory
+        (`tracemalloc`, after `gc.collect()`) is at most 1 MiB above the level before LARGE. Control: with LARGE
+        selected the retained memory is well above that (the numbers are kept)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            gc.collect()
+            tracemalloc.start()
+            try:
+                base = tracemalloc.get_traced_memory()[0]
+                await pick(pilot, sheet, LARGE)
+                await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 240)
+                gc.collect()
+                held = tracemalloc.get_traced_memory()[0] - base
+                await pick(pilot, sheet, "SMALL_BLK")
+                await wait_for(pilot, lambda: has_values(sheet, "SMALL_BLK"), "SMALL_BLK's values", 60)
+                gc.collect()
+                return held, tracemalloc.get_traced_memory()[0] - base, st(sheet, LARGE)
+            finally:
+                tracemalloc.stop()
+    
+>       held, after, state = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:185: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:175: in body
+    await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 240)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values.<locals>.body.<locals>.<lambda> at 0x7f2882a11760>
+what = "LARGE's values", timeout = 240, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 240 s: LARGE's values
+
+tests/support/b103_inc9_w.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+=================== 1 failed, 4 passed in 288.32s (0:04:48) ====================
+# rc=1 end 2026-11-14T00:48:51-06:00 load: load average: 10.84, 11.66, 11.46

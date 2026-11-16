@@ -1,0 +1,134 @@
+scene=stage-refresh
+capture_seq=1
+phase=busy-f1
+png_name=stage-refresh.118x54.f1.png
+commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+fixture=large
+capture_timestamp=2026-11-16T02:56:05.120395+00:00
+monotonic=422645.906000
+requested_size=118x54
+app_size=118x54
+patch_sheet_win_region=5,6,112x28
+patch_sheet_win_size=110x26
+title_room_B=106
+body=143x24;content=143x24
+grid=scroll_x=0.0;size=110x25;virtual=143x24
+sheet_top=0
+focused=patch_sheet_body
+selected=LARGE
+page_rows=LARGE, SMALL_BLK
+sheet_subtitle=None
+painted_sheet_top_row=╭─ STAGING SHEET   ◑ BUSY · stage LARGE · 20.0 s · keys still work  ───────────────────────────────────────────╮
+painted_top_left_border_color=#f5c26b
+border_title_plain=STAGING SHEET  [rgb(10,14,27) on rgb(245,194,107) bold] ◑ BUSY · stage LARGE · 20.0 s · keys still work [/rgb(10,14,27) on rgb(245,194,107) bold]
+pill_bold=True
+pill_foreground=#0a0e1b
+pill_background=#f5c26b
+spinner_glyph=◑
+job_word=stage
+busy_name=LARGE
+pending_seconds=20.0
+different_from_f1=not-applicable
+same_job_name=not-applicable
+elapsed_nondecreasing=not-applicable
+frame_pair_valid=not-applicable
+frame_delta_s=not-applicable
+idle_title=False
+busy_absent=False
+idle_border_not_busy=False
+active_job=None
+record_hold=True
+record_stage_name=LARGE
+bench_state=cursor:(15, 255);anchor:(0, 0);tool:s;focus:True;edit:{};undo:0;job:None
+values_present=True
+preview_result_kind=None
+document_entry_count_before=0
+document_entry_count=1
+document_entries=0x100000:1048576
+ledger_row_count=0
+staged_mark=False
+write_landed_before_busy=True
+held_refresh_callbacks=1
+held_refresh_callback_invocations=0
+capture_frame_hold=True
+presentation_settle_s=0.2
+frame_hold_painted_stable=True
+decode_gate_target=[]
+encode_gate_target=[]
+decode_gate_entered=[]
+encode_gate_entered=[]
+decode_gate_released=False
+encode_gate_released=False
+capture_interposition=held second refresh timer; callback resumed once after f2 ACK
+keys_sent=tab | tab | tab | enter | <270 selection keys> | s enter | <set operand '7'> | enter | escape | alt+s
+stub_os_writes=0
+app_is_running=True
+widget_#patch_sheet=size:110x26;classes:[];subtitle:None
+widget_#patch_inspector=size:108x4;classes:[];subtitle:'0 entries ●'
+widget_#patch_editor_panel=size:112x39;classes:['-bench'];subtitle:None
+status=A2L loaded: large.a2l
+status=Loaded large.s19
+status=Patch Editor: LARGE staged as 4096 values (1048576 B at 0x100000).
+screen_text_begin
+
+  ⭘                                                Hex Edit Tool
+    │                                       Patch Editor                                         ?  📂 Open patches/
+ ▏◫ │
+ ▏≡ │ draft · change
+ ▏◉ │ Filter filter parameters                                2 of 2 shown  <    Page 1/1   >    ▽ Pick   Add list
+ ▏▤ │╭─ STAGING SHEET   ◑ BUSY · stage LARGE · 20.0 s · keys still work  ───────────────────────────────────────────╮
+ ▏! ││  Parameter                 │Kind      │Current             │New             │Unit    │Limits                 │
+ ▏✎ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━│
+ ▏✔ ││▶ LARGE                     │VAL_BLK   │▁▁▁▁▁▁▁▁ 1048576    │·               │        │     0          …      │
+ ▏⏚ ││  ┊ └ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x00100000 · 1048576 B                       │
+ ▏✦ ││  ┊        +0    +1    +2    +3    +4    +5    +6    +7    +8    +9    +10   +11   +12   +13   +14   +15      │
+ ▏▶ ││  ┊   3856  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+ ▏☑ ││  ┊   3872  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+ ▏⊕ ││  ┊   3888  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3904  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3920  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3936  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3952  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3968  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   3984  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4000  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4016  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4032  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4048  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4064  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0       │
+    ││  ┊   4080  0     0     0     0     0     0     0     0     0     0     0     0     0     0     0    ▸0       │
+    ││  ┊ rows 241..255 of 65536 · cols 0..15 of 16 · pgup/pgdn page                                                │
+    ││  ┊ shade ████████████ 0 … 0   sel 0..4095   * / bold = edited                                                │
+    ││  ┊  s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                     │
+    ││  ┊ no edit yet · bytes appear here                                                                           │
+    ││                                                                                    ▋                         │
+    ││LARGE[0..4095] op =  7                Set on 4096 cells   enter apply  alt+s stage record                     │
+    │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+    │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+    ││   Patch script    Inspector    JSON    Checks                                                                │
+    ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    │╰──────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ● ─╯
+    │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+    │  Validate   Apply loaded changes   Save
+    │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Loaded large.s19 (S19 only)                                                                   (none)  |  large.a2l
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  A2L loaded: large.a2l
+  Loaded large.s19 (S19 only)
+  Loaded large.s19
+  Patch Editor: LARGE staged as 4096 values (1048576 B at 0x100000).
+  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+
+screen_text_end
+surface=ready
+
+png_width=1111
+png_height=1091
+capture_method=PrintWindow
+png_bytes=121138
+png_captured_at=2026-11-15T20:56:05.3326588-06:00

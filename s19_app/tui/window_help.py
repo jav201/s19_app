@@ -61,28 +61,46 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     "patch": {
         "title": "Patch Editor",
         "steps": (
-            "Edit a change-set: the PATCH SCRIPT ledger on the left lists its "
-            "entries; the inspector on the right shows the highlighted entry "
-            "and holds the Inspector, JSON, Checks and A2L tabs. Load an "
-            "S19/HEX image first (`^L`) to see the bytes an entry replaces.",
+            "Edit a change-set: the filter row narrows the loaded A2L's "
+            "parameters, the STAGING SHEET lists them one row each to stage "
+            "an edit, and LANDS IN holds the Patch script, Inspector, JSON "
+            "and Checks tabs. Load an S19/HEX image first (`^L`) to see the "
+            "bytes an entry replaces.",
+            "Patch script — the ledger of the document's entries, one row "
+            "each, with the highlighted entry's BEFORE → AFTER bytes.",
+            "STAGING SHEET — ↑↓ select a row, enter moves to the formula "
+            "input, ←→ choose an enum entry, home end scroll the grid to its "
+            "first and last columns, esc returns from the formula input to "
+            "the sheet.",
+            "new = — the formula input of a number row; enter stages the "
+            "typed value.",
+            "field = — the formula input of a bit mask row; enter stages the "
+            "typed field value.",
+            "text = — the formula input of a text row; enter stages the "
+            "typed text.",
             "Inspector — shows the highlighted entry's BEFORE → AFTER bytes, "
             "the entry form and the DOCUMENT tally.",
             "JSON — shows the loaded document as read-only JSON under its "
             "stamp, and the editable paste buffer.",
             "Checks — shows the declaration faults and the check results, "
             "with Run checks.",
-            "A2L — lists the loaded A2L's measurable parameters (filter, "
-            "one 200-row page at a time); the highlighted row's full name "
-            "and address sit under the ledger.",
-            "Filter — narrows the A2L PARAMETERS ledger to the names that "
-            "contain the typed text.",
-            "Prev — turns the A2L PARAMETERS ledger to the previous page; "
+            "Filter — narrows the filter row's parameter list, and so the "
+            "staging sheet, to the names that contain the typed text.",
+            "Prev — turns the filter row's list to the previous page; "
             "disabled on the first page.",
-            "Next — turns the ledger to the next page; disabled on the last "
+            "Next — turns the list to the next page; disabled on the last "
             "page, so a long A2L is walked page by page.",
-            "Use parameter — on the A2L tab, copies the highlighted "
-            "parameter's address and the loaded image's current bytes into "
-            "the entry form; the document changes only through Add or Edit.",
+            "Pick — includes the staging sheet's selected row in the shared "
+            "parameter selection, or removes it when it is already included "
+            "(the Check Editor's Include parameter).",
+            "Add list — opens the bulk-add popup: paste many A2L names at "
+            "once, separated by new lines, commas, semicolons or spaces; "
+            "Include matches includes every listed name found in the A2L; "
+            "esc closes the popup.",
+            "Use parameter — on the Inspector tab, uses the staging sheet's "
+            "selected row: copies its address and the loaded image's current "
+            "bytes into the entry form; the document changes only through "
+            "Add or Edit.",
             "Address — the entry's start address, `0x…` hex.",
             "String — a text value, written in the document's encoding.",
             "Bytes — every token is a hex byte (1–2 digits, `0x` optional); "

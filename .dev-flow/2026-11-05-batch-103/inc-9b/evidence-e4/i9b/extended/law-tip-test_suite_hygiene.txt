@@ -1,0 +1,124 @@
+### LABEL: law-tip-test_suite_hygiene
+### CLONE: ~/work/zq-i9b/tip
+### DATE: 2026-11-15T13:24:11-06:00
+### UPTIME:  13:24:11 up 2 days, 22:12,  3 users,  load average: 1.70, 1.64, 1.38
+### HEAD: c19503f0f786e85cf4fffc6a9359b5f3947cdf0b
+### STATUS-BEGIN
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/tip/s19_app/__init__.py
+### HEADER-END
+### PYTEST jobs=2
+### ARGS: tests/test_suite_hygiene.py
+--- begin ---
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [67 items]
+
+...................................F.......................FF......      [100%]
+=================================== FAILURES ===================================
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing _____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+        from tests.support import suite_census
+    
+        assert set(suite_census.SAMPLED_TIMING_ARMS) == _SAMPLED_PIN
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        lost = sorted(_BASE_STATIC_ARMS - arms)
+        assert not lost, f"census lost base timing arms: {lost}"
+        marked, refusals = _marked_set(TESTS_ROOT)
+        assert not refusals, "\n".join(refusals)
+        arm_set = arms | set(suite_census.SAMPLED_TIMING_ARMS)
+        guard_lines = _marker_guard_lines(arm_set, set(), marked)
+>       assert not guard_lines, "\n".join(guard_lines)
+E       AssertionError: timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+E         timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+E         timing arm without serial_timing: tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look
+E         timing arm without serial_timing: tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage
+E         timing arm without serial_timing: tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped
+E       assert not ['timing arm without serial_timing: tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_wi...t_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s', ...]
+
+tests/test_suite_hygiene.py:403: AssertionError
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported() -> None:
+        lines = _margin_guard_lines(TESTS_ROOT)
+>       assert lines == [], "\n".join(lines)
+E       AssertionError: timing bound without report_margin: tests/test_b103_inc9b_s.py:212
+E         timing bound without report_margin: tests/test_b103_inc9b_s.py:231
+E         timing bound without report_margin: tests/test_b103_inc9b_w.py:226
+E         timing bound without report_margin: tests/test_b103_inc9b_w.py:276
+E         timing bound without report_margin: tests/test_b103_inc9b_w.py:732
+E       assert ['timing boun...c9b_w.py:732'] == []
+E         
+E         Left contains 5 more items, first extra item: 'timing bound without report_margin: tests/test_b103_inc9b_s.py:212'
+E         Use -v to get more diff
+
+tests/test_suite_hygiene.py:1453: AssertionError
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         inc-8b/04-validation.md: posix home path outside the runner image: /home/end
+E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: /home/end
+E         inc-8b/steps.log: posix home path outside the runner image: /home/end
+E         inc-9b/E4-roster.md: user-profile path: C:\Users\<user>
+E         inc-9b/E4-roster.md: user-profile path: C:\Users\<user>
+E       assert not ['inc-8b/04-validation.md: posix home path outside the runner image: /home/end', 'inc-8b/evidence/e5/runs/out-green/la...'inc-9b/E4-roster.md: user-profile path: C:\\Users\\<user>', 'inc-9b/E4-roster.md: user-profile path: C:\\Users\\<user>']
+
+tests/test_suite_hygiene.py:2053: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+=================== 3 failed, 64 passed in 157.87s (0:02:37) ===================
+--- end rc=1 ---

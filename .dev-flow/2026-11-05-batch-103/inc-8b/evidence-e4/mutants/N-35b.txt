@@ -1,0 +1,83 @@
+# mutant N-35b  rows: R-PE-DEF.35
+# edits: s19_app/tui/definition_sheet.py:703
+# -k: r_pe_def_35_
+# uptime: 01:59:59 up 2 days, 10:48,  3 users,  load average: 1.47, 1.00, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-35b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF.F.                                                                    [100%]
+=================================== FAILURES ===================================
+__________ test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row(v171):
+        """R-PE-DEF.35/1 (changed at Inc 8b E1) - V171 ASCII at start -> the hex grid in its card (`T.V171.start.line0..3`), no pending style.
+    
+        Why: the operator reads a text span as bytes and characters side by side, 16 per row with the ASCII
+        guide at one column; Inc 8's `+00 <bytes>` rows had no ASCII column.
+        """
+        d, img = v171["def"], v171["image"]
+        row, _ = make_row(d, v171["a2l"], img)
+        out = ds.detail_lines(row, None, WIDE, None, ROOM)
+        data = span_bytes(d, img)
+        lines = [content(t.plain) for t in out]
+>       assert lines[1:] == _text_card(d, data, data)
+E       AssertionError: assert ['╭─ ASAM.C.A...····· │', ...] == ['╭─ ASAM.C.A...───────────╯']
+E         
+E         At index 3 diff: '│ +08 │ 41 4D 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ AM·············· │' != '│ +10 │ 00 00 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ ················ │'
+E         Left contains 3 more items, first extra item: '│ +20 │ 00 00 00 00 00 00 00 00 │ 00 00                   │ ··········       │'
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1_detail.py:283: AssertionError
+_____ test_r_pe_def_35_1_a_text_row_at_start_shows_the_hex_grid_16_per_row _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_35_1_a_text_row_at_start_shows_the_hex_grid_16_per_row(v171):
+        """R-PE-DEF.35/1 (EX-8B-T1) - V171 ASCII at start -> `T.V171.start.line0..3` inside the card (head + 3 rows)."""
+        row, _ = make_row(v171["def"], v171["a2l"], v171["image"])
+        lines = painted(row)
+        for n in range(4):
+>           assert at(lines, 2 + n).startswith(BAR + "│ " + OT[f"T.V171.start.line{n}"]), (n, at(lines, 2 + n))
+E           AssertionError: (2, '  ┊ │ +08 │ 41 4D 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ AM·············· │                                                             ')
+E           assert False
+E            +  where False = <built-in method startswith of str object at 0x7f7bd02b15c0>((('  ┊ ' + '│ ') + '+10 │ 00 00 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ ················'))
+E            +    where <built-in method startswith of str object at 0x7f7bd02b15c0> = '  ┊ │ +08 │ 41 4D 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ AM·············· │                                                             '.startswith
+E            +      where '  ┊ │ +08 │ 41 4D 00 00 00 00 00 00 │ 00 00 00 00 00 00 00 00 │ AM·············· │                                                             ' = at([<text '  ┊ └ text · 0x00810200 · 42 B                                                                                ...), Span(77, 78, '#969aad'), Span(78, 79, '#969aad'), Span(79, 80, '#969aad'), Span(80, 82, '#91abec')] '#91abec'>, ...], (2 + 2))
+
+tests/test_b103_inc8b_s2.py:307: AssertionError
+_ test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style(v171):
+        """R-PE-DEF.35/2 (changed at Inc 8b E1) - pending `ABC` -> `T.V171.pendingABC.line1` (`+00 │ 41 42 43 00 …`); the 10 changed bytes share a style the others lack."""
+        d, a2l, img = v171["def"], v171["a2l"], v171["image"]
+        row, pv = row_and_preview(d, a2l, img, "ABC")
+        assert bytes(pv.result.data) == EX.after
+        out = ds.detail_lines(row, pv, WIDE, None, ROOM)
+        rows = _data_rows(out)
+        assert content(rows[0].plain)[2:-2].rstrip() == fact("T.V171.pendingABC.line1")
+        assert rows[0].plain.split("│")[2].split() [:4] == [f"{b:02X}" for b in EX.after[:4]]
+        changed = [i for i, (a, b) in enumerate(zip(EX.before, EX.after)) if a != b]
+        assert changed == fact("T.V171.pendingABC.changed_offsets") and len(changed) == 10
+        flat = [tok for t in rows for tok in _token_styles(t)]
+>       assert len(flat) == d.byte_length
+E       AssertionError: assert 76 == 42
+E        +  where 76 = len([('41', Style(color=Color('#b565f3', ColorType.TRUECOLOR, triplet=ColorTriplet(red=181, green=101, blue=243)), bgcolor...lor('#0f1525', ColorType.TRUECOLOR, triplet=ColorTriplet(red=15, green=21, blue=37)), bold=True, underline=True)), ...])
+E        +  and   42 = Definition(name='ASAM.C.ASCII.UBYTE.NUMBER_42', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=8454...ared_with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()).byte_length
+
+tests/test_b103_inc8_s1_detail.py:311: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_35_1_a_text_row_at_start_shows_the_hex_grid_16_per_row
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style
+3 failed, 2 passed in 1.84s
+
+# exit=1

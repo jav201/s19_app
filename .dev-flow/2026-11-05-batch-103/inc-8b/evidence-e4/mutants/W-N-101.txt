@@ -1,0 +1,14 @@
+# WIDE re-run of mutant N-101  rows: R-PE-DEF.101
+# edits: s19_app/tui/definition_sheet.py:1033
+# uptime: 02:05:10 up 2 days, 10:53,  2 users,  load average: 1.24, 1.13, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/W-N-101/s19_app/__init__.py
+## group fast+bench: exit=1 | 16 failed, 500 passed in 116.25s (0:01:56)
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_a_fallback_row_with_a_raw_entry_over_its_span_is_staged
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_a_staged_bit_mask_shows_the_field_in_hex
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_a_staged_enum_shows_stored_value_and_text
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_a_staged_number_shows_the_dot_mark_and_its_value_text
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_23_i85_mark_field_none_keeps_inc8_rule_and_a_kind_mark_overrides
+   FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_62_a_staged_row_follows_the_image_it_is_built_over
+   FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_23_4_a_raw_entry_over_a_fallback_row_marks_it_staged
+   FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_23_n_a_staged_row_shows_the_dot_and_its_staged_value[23-1-display]
+# verdict: KILLED-WIDE fast+bench: tests/test_b103_inc8_s1.py::test_r_pe_def_23_a_fallback_row_with_a_raw_entry_over_its_span_is_staged

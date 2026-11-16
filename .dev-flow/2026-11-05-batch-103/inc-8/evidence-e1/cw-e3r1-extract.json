@@ -1,0 +1,359 @@
+{
+  "marks": [
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 568,
+      "def": {
+        "qualname": "A2LParameterPicker.set_parameters",
+        "line": 569,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "PatchMixin._strip_source_map",
+      "reqs": [
+        "R-PE-DEF.51"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 1001,
+      "def": {
+        "qualname": "PatchMixin._strip_source_map",
+        "line": 1002,
+        "params": [
+          {
+            "name": "loaded",
+            "type": "Optional[LoadedFile]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Mapping[int, int]]"
+      }
+    },
+    {
+      "name": "PatchMixin._report_change_result",
+      "reqs": [
+        "R-PE-DEF.59"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 1156,
+      "def": {
+        "qualname": "PatchMixin._report_change_result",
+        "line": 1157,
+        "params": [
+          {
+            "name": "result",
+            "type": "ChangeActionResult",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ShellMixin._refuse_if_busy",
+      "reqs": [
+        "R-PE-110"
+      ],
+      "file": "s19_app/tui/app/shell.py",
+      "line": 425,
+      "def": {
+        "qualname": "ShellMixin._refuse_if_busy",
+        "line": 426,
+        "params": [],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 209,
+      "def": {
+        "qualname": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+        "line": 210,
+        "params": [
+          {
+            "name": "event",
+            "type": "A2LParameterPicker.ViewChanged",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "section_body_text",
+      "reqs": [
+        "R-PE-DEF.83"
+      ],
+      "file": "s19_app/tui/window_help.py",
+      "line": 622,
+      "def": {
+        "qualname": "section_body_text",
+        "line": 623,
+        "params": [
+          {
+            "name": "window_key",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "repopulated"
+        ],
+        "raw": "bool repopulated"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3A-04: it keeps its describe as `definitions`)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LParameterPicker.set_parameters"
+    },
+    {
+      "name": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "A2LParameterPicker.ViewChanged",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3A-04: passes the picker's definitions to show_page)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin._on_a2l_parameter_picker_view_changed"
+    },
+    {
+      "name": "section_body_text",
+      "reqs": [
+        "R-PE-DEF.83"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "window_key",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "body"
+        ],
+        "raw": "str body"
+      },
+      "module": "s19_app/tui/window_help.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3A-06: the reader of WINDOW_HELP_SECTIONS[\"patch\"])",
+      "volatile": [],
+      "oracle": [],
+      "key": "section_body_text"
+    },
+    {
+      "name": "PatchMixin._strip_source_map",
+      "reqs": [
+        "R-PE-DEF.51"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[LoadedFile]",
+          "name": "loaded",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Mapping[int, int]]",
+        "names": [
+          "view"
+        ],
+        "raw": "Optional[Mapping[int, int]] view"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3S-01: A3 passes its view to stage_definition)",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._strip_source_map"
+    },
+    {
+      "name": "PatchMixin._report_change_result",
+      "reqs": [
+        "R-PE-DEF.59"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChangeActionResult",
+          "name": "result",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3A-10: the notice line is printed apart from issues)",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._report_change_result"
+    },
+    {
+      "name": "ShellMixin._refuse_if_busy",
+      "reqs": [
+        "R-PE-110"
+      ],
+      "in": [],
+      "out": {
+        "type": "bool",
+        "names": [
+          "refused"
+        ],
+        "raw": "bool refused"
+      },
+      "module": "s19_app/tui/app/shell.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers (E3S-03: A3 calls it first)",
+      "volatile": [],
+      "oracle": [],
+      "key": "ShellMixin._refuse_if_busy"
+    }
+  ],
+  "calls": [],
+  "top_level_sites": {
+    "ShellMixin._refuse_if_busy": [
+      "s19_app/tui/app/file_load.py:675",
+      "s19_app/tui/app/patch.py:1586"
+    ],
+    "PatchMixin._strip_source_map": [
+      "s19_app/tui/app/patch.py:1537",
+      "s19_app/tui/app/patch.py:293",
+      "s19_app/tui/app/patch.py:571"
+    ],
+    "PatchMixin._report_change_result": [
+      "s19_app/tui/app/patch.py:1498",
+      "s19_app/tui/app/patch.py:192",
+      "s19_app/tui/app/patch.py:213",
+      "s19_app/tui/app/patch.py:249",
+      "s19_app/tui/app/patch.py:261",
+      "s19_app/tui/app/patch.py:416",
+      "s19_app/tui/app/patch.py:860",
+      "s19_app/tui/app/patch.py:985"
+    ],
+    "A2LParameterPicker.set_parameters": [
+      "s19_app/tui/screens_directionb/check_editor.py:223",
+      "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:40"
+    ],
+    "section_body_text": [
+      "s19_app/tui/window_help.py:712"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/tui/a2l_parameter_picker.py:568",
+      "msg": "`signature`: graph no default vs code default `None`"
+    },
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/tui/a2l_parameter_picker.py:568",
+      "msg": "`a2l_data`: graph no default vs code default `None`"
+    }
+  ],
+  "parse_failures": []
+}

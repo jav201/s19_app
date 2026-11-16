@@ -1,0 +1,48 @@
+scenario=inspector
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+inspector_scroll_y=0.0/7
+painted patch_entry_address_input: Region(x=33, y=42, width=183, height=1) hit_at_centre=patch_entry_address_input
+painted patch_entry_bytes_input: Region(x=33, y=46, width=183, height=0) hit_at_centre=None
+painted patch_entry_add_button: Region(x=25, y=47, width=5, height=0) hit_at_centre=None
+painted patch_doc_path_input: Region(x=88, y=46, width=112, height=1) hit_at_centre=patch_doc_path_input
+painted patch_doc_validate_button: Region(x=24, y=47, width=10, height=1) hit_at_centre=patch_doc_validate_button
+lands_in_painted_begin
+  ╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │   Patch script    Inspector    JSON    Checks                                                                                                                                                    │
+  │ ─BEFORE → AFTER────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  │
+  │  No entry yet: Add one or Load a file.                                                                                                                                                           │
+  │                                                                                                                                                                                                ▁ │
+  │ Address 0x100                                                                                                                                                                                    │
+  │                                                                                                                                                                                                  │
+  │ String  text (document encoding)                                                                                                                                                                 │
+  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+lands_in_painted_end
+top_screen=Screen
+focused=patch_tab_inspector
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+ledger_entries=0
+selected_rows=[▶ ] ENUM_0001               VALUE     1 IDLE
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+  ▶ ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                              
+  └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B
+  ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE"
+  ↔ choose · enter stage
+    MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                              
+    MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                            
+    DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                          
+    CURVE_DEF_0001          CURVE     5 values                                    ·                           -                                                                                    
+    CURVE_DEF_0002          CURVE     5 values                                    ·                           -                                                                                    
+    MAP_DEF_0001            MAP       12 values                                   ·                           -                                                                                    
+    VAL_BLK_DEF_0001        VAL_BLK   6 values                                    ·                   units   -                                                                                    
+  ENUM_0001
+  new =
+  (0 … 3)
+sheet_text_end
+stub_os_writes=0
+surface=ready

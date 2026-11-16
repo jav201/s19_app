@@ -1,0 +1,37 @@
+test_b100_active_variant base: 6 failed, 65 passed, 3 skipped in 169.55s (0:02:49)
+test_b100_active_variant failed-id diff clone vs base: 0 lines
+test_b100_document base: 4 failed, 146 passed, 13 skipped in 87.75s (0:01:27)
+test_b100_document failed-id diff clone vs base: 0 lines
+test_b100_session_reset base: 3 failed, 17 passed in 66.93s (0:01:06)
+test_b100_session_reset failed-id diff clone vs base: 0 lines
+test_b101_designer_writes base: 11 failed, 3 passed in 575.38s (0:09:35)
+test_b101_designer_writes failed-id diff clone vs base: 0 lines
+test_b101_inplace_views base: 4 failed, 18 passed in 575.94s (0:09:35)
+test_b101_inplace_views failed-id diff clone vs base: 0 lines
+test_b103_clipboard_core base: 2 failed, 83 passed, 2 skipped in 137.82s (0:02:17)
+test_b103_clipboard_core failed-id diff clone vs base: 0 lines
+test_b103_copy_paste_matrix base: 7 failed, 7 passed, 15 skipped in 120.46s (0:02:00)
+test_b103_copy_paste_matrix failed-id diff clone vs base: 0 lines
+test_b97_chips_help base: 1 failed, 78 passed in 212.25s (0:03:32)
+test_b97_chips_help failed-id diff clone vs base: 0 lines
+test_b99_editor_image base: 2 failed, 6 passed in 32.77s
+test_b99_editor_image failed-id diff clone vs base: 0 lines
+test_b99_s0 base: 1 failed, 5 passed in 12.67s
+test_b99_s0 failed-id diff clone vs base: 0 lines
+test_b99_staging base: 1 failed, 31 passed in 45.84s
+test_b99_staging failed-id diff clone vs base: 0 lines
+test_tui_patch_card base: 1 failed, 25 passed in 29.97s
+test_tui_patch_card failed-id diff clone vs base: 0 lines
+test_tui_patch_editor_b94 base: 1 failed, 16 passed in 30.10s
+test_tui_patch_editor_b94 failed-id diff clone vs base: 0 lines
+test_tui_patch_history_strip base: 2 failed, 6 passed in 20.24s
+test_tui_patch_history_strip failed-id diff clone vs base: 2 lines
+test_tui_patch_json base: 4 failed, 13 passed in 16.09s
+test_tui_patch_json failed-id diff clone vs base: 0 lines
+test_id_registry base: 1 passed, 11 errors in 1.17s
+test_id_registry failed-id diff clone vs base: 2 lines
+test_requirements_canon base: 1 failed, 10 passed in 1.33s
+test_requirements_canon failed-id diff clone vs base: 0 lines
+test_address_census base: 1 failed, 22 passed in 30.60s
+test_address_census failed-id diff clone vs base: 0 lines
+CHAIN3_DONE

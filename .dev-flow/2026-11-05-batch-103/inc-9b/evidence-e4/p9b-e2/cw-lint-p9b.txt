@@ -1,0 +1,3 @@
+$ python -I -B <code-wire>/tools/codewire_lint.py .dev-flow/2026-11-05-batch-103/inc-9b/codewire/graph-inc9b.md
+not read=0 nodes=15 entities=6 edges=20
+exit=0

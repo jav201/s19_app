@@ -1,0 +1,1532 @@
+{
+  "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+  "runnable_controls": 26,
+  "groups": 23,
+  "resolved_arms": 43,
+  "missing": [
+    {
+      "id": "I-APPLY-SYNC",
+      "requirement": "R-PE-DEF.62 / batch-48 LLR-081.3",
+      "reason": "No existing node drives bytes-entry Apply and asserts same-call ledger/JSON/sheet repaint.",
+      "verdict": "MISSING"
+    },
+    {
+      "id": "I-LOAD-SYNC",
+      "requirement": "R-PE-DEF.62 / batch-48 LLR-081.3",
+      "reason": "No existing node drives the change-document load caller and asserts same-call repaint.",
+      "verdict": "MISSING"
+    },
+    {
+      "id": "I-MOUNT-ONCE",
+      "requirement": "C9b-W mount contract",
+      "reason": "No existing node counts StagingSheet.on_mount executions and asserts exactly once.",
+      "verdict": "MISSING"
+    }
+  ],
+  "results": [
+    {
+      "group": "G01",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 3,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G01-baseline.txt",
+        "preflight": {
+          "load_one": 0.22,
+          "other_test_jobs": 0,
+          "uptime": "18:58:25 up 3 days,  3:47,  2 users,  load average: 0.22, 0.07, 0.11"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G01-mutant.txt",
+        "preflight": {
+          "load_one": 0.34,
+          "other_test_jobs": 0,
+          "uptime": "18:58:50 up 3 days,  3:47,  2 users,  load average: 0.34, 0.11, 0.13"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-94a",
+          "requirement": "R-PE-BENCH.94",
+          "mutation": "bench_sheet.py:526: key the cue to the active running job",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no cue `decode MID` within 0.5 s of its ask while LARGE's summary ran (running=1, load 0.44 0.14 0.14); top border '╭─ STAGING SHEET   ◒ BUSY · decode LARGE · 0.8 s · keys still work  ───────────────────────────────────────────╮', painted corner #f5c26b"
+            }
+          ]
+        },
+        {
+          "id": "N-102",
+          "requirement": "R-PE-BENCH.102",
+          "mutation": "bench_sheet.py:526: key the cue to the active running worker",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs",
+              "verdict": "KILLED",
+              "detail": "AssertionError: idle paint None s after the key (bound 0.3 s, load 0.41 0.14 0.14); top border '╭─ STAGING SHEET   ◑ BUSY · decode VAL_BLK_DEF_0001 · 1.4 s · keys still work  ────────────────────────────────╮', corner #f5c26b"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s",
+              "verdict": "KILLED",
+              "detail": "AssertionError: idle look 0.326 s after the filter keystroke (bound 0.3 s, load 0.50 0.17 0.15); top border '╭─ STAGING SHEET   ◑ BUSY · decode MAP_DEF_0001 · 0.6 s · keys still work  ────────────────────────────────────╮', corner #f5c26b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G02",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G02-baseline.txt",
+        "preflight": {
+          "load_one": 0.54,
+          "other_test_jobs": 0,
+          "uptime": "18:59:18 up 3 days,  3:48,  2 users,  load average: 0.54, 0.18, 0.15"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G02-mutant.txt",
+        "preflight": {
+          "load_one": 0.83,
+          "other_test_jobs": 0,
+          "uptime": "19:00:07 up 3 days,  3:48,  2 users,  load average: 0.83, 0.32, 0.20"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-94b",
+          "requirement": "R-PE-BENCH.94",
+          "mutation": "bench_sheet.py:119-120: omit busy-timer creation",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no `decode LARGE` busy title within 6 s of the key; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 0.92 0.41 0.24)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G03",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue"
+      ],
+      "baseline": {
+        "rc": 1,
+        "transcript": "G03-baseline.txt",
+        "preflight": {
+          "load_one": 0.92,
+          "other_test_jobs": 0,
+          "uptime": "19:00:52 up 3 days,  3:49,  2 users,  load average: 0.92, 0.41, 0.24"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue": {
+            "verdict": "FAIL",
+            "detail": "AssertionError: the decode lasted 0.277 s, not inside the 0.2 s grace (load 0.85 0.42 0.24)"
+          }
+        },
+        "error": ""
+      },
+      "controls": [
+        {
+          "id": "N-95a",
+          "requirement": "R-PE-BENCH.95",
+          "mutation": "bench_sheet.py:48: reduce busy grace to zero",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue"
+          ],
+          "verdict": "BAD",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue",
+              "verdict": "BAD",
+              "detail": "baseline was not a complete GREEN selection"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G04",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G04-baseline.txt",
+        "preflight": {
+          "load_one": 0.86,
+          "other_test_jobs": 0,
+          "uptime": "19:01:04 up 3 days,  3:49,  2 users,  load average: 0.86, 0.43, 0.25"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1,
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 0,
+        "transcript": "G04-mutant.txt",
+        "preflight": {
+          "load_one": 0.96,
+          "other_test_jobs": 0,
+          "uptime": "19:01:12 up 3 days,  3:49,  2 users,  load average: 0.96, 0.45, 0.26"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-95b",
+          "requirement": "R-PE-BENCH.95",
+          "mutation": "bench_sheet.py:56,154: count summary jobs as busy at both sites",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs"
+          ],
+          "verdict": "SURVIVED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs",
+              "verdict": "SURVIVED",
+              "detail": "selected node stayed green"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G05",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G05-baseline.txt",
+        "preflight": {
+          "load_one": 0.89,
+          "other_test_jobs": 0,
+          "uptime": "19:01:22 up 3 days,  3:50,  2 users,  load average: 0.89, 0.46, 0.26"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/definition_bench_view.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G05-mutant.txt",
+        "preflight": {
+          "load_one": 0.91,
+          "other_test_jobs": 0,
+          "uptime": "19:01:32 up 3 days,  3:50,  2 users,  load average: 0.91, 0.48, 0.27"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-96a",
+          "requirement": "R-PE-BENCH.96",
+          "mutation": "definition_bench_view.py:538: pad seconds to width four",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no busy title with a pending time of 1.7 s: '╭─ STAGING SHEET   ◐ BUSY · decode LARGE ·  8.3 s · keys still work  ──────────────────────────────────────────╮'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G06",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G06-baseline.txt",
+        "preflight": {
+          "load_one": 0.79,
+          "other_test_jobs": 0,
+          "uptime": "19:02:06 up 3 days,  3:50,  3 users,  load average: 0.79, 0.50, 0.28"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/definition_bench_view.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G06-mutant.txt",
+        "preflight": {
+          "load_one": 0.74,
+          "other_test_jobs": 0,
+          "uptime": "19:02:14 up 3 days,  3:50,  3 users,  load average: 0.74, 0.50, 0.29"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-96b",
+          "requirement": "R-PE-BENCH.96",
+          "mutation": "definition_bench_view.py:544: remove the busy-pill background",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour",
+              "verdict": "KILLED",
+              "detail": "AssertionError: (Style(color=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), bgcolor=Color('#0...e), '╭─ STAGING SHEET   ◒ BUSY · decode LARGE · 0.5 s · keys still work  ───────────────────────────────────────────╮')"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G07",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G07-baseline.txt",
+        "preflight": {
+          "load_one": 0.78,
+          "other_test_jobs": 0,
+          "uptime": "19:02:25 up 3 days,  3:51,  2 users,  load average: 0.78, 0.51, 0.29"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G07-mutant.txt",
+        "preflight": {
+          "load_one": 0.98,
+          "other_test_jobs": 0,
+          "uptime": "19:03:11 up 3 days,  3:51,  3 users,  load average: 0.98, 0.60, 0.33"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-97a",
+          "requirement": "R-PE-BENCH.97",
+          "mutation": "bench_sheet.py:538-540: paint the busy title only on frame zero",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no `decode LARGE` busy title within 6 s of the key; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 0.99 0.66 0.37)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G08",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G08-baseline.txt",
+        "preflight": {
+          "load_one": 0.99,
+          "other_test_jobs": 0,
+          "uptime": "19:04:00 up 3 days,  3:52,  2 users,  load average: 0.99, 0.66, 0.37"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1,
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 4,
+        "transcript": "G08-mutant.txt",
+        "preflight": {
+          "load_one": 0.78,
+          "other_test_jobs": 0,
+          "uptime": "19:05:00 up 3 days,  3:53,  3 users,  load average: 0.78, 0.68, 0.39"
+        },
+        "selection_error": "missing JUnit XML"
+      },
+      "controls": [
+        {
+          "id": "N-97b",
+          "requirement": "R-PE-BENCH.97",
+          "mutation": "bench_sheet.py:192,233: run bench jobs synchronously with direct completion",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds"
+          ],
+          "verdict": "CRASH",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds",
+              "verdict": "CRASH",
+              "detail": "missing JUnit XML"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G09",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G09-baseline.txt",
+        "preflight": {
+          "load_one": 0.79,
+          "other_test_jobs": 0,
+          "uptime": "19:05:03 up 3 days,  3:53,  3 users,  load average: 0.79, 0.68, 0.40"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G09-mutant.txt",
+        "preflight": {
+          "load_one": 0.95,
+          "other_test_jobs": 0,
+          "uptime": "19:07:46 up 3 days,  3:56,  2 users,  load average: 0.95, 0.77, 0.48"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-98a",
+          "requirement": "R-PE-BENCH.98",
+          "mutation": "patch.py:411-413: run the write and full refresh in one UI-thread call",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no busy title after the write; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 1.01 0.89 0.57)"
+            },
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_the_stepped_stage_writes_the_base_bytes_and_yields_between_write_and_refresh",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the ledger already held 1 row(s) when the entry appeared: the write and the refresh ran in one call"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G10",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second"
+      ],
+      "baseline": {
+        "rc": 124,
+        "transcript": "G10-baseline.txt",
+        "preflight": {
+          "load_one": 0.78,
+          "other_test_jobs": 0,
+          "uptime": "19:10:42 up 3 days,  3:59,  2 users,  load average: 0.78, 0.85, 0.57"
+        },
+        "arms": null,
+        "error": "missing JUnit XML"
+      },
+      "controls": [
+        {
+          "id": "N-98b",
+          "requirement": "R-PE-BENCH.98",
+          "mutation": "patch.py:731-732: add a 1.3-second stall to the sheet refresh step",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record"
+          ],
+          "verdict": "BAD",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+              "verdict": "BAD",
+              "detail": "baseline was not a complete GREEN selection"
+            }
+          ]
+        },
+        {
+          "id": "N-99",
+          "requirement": "R-PE-BENCH.99",
+          "mutation": "patch.py:731-732: add a 1.3-second stall to the sheet refresh step",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second"
+          ],
+          "verdict": "BAD",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second",
+              "verdict": "BAD",
+              "detail": "baseline was not a complete GREEN selection"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G11",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 3,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G11-baseline.txt",
+        "preflight": {
+          "load_one": 0.93,
+          "other_test_jobs": 0,
+          "uptime": "19:15:44 up 3 days,  4:04,  3 users,  load average: 0.93, 0.91, 0.68"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G11-mutant.txt",
+        "preflight": {
+          "load_one": 0.77,
+          "other_test_jobs": 0,
+          "uptime": "19:16:09 up 3 days,  4:04,  2 users,  load average: 0.77, 0.87, 0.68"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-100a",
+          "requirement": "R-PE-BENCH.100",
+          "mutation": "bench_sheet.py:546-547: leave the inline busy-border rules installed",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.854 s after the result of ('decode', 'LARGE') (bound 0.3 s, load 0.81 0.88 0.68); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #f5c26b"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.877 s after the result of ('preview', 'VAL_BLK_DEF_0001') (bound 0.3 s, load 0.82 0.88 0.68); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #f5c26b"
+            },
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the window never returned to its idle look; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #f5c26b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G12",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 3,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G12-baseline.txt",
+        "preflight": {
+          "load_one": 0.68,
+          "other_test_jobs": 0,
+          "uptime": "19:17:07 up 3 days,  4:05,  3 users,  load average: 0.68, 0.83, 0.67"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G12-mutant.txt",
+        "preflight": {
+          "load_one": 0.62,
+          "other_test_jobs": 0,
+          "uptime": "19:17:32 up 3 days,  4:06,  3 users,  load average: 0.62, 0.81, 0.67"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-100b",
+          "requirement": "R-PE-BENCH.100",
+          "mutation": "bench_sheet.py:548: leave the last busy title in place",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.803 s after the result of ('decode', 'LARGE') (bound 0.3 s, load 0.68 0.82 0.67); top border '╭─ STAGING SHEET   ◓ BUSY · decode LARGE · 0.5 s · keys still work  ───────────────────────────────────────────╮', painted corner #91abec"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.843 s after the result of ('preview', 'VAL_BLK_DEF_0001') (bound 0.3 s, load 0.73 0.83 0.68); top border '╭─ STAGING SHEET   ◑ BUSY · preview VAL_BLK_DEF_0001 · 0.5 s · keys still work  ───────────────────────────────╮', painted corner #91abec"
+            },
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the window never returned to its idle look; last top row '╭─ STAGING SHEET   ◒ BUSY · stage VAL_BLK_DEF_0001 · 0.5 s · keys still work  ─────────────────────────────────╮', corner #91abec"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G13",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 6,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s",
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G13-baseline.txt",
+        "preflight": {
+          "load_one": 0.63,
+          "other_test_jobs": 0,
+          "uptime": "19:18:30 up 3 days,  4:07,  3 users,  load average: 0.63, 0.79, 0.67"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1,
+          1
+        ],
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G13-mutant.txt",
+        "preflight": {
+          "load_one": 0.69,
+          "other_test_jobs": 0,
+          "uptime": "19:19:25 up 3 days,  4:08,  3 users,  load average: 0.69, 0.78, 0.67"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-101a",
+          "requirement": "R-PE-BENCH.101",
+          "mutation": "bench_sheet.py:282,310 and patch.py:406-408: preserve busy state on unsuccessful results",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s",
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s",
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look",
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.836 s after the result of ('preview', 'VAL_BLK_DEF_0001') (bound 0.3 s, load 0.74 0.78 0.68); top border '╭─ STAGING SHEET   ◒ BUSY · preview VAL_BLK_DEF_0001 · 1.5 s · keys still work  ───────────────────────────────╮', painted corner #f5c26b"
+            },
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no idle look within 5 s of the release; last top row '╭─ STAGING SHEET   ◑ BUSY · stage VAL_BLK_DEF_0001 · 5.2 s · keys still work  ─────────────────────────────────╮', corner #f5c26b"
+            },
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no refusal status 'Patch Editor: no A2L is loaded — nothing staged.' with an idle look within 5 s; top row '╭─ STAGING SHEET   ◑ BUSY · stage VAL_BLK_DEF_0001 · 5.2 s · keys still work  ─────────────────────────────────╮'; [(274112.600914412, 'A2L loaded: definitions.a2l'), (274113.496635521, 'Loaded definitions.s19'), (274117.754732634, 'Patch Editor: no A2L is loaded — nothing staged.')]"
+            },
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no refusal status 'busy: Loading x.s19 is running — wait for it to finish.' with an idle look within 5 s; top row '╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 5.2 s · keys still work  ─────────────────────────────────╮'; [(274125.713252861, 'A2L loaded: definitions.a2l'), (274126.509693026, 'Loaded definitions.s19'), (274130.817383433, 'busy: Loading x.s19 is running — wait for it to finish.')]"
+            },
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s",
+              "verdict": "SURVIVED",
+              "detail": "selected node stayed green"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the idle look came 0.829 s after the result of ('decode', 'MAP_DEF_0001') (bound 0.3 s, load 0.76 0.78 0.68); top border '╭─ STAGING SHEET   ◒ BUSY · decode MAP_DEF_0001 · 1.0 s · keys still work  ────────────────────────────────────╮', painted corner #f5c26b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G14",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G14-baseline.txt",
+        "preflight": {
+          "load_one": 0.78,
+          "other_test_jobs": 0,
+          "uptime": "19:20:37 up 3 days,  4:09,  3 users,  load average: 0.78, 0.78, 0.69"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G14-mutant.txt",
+        "preflight": {
+          "load_one": 0.83,
+          "other_test_jobs": 0,
+          "uptime": "19:20:54 up 3 days,  4:09,  3 users,  load average: 0.83, 0.80, 0.69"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-101b",
+          "requirement": "R-PE-BENCH.101",
+          "mutation": "patch.py:406-408: keep the record hold after a refusal",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no refusal status 'Patch Editor: no A2L is loaded — nothing staged.' with an idle look within 5 s; top row '╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 5.3 s · keys still work  ─────────────────────────────────╮'; [(274180.350246648, 'A2L loaded: definitions.a2l'), (274181.083943076, 'Loaded definitions.s19'), (274185.319744371, 'Patch Editor: no A2L is loaded — nothing staged.')]"
+            },
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look",
+              "verdict": "KILLED",
+              "detail": "AssertionError: no refusal status 'busy: Loading x.s19 is running — wait for it to finish.' with an idle look within 5 s; top row '╭─ STAGING SHEET   ◑ BUSY · stage VAL_BLK_DEF_0001 · 5.5 s · keys still work  ─────────────────────────────────╮'; [(274193.213377044, 'A2L loaded: definitions.a2l'), (274193.982216393, 'Loaded definitions.s19'), (274198.341622524, 'busy: Loading x.s19 is running — wait for it to finish.')]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G15",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G15-baseline.txt",
+        "preflight": {
+          "load_one": 0.9,
+          "other_test_jobs": 0,
+          "uptime": "19:21:24 up 3 days,  4:10,  3 users,  load average: 0.90, 0.82, 0.70"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G15-mutant.txt",
+        "preflight": {
+          "load_one": 0.7,
+          "other_test_jobs": 0,
+          "uptime": "19:21:41 up 3 days,  4:10,  3 users,  load average: 0.70, 0.78, 0.69"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-103",
+          "requirement": "R-PE-BENCH.103",
+          "mutation": "bench_sheet.py:538-540: assign the busy title as a markup string",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the name is not shown literally: '╭─ STAGING SHEET   ◑ BUSY · decode X · 0.5 s · keys still work  ───────────────────────────────────────────────╮'"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the name is not shown literally: '╭─ STAGING SHEET   ◑ BUSY · decode AB · 0.4 s · keys still work  ──────────────────────────────────────────────╮'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G16",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G16-baseline.txt",
+        "preflight": {
+          "load_one": 0.78,
+          "other_test_jobs": 0,
+          "uptime": "19:21:59 up 3 days,  4:10,  3 users,  load average: 0.78, 0.79, 0.70"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/definition_bench_view.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G16-mutant.txt",
+        "preflight": {
+          "load_one": 0.75,
+          "other_test_jobs": 0,
+          "uptime": "19:22:15 up 3 days,  4:10,  3 users,  load average: 0.75, 0.79, 0.70"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-104",
+          "requirement": "R-PE-BENCH.104",
+          "mutation": "definition_bench_view.py:540: use the raw busy-name string",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the title does not show `A\\ufffd[2J`: '╭─ STAGING SHEET   ◒ BUSY · decode A\\x1b[2J · 0.6 s · keys still work  ────────────────────────────────────────────╮'"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the title does not show `B\\ufffdC`: '╭─ STAGING SHEET   ◒ BUSY · decode B\\x85C · 0.5 s · keys still work  ──────────────────────────────────────────────╮'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G17",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 3,
+      "nodes": [
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G17-baseline.txt",
+        "preflight": {
+          "load_one": 0.82,
+          "other_test_jobs": 0,
+          "uptime": "19:22:34 up 3 days,  4:11,  3 users,  load average: 0.82, 0.80, 0.71"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/definition_bench_view.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G17-mutant.txt",
+        "preflight": {
+          "load_one": 0.74,
+          "other_test_jobs": 0,
+          "uptime": "19:22:57 up 3 days,  4:11,  3 users,  load average: 0.74, 0.78, 0.70"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-105",
+          "requirement": "R-PE-BENCH.105",
+          "mutation": "definition_bench_view.py:541-542: omit busy-name truncation",
+          "nodes": [
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]",
+            "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the pill's end is missing at 80 columns: '╭─ STAGING SHEET   ◑ BUSY · decode NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN… ─╮'"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the pill's end is missing at 118 columns: '╭─ STAGING SHEET   ◑ BUSY · decode NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN… ─╮'"
+            },
+            {
+              "node": "tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the pill's end is missing at 220 columns: '╭─ STAGING SHEET   ◒ BUSY · decode NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN… ─╮'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G18",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere",
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G18-baseline.txt",
+        "preflight": {
+          "load_one": 0.62,
+          "other_test_jobs": 0,
+          "uptime": "19:23:22 up 3 days,  4:12,  2 users,  load average: 0.62, 0.75, 0.70"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          },
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G18-mutant.txt",
+        "preflight": {
+          "load_one": 0.69,
+          "other_test_jobs": 0,
+          "uptime": "19:23:42 up 3 days,  4:12,  3 users,  load average: 0.69, 0.76, 0.70"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "N-106",
+          "requirement": "R-PE-BENCH.106",
+          "mutation": "patch.py:755: ignore the document token on later refresh steps",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere",
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the action was not observed before the chain ended: [(139670825236992, (('back', 1), ('bound', 20), ('forward', 0)), 139670817248208, 0)]"
+            },
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the action was not observed before the chain ended: [(139670812576736, (('back', 1), ('bound', 20), ('forward', 0)), 139670765819024, 0)]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G19",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 2,
+      "nodes": [
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second"
+      ],
+      "baseline": {
+        "rc": 124,
+        "transcript": "G19-baseline.txt",
+        "preflight": {
+          "load_one": 0.57,
+          "other_test_jobs": 0,
+          "uptime": "19:24:05 up 3 days,  4:12,  3 users,  load average: 0.57, 0.72, 0.69"
+        },
+        "arms": null,
+        "error": "missing JUnit XML"
+      },
+      "controls": [
+        {
+          "id": "I-CHAIN-98",
+          "requirement": "R-PE-BENCH.98",
+          "mutation": "patch.py:766: replace timer separation with call_after_refresh",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record"
+          ],
+          "verdict": "BAD",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record",
+              "verdict": "BAD",
+              "detail": "baseline was not a complete GREEN selection"
+            }
+          ]
+        },
+        {
+          "id": "I-CHAIN-99",
+          "requirement": "R-PE-BENCH.99",
+          "mutation": "patch.py:766: replace timer separation with call_after_refresh",
+          "nodes": [
+            "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second"
+          ],
+          "verdict": "BAD",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second",
+              "verdict": "BAD",
+              "detail": "baseline was not a complete GREEN selection"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G20",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G20-baseline.txt",
+        "preflight": {
+          "load_one": 0.79,
+          "other_test_jobs": 0,
+          "uptime": "19:29:22 up 3 days,  4:18,  2 users,  load average: 0.79, 0.88, 0.78"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G20-mutant.txt",
+        "preflight": {
+          "load_one": 0.77,
+          "other_test_jobs": 0,
+          "uptime": "19:29:33 up 3 days,  4:18,  2 users,  load average: 0.77, 0.87, 0.78"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "I-TOKEN-DROP",
+          "requirement": "R-PE-BENCH.106",
+          "mutation": "patch.py:779: remove write generation from the document token",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the action was not observed before the chain ended: [(140361815423584, (('back', 1), ('bound', 20), ('forward', 0)), 140361813875216), (140361815423584, (('back', 1), ('bound', 20), ('forward', 0)), 140361813875216)]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G21",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G21-baseline.txt",
+        "preflight": {
+          "load_one": 0.8,
+          "other_test_jobs": 0,
+          "uptime": "19:29:45 up 3 days,  4:18,  2 users,  load average: 0.80, 0.88, 0.79"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G21-mutant.txt",
+        "preflight": {
+          "load_one": 0.83,
+          "other_test_jobs": 0,
+          "uptime": "19:29:56 up 3 days,  4:18,  3 users,  load average: 0.83, 0.88, 0.79"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "I-NO-INCREMENT",
+          "requirement": "R-PE-BENCH.106",
+          "mutation": "patch.py:1872: stop the in-place-write generation increment",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere",
+              "verdict": "KILLED",
+              "detail": "AssertionError: the action was not observed before the chain ended: [(140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0), (140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0)]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G22",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G22-baseline.txt",
+        "preflight": {
+          "load_one": 0.8,
+          "other_test_jobs": 0,
+          "uptime": "19:30:09 up 3 days,  4:18,  3 users,  load average: 0.80, 0.87, 0.79"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 4,
+        "transcript": "G22-mutant.txt",
+        "preflight": {
+          "load_one": 0.81,
+          "other_test_jobs": 0,
+          "uptime": "19:30:14 up 3 days,  4:18,  3 users,  load average: 0.81, 0.87, 0.79"
+        },
+        "selection_error": "missing JUnit XML"
+      },
+      "controls": [
+        {
+          "id": "I-LATER-RAISE",
+          "requirement": "R-PE-BENCH.98/2",
+          "mutation": "patch.py:762-764: omit cleanup when a later refresh step raises",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once"
+          ],
+          "verdict": "CRASH",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once",
+              "verdict": "CRASH",
+              "detail": "missing JUnit XML"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "G23",
+      "commit": "2e80b0d68370c0d4c3eebbc5cf6e325b712769d0",
+      "expected_arms": 1,
+      "nodes": [
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once"
+      ],
+      "baseline": {
+        "rc": 0,
+        "transcript": "G23-baseline.txt",
+        "preflight": {
+          "load_one": 0.81,
+          "other_test_jobs": 0,
+          "uptime": "19:30:17 up 3 days,  4:18,  3 users,  load average: 0.81, 0.87, 0.79"
+        },
+        "arms": {
+          "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once": {
+            "verdict": "PASS",
+            "detail": "baseline green"
+          }
+        },
+        "error": ""
+      },
+      "mutation_receipts": {
+        "s19_app/tui/app/patch.py": [
+          1
+        ]
+      },
+      "mutant": {
+        "rc": 1,
+        "transcript": "G23-mutant.txt",
+        "preflight": {
+          "load_one": 0.83,
+          "other_test_jobs": 0,
+          "uptime": "19:30:22 up 3 days,  4:19,  3 users,  load average: 0.83, 0.88, 0.79"
+        },
+        "selection_error": ""
+      },
+      "controls": [
+        {
+          "id": "I-PANEL-GONE",
+          "requirement": "R-PE-BENCH.98/2",
+          "mutation": "patch.py:758: return immediately when the panel is gone",
+          "nodes": [
+            "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once"
+          ],
+          "verdict": "KILLED",
+          "arms": [
+            {
+              "node": "tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_exactly_once",
+              "verdict": "KILLED",
+              "detail": "AssertionError: ['first']"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+## uptime:  04:04:15 up 2 days, 12:52,  2 users,  load average: 0.96, 0.81, 0.75
+## date: 2026-11-15T10:04:15Z  head: e4485817
+## s19_app.__file__ = ~/work/zq-p9b/tree/s19_app/__init__.py  textual 8.2.8
+P9B EX-BC6 {"trial": 3, "load": [0.95, 0.86, 0.77], "calls": {"stage_record": [0.0195], "_patch_document_view": [0.1613], "set_document": [0.2563], "refresh_entries": [0.4756], "_refresh_patch_history_view": [0.641], "_stage_bench_record": [0.6824]}, "step_write": 0.0414, "step1_serialize": 0.1613, "step2_ledger_card_json": 0.2193, "step3_sheet": 0.2563, "step4_rest": 0.0041, "block": 0.6824}
+.
+1 passed, 25 deselected in 150.15s (0:02:30)
+## rc=0
+## end: 2026-11-15T10:06:46Z  uptime:  04:06:46 up 2 days, 12:55,  2 users,  load average: 0.96, 0.86, 0.78

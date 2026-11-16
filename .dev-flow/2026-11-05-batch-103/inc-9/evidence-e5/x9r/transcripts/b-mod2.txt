@@ -1,0 +1,15 @@
+tree: mod2  | load before: 1.08 1.05 1.04 2/635 591851
+~/work/zq-x9r/mod2/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x9r/mod2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [112 items]
+
+........................................................................ [ 64%]
+........................................                                 [100%]
+======================= 112 passed in 281.85s (0:04:41) ========================
+rc=0
+load after: 1.75 1.42 1.20 1/638 593542

@@ -83,6 +83,13 @@ PURPLE = "#b565f3"
 #: therefore keeps Amendment F's *semantics* (it escalates as a warning) and
 #: takes a hue that **cannot be mistaken for a verdict**.
 #:
+#: **The verdict-hue rule, as the staging sheet applies it (Inc 8b,
+#: R-PE-DEF.101).** Inside ``#patch_editor_panel`` GREEN, YELLOW and RED are
+#: state hues that ride their glyph: GREEN with ``✓`` (passed) or ``●``
+#: (staged), YELLOW with ``▲``, RED with ``✗``. A line is painted in one of them
+#: only when it carries that glyph; a cue that is not a state (this gauge, a JSON
+#: token) never takes them.
+#:
 #: **What it must never be confused with:** GREEN ``#54efae`` / YELLOW
 #: ``#f6ff8f`` / RED ``#fd8383`` (verdicts) · Orange (the MAC-specific record
 #: cue Amendment F preserved) · PURPLE ``#b565f3`` (kind role / apply chip) ·

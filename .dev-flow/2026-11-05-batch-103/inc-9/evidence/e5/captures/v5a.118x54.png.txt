@@ -1,0 +1,77 @@
+scene=v5a
+fixture=hand
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=118x54
+time=2026-11-14 08:07:20
+app_size=118x54
+focused=patch_sheet_body
+selected=VB1D
+bench_state: cursor=(3, 0) anchor=(0, 0) tool=d focus=True edit={(0,): '3', (1,): '15', (2,): '27', (3,): '18'} undo=1
+page_rows=VB1D
+subtitle=None
+widget #patch_sheet: size=110x26 classes=[] subtitle=None
+widget #patch_inspector: size=108x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=112x39 classes=['-bench'] subtitle=None
+keys_sent: <type filter 'VB1D'> | tab | tab | tab | enter | shift+right shift+right shift+right | d enter | <set op input to '3'> | enter | escape
+status_lines_this_run=2
+status: A2L loaded: hand.a2l
+status: Loaded hand.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                Hex Edit Tool
+      │                                       Patch Editor                                         ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ │ draft · change
+   ▏◉ │ Filter VB1D                                               1 of 1 shown  <    Page 1/1   >    Pick   Add list
+   ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏! ││  Parameter         Kind     Current           New          Unit   Limits                    Δ                │
+   ▏✎ ││▶◆VB1D              VAL_BLK  ████████████████ …4 cells             0 … 255                   max |Δ| 3        │
+   ▏✔ ││└ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x00100000 · 40 B                                │
+   ▏⏚ ││       +0    +1    +2    +3    +4    +5    +6    +7    +8    +9    +10   +11   +12   +13   +14   +15          │
+   ▏✦ ││     0  3    15    27    ▸18   27    39    30    42    54    45    57    69    60    72    84    75           │
+   ▏▶ ││      ▀▀▀▀▀ ▀▀▀▀▀ ▀▀▀▀▀ ▀▀▀▀▀                                                                                 │
+   ▏☑ ││    16 87    99    90    102   114   105   117   129   120   132   144   135   147   159   150   162          │
+   ▏⊕ ││                                                                                                              │
+      ││    32 174   165   177   189   180   192    4    195                                                          │
+      ││                                                                                                              │
+      ││shade ████████████ 0 … 195   sel 0..3   * / bold = edited                                                     │
+      ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                         │
+      ││4 of 40 B differ  +0x00 00 0C 18 0F → 03 0F 1B 12                                                             │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││VB1D[0..3] op =  3                +Δ on 4 cells ✓   enter apply  alt+s stage record                           │
+      │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+      │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+      ││   Patch script    Inspector    JSON    Checks                                                                │
+      ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+      │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+      │  Validate   Apply loaded changes   Save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded hand.s19 (S19 only)                                                                     (none)  |  hand.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: hand.a2l
+    Loaded hand.s19 (S19 only)
+    Loaded hand.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

@@ -1,0 +1,10 @@
+# tree: fin @ 0bf2373b
+# uptime:  00:49:59 up 2 days,  9:38,  3 users,  load average: 5.16, 4.55, 3.29
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/fin/s19_app/__init__.py
+# pytest -n 2 -q tests/test_b103_inc8_a1_service.py
+bringing up nodes...
+bringing up nodes...
+
+.......................                                                  [100%]
+23 passed in 1.73s
+# exit=0

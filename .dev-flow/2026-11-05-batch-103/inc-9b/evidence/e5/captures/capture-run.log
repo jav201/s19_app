@@ -1,0 +1,390 @@
+CAP9b START 2026-11-15T20:31:58.2497441-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:31:58.2723449-06:00 host_pid=47236
+SEQUENCE START name-brackets.118x54 2026-11-15T20:31:58.2834587-06:00
+CAPTURED name-brackets.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=80586  seq=1  t=2026-11-15T20:32:03.8765720-06:00
+CAPTURED name-brackets.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=80576  seq=2  t=2026-11-15T20:32:04.2731196-06:00
+FRAME_PAIR name-brackets.118x54 delta_s=0.422000
+CLOSING launcher PID 63212
+CLEANUP title=b103-9b-name-brackets-118-d1eb154a scratch_removed=True error=
+SEQUENCE COMPLETE name-brackets.118x54 2026-11-15T20:32:05.1776625-06:00
+MATRIX DONE 2026-11-15T20:32:05.1776625-06:00
+LOCK RELEASED 2026-11-15T20:32:05.1890798-06:00
+RUN_LOG_END 2026-11-15T20:32:05.1906182-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:34:37.0210905-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:34:37.0405276-06:00 host_pid=64972
+SEQUENCE START decode.118x54 2026-11-15T20:34:37.0465705-06:00
+CAPTURED decode.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79814  seq=1  t=2026-11-15T20:35:01.0019330-06:00
+CLOSING launcher PID 29828
+CLEANUP title=b103-9b-decode-118-da578b1e scratch_removed=True error=window 'b103-9b-decode-118-da578b1e' is still open after PID-only fallback
+CLEANUP-ALSO-FAILED: window 'b103-9b-decode-118-da578b1e' is still open after PID-only fallback
+Set-Content : Stream was not readable.
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:277 char:5
++     Set-Content -LiteralPath $ack -Value $seq -Encoding ASCII
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (<capture>\...b1e\capture.ack:String) [Set-Content], ArgumentExcep 
+   tion
+    + FullyQualifiedErrorId : GetContentWriterArgumentError,Microsoft.PowerShell.Commands.SetContentCommand
+ 
+MATRIX ERROR capture sequence decode.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T20:35:23.3331496-06:00
+RUN_LOG_END 2026-11-15T20:35:23.3341748-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:40:12.9357864-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:40:12.9566312-06:00 host_pid=35080
+SEQUENCE START decode.118x54 2026-11-15T20:40:12.9666992-06:00
+CAPTURED decode.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79811  seq=1  t=2026-11-15T20:40:39.1660128-06:00
+CAPTURED decode.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79818  seq=2  t=2026-11-15T20:40:39.5725432-06:00
+FRAME_PAIR decode.118x54 delta_s=0.531000
+CAPTURED decode.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79848  seq=3  t=2026-11-15T20:41:00.7138277-06:00
+CLOSING launcher PID 66676
+CLEANUP title=b103-9b-decode-118-ba63094b scratch_removed=True error=
+SEQUENCE COMPLETE decode.118x54 2026-11-15T20:41:01.6200940-06:00
+MATRIX DONE 2026-11-15T20:41:01.6200940-06:00
+LOCK RELEASED 2026-11-15T20:41:01.6363091-06:00
+RUN_LOG_END 2026-11-15T20:41:01.6378126-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:43:43.7739788-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:43:43.7910741-06:00 host_pid=60412
+SKIP COMPLETE decode.118x54
+MATRIX DONE 2026-11-15T20:43:43.8044068-06:00
+LOCK RELEASED 2026-11-15T20:43:43.8159385-06:00
+RUN_LOG_END 2026-11-15T20:43:43.8174453-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:44:12.7501944-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:44:12.7708099-06:00 host_pid=64596
+SEQUENCE START decode.118x54 2026-11-15T20:44:12.7799005-06:00
+CAPTURED decode.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79789  seq=1  t=2026-11-15T20:44:40.7007500-06:00
+CAPTURED decode.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79784  seq=2  t=2026-11-15T20:44:41.1443469-06:00
+FRAME_PAIR decode.118x54 delta_s=0.484000
+CAPTURED decode.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=112974  seq=3  t=2026-11-15T20:45:03.3281307-06:00
+CLOSING launcher PID 40500
+CLEANUP title=b103-9b-decode-118-b2fa7d99 scratch_removed=True error=
+SEQUENCE COMPLETE decode.118x54 2026-11-15T20:45:04.2282796-06:00
+MATRIX DONE 2026-11-15T20:45:04.2282796-06:00
+LOCK RELEASED 2026-11-15T20:45:04.2404399-06:00
+RUN_LOG_END 2026-11-15T20:45:04.2429997-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:45:57.0278439-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:45:57.0482913-06:00 host_pid=39908
+SKIP COMPLETE decode.118x54
+SEQUENCE START decode.220x60 2026-11-15T20:45:57.0609630-06:00
+CAPTURED decode.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=100352  seq=1  t=2026-11-15T20:46:19.0347038-06:00
+CAPTURED decode.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=100359  seq=2  t=2026-11-15T20:46:19.5073874-06:00
+FRAME_PAIR decode.220x60 delta_s=0.640000
+CAPTURED decode.220x60.idle.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=148024  seq=3  t=2026-11-15T20:46:36.4331321-06:00
+CLOSING launcher PID 31540
+CLEANUP title=b103-9b-decode-220-29f08992 scratch_removed=True error=
+SEQUENCE COMPLETE decode.220x60 2026-11-15T20:46:37.0681206-06:00
+SEQUENCE START preview.118x54 2026-11-15T20:46:37.0686296-06:00
+CAPTURED preview.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=99473  seq=1  t=2026-11-15T20:46:46.2165781-06:00
+CAPTURED preview.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=99480  seq=2  t=2026-11-15T20:46:46.6723181-06:00
+FRAME_PAIR preview.118x54 delta_s=0.547000
+CAPTURED preview.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=98011  seq=3  t=2026-11-15T20:46:47.2921508-06:00
+CLOSING launcher PID 71228
+CLEANUP title=b103-9b-preview-118-639fffa3 scratch_removed=True error=
+SEQUENCE COMPLETE preview.118x54 2026-11-15T20:46:48.1924971-06:00
+SEQUENCE START preview.220x60 2026-11-15T20:46:48.1934993-06:00
+CAPTURED preview.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=126144  seq=1  t=2026-11-15T20:46:56.3636201-06:00
+CAPTURED preview.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=126134  seq=2  t=2026-11-15T20:46:56.8735727-06:00
+FRAME_PAIR preview.220x60 delta_s=0.641000
+CAPTURED preview.220x60.idle.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=124554  seq=3  t=2026-11-15T20:46:57.5607018-06:00
+CLOSING launcher PID 69040
+CLEANUP title=b103-9b-preview-220-2e9f87de scratch_removed=True error=
+SEQUENCE COMPLETE preview.220x60 2026-11-15T20:46:58.4808269-06:00
+SEQUENCE START stage-encode.118x54 2026-11-15T20:46:58.4823310-06:00
+CAPTURED stage-encode.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=100512  seq=1  t=2026-11-15T20:47:08.8249121-06:00
+CAPTURED stage-encode.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=100514  seq=2  t=2026-11-15T20:47:09.2591981-06:00
+FRAME_PAIR stage-encode.118x54 delta_s=0.563000
+CAPTURED stage-encode.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=102820  seq=3  t=2026-11-15T20:47:10.2195011-06:00
+CLOSING launcher PID 67324
+CLEANUP title=b103-9b-stage-encode-118-dc6e80d9 scratch_removed=True error=
+SEQUENCE COMPLETE stage-encode.118x54 2026-11-15T20:47:11.1292606-06:00
+SEQUENCE START stage-encode.220x60 2026-11-15T20:47:11.1307659-06:00
+CAPTURED stage-encode.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=127498  seq=1  t=2026-11-15T20:47:19.8769377-06:00
+CAPTURED stage-encode.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=127510  seq=2  t=2026-11-15T20:47:20.3914994-06:00
+FRAME_PAIR stage-encode.220x60 delta_s=0.641000
+CAPTURED stage-encode.220x60.idle.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=130148  seq=3  t=2026-11-15T20:47:21.4214882-06:00
+CLOSING launcher PID 72564
+CLEANUP title=b103-9b-stage-encode-220-d582f625 scratch_removed=True error=
+SEQUENCE COMPLETE stage-encode.220x60 2026-11-15T20:47:22.3449792-06:00
+SEQUENCE START stage-refused.118x54 2026-11-15T20:47:22.3454826-06:00
+CAPTURED stage-refused.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=101860  seq=1  t=2026-11-15T20:47:33.9150879-06:00
+CAPTURED stage-refused.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=101861  seq=2  t=2026-11-15T20:47:34.3920010-06:00
+FRAME_PAIR stage-refused.118x54 delta_s=0.515000
+CAPTURED stage-refused.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=102222  seq=3  t=2026-11-15T20:47:34.9132995-06:00
+CLOSING launcher PID 33412
+CLEANUP title=b103-9b-stage-refused-118-49f8533a scratch_removed=True error=
+SEQUENCE COMPLETE stage-refused.118x54 2026-11-15T20:47:36.0881291-06:00
+SEQUENCE START stage-refused.220x60 2026-11-15T20:47:36.0881291-06:00
+CAPTURED stage-refused.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=130296  seq=1  t=2026-11-15T20:47:45.5648859-06:00
+CAPTURED stage-refused.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=130296  seq=2  t=2026-11-15T20:47:46.0408331-06:00
+FRAME_PAIR stage-refused.220x60 delta_s=0.656000
+CAPTURED stage-refused.220x60.idle.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=130519  seq=3  t=2026-11-15T20:47:46.5314533-06:00
+CLOSING launcher PID 58808
+CLEANUP title=b103-9b-stage-refused-220-2493a941 scratch_removed=True error=
+SEQUENCE COMPLETE stage-refused.220x60 2026-11-15T20:47:47.7051573-06:00
+SEQUENCE START stage-refresh.118x54 2026-11-15T20:47:47.7056709-06:00
+CAPTURED stage-refresh.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=121186  seq=1  t=2026-11-15T20:49:26.9643128-06:00
+CAPTURED stage-refresh.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=121181  seq=2  t=2026-11-15T20:49:27.4964171-06:00
+FRAME_PAIR stage-refresh.118x54 delta_s=0.594000
+CAPTURED stage-refresh.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=120905  seq=3  t=2026-11-15T20:49:28.8983876-06:00
+CLOSING launcher PID 62352
+CLEANUP title=b103-9b-stage-refresh-118-d94769ff scratch_removed=True error=window 'b103-9b-stage-refresh-118-d94769ff' is still open after PID-only fallback
+capture cleanup failed: window 'b103-9b-stage-refresh-118-d94769ff' is still open after PID-only fallback
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:300 char:22
++ if ($cleanupError) { throw "capture cleanup failed: $cleanupError" }
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (capture cleanup...D-only fallback:String) [], RuntimeException
+    + FullyQualifiedErrorId : capture cleanup failed: window 'b103-9b-stage-refresh-118-d94769ff' is still open after  
+   PID-only fallback
+ 
+MATRIX ERROR capture sequence stage-refresh.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T20:49:50.7788350-06:00
+RUN_LOG_END 2026-11-15T20:49:50.7823608-06:00 reason=lock-released
+CAP9b START 2026-11-15T20:54:15.3934154-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T20:54:15.4149565-06:00 host_pid=39384
+SEQUENCE START stage-refresh.118x54 2026-11-15T20:54:15.4230705-06:00
+CAPTURED stage-refresh.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=121138  seq=1  t=2026-11-15T20:56:05.3442030-06:00
+CAPTURED stage-refresh.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=121158  seq=2  t=2026-11-15T20:56:05.7968495-06:00
+FRAME_PAIR stage-refresh.118x54 delta_s=0.547000
+CAPTURED stage-refresh.118x54.idle.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=120863  seq=3  t=2026-11-15T20:56:07.3222206-06:00
+CLOSING launcher PID 54360
+CLEANUP title=b103-9b-stage-refresh-118-7d75650d scratch_removed=True error=
+SEQUENCE COMPLETE stage-refresh.118x54 2026-11-15T20:56:24.0948937-06:00
+MATRIX DONE 2026-11-15T20:56:24.0948937-06:00
+LOCK RELEASED 2026-11-15T20:56:24.1120264-06:00
+RUN_LOG_END 2026-11-15T20:56:24.1286826-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:04:11.1542436-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:04:11.1773814-06:00 host_pid=71320
+SKIP COMPLETE decode.118x54
+SKIP COMPLETE decode.220x60
+SKIP COMPLETE preview.118x54
+SKIP COMPLETE preview.220x60
+SKIP COMPLETE stage-encode.118x54
+SKIP COMPLETE stage-encode.220x60
+SKIP COMPLETE stage-refused.118x54
+SKIP COMPLETE stage-refused.220x60
+SKIP COMPLETE stage-refresh.118x54
+SEQUENCE START stage-refresh.220x60 2026-11-15T21:04:11.2158240-06:00
+CAPTURED stage-refresh.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=156992  seq=1  t=2026-11-15T21:05:59.2830521-06:00
+CAPTURED stage-refresh.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=156971  seq=2  t=2026-11-15T21:05:59.8935582-06:00
+FRAME_PAIR stage-refresh.220x60 delta_s=0.625000
+CAPTURED stage-refresh.220x60.idle.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=157845  seq=3  t=2026-11-15T21:06:01.5385956-06:00
+CLOSING launcher PID 56996
+CLEANUP title=b103-9b-stage-refresh-220-ea4e6d98 scratch_removed=True error=
+SEQUENCE COMPLETE stage-refresh.220x60 2026-11-15T21:06:16.6908519-06:00
+SEQUENCE START name-markup.118x54 2026-11-15T21:06:16.6918567-06:00
+CAPTURED name-markup.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=82536  seq=1  t=2026-11-15T21:06:24.7447817-06:00
+CAPTURED name-markup.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=82537  seq=2  t=2026-11-15T21:06:25.1748944-06:00
+FRAME_PAIR name-markup.118x54 delta_s=0.563000
+CLOSING launcher PID 37036
+CLEANUP title=b103-9b-name-markup-118-0ade2a03 scratch_removed=True error=
+SEQUENCE COMPLETE name-markup.118x54 2026-11-15T21:06:26.3521677-06:00
+SEQUENCE START name-markup.220x60 2026-11-15T21:06:26.3521677-06:00
+CAPTURED name-markup.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=102995  seq=1  t=2026-11-15T21:06:34.9385830-06:00
+CAPTURED name-markup.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=103006  seq=2  t=2026-11-15T21:06:35.4232964-06:00
+FRAME_PAIR name-markup.220x60 delta_s=0.594000
+CLOSING launcher PID 44772
+CLEANUP title=b103-9b-name-markup-220-0aafeddb scratch_removed=True error=
+SEQUENCE COMPLETE name-markup.220x60 2026-11-15T21:06:36.6129911-06:00
+SKIP COMPLETE name-brackets.118x54
+SEQUENCE START name-brackets.220x60 2026-11-15T21:06:36.6155010-06:00
+CAPTURED name-brackets.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=101151  seq=1  t=2026-11-15T21:06:43.6530726-06:00
+CAPTURED name-brackets.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=101165  seq=2  t=2026-11-15T21:06:44.1359617-06:00
+FRAME_PAIR name-brackets.220x60 delta_s=0.578000
+CLOSING launcher PID 69272
+CLEANUP title=b103-9b-name-brackets-220-1b5e8234 scratch_removed=True error=
+SEQUENCE COMPLETE name-brackets.220x60 2026-11-15T21:06:45.0416642-06:00
+SEQUENCE START name-esc.118x54 2026-11-15T21:06:45.0416642-06:00
+REPORT scene=name-esc
+REPORT capture_seq=1
+REPORT phase=error
+REPORT commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+REPORT requested_size=118x54
+REPORT keys_sent=tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | tab | down | up
+REPORT painted_sheet_top_row=ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"? STAGING SHEET   ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-? BUSY AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· decode AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· 90.1 s AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· keys still work  ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢r
+REPORT surface=error AssertionError: painted-state condition did not arrive
+REPORT Traceback (most recent call last):
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 548, in _drive
+REPORT     await self.scene_name()
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 499, in scene_name
+REPORT     await self.busy_pair("decode", name)
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 377, in busy_pair
+REPORT     first = await self.wait_snapshot(lambda snap: ready() and self.busy_match(snap, word, name), 90)
+REPORT             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 276, in wait_snapshot
+REPORT     raise AssertionError("painted-state condition did not arrive")
+REPORT AssertionError: painted-state condition did not arrive
+CLOSING launcher PID 71204
+CLEANUP title=b103-9b-name-esc-118-9fb9dbe8 scratch_removed=True error=
+driver reported surface=error at sequence 1 (diagnostic only)
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:238 char:13
++             throw "driver reported surface=error at sequence $seq (di ...
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (driver reported...iagnostic only):String) [], RuntimeException
+    + FullyQualifiedErrorId : driver reported surface=error at sequence 1 (diagnostic only)
+ 
+MATRIX ERROR capture sequence name-esc.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T21:08:28.9983365-06:00
+RUN_LOG_END 2026-11-15T21:08:29.0074225-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:11:27.0520193-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:11:27.0758803-06:00 host_pid=27800
+SEQUENCE START name-esc.118x54 2026-11-15T21:11:27.0866763-06:00
+REPORT scene=name-esc
+REPORT capture_seq=1
+REPORT phase=error
+REPORT commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+REPORT requested_size=118x54
+REPORT keys_sent=tab | tab | tab | down | up
+REPORT painted_sheet_top_row=ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"? STAGING SHEET   ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-? BUSY AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· decode AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· 90.1 s AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· keys still work  ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢r
+REPORT surface=error AssertionError: painted-state condition did not arrive; corner=#f5c26b; groups=('ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-'', 'decode', 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J', '90.0'); row='ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"? STAGING SHEET   ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-' BUSY AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· decode AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· 90.0 s AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· keys still work  ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢r'
+REPORT Traceback (most recent call last):
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 553, in _drive
+REPORT     await self.scene_name()
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 504, in scene_name
+REPORT     await self.busy_pair("decode", name)
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 382, in busy_pair
+REPORT     first = await self.wait_snapshot(lambda snap: ready() and self.busy_match(snap, word, name), 90)
+REPORT             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+REPORT   File "<scratch>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_9b_driver.py", line 278, in wait_snapshot
+REPORT     raise AssertionError(
+REPORT AssertionError: painted-state condition did not arrive; corner=#f5c26b; groups=('ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-'', 'decode', 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J', '90.0'); row='ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"? STAGING SHEET   ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢-' BUSY AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· decode AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½[2J AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· 90.0 s AÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· keys still work  ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢"?ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢r'
+CLOSING launcher PID 41316
+CLEANUP title=b103-9b-name-esc-118-69ecd8b0 scratch_removed=True error=
+driver reported surface=error at sequence 1 (diagnostic only)
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:238 char:13
++             throw "driver reported surface=error at sequence $seq (di ...
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (driver reported...iagnostic only):String) [], RuntimeException
+    + FullyQualifiedErrorId : driver reported surface=error at sequence 1 (diagnostic only)
+ 
+MATRIX ERROR capture sequence name-esc.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T21:13:05.5345088-06:00
+RUN_LOG_END 2026-11-15T21:13:05.5527345-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:15:41.2753700-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:15:41.2988919-06:00 host_pid=41064
+SEQUENCE START name-esc.118x54 2026-11-15T21:15:41.3074538-06:00
+CLOSING launcher PID 64892
+CLEANUP title=b103-9b-name-esc-118-3b50138d scratch_removed=True error=
+painted hostile/name literal mismatch
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:268 char:61
++ ... tains($nameNeedle)) { throw "painted hostile/name literal mismatch" }
++                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (painted hostile/name literal mismatch:String) [], RuntimeException
+    + FullyQualifiedErrorId : painted hostile/name literal mismatch
+ 
+MATRIX ERROR capture sequence name-esc.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T21:15:50.8133703-06:00
+RUN_LOG_END 2026-11-15T21:15:50.8329517-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:16:28.5380966-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:16:28.5611751-06:00 host_pid=55076
+SEQUENCE START name-esc.118x54 2026-11-15T21:16:28.5718636-06:00
+CLOSING launcher PID 58096
+CLEANUP title=b103-9b-name-esc-118-74dca23b scratch_removed=True error=
+painted hostile/name literal mismatch: row=[?ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ STAGING SHEET   ? BUSY Ãƒâ€šÃ‚Â· decode A?[2J Ãƒâ€šÃ‚Â· 0.2 s Ãƒâ€šÃ‚Â· keys still work  
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬?] needle=[decode A?[2J AÃƒâ€šÃ‚Â·]
+At <capture>\Github\s19_app-b103-inc9b\.dev-flow\2026-11-05-batch-103\inc-9b\evidence\e5\captures\scripts\capture_
+9b.ps1:268 char:61
++ ... eNeedle)) { throw "painted hostile/name literal mismatch: row=[$row]  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (painted hostile...ecode A?[2J AÃƒâ€šÃ‚Â·]:String) [], RuntimeException
+    + FullyQualifiedErrorId : painted hostile/name literal mismatch: row=[?ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ STAGING SHEET   ? BUSY Ãƒâ€šÃ‚Â· decode A?[2J Ãƒâ€šÃ‚Â· 0 
+   .2 s Ãƒâ€šÃ‚Â· keys still work  ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬?] needle=[decode A?[2J AÃƒâ€šÃ‚Â·]
+ 
+MATRIX ERROR capture sequence name-esc.118x54 failed with rc=1
+LOCK RELEASED 2026-11-15T21:16:40.0911194-06:00
+RUN_LOG_END 2026-11-15T21:16:40.1105744-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:17:42.0487233-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:17:42.0710619-06:00 host_pid=65804
+SEQUENCE START name-esc.118x54 2026-11-15T21:17:42.0799568-06:00
+CAPTURED name-esc.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79460  seq=1  t=2026-11-15T21:17:50.2059287-06:00
+CAPTURED name-esc.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79458  seq=2  t=2026-11-15T21:17:50.6243464-06:00
+FRAME_PAIR name-esc.118x54 delta_s=0.578000
+CLOSING launcher PID 27920
+CLEANUP title=b103-9b-name-esc-118-b769ed39 scratch_removed=True error=
+SEQUENCE COMPLETE name-esc.118x54 2026-11-15T21:17:51.5673324-06:00
+MATRIX DONE 2026-11-15T21:17:51.5673324-06:00
+LOCK RELEASED 2026-11-15T21:17:51.6051019-06:00
+RUN_LOG_END 2026-11-15T21:17:51.6108228-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:19:00.7621080-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:19:00.7842162-06:00 host_pid=68788
+SKIP COMPLETE decode.118x54
+SKIP COMPLETE decode.220x60
+SKIP COMPLETE preview.118x54
+SKIP COMPLETE preview.220x60
+SKIP COMPLETE stage-encode.118x54
+SKIP COMPLETE stage-encode.220x60
+SKIP COMPLETE stage-refused.118x54
+SKIP COMPLETE stage-refused.220x60
+SKIP COMPLETE stage-refresh.118x54
+SKIP COMPLETE stage-refresh.220x60
+SKIP COMPLETE name-markup.118x54
+SKIP COMPLETE name-markup.220x60
+SKIP COMPLETE name-brackets.118x54
+SKIP COMPLETE name-brackets.220x60
+SKIP COMPLETE name-esc.118x54
+SEQUENCE START name-esc.220x60 2026-11-15T21:19:00.8325866-06:00
+CAPTURED name-esc.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=99920  seq=1  t=2026-11-15T21:19:08.8037730-06:00
+CAPTURED name-esc.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=99918  seq=2  t=2026-11-15T21:19:09.2934200-06:00
+FRAME_PAIR name-esc.220x60 delta_s=0.609000
+CLOSING launcher PID 43904
+CLEANUP title=b103-9b-name-esc-220-6e1b7506 scratch_removed=True error=
+SEQUENCE COMPLETE name-esc.220x60 2026-11-15T21:19:10.4795757-06:00
+SEQUENCE START name-c1.118x54 2026-11-15T21:19:10.4811241-06:00
+CAPTURED name-c1.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=78993  seq=1  t=2026-11-15T21:19:20.1463588-06:00
+CAPTURED name-c1.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79000  seq=2  t=2026-11-15T21:19:20.6884530-06:00
+FRAME_PAIR name-c1.118x54 delta_s=0.609000
+CLOSING launcher PID 62544
+CLEANUP title=b103-9b-name-c1-118-0f8c7e10 scratch_removed=True error=
+SEQUENCE COMPLETE name-c1.118x54 2026-11-15T21:19:21.9063780-06:00
+SEQUENCE START name-c1.220x60 2026-11-15T21:19:21.9079647-06:00
+CAPTURED name-c1.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=99499  seq=1  t=2026-11-15T21:19:30.1346733-06:00
+CAPTURED name-c1.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=99510  seq=2  t=2026-11-15T21:19:30.6141814-06:00
+FRAME_PAIR name-c1.220x60 delta_s=0.562000
+CLOSING launcher PID 45868
+CLEANUP title=b103-9b-name-c1-220-0061cabb scratch_removed=True error=
+SEQUENCE COMPLETE name-c1.220x60 2026-11-15T21:19:31.5427264-06:00
+SEQUENCE START name-long.80x24 2026-11-15T21:19:31.5427264-06:00
+CAPTURED name-long.80x24.f1.png  769x521px  grid=80x24  method=PrintWindow  bytes=39928  seq=1  t=2026-11-15T21:19:39.9987720-06:00
+CAPTURED name-long.80x24.f2.png  769x521px  grid=80x24  method=PrintWindow  bytes=39937  seq=2  t=2026-11-15T21:19:40.4881525-06:00
+FRAME_PAIR name-long.80x24 delta_s=0.609000
+CLOSING launcher PID 65232
+CLEANUP title=b103-9b-name-long-80-0772cd13 scratch_removed=True error=
+SEQUENCE COMPLETE name-long.80x24 2026-11-15T21:19:41.6868483-06:00
+SEQUENCE START name-long.118x54 2026-11-15T21:19:41.6873618-06:00
+CAPTURED name-long.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79408  seq=1  t=2026-11-15T21:19:49.8628270-06:00
+CAPTURED name-long.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=79412  seq=2  t=2026-11-15T21:19:50.3101326-06:00
+FRAME_PAIR name-long.118x54 delta_s=0.484000
+CLOSING launcher PID 57972
+CLEANUP title=b103-9b-name-long-118-67573608 scratch_removed=True error=
+SEQUENCE COMPLETE name-long.118x54 2026-11-15T21:19:51.4905985-06:00
+SEQUENCE START name-long.220x60 2026-11-15T21:19:51.4905985-06:00
+CAPTURED name-long.220x60.f1.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=100073  seq=1  t=2026-11-15T21:19:59.7148207-06:00
+CAPTURED name-long.220x60.f2.png  2029x1205px  grid=220x60  method=PrintWindow  bytes=100077  seq=2  t=2026-11-15T21:20:00.2347596-06:00
+FRAME_PAIR name-long.220x60 delta_s=0.656000
+CLOSING launcher PID 63208
+CLEANUP title=b103-9b-name-long-220-aa6e8315 scratch_removed=True error=
+SEQUENCE COMPLETE name-long.220x60 2026-11-15T21:20:01.4771203-06:00
+SEQUENCE START name-short.80x24 2026-11-15T21:20:01.4781257-06:00
+CAPTURED name-short.80x24.f1.png  769x521px  grid=80x24  method=PrintWindow  bytes=39948  seq=1  t=2026-11-15T21:20:09.6610101-06:00
+CAPTURED name-short.80x24.f2.png  769x521px  grid=80x24  method=PrintWindow  bytes=39941  seq=2  t=2026-11-15T21:20:10.0547518-06:00
+FRAME_PAIR name-short.80x24 delta_s=0.515000
+CLOSING launcher PID 31336
+CLEANUP title=b103-9b-name-short-80-19121898 scratch_removed=True error=
+SEQUENCE COMPLETE name-short.80x24 2026-11-15T21:20:10.9797686-06:00
+MATRIX DONE 2026-11-15T21:20:10.9797686-06:00
+LOCK RELEASED 2026-11-15T21:20:11.0048391-06:00
+RUN_LOG_END 2026-11-15T21:20:11.0146897-06:00 reason=lock-released
+CAP9b START 2026-11-15T21:21:44.3986364-06:00 commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+LOCK ACQUIRED 2026-11-15T21:21:44.4189101-06:00 host_pid=28320
+SEQUENCE START name-brackets.118x54 2026-11-15T21:21:44.4259725-06:00
+CAPTURED name-brackets.118x54.f1.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=80557  seq=1  t=2026-11-15T21:21:53.2692005-06:00
+CAPTURED name-brackets.118x54.f2.png  1111x1091px  grid=118x54  method=PrintWindow  bytes=80577  seq=2  t=2026-11-15T21:21:53.6934225-06:00
+FRAME_PAIR name-brackets.118x54 delta_s=0.515000
+CLOSING launcher PID 31960
+CLEANUP title=b103-9b-name-brackets-118-f039d716 scratch_removed=True error=
+SEQUENCE COMPLETE name-brackets.118x54 2026-11-15T21:21:54.6144109-06:00
+MATRIX DONE 2026-11-15T21:21:54.6151040-06:00
+LOCK RELEASED 2026-11-15T21:21:54.6496382-06:00
+RUN_LOG_END 2026-11-15T21:21:54.6570011-06:00 reason=lock-released

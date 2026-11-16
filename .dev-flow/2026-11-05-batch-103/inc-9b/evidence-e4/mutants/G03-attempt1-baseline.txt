@@ -1,0 +1,69 @@
+DATE 2026-11-15T19:01:01.933498-06:00
+GROUP G03
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:00:52 up 3 days,  3:49,  2 users,  load average: 0.92, 0.41, 0.24
+LOAD_ONE 0.92
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G03/tree/s19_app/__init__.py
+PID 1026857
+SID 1026857
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-4/test_r_pe_bench_95_1_a_decode_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-4/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fae56b3d590>
+
+    def test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.95/1, EX-BC3: MAP_DEF_0001's decode is gated 0.15 s after its ask, then released: at no paint
+        of the screen (the cue tick is every 0.1 s) nor 0.6 s later is the border the busy colour or the title anything but `STAGING SHEET`.
+        Operator need (P-127): a blink of amber on every quick selection would teach the user to ignore the cue.
+        Negative control: grace 0 shows the cue at the 0.1 s tick."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, MAP)
+            screen, seen = app.screen, []
+            real_refresh = screen._compositor_refresh
+    
+            def hooked():  # every paint of the screen from the ask on: the cue would have to be painted to be seen
+                real_refresh()
+                seen.append((time.monotonic(), top_row(app), border_hex(app)))
+    
+            timer = threading.Timer(0.15, gate.release)
+            stamps = Stamps(sheet, on_ask={("decode", MAP): lambda: None if timer.is_alive() or timer.finished.is_set() else timer.start()})
+            try:
+                gate.hold.add(MAP)
+                screen._compositor_refresh = hooked
+                await reselect(pilot, sheet, MAP, DISPLAY)
+                await wait_for(pilot, lambda: ("decode", MAP) in stamps.done, "the decode's result", 30)
+                asked, done = stamps.asked[("decode", MAP)], stamps.done[("decode", MAP)]
+                end = time.monotonic() + 0.6  # the cue's tick would have shown by 0.3 s of pending time
+                while time.monotonic() < end:
+                    await pilot.pause(0.01)
+                final = (time.monotonic(), top_row(app), border_hex(app))
+                return asked, done, [s for s in seen if s[0] >= asked] + [final]
+            finally:
+                screen.__dict__.pop("_compositor_refresh", None)
+                timer.cancel()
+                gate.release()
+                stamps.close()
+    
+        asked, done, seen = run(tmp_path, defc_dir, body)
+>       assert done - asked < GRACE_S, f"the decode lasted {done - asked:.3f} s, not inside the 0.2 s grace ({load()})"
+E       AssertionError: the decode lasted 0.277 s, not inside the 0.2 s grace (load 0.85 0.42 0.24)
+E       assert (272982.405077918 - 272982.128269561) < 0.2
+
+tests/test_b103_inc9b_w.py:352: AssertionError
+---- generated xml file: ~/work/zq-m9b/groups/G03/baseline.xml ----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue
+1 failed in 8.55s
+EXIT_CODE 1

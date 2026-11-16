@@ -1,0 +1,388 @@
+# T8b-S1 RED on base 48af05ff (tree = git archive of the base + tests/test_b103_inc8b_s1.py; no product change)
+# command (from the base tree root, HT-02 env, HOME basename <runner-home>):
+#   env -i PATH=/usr/bin:/bin HOME=$S/home/<runner-home> XDG_*=$S/x/... TMPDIR=$S/tmp PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 PYTHONPATH=. timeout 300 python -m pytest -p no:cacheprovider -n 2 tests/test_b103_inc8b_s1.py -v --no-header --tb=line -rfEp
+# first line below: s19_app.__file__ (must be inside the base tree)
+ 00:17:11 up 2 days,  9:05,  4 users,  load average: 3.63, 3.03, 1.46
+~/work/<scratch>/base/s19_app/__init__.py
+============================= test session starts ==============================
+created: 2/2 workers
+2 workers [93 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b103_inc8b_s1.py::test_r_pe_def_91_1_the_header_rule_is_the_grid_rule 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[73] 
+[gw1] [  1%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_91_1_the_header_rule_is_the_grid_rule 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_1_a_wide_name_is_cut_by_cells 
+[gw0] [  2%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[73] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[111] 
+[gw0] [  3%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[111] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[195] 
+[gw0] [  4%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[195] 
+[gw1] [  5%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_1_a_wide_name_is_cut_by_cells 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[73] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells 
+[gw1] [  6%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_3_a_300_character_enum_entry_is_cut_in_the_current_cell 
+[gw1] [  7%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_3_a_300_character_enum_entry_is_cut_in_the_current_cell 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_4_a_10000_character_name_is_clipped_without_cleaning_it_whole 
+[gw0] [  8%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[73] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[111] 
+[gw1] [  9%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_4_a_10000_character_name_is_clipped_without_cleaning_it_whole 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_5_a_40_character_unit_keeps_the_limits_column_in_place 
+[gw0] [ 10%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[111] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[195] 
+[gw1] [ 11%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_5_a_40_character_unit_keeps_the_limits_column_in_place 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_96_6_a_name_that_only_holds_a_control_character_is_cleaned_not_cut 
+[gw0] [ 12%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[195] 
+[gw1] [ 13%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_6_a_name_that_only_holds_a_control_character_is_cleaned_not_cut 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[73] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_1_text_style_names_and_current_values 
+[gw1] [ 15%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_1_text_style_names_and_current_values 
+[gw0] [ 16%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[73] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_2_dim_style_kind_unit_limits_text_and_the_empty_new_mark 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[111] 
+[gw1] [ 17%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_2_dim_style_kind_unit_limits_text_and_the_empty_new_mark 
+[gw0] [ 18%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[111] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_3_header_labels_are_bold_dim 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[195] 
+[gw1] [ 19%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_3_header_labels_are_bold_dim 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_4_rule_style_gutters_are_hilite 
+[gw0] [ 20%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[195] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_90_1_gutters_stand_after_every_column_of_every_defc_row 
+[gw1] [ 21%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_4_rule_style_gutters_are_hilite 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_5_the_selected_row_has_its_ground_and_a_bold_hilite_marker 
+[gw0] [ 22%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_90_1_gutters_stand_after_every_column_of_every_defc_row 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter 
+[gw1] [ 23%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_5_the_selected_row_has_its_ground_and_a_bold_hilite_marker 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_6_zebra_ground_on_odd_positions_only 
+[gw0] [ 24%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_99_3_a_pending_bench_edit_is_purple 
+[gw1] [ 25%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_6_zebra_ground_on_odd_positions_only 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_7_the_current_marker_on_the_track_is_bold_value 
+[gw0] [ 26%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_3_a_pending_bench_edit_is_purple 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_100_1_a_refused_preview_is_red_with_its_cross 
+[gw1] [ 27%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_7_the_current_marker_on_the_track_is_bold_value 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_8_the_after_bytes_of_the_formula_tail_are_pending_without_underline 
+[gw0] [ 29%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_100_1_a_refused_preview_is_red_with_its_cross 
+[gw1] [ 30%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_8_the_after_bytes_of_the_formula_tail_are_pending_without_underline 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_97_9_the_key_hint_is_ink_on_hilite 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check 
+[gw1] [ 31%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_9_the_key_hint_is_ink_on_hilite 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[DISPLAY_0001-25.5-25.5--118.0 staged] 
+[gw0] [ 32%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_101_2_yellow_only_beside_a_notice_triangle 
+[gw1] [ 33%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[DISPLAY_0001-25.5-25.5--118.0 staged] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[MASK_FIELD_0001-255-255 (0xFF)-+81] 
+[gw0] [ 34%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_2_yellow_only_beside_a_notice_triangle 
+[gw1] [ 35%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[MASK_FIELD_0001-255-255 (0xFF)-+81] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_101_3_red_only_beside_a_cross 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta 
+[gw1] [ 36%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[25.5--118.0 (-62.1%)] 
+[gw0] [ 37%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_3_red_only_beside_a_cross 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_101_4_no_span_uses_riches_own_state_colours 
+[gw1] [ 38%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[25.5--118.0 (-62.1%)] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[175-] 
+[gw0] [ 39%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_4_no_span_uses_riches_own_state_colours 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour 
+[gw1] [ 40%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[175-] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[ENUM_0001.cur1] 
+[gw1] [ 41%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[ENUM_0001.cur1] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new175] 
+[gw0] [ 43%] PASSED tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.cur143.5.new25.5] 
+[gw1] [ 44%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new175] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new-45] 
+[gw0] [ 45%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.cur143.5.new25.5] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[MASK_FIELD_0001.cur174.new255] 
+[gw1] [ 46%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new-45] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column 
+[gw0] [ 47%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[MASK_FIELD_0001.cur174.new255] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[neg_big] 
+[gw1] [ 48%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[DISPLAY_0001] 
+[gw0] [ 49%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[neg_big] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[huge] 
+[gw1] [ 50%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[DISPLAY_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_FIELD_0001] 
+[gw0] [ 51%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[huge] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_5_5] 
+[gw1] [ 52%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_FIELD_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_BIT_0001] 
+[gw0] [ 53%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_5_5] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_9_1] 
+[gw1] [ 54%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_BIT_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[ENUM_0001] 
+[gw0] [ 55%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_9_1] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[lower_-inf] 
+[gw1] [ 56%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[ENUM_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[MAP_DEF_0001] 
+[gw0] [ 58%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[lower_-inf] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[upper_nan] 
+[gw1] [ 59%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[MAP_DEF_0001] 
+[gw0] [ 60%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[upper_nan] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[CURVE_DEF_0001] 
+[gw1] [ 61%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_5_the_no_limits_dash_stands_at_16_on_text_and_refused_rows 
+[gw0] [ 62%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end 
+[gw0] [ 63%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[4290000000000.0] 
+[gw0] [ 64%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[4290000000000.0] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999600000000.0] 
+[gw0] [ 65%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999600000000.0] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[-1.7e+308] 
+[gw0] [ 66%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[-1.7e+308] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999400000000.0] 
+[gw0] [ 67%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999400000000.0] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_106_1_a_lower_limit_that_is_not_finite_gives_the_range_form 
+[gw0] [ 68%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_106_1_a_lower_limit_that_is_not_finite_gives_the_range_form 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_106_2_an_upper_limit_that_is_not_finite_gives_the_range_form 
+[gw0] [ 69%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_106_2_an_upper_limit_that_is_not_finite_gives_the_range_form 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_114_1_an_erased_float_current_gives_the_no_position_form 
+[gw0] [ 70%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_1_an_erased_float_current_gives_the_no_position_form 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_114_2_a_span_that_overflows_gives_the_no_position_form 
+[gw0] [ 72%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_2_a_span_that_overflows_gives_the_no_position_form 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow 
+[gw0] [ 73%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_5_5] 
+[gw0] [ 74%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_5_5] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_9_1] 
+[gw0] [ 75%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_9_1] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[CURVE_DEF_0001] 
+[gw0] [ 76%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[MAP_DEF_0001] 
+[gw0] [ 77%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[MAP_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[VAL_BLK_DEF_0001] 
+[gw0] [ 78%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[CURVE_DEF_0001] 
+[gw1] [ 79%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_5_the_no_limits_dash_stands_at_16_on_text_and_refused_rows 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-1000.0-1000.0-k-k] 
+[gw0] [ 80%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[MAP_DEF_0001] 
+[gw1] [ 81%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-1000.0-1000.0-k-k] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[0.0-65535.0-None-k] 
+[gw0] [ 82%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[MAP_DEF_0001] 
+[gw1] [ 83%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[0.0-65535.0-None-k] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-655350.0--1000.0-k-k] 
+[gw0] [ 84%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level 
+[gw1] [ 86%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-655350.0--1000.0-k-k] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[MAP_DEF_0001] 
+[gw0] [ 87%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[CURVE_DEF_0001] 
+[gw1] [ 88%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[MAP_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[VAL_BLK_DEF_0001] 
+[gw0] [ 89%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-CURVE_DEF_0001] 
+[gw1] [ 90%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-MAP_DEF_0001] 
+[gw0] [ 91%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-VAL_BLK_DEF_0001] 
+[gw1] [ 92%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-MAP_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-CURVE_DEF_0001] 
+[gw0] [ 93%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-MAP_DEF_0001] 
+[gw1] [ 94%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-CURVE_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-VAL_BLK_DEF_0001] 
+[gw0] [ 95%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-MAP_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[CURVE_DEF_0001-None] 
+[gw1] [ 96%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-VAL_BLK_DEF_0001] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[MAP_DEF_0001-None] 
+[gw0] [ 97%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[CURVE_DEF_0001-None] 
+tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16 
+[gw1] [ 98%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[MAP_DEF_0001-None] 
+[gw0] [100%] FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16 
+
+=================================== FAILURES ===================================
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:158: AssertionError: definition_sheet.header_rule is absent (new in Inc 8b)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:242: AssertionError: assert '  Parameter ...   Δ         ' == '  Parameter ...            │'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:242: AssertionError: assert '  Parameter ...             ' == '  Parameter ...            │'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:242: AssertionError: assert '  Parameter ...             ' == '  Parameter ...            │'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:308: AssertionError: assert '温度温度温度温度… VALUE   ' == '温度温度温度温度温度温度… '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:315: AssertionError: assert '──────●┤' == '温度温… '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:323: AssertionError: assert 'XXXXXX…·            ' == '1 XXXXXXXXXXXXXXXXX…'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:258: AssertionError: ('ENUM_0001', 72)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:340: AssertionError: assert 'NNNNNNNNNNNNNNNNN…VALUE   ' == 'NNNNNNNNNNNNNNNNNNNNNNNNN…'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:258: AssertionError: ('ENUM_0001', 110)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:347: AssertionError: assert '──────●┤' == 'UUUUUUU…'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:258: AssertionError: ('ENUM_0001', 194)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:356: AssertionError: assert 'A�[2JB            VALUE   ' == 'A�[2JB                    '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:368: AssertionError: assert None == '#e9e9e9'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:270: AssertionError: assert (16, 0, 14, 12, 0, 18, ...) == (26, 10, 20, 16, 8, 34, ...)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:378: AssertionError: assert None == '#969aad'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:270: AssertionError: assert (18, 9, 18, 13, 7, 27, ...) == (26, 10, 20, 16, 8, 34, ...)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:390: AssertionError: Parameter
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:270: AssertionError: assert (24, 10, 44, 20, 8, 64, ...) == (26, 10, 20, 16, 8, 34, ...)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:399: AssertionError: 28
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:279: AssertionError: ENUM_0001
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:408: AssertionError: assert ('\u25b6' == '\u25b6'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:285: AssertionError: assert [] == [28, 39, 60, 77, 86, 121, ...]
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:172: TypeError: row_line() got an unexpected keyword argument 'odd'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:521: AssertionError: assert ('V' == '◆'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:152: AssertionError: '●' is not in the painted text '150                    '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:531: AssertionError: assert ('eg C  -40 ├─────', '') == ('250', '✗ refused')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:439: AssertionError: assert (None == '#b565f3')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:447: AssertionError: assert (None == '#0a0e1b')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:555: AssertionError: no GREEN anywhere: the staged row and the passed check must be green
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:481: AssertionError: assert ('eg C  -40 ├────◆' == '25.5'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:565: AssertionError: the notice itself is YELLOW with its ▲
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:481: AssertionError: assert ('      0 ├───────' == '255 (0xFF)'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:494: AssertionError: assert ('\u25cf' == '\u25cf'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:575: AssertionError: assert ('✗' in '✗ DISPLAY_0001: 250 is outside the extended limits -50..200' and '#fd8383' in {'#800000'})
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:505: AssertionError: assert ('eg C  -40 ├────◆' == '25.5'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:581: AssertionError:  ●DISPLAY_0001      VALUE    143.5             25.5         deg C  -40 ├────◆───────●┤ 150    -118.0 staged
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:505: AssertionError: assert ('eg C  -40 ├─────' == '175'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:658: AssertionError: assert '0 ├──────●─────────────┤ 3' == '     0  ├───...────┤      3 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:658: AssertionError: assert '-40 ├───────...──────●─▶ 150' == '   -40  ├───...──●─▶    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:658: AssertionError: assert '-40 ├───────...──────●─┤ 150' == '   -40  ├───...──●─┤    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:658: AssertionError: assert '-40 ◀───────...──────●─┤ 150' == '   -40  ◀───...──●─┤    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:658: AssertionError: assert '0 ├─────────────●─────◆┤ 255' == '     0  ├───...───◆┤    255 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:667: AssertionError: assert '150    -118.0 (-62.1%) ' == '   -40  ├───...──●─┤    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:683: AssertionError: assert '-655k ├─────...─────┤ -1.00k' == '  -655k ├───...────┤  -1.00k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:674: AssertionError: assert 4 == 8
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:683: AssertionError: assert '-1.70e+299G ...─●┤ 4.29e+03G' == '-2e308  ├───...───●┤   4e12 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:674: AssertionError: assert 2 == 8
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:691: AssertionError: assert (2 == 16)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:674: AssertionError: assert 2 == 8
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:691: AssertionError: assert (2 == 16)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:674: AssertionError: assert 2 == 8
+~/work/<scratch>/base/s19_app/tui/definition_sheet.py:724: ValueError: cannot convert float NaN to integer
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:701: AssertionError: assert '-1.00k … 1.00k' == ' -1.00k     ...        1.00k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:691: AssertionError: assert (2 == 16)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:701: AssertionError: assert '-50 … 50' == '   -50      ...          50 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:701: AssertionError: assert '0 … 65.5k' == '     0      ...        65.5k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:737: AssertionError: assert '-40 ├───────...──────◆●┤ 150' == '   -40  ├───...──◆●┤    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:753: AssertionError: assert '29e+03G' == '  4e12 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:753: AssertionError: assert '00e+03G' == '  1e12 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:750: AssertionError: assert '-1.70e+' == '-2e308 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:753: AssertionError: assert '─┤ 999G' == '   999G'
+~/work/<scratch>/base/s19_app/tui/definition_sheet.py:724: ValueError: cannot convert float NaN to integer
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:768: AssertionError: assert '0 … nan' == '     0      ...         nan '
+~/work/<scratch>/base/s19_app/tui/definition_sheet.py:724: ValueError: cannot convert float NaN to integer
+~/work/<scratch>/base/s19_app/tui/definition_sheet.py:724: ValueError: cannot convert float NaN to integer
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:802: AssertionError: assert '-40 ├───────...──────●─▶ 150' == '   -40  ├───...────┤    150 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:815: AssertionError: assert '5 … 5' == '     5      ...           5 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:815: AssertionError: assert '9 … 1' == '     9      ...           1 '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:837: AssertionError: assert '▅▇▄█▁ 5' == '▄▆▃▇▁ 5'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:837: AssertionError: assert '████ 12' == '▆▃▅▃ 12'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:837: AssertionError: assert '███ 6' == '▄▃▄ 6'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:712: AssertionError: assert ('-' == '            ...             '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:851: AssertionError: ▅▇▄█▁
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:724: AssertionError: assert ' ' == 'k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:851: AssertionError: ████
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:726: AssertionError: assert '─' == ' '
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:851: AssertionError: ███
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:724: AssertionError: assert '├' == 'k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:861: AssertionError: assert ('▁▂▂▃▃▄▄▅▅▆▆▇▇█' == '▁▁▂▂▃▃▄▄▅▅▆▆▇▇'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:874: AssertionError: ('MAP_DEF_0001', 0)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:874: AssertionError: ('CURVE_DEF_0001', 0)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:874: AssertionError: ('VAL_BLK_DEF_0001', 0)
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:889: AssertionError: ('every strip block is found in the Current column (no vacuous pass)', '       ·            ')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:889: AssertionError: ('every strip block is found in the Current column (no vacuous pass)', '       ·            ')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:889: AssertionError: ('every strip block is found in the Current column (no vacuous pass)', '       ·            ')
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:886: TypeError: row_line() got an unexpected keyword argument 'odd'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:886: TypeError: row_line() got an unexpected keyword argument 'odd'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:886: TypeError: row_line() got an unexpected keyword argument 'odd'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:902: AssertionError: assert '                       ' == '     0      ...        65.5k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:902: AssertionError: assert '                       ' == ' -1.00k     ...        1.00k'
+~/work/<scratch>/base/tests/test_b103_inc8b_s1.py:911: AssertionError: assert ('-' == '            ...             '
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_91_1_the_header_rule_is_the_grid_rule
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[73]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[111]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[195]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_1_a_wide_name_is_cut_by_cells
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_2_a_wide_unit_is_cut_by_cells
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_3_a_300_character_enum_entry_is_cut_in_the_current_cell
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[73]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_4_a_10000_character_name_is_clipped_without_cleaning_it_whole
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[111]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_5_a_40_character_unit_keeps_the_limits_column_in_place
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_every_defc_row_has_its_cells_at_the_column_starts[195]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_96_6_a_name_that_only_holds_a_control_character_is_cleaned_not_cut
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_1_text_style_names_and_current_values
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[73]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_2_dim_style_kind_unit_limits_text_and_the_empty_new_mark
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[111]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_3_header_labels_are_bold_dim
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_89_the_widths_do_not_depend_on_the_view[195]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_4_rule_style_gutters_are_hilite
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_90_1_gutters_stand_after_every_column_of_every_defc_row
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_5_the_selected_row_has_its_ground_and_a_bold_hilite_marker
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_6_zebra_ground_on_odd_positions_only
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_3_a_pending_bench_edit_is_purple
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_7_the_current_marker_on_the_track_is_bold_value
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_100_1_a_refused_preview_is_red_with_its_cross
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_8_the_after_bytes_of_the_formula_tail_are_pending_without_underline
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_9_the_key_hint_is_ink_on_hilite
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[DISPLAY_0001-25.5-25.5--118.0 staged]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_2_yellow_only_beside_a_notice_triangle
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_staged_scalar_is_painted_green_with_its_dot[MASK_FIELD_0001-255-255 (0xFF)-+81]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_98_3_a_staged_array_without_an_edit_shows_the_green_dot_and_staged_delta
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_3_red_only_beside_a_cross
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[25.5--118.0 (-62.1%)]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_4_no_span_uses_riches_own_state_colours
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_99_1_2_pending_scalar_is_painted_purple_with_its_diamond[175-]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[ENUM_0001.cur1]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new175]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.cur143.5.new25.5]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new-45]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[MASK_FIELD_0001.cur174.new255]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[neg_big]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[DISPLAY_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[huge]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_FIELD_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_5_5]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[MASK_BIT_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[limits_9_1]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_1_the_track_ends_stand_at_8_and_25_on_every_scalar_kind[ENUM_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[lower_-inf]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_3_the_range_mark_stands_at_16_when_the_limits_have_no_track[upper_nan]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[4290000000000.0]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999600000000.0]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[-1.7e+308]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_105_a_wide_limit_is_written_in_its_exponent_form[999400000000.0]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_106_1_a_lower_limit_that_is_not_finite_gives_the_range_form
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_106_2_an_upper_limit_that_is_not_finite_gives_the_range_form
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_1_an_erased_float_current_gives_the_no_position_form
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_2_a_span_that_overflows_gives_the_no_position_form
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_114_3_a_new_value_of_plus_infinity_gives_the_no_position_form_not_a_right_arrow
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_5_5]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_9_1]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_5_the_no_limits_dash_stands_at_16_on_text_and_refused_rows
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-1000.0-1000.0-k-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[0.0-65535.0-None-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-655350.0--1000.0-k-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_1_the_strip_is_dim_with_no_ground[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[True-None-#1c2547-VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_108_2_the_row_ground_shows_through_the_strip[False-True-#131a2c-VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[CURVE_DEF_0001-None]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[MAP_DEF_0001-None]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16
+PASSED tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour
+========================= 92 failed, 1 passed in 1.50s =========================
+EXIT=1

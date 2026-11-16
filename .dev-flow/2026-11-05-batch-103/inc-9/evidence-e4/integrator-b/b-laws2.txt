@@ -1,0 +1,174 @@
+== b-laws2  Fri Nov 13 09:35:54 PM CST 2026  load: 4.20 3.76 2.26
+s19_app.__file__ = ~/work/zq-e4-9-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..............s..................F................F........F............ [ 71%]
+................sF....s......                                            [100%]
+=================================== FAILURES ===================================
+________ test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text() -> None:
+        """E3S-1 guard case: collecting the parallel lane prints no QC-TM text."""
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-m",
+                "not serial_timing",
+                "-p",
+                "no:cacheprovider",
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=900,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        output = proc.stdout + proc.stderr
+>       assert proc.returncode == 0, output[-2000:]
+E       AssertionError: nts.py::test_single_s19_project_loads_equivalently
+E         tests/test_workspace_variants.py::test_populated_reports_subdirectory_is_neutral
+E         tests/test_workspace_variants.py::test_variant_descriptor_is_frozen_with_expected_fields
+E         tests/test_workspace_variants.py::test_project_variant_set_construction
+E         tests/test_workspace_variants.py::test_loaded_file_variant_id_defaults_to_none
+E         tests/test_workspace_variants.py::test_build_variant_set_orders_variants_and_defaults_active_to_first
+E         tests/test_workspace_variants.py::test_build_variant_set_honors_explicit_active_id
+E         tests/test_workspace_variants.py::test_build_variant_set_rejects_unknown_active_id
+E         tests/test_workspace_variants.py::test_build_variant_set_empty_project_has_no_active_variant
+E         
+E         ==================================== ERRORS ====================================
+E         _______________ ERROR collecting tests/test_batch91_adoption.py ________________
+E         tests/test_batch91_adoption.py:23: in <module>
+E             ROOT = repo_root(Path(__file__))
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+E         tools/id_registry.py:289: in repo_root
+E             raise RuntimeError(
+E         E   RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+E         ___________ ERROR collecting tests/test_batch91_registry_hygiene.py ____________
+E         tests/test_batch91_registry_hygiene.py:35: in <module>
+E             ROOT = repo_root(Path(__file__))
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+E         tools/id_registry.py:289: in repo_root
+E             raise RuntimeError(
+E         E   RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+E         =========================== short test summary info ============================
+E         ERROR tests/test_batch91_adoption.py - RuntimeError: could not locate the rep...
+E         ERROR tests/test_batch91_registry_hygiene.py - RuntimeError: could not locate...
+E         !!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+E         8653/8847 tests collected (194 deselected), 2 errors in 19.55s
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['~/miniconda3/envs/s19ci/bin/python', '-m', 'pytest', '--collect-only', '-q', '-m'...s during collection !!!!!!!!!!!!!!!!!!!!\n8653/8847 tests collected (194 deselected), 2 errors in 19.55s\n', stderr='').returncode
+
+tests/test_suite_hygiene.py:427: AssertionError
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+        (records and evidence, not git-ignored) holds no home path, account or
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+        address. A root missing from the checkout fails the test."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        all_hits = []
+        for root in _redaction_roots(REPO_ROOT):
+            if not root.is_dir():
+                pytest.fail(
+                    f"the redaction root {root} is missing from this checkout; "
+                    "the gate has nothing it is responsible for"
+                )
+            all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+>       assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
+E       AssertionError: unredacted batch records or evidence:
+E         inc-9/E3-security.md: posix home path outside the runner image: <home path>
+E         inc-9/E3-security.md: local account or host name: <home>
+E         inc-9/E3-security.md: local account or host name: <home>
+E         inc-9/evidence-e1/run_pilot.sh: posix home path outside the runner image: <home path>
+E         inc-9/evidence-e1/run_pilot.sh: posix home path outside the runner image: <home path>
+E         inc-9/evidence-e1/run_pilot.sh: local account or host name: <home>
+E         inc-9/evidence-e1/run_pilot.sh: local account or host name: <home>
+E         inc-9/evidence-e1/run_pilot.sh: local account or host name: <home>
+E       assert not ['inc-9/E3-security.md: posix home path outside the runner image: <home path>', 'inc-9/E3-security.md: local acco...ide the runner image: <home path>', 'inc-9/evidence-e1/run_pilot.sh: local account or host name: <home>', ...]
+
+tests/test_suite_hygiene.py:2053: AssertionError
+________________ test_canon_rows_hold_the_obligation_word_once _________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_canon_rows_hold_the_obligation_word_once() -> None:
+        """R-DOC-CANON.4 -- each sentence holds ``shall`` exactly once.
+    
+        Why: one ``shall`` is one obligation is one test case. Two make a row that can be
+        half met; none makes a statement that obliges nothing.
+        """
+        rows = _rows()
+        offenders: List[str] = []
+        for r in rows:
+            n = len(re.findall(r"\bshall\b", r.sentence))
+            if n != 1:
+                offenders.append(f"line {r.line} {r.id}: 'shall' appears {n} times")
+>       _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+
+tests/test_requirements_canon.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rule = 'R-DOC-CANON.4 the obligation word is not used exactly once'
+offenders = ["line 1321 R-A2L-DEF.153: 'shall' appears 2 times", "line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times", "line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times"]
+checked = 2990
+
+    def _report(rule: str, offenders: List[str], checked: int) -> None:
+        if not offenders:
+            return
+        shown = "\n  ".join(offenders[:SHOWN])
+        more = f"\n  ... and {len(offenders) - SHOWN} more" if len(offenders) > SHOWN else ""
+>       pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E       Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2990 checked)
+E         line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+E         line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times
+E         line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times
+
+tests/test_requirements_canon.py:176: Failed
+_______________ test_at_b83_08_tree_holds_no_assembled_selectors _______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_at_b83_08_tree_holds_no_assembled_selectors() -> None:
+        """The premise that makes the detector cheap: no flow tracking is needed.
+    
+        Meaningful only because the fixture above proves detection works. If this ever goes
+        red, 'recognise the site' has stopped being sufficient and the design needs revisiting
+        -- which is the point of the guard.
+        """
+        from pathlib import Path
+        from tools.address_census import census
+    
+        root = Path(__file__).resolve().parent.parent
+        data = census(root)
+        odd = [s for s in data.sites if s.form.startswith("other:")]
+>       assert not odd, (
+            "address arguments outside {literal, name, fstring} appeared: "
+            + ", ".join(f"{s.file}:{s.line} {s.form}" for s in odd[:10])
+        )
+E       AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b103_a2l_refresh.py:218 other:IfExp, tests/test_b103_a2l_refresh.py:282 other:IfExp, tests/test_b103_picker_model.py:94 other:IfExp, tests/test_b103_picker_model.py:186 other:Subscript, tests/test_b103_picker_model.py:197 other:Subscript, tests/test_b103_picker_model.py:191 other:Subscript, tests/test_b103_picker_model.py:664 other:IfExp, tests/test_b103_picker_model.py:731 other:IfExp
+E       assert not [AddressSite(file='tests/test_b103_a2l_refresh.py', line=218, api='query_one', form='other:IfExp', shape=None, interp=...ts/test_b103_picker_model.py', line=191, api='query_one', form='other:Subscript', shape=None, interp=[], note=''), ...]
+
+tests/test_address_census.py:309: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+4 failed, 94 passed, 3 skipped in 175.16s (0:02:55)
+rc=1

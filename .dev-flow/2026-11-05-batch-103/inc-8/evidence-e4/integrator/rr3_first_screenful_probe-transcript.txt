@@ -1,0 +1,15 @@
+cwd=~/work/zq-e4-8-int/wt2
+ 17:30:55 up 1 day,  2:19,  2 users,  load average: 0.17, 1.52, 1.75
+~/work/zq-e4-8-int/wt2/s19_app/__init__.py
+RR3.120x30.panel.visible_rows = 15
+RR3.120x30.panel.max_scroll_y = 11
+RR3.120x30.patch_filter_row = (1, 2)
+RR3.120x30.patch_sheet_win = (2, 14)
+RR3.120x30.patch_inspector = (14, 23)
+RR3.120x30.patch_doc_file_row = (23, 24)
+RR3.120x30.patch_doc_controls = (24, 25)
+RR3.120x30.patch_legend = (25, 26)
+RR3.120x30.patch_doc_entry_buttons = (24, 25)
+.
+1 passed in 3.02s
+exit=0

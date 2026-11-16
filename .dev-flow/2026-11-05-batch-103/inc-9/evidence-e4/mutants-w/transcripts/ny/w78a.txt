@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+...............F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt3/tests/test_b103_inc9_w_mutants.py:530: AssertionError: assert [(8388752, b'...c\xfeu\xff*')] == []
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_78_3_a_request_made_for_an_older_document_is_not_staged
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 17 passed in 105.56s (0:01:45)

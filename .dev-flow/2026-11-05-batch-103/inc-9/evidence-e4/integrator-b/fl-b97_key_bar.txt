@@ -1,0 +1,8 @@
+== fl-b97_key_bar  Fri Nov 13 09:49:52 PM CST 2026  load: 9.76 8.22 5.41
+s19_app.__file__ = ~/work/zq-e4-9-int/fin2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......................................                                   [100%]
+38 passed in 295.91s (0:04:55)
+rc=0

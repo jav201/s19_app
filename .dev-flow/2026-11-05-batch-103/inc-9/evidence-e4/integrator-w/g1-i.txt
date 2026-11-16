@@ -1,0 +1,13 @@
+# run g1-i tree=-n 2026-11-13T22:57:54-06:00 load: load average: 2.25, 2.56, 3.69
+~/work/zq-e4-9w-int/g1/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/g1
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [3 items]
+
+...                                                                      [100%]
+============================== 3 passed in 10.31s ==============================
+# rc=0 end 2026-11-13T22:58:06-06:00 load: load average: 2.93, 2.70, 3.71

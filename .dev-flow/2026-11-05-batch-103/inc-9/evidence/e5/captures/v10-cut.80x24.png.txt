@@ -1,0 +1,47 @@
+scene=v10-cut
+fixture=hand
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=80x24
+time=2026-11-14 08:27:19
+app_size=80x24
+focused=patch_sheet_body
+selected=VB1D
+bench_state: cursor=(15, 0) anchor=(0, 0) tool=d focus=True edit={(0,): '3', (1,): '15', (2,): '27', (3,): '18', (4,): '30', (5,): '42', (6,): '33', (7,): '45', (8,): '57', (9,): '48', (10,): '60', (11,): '72', (12,): '63', (13,): '75', (14,): '87', (15,): '78'} undo=1
+page_rows=VB1D
+subtitle=None
+widget #patch_sheet: size=70x10 classes=[] subtitle=None
+widget #patch_inspector: size=68x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=74x9 classes=['-bench'] subtitle=None
+keys_sent: <type filter 'VB1D'> | tab | tab | tab | enter | shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right shift+right | d enter | <set op input to '3'> | enter | escape
+status_lines_this_run=2
+status: A2L loaded: hand.a2l
+status: Loaded hand.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                             Hex Edit Tool
+      │                    Patch Editor                      ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ ││  Parameter       Current       New         Limits         Δ          │
+   ▏◉ ││▶◆VB1D            ████████ 40   16 cells    0 … 255        max |Δ| 3  │▇▇
+   ▏▤ ││└ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x001000…│
+   ▏! ││       +6    +7    +8    +9    +10   +11   +12   +13   +14   +15      │
+   ▏✎ ││     0 33    45    57    48    60    72    63    75    87    ▸78      │▂▂
+   ▏✔ ││rows 0..0 of 3 · cols 6..15 of 16 · pgup/pgdn page                    │
+   ▏⏚ ││shade ████████████ 0 … 195   sel 0..15   * / bold = edited            │
+   ▏✦ ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shi…│
+      ││16 of 40 B differ  +0x00 00 0C 18 0F 1B 27 1E 2A 36 2D 39 45 3C 48 54…│
+   ──────────────────────────────────────────────────────────────────────────────
+    Loaded hand.s19 (S19 only)                               (none)  |  hand.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: hand.a2l
+    Loaded hand.s19 (S19 only)
+    Loaded hand.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+  
+screen_text_end
+surface=ready

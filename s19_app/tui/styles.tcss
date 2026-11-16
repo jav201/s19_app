@@ -2978,33 +2978,37 @@ ModalScreen {
     color: #969aad;                   /* insight_style.DGRAY */
 }
 
-#patch_editor_panel #patch_main {
+/* batch-103 Inc 8: the STAGING SHEET window takes every row the other
+ * regions leave, never fewer than 12 (R-PE-DEF.1.1, .74); it scrolls with
+ * the panel below that. */
+#patch_editor_panel #patch_sheet_win {
     height: 1fr;
     min-height: 12;
-}
-
-#patch_editor_panel #patch_win_script {
-    width: 3fr;
-    height: 100%;
     padding: 0;
     border: round $rule;
     border-title-color: #969aad;      /* insight_style.DGRAY */
     border-subtitle-color: #969aad;   /* insight_style.DGRAY */
 }
 
-/* The 45-cell floor keeps the pane's 41 content cells, so the execute row
- * and the strip's 8-byte rows fit at 120-133 columns too, where the rail
- * widens; the ledger then pays (its table scrolls sideways there). */
-#patch_editor_panel #patch_inspector {
-    width: 2fr;
-    min-width: 45;
+/* batch-103 Inc 8: the ledger is the Patch script tab, with no border of
+ * its own; its subtitle rides the landing pane (R-PE-041). */
+#patch_editor_panel #patch_win_script {
     height: 100%;
+    padding: 0;
+}
+
+/* batch-103 Inc 8: LANDS IN, the landing pane, spans the panel in 9 rows
+ * (R-PE-DEF.1.1): the chips and 6 content rows inside its border. */
+#patch_editor_panel #patch_inspector {
+    width: 100%;
+    height: 9;
     padding: 0 1;
     border: round $rule;
     border-title-color: #969aad;      /* insight_style.DGRAY */
+    border-subtitle-color: #969aad;   /* insight_style.DGRAY */
 }
 
-#patch_editor_panel #patch_win_script:focus-within,
+#patch_editor_panel #patch_sheet_win:focus-within,
 #patch_editor_panel #patch_inspector:focus-within {
     border: round $accent-calm;
 }
@@ -3112,8 +3116,7 @@ ModalScreen {
 /* The JSON tab: LOADED DOCUMENT (read-only) over the PASTE BUFFER, then the
  * paste, history and execute rows; the two text areas share the height. */
 #patch_editor_panel #patch_win_json,
-#patch_editor_panel #patch_win_checks,
-#patch_editor_panel #patch_win_a2l {
+#patch_editor_panel #patch_win_checks {
     height: 100%;
     layout: vertical;
     /* Below the range (LLR-149.6) the tab's rows outgrow it: it scrolls. */
@@ -3123,14 +3126,17 @@ ModalScreen {
 /* --- Patch A2L tab (batch-102 Inc 5, US-102-05 / R-B102-PE-001..006) ---
  * The shared picker mounts inside the inspector with patch_param_* ids; the
  * grammar mirrors the Check Editor's picker (filter, ledger, full-name and
- * count lines, page chips), scoped to the patch panel. */
-#patch_editor_panel #patch_win_a2l .ce-row {
+ * count lines, page chips), scoped to the patch panel. batch-103 Inc 8: the
+ * A2L tab left; the picker lies flat on the filter row (its filter-row rules
+ * close this section), so the two `.ce-*` rules are scoped to
+ * `#patch_filter_row`. */
+#patch_editor_panel #patch_filter_row .ce-row {
     layout: horizontal;
     height: 1;
     padding: 0;
 }
 
-#patch_editor_panel #patch_win_a2l .ce-label {
+#patch_editor_panel #patch_filter_row .ce-label {
     width: auto;
     height: 1;
     padding: 0 1 0 0;
@@ -3355,6 +3361,48 @@ ModalScreen {
     background: $accent-calm;
     color: $bg-base;
     text-style: bold underline;
+}
+
+/* --- Filter row and bench state (batch-103 Inc 8, R-PE-DEF.1.2, .2) ---
+ * The filter row is one terminal row: the shared picker lies flat (filter,
+ * count line, page chips, Pick, Add list side by side) and its own table and
+ * full-name line are hidden but stay mounted, so the cursor that `Use
+ * parameter` reads keeps following the sheet (R-PE-DEF.49). The count line
+ * and the filter input yield cells before a control is cut at 80 columns
+ * (R-PICKER-CORRECT.020). */
+#patch_editor_panel #patch_filter_row {
+    layout: horizontal;
+    height: 1;
+    padding: 0 1;
+}
+
+#patch_editor_panel #patch_filter_row A2LParameterPicker {
+    layout: horizontal;
+    width: 1fr;
+    height: 1;
+}
+
+#patch_editor_panel #patch_param_table,
+#patch_editor_panel #patch_param_full_name_line {
+    display: none;
+}
+
+#patch_editor_panel #patch_filter_row #patch_param_filter {
+    min-width: 8;
+}
+
+#patch_editor_panel #patch_filter_row #patch_param_status {
+    max-width: 30%;
+}
+
+#patch_editor_panel #patch_filter_row #patch_param_controls {
+    width: auto;
+}
+
+/* While a bench is shown (Inc 9's sheet sets `-bench` on the panel), LANDS
+ * IN keeps 6 rows and the sheet takes the 3 (R-PE-DEF.1.2). */
+#patch_editor_panel.-bench #patch_inspector {
+    height: 6;
 }
 
 /* batch-97 flow_builder — the pipeline rail (HLR-146, fb_A, decision B).

@@ -1,0 +1,30 @@
+scenario=status-overlap
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+seeded: a raw bytes entry at 0x800021 (1 B) added through the app's ChangeService.add_entry
+top_screen=Screen
+focused=patch_sheet_input
+status_lines_this_run=3
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: DISPLAY_0001 overlaps the entry at 0x800021 — remove that entry first.
+ledger_entries=1
+selected_rows=[▶●] DISPLAY_0001            VALUE     143.5
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+    ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                              
+    MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                              
+    MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                            
+  ▶●DISPLAY_0001            VALUE     143.5                                       25.5                deg C   -40 ├─────────────────◆────────────────────────────●──┤ 150    -118.0 (-62.1%)       
+  └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B
+    CURVE_DEF_0001          CURVE     5 values                                    ·                           -                                                                                    
+    MAP_DEF_0001            MAP       12 values                                   ·                           -                                                                                    
+    VAL_BLK_DEF_0001        VAL_BLK   6 values                                    ·                   units   -                                                                                    
+  DISPLAY_0001
+  new =
+  deg C  (-40 … 150)  raw 287→51 · 01 1F → 00 33  ✓ in limits  enter stage ↓
+sheet_text_end
+stub_os_writes=0
+surface=ready

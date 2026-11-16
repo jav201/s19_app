@@ -1,0 +1,17 @@
+# run k69-base tree=base 2026-11-14T00:24:29-06:00 load: load average: 11.19, 11.66, 10.84
+~/work/zq-e4-9w-int2/base/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b97_key_bar.py .                                              [100%]
+
+============================= slowest 3 durations ==============================
+44.26s call     tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 1 passed in 44.56s ==============================
+# rc=0 end 2026-11-14T00:25:17-06:00 load: load average: 10.92, 11.51, 10.83

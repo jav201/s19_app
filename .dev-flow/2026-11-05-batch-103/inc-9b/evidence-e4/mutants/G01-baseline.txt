@@ -1,0 +1,21 @@
+DATE 2026-11-15T18:58:50.468682-06:00
+GROUP G01
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 18:58:25 up 3 days,  3:47,  2 users,  load average: 0.22, 0.07, 0.11
+LOAD_ONE 0.22
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 3
+S19_APP_FILE ~/work/zq-m9b/groups/G01/tree/s19_app/__init__.py
+PID 1026199
+SID 1026199
+TIMEOUT_S 300
+XDIST_N 0
+...                                                                      [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G01/baseline.xml ----
+============================= QC-TM timing margins =============================
+44.6%  0.277 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+57.9%  0.126 s / 0.300 s  R-PE-BENCH.102/2 idle after the filter keystroke  tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+QC-TM: 2 bounds, 0 under 20 % margin
+3 passed in 23.61s
+EXIT_CODE 0

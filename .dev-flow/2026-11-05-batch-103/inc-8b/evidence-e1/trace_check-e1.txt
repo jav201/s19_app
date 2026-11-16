@@ -1,0 +1,34 @@
+$ python -I -B ~/.claude/skills/dev-flow/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-8b/01-requirements.md --base 09001bbc --src s19_app
+TEST   R-PE-BENCH.107 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-BENCH.108 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.100 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.101 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.102 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.103 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.104 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.105 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.106 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.107 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.108 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.109 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.110 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.111 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.112 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.113 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.114 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.115 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.116 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.89 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.90 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.91 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.92 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.93 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.94 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.95 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.96 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.97 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.98 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.99 is named by no file under tests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-8b/01-requirements.md
+trace_check: 1 US, 42 active requirements (2 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 31 gap(s)
+exit=1

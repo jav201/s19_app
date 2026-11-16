@@ -1,0 +1,10 @@
+$ [base tree + group A tests + scratch reference of I-8.2 written from the spec, NOT product code] pytest tests/test_b103_inc8_a1_service.py   (logic check of the tests only)
+bringing up nodes...
+bringing up nodes...
+
+.......................                                                  [100%]
+23 passed in 1.21s
+
+$ same with scratch reference help body, tests/test_b103_inc8_a3_help.py
+.........                                                                [100%]
+9 passed in 0.05s

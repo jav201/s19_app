@@ -1,0 +1,1584 @@
+{
+  "marks": [
+    {
+      "name": "describe_definition",
+      "reqs": [
+        "R-PE-DEF.64"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 588,
+      "def": {
+        "qualname": "describe_definition",
+        "line": 589,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "Definition"
+      }
+    },
+    {
+      "name": "describe_definitions",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 611,
+      "def": {
+        "qualname": "describe_definitions",
+        "line": 612,
+        "params": [
+          {
+            "name": "names",
+            "type": "Iterable[str]",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "dict[str, Definition]"
+      }
+    },
+    {
+      "name": "decode_definition",
+      "reqs": [
+        "R-PE-DEF.17"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 2804,
+      "def": {
+        "qualname": "decode_definition",
+        "line": 2805,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "image",
+            "type": "Mapping[int, int]",
+            "default": null
+          }
+        ],
+        "returns": "Decoded | Refusal"
+      }
+    },
+    {
+      "name": "display_text",
+      "reqs": [
+        "R-PE-DEF.26"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3355,
+      "def": {
+        "qualname": "display_text",
+        "line": 3356,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "value",
+            "type": "int | float",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "encode_definition",
+      "reqs": [
+        "R-PE-DEF.51"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3970,
+      "def": {
+        "qualname": "encode_definition",
+        "line": 3971,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "image",
+            "type": "Mapping[int, int]",
+            "default": null
+          }
+        ],
+        "returns": "Encoded | Refusal"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.visible_params",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 503,
+      "def": {
+        "qualname": "A2LParameterPicker.visible_params",
+        "line": 505,
+        "params": [],
+        "returns": "list"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.highlighted_parameter",
+      "reqs": [
+        "R-PE-DEF.49"
+      ],
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 524,
+      "def": {
+        "qualname": "A2LParameterPicker.highlighted_parameter",
+        "line": 526,
+        "params": [],
+        "returns": "Optional[dict]"
+      }
+    },
+    {
+      "name": "PatchMixin._refresh_patch_history_view",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 529,
+      "def": {
+        "qualname": "PatchMixin._refresh_patch_history_view",
+        "line": 530,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchMixin._strip_source_map",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 1002,
+      "def": {
+        "qualname": "PatchMixin._strip_source_map",
+        "line": 1003,
+        "params": [
+          {
+            "name": "loaded",
+            "type": "Optional[LoadedFile]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Mapping[int, int]]"
+      }
+    },
+    {
+      "name": "PatchMixin._report_change_result",
+      "reqs": [
+        "R-PE-DEF.57"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 1157,
+      "def": {
+        "qualname": "PatchMixin._report_change_result",
+        "line": 1158,
+        "params": [
+          {
+            "name": "result",
+            "type": "ChangeActionResult",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchMixin._prefill_patch_editor",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "file": "s19_app/tui/app/patch.py",
+      "line": 1593,
+      "def": {
+        "qualname": "PatchMixin._prefill_patch_editor",
+        "line": 1594,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 23,
+      "def": {
+        "qualname": "A2lPickerMixin.set_a2l_parameters",
+        "line": 24,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin._apply_a2l_layout",
+      "reqs": [
+        "R-PICKER-CORRECT.020"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 59,
+      "def": {
+        "qualname": "A2lPickerMixin._apply_a2l_layout",
+        "line": 60,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin._use_highlighted_parameter",
+      "reqs": [
+        "R-PE-DEF.3"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 128,
+      "def": {
+        "qualname": "A2lPickerMixin._use_highlighted_parameter",
+        "line": 129,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 212,
+      "def": {
+        "qualname": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+        "line": 213,
+        "params": [
+          {
+            "name": "event",
+            "type": "A2LParameterPicker.ViewChanged",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin._compose_a2l_tab",
+      "reqs": [
+        "R-PE-DEF.2"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 225,
+      "def": {
+        "qualname": "A2lPickerMixin._compose_a2l_tab",
+        "line": 226,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "EntriesMixin.refresh_entries",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/entries.py",
+      "line": 115,
+      "def": {
+        "qualname": "EntriesMixin.refresh_entries",
+        "line": 116,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[object]",
+            "default": null
+          },
+          {
+            "name": "mem_map",
+            "type": "Union[Mapping[int, int], None, _Unset]",
+            "default": "_UNSET"
+          },
+          {
+            "name": "document",
+            "type": "Union['PatchDocumentView', _Unset]",
+            "default": "_UNSET"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "LayoutMixin.compose",
+      "reqs": [
+        "R-TUI-063.1"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/layout.py",
+      "line": 17,
+      "def": {
+        "qualname": "LayoutMixin.compose",
+        "line": 18,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "LayoutMixin._apply_layout",
+      "reqs": [
+        "R-PE-DEF.6"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/layout.py",
+      "line": 107,
+      "def": {
+        "qualname": "LayoutMixin._apply_layout",
+        "line": 108,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.__init__",
+      "reqs": [
+        "R-TUI-063.3"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "line": 468,
+      "def": {
+        "qualname": "PatchEditorPanel.__init__",
+        "line": 469,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel._refresh_inspector_subtitle",
+      "reqs": [
+        "R-PE-041"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "line": 624,
+      "def": {
+        "qualname": "PatchEditorPanel._refresh_inspector_subtitle",
+        "line": 625,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.set_image_mem_map",
+      "reqs": [
+        "R-PE-DEF.18"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "line": 675,
+      "def": {
+        "qualname": "PatchEditorPanel.set_image_mem_map",
+        "line": 676,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Mapping[int, int]]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.on_mount",
+      "reqs": [
+        "R-TUI-063.4"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "line": 692,
+      "def": {
+        "qualname": "PatchEditorPanel.on_mount",
+        "line": 693,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel._show_tab",
+      "reqs": [
+        "R-TUI-063.6"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "line": 715,
+      "def": {
+        "qualname": "PatchEditorPanel._show_tab",
+        "line": 716,
+        "params": [
+          {
+            "name": "chip_id",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService._push_history",
+      "reqs": [
+        "R-PE-DEF.61"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 971,
+      "def": {
+        "qualname": "ChangeService._push_history",
+        "line": 972,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService._entry_index",
+      "reqs": [
+        "R-PE-DEF.52"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 1183,
+      "def": {
+        "qualname": "ChangeService._entry_index",
+        "line": 1184,
+        "params": [
+          {
+            "name": "address",
+            "type": "int",
+            "default": null
+          }
+        ],
+        "returns": "int"
+      }
+    },
+    {
+      "name": "ChangeService.add_symbol_entry",
+      "reqs": [
+        "R-PE-DEF.50"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 1255,
+      "def": {
+        "qualname": "ChangeService.add_symbol_entry",
+        "line": 1256,
+        "params": [
+          {
+            "name": "symbol_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "value_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "ChangeActionResult"
+      }
+    },
+    {
+      "name": "ChangeService.rows",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 3144,
+      "def": {
+        "qualname": "ChangeService.rows",
+        "line": 3145,
+        "params": [
+          {
+            "name": "ranges",
+            "type": "Optional[Sequence[Tuple[int, int]]]",
+            "default": null
+          }
+        ],
+        "returns": "list[ChangeEntryRow]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "LayoutMixin.compose",
+      "reqs": [
+        "R-TUI-063.1"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "tree"
+        ],
+        "raw": "ComposeResult tree"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/layout.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "LayoutMixin.compose"
+    },
+    {
+      "name": "LayoutMixin._apply_layout",
+      "reqs": [
+        "R-PE-DEF.6"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/layout.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "LayoutMixin._apply_layout"
+    },
+    {
+      "name": "PatchEditorPanel.__init__",
+      "reqs": [
+        "R-TUI-063.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "PatchEditorPanel",
+        "names": [
+          "panel"
+        ],
+        "raw": "PatchEditorPanel panel"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchEditorPanel.__init__"
+    },
+    {
+      "name": "PatchEditorPanel._refresh_inspector_subtitle",
+      "reqs": [
+        "R-PE-041"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchEditorPanel._refresh_inspector_subtitle"
+    },
+    {
+      "name": "PatchEditorPanel.set_image_mem_map",
+      "reqs": [
+        "R-PE-DEF.18"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[int, int]]",
+          "name": "mem_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchEditorPanel.set_image_mem_map"
+    },
+    {
+      "name": "PatchEditorPanel.on_mount",
+      "reqs": [
+        "R-TUI-063.4"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchEditorPanel.on_mount"
+    },
+    {
+      "name": "PatchEditorPanel._show_tab",
+      "reqs": [
+        "R-TUI-063.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "chip_id",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/panel.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchEditorPanel._show_tab"
+    },
+    {
+      "name": "EntriesMixin.refresh_entries",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[object]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "mem_map",
+          "default": "_UNSET"
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "document",
+          "default": "_UNSET"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/entries.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "EntriesMixin.refresh_entries"
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin.set_a2l_parameters"
+    },
+    {
+      "name": "A2lPickerMixin._apply_a2l_layout",
+      "reqs": [
+        "R-PICKER-CORRECT.020"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin._apply_a2l_layout"
+    },
+    {
+      "name": "A2lPickerMixin._use_highlighted_parameter",
+      "reqs": [
+        "R-PE-DEF.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin._use_highlighted_parameter"
+    },
+    {
+      "name": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin._on_a2l_parameter_picker_view_changed"
+    },
+    {
+      "name": "A2lPickerMixin._compose_a2l_tab",
+      "reqs": [
+        "R-PE-DEF.2"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "tree"
+        ],
+        "raw": "ComposeResult tree"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin._compose_a2l_tab"
+    },
+    {
+      "name": "A2LParameterPicker.highlighted_parameter",
+      "reqs": [
+        "R-PE-DEF.49"
+      ],
+      "in": [],
+      "out": {
+        "type": "Optional[dict]",
+        "names": [
+          "parameter"
+        ],
+        "raw": "Optional[dict] parameter"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LParameterPicker.highlighted_parameter"
+    },
+    {
+      "name": "A2LParameterPicker.visible_params",
+      "reqs": [
+        "R-PE-DEF.10"
+      ],
+      "in": [],
+      "out": {
+        "type": "list",
+        "names": [
+          "names"
+        ],
+        "raw": "list names"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LParameterPicker.visible_params"
+    },
+    {
+      "name": "ChangeService.add_symbol_entry",
+      "reqs": [
+        "R-PE-DEF.50"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "symbol_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "value_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ChangeActionResult",
+        "names": [
+          "result"
+        ],
+        "raw": "ChangeActionResult result"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "ChangeService.add_symbol_entry"
+    },
+    {
+      "name": "ChangeService._entry_index",
+      "reqs": [
+        "R-PE-DEF.52"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "address",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "int",
+        "names": [
+          "index"
+        ],
+        "raw": "int index"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "ChangeService._entry_index"
+    },
+    {
+      "name": "ChangeService._push_history",
+      "reqs": [
+        "R-PE-DEF.61"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "ChangeService._push_history"
+    },
+    {
+      "name": "ChangeService.rows",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[Tuple[int, int]]]",
+          "name": "ranges",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list",
+        "names": [
+          "rows"
+        ],
+        "raw": "list rows"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "ChangeService.rows"
+    },
+    {
+      "name": "PatchMixin._refresh_patch_history_view",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._refresh_patch_history_view"
+    },
+    {
+      "name": "PatchMixin._report_change_result",
+      "reqs": [
+        "R-PE-DEF.57"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChangeActionResult",
+          "name": "result",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._report_change_result"
+    },
+    {
+      "name": "PatchMixin._prefill_patch_editor",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._prefill_patch_editor"
+    },
+    {
+      "name": "PatchMixin._strip_source_map",
+      "reqs": [
+        "R-PE-DEF.62"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "loaded",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "object",
+        "names": [
+          "source_map"
+        ],
+        "raw": "object source_map"
+      },
+      "module": "s19_app/tui/app/patch.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "PatchMixin._strip_source_map"
+    },
+    {
+      "name": "describe_definition",
+      "reqs": [
+        "R-PE-DEF.64"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Definition",
+        "names": [
+          "definition"
+        ],
+        "raw": "Definition definition"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "describe_definition"
+    },
+    {
+      "name": "describe_definitions",
+      "reqs": [
+        "R-PE-DEF.11"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "definitions"
+        ],
+        "raw": "dict definitions"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "describe_definitions"
+    },
+    {
+      "name": "decode_definition",
+      "reqs": [
+        "R-PE-DEF.17"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Mapping[int, int]",
+          "name": "image",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "object",
+        "names": [
+          "decoded"
+        ],
+        "raw": "object decoded"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "decode_definition"
+    },
+    {
+      "name": "encode_definition",
+      "reqs": [
+        "R-PE-DEF.51"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Mapping[int, int]",
+          "name": "image",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "object",
+        "names": [
+          "encoded"
+        ],
+        "raw": "object encoded"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "encode_definition"
+    },
+    {
+      "name": "display_text",
+      "reqs": [
+        "R-PE-DEF.26"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "float",
+          "name": "value",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "text"
+        ],
+        "raw": "str text"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(baseline) census only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline, read for its real callers",
+      "volatile": [],
+      "oracle": [],
+      "key": "display_text"
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2lPickerMixin._on_a2l_parameter_picker_view_changed",
+      "callee": "A2lPickerMixin._apply_a2l_layout",
+      "sites": [
+        "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:221"
+      ]
+    },
+    {
+      "caller": "ChangeService.add_symbol_entry",
+      "callee": "ChangeService._entry_index",
+      "sites": [
+        "s19_app/tui/services/change_service.py:1315"
+      ]
+    },
+    {
+      "caller": "ChangeService.add_symbol_entry",
+      "callee": "ChangeService._push_history",
+      "sites": [
+        "s19_app/tui/services/change_service.py:1323"
+      ]
+    },
+    {
+      "caller": "PatchEditorPanel._show_tab",
+      "callee": "PatchEditorPanel._refresh_inspector_subtitle",
+      "sites": [
+        "s19_app/tui/screens_directionb/patch_editor/panel.py:728"
+      ]
+    },
+    {
+      "caller": "PatchEditorPanel.on_mount",
+      "callee": "PatchEditorPanel._refresh_inspector_subtitle",
+      "sites": [
+        "s19_app/tui/screens_directionb/patch_editor/panel.py:622"
+      ]
+    },
+    {
+      "caller": "PatchMixin._prefill_patch_editor",
+      "callee": "A2lPickerMixin.set_a2l_parameters",
+      "sites": [
+        "s19_app/tui/app/patch.py:1613"
+      ]
+    },
+    {
+      "caller": "PatchMixin._refresh_patch_history_view",
+      "callee": "ChangeService.rows",
+      "sites": [
+        "s19_app/tui/app/patch.py:569"
+      ]
+    },
+    {
+      "caller": "PatchMixin._refresh_patch_history_view",
+      "callee": "EntriesMixin.refresh_entries",
+      "sites": [
+        "s19_app/tui/app/patch.py:568"
+      ]
+    },
+    {
+      "caller": "PatchMixin._refresh_patch_history_view",
+      "callee": "PatchMixin._strip_source_map",
+      "sites": [
+        "s19_app/tui/app/patch.py:572"
+      ]
+    },
+    {
+      "caller": "decode_definition",
+      "callee": "display_text",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:2906"
+      ]
+    },
+    {
+      "caller": "describe_definition",
+      "callee": "describe_definitions",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:608"
+      ]
+    },
+    {
+      "caller": "encode_definition",
+      "callee": "decode_definition",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:4069"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "decode_definition": [
+      "s19_app/tui/a2l_definition.py:3149"
+    ],
+    "encode_definition": [
+      "s19_app/tui/a2l_definition.py:4288",
+      "s19_app/tui/a2l_definition.py:4372"
+    ],
+    "describe_definitions": [
+      "s19_app/tui/a2l_parameter_picker.py:609"
+    ],
+    "A2lPickerMixin.set_a2l_parameters": [
+      "s19_app/tui/app/checks_diff.py:101"
+    ],
+    "PatchEditorPanel.__init__": [
+      "s19_app/tui/app/compose_screens.py:540"
+    ],
+    "PatchEditorPanel.set_image_mem_map": [
+      "s19_app/tui/app/loaded_state.py:407"
+    ],
+    "EntriesMixin.refresh_entries": [
+      "s19_app/tui/app/loaded_state.py:675",
+      "s19_app/tui/app/patch.py:1534",
+      "s19_app/tui/app/patch.py:289",
+      "s19_app/tui/app/project_load.py:1029"
+    ],
+    "ChangeService.rows": [
+      "s19_app/tui/app/loaded_state.py:676",
+      "s19_app/tui/app/patch.py:1535",
+      "s19_app/tui/app/patch.py:290",
+      "s19_app/tui/app/project_load.py:1030"
+    ],
+    "PatchMixin._strip_source_map": [
+      "s19_app/tui/app/patch.py:1538",
+      "s19_app/tui/app/patch.py:293"
+    ],
+    "PatchMixin._report_change_result": [
+      "s19_app/tui/app/patch.py:1499",
+      "s19_app/tui/app/patch.py:192",
+      "s19_app/tui/app/patch.py:213",
+      "s19_app/tui/app/patch.py:249",
+      "s19_app/tui/app/patch.py:261",
+      "s19_app/tui/app/patch.py:416",
+      "s19_app/tui/app/patch.py:861",
+      "s19_app/tui/app/patch.py:986"
+    ],
+    "PatchMixin._refresh_patch_history_view": [
+      "s19_app/tui/app/patch.py:1000",
+      "s19_app/tui/app/patch.py:726",
+      "s19_app/tui/app/patch.py:761"
+    ],
+    "ChangeService._push_history": [
+      "s19_app/tui/services/change_service.py:1248",
+      "s19_app/tui/services/change_service.py:1365",
+      "s19_app/tui/services/change_service.py:1395",
+      "s19_app/tui/services/change_service.py:1524",
+      "s19_app/tui/services/change_service.py:1587",
+      "s19_app/tui/services/change_service.py:1652"
+    ],
+    "ChangeService._entry_index": [
+      "s19_app/tui/services/change_service.py:1243",
+      "s19_app/tui/services/change_service.py:1361",
+      "s19_app/tui/services/change_service.py:1392"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/screens_directionb/patch_editor/entries.py:115",
+      "msg": "`mem_map`: graph `object` vs code `Union[Mapping[int, int], None, _Unset]`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/screens_directionb/patch_editor/entries.py:115",
+      "msg": "`document`: graph `object` vs code `Union['PatchDocumentView', _Unset]`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:212",
+      "msg": "`event`: graph `object` vs code `A2LParameterPicker.ViewChanged`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/services/change_service.py:3144",
+      "msg": "output: graph `list` vs code `list[ChangeEntryRow]`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/app/patch.py:1002",
+      "msg": "`loaded`: graph `object` vs code `Optional[LoadedFile]`"
+    },
+    {
+      "kind": "output_type_mismatch",
+      "where": "s19_app/tui/app/patch.py:1002",
+      "msg": "graph `object` vs code `Optional[Mapping[int, int]]`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/a2l_definition.py:611",
+      "msg": "output: graph `dict` vs code `dict[str, Definition]`"
+    },
+    {
+      "kind": "output_type_mismatch",
+      "where": "s19_app/tui/a2l_definition.py:2804",
+      "msg": "graph `object` vs code `Decoded | Refusal`"
+    },
+    {
+      "kind": "output_type_mismatch",
+      "where": "s19_app/tui/a2l_definition.py:3970",
+      "msg": "graph `object` vs code `Encoded | Refusal`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/a2l_definition.py:3355",
+      "msg": "`value`: graph `float` vs code `int | float`"
+    }
+  ],
+  "parse_failures": []
+}

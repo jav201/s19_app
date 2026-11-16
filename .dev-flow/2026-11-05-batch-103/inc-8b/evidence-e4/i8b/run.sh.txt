@@ -1,0 +1,17 @@
+#!/bin/bash
+# usage: run.sh <tree-dir> <out-name> <pytest args...>
+S=~/work/zq-e4-8b-i8b  # HOME basename below: see HT-02 (records write <runner-home>)
+T="$1"; O="$2"; shift 2
+mkdir -p "$S/home/"$RUNNER_HOME_NAME"" "$S/x/config" "$S/x/cache" "$S/x/data" "$S/tmp" "$S/out"
+cd "$T" || exit 9
+E=(env -i PATH=/usr/bin:/bin HOME="$S/home/"$RUNNER_HOME_NAME"" XDG_CONFIG_HOME="$S/x/config" XDG_CACHE_HOME="$S/x/cache" XDG_DATA_HOME="$S/x/data" TMPDIR="$S/tmp" PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 PYTHONPATH=.)
+P=~/miniconda3/envs/s19ci/bin/python
+{
+  echo "# tree: $(basename "$T") @ $(git rev-parse --short=8 HEAD 2>/dev/null)"
+  echo "# uptime: $(uptime)"
+  "${E[@]}" $P -c "import s19_app;print('s19_app.__file__ =', s19_app.__file__)" < /dev/null
+  echo "# pytest $*"
+  "${E[@]}" timeout 300 $P -m pytest -p no:cacheprovider "$@" < /dev/null
+  echo "# exit=$?"
+} > "$S/out/$O.txt" 2>&1
+tail -3 "$S/out/$O.txt"

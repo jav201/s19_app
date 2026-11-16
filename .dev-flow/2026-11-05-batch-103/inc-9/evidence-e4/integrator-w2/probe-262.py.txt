@@ -1,0 +1,25 @@
+import gc, time, tracemalloc
+import pytest
+from tests.support.b103_inc9_w import big_case, defc_dir, has_values, pick, run, sheet_of, wait_for  # noqa: F401
+
+
+@pytest.mark.parametrize("traced", [False, True])
+def test_probe_262(tmp_path, defc_dir, traced):
+    a2l, s19 = big_case(tmp_path)
+
+    async def body(app, pilot, panel):
+        sheet = sheet_of(panel)
+        gc.collect()
+        if traced:
+            tracemalloc.start()
+        try:
+            await pick(pilot, sheet, "LARGE")
+            t0 = time.monotonic()
+            await wait_for(pilot, lambda: has_values(sheet, "LARGE"), "LARGE's values", 800)
+            return time.monotonic() - t0
+        finally:
+            if traced:
+                tracemalloc.stop()
+
+    took = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+    print(f"PROBE traced={traced} values after {took:.1f} s load={open('/proc/loadavg').read().split()[0]}")

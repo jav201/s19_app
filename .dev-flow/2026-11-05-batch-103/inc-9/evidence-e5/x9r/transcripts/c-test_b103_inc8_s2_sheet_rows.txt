@@ -1,0 +1,14 @@
+tree: head ab62093b | load before: 1.44 1.50 1.35 1/636 601334
+~/work/zq-x9r/head/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x9r/head
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [35 items]
+
+...................................                                      [100%]
+============================== 35 passed in 6.52s ==============================
+rc=0
+load after: 1.38 1.48 1.35 1/636 601373

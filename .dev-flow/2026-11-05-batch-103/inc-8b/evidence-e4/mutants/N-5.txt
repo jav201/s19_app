@@ -1,0 +1,141 @@
+# mutant N-5  rows: R-PE-DEF.5
+# edits: s19_app/tui/definition_sheet.py:181
+# -k: r_pe_def_5_
+# uptime: 01:54:27 up 2 days, 10:43,  2 users,  load average: 0.16, 0.39, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/N-5/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[195] ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+view = 195
+
+    @pytest.mark.parametrize("view", VIEWS)
+    def test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width(view):
+        """R-PE-DEF.5/1..3 (V = 111, 73, 195): the header line is ``G.header_line`` whatever the width.
+    
+        Operator need: Kind and Unit stay visible and the labels sit where the columns are; the grid does not
+        stretch or hide columns with the window."""
+>       assert ds.header_line(ds.sheet_widths(view)).plain == TR["G.header_line"]
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8b_s1.py:242: AssertionError
+____ test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[73] ____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+view = 73
+
+    @pytest.mark.parametrize("view", VIEWS)
+    def test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width(view):
+        """R-PE-DEF.5/1..3 (V = 111, 73, 195): the header line is ``G.header_line`` whatever the width.
+    
+        Operator need: Kind and Unit stay visible and the labels sit where the columns are; the grid does not
+        stretch or hide columns with the window."""
+>       assert ds.header_line(ds.sheet_widths(view)).plain == TR["G.header_line"]
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8b_s1.py:242: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[73] _______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+w = 73
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+___ test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[111] ____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+view = 111
+
+    @pytest.mark.parametrize("view", VIEWS)
+    def test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width(view):
+        """R-PE-DEF.5/1..3 (V = 111, 73, 195): the header line is ``G.header_line`` whatever the width.
+    
+        Operator need: Kind and Unit stay visible and the labels sit where the columns are; the grid does not
+        stretch or hide columns with the window."""
+>       assert ds.header_line(ds.sheet_widths(view)).plain == TR["G.header_line"]
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8b_s1.py:242: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[111] ______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+w = 111
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[195] ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+w = 195
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...            │' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                                        -
+E         +   Parameter                 │Kind      Current             │New             │Unit    │Limits                            │Δ                   │
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[195]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[73]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[73]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_5_header_line_is_the_grid_header_at_every_view_width[111]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[111]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[195]
+6 failed in 1.82s
+
+# exit=1

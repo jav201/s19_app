@@ -1,0 +1,330 @@
+# mutant N-B107  rows: R-PE-BENCH.107,11
+# edits: s19_app/tui/definition_bench.py:438; s19_app/tui/definition_bench.py:513
+# -k: r_pe_bench_107_ or r_pe_bench_11_
+# uptime: 02:00:43 up 2 days, 10:49,  3 users,  load average: 1.63, 1.11, 1.28
+s19_app.__file__ = ~/work/zq-m8b/m/N-B107/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFFF..FFFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[VAL_BLK_DEF_0001] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count(defc, name):
+        """R-PE-BENCH.11/1 .. /3 - CURVE ``▄▆▃▇▁ 5``, MAP ``▆▃▅▃ 12``, VAL_BLK ``▄▃▄ 6`` (``S.after.current.*``) at Current 20."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT].plain
+>       assert cell.rstrip() == TR[f"S.after.current.{name}"]
+E       AssertionError: assert '▅▃▅ 6' == '▄▃▄ 6'
+E         
+E         - ▄▃▄ 6
+E         + ▅▃▅ 6
+
+tests/test_b103_inc8b_s1.py:865: AssertionError
+_ test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[CURVE_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count(defc, name):
+        """R-PE-BENCH.11/1 .. /3 - CURVE ``▄▆▃▇▁ 5``, MAP ``▆▃▅▃ 12``, VAL_BLK ``▄▃▄ 6`` (``S.after.current.*``) at Current 20."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT].plain
+>       assert cell.rstrip() == TR[f"S.after.current.{name}"]
+E       AssertionError: assert '▅▇▄█▁ 5' == '▄▆▃▇▁ 5'
+E         
+E         - ▄▆▃▇▁ 5
+E         + ▅▇▄█▁ 5
+
+tests/test_b103_inc8b_s1.py:865: AssertionError
+___ test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[CURVE_DEF_0001] ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_107_1_the_defc_strips_use_no_full_block(defc, name):
+        """R-PE-BENCH.107/1 - the three DEFC strips hold only ``▁ .. ▇`` and spaces: no ``█`` (F-R14-1).
+    
+        Operator need: a full block fills its cell to the row above and below, so two strips join into one
+        shape (the defect seen at 118x54); one eighth of headroom keeps rows apart."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        strip = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT].plain.rstrip().rsplit(" ", 1)[0]
+>       assert "█" not in strip and set(strip) <= set(EX8.BLOCKS7) | {" "}, strip
+E       AssertionError: ▅▇▄█▁
+E       assert ('█' not in '▅▇▄█▁'
+E         
+E         '█' is contained here:
+E           ▅▇▄█▁
+E         ?    +)
+
+tests/test_b103_inc8b_s1.py:879: AssertionError
+_ test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[MAP_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", BENCH)
+    def test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count(defc, name):
+        """R-PE-BENCH.11/1 .. /3 - CURVE ``▄▆▃▇▁ 5``, MAP ``▆▃▅▃ 12``, VAL_BLK ``▄▃▄ 6`` (``S.after.current.*``) at Current 20."""
+        o, state = _bench_state(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, state, ds.sheet_widths(111))[CURRENT].plain
+>       assert cell.rstrip() == TR[f"S.after.current.{name}"]
+E       AssertionError: assert '▇▃▆▃ 12' == '▆▃▅▃ 12'
+E         
+E         - ▆▃▅▃ 12
+E         + ▇▃▆▃ 12
+
+tests/test_b103_inc8b_s1.py:865: AssertionError
+______ test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[2-map] ______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize(
+        "name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+        ids=["1-curve", "2-map", "3-valblk"],
+    )
+    def test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels(defc, name):
+        """R-PE-BENCH.11/1..3 - the Current cell is the strip then the element count: `▄▆▃▇▁ 5`, `▆▃▅▃ 12`,
+        `▄▃▄ 6`. Why it matters: Inc 9's eight levels drew `█` in every column and the ramp shades turned
+        neighbouring rows into one block (F-R14-1); the operator reads the summary as a shape, so the levels
+        must be the seven that never fill the cell."""
+        o = defc_obj(defc, name)
+        strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+>       assert strip.plain.rstrip() == T[f"S.after.{name}"]
+E       AssertionError: assert '▇▃▆▃' == '▆▃▅▃'
+E         
+E         - ▆▃▅▃
+E         + ▇▃▆▃
+
+tests/test_b103_inc8b_bw.py:134: AssertionError
+_ test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level(defc):
+        """R-PE-BENCH.107/2 - a ramp of 40 points in 17 cells -> ``S.wide.40_points_in_17``; the top level is ``▇``."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        grid = db.bench_grid(replace(o.d, shape=(40,), element_count=40))
+        values = db.BenchValues.from_decoded(decoded_of(*[(float(i), str(i)) for i in range(40)]))
+        strip = db.summary_strip(values, grid, 17).plain.rstrip()
+>       assert strip == TR["S.wide.40_points_in_17"] and strip[-1] == "▇" and "█" not in strip
+E       AssertionError: assert ('▁▂▂▃▃▄▄▅▅▆▆▇▇█' == '▁▁▂▂▃▃▄▄▅▅▆▆▇▇'
+E         
+E         - ▁▁▂▂▃▃▄▄▅▅▆▆▇▇
+E         ? -
+E         + ▁▂▂▃▃▄▄▅▅▆▆▇▇█
+E         ?              +)
+
+tests/test_b103_inc8b_s1.py:889: AssertionError
+____ test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[3-valblk] _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize(
+        "name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+        ids=["1-curve", "2-map", "3-valblk"],
+    )
+    def test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels(defc, name):
+        """R-PE-BENCH.11/1..3 - the Current cell is the strip then the element count: `▄▆▃▇▁ 5`, `▆▃▅▃ 12`,
+        `▄▃▄ 6`. Why it matters: Inc 9's eight levels drew `█` in every column and the ramp shades turned
+        neighbouring rows into one block (F-R14-1); the operator reads the summary as a shape, so the levels
+        must be the seven that never fill the cell."""
+        o = defc_obj(defc, name)
+        strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+>       assert strip.plain.rstrip() == T[f"S.after.{name}"]
+E       AssertionError: assert '▅▃▅' == '▄▃▄'
+E         
+E         - ▄▃▄
+E         + ▅▃▅
+
+tests/test_b103_inc8b_bw.py:134: AssertionError
+_____ test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[1-curve] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize(
+        "name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+        ids=["1-curve", "2-map", "3-valblk"],
+    )
+    def test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels(defc, name):
+        """R-PE-BENCH.11/1..3 - the Current cell is the strip then the element count: `▄▆▃▇▁ 5`, `▆▃▅▃ 12`,
+        `▄▃▄ 6`. Why it matters: Inc 9's eight levels drew `█` in every column and the ramp shades turned
+        neighbouring rows into one block (F-R14-1); the operator reads the summary as a shape, so the levels
+        must be the seven that never fill the cell."""
+        o = defc_obj(defc, name)
+        strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+>       assert strip.plain.rstrip() == T[f"S.after.{name}"]
+E       AssertionError: assert '▅▇▄█▁' == '▄▆▃▇▁'
+E         
+E         - ▄▆▃▇▁
+E         + ▅▇▄█▁
+
+tests/test_b103_inc8b_bw.py:134: AssertionError
+___ test_r_pe_bench_107_1_the_three_strips_hold_only_seven_levels_and_spaces ___
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_107_1_the_three_strips_hold_only_seven_levels_and_spaces(defc):
+        """R-PE-BENCH.107/1 - the DEFC CURVE, MAP and VAL_BLK strips hold only `▁ … ▇` and spaces: a cell
+        never filled to its top edge, so two rows of strips never join into one block."""
+        allowed = set("▁▂▃▄▅▆▇ ")
+        for name in ("CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"):
+            o = defc_obj(defc, name)
+            strip = db.summary_strip(o.values, o.grid, T[f"S.strip_width.{name}"])
+            assert strip.plain, name
+>           assert set(strip.plain) <= allowed, (name, strip.plain)
+E           AssertionError: ('CURVE_DEF_0001', '▅▇▄█▁')
+E           assert {'▁', '▄', '▅', '▇', '█'} <= {' ', '▁', '▂...'▄', '▅', ...}
+E             
+E             Extra items in the left set:
+E             '█'
+
+tests/test_b103_inc8b_bw.py:148: AssertionError
+____________ test_r_pe_bench_107_2_forty_points_in_seventeen_cells _____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-65/popen-gw0/test_r_pe_bench_107_2_forty_po0')
+
+    def test_r_pe_bench_107_2_forty_points_in_seventeen_cells(tmp_path):
+        """R-PE-BENCH.107/2 (EX-8B-F2) - 40 rising points in 17 cells -> `S.wide.40_points_in_17`, the top
+        level `▇` (never `█`); and 3 equal points -> `S.flat.all_equal` (a flat curve is the lowest level)."""
+        from array import array
+    
+        ramp = db.BenchValues(numbers=array("d", range(40)), texts=None, missing=frozenset())
+        got = db.summary_strip(ramp, db.Grid("chart", 40, 1, 40, "2d"), 17)
+>       assert got.plain.rstrip() == T["S.wide.40_points_in_17"]
+E       AssertionError: assert '▁▂▂▃▃▄▄▅▅▆▆▇▇█' == '▁▁▂▂▃▃▄▄▅▅▆▆▇▇'
+E         
+E         - ▁▁▂▂▃▃▄▄▅▅▆▆▇▇
+E         ? -
+E         + ▁▂▂▃▃▄▄▅▅▆▆▇▇█
+E         ?              +
+
+tests/test_b103_inc8b_bw.py:159: AssertionError
+______________ test_r_pe_bench_11_1_the_curve_strip_and_its_count ______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_1_the_curve_strip_and_its_count(defc):
+        """R-PE-BENCH.11/1 (changed at Inc 8b E1, F-R14-1) - CURVE_DEF_0001 -> `▄▆▃▇▁ 5` (`S.after.current.CURVE_DEF_0001`).
+    
+        Why: with eight levels the tallest block `█` filled its cell and the strips of two stacked rows fused
+        into a white bar; seven levels keep a gap. The Current width is 20 now, so the strip is 17 cells wide.
+        """
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        assert strip_width(o) == fact("S.strip_width.CURVE_DEF_0001") == 17
+        current = cells_of(o, summarised(o))[0][CURRENT]
+>       assert current == fact("S.after.current.CURVE_DEF_0001") == "▄▆▃▇▁ 5"
+E       AssertionError: assert '▅▇▄█▁ 5' == '▄▆▃▇▁ 5'
+E         
+E         - ▄▆▃▇▁ 5
+E         + ▅▇▄█▁ 5
+
+tests/test_b103_inc9_b_cells.py:91: AssertionError
+__________ test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks ___________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks(defc):
+        """R-PE-BENCH.11/2 (changed at Inc 8b E1) - MAP_DEF_0001 -> `▆▃▅▃ 12`: one block per grid column at the level of its mean (`S.after.current.MAP_DEF_0001`)."""
+        o = defc_obj(defc, "MAP_DEF_0001")
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[CURRENT]
+>       assert cell.plain.strip() == fact("S.after.current.MAP_DEF_0001") == "▆▃▅▃ 12"
+E       AssertionError: assert '▇▃▆▃ 12' == '▆▃▅▃ 12'
+E         
+E         - ▆▃▅▃ 12
+E         + ▇▃▆▃ 12
+
+tests/test_b103_inc9_b_cells.py:100: AssertionError
+_________ test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks(defc):
+        """R-PE-BENCH.11/3 (changed at Inc 8b E1) - VAL_BLK_DEF_0001 -> `▄▃▄ 6` (`S.after.current.VAL_BLK_DEF_0001`)."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[CURRENT]
+>       assert cell.plain.strip() == fact("S.after.current.VAL_BLK_DEF_0001") == "▄▃▄ 6"
+E       AssertionError: assert '▅▃▅ 6' == '▄▃▄ 6'
+E         
+E         - ▄▃▄ 6
+E         + ▅▃▅ 6
+
+tests/test_b103_inc9_b_cells.py:109: AssertionError
+_______ test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip(defc):
+        """R-PE-BENCH.11 (B13, changed at Inc 8b E1) - width 17 -> the 7-level oracle strip `▄▆▃▇▁`; wider than the points: one block per point."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+>       assert db.summary_strip(o.values, o.grid, 17).plain.rstrip() == EXB.chart_strip(EX.CURVE, 17, EXB.BLOCKS7)
+E       AssertionError: assert '▅▇▄█▁' == '▄▆▃▇▁'
+E         
+E         - ▄▆▃▇▁
+E         + ▅▇▄█▁
+
+tests/test_b103_inc9_b_cells.py:289: AssertionError
+___________ test_r_pe_bench_11_summary_strip_samples_every_kth_point ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_summary_strip_samples_every_kth_point(defc):
+        """R-PE-BENCH.11 (B13) - 5 points in a strip of width 2: every k-th point, k = ceil(5 / 2) = 3 (the oracle's rule)."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+>       assert db.summary_strip(o.values, o.grid, 2).plain.rstrip() == EXB.chart_strip(EX.CURVE, 2, EXB.BLOCKS7)
+E       AssertionError: assert '▅█' == '▄▇'
+E         
+E         - ▄▇
+E         + ▅█
+
+tests/test_b103_inc9_b_cells.py:297: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_1_the_defc_strips_use_no_full_block[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_11_the_current_cell_is_the_strip_and_its_count[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[2-map]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_107_2_forty_points_in_seventeen_cells_end_at_the_seventh_level
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[3-valblk]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_11_the_strip_and_its_count_use_seven_levels[1-curve]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_107_1_the_three_strips_hold_only_seven_levels_and_spaces
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_107_2_forty_points_in_seventeen_cells
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_1_the_curve_strip_and_its_count
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_summary_strip_samples_every_kth_point
+15 failed, 2 passed in 2.33s
+
+# exit=1

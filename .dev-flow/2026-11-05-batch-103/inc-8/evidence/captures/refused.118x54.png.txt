@@ -1,0 +1,22 @@
+scenario=refused
+fixture=public example A2L examples/case_00_public/ASAP2_Demo_V171.a2l and a hand image of 'Hello ASAM' + NUL (42 B) at 0x810200 (scratch S19)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+top_screen=Screen
+focused=patch_sheet_body
+status_lines_this_run=2
+status: A2L loaded: ASAP2_Demo_V171.a2l
+status: Loaded hand_image.s19
+ledger_entries=0
+selected_rows=[▶ ] ASAM.C.SCALAR.SWO…VALUE    refused           ·            rpm    -
+sheet_text_begin
+    Parameter         Kind     Current           New          Unit   Limits                    Δ               
+  ▶ ASAM.C.SCALAR.SWO…VALUE    refused           ·            rpm    -                                         
+  └ ASAM.C.SCALAR.SWORD.FORM_X_PLUS_4: the conversion type FORM of CM.FORM.X_PLUS_4 is not supported
+  ASAM.C.SCALAR.SWORD.FORM_X_PLUS_4
+  
+  edit VALUE objects in the Inspector tab
+sheet_text_end
+stub_os_writes=0
+surface=ready

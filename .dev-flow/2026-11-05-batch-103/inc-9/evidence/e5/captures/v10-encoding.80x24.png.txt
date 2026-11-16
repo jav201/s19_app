@@ -1,0 +1,48 @@
+scene=v10-encoding
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=80x24
+time=2026-11-14 08:23:52
+interposition: encode_values waits for the PNG (*)
+app_size=80x24
+focused=patch_sheet_input
+selected=MAP_DEF_0001
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=d focus=True edit={(0, 0): '473'} undo=1
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=70x10 classes=[] subtitle=None
+widget #patch_inspector: size=68x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=74x9 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | enter | d enter | <set op input to '1'> | enter
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                             Hex Edit Tool
+      │                    Patch Editor                      ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ ││rows 0..0 of 3 · cols 0..3 of 4 · pgup/pgdn page                      │
+   ▏◉ ││shade ████████████ -890 … 843   sel x0,y0   * / bold = edited         │
+   ▏▤ ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shi…│
+   ▏! ││encoding …                                                            │▇▇
+   ▏✎ ││MAP_DEF_0001[x0,y0] op =  1                +Δ on 1 cells   enter appl…│
+   ▏✔ │╰──────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+   ▏⏚ │╭─ LANDS IN ───────────────────────────────────────────────────────────╮▂▂
+   ▏✦ ││   Patch script    Inspector    JSON    Checks                        │
+      ││  No entries yet: Add one, paste a change-set or Load a file.         │
+   ──────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                 (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+  
+screen_text_end
+surface=ready

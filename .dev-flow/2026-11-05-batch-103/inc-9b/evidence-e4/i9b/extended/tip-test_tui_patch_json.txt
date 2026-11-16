@@ -1,0 +1,145 @@
+### LABEL: tip-test_tui_patch_json
+### CLONE: ~/work/zq-i9b/tip
+### DATE: 2026-11-15T12:55:13-06:00
+### UPTIME:  12:55:13 up 2 days, 21:43,  3 users,  load average: 1.45, 1.48, 1.16
+### HEAD: c19503f0f786e85cf4fffc6a9359b5f3947cdf0b
+### STATUS-BEGIN
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/tip/s19_app/__init__.py
+### HEADER-END
+### PYTEST jobs=2
+### ARGS: tests/test_tui_patch_json.py
+--- begin ---
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [17 items]
+
+..........F...F.F                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_ac1_editor_fills_json_window_when_room_exists ______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+        """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    
+        C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+        region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+        is 26 rows and its bottom is flush with the JSON body's content region; under
+        a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+        by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+        which also fails the ``> 8`` assertion — so this arm cannot green on an
+        invisible widget.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+>       assert editor_h > 8, (
+            f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+            f"has free vertical space (120x50); painted region.height is {editor_h}"
+        )
+E       AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1295: AssertionError
+________________ test_ac3_fill_does_not_leak_to_sibling_windows ________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+        """Each tab's scroll body fills ITS tab; the JSON fill stays JSON-scoped.
+    
+        batch-97 Inc-4 (named supersession, HLR-144 / design §3): the three windows
+        became the ledger and two tabs of one inspector. By design every body now
+        fills its own region — the ledger body (the hero), the JSON body (the paste
+        buffer's share of the JSON tab) and the Checks body (the Checks tab's scroll
+        view). What this arm keeps from the batch-48 C-30 intent: the JSON body
+        never claims the read-only view's share (it ends where the tab's docked
+        rows begin, below the view), and no Patch rule leaks to another screen
+        (the scope arm of TC-B97-04, ``tests/test_b97_patch_editor.py``).
+        """
+    
+        async def _run() -> dict[str, object]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                bodies = _json_window_bodies(app)
+                view = app.query_one("#patch_json_view", TextArea)
+                controls = app.query_one("#patch_paste_controls")
+                out = {
+                    "json": (bodies["patch_win_json"].region, view.region, controls.region),
+                    "script": (
+                        app.query_one("#patch_win_script").content_region.height,
+                        bodies["patch_win_script"].region.height,
+                    ),
+                }
+                app.query_one("#patch_tab_checks", Button).press()
+                await pilot.pause()
+                out["checks"] = (
+                    app.query_one("#patch_win_checks").content_region.height,
+                    bodies["patch_win_checks"].region.height,
+                    app.query_one("#patch_checks_controls").region.height,
+                )
+                return out
+    
+        dims = asyncio.run(_run())
+        json_body, view, controls = dims["json"]
+        assert json_body.y >= view.bottom, (
+            f"the JSON body must sit below the read-only view, not claim it: "
+            f"body {json_body} vs view {view}"
+        )
+        assert json_body.bottom <= controls.y, (
+            f"the JSON body must end where the docked paste controls begin: "
+            f"body {json_body} vs controls {controls}"
+        )
+>       assert view.height >= 8 and json_body.height >= 8, (view, json_body)
+E       AssertionError: (Region(x=7, y=35, width=108, height=3), Region(x=7, y=38, width=108, height=9))
+E       assert (3 >= 8)
+E        +  where 3 = Region(x=7, y=35, width=108, height=3).height
+
+tests/test_tui_patch_json.py:1431: AssertionError
+______________________ test_ac5_gauge_stays_above_editor _______________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_ac5_gauge_stays_above_editor() -> None:
+        """The cap gauge renders above the (now taller) editor and is not overlapped.
+    
+        MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+        region sits strictly above the editor's, so the editor's growth pushes DOWN
+        from the gauge rather than displacing or overlapping it.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                gauge = app.query_one("#patch_paste_gauge", Static)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                return gauge.region.bottom, editor.region.y, editor.region.height
+    
+        gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+>       assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+E       AssertionError: precondition: the editor must have grown at 120x50
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1504: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+======================== 3 failed, 14 passed in 15.09s =========================
+--- end rc=1 ---

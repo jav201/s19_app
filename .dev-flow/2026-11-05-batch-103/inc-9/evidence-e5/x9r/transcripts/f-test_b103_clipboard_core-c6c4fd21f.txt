@@ -1,0 +1,2 @@
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input

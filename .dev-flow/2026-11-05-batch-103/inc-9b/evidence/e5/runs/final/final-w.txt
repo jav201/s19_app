@@ -1,0 +1,31 @@
+DATE 2026-11-15T21:05:00-06:00
+HEAD 6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+TREE <runner-home>/work/zq-x9b/final-exact
+DIRTY_BEGIN
+DIRTY_END
+ 21:05:00 up 3 days,  5:53,  2 users,  load average: 0.32, 0.41, 0.33
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/final-exact/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_w.py
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/final-exact
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 25 items
+
+tests/test_b103_inc9b_w.py .........................                     [100%]
+============================= QC-TM timing margins =============================
+24.6%  0.226 s / 0.300 s  R-PE-BENCH.102/2 idle after the filter keystroke  tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+45.0%  0.275 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+77.0%  0.069 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+77.5%  0.068 s / 0.300 s  R-PE-BENCH idle after decode LARGE  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+81.3%  0.056 s / 0.300 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+82.1%  0.054 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+98.9%  0.055 s / 5.000 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+QC-TM: 7 bounds, 0 under 20 % margin
+
+======================== 25 passed in 204.14s (0:03:24) ========================
+EXIT_CODE 0

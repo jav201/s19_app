@@ -1,0 +1,11 @@
+# uptime before: 2.68 1.54 0.93 2/652 412907
+s19_app.__file__ = ~/work/zq-fx9/base/s19_app/__init__.py
+PROBE2 stall load 2.17 1.72 1.05
+PRESS {"t": 7.4, "phase": "encode", "handle_s": 0.8611, "frame_s": 0.9377, "press_s": 2.208}
+PRESS {"t": 9.84, "phase": "encode", "handle_s": 0.8598, "frame_s": 0.9419, "press_s": 2.231}
+PRESS {"t": 12.29, "phase": "encode", "handle_s": 0.8609, "frame_s": 0.926, "press_s": 2.206}
+PRESS {"t": 14.69, "phase": "encode", "handle_s": 0.861, "frame_s": 0.9374, "press_s": 2.213}
+.
+1 passed in 96.40s (0:01:36)
+# rc=0
+# uptime after: 2.17 1.72 1.05 2/642 413513

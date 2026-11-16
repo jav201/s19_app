@@ -1,0 +1,16 @@
+# uptime before: 0.15 0.08 0.38 1/638 409433
+s19_app.__file__ = ~/work/zq-fx9/base/s19_app/__init__.py
+PROBE base load 0.79 0.33 0.44
+APPLY_S 7.277
+PRESS [7.277, 2.238, "encode", 160]
+PRESS [9.514, 2.221, "encode", 174]
+PRESS [11.735, 2.234, "encode", 160]
+PRESS [13.969, 2.22, "encode", 156]
+PRESS [16.189, 1.138, "encode", 94]
+AFTER [0.129, 26]
+AFTER [0.129, 26]
+AFTER [0.13, 26]
+.
+1 passed in 99.63s (0:01:39)
+# rc=0
+# uptime after: 0.79 0.33 0.44 1/636 409798

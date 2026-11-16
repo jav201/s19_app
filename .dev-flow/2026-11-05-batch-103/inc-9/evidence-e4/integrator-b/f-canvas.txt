@@ -1,0 +1,8 @@
+== f-canvas  Fri Nov 13 09:43:30 PM CST 2026  load: 7.23 5.49 3.62
+s19_app.__file__ = ~/work/zq-e4-9-int/fin2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................                                 [100%]
+40 passed in 1.61s
+rc=0

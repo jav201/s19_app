@@ -1,0 +1,162 @@
+ 12:54:19 up 21:43,  5 users,  load average: 8.76, 7.95, 6.47
+a2l            3816  definitions.a2l
+s19             698  definitions.s19
+s19_app.__file__ = /home/<runner>/work/zq-i9/clone/s19_app/__init__.py
+DEFC.CURVE_DEF_0001.kind = 'curve'
+DEFC.CURVE_DEF_0001.char_type = 'CURVE'
+DEFC.CURVE_DEF_0001.address = 8388688
+DEFC.CURVE_DEF_0001.byte_length = 10
+DEFC.CURVE_DEF_0001.datatype = 'UWORD'
+DEFC.CURVE_DEF_0001.byte_order = 'big'
+DEFC.CURVE_DEF_0001.conversion_type = 'IDENTICAL'
+DEFC.CURVE_DEF_0001.method_name = 'CM_DEF_IDENT'
+DEFC.CURVE_DEF_0001.display_format = '%.0'
+DEFC.CURVE_DEF_0001.decimals = 0
+DEFC.CURVE_DEF_0001.unit = ''
+DEFC.CURVE_DEF_0001.limits = Limits(lower=0.0, upper=65535.0, lower_text='0', upper_text='65535')
+DEFC.CURVE_DEF_0001.extended_limits = None
+DEFC.CURVE_DEF_0001.shape = (5,)
+DEFC.CURVE_DEF_0001.element_count = 5
+DEFC.CURVE_DEF_0001.index_mode = 'COLUMN_DIR'
+DEFC.CURVE_DEF_0001.values_offset = 0
+DEFC.CURVE_DEF_0001.record_layout = 'RL_U16'
+DEFC.CURVE_DEF_0001.refusal = None
+DEFC.CURVE_DEF_0001.axis.X = kind COM_AXIS, points 5, object 'AXIS_DEF_0001', monotony STRICT_MON, has_points True
+DEFC.CURVE_DEF_0001.values = ['37818', '52215', '28375', '58106', '11719']
+DEFC.CURVE_DEF_0001.axis_texts.X = ['242.500', '317.500', '348.000', '414.000', '450.500']
+DEFC.CURVE_DEF_0002.kind = 'curve'
+DEFC.CURVE_DEF_0002.char_type = 'CURVE'
+DEFC.CURVE_DEF_0002.address = 8388704
+DEFC.CURVE_DEF_0002.byte_length = 10
+DEFC.CURVE_DEF_0002.datatype = 'UWORD'
+DEFC.CURVE_DEF_0002.byte_order = 'big'
+DEFC.CURVE_DEF_0002.conversion_type = 'IDENTICAL'
+DEFC.CURVE_DEF_0002.method_name = 'CM_DEF_IDENT'
+DEFC.CURVE_DEF_0002.display_format = '%.0'
+DEFC.CURVE_DEF_0002.decimals = 0
+DEFC.CURVE_DEF_0002.unit = ''
+DEFC.CURVE_DEF_0002.limits = Limits(lower=0.0, upper=65535.0, lower_text='0', upper_text='65535')
+DEFC.CURVE_DEF_0002.extended_limits = None
+DEFC.CURVE_DEF_0002.shape = (5,)
+DEFC.CURVE_DEF_0002.element_count = 5
+DEFC.CURVE_DEF_0002.index_mode = 'COLUMN_DIR'
+DEFC.CURVE_DEF_0002.values_offset = 0
+DEFC.CURVE_DEF_0002.record_layout = 'RL_U16'
+DEFC.CURVE_DEF_0002.refusal = None
+DEFC.CURVE_DEF_0002.axis.X = kind COM_AXIS, points 5, object 'AXIS_DEF_0001', monotony STRICT_MON, has_points True
+DEFC.CURVE_DEF_0002.values = ['33014', '24541', '24691', '2267', '39540']
+DEFC.CURVE_DEF_0002.axis_texts.X = ['242.500', '317.500', '348.000', '414.000', '450.500']
+DEFC.MAP_DEF_0001.kind = 'map'
+DEFC.MAP_DEF_0001.char_type = 'MAP'
+DEFC.MAP_DEF_0001.address = 8388720
+DEFC.MAP_DEF_0001.byte_length = 32
+DEFC.MAP_DEF_0001.datatype = 'SWORD'
+DEFC.MAP_DEF_0001.byte_order = 'big'
+DEFC.MAP_DEF_0001.conversion_type = 'IDENTICAL'
+DEFC.MAP_DEF_0001.method_name = 'CM_DEF_IDENT'
+DEFC.MAP_DEF_0001.display_format = '%.0'
+DEFC.MAP_DEF_0001.decimals = 0
+DEFC.MAP_DEF_0001.unit = ''
+DEFC.MAP_DEF_0001.limits = Limits(lower=-1000.0, upper=1000.0, lower_text='-1000', upper_text='1000')
+DEFC.MAP_DEF_0001.extended_limits = None
+DEFC.MAP_DEF_0001.shape = (4, 3)
+DEFC.MAP_DEF_0001.element_count = 12
+DEFC.MAP_DEF_0001.index_mode = 'COLUMN_DIR'
+DEFC.MAP_DEF_0001.values_offset = 8
+DEFC.MAP_DEF_0001.record_layout = 'RL_DEF_MAP'
+DEFC.MAP_DEF_0001.refusal = None
+DEFC.MAP_DEF_0001.axis.X = kind STD_AXIS, points 4, object None, monotony STRICT_INCREASE, has_points True
+DEFC.MAP_DEF_0001.axis.Y = kind FIX_AXIS, points 3, object None, monotony STRICT_MON, has_points True
+DEFC.MAP_DEF_0001.values = ['472', '132', '610', '330', '709', '-890', '-383', '-636', '843', '-485', '730', '-556']
+DEFC.MAP_DEF_0001.axis_texts.X = ['224', '577', '648', '909']
+DEFC.MAP_DEF_0001.axis_texts.Y = ['10', '15', '20']
+DEFC.VAL_BLK_DEF_0001.kind = 'array'
+DEFC.VAL_BLK_DEF_0001.char_type = 'VAL_BLK'
+DEFC.VAL_BLK_DEF_0001.address = 8388752
+DEFC.VAL_BLK_DEF_0001.byte_length = 12
+DEFC.VAL_BLK_DEF_0001.datatype = 'SWORD'
+DEFC.VAL_BLK_DEF_0001.byte_order = 'big'
+DEFC.VAL_BLK_DEF_0001.conversion_type = 'LINEAR'
+DEFC.VAL_BLK_DEF_0001.method_name = 'CM_DEF_FINE'
+DEFC.VAL_BLK_DEF_0001.display_format = '%.1'
+DEFC.VAL_BLK_DEF_0001.decimals = 1
+DEFC.VAL_BLK_DEF_0001.unit = 'units'
+DEFC.VAL_BLK_DEF_0001.limits = Limits(lower=-50.0, upper=50.0, lower_text='-50', upper_text='50')
+DEFC.VAL_BLK_DEF_0001.extended_limits = None
+DEFC.VAL_BLK_DEF_0001.shape = (3, 2)
+DEFC.VAL_BLK_DEF_0001.element_count = 6
+DEFC.VAL_BLK_DEF_0001.index_mode = 'ROW_DIR'
+DEFC.VAL_BLK_DEF_0001.values_offset = 0
+DEFC.VAL_BLK_DEF_0001.record_layout = 'RL_DEF_S16_ROW'
+DEFC.VAL_BLK_DEF_0001.refusal = None
+DEFC.VAL_BLK_DEF_0001.values = ['36.9', '11.0', '31.8', '-20.7', '-19.8', '-10.7']
+DEFC.DISPLAY_0001.kind = 'number'
+DEFC.DISPLAY_0001.char_type = 'VALUE'
+DEFC.DISPLAY_0001.address = 8388640
+DEFC.DISPLAY_0001.byte_length = 2
+DEFC.DISPLAY_0001.datatype = 'SWORD'
+DEFC.DISPLAY_0001.byte_order = 'big'
+DEFC.DISPLAY_0001.conversion_type = 'LINEAR'
+DEFC.DISPLAY_0001.method_name = 'CM_DEF_LIN'
+DEFC.DISPLAY_0001.display_format = '%.1'
+DEFC.DISPLAY_0001.decimals = 1
+DEFC.DISPLAY_0001.unit = 'deg C'
+DEFC.DISPLAY_0001.limits = Limits(lower=-40.0, upper=150.0, lower_text='-40', upper_text='150')
+DEFC.DISPLAY_0001.extended_limits = Limits(lower=-50.0, upper=200.0, lower_text='-50', upper_text='200')
+DEFC.DISPLAY_0001.shape = ()
+DEFC.DISPLAY_0001.element_count = 1
+DEFC.DISPLAY_0001.index_mode = None
+DEFC.DISPLAY_0001.values_offset = 0
+DEFC.DISPLAY_0001.record_layout = None
+DEFC.DISPLAY_0001.refusal = None
+DEFC.DISPLAY_0001.values = ['143.5']
+NAME.VB.(1,1) = 'VAL_BLK_DEF_0001[1,1]'; NAME.MAP.(1,2) = 'MAP_DEF_0001[1,2]'; NAME.CURVE.(3,) = 'CURVE_DEF_0001[3]'
+DISPLAY.VB.36.9 = '36.9'; DISPLAY.MAP.472 = '472'
+TOOL.VB.SET.(0,0).'10'.edit = {(0, 0): '10'}
+TOOL.VB.SET.(0,0).'10'.encoded = Encoded(0x800090, 00 c8 00 db 02 7c fe 63 fe 75 ff 2a, notices=())
+TOOL.VB.SET.(0,0).'10'.diff = 2 of 12 B differ at offsets [0, 1]
+TOOL.VB.SET.(0,0).'10'.decoded_after = ['10.0', '11.0', '31.8', '-20.7', '-19.8', '-10.7']
+TOOL.VB.ADD5.(0,0)(1,0).edit = {(0, 0): '41.9', (1, 0): '16.0'}
+TOOL.VB.ADD5.(0,0)(1,0).encoded = Encoded(0x800090, 03 46 01 40 02 7c fe 63 fe 75 ff 2a, notices=())
+TOOL.VB.ADD5.(0,0)(1,0).diff = 4 of 12 B differ at offsets [0, 1, 2, 3]
+TOOL.VB.ADD5.(0,0)(1,0).decoded_after = ['41.9', '16.0', '31.8', '-20.7', '-19.8', '-10.7']
+TOOL.VB.PCT10.(1,0)(2,0).edit = {(1, 0): '12.0', (2, 0): '35.0'}
+TOOL.VB.PCT10.(1,0)(2,0).encoded = Encoded(0x800090, 02 e1 00 f0 02 bc fe 63 fe 75 ff 2a, notices=())
+TOOL.VB.PCT10.(1,0)(2,0).diff = 2 of 12 B differ at offsets [3, 5]
+TOOL.VB.PCT10.(1,0)(2,0).decoded_after = ['36.9', '12.0', '35.0', '-20.7', '-19.8', '-10.7']
+TOOL.VB.INTERP.y0.x0..2.edit = {(1, 0): '34.3'}
+TOOL.VB.INTERP.y0.x0..2.encoded = Encoded(0x800090, 02 e1 02 ae 02 7c fe 63 fe 75 ff 2a, notices=())
+TOOL.VB.INTERP.y0.x0..2.diff = 2 of 12 B differ at offsets [2, 3]
+TOOL.VB.INTERP.y0.x0..2.decoded_after = ['36.9', '34.3', '31.8', '-20.7', '-19.8', '-10.7']
+TOOL.VB.SMOOTH.y0.x0..2.edit = {(1, 0): '26.5'}
+TOOL.VB.SMOOTH.y0.x0..2.encoded = Encoded(0x800090, 02 e1 02 12 02 7c fe 63 fe 75 ff 2a, notices=())
+TOOL.VB.SMOOTH.y0.x0..2.diff = 2 of 12 B differ at offsets [2, 3]
+TOOL.VB.SMOOTH.y0.x0..2.decoded_after = ['36.9', '26.5', '31.8', '-20.7', '-19.8', '-10.7']
+TOOL.VB.SET.(1,1).'abc'.edit = {(1, 1): 'abc'}
+TOOL.VB.SET.(1,1).'abc'.encoded = Refusal('A2L-DEF-NUMBER', "VAL_BLK_DEF_0001[1,1]: 'abc' is not a number")
+TOOL.VB.SET.(1,1).'abc'.diff = Refusal('A2L-DEF-NUMBER', "VAL_BLK_DEF_0001[1,1]: 'abc' is not a number")
+TOOL.VB.SET.(0,0).'60'.edit = {(0, 0): '60'}
+TOOL.VB.SET.(0,0).'60'.encoded = Refusal('A2L-DEF-LIMITS', 'VAL_BLK_DEF_0001[0,0]: 60 is outside the limits -50..50')
+TOOL.VB.SET.(0,0).'60'.diff = Refusal('A2L-DEF-LIMITS', 'VAL_BLK_DEF_0001[0,0]: 60 is outside the limits -50..50')
+TOOL.VB.SET.(0,0).'10.03'.edit = {(0, 0): '10.03'}
+TOOL.VB.SET.(0,0).'10.03'.encoded = Refusal('A2L-DEF-ENCODE', 'VAL_BLK_DEF_0001[0,0]: the converted raw value 200.59999999999997 is not integral')
+TOOL.VB.SET.(0,0).'10.03'.diff = Refusal('A2L-DEF-ENCODE', 'VAL_BLK_DEF_0001[0,0]: the converted raw value 200.59999999999997 is not integral')
+ORDER.VB.e1 = Encoded(0x800090, 00 c8 00 db 02 7c fe 63 fe 75 ff 2a, notices=())
+ORDER.VB.e2 = Encoded(0x800090, 00 c8 00 db 02 7c fe 63 ff 9c ff 2a, notices=())
+ORDER.VB.after = ['10.0', '11.0', '31.8', '-20.7', '-5.0', '-10.7']
+ORDER.VB.no_overlay.after = ['36.9', '11.0', '31.8', '-20.7', '-5.0', '-10.7']
+TOOL.MAP.SET.(1,2).'0'.encoded = Encoded(0x800070, 00 e0 02 41 02 88 03 8d 01 d8 02 c5 03 4b 00 84 fc 86 00 00 02 62 fe 81 02 da 01 4a fd 84 fd d4, notices=()); diff = 2 of 32 B differ at offsets [18, 19]
+TOOL.MAP.ADD100.x0..1.y0..1.edit = {(0, 0): '572', (0, 1): '809', (1, 0): '232', (1, 1): '-790'}
+TOOL.MAP.ADD100.x0..1.y0..1.encoded = Encoded(0x800070, 00 e0 02 41 02 88 03 8d 02 3c 03 29 03 4b 00 e8 fc ea fe 1b 02 62 fe 81 02 da 01 4a fd 84 fd d4, notices=()); diff = 6 of 32 B differ at offsets [8, 9, 10, 11, 15, 17]
+TOOL.MAP.ADD100.x0..1.y0..1.decoded_after = ['572', '232', '610', '330', '809', '-790', '-383', '-636', '843', '-485', '730', '-556']
+TOOL.MAP.SET.(0,0).'2000' = Refusal('A2L-DEF-LIMITS', 'MAP_DEF_0001[0,0]: 2000 is outside the limits -1000..1000')
+AXIS.MAP.Y.FIX = Refusal('A2L-DEF-AXIS-FIXED', 'MAP_DEF_0001.Y[0]: the points of a fixed axis are not stored in the image')
+AXIS.CURVE.X.COM = Refusal('A2L-DEF-AXIS-SHARED', 'CURVE_DEF_0001.X[0]: the points of the common axis AXIS_DEF_0001 are not edited through CURVE_DEF_0001')
+TOOL.CURVE.SET.(1)(3).'40000'.encoded = Encoded(0x800050, 93 ba 9c 40 6e d7 9c 40 2d c7, notices=()); diff = 4 of 10 B differ at offsets [2, 3, 6, 7]
+TOOL.CURVE.PCT50.all.edit = {(0,): '56727', (1,): '78323', (2,): '42563', (3,): '87159', (4,): '17579'}
+TOOL.CURVE.PCT50.all.encoded = Refusal('A2L-DEF-LIMITS', 'CURVE_DEF_0001[1]: 78323 is outside the limits 0..65535')
+KINDS.V171 = {'array': 11, 'curve': 16, 'map': 8}; counted = 33; <=64 = 33; 65..4096 = 0; >4096 = 0
+KINDS.V171.max = 64 elements, 64 B; decode_s = 0.0019 (64 values); loadavg = (8.76220703125, 7.947265625, 6.4697265625)
+KINDS.SWA = {'array': 297, 'curve': 158, 'map': 11}; counted = 466; <=64 = 451; 65..4096 = 15; >4096 = 0
+KINDS.SWA.max = 822 elements, 822 B; decode_s = 0.0000 (0 values); loadavg = (8.76220703125, 7.947265625, 6.4697265625)
+exit=0

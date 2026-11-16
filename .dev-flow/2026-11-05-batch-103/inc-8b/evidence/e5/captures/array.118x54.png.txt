@@ -1,0 +1,79 @@
+scene=array
+fixture=grid8b
+os_clipboard=stubbed (never touched)
+commit=7c4e377c
+requested_size=118x54
+time=2026-11-15 03:04:52
+app_size=118x54
+focused=patch_sheet_body
+selected=MAP_DEF_0001
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=False edit={} undo=0
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, MAP_DEF_0001, TEXT_0001, NAN_0001
+body: size=143x24 content_size=143x24 sheet_top=0
+grid: scroll_x=0.0 size=110x25 virtual_size=143x24 max_scroll_x=33 show_horizontal_scrollbar=True
+subtitle=None
+widget #patch_sheet: size=110x26 classes=[] subtitle=None
+widget #patch_inspector: size=108x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=112x39 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down
+status_lines_this_run=2
+status: A2L loaded: grid8b.a2l
+status: Loaded grid8b.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                Hex Edit Tool
+      │                                       Patch Editor                                         ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ │ draft · change
+   ▏◉ │ Filter _0001                                            7 of 7 shown  <    Page 1/1   >    ▽ Pick   Add list
+   ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏! ││  Parameter                 │Kind      │Current             │New             │Unit    │Limits                 │
+   ▏✎ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━│
+   ▏✔ ││  ENUM_0001                 │VALUE     │1 IDLE              │·               │        │     0  ├─────●────────│
+   ▏⏚ ││  MASK_BIT_0001             │VALUE     │1 (0x01)            │·               │        │     0  ├──────────────│
+   ▏✦ ││  MASK_FIELD_0001           │VALUE     │174 (0xAE)          │·               │        │     0  ├──────────●───│
+   ▏▶ ││  DISPLAY_0001              │VALUE     │143.5               │·               │deg C   │   -40  ├──────────────│
+   ▏☑ ││▶ MAP_DEF_0001              │MAP 4x3   │▆▃▅▃ 12             │·               │        │ -1.00k         …      │
+   ▏⊕ ││  ┊ └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B                            │
+      ││  ┊               224                  577                  648                  909                          │
+      ││  ┊     10        472                  132                  610                  330                          │
+      ││  ┊       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                │
+      ││  ┊     15        709                  -890                 -383                 -636                         │
+      ││  ┊                                                                                                           │
+      ││  ┊     20        843                  -485                 730                  -556                         │
+      ││  ┊                                                                                                           │
+      ││  ┊ shade ████████████ -890 … 843   sel x0,y0   * / bold = edited                                             │
+      ││  ┊  s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                     │
+      ││  ┊ no edit yet · bytes appear here                                                                           │
+      ││  TEXT_0001                 │ASCII     │"Hello ASAM, ASCII …│·               │        │                -      │
+      ││  NAN_0001                  │VALUE     │nan                 │·               │deg C   │   -40  ├───────?──────│
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      ││                                                                                    ▋                         │
+      ││MAP_DEF_0001[x0,y0] op =                   Set on 1 cell   enter apply  alt+s stage record                    │
+      │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+      │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+      ││   Patch script    Inspector    JSON    Checks                                                                │
+      ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+      ││                                                                                                              │
+      ││                                                                                                              │
+      │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+      │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+      │  Validate   Apply loaded changes   Save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded grid8b.s19 (S19 only)                                                                 (none)  |  grid8b.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: grid8b.a2l
+    Loaded grid8b.s19 (S19 only)
+    Loaded grid8b.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

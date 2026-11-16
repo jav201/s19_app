@@ -93,7 +93,8 @@ async def _show_panel(app, pilot, kind: str):
     await _settle(pilot, 6)
     panel = app.query_one("#check_editor_panel" if kind == "check" else "#patch_editor_panel")
     if kind == "patch":
-        panel.query_one("#patch_tab_a2l", Button).press()
+        # Inc 8 R-TUI-063.3 / R-PE-DEF.3: #patch_tab_a2l (retired) -> #patch_tab_inspector
+        panel.query_one("#patch_tab_inspector", Button).press()
         await _settle(pilot, 3)
     return panel
 
@@ -485,8 +486,16 @@ def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
     """R-PICKER-CORRECT.017/2: u16 [link=e] plus two replacements, no link span."""
     unit = "[link=e]\x1b\x7f%"
     expected = "u16 [link=e]" + CONTROL_REPLACEMENT * 2 + "%"
+    # Inc 8 R-PE-DEF.10 / .14: the staging sheet describes its rows from the loaded A2L (none
+    # without one), so an A2L declaring the same parameter with the same unit is loaded first.
+    a2l = _write_a2l(
+        tmp_path / "hostile_unit.a2l",
+        cm("CM_HOST", "IDENTICAL", unit=f'"{unit}"'),
+        characteristic("HOSTILE_UNIT", "VALUE", "0x1000", "RL_U16", "CM_HOST", "0", "65535"),
+    )
 
     async def body(app, pilot):
+        await _load_a2l(app, pilot, a2l)
         results = {}
         for editor in ("check", "patch"):
             panel = await _show_panel(app, pilot, editor)
@@ -502,19 +511,38 @@ def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
                 ("hostile-unit", editor),
             )
             await _settle(pilot)
+            # Inc 8 R-PE-DEF.2: the Patch Editor's full-name line is mounted but not shown; the name
+            # and unit its operator sees are the staging sheet's formula bar (name label, tail).
+            full = (
+                _full_name(panel)
+                if editor == "check"
+                else (
+                    panel.query_one("#patch_sheet_name", Static).content,
+                    panel.query_one("#patch_sheet_tail", Static).content,
+                )
+            )
             results[editor] = (
                 _cells(panel, "HOSTILE_UNIT")[3],
-                _full_name(panel),
+                full,
                 _clip_cells(expected, _picker(panel)._layout().fmt),
             )
         return results
 
     results = _run(tmp_path, body, size=(160, 54))
-    for cell, full, expected_cell in results.values():
+    for editor, (cell, full, expected_cell) in results.items():
         _assert_literal_surface(cell, expected_cell)
-        assert f"  {expected}  HOSTILE_UNIT" in full.plain
-        assert not [span for span in full.spans if "link" in str(span.style).lower()]
-        assert not [ch for ch in full.plain if ord(ch) < 0x20 or 0x7F <= ord(ch) <= 0x9F]
+        if editor == "check":
+            surfaces = [full]
+            assert f"  {expected}  HOSTILE_UNIT" in full.plain
+        else:
+            # Inc 8 R-PE-DEF.2 (ruling on r017_2): the full-name assertion is retargeted to the
+            # formula bar, the visible place that now shows the name and the literal unit.
+            name, tail = surfaces = list(full)
+            assert name.plain == "HOSTILE_UNIT", name.plain
+            assert tail.plain.startswith("[link=e]" + CONTROL_REPLACEMENT * 2 + "%"), tail.plain
+        for text in surfaces:
+            assert not [span for span in text.spans if "link" in str(span.style).lower()]
+            assert not [ch for ch in text.plain if ord(ch) < 0x20 or 0x7F <= ord(ch) <= 0x9F]
 
 
 # R-PICKER-CORRECT.017/3: a 400-cell UWORD unit clips on ledger and full name.

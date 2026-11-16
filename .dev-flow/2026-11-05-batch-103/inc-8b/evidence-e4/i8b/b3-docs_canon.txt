@@ -1,0 +1,10 @@
+# tree: base @ 48af05ff
+# uptime:  00:38:28 up 2 days,  9:27,  2 users,  load average: 0.80, 0.84, 1.41
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/base/s19_app/__init__.py
+# pytest -n 2 -q tests/test_docs_canon.py
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 1.27s
+# exit=0

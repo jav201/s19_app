@@ -1,0 +1,5 @@
+cw-00 37 nodes: 37 passed in 171.96s (0:02:51) # exit=0
+cw-01 37 nodes: 37 passed in 130.60s (0:02:10) # exit=0
+cw-02 37 nodes: 37 passed in 152.49s (0:02:32) # exit=0
+cw-03 34 nodes: 34 passed in 286.48s (0:04:46) # exit=0
+CHUNKS_DONE total=145

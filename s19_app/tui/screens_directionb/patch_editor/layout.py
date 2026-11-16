@@ -15,20 +15,24 @@ class LayoutMixin:
     """Mixin: the panel's layout: compose and the width derivation."""
 
     def compose(self) -> ComposeResult:
-        """Lay out the Patch Editor as a ledger + inspector (HLR-144, pe_A).
+        """Lay out the Patch Editor as a staging sheet over a landing pane.
 
         Summary:
-            The batch-97 composition (design §3, Patch Editor tree): an
-            identity ribbon; the full-height PATCH SCRIPT ledger (``3fr``)
-            beside the inspector (``2fr``) whose Inspector / JSON / Checks /
-            A2L tab chips switch one ``ContentSwitcher``; then the file row,
-            the document controls and the glyph legend, one terminal row
-            each. Every shipped id is kept (LLR-144.1) and each
-            ``patch_win_*`` / ``patch_saveback_row`` /
-            ``patch_before_after_row`` / ``patch_checks_results`` id keeps
-            its ``Container`` type. Geometry lives in ``styles.tcss`` (one
-            scoped section, D23); Python sizes only the ledger columns and
-            the strip's bytes per row (D21).
+            batch-103 Inc 8 (R-TUI-063.1, CTX-PE-DEF), top to bottom: the
+            identity ribbon; the filter row (the shared picker in pick mode,
+            its table hidden, R-PE-DEF.2); the STAGING SHEET window, which
+            takes every row the other regions leave (R-PE-DEF.1.1, at least
+            12, R-PE-DEF.74); the LANDS IN landing pane, whose Patch script /
+            Inspector / JSON / Checks chips switch one ``ContentSwitcher``
+            (Patch script first, R-TUI-063.3, .4); the file row; the
+            document controls (Inc 10's dock rides inside them, I-8.3); the
+            glyph legend. ``#patch_main`` and ``#patch_win_a2l`` left; every
+            other shipped id is kept (LLR-144.1) and each ``patch_win_*`` /
+            ``patch_saveback_row`` / ``patch_before_after_row`` /
+            ``patch_checks_results`` id keeps its ``Container`` type.
+            Geometry lives in ``styles.tcss`` (one scoped section, D23);
+            Python sizes only the ledger columns and the strip's bytes per
+            row (D21).
 
         Returns:
             ComposeResult: The widget tree.
@@ -36,43 +40,43 @@ class LayoutMixin:
         yield Static(
             "", id="patch_identity_ribbon", classes="nowrap-ribbon", markup=False
         )
-        with Horizontal(id="patch_main"):
-            with Container(id="patch_win_script") as script:
-                script.border_title = self._WINDOW_BORDER_TITLES["patch_win_script"]
-                with VerticalScroll(id="patch_win_script_body") as script_body:
-                    script_body.can_focus = False
-                    with Container(id="patch_pane_entries"):
-                        yield from self._compose_ledger()
-            with Vertical(id="patch_inspector") as inspector:
-                inspector.border_title = self._TABS[0][3]
-                with Horizontal(id="patch_tabs"):
-                    for chip_id, label, _pane, _title in self._TABS:
-                        yield TabChip(
-                            label,
-                            id=chip_id,
-                            classes="tab-chip chip-selected"
-                            if chip_id == "patch_tab_inspector"
-                            else "tab-chip",
-                        )
-                with ContentSwitcher(
-                    initial="patch_pane_inspector", id="patch_tab_switcher"
-                ):
-                    with VerticalScroll(id="patch_pane_inspector") as pane:
-                        pane.can_focus = False
-                        yield from self._compose_entry_form()
-                        yield from self._compose_tally()
-                    with Container(id="patch_win_json"):
-                        yield from self._compose_json_view()
-                        yield from self._compose_paste_buffer()
-                        yield from self._compose_action_bar()
-                    with Container(id="patch_win_checks"):
-                        yield from self._compose_checks_pane()
-                    # batch-102 Inc 5 (US-102-05): the A2L tab hosts the shared
-                    # picker in pick mode; ``Use parameter`` transfers the
-                    # highlighted row into the entry form without touching the
-                    # document (R-B102-PE-003).
-                    with Container(id="patch_win_a2l"):
-                        yield from self._compose_a2l_tab()
+        with Horizontal(id="patch_filter_row"):
+            yield from self._compose_filter_row()
+        with Container(id="patch_sheet_win") as sheet_win:
+            sheet_win.border_title = "STAGING SHEET"
+            sheet_win.border_subtitle = "enter edit · ↑↓ row · arrays open the bench"
+            yield self._sheet
+        with Vertical(id="patch_inspector") as inspector:
+            inspector.border_title = self._TABS[0][3]
+            with Horizontal(id="patch_tabs"):
+                for chip_id, label, _pane, _title in self._TABS:
+                    yield TabChip(
+                        label,
+                        id=chip_id,
+                        classes="tab-chip chip-selected"
+                        if chip_id == "patch_tab_script"
+                        else "tab-chip",
+                    )
+            with ContentSwitcher(
+                initial="patch_win_script", id="patch_tab_switcher"
+            ):
+                with Container(id="patch_win_script") as script:
+                    script.border_title = self._WINDOW_BORDER_TITLES["patch_win_script"]
+                    with VerticalScroll(id="patch_win_script_body") as script_body:
+                        script_body.can_focus = False
+                        with Container(id="patch_pane_entries"):
+                            yield from self._compose_ledger()
+                with VerticalScroll(id="patch_pane_inspector") as pane:
+                    pane.can_focus = False
+                    yield from self._compose_entry_form()
+                    yield from self._compose_use_row()
+                    yield from self._compose_tally()
+                with Container(id="patch_win_json"):
+                    yield from self._compose_json_view()
+                    yield from self._compose_paste_buffer()
+                    yield from self._compose_action_bar()
+                with Container(id="patch_win_checks"):
+                    yield from self._compose_checks_pane()
         yield from self._compose_file_row()
         yield from self._compose_doc_controls()
         yield Static(
@@ -113,14 +117,17 @@ class LayoutMixin:
         Value / Status / Linkage cells with ``update_cell`` (the first call
         ``update_width=True``, the PC-8 path), re-renders the strip at its new
         bytes per row and repaints the ribbon. It never adds a column.
+        batch-103 Inc 8: the borderless ledger fills the landing pane, so
+        while another tab hides it the pane's content width stands for it.
         """
         ledger = self.query_one("#patch_win_script")
         inspector = self.query_one("#patch_inspector")
         ribbon = self.query_one("#patch_identity_ribbon")
-        if ledger.content_region.width == 0 or inspector.content_region.width == 0:
+        ledger_w = ledger.content_region.width or inspector.content_region.width
+        if ledger_w == 0 or inspector.content_region.width == 0:
             return
         layout = patch_layout(
-            ledger.content_region.width,
+            ledger_w,
             inspector.content_region.width,
             self._status_longest(),
             ribbon.content_region.width,

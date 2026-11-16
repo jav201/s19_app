@@ -141,6 +141,14 @@ SNAPSHOT_ALLOW_LIST = {
 # ---------------------------------------------------------------------------
 
 
+async def _click_visible(pilot, selector: str) -> bool:
+    """Inc 8 R-PE-DEF.1.1: the entry form lives in the 9-row landing pane and scrolls inside it,
+    so the operator scrolls a field into view before clicking it (E4 integration, test side)."""
+    pilot.app.screen.query_one(selector).scroll_visible(animate=False)
+    await pilot.pause()
+    return await pilot.click(selector)
+
+
 async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
     for _ in range(attempts):
         if predicate():
@@ -862,15 +870,21 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
                 lambda: len(app.query("#patch_entry_add_button")) > 0,
                 "the Patch Editor panel",
             )
-            assert await pilot.click("#patch_entry_address_input"), (
+            # Inc 8 R-TUI-063.4: the Patch Editor opens on the Patch script tab, so the
+            # entry form (Inspector pane) is reached through its chip first.
+            assert await pilot.click("#patch_tab_inspector"), (
+                "click missed #patch_tab_inspector"
+            )
+            await pilot.pause()
+            assert await _click_visible(pilot, "#patch_entry_address_input"), (
                 "click missed #patch_entry_address_input"
             )
             await pilot.press(*"0x8000007C")
-            assert await pilot.click("#patch_entry_bytes_input"), (
+            assert await _click_visible(pilot, "#patch_entry_bytes_input"), (
                 "click missed #patch_entry_bytes_input"
             )
             await pilot.press(*"DE AD BE EF")
-            assert await pilot.click("#patch_entry_add_button"), (
+            assert await _click_visible(pilot, "#patch_entry_add_button"), (
                 "click missed #patch_entry_add_button"
             )
             await _wait_for(
@@ -883,7 +897,7 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
             # the load-over (without this the no-marker assertion below
             # would pass even if the marker had never existed).
             marked = (
-                app.query_one("#patch_win_script", Container).border_subtitle
+                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
                 or ""
             )
             assert "●" in marked, marked
@@ -900,7 +914,7 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
                 lambda: app.query_one("#patch_paste_text", TextArea).region.width > 0,
                 "the JSON view's paste buffer to become visible",
             )
-            assert await pilot.click("#patch_paste_text"), (
+            assert await _click_visible(pilot, "#patch_paste_text"), (
                 "click missed #patch_paste_text"
             )
             await pilot.press(*"P1 DRAFT")
@@ -935,12 +949,12 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
                 lambda: (
                     "0 entries"
                     in (
-                        app.query_one("#patch_win_script", Container).border_subtitle
+                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
                         or ""
                     )
                     and "●"
                     not in (
-                        app.query_one("#patch_win_script", Container).border_subtitle
+                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
                         or ""
                     )
                 ),
@@ -1017,7 +1031,7 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
                 "a clean session raised the dirty-load question"
             )
             subtitle = str(
-                app.query_one("#patch_win_script", Container).border_subtitle
+                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
             )
             assert "6 entries" in subtitle and "●" not in subtitle, subtitle
 

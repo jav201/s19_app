@@ -1,0 +1,50 @@
+DATE 2026-11-15T19:30:07.242524-06:00
+GROUP G21
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:29:56 up 3 days,  4:18,  3 users,  load average: 0.83, 0.88, 0.79
+LOAD_ONE 0.83
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G21/tree/s19_app/__init__.py
+PID 1034361
+SID 1034361
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-37/test_r_pe_bench_106_2_an_apply0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-37/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere(tmp_path, defc_dir):
+        """R-PE-BENCH.106/2 (EX-BC14). Same as .106/1 with an Apply of the change document handled between steps (the Apply
+        changes the image under the sheet and the ledger's states): when the refresh ends, the ledger, the JSON view and the
+        sheet's marks equal a full refresh of the applied document. A save-back prompt the Apply opens is dismissed with escape.
+        Negative control: a later step repainting the pre-apply sheet or ledger differs from the full refresh -> RED."""
+    
+        async def body(app, pilot, panel):
+            def apply():
+                panel.request_action("apply_doc")
+    
+            result = await undone_or_applied_between_steps(pilot, app, panel, apply)
+            if app.screen is not panel.screen:
+                await pilot.press("escape")
+                await pilot.pause(0.3)
+            return result, entries_of(app)
+    
+        (before, rows_at_write, settled, full, tokens), entries = run(tmp_path, defc_dir, body)
+        assert rows_at_write == 0, "the Apply was not between steps: the ledger was already refreshed when the entry appeared"
+        assert len(entries) == 1, entries
+>       assert tokens and any(token != tokens[0] for token in tokens[1:]), f"the action was not observed before the chain ended: {tokens!r}"
+E       AssertionError: the action was not observed before the chain ended: [(140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0), (140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0)]
+E       assert ([(140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0), (140002703653376, (('back', 1), ('bound', 20), ('forward', 0)), 140002677859152, 0)] and False)
+E        +  where False = any(<generator object test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere.<locals>.<genexpr> at 0x7f54ea496ce0>)
+
+tests/test_b103_inc9b_s.py:318: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G21/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere
+1 failed in 9.45s
+EXIT_CODE 1

@@ -1,0 +1,17 @@
+# tree: clone @ 439614dd
+# uptime:  00:37:23 up 2 days,  9:26,  2 users,  load average: 0.16, 0.83, 1.45
+s19_app.__file__ = /home/<user>/work/zq-e4-8b-i8b/clone/s19_app/__init__.py
+# pytest -q -s -p no:xdist tests/test_zz_probe_80.py
+BODY region Region(x=6, y=7, width=143, height=8) content Size(width=143, height=8) GRID region Region(x=6, y=7, width=70, height=9) Region(x=6, y=7, width=70, height=8)
+ROWS ['ENUM_0001']
+L|  Parameter                 │Kind      │Current             │New             │Unit    │Limits       
+L|━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━
+L|▶ ENUM_0001                 │VALUE     │1 IDLE              │·               │        │     0  ├────
+L|  ┊ └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B                                     
+L|  ┊ ╭─ ENUM_0001 · choose one ───────────────────────────────────────────────────╮                  
+L|  ┊ │ ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │                  
+L|  ┊ │ ↔ choose · enter stage                                                     │                  
+L|  ┊ ╰────────────────────────────────────────────────────────────────────────────╯                  
+.
+1 passed in 12.36s
+# exit=0

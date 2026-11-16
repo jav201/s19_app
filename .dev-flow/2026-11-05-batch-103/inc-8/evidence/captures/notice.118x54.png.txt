@@ -1,0 +1,28 @@
+scenario=notice
+fixture=definitions case (tools/synth/make_release_case.py --case definitions --seed 20260001)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+top_screen=Screen
+focused=patch_sheet_input
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+ledger_entries=0
+selected_rows=[▶◆] DISPLAY_0001      VALUE    143.5             175.0        deg C  -40
+sheet_text_begin
+    Parameter         Kind     Current           New          Unit   Limits                    Δ               
+    ENUM_0001         VALUE    1 IDLE            ·                   0 ├────●───────┤ 3                        
+    MASK_BIT_0001     VALUE    1 (0x01)          ·                   0 ├───────────●┤ 1                        
+    MASK_FIELD_0001   VALUE    174 (0xAE)        ·                   0 ├────────●───┤ 255                      
+  ▶◆DISPLAY_0001      VALUE    143.5             175.0        deg C  -40 ├───────────●▶ 150    +31.5 (+16.6%)  
+  └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B
+    CURVE_DEF_0001    CURVE    5 values          ·                   -                                         
+    MAP_DEF_0001      MAP      12 values         ·                   -                                         
+    VAL_BLK_DEF_0001  VAL_BLK  6 values          ·            units  -                                         
+  DISPLAY_0001
+  new =
+  deg C  raw 287→350 · 01 1F → 01 5E  ▲ DISPLAY_0001: 175 is outside the l…
+sheet_text_end
+stub_os_writes=0
+surface=ready

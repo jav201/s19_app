@@ -1,0 +1,43 @@
+# uptime before: 1.57 1.68 1.70 3/649 424179
+s19_app.__file__ = ~/work/zq-fx9/fix2m/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second _
+
+tmp_path = PosixPath('~/work/zq-fx9/tmp/pytest-of-<user>/pytest-16/test_r_pe_bench_29_2_a_cursor_0')
+defc_dir = PosixPath('~/work/zq-fx9/tmp/pytest-of-<user>/pytest-16/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second(tmp_path, defc_dir):
+        """`right` pressed again and again while the preview result of LARGE is on its way: every press <= 0.5 s,
+        and more than two presses were made before the result arrived (so the arrival was inside the loop)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await open_bench(pilot, sheet, LARGE)
+            await pilot.press(*(["shift+right"] * 15 + ["shift+down"] * 255))
+            await apply_tool(pilot, sheet, "s", "7")
+            return await keys_until(pilot, sheet, "right", lambda: previewed(sheet))
+    
+        times = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        assert len(times) > 2, f"the preview arrived after {len(times)} presses: the arrival was not exercised"
+>       assert max(times) <= report_margin(
+            "R-PE-BENCH.29/2 cursor key while the preview arrives", max(times), KEY_LIMIT_S
+        ), f"slowest press {max(times):.3f} s ({load()}); load-sensitive"
+E       AssertionError: slowest press 0.972 s (load 2.37 1.94 1.80); load-sensitive
+E       assert 0.9719417179876473 <= 0.5
+E        +  where 0.9719417179876473 = max([0.959360088018002, 0.8624618119793013, 0.8433301500044763, 0.8503698679851368, 0.9719417179876473])
+E        +  and   0.5 = report_margin('R-PE-BENCH.29/2 cursor key while the preview arrives', 0.9719417179876473, 0.5)
+E        +    where 0.9719417179876473 = max([0.959360088018002, 0.8624618119793013, 0.8433301500044763, 0.8503698679851368, 0.9719417179876473])
+
+tests/test_b103_inc9_w_jobs.py:353: AssertionError
+============================= QC-TM timing margins =============================
+LOW -94.4%  0.972 s / 0.500 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second
+1 failed in 100.58s (0:01:40)
+# rc=1
+# uptime after: 2.37 1.94 1.80 4/657 424692

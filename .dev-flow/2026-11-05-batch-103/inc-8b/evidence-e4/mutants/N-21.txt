@@ -1,0 +1,219 @@
+# mutant N-21  rows: R-PE-DEF.21
+# edits: s19_app/tui/definition_sheet.py:880
+# -k: r_pe_def_21_
+# uptime: 01:59:03 up 2 days, 10:47,  3 users,  load average: 1.22, 0.87, 1.22
+s19_app.__file__ = ~/work/zq-m8b/m/N-21/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF............................FF.....FFFF.F                              [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.cur143.5.new25.5] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'DISPLAY_0001.cur143.5.new25.5'
+
+    @pytest.mark.parametrize(
+        "key",
+        ["DISPLAY_0001.cur143.5.new25.5", "MASK_FIELD_0001.cur174.new255", "ENUM_0001.cur1",
+         "DISPLAY_0001.new175", "DISPLAY_0001.new-45"],
+    )
+    def test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript(defc, key):
+        """R-PE-DEF.21/1 .. /5 - the five Limits cells: ``<slot> <track> <slot>`` in 34 cells, marks on the ruler rule.
+    
+        Operator need: the mark of the current value sits where the value is between the limits, and the cell is
+        always the same 34 cells (D's aligned Limits column)."""
+        cell = _the_cell(defc, key)
+>       assert cell.plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '   -40  ├───...────▶    150 ' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├─────◆────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ├─────◆──────────▶    150 
+E         ?                         ^^
+
+tests/test_b103_inc8b_s1.py:666: AssertionError
+_______ test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column _______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column(defc):
+        """R-PE-DEF.21/1 (in the row) - DISPLAY_0001 pending 25.5: columns 87 .. 120 of the row line are the transcript cell."""
+        line, _, _ = paint(defc, display(defc), text="25.5")
+        key = "DISPLAY_0001.cur143.5.new25.5"
+>       assert cell_slice(line.plain, START["Limits"], LIMITS_W) == TR[f"L.cell.{key}"]
+E       AssertionError: assert '   -40  ├───...────▶    150 ' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├─────◆────────●─┤    150 
+E         ?                        ^^^
+E         +    -40  ├───────◆────────▶    150 
+E         ?          ++              ^
+
+tests/test_b103_inc8b_s1.py:675: AssertionError
+_ test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new175] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'DISPLAY_0001.new175'
+
+    @pytest.mark.parametrize(
+        "key",
+        ["DISPLAY_0001.cur143.5.new25.5", "MASK_FIELD_0001.cur174.new255", "ENUM_0001.cur1",
+         "DISPLAY_0001.new175", "DISPLAY_0001.new-45"],
+    )
+    def test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript(defc, key):
+        """R-PE-DEF.21/1 .. /5 - the five Limits cells: ``<slot> <track> <slot>`` in 34 cells, marks on the ruler rule.
+    
+        Operator need: the mark of the current value sits where the value is between the limits, and the cell is
+        always the same 34 cells (D's aligned Limits column)."""
+        cell = _the_cell(defc, key)
+>       assert cell.plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '   -40  ├───...────▶    150 ' == '   -40  ├───...──●─▶    150 '
+E         
+E         -    -40  ├──────────────●─▶    150 
+E         ?                        ^
+E         +    -40  ├────────────────▶    150 
+E         ?                        ^
+
+tests/test_b103_inc8b_s1.py:666: AssertionError
+_ test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new-45] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'DISPLAY_0001.new-45'
+
+    @pytest.mark.parametrize(
+        "key",
+        ["DISPLAY_0001.cur143.5.new25.5", "MASK_FIELD_0001.cur174.new255", "ENUM_0001.cur1",
+         "DISPLAY_0001.new175", "DISPLAY_0001.new-45"],
+    )
+    def test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript(defc, key):
+        """R-PE-DEF.21/1 .. /5 - the five Limits cells: ``<slot> <track> <slot>`` in 34 cells, marks on the ruler rule.
+    
+        Operator need: the mark of the current value sits where the value is between the limits, and the cell is
+        always the same 34 cells (D's aligned Limits column)."""
+        cell = _the_cell(defc, key)
+>       assert cell.plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '   -40  ◀───...────▶    150 ' == '   -40  ◀───...──●─┤    150 '
+E         
+E         -    -40  ◀──────────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ◀────────────────▶    150 
+E         ?                         ^^
+
+tests/test_b103_inc8b_s1.py:666: AssertionError
+_ test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell(defc):
+        """R-PE-DEF.21/1 (changed at Inc 8b E1) - DISPLAY_0001 at its current 143.5: `L.cell.DISPLAY_0001.cur143.5`.
+    
+        Why: the operator asked for every Limits cell to line up down the column: two 7-cell slots (number
+        right-aligned, unit letter last) and an 18-cell track at fixed offsets, `├` at 8 whatever the lower
+        limit's width. Inc 8's cell started the track after the lower limit's own text.
+        """
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"])
+>       assert cell == fact("L.cell.DISPLAY_0001.cur143.5") and len(cell) == fact("L.cell.DISPLAY_0001.cur143.5.len") == 34
+E       AssertionError: assert ('   -40  ├───...────▶    150 ' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├──────────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ├────────────────▶    150 
+E         ?                         ^^)
+
+tests/test_b103_inc8_s1.py:492: AssertionError
+_____ test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end(defc):
+        """R-PE-DEF.21/4 - a preview of 175 (above 150) -> `▶` at offset 25 (the track's right end), no `◆`; `L.cell.DISPLAY_0001.new175`."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], 175)
+>       assert cell == fact("L.cell.DISPLAY_0001.new175")
+E       AssertionError: assert '   -40  ├───...────▶    150 ' == '   -40  ├───...──●─▶    150 '
+E         
+E         -    -40  ├──────────────●─▶    150 
+E         ?                        ^
+E         +    -40  ├────────────────▶    150 
+E         ?                        ^
+
+tests/test_b103_inc8_s1.py:508: AssertionError
+________ test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell ________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell(defc):
+        """R-PE-DEF.21/1 - a preview of 25.5 -> `L.cell.DISPLAY_0001.cur143.5.new25.5` (`◆` on its cell, `●` on the current value's)."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], EX.new)
+        marks = fact("L.cell.DISPLAY_0001.cur143.5.new25.5.marks")
+>       assert cell == fact("L.cell.DISPLAY_0001.cur143.5.new25.5")
+E       AssertionError: assert '   -40  ├───...────▶    150 ' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├─────◆────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ├─────◆──────────▶    150 
+E         ?                         ^^
+
+tests/test_b103_inc8_s1.py:501: AssertionError
+_____ test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end(defc):
+        """R-PE-DEF.21/5 - below the lower limit -> `◀` at offset 8 (the track's left end); `L.cell.DISPLAY_0001.new-45`."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], -45)
+>       assert cell == fact("L.cell.DISPLAY_0001.new-45")
+E       AssertionError: assert '   -40  ◀───...────▶    150 ' == '   -40  ◀───...──●─┤    150 '
+E         
+E         -    -40  ◀──────────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ◀────────────────▶    150 
+E         ?                         ^^
+
+tests/test_b103_inc8_s1.py:515: AssertionError
+_________ test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form(defc):
+        """R-PE-DEF.21/2 (the case is gone at Inc 8b E1; E3-8b-10) - the Limits width is fixed, so the `width` argument changes nothing.
+    
+        Why: Inc 8 drew `-40 … 150` when the Limits column was narrower than 18. The column is 34 cells at
+        every view width now: asking for width 16, 34 or 200 must give the same aligned cell, never the old
+        dots form.
+        """
+        display = defc["defs"]["DISPLAY_0001"]
+        narrow = _limits(display, defc["a2l"], defc["image"], None, 16)
+        assert narrow == _limits(display, defc["a2l"], defc["image"], None, 34)
+        assert narrow == _limits(display, defc["a2l"], defc["image"], None, 200)
+>       assert narrow == fact("L.cell.DISPLAY_0001.cur143.5") and narrow.strip() != "-40 … 150"
+E       AssertionError: assert ('   -40  ├───...────▶    150 ' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├──────────────●─┤    150 
+E         ?                        - ^
+E         +    -40  ├────────────────▶    150 
+E         ?                         ^^)
+
+tests/test_b103_inc8_s1.py:530: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.cur143.5.new25.5]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_1_the_cell_in_its_row_sits_at_the_limits_column
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new175]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_21_the_limits_cell_is_the_aligned_cell_of_the_transcript[DISPLAY_0001.new-45]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form
+9 failed, 34 passed in 1.89s
+
+# exit=1

@@ -1,0 +1,24 @@
+scenario=array
+fixture=public example A2L examples/case_00_public/ASAP2_Demo_V171.a2l and a hand image of 'Hello ASAM' + NUL (42 B) at 0x810200 (scratch S19)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+top_screen=Screen
+focused=patch_sheet_body
+status_lines_this_run=2
+status: A2L loaded: ASAP2_Demo_V171.a2l
+status: Loaded hand_image.s19
+ledger_entries=0
+selected_rows=[▶ ] ASAM.C.ARRAY.SWORD.MATR…VAL_BLK   12 values
+sheet_text_begin
+    Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                     
+  ▶ ASAM.C.ARRAY.SWORD.MATR…VAL_BLK   12 values                                   ·                   hours   -                                                                                    
+  └ IDENTICAL phys = raw · SWORD s16 little-endian · RL.FNC.SWORD.ROW_DIR · 0x00810100 · 24 B
+    ASAM.C.ARRAY.SWORD.MATR…VAL_BLK   12 values                                   ·                   hours   -                                                                                    
+    ASAM.C.ARRAY.SWORD.MATR…VAL_BLK   6 values                                    ·                   hours   -                                                                                    
+  ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR
+  
+  edit VAL_BLK objects in the Inspector tab
+sheet_text_end
+stub_os_writes=0
+surface=ready

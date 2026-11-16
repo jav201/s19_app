@@ -1,0 +1,20 @@
+DATE 2026-11-15T19:07:46.051636-06:00
+GROUP G09
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:05:03 up 3 days,  3:53,  3 users,  load average: 0.79, 0.68, 0.40
+LOAD_ONE 0.79
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 2
+S19_APP_FILE ~/work/zq-m9b/groups/G09/tree/s19_app/__init__.py
+PID 1028039
+SID 1028039
+TIMEOUT_S 300
+XDIST_N 0
+..                                                                       [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G09/baseline.xml ----
+============================= QC-TM timing margins =============================
+LOW 6.4%  0.468 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 1 under 20 % margin
+2 passed in 161.18s (0:02:41)
+EXIT_CODE 0

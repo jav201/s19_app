@@ -1,0 +1,133 @@
+scene=stage-refused
+capture_seq=1
+phase=busy-f1
+png_name=stage-refused.118x54.f1.png
+commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+fixture=defc
+capture_timestamp=2026-11-16T02:47:33.698158+00:00
+monotonic=422134.484000
+requested_size=118x54
+app_size=118x54
+patch_sheet_win_region=5,6,112x28
+patch_sheet_win_size=110x26
+title_room_B=106
+body=143x24;content=143x24
+grid=scroll_x=0.0;size=110x25;virtual=143x24
+sheet_top=1
+focused=patch_sheet_body
+selected=VAL_BLK_DEF_0001
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+sheet_subtitle=None
+painted_sheet_top_row=╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.3 s · keys still work  ─────────────────────────────────╮
+painted_top_left_border_color=#f5c26b
+border_title_plain=STAGING SHEET  [rgb(10,14,27) on rgb(245,194,107) bold] ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.3 s · keys still work [/rgb(10,14,27) on rgb(245,194,107) bold]
+pill_bold=True
+pill_foreground=#0a0e1b
+pill_background=#f5c26b
+spinner_glyph=◐
+job_word=stage
+busy_name=VAL_BLK_DEF_0001
+pending_seconds=0.3
+different_from_f1=not-applicable
+same_job_name=not-applicable
+elapsed_nondecreasing=not-applicable
+frame_pair_valid=not-applicable
+frame_delta_s=not-applicable
+idle_title=False
+busy_absent=False
+idle_border_not_busy=False
+active_job=('record', 'VAL_BLK_DEF_0001')
+record_hold=False
+record_stage_name=None
+bench_state=cursor:(0, 0);anchor:(0, 0);tool:s;focus:True;edit:{(0, 0): '60'};undo:1;job:None
+values_present=True
+preview_result_kind=Refusal
+document_entry_count_before=0
+document_entry_count=0
+document_entries=
+ledger_row_count=0
+staged_mark=False
+write_landed_before_busy=False
+held_refresh_callbacks=0
+held_refresh_callback_invocations=0
+capture_frame_hold=True
+presentation_settle_s=0.2
+frame_hold_painted_stable=True
+decode_gate_target=[]
+encode_gate_target=['VAL_BLK_DEF_0001']
+decode_gate_entered=[]
+encode_gate_entered=['VAL_BLK_DEF_0001']
+decode_gate_released=False
+encode_gate_released=False
+capture_interposition=I-2 result-preserving gate; released after f2 ACK
+keys_sent=<type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down | enter | s enter | <set operand '60'> | enter | escape | alt+s
+stub_os_writes=0
+app_is_running=True
+widget_#patch_sheet=size:110x26;classes:[];subtitle:None
+widget_#patch_inspector=size:108x4;classes:[];subtitle:'0 entries'
+widget_#patch_editor_panel=size:112x39;classes:['-bench'];subtitle:None
+status=A2L loaded: definitions.a2l
+status=Loaded definitions.s19
+screen_text_begin
+
+  ⭘                                                Hex Edit Tool
+    │                                       Patch Editor                                         ?  📂 Open patches/
+ ▏◫ │
+ ▏≡ │ draft · change
+ ▏◉ │ Filter _0001                                            7 of 7 shown  <    Page 1/1   >    ▽ Pick   Add list
+ ▏▤ │╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.3 s · keys still work  ─────────────────────────────────╮
+ ▏! ││  Parameter                 │Kind      │Current             │New             │Unit    │Limits                 │
+ ▏✎ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━│
+ ▏✔ ││  MASK_BIT_0001             │VALUE     │1 (0x01)            │·               │        │     0  ├──────────────│
+ ▏⏚ ││  MASK_FIELD_0001           │VALUE     │174 (0xAE)          │·               │        │     0  ├──────────●───│
+ ▏✦ ││  DISPLAY_0001              │VALUE     │143.5               │·               │deg C   │   -40  ├──────────────│
+ ▏▶ ││  CURVE_DEF_0001            │CURVE     │▄▆▃▇▁ 5             │·               │        │     0          …      │
+ ▏☑ ││  MAP_DEF_0001              │MAP 4x3   │▆▃▅▃ 12             │·               │        │ -1.00k         …      │
+ ▏⊕ ││▶◆VAL_BLK_DEF_0001          │VAL_BLK   │▄▃▄ 6               │1 cell          │units   │   -50          …      │
+    ││  ┊ └ LINEAR phys = 0.05*raw · SWORD s16 big-endian · RL_DEF_S16_ROW · 0x00800090 · 12 B                      │
+    ││  ┊                0                    1                    2                                                │
+    ││  ┊      0        ▸60*                 11.0                 31.8                                              │
+    ││  ┊       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                │
+    ││  ┊      1       -20.7                -19.8                -10.7                                              │
+    ││  ┊                                                                                                           │
+    ││  ┊ shade ████████████ -20.7 … 36.9 units   sel x0,y0   * / bold = edited                                     │
+    ││  ┊  s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                     │
+    ││  ┊ ✗ refused: VAL_BLK_DEF_0001[0,0]: 60 is outside the limits -50..50                                        │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    ││                                                                                    ▋                         │
+    ││VAL_BLK_DEF_0001[x0,y0] op =  60               units  Set on 1 cell ✗ VAL_BLK_DEF_0001[0,0]: 60 is outside th…│
+    │╰──────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+    │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮
+    ││   Patch script    Inspector    JSON    Checks                                                                │
+    ││  No entries yet: Add one, paste a change-set or Load a file.                                                 │
+    ││                                                                                                              │
+    ││                                                                                                              │
+    │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯
+    │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh
+    │  Validate   Apply loaded changes   Save
+    │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Loaded definitions.s19 (S19 only)                                                       (none)  |  definitions.a2l
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+
+  A2L loaded: definitions.a2l
+  Loaded definitions.s19 (S19 only)
+  Loaded definitions.s19
+  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+
+screen_text_end
+surface=ready
+
+png_width=1111
+png_height=1091
+capture_method=PrintWindow
+png_bytes=101860
+png_captured_at=2026-11-15T20:47:33.9036043-06:00

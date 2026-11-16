@@ -1,0 +1,20 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=gap Q9B_SIDE=tip Q9B_LABEL=c-post Q9B_RUN=06
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 15:20:17 up 3 days, 8 min,  3 users,  load average: 1.08, 0.84, 0.77
+ 15:22:17 up 3 days, 10 min,  3 users,  load average: 0.14, 0.55, 0.67
+Q9B_LOAD1=0.14
+Q9B_NODE=tests/test_q9b_gap.py::test_q9b_gap
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_q9b_gap.py::test_q9b_gap Q9BGAP {"error": null, "events": [{"dt": 0.0, "key": "up", "m": "key", "t": 259917.007297974}, {"delta": -1, "dt": 0.04552916300599463, "m": "action_move", "t": 259917.052827137}, {"dt": 0.046964600012870505, "m": "selection_changed", "name": "LARGE", "t": 259917.054262574}, {"dt": 0.047003429994219914, "kind": "decode", "m": "enqueue_decode", "name": "LARGE", "t": 259917.054301404}, {"dt": 0.047026050015119836, "kind": "decode", "m": "active_job", "name": "LARGE", "t": 259917.054324024}, {"dt": 0.05485978000797331, "kind": "decode", "m": "run_job", "name": "LARGE", "t": 259917.062157754}, {"dt": 0.35172239001258276, "m": "paint_busy", "t": 259917.359020364}], "key": "up", "loadavg": [0.73583984375, 0.65087890625, 0.6982421875], "markers": ["action_move", "active_job", "enqueue_decode", "key", "paint_busy", "run_job", "selection_changed"], "missing": [], "run": "06", "scenario": "c-post", "target": "LARGE"}
+PASSED
+
+========================= 1 passed in 70.82s (0:01:10) =========================
+Q9B_RC=0
+Q9B_VALID=PASS

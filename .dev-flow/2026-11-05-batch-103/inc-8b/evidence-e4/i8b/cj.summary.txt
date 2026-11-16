@@ -1,0 +1,4 @@
+cj-00 4 nodes: 4 passed in 105.33s (0:01:45) # exit=0
+cj-01 4 nodes:  
+cj-02 2 nodes: 2 passed in 186.22s (0:03:06) # exit=0
+CHUNKS_DONE total=10

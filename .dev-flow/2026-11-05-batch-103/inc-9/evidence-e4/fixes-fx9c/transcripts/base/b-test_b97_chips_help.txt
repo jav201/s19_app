@@ -1,0 +1,94 @@
+load before: 1.37 1.56 1.68 1/637 535719
+~/work/zq-fx9c/baseclone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+............................F........................................... [ 91%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_tc_b97_32_patch_help_names_every_label __________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9c/tmp/pytest-of-<user>/pytest-69/popen-gw1/test_tc_b97_32_patch_help_name0')
+
+    def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
+        """TC-B97-32 (LLR-148.6, Patch arm, D20): the ``patch`` help body holds one
+        ``label — effect`` line, effect non-empty, for every button, tab chip,
+        input and select label the screen renders over its driven states
+        (Inspector, JSON and Checks tabs; the save-back prompt and the
+        before/after report offered), every key it binds and every glyph of
+        ``PATCH_GLYPHS``. The floor is derived over ``PE_IDS_9C7BEAF`` by the type
+        tuple Button · Input · Select and equals 26; the count of covered control
+        WIDGETS is at least that floor; the one ``Edit JSON`` line names both tabs.
+    
+        RED on main (P-21): 6 of 19 labels named. Mutation: a body line without
+        `` — effect``; coverage from one tab only; the ``TextArea`` put back in
+        the tuple (derived 27 ≠ 26).
+        """
+        from textual.widgets import Button, Input as _Input, Select as _Select
+    
+        from s19_app.tui import screens_directionb as sdb
+        from tests.b97_fixtures import PE_IDS_9C7BEAF, calib_hotfix, load_change_file, open_patch_editor
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                panel = await open_patch_editor(app, pilot)
+                screen = app.query_one("#screen_patch")
+                derived = {
+                    i for i in PE_IDS_9C7BEAF
+                    if isinstance(app.query_one(f"#{i}"), (Button, _Input, _Select))
+                }
+                await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
+                seen = {}
+    
+                def harvest():
+                    for widget in screen.query("*"):
+                        if not isinstance(widget, (Button, _Input, _Select)):
+                            continue
+                        if not widget.display or widget.region.width == 0:
+                            continue
+                        if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                            continue
+                        seen[widget] = _control_label(screen, widget)
+    
+                for tab in PATCH_TABS:
+                    if panel.query(f"#{tab}"):
+                        panel.query_one(f"#{tab}").press()
+                        await settle(pilot, 3)
+                    harvest()
+                if panel.query("#patch_tab_json"):
+                    panel.query_one("#patch_tab_json").press()
+                    await settle(pilot, 2)
+                panel.query_one("#patch_doc_apply_button").press()
+                await settle(pilot, 6)
+                harvest()
+                panel.query_one("#patch_saveback_confirm_button").press()
+                await settle(pilot, 8)
+                harvest()
+                in_panel = {w: label for w, label in seen.items() if panel in w.ancestors}
+                return derived, in_panel, set(seen.values()), window_keys_text(app, "patch")
+    
+        derived, in_panel, labels, keys_text = asyncio.run(_drive())
+        from s19_app.tui import screens_directionb as sdb
+    
+        lines = _help_lines("patch", keys_text)
+        # Inc-8 (D27): ^z / ^y are lines of the generated keys block, keyed by the
+        # key bar's display (`^z`), no longer the hand-typed `ctrl+z`.
+        keys = {"^z", "^y", "space", "enter", "?"}
+        glyphs = set(getattr(sdb, "PATCH_GLYPHS", {}) or {"(no PATCH_GLYPHS)"})
+        assert len(derived) == 26, sorted(derived)
+        missing = sorted((labels | keys | glyphs) - set(lines))
+>       assert missing == [], f"labels with no `label — effect` line: {missing}"
+E       AssertionError: labels with no `label — effect` line: ['']
+E       assert [''] == []
+E         
+E         Left contains one more item: ''
+E         Use -v to get more diff
+
+tests/test_b97_chips_help.py:1114: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+1 failed, 78 passed in 213.56s (0:03:33)
+rc=1
+load after: 1.83 1.72 1.73 1/635 536762

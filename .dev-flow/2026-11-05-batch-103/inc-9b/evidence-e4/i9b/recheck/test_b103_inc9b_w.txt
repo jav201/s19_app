@@ -1,0 +1,40 @@
+### LABEL: test_b103_inc9b_w
+### CLONE: ~/work/zq-i9b/tip
+### DATE: 2026-11-15T13:59:36-06:00
+### UPTIME:  13:59:36 up 2 days, 22:48,  2 users,  load average: 1.65, 0.94, 0.73
+### HEAD: c19503f0f786e85cf4fffc6a9359b5f3947cdf0b
+### STATUS-BEGIN
+ M .dev-flow/2026-11-05-batch-103/inc-9b/E4-roster.md
+ M tests/test_b103_inc9b_at.py
+ M tests/test_b103_inc9b_s.py
+ M tests/test_b103_inc9b_w.py
+ M tests/test_id_registry.py
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/tip/s19_app/__init__.py
+### HEADER-END
+### PYTEST jobs=0
+### ARGS: tests/test_b103_inc9b_w.py
+--- begin ---
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 22 items
+
+tests/test_b103_inc9b_w.py ......................                        [100%]
+============================= QC-TM timing margins =============================
+27.4%  0.218 s / 0.300 s  R-PE-BENCH.102/2 idle after the filter keystroke  tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+41.5%  0.293 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+53.4%  0.140 s / 0.300 s  R-PE-BENCH idle after decode LARGE  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+82.0%  0.054 s / 0.300 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+82.2%  0.054 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+82.4%  0.053 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+98.9%  0.053 s / 5.000 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+QC-TM: 7 bounds, 0 under 20 % margin
+
+======================== 22 passed in 181.88s (0:03:01) ========================
+--- end rc=0 ---
+### END-DATE: 2026-11-15T14:02:40-06:00
+### END-UPTIME:  14:02:40 up 2 days, 22:51,  2 users,  load average: 0.84, 0.87, 0.74

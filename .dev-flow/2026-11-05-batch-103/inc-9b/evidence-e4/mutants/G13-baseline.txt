@@ -1,0 +1,25 @@
+DATE 2026-11-15T19:19:25.443315-06:00
+GROUP G13
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:18:30 up 3 days,  4:07,  3 users,  load average: 0.63, 0.79, 0.67
+LOAD_ONE 0.63
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 6
+S19_APP_FILE ~/work/zq-m9b/groups/G13/tree/s19_app/__init__.py
+PID 1031398
+SID 1031398
+TIMEOUT_S 300
+XDIST_N 0
+......                                                                   [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G13/baseline.xml ----
+============================= QC-TM timing margins =============================
+48.4%  0.155 s / 0.300 s  R-PE-BENCH.101/3 idle after a refused write  tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look
+56.9%  0.129 s / 0.300 s  R-PE-BENCH.101/2 idle after a refused record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_2_a_record_refused_by_its_encode_returns_the_window_to_its_idle_look_within_0_3_s
+73.7%  0.079 s / 0.300 s  R-PE-BENCH.101/5 idle after a stale record  tests/test_b103_inc9b_at.py::test_r_pe_bench_101_5_a_record_made_stale_by_an_undo_returns_the_window_to_its_idle_look_within_0_3_s
+82.9%  0.051 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+83.0%  0.051 s / 0.300 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+88.7%  0.034 s / 0.300 s  R-PE-BENCH.101/4 idle after a refused write  tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look
+QC-TM: 6 bounds, 0 under 20 % margin
+6 passed in 52.67s
+EXIT_CODE 0

@@ -1,0 +1,169 @@
+Cloning into '<runner-home>/work/zq-x9b/apply-base'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at 8539c371 batch-103 Inc 9b E5: test same-call bytes Apply repaint
+Cloning into '<runner-home>/work/zq-x9b/apply-equivalent'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at 8539c371 batch-103 Inc 9b E5: test same-call bytes Apply repaint
+Cloning into '<runner-home>/work/zq-x9b/apply-red'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at 8539c371 batch-103 Inc 9b E5: test same-call bytes Apply repaint
+APPLIED hold-apply s19_app/tui/app/patch.py anchors=1
+APPLIED hold-apply-no-hook s19_app/tui/app/patch.py anchors=1
+PHASE apply-base
+DATE 2026-11-15T20:11:53-06:00
+HEAD 8539c3718dd9c76a00d298a0e4431855bf19289d
+TREE <runner-home>/work/zq-x9b/apply-base
+DIRTY_BEGIN
+DIRTY_END
+ 20:11:53 up 3 days,  5:00,  2 users,  load average: 0.32, 0.21, 0.24
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/apply-base/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/apply-base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py .                                             [100%]
+
+============================== 1 passed in 4.35s ===============================
+EXIT_CODE 0
+PHASE_RC_apply-base 0
+PHASE apply-equivalent
+DATE 2026-11-15T20:11:59-06:00
+HEAD 8539c3718dd9c76a00d298a0e4431855bf19289d
+TREE <runner-home>/work/zq-x9b/apply-equivalent
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:11:59 up 3 days,  5:00,  2 users,  load average: 0.38, 0.23, 0.24
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/apply-equivalent/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/apply-equivalent
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py .                                             [100%]
+
+============================== 1 passed in 4.24s ===============================
+EXIT_CODE 0
+PHASE_RC_apply-equivalent 0
+PHASE apply-red
+DATE 2026-11-15T20:12:05-06:00
+HEAD 8539c3718dd9c76a00d298a0e4431855bf19289d
+TREE <runner-home>/work/zq-x9b/apply-red
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:12:05 up 3 days,  5:00,  2 users,  load average: 0.43, 0.24, 0.25
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/apply-red/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/apply-red
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py F                                             [100%]
+
+=================================== FAILURES ===================================
+____ test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call _____
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-apply-red/tmp/pytest-of-<runner>/pytest-0/test_e5_9b_hold_apply_bytes_en0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-apply-red/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    def test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call(tmp_path, defc_dir):
+        """E5 / HOLD-APPLY: the real Apply handler repaints before it returns.
+    
+        The roster's return-after-hook control is equivalent for these views:
+        ``_note_image_bytes_written`` itself reaches ``_patch_editor_load_tail``.
+        Removing the hook as well is the discriminating negative control.
+        """
+        from s19_app.tui.screens_directionb import PatchEditorPanel
+    
+        document = write_bytes_change(tmp_path / "hold-apply.json")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            app._patch_editor_load(panel, str(document))
+            await pilot.pause()
+            before = digest(panel, sheet)
+            app.on_patch_editor_panel_action_requested(
+                PatchEditorPanel.ActionRequested("apply_doc")
+            )
+            same_call = digest(panel, sheet)
+            written = bytes(app.current_file.mem_map[VB_ADDRESS + i] for i in range(12))
+            app._refresh_patch_history_view()
+            return before, same_call, written, digest(panel, sheet)
+    
+        before, same_call, written, full = run(tmp_path, defc_dir, body)
+        assert written == bytes(range(1, 13)), written
+        assert len(before[0]) == 1 and len(same_call[0]) == 1, (before, same_call)
+>       assert same_call == full, f"Apply returned before a full repaint:\n{same_call}\n{full}"
+E       AssertionError: Apply returned before a full repaint:
+E         ((('· bytes', '0x800090', '01 02 03 04 05 06 07 08 .. (12 bytes)', 'inside', '-'),), '{\n  "format": "s19app-changeset",\n  "version": "",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x800090",\n      "bytes": "01 02 03 04 05 06 07 08 09 0A 0B 0C"\n    }\n  ]\n}', (('ENUM_0001', False, "Decoded(stored=1, value='IDLE', text='IDLE')", "Decoded(stored=1, value='IDLE', text='IDLE')"), ('MASK_BIT_0001', False, "Decoded(stored=1, value=1, text='1')", "Decoded(stored=1, value=1, text='1')"), ('MASK_FIELD_0001', False, "Decoded(stored=174, value=174, text='174')", "Decoded(stored=174, value=174, text='174')"), ('DISPLAY_0001', False, "Decoded(stored=287, value=143.5, text='143.5')", "Decoded(stored=287, value=143.5, text='143.5')"), ('CURVE_DEF_0001', False, 'None', 'None'), ('CURVE_DEF_0002', False, 'None', 'None'), ('MAP_DEF_0001', False, 'None', 'None'), ('VAL_BLK_DEF_0001', True, 'None', 'None')))
+E         ((('· bytes', '0x800090', '01 02 03 04 05 06 07 08 .. (12 bytes)', 'inside', 'a2l-li…'),), '{\n  "format": "s19app-changeset",\n  "version": "",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x800090",\n      "bytes": "01 02 03 04 05 06 07 08 09 0A 0B 0C"\n    }\n  ]\n}', (('ENUM_0001', False, "Decoded(stored=1, value='IDLE', text='IDLE')", "Decoded(stored=1, value='IDLE', text='IDLE')"), ('MASK_BIT_0001', False, "Decoded(stored=1, value=1, text='1')", "Decoded(stored=1, value=1, text='1')"), ('MASK_FIELD_0001', False, "Decoded(stored=174, value=174, text='174')", "Decoded(stored=174, value=174, text='174')"), ('DISPLAY_0001', False, "Decoded(stored=287, value=143.5, text='143.5')", "Decoded(stored=287, value=143.5, text='143.5')"), ('CURVE_DEF_0001', False, 'None', 'None'), ('CURVE_DEF_0002', False, 'None', 'None'), ('MAP_DEF_0001', False, 'None', 'None'), ('VAL_BLK_DEF_0001', True, 'None', 'None')))
+E       assert ((('· bytes',...'None'), ...)) == ((('· bytes',...'None'), ...))
+E         
+E         At index 0 diff: (('· bytes', '0x800090', '01 02 03 04 05 06 07 08 .. (12 bytes)', 'inside', '-'),) != (('· bytes', '0x800090', '01 02 03 04 05 06 07 08 .. (12 bytes)', 'inside', 'a2l-li…'),)
+E         Use -v to get more diff
+
+tests/test_b103_inc9b_s.py:365: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_e5_9b_hold_apply_bytes_entry_repaints_all_views_in_the_same_call
+============================== 1 failed in 4.27s ===============================
+EXIT_CODE 1
+PHASE_RC_apply-red 1

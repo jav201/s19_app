@@ -1,0 +1,52 @@
+# mutant N-33  rows: R-PE-DEF.33
+# edits: s19_app/tui/definition_sheet.py:538
+# -k: r_pe_def_33_
+# uptime: 01:59:50 up 2 days, 10:48,  3 users,  load average: 1.47, 0.98, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-33/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+..FF                                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_r_pe_def_33_enum_options_follow_the_previewed_choice ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_33_enum_options_follow_the_previewed_choice(defc):
+        """R-PE-DEF.33/2 - after choosing RUN the card's options row marks `(●) 2 RUN` and not IDLE."""
+        d, a2l, img = defc["defs"]["ENUM_0001"], defc["a2l"], defc["image"]
+        row, pv = row_and_preview(d, a2l, img, "RUN")
+        lines = lines_of(row, pv)
+>       assert lines[1:] == EXB.card(f"{d.name} · choose one", [_enum_options(d, 2), "↔ choose · enter stage"], cap_of())
+E       assert ['╭─ ENUM_000...───────────╯'] == ['╭─ ENUM_000...───────────╯']
+E         
+E         At index 1 diff: '│ ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │' != '│ ( ) 0 OFF   ( ) 1 IDLE   (●) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │'
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1_detail.py:204: AssertionError
+_________ test_r_pe_def_33_2_after_choosing_run_the_mark_moves_to_run __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_33_2_after_choosing_run_the_mark_moves_to_run(defc):
+        """R-PE-DEF.33/2 (EX-8B-K2) - the preview of `RUN` -> `(●) 2 RUN`, no mark left on IDLE; the frame is unchanged."""
+        row, pv = with_pending(defc, "ENUM_0001", "RUN")
+        lines = painted(row, pv)
+        expected = OT["E.card.ENUM_0001.line1"].replace("(●) 1 IDLE", "( ) 1 IDLE").replace("( ) 2 RUN", "(●) 2 RUN")
+        assert expected != OT["E.card.ENUM_0001.line1"], "the derivation changes the oracle line"
+>       assert at(lines, 2).startswith(BAR + expected)
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x7f874e585170>(('  ┊ ' + '│ ( ) 0 OFF   ( ) 1 IDLE   (●) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │'))
+E        +    where <built-in method startswith of str object at 0x7f874e585170> = '  ┊ │ ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │                                                             '.startswith
+E        +      where '  ┊ │ ( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE" │                                                             ' = at([<text '  ┊ └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B                                               ...                          ' [Span(0, 143, 'on #1b233a'), Span(4, 82, '#91abec'), Span(4, 82, 'on #0f1525')] '#91abec'>], 2)
+
+tests/test_b103_inc8b_s2.py:222: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_33_enum_options_follow_the_previewed_choice
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_33_2_after_choosing_run_the_mark_moves_to_run
+2 failed, 2 passed in 1.80s
+
+# exit=1

@@ -1,0 +1,13 @@
+# mutant BASELINE-at-union  rows: AT 1,2,3,4,9
+# edits: none (unmutated baseline)
+# -k: at_b103_i8b_1_ or at_b103_i8b_2_ or at_b103_i8b_3_ or at_b103_i8b_4_ or at_b103_i8b_9_
+# uptime: 01:48:15 up 2 days, 10:36,  2 users,  load average: 1.16, 0.89, 1.75
+s19_app.__file__ = ~/work/zq-m8b/m/BASELINE-at-union/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.......                                                                  [100%]
+7 passed in 80.89s (0:01:20)
+
+# exit=0

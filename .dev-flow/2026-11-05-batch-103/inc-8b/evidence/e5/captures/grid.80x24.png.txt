@@ -1,0 +1,48 @@
+scene=grid
+fixture=grid8b
+os_clipboard=stubbed (never touched)
+commit=7c4e377c
+requested_size=80x24
+time=2026-11-15 03:05:56
+app_size=80x24
+focused=patch_sheet_body
+selected=DISPLAY_0001
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, MAP_DEF_0001, TEXT_0001, NAN_0001
+body: size=143x8 content_size=143x8 sheet_top=3
+grid: scroll_x=0.0 size=70x9 virtual_size=143x8 max_scroll_x=73 show_horizontal_scrollbar=True
+subtitle=None
+widget #patch_sheet: size=70x10 classes=[] subtitle=None
+widget #patch_inspector: size=68x7 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=74x9 classes=[] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | up
+status_lines_this_run=2
+status: A2L loaded: grid8b.a2l
+status: Loaded grid8b.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                             Hex Edit Tool
+      │                    Patch Editor                      ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ ││  Parameter                 │Kind      │Current             │New      │
+   ▏◉ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━│
+   ▏▤ ││▶ DISPLAY_0001              │VALUE     │143.5               │·        │
+   ▏! ││  ┊ └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B │
+   ▏✎ ││  MAP_DEF_0001              │MAP 4x3   │▆▃▅▃ 12             │·        │▇▇
+   ▏✔ ││  TEXT_0001                 │ASCII     │"Hello ASAM, ASCII …│·        │
+   ▏⏚ ││  NAN_0001                  │VALUE     │nan                 │·        │
+   ▏✦ ││                                                                      │
+      ││                                  ▍                                   │
+   ──────────────────────────────────────────────────────────────────────────────
+    Loaded grid8b.s19 (S19 only)                           (none)  |  grid8b.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: grid8b.a2l
+    Loaded grid8b.s19 (S19 only)
+    Loaded grid8b.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+  
+screen_text_end
+surface=ready

@@ -1,0 +1,1477 @@
+KEY R-TUI-063.1
+LOAD_BEFORE 1.17
+ 20:05:27 up 1 day,  4:54,  2 users,  load average: 1.17, 1.11, 1.30
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:71: AssertionError: the regions are not strictly increasing in ('patch_identity_ribbon', 'patch_filter_row', 'patch_sheet_win', 'patch_inspector', 'patch_doc_file_row', 'patch_doc_controls', 'patch_legend'): [4, 5, 15, 6, 46, 47, 48]
+<tree>/tests/test_b103_inc8_p_layout.py:71: AssertionError: the regions are not strictly increasing in ('patch_identity_ribbon', 'patch_filter_row', 'patch_sheet_win', 'patch_inspector', 'patch_doc_file_row', 'patch_doc_controls', 'patch_legend'): [4, 5, 15, 6, 40, 41, 42]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_tui_063_1_the_seven_regions_run_top_to_bottom[220x60]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_tui_063_1_the_seven_regions_run_top_to_bottom[118x54]
+2 failed, 1 passed in 7.97s
+LOAD_AFTER 1.38
+RESTORE_OK
+VERDICT R-TUI-063.1 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.1.1
+LOAD_BEFORE 1.17
+ 20:05:27 up 1 day,  4:54,  2 users,  load average: 1.17, 1.11, 1.30
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:125: AssertionError: sheet 30 != panel - the other regions 31
+<tree>/tests/test_b103_inc8_p_layout.py:125: AssertionError: sheet 30 != panel - the other regions 25
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_the_landing_pane_has_9_rows_and_the_sheet_takes_the_rest[220x60]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_the_landing_pane_has_9_rows_and_the_sheet_takes_the_rest[118x54]
+2 failed in 4.76s
+LOAD_AFTER 1.24
+RESTORE_OK
+VERDICT R-PE-DEF.1.1 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.1.2
+LOAD_BEFORE 1.38
+ 20:05:36 up 1 day,  4:54,  2 users,  load average: 1.38, 1.15, 1.32
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:152: AssertionError: assert 9 == 6
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_2_a_bench_gives_the_landing_pane_6_rows_and_the_sheet_the_3
+1 failed in 4.90s
+LOAD_AFTER 1.43
+RESTORE_OK
+VERDICT R-PE-DEF.1.2 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.74
+LOAD_BEFORE 1.24
+ 20:05:32 up 1 day,  4:54,  2 users,  load average: 1.24, 1.12, 1.31
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:160: AssertionError: Region(x=5, y=6, width=72, height=2)
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_74_the_sheet_window_has_at_least_12_rows_at_80x24
+1 failed, 1 passed in 4.57s
+LOAD_AFTER 1.38
+RESTORE_OK
+VERDICT R-PE-DEF.74 inconclusive-rc2-unit
+
+
+KEY R-TUI-063.3
+LOAD_BEFORE 1.43
+ 20:05:42 up 1 day,  4:54,  2 users,  load average: 1.43, 1.17, 1.32
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:312: AssertionError: assert ['Patch scrip...hecks', 'A2L'] == ['Patch scrip...ON', 'Checks']
+FAILED tests/test_b103_inc8_p_layout.py::test_r_tui_063_3_the_chips_are_patch_script_inspector_json_checks
+1 failed in 4.69s
+LOAD_AFTER 1.55
+RESTORE_OK
+VERDICT R-TUI-063.3 inconclusive-rc2-unit
+
+
+KEY R-TUI-063.4
+LOAD_BEFORE 1.38
+ 20:05:38 up 1 day,  4:54,  2 users,  load average: 1.38, 1.15, 1.32
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:320: AssertionError: assert 'patch_pane_inspector' == 'patch_win_script'
+FAILED tests/test_b103_inc8_p_layout.py::test_r_tui_063_4_the_ledger_pane_shows_first_with_its_chip_selected
+1 failed in 4.63s
+LOAD_AFTER 1.55
+RESTORE_OK
+VERDICT R-TUI-063.4 inconclusive-rc2-unit
+
+
+KEY R-TUI-063.6
+LOAD_BEFORE 1.55
+ 20:05:47 up 1 day,  4:54,  2 users,  load average: 1.55, 1.20, 1.33
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:334: AssertionError: assert 'INSPECTOR' == 'LANDS IN'
+FAILED tests/test_b103_inc8_p_layout.py::test_r_tui_063_6_every_shown_tab_titles_the_landing_pane_lands_in[patch_tab_inspector-patch_pane_inspector]
+1 failed, 3 passed in 10.36s
+LOAD_AFTER 2.02
+RESTORE_OK
+VERDICT R-TUI-063.6 inconclusive-rc2-unit
+
+
+KEY R-PE-041
+LOAD_BEFORE 1.55
+ 20:05:44 up 1 day,  4:54,  2 users,  load average: 1.55, 1.20, 1.33
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_p_ledger.py:70: AssertionError: Inspector tab: ''
+<tree>/tests/test_b103_inc8_p_ledger.py:83: AssertionError:
+FAILED tests/test_b103_inc8_p_ledger.py::test_r_pe_041_the_patch_script_and_inspector_tabs_show_the_entry_count[0-entries]
+FAILED tests/test_b103_inc8_p_ledger.py::test_r_pe_041_a_dirty_document_adds_the_marker_on_the_inspector_tab
+2 failed in 11.02s
+LOAD_AFTER 1.85
+RESTORE_OK
+VERDICT R-PE-041 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.2
+LOAD_BEFORE 2.02
+ 20:05:59 up 1 day,  4:54,  2 users,  load average: 2.02, 1.32, 1.37
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:200: AssertionError: patch_param_filter has no region
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_2_the_seven_controls_sit_on_the_filter_row_and_the_table_is_hidden
+1 failed in 5.00s
+LOAD_AFTER 2.10
+RESTORE_OK
+VERDICT R-PE-DEF.2 inconclusive-rc2-unit
+
+
+KEY R-PICKER-CORRECT.011
+LOAD_BEFORE 1.85
+ 20:05:56 up 1 day,  4:54,  2 users,  load average: 1.85, 1.27, 1.35
+RUN unit nodes=2
+RC unit 2
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1463: textual.widget.MountError: Tried to insert 2 widgets with the same ID 'patch_param_include_button'. Widget IDs must be unique.
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1463: textual.widget.MountError: Tried to insert 2 widgets with the same ID 'patch_param_include_button'. Widget IDs must be unique.
+FAILED tests/test_b103_inc8_p_layout.py::test_r_picker_correct_011_the_include_and_add_list_controls_are_on_the_filter_row
+FAILED tests/test_b103_inc8_p_layout.py::test_r_picker_correct_011_every_picker_id_is_unique_with_both_editors_mounted
+2 failed in 5.29s
+LOAD_AFTER 2.02
+RESTORE_OK
+VERDICT R-PICKER-CORRECT.011 inconclusive-rc2-unit
+
+
+KEY R-PICKER-CORRECT.020
+LOAD_BEFORE 0.22
+ 20:17:24 up 1 day,  5:06,  2 users,  load average: 0.22, 0.97, 1.30
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:244: AssertionError: #patch_filter_row overflows the panel horizontally: Region(x=5, y=-2, width=90, height=1) vs Region(x=5, y=4, width=74, height=9)
+FAILED tests/test_b103_inc8_p_layout.py::test_r_picker_correct_020_filter_row_use_row_and_status_stay_inside_the_panel[80x24]
+1 failed, 1 passed in 6.22s
+LOAD_AFTER 0.45
+RESTORE_OK
+VERDICT R-PICKER-CORRECT.020 killed-unit
+
+
+KEY R-PE-DEF.3
+LOAD_BEFORE 2.02
+ 20:06:02 up 1 day,  4:54,  2 users,  load average: 2.02, 1.32, 1.37
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:264: AssertionError: assert 0 > 40
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_3_use_row_and_status_are_under_the_entry_form_in_the_inspector
+1 failed in 5.66s
+LOAD_AFTER 2.17
+RESTORE_OK
+VERDICT R-PE-DEF.3 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.4
+LOAD_BEFORE 2.17
+ 20:06:12 up 1 day,  4:54,  2 users,  load average: 2.17, 1.38, 1.39
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_p_layout.py:279: AssertionError: assert '#1b233a' == '#91abec'
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_4_focus_on_the_sheet_paints_the_accent_border
+1 failed, 1 passed in 5.29s
+LOAD_AFTER 2.32
+RESTORE_OK
+VERDICT R-PE-DEF.4 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.5
+LOAD_BEFORE 2.17
+ 20:06:09 up 1 day,  4:54,  2 users,  load average: 2.17, 1.38, 1.39
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:79: AssertionError: ('current', 29, '  Parameter         Kind     New               Current      Unit   Limits                            Δ               ')
+<tree>/tests/test_b103_inc8_s1.py:79: AssertionError: ('current', 18, '  Parameter       New           Current     Limits                                   Δ         ')
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[118]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[96]
+2 failed in 1.21s
+LOAD_AFTER 2.17
+RESTORE_OK
+VERDICT R-PE-DEF.5 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.6
+LOAD_BEFORE 2.32
+ 20:06:18 up 1 day,  4:55,  2 users,  load average: 2.32, 1.42, 1.40
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:67: AssertionError: assert {'current': 1...its': 34, ...} == {'current': 1...its': 25, ...}
+<tree>/tests/test_b103_inc8_s1.py:67: AssertionError: assert {'current': 1...its': 34, ...} == {'current': 1...its': 44, ...}
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[80]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[99]
+2 failed in 1.27s
+LOAD_AFTER 2.37
+RESTORE_OK
+VERDICT R-PE-DEF.6 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.7#a
+LOAD_BEFORE 2.17
+ 20:06:11 up 1 day,  4:54,  2 users,  load average: 2.17, 1.38, 1.39
+RUN unit nodes=2
+RC unit 0
+4 passed in 1.25s
+LOAD_AFTER 2.17
+RESTORE_OK
+VERDICT R-PE-DEF.7#a survived
+
+
+KEY R-PE-DEF.7#b
+LOAD_BEFORE 2.37
+ 20:06:21 up 1 day,  4:55,  2 users,  load average: 2.37, 1.45, 1.41
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:314: AssertionError: assert ('温度温度温度温度 …' == '温度温度温度温度…'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_7_wide_characters_are_clipped_by_cells_not_by_length
+1 failed, 3 passed in 1.28s
+LOAD_AFTER 2.37
+RESTORE_OK
+VERDICT R-PE-DEF.7#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.10
+LOAD_BEFORE 2.32
+ 20:06:13 up 1 day,  4:54,  2 users,  load average: 2.32, 1.42, 1.40
+RUN unit nodes=6
+RC unit 2
+<tree>/tests/test_b103_inc8_p_wiring.py:115: AssertionError: assert 'PNAME_0200' in '  Parameter         Kind     Current           New          Unit   Limits                    Δ                \n▶ PNA...      \n  PNAME_0019        MEASUREM…--                ·                   0 ├────────────┤ 65.5k                     '
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_10_3_a_page_turn_of_a_201_name_list_shows_the_one_row_of_page_2
+1 failed, 4 passed in 10.99s
+LOAD_AFTER 2.34
+RESTORE_OK
+VERDICT R-PE-DEF.10 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.11#a
+LOAD_BEFORE 2.37
+ 20:06:23 up 1 day,  4:55,  2 users,  load average: 2.37, 1.45, 1.41
+RUN unit nodes=12
+RC unit 2
+<tree>/tests/test_b103_inc8_p_wiring.py:153: AssertionError: a page change described ['describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions']
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_11_2_a_page_turn_and_a_filter_change_describe_nothing
+1 failed, 4 passed in 12.65s
+LOAD_AFTER 2.36
+RESTORE_OK
+VERDICT R-PE-DEF.11#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.11#b
+LOAD_BEFORE 2.34
+ 20:06:25 up 1 day,  4:55,  2 users,  load average: 2.34, 1.46, 1.41
+RUN unit nodes=12
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_picker_definitions.py:78: AssertionError: assert ('IDLEX' in ['OFF', 'IDLE', 'RUN', 'FAULT'])
+<tree>/tests/test_b103_inc8_p_wiring.py:61: AssertionError: timed out waiting for the reloaded enum text
+FAILED tests/test_b103_inc8_s2_picker_definitions.py::test_r_pe_def_11_7_a_changed_signature_replaces_both
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_11_1_an_a2l_reload_changing_enum_text_shows_the_new_text
+2 failed, 7 passed in 12.24s
+LOAD_AFTER 2.41
+RESTORE_OK
+VERDICT R-PE-DEF.11#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.11#c
+LOAD_BEFORE 0.45
+ 20:17:31 up 1 day,  5:06,  2 users,  load average: 0.45, 1.01, 1.31
+RUN unit nodes=12
+RC unit 2
+<tree>/tests/test_b103_inc8_p_wiring.py:153: AssertionError: a page change described ['describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions', 'describe_definition', 'describe_definitions']
+<tree>/tests/test_b103_inc8_p_wiring.py:183: AssertionError: ▶ DISPLAY_0001      VALUE    287.0             ·            deg C  -40 ├────────────▶ 150
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_11_2_a_page_turn_and_a_filter_change_describe_nothing
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_11_3_the_apps_a2l_swapped_before_the_picker_repopulates_does_not_leak_into_rows
+2 failed, 2 passed in 11.52s
+LOAD_AFTER 0.64
+RESTORE_OK
+VERDICT R-PE-DEF.11#c killed-unit
+
+
+KEY R-PE-DEF.12#a
+LOAD_BEFORE 0.64
+ 20:17:44 up 1 day,  5:06,  2 users,  load average: 0.64, 1.02, 1.31
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:216: AssertionError: assert '1048576 B' in '  Parameter         Kind     Current           New          Unit   Limits                            Δ               ...n  HOSTILE_050       ?        refused           ·                   -                                                 '
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:193: assert 27.761469450997538 <= 0.5
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second
+2 failed in 168.03s (0:02:48)
+LOAD_AFTER 1.01
+RESTORE_OK
+VERDICT R-PE-DEF.12#a killed-unit
+
+
+KEY R-PE-DEF.12#b
+LOAD_BEFORE 2.57
+ 20:06:50 up 1 day,  4:55,  2 users,  load average: 2.57, 1.58, 1.45
+RUN unit nodes=2
+RC unit 124
+LOAD_AFTER 1.17
+RESTORE_OK
+VERDICT R-PE-DEF.12#b inconclusive-rc124-unit
+
+
+KEY R-PE-DEF.13
+LOAD_BEFORE 2.41
+ 20:06:42 up 1 day,  4:55,  2 users,  load average: 2.41, 1.52, 1.43
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:272: AssertionError: assert 'No parameters on this page: type a filter above.' in ''
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:261: AssertionError: assert 'No parameters on this page: type a filter above.' in ''
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_13_2_an_a2l_with_no_addressed_tag_shows_the_line
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_13_1_a_filter_with_no_match_shows_the_line
+2 failed in 1.41s
+LOAD_AFTER 2.54
+RESTORE_OK
+VERDICT R-PE-DEF.13 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.14
+LOAD_BEFORE 1.17
+ 20:11:50 up 1 day,  5:00,  2 users,  load average: 1.17, 1.60, 1.53
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:281: AssertionError: assert 'Load an A2L file to edit parameters by definition.' in 'No parameters on this page: type a filter above.'
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:296: AssertionError: assert 'Load an A2L file to edit parameters by definition.' in 'No parameters on this page: type a filter above.'
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_14_1_no_a2l_at_start_shows_the_line
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_14_2_an_unloaded_a2l_shows_the_line
+2 failed in 1.31s
+LOAD_AFTER 1.17
+RESTORE_OK
+VERDICT R-PE-DEF.14 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.15
+LOAD_BEFORE 2.54
+ 20:06:45 up 1 day,  4:55,  2 users,  load average: 2.54, 1.56, 1.45
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:304: AssertionError: assert (True and 'A[b]' in '  A                 VALUE    143.5             ·            deg C  -40 ├──────────────────●─┤ 150                    ')
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_15_a_name_with_brackets_is_shown_literally
+1 failed, 1 passed in 1.26s
+LOAD_AFTER 2.54
+RESTORE_OK
+VERDICT R-PE-DEF.15 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.16
+LOAD_BEFORE 1.17
+ 20:11:52 up 1 day,  5:00,  2 users,  load average: 1.17, 1.60, 1.53
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:155: AssertionError: assert 'number' == '?'
+<tree>/tests/test_b103_inc8_s1.py:147: AssertionError: assert 'enum' == 'VALUE'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_16_kind_word_is_a_question_mark_when_the_definition_gives_neither
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_16_kind_word_is_the_char_type_or_measurement
+2 failed in 1.21s
+LOAD_AFTER 1.24
+RESTORE_OK
+VERDICT R-PE-DEF.16 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.17
+LOAD_BEFORE 2.54
+ 20:06:47 up 1 day,  4:55,  2 users,  load average: 2.54, 1.56, 1.45
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:229: assert {'enum': '1 I..."Hello ASAM"'} == {'enum': '1 I..."Hello ASAM"'}
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_17_current_value_texts_of_the_four_scalar_rows
+1 failed, 1 passed in 1.25s
+LOAD_AFTER 2.57
+RESTORE_OK
+VERDICT R-PE-DEF.17 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.18
+LOAD_BEFORE 1.24
+ 20:11:54 up 1 day,  5:00,  2 users,  load average: 1.24, 1.60, 1.53
+RUN unit nodes=7
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:309: AssertionError: assert '0.0' == '--'
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:321: AssertionError: assert '128.0' == '--'
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_18_1_no_image_shows_dashes
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_18_2_an_image_missing_the_second_byte_shows_dashes
+2 failed in 1.42s
+LOAD_AFTER 1.24
+RESTORE_OK
+VERDICT R-PE-DEF.18 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.75
+LOAD_BEFORE 2.57
+ 20:06:49 up 1 day,  4:55,  2 users,  load average: 2.57, 1.58, 1.45
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:274: AssertionError: assert '143.5' == '24 values'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_75_fallback_rows_show_the_element_count_or_dashes
+1 failed in 1.25s
+LOAD_AFTER 2.57
+RESTORE_OK
+VERDICT R-PE-DEF.75 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.88
+LOAD_BEFORE 1.24
+ 20:11:57 up 1 day,  5:00,  2 users,  load average: 1.24, 1.60, 1.53
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:284: assert '"AAAAAAAAAAAAAAAA…' == '4097 B'
+<tree>/tests/test_b103_inc8_s1.py:284: assert '"AAAAAAAAAAAAAAAA…' == '1048576 B'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_88_a_text_span_over_4096_shows_its_length_and_is_not_decoded[4097]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_88_a_text_span_over_4096_shows_its_length_and_is_not_decoded[1048576]
+2 failed in 2.07s
+LOAD_AFTER 1.30
+RESTORE_OK
+VERDICT R-PE-DEF.88 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.19
+LOAD_BEFORE 1.01
+ 20:20:33 up 1 day,  5:09,  2 users,  load average: 1.01, 1.03, 1.26
+RUN unit nodes=2
+RC unit 0
+2 passed in 1.14s
+LOAD_AFTER 1.09
+RESTORE_OK
+VERDICT R-PE-DEF.19 survived
+
+
+KEY R-PE-DEF.19#x
+LOAD_BEFORE 0.22
+ 20:17:24 up 1 day,  5:06,  2 users,  load average: 0.22, 0.97, 1.30
+RUN unit nodes=2
+RC unit 0
+2 passed in 1.23s
+LOAD_AFTER 0.22
+RESTORE_OK
+VERDICT R-PE-DEF.19#x survived
+
+
+KEY R-PE-DEF.20
+LOAD_BEFORE 1.30
+ 20:12:00 up 1 day,  5:00,  2 users,  load average: 1.30, 1.61, 1.53
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:327: AssertionError: assert '%\x1b' == '%�'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_20_a_control_character_in_a_unit_becomes_fffd
+1 failed, 1 passed in 1.16s
+LOAD_AFTER 1.30
+RESTORE_OK
+VERDICT R-PE-DEF.20 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.21
+LOAD_BEFORE 2.69
+ 20:06:54 up 1 day,  4:55,  2 users,  load average: 2.69, 1.62, 1.47
+RUN unit nodes=8
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:399: AssertionError: the track is Limits width - 12 cells
+<tree>/tests/test_b103_inc8_s1.py:410: AssertionError: assert '─' == '●'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell
+2 failed, 3 passed in 1.20s
+LOAD_AFTER 2.69
+RESTORE_OK
+VERDICT R-PE-DEF.21 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.76
+LOAD_BEFORE 1.30
+ 20:12:02 up 1 day,  5:00,  2 users,  load average: 1.30, 1.61, 1.53
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:456: AssertionError: assert '9 ├────────────────────▶ 1' == '9 … 1'
+<tree>/tests/test_b103_inc8_s1.py:456: AssertionError: assert '5 ├────────────────────▶ 5' == '5 … 5'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[9.0-1.0-9 \u2026 1]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[5.0-5.0-5 \u2026 5]
+2 failed in 1.15s
+LOAD_AFTER 1.36
+RESTORE_OK
+VERDICT R-PE-DEF.76 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.77
+LOAD_BEFORE 2.69
+ 20:06:56 up 1 day,  4:55,  2 users,  load average: 2.69, 1.62, 1.47
+RUN unit nodes=1
+RC unit 2
+<tree>/s19_app/tui/definition_sheet.py:674: ZeroDivisionError: float division by zero
+<tree>/tests/test_b103_inc8_s1.py:629: AssertionError: assert '-118.0 (+1475.0…' == '-118.0'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_77_limits_not_ascending_leave_the_percent_out_of_the_delta[5.0-5.0]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_77_limits_not_ascending_leave_the_percent_out_of_the_delta[9.0-1.0]
+2 failed in 1.20s
+LOAD_AFTER 2.69
+RESTORE_OK
+VERDICT R-PE-DEF.77 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.22
+LOAD_BEFORE 1.36
+ 20:12:04 up 1 day,  5:00,  2 users,  load average: 1.36, 1.62, 1.54
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:349: AssertionError: assert '▶' == ' '
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_22_the_selected_row_has_the_pointer_in_its_mark_cell
+1 failed in 1.20s
+LOAD_AFTER 1.36
+RESTORE_OK
+VERDICT R-PE-DEF.22 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.23#a
+LOAD_BEFORE 2.69
+ 20:06:58 up 1 day,  4:55,  2 users,  load average: 2.69, 1.62, 1.47
+RUN unit nodes=8
+RC unit 0
+10 passed in 1.77s
+RUN at nodes=2
+RC at 0
+2 passed in 10.57s
+LOAD_AFTER 2.53
+RESTORE_OK
+VERDICT R-PE-DEF.23#a survived
+
+
+KEY R-PE-DEF.23#b
+LOAD_BEFORE 1.36
+ 20:12:06 up 1 day,  5:00,  2 users,  load average: 1.36, 1.62, 1.54
+RUN unit nodes=8
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:365: AssertionError: assert ' ' == '●'
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_23_4_a_raw_entry_over_a_fallback_row_marks_it_staged
+1 failed, 8 passed in 1.68s
+LOAD_AFTER 1.33
+RESTORE_OK
+VERDICT R-PE-DEF.23#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.24#a
+LOAD_BEFORE 2.53
+ 20:07:13 up 1 day,  4:55,  2 users,  load average: 2.53, 1.64, 1.48
+RUN unit nodes=7
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:564: AssertionError: assert ('\u25c6' == '\u25c6'
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:380: AssertionError: assert '25.50' == '25.5'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_24_a_pending_enum_shows_stored_value_and_text
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_24_1_a_pending_number_shows_the_diamond_and_the_previews_text
+2 failed, 1 passed in 1.97s
+LOAD_AFTER 2.57
+RESTORE_OK
+VERDICT R-PE-DEF.24#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.24#b
+LOAD_BEFORE 1.33
+ 20:12:09 up 1 day,  5:00,  2 users,  load average: 1.33, 1.61, 1.53
+RUN unit nodes=7
+RC unit 0
+7 passed in 2.41s
+LOAD_AFTER 1.33
+RESTORE_OK
+VERDICT R-PE-DEF.24#b survived
+
+
+KEY R-PE-DEF.25
+LOAD_BEFORE 2.57
+ 20:07:16 up 1 day,  4:55,  2 users,  load average: 2.57, 1.66, 1.49
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:577: AssertionError: assert (False)
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:416: AssertionError: {'Current': '143.5', 'Kind': 'VALUE', 'Limits': '-40 ├──────────────●┤ 150', 'New': 'A2L-DEF-NUMBER', ...}
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_25_a_long_refused_text_is_clipped_with_an_ellipsis
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_25_1_a_refusal_shows_the_formula_text_in_new
+2 failed in 1.70s
+LOAD_AFTER 2.57
+RESTORE_OK
+VERDICT R-PE-DEF.25 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.26
+LOAD_BEFORE 1.33
+ 20:12:13 up 1 day,  5:00,  2 users,  load average: 1.33, 1.61, 1.53
+RUN unit nodes=5
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:588: AssertionError: assert '-118.0 (-47.2%)' == '-118.0 (-62.1%)'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_26_pending_number_delta_is_taken_over_the_definitions_limits
+1 failed, 3 passed in 1.20s
+LOAD_AFTER 1.38
+RESTORE_OK
+VERDICT R-PE-DEF.26 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.27
+LOAD_BEFORE 2.57
+ 20:07:18 up 1 day,  4:56,  2 users,  load average: 2.57, 1.66, 1.49
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:621: AssertionError: assert '' == '✗ refused'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_27_a_refused_preview_shows_refused_in_the_delta_column
+1 failed in 1.22s
+LOAD_AFTER 2.52
+RESTORE_OK
+VERDICT R-PE-DEF.27 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.28
+LOAD_BEFORE 1.38
+ 20:12:15 up 1 day,  5:00,  2 users,  load average: 1.38, 1.61, 1.54
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:355: AssertionError: assert '143.5' == '·'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_28_an_untouched_row_shows_a_dot_and_no_delta
+1 failed in 1.14s
+LOAD_AFTER 1.38
+RESTORE_OK
+VERDICT R-PE-DEF.28 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.30
+LOAD_BEFORE 2.52
+ 20:07:20 up 1 day,  4:56,  2 users,  load average: 2.52, 1.67, 1.49
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_rows.py:246: AssertionError: ['  Parameter               Kind      Current                                     New                 Unit    Limits  ...                                 ·                           0 ├──────────●────┤ 255                            ', ...]
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_30_1_the_detail_moves_with_the_selection
+1 failed in 1.41s
+LOAD_AFTER 2.52
+RESTORE_OK
+VERDICT R-PE-DEF.30 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.31#a
+LOAD_BEFORE 1.38
+ 20:12:17 up 1 day,  5:00,  2 users,  load average: 1.38, 1.61, 1.54
+RUN unit nodes=6
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:141: AssertionError: assert '└ IDENTICAL ...0800010 · 2 B' == '└ IDENTICAL ...0800010 · 2 B'
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_definition_line_of_a_bit_mask_names_the_masked_word
+1 failed, 3 passed in 1.16s
+LOAD_AFTER 1.35
+RESTORE_OK
+VERDICT R-PE-DEF.31#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.31#b
+LOAD_BEFORE 2.52
+ 20:07:23 up 1 day,  4:56,  2 users,  load average: 2.52, 1.67, 1.49
+RUN unit nodes=6
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:157: AssertionError: assert ['└ LINEAR ph...800020 · 2 B'] == ['└ LINEAR ph...800020 · 2 B']
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_a_named_record_layout_comes_after_the_byte_order
+1 failed, 4 passed in 1.18s
+LOAD_AFTER 2.48
+RESTORE_OK
+VERDICT R-PE-DEF.31#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.32
+LOAD_BEFORE 1.35
+ 20:12:19 up 1 day,  5:01,  2 users,  load average: 1.35, 1.60, 1.53
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:168: AssertionError: assert ['└ NO_COMPU_...--- · None B'] == ['└ NO_SUCH_P...e in the A2L']
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_32_a_refused_row_shows_its_message_as_the_detail
+1 failed in 1.09s
+LOAD_AFTER 1.35
+RESTORE_OK
+VERDICT R-PE-DEF.32 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.33
+LOAD_BEFORE 2.48
+ 20:07:25 up 1 day,  4:56,  2 users,  load average: 2.48, 1.67, 1.49
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:191: assert ('( ) 0 OFF   ...NKNOWN_STATE"' == '( ) 0 OFF   ...NKNOWN_STATE"'
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_33_enum_options_follow_the_previewed_choice
+1 failed, 1 passed in 1.20s
+LOAD_AFTER 2.48
+RESTORE_OK
+VERDICT R-PE-DEF.33 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.34
+LOAD_BEFORE 1.35
+ 20:12:21 up 1 day,  5:01,  2 users,  load average: 1.35, 1.60, 1.53
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:213: AssertionError: assert False
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field
+1 failed, 1 passed in 1.11s
+LOAD_AFTER 1.35
+RESTORE_OK
+VERDICT R-PE-DEF.34 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.35
+LOAD_BEFORE 2.48
+ 20:07:27 up 1 day,  4:56,  2 users,  load average: 2.48, 1.67, 1.49
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:236: AssertionError: assert ['+00', '+08'... '+20', '+28'] == ['+00', '+10', '+20']
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row
+1 failed, 2 passed in 1.20s
+LOAD_AFTER 2.52
+RESTORE_OK
+VERDICT R-PE-DEF.35 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.36#a
+LOAD_BEFORE 1.35
+ 20:12:23 up 1 day,  5:01,  2 users,  load average: 1.35, 1.60, 1.53
+RUN unit nodes=7
+RC unit 0
+7 passed in 1.25s
+LOAD_AFTER 1.32
+RESTORE_OK
+VERDICT R-PE-DEF.36#a survived
+
+
+KEY R-PE-DEF.36#b
+LOAD_BEFORE 2.52
+ 20:07:29 up 1 day,  4:56,  2 users,  load average: 2.52, 1.70, 1.50
+RUN unit nodes=7
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:359: AssertionError: assert '' == 'edit ASCII o...Inspector tab'
+<tree>/tests/test_b103_inc8_s1.py:200: AssertionError: assert True is False
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_36_a_row_with_no_editor_gets_the_inspector_text
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_36_scalar_kinds_are_editable_and_the_text_span_bound_is_4096
+2 failed, 2 passed in 1.30s
+LOAD_AFTER 2.52
+RESTORE_OK
+VERDICT R-PE-DEF.36#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.37
+LOAD_BEFORE 1.32
+ 20:12:25 up 1 day,  5:01,  2 users,  load average: 1.32, 1.59, 1.53
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:70: AssertionError: assert 'new =' == 'text ='
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:70: AssertionError: assert 'new =' == 'field ='
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_37_n_the_bar_shows_the_row_name_and_its_kind_label[37-4-text]
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_37_n_the_bar_shows_the_row_name_and_its_kind_label[37-3-bit-mask]
+2 failed, 7 passed in 1.77s
+LOAD_AFTER 1.32
+RESTORE_OK
+VERDICT R-PE-DEF.37 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.38#a
+LOAD_BEFORE 2.52
+ 20:07:32 up 1 day,  4:56,  2 users,  load average: 2.52, 1.70, 1.50
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:83: AssertionError: assert '' == 'Hello ASAM'
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_38_1_a_selected_text_row_fills_the_input_with_its_text
+1 failed, 1 passed in 1.74s
+LOAD_AFTER 2.48
+RESTORE_OK
+VERDICT R-PE-DEF.38#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.38#b
+LOAD_BEFORE 1.32
+ 20:12:28 up 1 day,  5:01,  2 users,  load average: 1.32, 1.59, 1.53
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:389: AssertionError: assert 'Hello ASAM' == 'ABC'
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:100: AssertionError: assert 'Hello ASAM' == 'ABC'
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_38_a_text_row_fills_with_its_current_text_until_edited
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_38_2_an_edited_text_row_keeps_its_edit_when_reselected
+2 failed, 1 passed in 1.64s
+LOAD_AFTER 1.30
+RESTORE_OK
+VERDICT R-PE-DEF.38#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.39
+LOAD_BEFORE 2.48
+ 20:07:34 up 1 day,  4:56,  2 users,  load average: 2.48, 1.70, 1.50
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:124: AssertionError: assert '' == '25.5'
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_39_2_a_pending_row_gets_its_pending_text_back
+1 failed, 2 passed in 2.35s
+LOAD_AFTER 2.48
+RESTORE_OK
+VERDICT R-PE-DEF.39 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.40
+LOAD_BEFORE 1.30
+ 20:12:31 up 1 day,  5:01,  2 users,  load average: 1.30, 1.58, 1.53
+RUN unit nodes=10
+RC unit 0
+10 passed in 2.17s
+RUN at nodes=1
+RC at 0
+1 passed in 9.48s
+LOAD_AFTER 1.15
+RESTORE_OK
+VERDICT R-PE-DEF.40 survived
+
+
+KEY R-PE-DEF.41
+LOAD_BEFORE 2.48
+ 20:07:38 up 1 day,  4:56,  2 users,  load average: 2.48, 1.70, 1.50
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:349: assert (False)
+<tree>/tests/test_b103_inc8_s1_detail.py:349: assert (False)
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_41_a_long_refusal_is_cut_at_the_bar_edge_with_one_ellipsis[100]
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_41_a_long_refusal_is_cut_at_the_bar_edge_with_one_ellipsis[220]
+2 failed in 1.20s
+LOAD_AFTER 2.44
+RESTORE_OK
+VERDICT R-PE-DEF.41 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.42
+LOAD_BEFORE 1.15
+ 20:12:44 up 1 day,  5:01,  2 users,  load average: 1.15, 1.54, 1.51
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:224: AssertionError: assert 'yyyyyyyyyyyy...xxxxxxxxxxxxx' == 'yyyyyyyyyyyy...yyyyyyyyyyyyy'
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:206: AssertionError: assert 'xxxxxxxxxxxx...xxxxxxxxxxxxx' == ''
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_42_2_a_paste_that_would_pass_the_cap_leaves_the_text_unchanged
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_42_1_a_paste_over_the_cap_into_an_empty_input_leaves_it_empty
+2 failed in 1.40s
+LOAD_AFTER 1.15
+RESTORE_OK
+VERDICT R-PE-DEF.42 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.78
+LOAD_BEFORE 0.22
+ 20:17:26 up 1 day,  5:06,  2 users,  load average: 0.22, 0.97, 1.30
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:407: AssertionError: assert 'AAAAAAAAAAAA...AAAAAAAAAAAAA' == ''
+<tree>/tests/test_b103_inc8_s2_sheet_formula.py:263: AssertionError: assert 'AAAAAAAAAAAA...AAAAAAAAAAAAA' == ''
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_78_a_row_with_no_editor_fills_empty[4097]
+FAILED tests/test_b103_inc8_s2_sheet_formula.py::test_r_pe_def_78_n_a_text_row_without_an_editor_keeps_the_input_empty[78-1-4097-bytes]
+2 failed in 1.39s
+LOAD_AFTER 0.45
+RESTORE_OK
+VERDICT R-PE-DEF.78 killed-unit
+
+
+KEY R-PE-DEF.79
+LOAD_BEFORE 1.15
+ 20:12:47 up 1 day,  5:01,  2 users,  load average: 1.15, 1.54, 1.51
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:267: AssertionError: assert 7 == 6
+<tree>/tests/test_b103_inc8_s1_detail.py:267: AssertionError: assert 50 == 6
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[65]
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[1048576]
+2 failed in 3.38s
+LOAD_AFTER 1.22
+RESTORE_OK
+VERDICT R-PE-DEF.79 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.80
+LOAD_BEFORE 2.44
+ 20:07:43 up 1 day,  4:56,  2 users,  load average: 2.44, 1.71, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1_detail.py:415: AssertionError: assert 'EEEEEEEEEEEE...EEEEEEEEEEEEE' == 'EEEEEEEEEEEE...EEEEEEEEEEEEE'
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_80_a_fill_is_capped_to_4096_characters
+1 failed in 1.15s
+LOAD_AFTER 2.49
+RESTORE_OK
+VERDICT R-PE-DEF.80 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.45
+LOAD_BEFORE 1.22
+ 20:12:51 up 1 day,  5:01,  2 users,  load average: 1.22, 1.54, 1.52
+RUN unit nodes=5
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:104: AssertionError: assert 'ENUM_0001' == 'DISPLAY_0001'
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:117: AssertionError: assert 'ENUM_0001' == 'MASK_BIT_0001'
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_45_4_up_on_the_first_row_keeps_it
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_45_5_down_on_the_last_row_keeps_it_without_wrapping
+2 failed, 3 passed in 2.23s
+LOAD_AFTER 1.20
+RESTORE_OK
+VERDICT R-PE-DEF.45 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.46
+LOAD_BEFORE 2.49
+ 20:07:45 up 1 day,  4:56,  2 users,  load average: 2.49, 1.73, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:131: AssertionError: assert _SheetBody(id='patch_sheet_body') is OsClipboardInput(id='patch_sheet_input')
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_46_1_enter_on_the_sheet_moves_the_focus_to_the_formula_input
+1 failed in 1.43s
+LOAD_AFTER 2.49
+RESTORE_OK
+VERDICT R-PE-DEF.46 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.47
+LOAD_BEFORE 1.20
+ 20:12:54 up 1 day,  5:01,  2 users,  load average: 1.20, 1.54, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:149: AssertionError: assert ['2', '2', '2', '0'] == ['RUN', 'FAUL...FAULT', 'RUN']
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_47_n_right_and_left_choose_table_entries_without_wrapping
+1 failed in 1.62s
+LOAD_AFTER 1.20
+RESTORE_OK
+VERDICT R-PE-DEF.47 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.48
+LOAD_BEFORE 2.49
+ 20:07:47 up 1 day,  4:56,  2 users,  load average: 2.49, 1.73, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:167: AssertionError: assert '◆' != '◆'
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_48_1_escape_in_the_input_clears_the_row_and_returns_to_the_sheet
+1 failed in 1.82s
+LOAD_AFTER 2.53
+RESTORE_OK
+VERDICT R-PE-DEF.48 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.49
+LOAD_BEFORE 1.20
+ 20:12:57 up 1 day,  5:01,  2 users,  load average: 1.20, 1.54, 1.51
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_p_wiring.py:227: AssertionError: assert 'ENUM_0001' == 'MASK_FIELD_0001'
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_49_1_selecting_row_3_highlights_that_parameter
+1 failed, 3 passed in 6.76s
+LOAD_AFTER 1.32
+RESTORE_OK
+VERDICT R-PE-DEF.49 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.81#a
+LOAD_BEFORE 2.53
+ 20:07:50 up 1 day,  4:56,  2 users,  load average: 2.53, 1.75, 1.52
+RUN unit nodes=6
+RC unit 2
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: RuntimeError: coroutine raised StopIteration
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: RuntimeError: coroutine raised StopIteration
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body
+2 failed in 5.90s
+LOAD_AFTER 2.41
+RESTORE_OK
+VERDICT R-PE-DEF.81#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.81#b
+LOAD_BEFORE 0.45
+ 20:17:29 up 1 day,  5:06,  3 users,  load average: 0.45, 1.01, 1.31
+RUN unit nodes=6
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:659: assert (4, 3) == (3, 2)
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_81_row_window_examples[3-0-3-3-expect5]
+1 failed, 9 passed in 10.22s
+LOAD_AFTER 0.61
+RESTORE_OK
+VERDICT R-PE-DEF.81#b killed-unit
+
+
+KEY R-PE-DEF.81#x
+LOAD_BEFORE 0.61
+ 20:17:40 up 1 day,  5:06,  2 users,  load average: 0.61, 1.02, 1.32
+RUN unit nodes=6
+RC unit 0
+12 passed in 10.18s
+LOAD_AFTER 0.67
+RESTORE_OK
+VERDICT R-PE-DEF.81#x survived
+
+
+KEY R-PE-DEF.50
+LOAD_BEFORE 2.41
+ 20:07:57 up 1 day,  4:56,  2 users,  load average: 2.41, 1.74, 1.52
+RUN unit nodes=6
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:77: assert False
+<tree>/tests/test_b103_inc8_a2_app.py:166: AssertionError: assert 'Added symbol...020 (2 bytes)' == 'Patch Editor...at 0x800020).'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_50_2_enum_run_stages_02
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_50_1_app_display_25_5_through_the_sheet_message
+2 failed in 7.12s
+LOAD_AFTER 2.42
+RESTORE_OK
+VERDICT R-PE-DEF.50 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.51#a
+LOAD_BEFORE 1.19
+ 20:13:16 up 1 day,  5:01,  2 users,  load average: 1.19, 1.52, 1.51
+RUN unit nodes=7
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:134: AssertionError: assert '1' == '0'
+<tree>/tests/test_b103_inc8_a2_app.py:193: AssertionError: assert [(8388624, b'..._FIELD_0001')] == [(8388624, b'..._FIELD_0001')]
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_51_2_bit_then_field_decode_as_typed
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_51_1_app_field_then_bit_through_the_sheet
+2 failed in 7.10s
+LOAD_AFTER 1.40
+RESTORE_OK
+VERDICT R-PE-DEF.51#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.51#b
+LOAD_BEFORE 2.42
+ 20:08:05 up 1 day,  4:56,  3 users,  load average: 2.42, 1.76, 1.53
+RUN unit nodes=7
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:216: AssertionError: assert [(8388624, b'\x1f\xf6')] == [(8388624, b'\x1a\xe6')]
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_51_3_app_handler_encodes_over_the_source_view
+1 failed, 5 passed in 7.27s
+LOAD_AFTER 2.46
+RESTORE_OK
+VERDICT R-PE-DEF.51#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.52#a
+LOAD_BEFORE 1.40
+ 20:13:24 up 1 day,  5:02,  2 users,  load average: 1.40, 1.55, 1.52
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:176: AssertionError: assert 2 == 1
+<tree>/tests/test_b103_inc8_a1_service.py:171: AssertionError: assert [(8388640, b'...40, b'\x00<')] == [(8388640, b'\x00<')]
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_2_two_masked_fields_make_one_entry
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_1_second_stage_of_one_span_replaces_the_entry
+2 failed in 1.14s
+LOAD_AFTER 1.40
+RESTORE_OK
+VERDICT R-PE-DEF.52#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.52#b
+LOAD_BEFORE 1.36
+ 20:37:01 up 1 day,  5:25,  2 users,  load average: 1.36, 2.72, 2.44
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:187: AssertionError: assert ('string' == 'bytes'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_3_string_entry_replaced_by_bytes_entry_round_trips
+1 failed, 2 passed in 1.15s
+LOAD_AFTER 1.36
+RESTORE_OK
+VERDICT R-PE-DEF.52#b killed-unit
+
+
+KEY R-PE-DEF.53
+LOAD_BEFORE 1.40
+ 20:13:26 up 1 day,  5:02,  2 users,  load average: 1.40, 1.55, 1.52
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:202: AssertionError: assert None == 'DISPLAY_0001'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_53_1_no_intersect_appends_with_the_row_name_as_symbol
+1 failed in 1.13s
+LOAD_AFTER 1.40
+RESTORE_OK
+VERDICT R-PE-DEF.53 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.54
+LOAD_BEFORE 2.51
+ 20:08:15 up 1 day,  4:56,  3 users,  load average: 2.51, 1.80, 1.55
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:207: AssertionError: assert 'MASK_BIT_0001' == 'MASK_FIELD_0001'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_54_1_replace_keeps_the_old_symbol
+1 failed in 1.20s
+LOAD_AFTER 2.51
+RESTORE_OK
+VERDICT R-PE-DEF.54 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.55
+LOAD_BEFORE 1.40
+ 20:13:28 up 1 day,  5:02,  3 users,  load average: 1.40, 1.55, 1.52
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:219: AssertionError: assert not True
+<tree>/tests/test_b103_inc8_a1_service.py:219: AssertionError: assert not True
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_55_1_entry_inside_the_span_refuses
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_55_2_entry_straddling_the_start_refuses
+2 failed in 1.14s
+LOAD_AFTER 1.45
+RESTORE_OK
+VERDICT R-PE-DEF.55 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.56
+LOAD_BEFORE 2.51
+ 20:08:18 up 1 day,  4:57,  3 users,  load average: 2.51, 1.80, 1.55
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:247: AssertionError: assert not True
+<tree>/tests/test_b103_inc8_a1_service.py:247: AssertionError: assert not True
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_56_3_walk_leaves_the_document_unchanged
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_56_1_abc_leaves_the_document_unchanged
+2 failed in 1.31s
+LOAD_AFTER 2.55
+RESTORE_OK
+VERDICT R-PE-DEF.56 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.57
+LOAD_BEFORE 1.45
+ 20:13:30 up 1 day,  5:02,  2 users,  load average: 1.45, 1.56, 1.52
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:239: AssertionError: assert 'Patch Editor: A2L-DEF-NUMBER' == 'Patch Editor... not a number'
+<tree>/tests/test_b103_inc8_a2_app.py:234: AssertionError: assert 'Patch Editor...-DEF-EXTENDED' == 'Patch Editor...mits -50..200'
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_57_2_abc_status_line - A...
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_57_1_250_status_line - A...
+2 failed in 6.25s
+LOAD_AFTER 1.50
+RESTORE_OK
+VERDICT R-PE-DEF.57 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.58#a
+LOAD_BEFORE 2.55
+ 20:08:20 up 1 day,  4:57,  2 users,  load average: 2.55, 1.82, 1.55
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:277: AssertionError: assert 'Patch Editor: entry added.' == 'Patch Editor...at 0x800000).'
+<tree>/tests/test_b103_inc8_a2_app.py:166: AssertionError: assert 'Patch Editor: entry added.' == 'Patch Editor...at 0x800020).'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_58_2_message_of_an_enum_stage
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_50_1_app_display_25_5_through_the_sheet_message
+2 failed in 7.01s
+LOAD_AFTER 2.50
+RESTORE_OK
+VERDICT R-PE-DEF.58#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.58#b
+LOAD_BEFORE 1.50
+ 20:13:38 up 1 day,  5:02,  2 users,  load average: 1.50, 1.56, 1.52
+RUN unit nodes=4
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:285: AssertionError: assert 'staged as xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx… (42 B at 0x810200).' in 'Patch Editor: ASAM.C.ASCII.UBYTE.NUMBER_42 staged as xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (42 B at 0x810200).'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_58_3_shown_text_of_300_chars_is_clipped_to_256_and_an_ellipsis
+1 failed, 3 passed in 7.11s
+LOAD_AFTER 1.49
+RESTORE_OK
+VERDICT R-PE-DEF.58#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.59#a
+LOAD_BEFORE 2.50
+ 20:08:28 up 1 day,  4:57,  2 users,  load average: 2.50, 1.83, 1.56
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:297: AssertionError: assert () == ('Patch Edito...ts -50..200',)
+<tree>/tests/test_b103_inc8_a2_app.py:280: AssertionError: assert 'Loaded definitions.s19' == 'Patch Editor...at 0x800020).'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_59_1_notice_is_in_notices_not_in_issues
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_59_1_app_notice_is_a_status_line_of_its_own
+2 failed in 6.20s
+LOAD_AFTER 2.34
+RESTORE_OK
+VERDICT R-PE-DEF.59#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.59#b
+LOAD_BEFORE 1.49
+ 20:13:46 up 1 day,  5:02,  2 users,  load average: 1.49, 1.56, 1.52
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:297: AssertionError: assert () == ('Patch Edito...ts -50..200',)
+<tree>/s19_app/tui/app/patch.py:1243: AttributeError: 'str' object has no attribute 'code'
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_59_1_notice_is_in_notices_not_in_issues
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_59_1_app_notice_is_a_status_line_of_its_own
+2 failed in 6.50s
+LOAD_AFTER 1.45
+RESTORE_OK
+VERDICT R-PE-DEF.59#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.60#a
+LOAD_BEFORE 2.34
+ 20:08:35 up 1 day,  4:57,  2 users,  load average: 2.34, 1.82, 1.56
+RUN unit nodes=12
+RC unit 2
+<tree>/tests/test_b103_inc8_p_ledger.py:126: AssertionError: assert 'ENUM_0001' == 'CURVE_DEF_0001'
+<tree>/tests/test_b103_inc8_a2_app.py:296: AssertionError: assert 'DISPLAY_0001' == 'CURVE_DEF_0001'
+FAILED tests/test_b103_inc8_p_ledger.py::test_r_pe_def_60_1_note_staged_selects_the_row_after_the_staged_row
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_60_1_stage_selects_the_next_row
+2 failed in 7.61s
+LOAD_AFTER 2.45
+RESTORE_OK
+VERDICT R-PE-DEF.60#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.60#b
+LOAD_BEFORE 1.45
+ 20:13:53 up 1 day,  5:02,  2 users,  load average: 1.45, 1.55, 1.52
+RUN unit nodes=12
+RC unit 2
+<tree>/tests/test_b103_inc8_p_ledger.py:126: AssertionError: assert 'MASK_BIT_0001' == 'CURVE_DEF_0001'
+FAILED tests/test_b103_inc8_p_ledger.py::test_r_pe_def_60_1_note_staged_selects_the_row_after_the_staged_row
+1 failed, 2 passed in 13.55s
+LOAD_AFTER 1.43
+RESTORE_OK
+VERDICT R-PE-DEF.60#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.82
+LOAD_BEFORE 2.45
+ 20:08:44 up 1 day,  4:57,  2 users,  load average: 2.45, 1.86, 1.57
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:263: AssertionError: assert '◆' != '◆'
+<tree>/tests/test_b103_inc8_s2_sheet_keys.py:276: AssertionError: assert '25.5' == ''
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_82_1_select_after_clears_the_staged_rows_pending_text
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_82_2_the_staged_row_selected_again_has_an_empty_input
+2 failed in 2.06s
+LOAD_AFTER 2.45
+RESTORE_OK
+VERDICT R-PE-DEF.82 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.61
+LOAD_BEFORE 1.43
+ 20:14:08 up 1 day,  5:02,  2 users,  load average: 1.43, 1.54, 1.52
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a1_service.py:311: assert 0 == (0 + 1)
+<tree>/tests/test_b103_inc8_a2_app.py:168: assert 0 == (0 + 1)
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_61_1_stage_adds_one_undo_step_and_undo_restores
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_50_1_app_display_25_5_through_the_sheet_message
+2 failed in 6.99s
+LOAD_AFTER 1.36
+RESTORE_OK
+VERDICT R-PE-DEF.61 inconclusive-rc2-unit
+
+
+KEY R-PE-034
+LOAD_BEFORE 2.45
+ 20:08:47 up 1 day,  4:57,  2 users,  load average: 2.45, 1.86, 1.57
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:179: assert (False, False) == (False, True)
+<tree>/tests/test_b103_inc8_p_ledger.py:114: AssertionError: 0 entries
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_034_1_stage_sets_the_dirty_flag
+FAILED tests/test_b103_inc8_p_ledger.py::test_r_pe_034_1_note_staged_sets_the_dirty_flag
+2 failed in 6.85s
+LOAD_AFTER 2.53
+RESTORE_OK
+VERDICT R-PE-034 inconclusive-rc2-unit
+
+
+KEY R-PE-035
+LOAD_BEFORE 1.36
+ 20:14:16 up 1 day,  5:02,  2 users,  load average: 1.36, 1.52, 1.51
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:252: AssertionError: assert True is False
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_035_1_refused_stage_keeps_the_flag_clear
+1 failed, 1 passed in 6.75s
+LOAD_AFTER 1.41
+RESTORE_OK
+VERDICT R-PE-035 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.62#a
+LOAD_BEFORE 2.53
+ 20:08:55 up 1 day,  4:57,  2 users,  load average: 2.53, 1.89, 1.59
+RUN unit nodes=11
+RC unit 2
+<tree>/tests/test_b103_inc8_p_wiring.py:270: AssertionError:   DISPLAY_0001      VALUE    143.5             ·            deg C  -40 ├───────────●┤ 150
+<tree>/tests/test_b103_inc8_a2_app.py:369: AssertionError: assert (not False and False)
+FAILED tests/test_b103_inc8_p_wiring.py::test_r_pe_def_62_1_a_staged_entry_marks_its_row_and_undo_clears_it
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_62_1_undo_of_a_stage_clears_the_mark
+2 failed in 7.44s
+LOAD_AFTER 2.65
+RESTORE_OK
+VERDICT R-PE-DEF.62#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.62#b
+LOAD_BEFORE 1.41
+ 20:14:23 up 1 day,  5:03,  2 users,  load average: 1.41, 1.53, 1.52
+RUN unit nodes=11
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:428: AssertionError: assert False
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_62_4_new_image_word_changes_the_staged_cue
+1 failed, 9 passed in 21.76s
+LOAD_AFTER 1.47
+RESTORE_OK
+VERDICT R-PE-DEF.62#b inconclusive-rc2-unit
+
+
+KEY R-PE-110
+LOAD_BEFORE 2.65
+ 20:09:03 up 1 day,  4:57,  2 users,  load average: 2.65, 1.93, 1.60
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:445: AssertionError: assert 'Patch Editor...at 0x800020).' == 'busy: Loadin...it to finish.'
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_110_1_stage_refused_while_a_session_action_runs
+1 failed in 6.34s
+LOAD_AFTER 2.47
+RESTORE_OK
+VERDICT R-PE-110 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.63
+LOAD_BEFORE 1.47
+ 20:14:46 up 1 day,  5:03,  2 users,  load average: 1.47, 1.54, 1.52
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:456: AssertionError: assert 'Patch Editor...at 0x800020).' == 'Patch Editor...thing staged.'
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_63_1_no_a2l_refuses_the_stage
+1 failed in 6.21s
+LOAD_AFTER 1.44
+RESTORE_OK
+VERDICT R-PE-DEF.63 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.64
+LOAD_BEFORE 2.47
+ 20:09:11 up 1 day,  4:57,  2 users,  load average: 2.47, 1.91, 1.60
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:470: assert [8388640] == [8388656]
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_64_1_stage_describes_again_with_the_a2l_loaded_now
+1 failed in 6.16s
+LOAD_AFTER 2.43
+RESTORE_OK
+VERDICT R-PE-DEF.64 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.70#a
+LOAD_BEFORE 1.44
+ 20:14:53 up 1 day,  5:03,  2 users,  load average: 1.44, 1.53, 1.52
+RUN unit nodes=6
+RC unit 2
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/rich/markup.py:167: rich.errors.MarkupError: closing tag '[/x]' at position 3 doesn't match any open tag
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_70_1_an_enum_text_with_a_closing_tag_is_shown_literally
+1 failed, 2 passed in 1.88s
+LOAD_AFTER 1.40
+RESTORE_OK
+VERDICT R-PE-DEF.70#a inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.70#b
+LOAD_BEFORE 2.43
+ 20:09:18 up 1 day,  4:58,  2 users,  load average: 2.43, 1.92, 1.60
+RUN unit nodes=6
+RC unit 2
+<runner-home>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/markup.py:320: textual.markup.MarkupError: closing tag '[/x]' does not match any open tag
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_70_5_a_row_named_like_a_closing_tag_selects_without_an_exception
+1 failed, 5 passed in 2.07s
+LOAD_AFTER 2.40
+RESTORE_OK
+VERDICT R-PE-DEF.70#b inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.71
+LOAD_BEFORE 1.40
+ 20:14:56 up 1 day,  5:03,  2 users,  load average: 1.40, 1.52, 1.51
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:682: AssertionError: assert 'A\x1b[2J' == 'A�[2J'
+<tree>/tests/test_b103_inc8_s1.py:335: AssertionError: assert (('DISP' + '�') + 'LAY') in '  DISP\x00LAY           VALUE    143.5             ·            deg C  -40 ├──────────────────●─┤ 150                    '
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_71_plain_replaces_every_control_character_and_keeps_brackets
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_71_a_control_character_in_a_name_becomes_fffd
+2 failed in 1.16s
+LOAD_AFTER 1.40
+RESTORE_OK
+VERDICT R-PE-DEF.71 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.72
+LOAD_BEFORE 2.40
+ 20:09:21 up 1 day,  4:58,  2 users,  load average: 2.40, 1.92, 1.60
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_s1.py:694: AssertionError: assert 'NNNNNNNNNNNN...NNNNNNNNNNNN…' == 'NNNNNNNNNNNN...NNNNNNNNNNNN…'
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_72_name_echo_caps_at_256_characters_and_cleans_controls
+1 failed in 1.23s
+LOAD_AFTER 2.40
+RESTORE_OK
+VERDICT R-PE-DEF.72 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.73
+LOAD_BEFORE 1.40
+ 20:14:58 up 1 day,  5:03,  2 users,  load average: 1.40, 1.52, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a2_app.py:483: AssertionError: the painted status line ate the brackets: "Patch Editor: DISPLAY_0001: 'A' is not a number"
+FAILED tests/test_b103_inc8_a2_app.py::test_r_pe_def_73_1_status_line_is_plain_text
+1 failed in 6.22s
+LOAD_AFTER 1.34
+RESTORE_OK
+VERDICT R-PE-DEF.73 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.83
+LOAD_BEFORE 2.40
+ 20:09:23 up 1 day,  4:58,  2 users,  load average: 2.40, 1.92, 1.60
+RUN unit nodes=2
+RC unit 2
+<tree>/tests/test_b103_inc8_a3_help.py:44: AssertionError: step 1 does not name ['filter row', 'STAGING SHEET', 'LANDS IN', 'Patch script']: 'Edit a change-set: the PATCH SCRIPT ledger on the left lists its entries; the inspector on the right shows the highlighted entry and holds the Inspector, JSON, Checks and A2L tabs. Load an S19/HEX image first (`^L`) to see the bytes an entry replaces.'
+<tree>/tests/test_b103_inc8_a3_help.py:50: AssertionError: the help still names ['A2L tab', 'on the left', 'on the right']
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_83_1_step_one_names_the_regions_and_four_tabs
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_83_2_no_step_names_the_a2l_tab_or_a_side
+2 failed in 1.09s
+LOAD_AFTER 2.36
+RESTORE_OK
+VERDICT R-PE-DEF.83 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.84
+LOAD_BEFORE 1.34
+ 20:15:06 up 1 day,  5:03,  2 users,  load average: 1.34, 1.50, 1.51
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a3_help.py:57: AssertionError: ['--', '?', 'Add', 'Add list', 'Address', 'Apply loaded changes', ...]
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_84_1_patch_script_line_names_entries
+1 failed in 1.03s
+LOAD_AFTER 1.34
+RESTORE_OK
+VERDICT R-PE-DEF.84 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.85
+LOAD_BEFORE 2.36
+ 20:09:25 up 1 day,  4:58,  2 users,  load average: 2.36, 1.92, 1.61
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a3_help.py:64: AssertionError: ['--', '?', 'Add', 'Add list', 'Address', 'Apply loaded changes', ...]
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_85_1_staging_sheet_line_names_the_keys
+1 failed in 1.10s
+LOAD_AFTER 2.36
+RESTORE_OK
+VERDICT R-PE-DEF.85 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.86
+LOAD_BEFORE 1.34
+ 20:15:08 up 1 day,  5:03,  2 users,  load average: 1.34, 1.50, 1.51
+RUN unit nodes=3
+RC unit 2
+<tree>/tests/test_b103_inc8_a3_help.py:74: AssertionError: no `field = — …` line: ['--', '?', 'Add', 'Add list', 'Address', 'Apply loaded changes', 'Bytes', 'Checks', "Don't save", 'Edit', 'Edit JSON', 'Execute scope', 'File', 'Filter', 'Inspector', 'JSON', 'Load', 'Next', 'Open patches/', 'Parse pasted', 'Patch script', 'Pick', 'Prev', 'Redo', 'Refresh', 'Remove', 'Run checks', 'STAGING SHEET', 'Save', 'Save patched image as', 'Scope', 'String', 'Undo', 'Use parameter', 'Validate', 'Width', 'Write before/after report', 'Write file', 'arrow keys', 'enter', 'new =', 'space', 'text =', '·', '◐', '✓', '✗']
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_86_2_field_label_line
+1 failed, 2 passed in 1.04s
+LOAD_AFTER 1.31
+RESTORE_OK
+VERDICT R-PE-DEF.86 inconclusive-rc2-unit
+
+
+KEY R-PE-DEF.87
+LOAD_BEFORE 2.36
+ 20:09:27 up 1 day,  4:58,  2 users,  load average: 2.36, 1.92, 1.61
+RUN unit nodes=1
+RC unit 2
+<tree>/tests/test_b103_inc8_a3_help.py:94: AssertionError: on the A2L tab, copies the highlighted parameter's address and the loaded image's current bytes into the entry form; the document changes only through Add or Edit.
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_87_1_use_parameter_uses_the_selected_row
+1 failed in 1.11s
+LOAD_AFTER 2.42
+RESTORE_OK
+VERDICT R-PE-DEF.87 inconclusive-rc2-unit

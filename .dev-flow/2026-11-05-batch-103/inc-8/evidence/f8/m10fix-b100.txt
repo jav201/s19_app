@@ -1,0 +1,273 @@
+TREE -n 2026-11-14T06:30:27Z load: 10.31 11.26 10.95
+~/work/zq-f8/merge10fix/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-f8/merge10fix
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [11 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A] 
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A] 
+[gw0] [  9%] PASSED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A] 
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B] 
+[gw1] [ 18%] PASSED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A] 
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B] 
+[gw0] [ 27%] PASSED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B] 
+tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] 
+[gw1] [ 36%] PASSED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B] 
+tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] 
+[gw0] [ 45%] PASSED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] 
+tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0] 
+[gw1] [ 54%] PASSED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] 
+tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1] 
+[gw1] [ 63%] FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1] 
+tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before 
+[gw0] [ 72%] FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0] 
+tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal 
+[gw0] [ 81%] SKIPPED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal 
+[gw1] [ 90%] PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before 
+tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name 
+[gw1] [100%] PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name 
+
+=================================== FAILURES ===================================
+____ test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1] _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-27/popen-gw1/test_at_b100_20_inc8a_every_wr0')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene, Inc 8a arm, by keys and clicks: P records
+        ``batch``, ``assignments``, ``declared_regions``, ``gathered`` and
+        ``active_document`` "patches/boost.json" (one entry at ``0x80000010``).
+        With P open through the Load project dialog, the engineer (1) adds and
+        applies ``0x8000007C DE AD BE EF`` in the Patch Editor and saves back
+        under the default name, then loads through Load (2) a new S19, (3) a
+        MAC and (4) an A2L. After each writer ``project.json`` on disk was
+        rewritten, keeps ``active_document`` and the four other not-owned keys
+        equal (JSON compare) with 0 absolute paths, and the document file's
+        bytes are unchanged. A fresh app opening P through the dialog paints
+        no problem naming the document in the Load-result panel, and the Patch
+        Editor ledger paints the document's entry ``80000010`` with the SCRIPT
+        window at ``1 entry`` and no unsaved marker.
+    
+        RED (base dc3b314): ``active_document`` is an unknown key there, so
+        the in-project writers refuse to rewrite the manifest (SEC6-2) and the
+        first writer's rewrite never comes."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_document_project(_workarea(base), extra=projects.seeded_keys())
+        for relative in (projects.SEEDED_PATCH, projects.SEEDED_CHECK):
+            target = project_dir / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('{"entries": []}', encoding="utf-8")
+        document_bytes = (project_dir / projects.DOCUMENT_TEXT).read_bytes()
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        dirty_marker = "●"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns, manifest_path.read_bytes())
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await projects.dismiss_load_result_panel(pilot, app)
+                # (1) save-back
+                previous = _stamp()
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware-patched.s19").is_file()
+                    and _stamp() != previous,
+                    "firmware-patched.s19 placed and project.json rewritten by the save-back",
+                )
+                snapshots.append(("save-back", json.loads(manifest_path.read_bytes())))
+                # (2) variant append, (3) MAC sync, (4) A2L sync, through Load
+                for writer, src, landed in (
+                    ("variant-append", s19 / "firmware.s19", "firmware_1.s19"),
+                    ("mac-sync", side / "firmware.mac", "firmware.mac"),
+                    ("a2l-sync", side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten by the {writer}",
+                    )
+                    snapshots.append((writer, json.loads(manifest_path.read_bytes())))
+    
+        async def _reopen() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                panel = await _open_and_close_the_panel(pilot, app, "P")
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_doc_entries_table")) > 0
+                    and f"{projects.DOCUMENT_ADDRESS:08X}" in _ledger(app).upper(),
+                    "the reopened document's entry painted in the ledger",
+                )
+                return panel, _ledger(app), _script_border(app)
+    
+        asyncio.run(_writers())
+        assert [writer for writer, _ in snapshots] == [
+            "save-back", "variant-append", "mac-sync", "a2l-sync"
+        ]
+        for writer, manifest in snapshots:
+            assert manifest.get("active_document") == projects.DOCUMENT_TEXT, (writer, manifest)
+            assert projects.not_owned(manifest) == projects.seeded_keys(), (writer, manifest)
+            assert projects.absolute_strings(manifest) == [], (writer, manifest)
+        assert snapshots[0][1]["active_variant"] == "firmware-patched", snapshots[0]
+        assert [m["active_variant"] for _, m in snapshots[1:]] == ["firmware_1"] * 3, snapshots
+        # No writer rewrote the document file itself.
+        assert (project_dir / projects.DOCUMENT_TEXT).read_bytes() == document_bytes
+    
+        panel, ledger, border = asyncio.run(_reopen())
+        flat = projects.flat(panel)
+        assert "Opened    firmware_1.s19" in panel, panel
+        assert "boost.json" not in flat, panel  # no problem row names the document
+        assert f"{projects.DOCUMENT_ADDRESS:08X}" in ledger.upper(), ledger
+>       assert "1 entry" in border and "1 entry" == border.split("─")[-2].strip(), border
+E       AssertionError:                                                                                                                                                                                                 
+E       assert ('1 entry' in '                                                                                                                                                                                                ')
+
+tests/test_b100_active_variant.py:1473: AssertionError
+____ test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-27/popen-gw0/test_at_b100_20_inc8a_every_wr0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene, Inc 8a arm, by keys and clicks: P records
+        ``batch``, ``assignments``, ``declared_regions``, ``gathered`` and
+        ``active_document`` "patches/boost.json" (one entry at ``0x80000010``).
+        With P open through the Load project dialog, the engineer (1) adds and
+        applies ``0x8000007C DE AD BE EF`` in the Patch Editor and saves back
+        under the default name, then loads through Load (2) a new S19, (3) a
+        MAC and (4) an A2L. After each writer ``project.json`` on disk was
+        rewritten, keeps ``active_document`` and the four other not-owned keys
+        equal (JSON compare) with 0 absolute paths, and the document file's
+        bytes are unchanged. A fresh app opening P through the dialog paints
+        no problem naming the document in the Load-result panel, and the Patch
+        Editor ledger paints the document's entry ``80000010`` with the SCRIPT
+        window at ``1 entry`` and no unsaved marker.
+    
+        RED (base dc3b314): ``active_document`` is an unknown key there, so
+        the in-project writers refuse to rewrite the manifest (SEC6-2) and the
+        first writer's rewrite never comes."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_document_project(_workarea(base), extra=projects.seeded_keys())
+        for relative in (projects.SEEDED_PATCH, projects.SEEDED_CHECK):
+            target = project_dir / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('{"entries": []}', encoding="utf-8")
+        document_bytes = (project_dir / projects.DOCUMENT_TEXT).read_bytes()
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        dirty_marker = "●"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns, manifest_path.read_bytes())
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await projects.dismiss_load_result_panel(pilot, app)
+                # (1) save-back
+                previous = _stamp()
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware-patched.s19").is_file()
+                    and _stamp() != previous,
+                    "firmware-patched.s19 placed and project.json rewritten by the save-back",
+                )
+                snapshots.append(("save-back", json.loads(manifest_path.read_bytes())))
+                # (2) variant append, (3) MAC sync, (4) A2L sync, through Load
+                for writer, src, landed in (
+                    ("variant-append", s19 / "firmware.s19", "firmware_1.s19"),
+                    ("mac-sync", side / "firmware.mac", "firmware.mac"),
+                    ("a2l-sync", side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten by the {writer}",
+                    )
+                    snapshots.append((writer, json.loads(manifest_path.read_bytes())))
+    
+        async def _reopen() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                panel = await _open_and_close_the_panel(pilot, app, "P")
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_doc_entries_table")) > 0
+                    and f"{projects.DOCUMENT_ADDRESS:08X}" in _ledger(app).upper(),
+                    "the reopened document's entry painted in the ledger",
+                )
+                return panel, _ledger(app), _script_border(app)
+    
+        asyncio.run(_writers())
+        assert [writer for writer, _ in snapshots] == [
+            "save-back", "variant-append", "mac-sync", "a2l-sync"
+        ]
+        for writer, manifest in snapshots:
+            assert manifest.get("active_document") == projects.DOCUMENT_TEXT, (writer, manifest)
+            assert projects.not_owned(manifest) == projects.seeded_keys(), (writer, manifest)
+            assert projects.absolute_strings(manifest) == [], (writer, manifest)
+        assert snapshots[0][1]["active_variant"] == "firmware-patched", snapshots[0]
+        assert [m["active_variant"] for _, m in snapshots[1:]] == ["firmware_1"] * 3, snapshots
+        # No writer rewrote the document file itself.
+        assert (project_dir / projects.DOCUMENT_TEXT).read_bytes() == document_bytes
+    
+        panel, ledger, border = asyncio.run(_reopen())
+        flat = projects.flat(panel)
+        assert "Opened    firmware_1.s19" in panel, panel
+        assert "boost.json" not in flat, panel  # no problem row names the document
+        assert f"{projects.DOCUMENT_ADDRESS:08X}" in ledger.upper(), ledger
+>       assert "1 entry" in border and "1 entry" == border.split("─")[-2].strip(), border
+E       AssertionError:                                                                                                             
+E       assert ('1 entry' in '                                                                                                            ')
+
+tests/test_b100_active_variant.py:1473: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0]
+============== 2 failed, 8 passed, 1 skipped in 172.06s (0:02:52) ==============
+RC=1

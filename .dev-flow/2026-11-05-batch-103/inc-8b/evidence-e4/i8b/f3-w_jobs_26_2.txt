@@ -1,0 +1,5 @@
+# tree: fin @ 0bf2373b
+# uptime:  01:23:40 up 2 days, 10:12,  3 users,  load average: 4.06, 5.80, 5.56
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/fin/s19_app/__init__.py
+# pytest -p no:xdist -q tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+# exit=124

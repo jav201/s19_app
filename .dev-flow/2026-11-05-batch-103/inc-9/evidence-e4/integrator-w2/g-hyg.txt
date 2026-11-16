@@ -1,0 +1,13 @@
+# run g-hyg tree=tip 2026-11-14T00:30:04-06:00 load: load average: 10.68, 11.40, 10.99
+~/work/zq-e4-9w-int2/tip/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 67 items / 65 deselected / 2 selected
+
+tests/test_suite_hygiene.py ..                                           [100%]
+
+================= 2 passed, 65 deselected in 143.25s (0:02:23) =================
+# rc=0 end 2026-11-14T00:32:41-06:00 load: load average: 10.50, 11.04, 10.92

@@ -1,0 +1,47 @@
+scene=v1
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=80x24
+time=2026-11-14 08:24:05
+app_size=80x24
+focused=patch_sheet_body
+selected=VAL_BLK_DEF_0001
+bench_state: cursor=(0, 0) anchor=(0, 0) tool=s focus=False edit={} undo=0
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=70x10 classes=[] subtitle=None
+widget #patch_inspector: size=68x4 classes=[] subtitle='0 entries'
+widget #patch_editor_panel: size=74x9 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down
+status_lines_this_run=2
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                             Hex Edit Tool
+      │                    Patch Editor                      ?  📂 Open patches/
+   ▏◫ │
+   ▏≡ ││  Parameter       Current       New         Limits         Δ          │
+   ▏◉ ││▶ VAL_BLK_DEF_0001███ 6         ·           -50 … 50                  │▇▇
+   ▏▤ ││└ LINEAR phys = 0.05*raw · SWORD s16 big-endian · RL_DEF_S16_ROW · 0x…│
+   ▏! ││               0                    1                    2            │
+   ▏✎ ││     0        36.9                 11.0                 31.8          │▂▂
+   ▏✔ ││     1       -20.7                -19.8                -10.7          │
+   ▏⏚ ││shade ████████████ -20.7 … 36.9 units   sel x0,y0   * / bold = edited │
+   ▏✦ ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shi…│
+      ││no edit yet · bytes appear here                                       │
+   ──────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                 (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+  
+screen_text_end
+surface=ready

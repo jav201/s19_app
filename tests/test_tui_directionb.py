@@ -9228,7 +9228,9 @@ def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "ob
 # batch-97 Inc-4 (named supersession, HLR-144 / pe_A): the superscript ordinal
 # named the window's read order in the retired three-window regime; the
 # ledger + inspector layout has one titled ledger, so the title is plain.
-PATCH_DOC_SECTION_TITLE = "PATCH SCRIPT"
+# Inc 8 R-TUI-063.6 / R-TUI-063.7 (withdrawn): the ledger's border title PATCH SCRIPT leaves with
+# its border; the landing pane that holds the ledger is titled LANDS IN on every tab.
+PATCH_DOC_SECTION_TITLE = "LANDS IN"
 PATCH_DOC_PATH_PLACEHOLDER = (
     "or type a path to the same change-set JSON "
     "(alternative to the patches/ dropdown)"
@@ -9282,7 +9284,7 @@ def _patch_label_and_placeholder(tmp_path: Path) -> tuple[str, str]:
             await pilot.pause()
             # batch-94: the title is the SCRIPT window's border title (the
             # in-body Label retired with the rework).
-            title = app.query_one("#patch_win_script").border_title
+            title = app.query_one("#patch_inspector").border_title  # Inc 8 R-TUI-063.6: was #patch_win_script
             placeholder = app.query_one(
                 "#patch_doc_path_input", Input
             ).placeholder

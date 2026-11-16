@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+..............F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt3/tests/test_b103_inc9_w_mutants.py:424: AssertionError:   Parameter         Kind     Current           New          Unit   Limits                    Δ
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_66_5_undoing_the_only_edit_clears_the_bytes_line
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 16 passed in 97.82s (0:01:37)

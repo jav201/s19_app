@@ -1,0 +1,222 @@
+# mutant N-104a  rows: R-PE-DEF.104
+# edits: s19_app/tui/definition_sheet.py:895; s19_app/tui/definition_sheet.py:896
+# -k: r_pe_def_104_
+# uptime: 01:59:06 up 2 days, 10:47,  3 users,  load average: 1.28, 0.89, 1.23
+s19_app.__file__ = ~/work/zq-m8b/m/N-104a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+........FFFFFF.FFF                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[neg_big] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'neg_big'
+
+    @pytest.mark.parametrize("key", ["neg_big", "huge"])
+    def test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits(defc, key):
+        """R-PE-DEF.104/2 - ``├`` 8 and ``┤`` 25 when the limits are -655k .. -1.00k or -1.7e308 .. 4.29e12."""
+        plain = _the_cell(defc, key).plain
+>       assert plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '-655  k ├───...────┤ -1.00 k' == '  -655k ├───...────┤  -1.00k'
+E         
+E         -   -655k ├────────────────┤  -1.00k
+E         ? --                         -
+E         + -655  k ├────────────────┤ -1.00 k
+E         ?     ++                          +
+
+tests/test_b103_inc8b_s1.py:691: AssertionError
+_ test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[CURVE_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"])
+    def test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets(defc, name):
+        """R-PE-DEF.104/4 - ``…`` at 16 on the three bench rows (``L.bench.*``), through ``bench_cells``."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, view_state(o), ds.sheet_widths(111))[LIMITS].plain
+>       assert cell == TR[f"L.bench.{name}"]
+E       AssertionError: assert '0           ...      65.5  k' == '     0      ...        65.5k'
+E         
+E         -      0          …            65.5k
+E         ? -----            --
+E         + 0               …          65.5  k
+E         ?            +++++               ++
+
+tests/test_b103_inc8b_s1.py:709: AssertionError
+_ test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[huge] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'huge'
+
+    @pytest.mark.parametrize("key", ["neg_big", "huge"])
+    def test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits(defc, key):
+        """R-PE-DEF.104/2 - ``├`` 8 and ``┤`` 25 when the limits are -655k .. -1.00k or -1.7e308 .. 4.29e12."""
+        plain = _the_cell(defc, key).plain
+>       assert plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '-2e308  ├───...───●┤ 4e12   ' == '-2e308  ├───...───●┤   4e12 '
+E         
+E         - -2e308  ├───────────────●┤   4e12 
+E         ?                            --
+E         + -2e308  ├───────────────●┤ 4e12   
+E         ?                                 ++
+
+tests/test_b103_inc8b_s1.py:691: AssertionError
+_ test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[MAP_DEF_0001] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"])
+    def test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets(defc, name):
+        """R-PE-DEF.104/4 - ``…`` at 16 on the three bench rows (``L.bench.*``), through ``bench_cells``."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, view_state(o), ds.sheet_widths(111))[LIMITS].plain
+>       assert cell == TR[f"L.bench.{name}"]
+E       AssertionError: assert '-1.00 k     ...      1.00  k' == ' -1.00k     ...        1.00k'
+E         
+E         -  -1.00k         …            1.00k
+E         ? -                --
+E         + -1.00 k         …          1.00  k
+E         ?      +                         ++
+
+tests/test_b103_inc8b_s1.py:709: AssertionError
+_ test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[VAL_BLK_DEF_0001] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"])
+    def test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets(defc, name):
+        """R-PE-DEF.104/4 - ``…`` at 16 on the three bench rows (``L.bench.*``), through ``bench_cells``."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, view_state(o), ds.sheet_widths(111))[LIMITS].plain
+>       assert cell == TR[f"L.bench.{name}"]
+E       AssertionError: assert '-50         ...      50     ' == '   -50      ...          50 '
+E         
+E         -    -50          …              50 
+E         ? ---              ----
+E         + -50             …          50     
+E         ?              +++              ++++
+
+tests/test_b103_inc8b_s1.py:709: AssertionError
+_ test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-1000.0-1000.0-k-k] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = -1000.0, upper = 1000.0, lower_unit = 'k', upper_unit = 'k'
+
+    @pytest.mark.parametrize(
+        ("lower", "upper", "lower_unit", "upper_unit"),
+        [(-1000.0, 1000.0, "k", "k"), (0.0, 65535.0, None, "k"), (-655350.0, -1000.0, "k", "k")],
+    )
+    def test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot(defc, lower, upper, lower_unit, upper_unit):
+        """R-PE-DEF.104/6 - ``  65.5k``, `` -1.00k``, ``  -655k``: the unit letter at offset 6 (lower) or 33 (upper)."""
+        plain = limits_of(defc, "DISPLAY_0001", lower=lower, upper=upper, current=None).plain
+        if lower_unit:
+            assert plain[TR["L.offset.lower_unit_cell"]] == lower_unit
+        else:
+            assert plain[TR["L.offset.lower_unit_cell"]] == " "
+        assert plain[TR["L.offset.upper_unit_cell"]] == upper_unit
+>       assert plain[:7] == EX8.slot(lower) and plain[-7:] == EX8.slot(upper)
+E       AssertionError: assert ('-1.00 k' == ' -1.00k'
+E         
+E         -  -1.00k
+E         ? -
+E         + -1.00 k
+E         ?      +)
+
+tests/test_b103_inc8b_s1.py:736: AssertionError
+_ test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-655350.0--1000.0-k-k] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = -655350.0, upper = -1000.0, lower_unit = 'k', upper_unit = 'k'
+
+    @pytest.mark.parametrize(
+        ("lower", "upper", "lower_unit", "upper_unit"),
+        [(-1000.0, 1000.0, "k", "k"), (0.0, 65535.0, None, "k"), (-655350.0, -1000.0, "k", "k")],
+    )
+    def test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot(defc, lower, upper, lower_unit, upper_unit):
+        """R-PE-DEF.104/6 - ``  65.5k``, `` -1.00k``, ``  -655k``: the unit letter at offset 6 (lower) or 33 (upper)."""
+        plain = limits_of(defc, "DISPLAY_0001", lower=lower, upper=upper, current=None).plain
+        if lower_unit:
+            assert plain[TR["L.offset.lower_unit_cell"]] == lower_unit
+        else:
+            assert plain[TR["L.offset.lower_unit_cell"]] == " "
+        assert plain[TR["L.offset.upper_unit_cell"]] == upper_unit
+>       assert plain[:7] == EX8.slot(lower) and plain[-7:] == EX8.slot(upper)
+E       AssertionError: assert ('-655  k' == '  -655k'
+E         
+E         -   -655k
+E         + -655  k)
+
+tests/test_b103_inc8b_s1.py:736: AssertionError
+_ test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[0.0-65535.0-None-k] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = 0.0, upper = 65535.0, lower_unit = None, upper_unit = 'k'
+
+    @pytest.mark.parametrize(
+        ("lower", "upper", "lower_unit", "upper_unit"),
+        [(-1000.0, 1000.0, "k", "k"), (0.0, 65535.0, None, "k"), (-655350.0, -1000.0, "k", "k")],
+    )
+    def test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot(defc, lower, upper, lower_unit, upper_unit):
+        """R-PE-DEF.104/6 - ``  65.5k``, `` -1.00k``, ``  -655k``: the unit letter at offset 6 (lower) or 33 (upper)."""
+        plain = limits_of(defc, "DISPLAY_0001", lower=lower, upper=upper, current=None).plain
+        if lower_unit:
+            assert plain[TR["L.offset.lower_unit_cell"]] == lower_unit
+        else:
+            assert plain[TR["L.offset.lower_unit_cell"]] == " "
+        assert plain[TR["L.offset.upper_unit_cell"]] == upper_unit
+>       assert plain[:7] == EX8.slot(lower) and plain[-7:] == EX8.slot(upper)
+E       AssertionError: assert ('0      ' == '     0 '
+E         
+E         -      0 
+E         + 0      )
+
+tests/test_b103_inc8b_s1.py:736: AssertionError
+_ test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end(defc):
+        """R-PE-DEF.104/7 - current 150 and a value of 149.9 both on cell 16: ``◆`` 23, ``●`` 24, ``┤`` 25 (E3-8b-07).
+    
+        Operator need: the track's right end must stay visible; no mark may cover ``┤``."""
+        key = "DISPLAY_0001.cur150.new149.9"
+        plain = _the_cell(defc, key).plain
+>       assert plain == TR[f"L.cell.{key}"]
+E       AssertionError: assert '-40     ├───...──◆●┤ 150    ' == '   -40  ├───...──◆●┤    150 '
+E         
+E         -    -40  ├──────────────◆●┤    150 
+E         ? ---                        ---
+E         + -40     ├──────────────◆●┤ 150    
+E         ?    +++                         +++
+
+tests/test_b103_inc8b_s1.py:745: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[neg_big]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[CURVE_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_2_the_track_ends_stand_at_8_and_25_on_extreme_limits[huge]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[MAP_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_4_bench_rows_show_the_range_form_at_the_same_offsets[VAL_BLK_DEF_0001]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-1000.0-1000.0-k-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[-655350.0--1000.0-k-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_6_the_unit_letter_is_the_last_cell_of_its_slot[0.0-65535.0-None-k]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_104_7_a_second_mark_on_cell_16_moves_left_and_never_onto_the_end
+9 failed, 9 passed in 1.90s
+
+# exit=1

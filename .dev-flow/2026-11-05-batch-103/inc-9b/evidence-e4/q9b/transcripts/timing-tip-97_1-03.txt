@@ -1,0 +1,18 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=timing Q9B_SIDE=tip Q9B_LABEL=97_1 Q9B_RUN=03
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 17:28:00 up 3 days,  2:16,  3 users,  load average: 0.97, 0.81, 0.80
+Q9B_LOAD1=0.97
+Q9B_NODE=tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title PASSED
+
+============================== 1 passed in 43.38s ==============================
+Q9B_RC=0
+Q9B_VALID=PASS

@@ -1,0 +1,109 @@
+# mutant N-76  rows: R-PE-DEF.76
+# edits: s19_app/tui/definition_sheet.py:974
+# -k: r_pe_def_76_
+# uptime: 01:59:28 up 2 days, 10:48,  3 users,  load average: 1.34, 0.93, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/N-76/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[5.0-5.0-L.cell.limits_5_5] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = 5.0, upper = 5.0, key = 'L.cell.limits_5_5'
+
+    @pytest.mark.parametrize("lower, upper, key", [(5.0, 5.0, "L.cell.limits_5_5"), (9.0, 1.0, "L.cell.limits_9_1")])
+    def test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division(defc, lower, upper, key):
+        """R-PE-DEF.76/1, /2 (changed at Inc 8b E1) - limits `5 5` and `9 1` -> the range form (both slots, `…` at offset 16); no ZeroDivisionError.
+    
+        Why: an upper limit that is not above the lower gives no scale to place a value on, so the cell shows
+        the limits only; Inc 8 wrote `5 … 5` from the column start, which broke the column's alignment.
+        """
+        flat = replace(defc["defs"]["DISPLAY_0001"], limits=Limits(lower, upper, str(int(lower)), str(int(upper))))
+        for value in (None, EX.new):
+            cell = _limits(flat, defc["a2l"], defc["image"], value)
+>           assert cell == fact(key) and cell.index("…") == 16
+E           AssertionError: assert ('     5  ├───...────▶      5 ' == '     5      ...           5 '
+E             
+E             -      5          …               5 
+E             +      5  ├────────────────▶      5 )
+
+tests/test_b103_inc8_s1.py:550: AssertionError
+_ test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_5_5] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'limits_5_5'
+
+    @pytest.mark.parametrize("key", ["limits_5_5", "limits_9_1"])
+    def test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division(defc, key):
+        """R-PE-DEF.76/1, /2 - limits ``5 5`` and ``9 1`` -> ``L.cell.limits_5_5`` / ``_9_1``, no ZeroDivisionError,
+        also when a preview value is asked."""
+        row, _ = make_row(
+            display(defc, limits=Limits(*{"limits_5_5": (5.0, 5.0), "limits_9_1": (9.0, 1.0)}[key], "", "")),
+            defc["a2l"], defc["image"],
+        )
+        for value in (None, 25.5):
+>           assert ds.limits_cell(row, value, LIMITS_W).plain == TR[f"L.cell.{key}"]
+E           AssertionError: assert '     5  ├───...────▶      5 ' == '     5      ...           5 '
+E             
+E             -      5          …               5 
+E             +      5  ├────────────────▶      5
+
+tests/test_b103_inc8b_s1.py:843: AssertionError
+_ test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[9.0-1.0-L.cell.limits_9_1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = 9.0, upper = 1.0, key = 'L.cell.limits_9_1'
+
+    @pytest.mark.parametrize("lower, upper, key", [(5.0, 5.0, "L.cell.limits_5_5"), (9.0, 1.0, "L.cell.limits_9_1")])
+    def test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division(defc, lower, upper, key):
+        """R-PE-DEF.76/1, /2 (changed at Inc 8b E1) - limits `5 5` and `9 1` -> the range form (both slots, `…` at offset 16); no ZeroDivisionError.
+    
+        Why: an upper limit that is not above the lower gives no scale to place a value on, so the cell shows
+        the limits only; Inc 8 wrote `5 … 5` from the column start, which broke the column's alignment.
+        """
+        flat = replace(defc["defs"]["DISPLAY_0001"], limits=Limits(lower, upper, str(int(lower)), str(int(upper))))
+        for value in (None, EX.new):
+            cell = _limits(flat, defc["a2l"], defc["image"], value)
+>           assert cell == fact(key) and cell.index("…") == 16
+E           AssertionError: assert ('     9  ├───...────▶      1 ' == '     9      ...           1 '
+E             
+E             -      9          …               1 
+E             +      9  ├────────────────▶      1 )
+
+tests/test_b103_inc8_s1.py:550: AssertionError
+_ test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_9_1] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'limits_9_1'
+
+    @pytest.mark.parametrize("key", ["limits_5_5", "limits_9_1"])
+    def test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division(defc, key):
+        """R-PE-DEF.76/1, /2 - limits ``5 5`` and ``9 1`` -> ``L.cell.limits_5_5`` / ``_9_1``, no ZeroDivisionError,
+        also when a preview value is asked."""
+        row, _ = make_row(
+            display(defc, limits=Limits(*{"limits_5_5": (5.0, 5.0), "limits_9_1": (9.0, 1.0)}[key], "", "")),
+            defc["a2l"], defc["image"],
+        )
+        for value in (None, 25.5):
+>           assert ds.limits_cell(row, value, LIMITS_W).plain == TR[f"L.cell.{key}"]
+E           AssertionError: assert '     9  ├───...────▶      1 ' == '     9      ...           1 '
+E             
+E             -      9          …               1 
+E             +      9  ├────────────────▶      1
+
+tests/test_b103_inc8b_s1.py:843: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[5.0-5.0-L.cell.limits_5_5]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_5_5]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[9.0-1.0-L.cell.limits_9_1]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_76_limits_not_ascending_give_the_range_form_without_a_division[limits_9_1]
+4 failed in 1.83s
+
+# exit=1

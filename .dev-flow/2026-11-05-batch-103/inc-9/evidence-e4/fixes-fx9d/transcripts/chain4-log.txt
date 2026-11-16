@@ -1,0 +1,6 @@
+clone2 92e9794f
+test_id_registry 12 passed in 7.68s
+test_b103_inc9_ob_json_view 2 passed in 4.80s
+test_suite_hygiene 65 passed, 2 skipped in 150.32s (0:02:30)
+test_requirements_canon 1 failed, 10 passed in 1.36s
+CHAIN4_DONE

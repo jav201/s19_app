@@ -1,0 +1,6 @@
+# uptime before: 1.17 1.71 1.75 1/636 425890
+s19_app.__file__ = ~/work/zq-fx9/fix1/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 439.29s (0:07:19)
+# rc=0
+# uptime after: 1.07 1.24 1.49 1/633 427843

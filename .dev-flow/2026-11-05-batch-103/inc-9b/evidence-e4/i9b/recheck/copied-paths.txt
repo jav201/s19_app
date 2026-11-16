@@ -1,0 +1,5 @@
+~/work/zq-i9b/tip/.dev-flow/2026-11-05-batch-103/inc-9b/E4-roster.md
+~/work/zq-i9b/tip/tests/test_id_registry.py
+~/work/zq-i9b/tip/tests/test_b103_inc9b_at.py
+~/work/zq-i9b/tip/tests/test_b103_inc9b_s.py
+~/work/zq-i9b/tip/tests/test_b103_inc9b_w.py

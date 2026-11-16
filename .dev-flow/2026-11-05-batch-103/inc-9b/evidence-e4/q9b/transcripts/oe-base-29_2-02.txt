@@ -1,0 +1,21 @@
+~/work/zq-q9b/base/s19_app/__init__.py
+Q9B_FAMILY=oe Q9B_SIDE=base Q9B_LABEL=29_2 Q9B_RUN=02
+Q9B_HEAD=e4485817d7ac3706c77f14a4c2a8cf784fe35038
+ 16:00:33 up 3 days, 49 min,  3 users,  load average: 0.96, 0.94, 0.86
+Q9B_LOAD1=0.96
+Q9B_NODE=tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second PASSED
+============================= QC-TM timing margins =============================
+62.8%  0.372 s / 1.000 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 117.71s (0:01:57) =========================
+Q9B_RC=0
+Q9B_VALID=PASS

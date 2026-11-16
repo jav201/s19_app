@@ -1,0 +1,221 @@
+TREE -n 2026-11-14T06:14:54Z load: 10.95 10.32 9.91
+~/work/zq-f8/m3/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-f8/m3
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [6 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+[gw1] [ 16%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+[gw0] [ 33%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+[gw0] [ 50%] FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+[gw1] [ 66%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[118x54] 
+tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+[gw0] [ 83%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[80x24] 
+[gw1] [100%] PASSED tests/test_b103_inc8_p_layout.py::test_r_pe_021_a_click_on_the_painted_add_adds_the_entry_and_never_validates[220x60] 
+
+=================================== FAILURES ===================================
+_ test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_def_1_1_inspector_wi0')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw1/inc8_p_layout_defc0')
+size = (80, 24)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            pane = need(panel, "#patch_pane_inspector")
+            pane.scroll_home(animate=False)
+            pane.scroll_visible(animate=False)  # at 80x24 the panel scrolls to the pane (R-TUI-064.3)
+            await settle(pilot)
+            top =_assert_no_shared_cell(app, pane, f"{size} top")
+            pane.scroll_end(animate=False)
+            await settle(pilot)
+            end = _assert_no_shared_cell(app, pane, f"{size} end")
+            assert top and end, f"{size}: no Inspector widget painted (top {top}, end {end})"
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_p_layout.py:402: in body
+    top =_assert_no_shared_cell(app, pane, f"{size} top")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pane = VerticalScroll(id='patch_pane_inspector'), where = '(80, 24) top'
+
+    def _assert_no_shared_cell(app, pane, where: str) -> int:
+        """No painted Inspector widget shares a cell with another painted widget that is not its
+        ancestor or descendant; each lies inside the pane and owns the cell at its centre."""
+        painted = _painted(app)
+        pane_seen = painted[pane]
+        inside = [w for w in painted if pane in w.ancestors]
+        for widget in inside:
+            region = painted[widget]
+>           assert pane_seen.contains_region(region), f"{where}: #{widget.id} {region} leaves the pane {pane_seen}"
+E           AssertionError: (80, 24) top: #patch_doc_entry_inputs Region(x=7, y=10, width=67, height=5) leaves the pane Region(x=7, y=7, width=68, height=6)
+E           assert False
+E            +  where False = contains_region(Region(x=7, y=10, width=67, height=5))
+E            +    where contains_region = Region(x=7, y=7, width=68, height=6).contains_region
+
+tests/test_b103_inc8_p_layout.py:378: AssertionError
+_ test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_def_1_1_inspector_wi0')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw0/inc8_p_layout_defc0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            pane = need(panel, "#patch_pane_inspector")
+            pane.scroll_home(animate=False)
+            pane.scroll_visible(animate=False)  # at 80x24 the panel scrolls to the pane (R-TUI-064.3)
+            await settle(pilot)
+            top =_assert_no_shared_cell(app, pane, f"{size} top")
+            pane.scroll_end(animate=False)
+            await settle(pilot)
+            end = _assert_no_shared_cell(app, pane, f"{size} end")
+            assert top and end, f"{size}: no Inspector widget painted (top {top}, end {end})"
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_p_layout.py:402: in body
+    top =_assert_no_shared_cell(app, pane, f"{size} top")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pane = VerticalScroll(id='patch_pane_inspector'), where = '(118, 54) top'
+
+    def _assert_no_shared_cell(app, pane, where: str) -> int:
+        """No painted Inspector widget shares a cell with another painted widget that is not its
+        ancestor or descendant; each lies inside the pane and owns the cell at its centre."""
+        painted = _painted(app)
+        pane_seen = painted[pane]
+        inside = [w for w in painted if pane in w.ancestors]
+        for widget in inside:
+            region = painted[widget]
+>           assert pane_seen.contains_region(region), f"{where}: #{widget.id} {region} leaves the pane {pane_seen}"
+E           AssertionError: (118, 54) top: #patch_doc_entry_inputs Region(x=7, y=36, width=107, height=5) leaves the pane Region(x=7, y=33, width=108, height=6)
+E           assert False
+E            +  where False = contains_region(Region(x=7, y=36, width=107, height=5))
+E            +    where contains_region = Region(x=7, y=33, width=108, height=6).contains_region
+
+tests/test_b103_inc8_p_layout.py:378: AssertionError
+_ test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_def_1_1_inspector_wi1')
+defc_dir = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-7/popen-gw0/inc8_p_layout_defc0')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", INSPECTOR_SIZES)
+    def test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end(tmp_path, defc_dir, size):
+        async def body(app, pilot, panel):
+            await show_tab(pilot, "patch_tab_inspector")
+            pane = need(panel, "#patch_pane_inspector")
+            pane.scroll_home(animate=False)
+            pane.scroll_visible(animate=False)  # at 80x24 the panel scrolls to the pane (R-TUI-064.3)
+            await settle(pilot)
+            top =_assert_no_shared_cell(app, pane, f"{size} top")
+            pane.scroll_end(animate=False)
+            await settle(pilot)
+            end = _assert_no_shared_cell(app, pane, f"{size} end")
+            assert top and end, f"{size}: no Inspector widget painted (top {top}, end {end})"
+    
+>       drive(tmp_path, size, body, a2l=defc_dir / "definitions.a2l", image=defc_dir / "definitions.s19")
+
+tests/test_b103_inc8_p_layout.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_p_layout.py:402: in body
+    top =_assert_no_shared_cell(app, pane, f"{size} top")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pane = VerticalScroll(id='patch_pane_inspector'), where = '(220, 60) top'
+
+    def _assert_no_shared_cell(app, pane, where: str) -> int:
+        """No painted Inspector widget shares a cell with another painted widget that is not its
+        ancestor or descendant; each lies inside the pane and owns the cell at its centre."""
+        painted = _painted(app)
+        pane_seen = painted[pane]
+        inside = [w for w in painted if pane in w.ancestors]
+        for widget in inside:
+            region = painted[widget]
+>           assert pane_seen.contains_region(region), f"{where}: #{widget.id} {region} leaves the pane {pane_seen}"
+E           AssertionError: (220, 60) top: #patch_doc_entry_inputs Region(x=25, y=42, width=191, height=5) leaves the pane Region(x=25, y=39, width=192, height=6)
+E           assert False
+E            +  where False = contains_region(Region(x=25, y=42, width=191, height=5))
+E            +    where contains_region = Region(x=25, y=39, width=192, height=6).contains_region
+
+tests/test_b103_inc8_p_layout.py:378: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[80x24]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[118x54]
+FAILED tests/test_b103_inc8_p_layout.py::test_r_pe_def_1_1_inspector_widgets_share_no_painted_cell_at_the_top_and_the_end[220x60]
+========================= 3 failed, 3 passed in 38.88s =========================
+RC=1

@@ -1,0 +1,9 @@
+~/work/zq-e4-8-impl-p/tree/s19_app/__init__.py
+-- control: HEAD sheet, the law as committed
+LAW.without = PASS
+-- Inc 8 sheet, the law as committed (expected FAIL)
+LAW.without = FAIL: every rule shipped at b514b07 is byte-equal; Inc-6 only appends
+-- Inc 8 sheet, the law + proposed Inc 8 supersessions
+LAW.with = PASS
+-- HEAD sheet, the law + proposed Inc 8 supersessions (expected FAIL: they name Inc 8 text)
+LAW.with = FAIL: Inc 8 block

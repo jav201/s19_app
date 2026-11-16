@@ -1,0 +1,14 @@
+# tree: fin @ 0bf2373b
+# uptime:  01:18:57 up 2 days, 10:07,  2 users,  load average: 6.23, 6.66, 5.56
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/fin/s19_app/__init__.py
+# pytest -n 2 -q tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+============================= QC-TM timing margins =============================
+LOW 1.8%  0.982 s / 1.000 s  R-PE-BENCH.82/1 key during a record encode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+43.7%  0.563 s / 1.000 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+QC-TM: 2 bounds, 1 under 20 % margin
+2 passed in 186.22s (0:03:06)
+# exit=0

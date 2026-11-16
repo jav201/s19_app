@@ -99,15 +99,18 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 # The three window ids created by the batch-46 restructure.
 _WINDOW_IDS = ("patch_win_script", "patch_win_checks", "patch_win_json")
 # batch-97: the two columns of the ledger + inspector composition.
-_COLUMN_IDS = ("patch_win_script", "patch_inspector")
+# Inc 8 R-TUI-063.1 / R-TUI-063.2 (withdrawn): the ledger no longer sits beside the inspector;
+# the staging sheet window is stacked over the landing pane (was: "patch_win_script" left of it).
+_COLUMN_IDS = ("patch_sheet_win", "patch_inspector")
 # batch-97: every panel button's home — a tab pane of the inspector, the tab
 # row, or a one-row dock of the panel; never the ledger's scroll body.
 _BUTTON_HOMES = (
     "patch_tabs",
+    "patch_filter_row",  # Inc 8 R-PE-DEF.2: the picker's Prev / Next / Include / Add list live here
     "patch_pane_inspector",
     "patch_win_json",
     "patch_win_checks",
-    "patch_win_a2l",
+    # Inc 8 R-TUI-063.3: "patch_win_a2l" leaves (the A2L tab is retired, D-1 A)
     "patch_doc_file_row",
     "patch_doc_controls",
 )
@@ -118,7 +121,8 @@ _TAB_FOR_HOME = {
     "patch_pane_inspector": "patch_tab_inspector",
     "patch_win_json": "patch_tab_json",
     "patch_win_checks": "patch_tab_checks",
-    "patch_pane_a2l": "patch_tab_a2l",
+    # Inc 8 R-TUI-063.3: "patch_pane_a2l": "patch_tab_a2l" (retired) -> the Patch script tab
+    "patch_win_script": "patch_tab_script",
 }
 
 # Pilot-measured usable floor (M-Q1 / C-23). Measured window minimums:
@@ -411,14 +415,18 @@ def _assert_no_overlap(regions: dict, size_label: str) -> None:
 def _assert_two_columns(dims: dict, size_label: str) -> None:
     """batch-97: the ledger (left) and the inspector (right) side by side —
     two distinct x's, one shared y, both at/above the usable floor, inside the
-    panel, non-overlapping."""
+    panel, non-overlapping.
+
+    Inc 8 R-TUI-063.1: the two regions are now the staging sheet window above the
+    landing pane — one shared x, the sheet's y strictly above the landing pane's,
+    both at/above the usable floor, inside the panel, non-overlapping."""
     counts, regions = dims["counts"], dims["regions"]
     assert all(counts[wid] == 1 for wid in _COLUMN_IDS), (
         f"@{size_label}: each column id must resolve once, got {counts}"
     )
-    (lx, ly, lw, lh), (ix, iy, iw, ih) = (regions[w] for w in _COLUMN_IDS)
-    assert lx < ix and ly == iy, (
-        f"@{size_label}: the ledger must sit LEFT of the inspector on one row, "
+    (lx, ly, lw, lh), (ix, iy, iw, ih) = (regions[w] for w in _COLUMN_IDS)  # sheet, landing pane
+    assert lx == ix and ly < iy, (
+        f"@{size_label}: the sheet must sit ABOVE the landing pane, same x, "
         f"got {regions}"
     )
     panel_right = dims["panel_right"]
@@ -609,14 +617,27 @@ def _drive_button_reachability(
             # captured BEFORE any scrolling happens.
             script_rows_at_scroll0: list[str] = []
             if size == (120, 30):
+                # Inc 8 R-PE-DEF.74 / R-PE-DEF.1.1 (ruling RR-3, measured in
+                # evidence-e4/integrator/rr3_first_screenful_probe): the 15-row first
+                # screenful holds the filter row and the 12-row staging sheet, so the
+                # scroll-0 check reads those two; LANDS IN (Inspector tab shown), the
+                # file row and the document row follow and are reached by scrolling.
+                for row_id in ("patch_filter_row", "patch_sheet_win"):
+                    if not _fully_visible(app, app.query_one(f"#{row_id}")):
+                        script_rows_at_scroll0.append(row_id)
+                app.query_one("#patch_tab_inspector", Button).press()
+                await pilot.pause()
                 for row_id in (
                     "patch_doc_file_row",
                     "patch_doc_entry_buttons",
                     "patch_doc_controls",
                 ):
                     row = app.query_one(f"#{row_id}")
+                    await _reach(app, pilot, row)
                     if not _fully_visible(app, row):
                         script_rows_at_scroll0.append(row_id)
+                panel.scroll_home(animate=False)
+                await pilot.pause()
 
             unreachable: list[str] = []
             for bid in button_ids:
@@ -792,8 +813,10 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
                     "docked_not_in_body": docked
                     not in body.walk_children(with_self=False),
                 }
-            titles = {"script": str(app.query_one("#patch_win_script").border_title or "")}
-            for chip, key in (("patch_tab_json", "json"), ("patch_tab_checks", "checks")):
+            # Inc 8 R-TUI-063.6 / R-TUI-063.7 (withdrawn): the ledger has no border of its own;
+            # the landing pane's title is LANDS IN on every tab (was: PATCH SCRIPT / JSON / CHECKS).
+            titles = {}
+            for chip, key in (("patch_tab_script", "script"), ("patch_tab_json", "json"), ("patch_tab_checks", "checks")):
                 app.query_one(f"#{chip}", Button).press()
                 await pilot.pause()
                 titles[key] = str(app.query_one("#patch_inspector").border_title or "")
@@ -802,8 +825,7 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
 
     result = asyncio.run(_run())
     titles = result.pop("titles")
-    assert titles["script"] == PatchEditorPanel._WINDOW_BORDER_TITLES["patch_win_script"]
-    assert titles["json"] == "JSON" and titles["checks"] == "CHECKS", titles
+    assert titles == {"script": "LANDS IN", "json": "LANDS IN", "checks": "LANDS IN"}, titles
     for win_id, r in result.items():
         assert r["body_is_scroll"], f"{win_id} body must be a VerticalScroll"
         assert r["dock_parent"] == _DOCK_PARENT[win_id], (win_id, r["dock_parent"])

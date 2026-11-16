@@ -3672,7 +3672,8 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
         # batch-97 Inc-4 (named supersession, HLR-144): a control on an
         # inspector tab is clicked with its tab open, as the operator does.
         homes = {a.id for a in target.ancestors if getattr(a, "id", None)}
-        for pane, chip in (("patch_win_json", "#patch_tab_json"), ("patch_pane_inspector", "#patch_tab_inspector")):
+        # Inc 8 R-TUI-063.3: the ledger's own tab joins (the ledger is no longer always shown).
+        for pane, chip in (("patch_win_json", "#patch_tab_json"), ("patch_pane_inspector", "#patch_tab_inspector"), ("patch_win_script", "#patch_tab_script")):
             if pane in homes:
                 await pilot.click(chip)
                 await pilot.pause()
@@ -3684,6 +3685,9 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
                 + panel.scroll_offset.y,
             )
             await pilot.pause()
+        # Inc 8 R-PE-DEF.1.1: a tab's content scrolls inside the 9-row landing pane.
+        target.scroll_visible(animate=False)
+        await pilot.pause()
         await pilot.click(selector)
         await pilot.pause()
 
@@ -3974,7 +3978,14 @@ def test_at068b_per_entry_json_popup_edits_only_selected_entry(
         container that reveals the docked rows) to its end, then ``pilot.click``
         delivers a genuine mouse event (no ``.focus()`` / no direct call).
         """
-        app.query_one("#patch_win_script").scroll_end(animate=False)
+        # Inc 8 R-TUI-063.3 / R-PE-DEF.3: the per-entry buttons ride the Inspector pane (a
+        # tab of the landing pane), so its chip is clicked and that pane is scrolled to its
+        # end (was: the ledger window ``#patch_win_script`` scrolled, with no tab to open).
+        # E4 integration: the Use parameter row and the tally follow the chips (R-PE-DEF.3), so the
+        # pane's end passes them; the button is scrolled into view inside the 9-row pane (R-PE-DEF.1.1).
+        await pilot.click("#patch_tab_inspector")
+        await pilot.pause()
+        app.query_one("#patch_entry_edit_json_button").scroll_visible(animate=False)
         await pilot.pause()
         await pilot.click("#patch_entry_edit_json_button")
         await pilot.pause()

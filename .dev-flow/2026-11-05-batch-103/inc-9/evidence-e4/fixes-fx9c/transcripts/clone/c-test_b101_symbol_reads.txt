@@ -1,0 +1,21 @@
+load before: 3.42 2.68 2.24 3/648 519370
+~/work/zq-fx9c/clone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................                                                 [100%]
+============================= QC-TM timing margins =============================
+46.1%  0.539 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+48.5%  0.515 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+82.2%  0.178 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+83.3%  0.167 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+84.4%  0.156 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+84.7%  0.153 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+84.8%  0.152 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+100.0%  0.000 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+100.0%  0.000 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+100.0%  0.000 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+QC-TM: 10 bounds, 0 under 20 % margin
+24 passed in 255.45s (0:04:15)
+rc=0
+load after: 3.22 3.02 2.49 3/652 520588

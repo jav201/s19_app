@@ -1,0 +1,28 @@
+## mutant P-B5_5: s19_app/tui/definition_bench_view.py
+## - 'the sheet width."""\n    if room < 1:\n        return []\n'
+## + 'the sheet width."""\n'
+## uptime:  03:02:35 up 2 days, 11:51,  2 users,  load average: 0.71, 0.85, 0.98
+## date: 2026-11-15T09:02:35Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-P-B5_5/s19_app/__init__.py
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_r_pe_bench_5_5_room_zero_at_a_narrow_view_shows_no_bench_line ______
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_5_5_room_zero_at_a_narrow_view_shows_no_bench_line(defc):
+        """R-PE-BENCH.5/5 (E5, X8b: at V = 111 every return path is cut to ``room`` anyway, so the room guard was not
+        observable) - room 0 at a 12-cell view (the kind lays out for 8 cells, under the 12-cell narrow path) -> no line."""
+        o = defc_obj(defc, "MAP_DEF_0001")
+>       assert painted(sheet_row(o.d, o.a2l, o.image), None, 12, 0, view_state(o)) == []
+E       AssertionError: assert [<text '  ┊ └...)] '#91abec'>] == []
+E         
+E         Left contains one more item: <text '  ┊ └ IDENT…                                                                                                                                   ' [Span(0, 143, 'on #1b233a')] '#91abec'>
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_s2.py:574: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_bench_5_5_room_zero_at_a_narrow_view_shows_no_bench_line
+1 failed, 1 passed, 36 deselected in 0.19s
+## rc=1
+## end: 2026-11-15T09:02:36Z  uptime:  03:02:36 up 2 days, 11:51,  2 users,  load average: 0.73, 0.85, 0.98

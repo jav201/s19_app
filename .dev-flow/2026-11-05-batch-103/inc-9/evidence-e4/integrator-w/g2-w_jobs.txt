@@ -1,0 +1,343 @@
+# run g2-w_jobs tree=g2 2026-11-13T23:13:13-06:00 load: load average: 8.68, 8.40, 6.43
+~/work/zq-e4-9w-int/g2/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/g2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [10 items]
+
+....F.FFFF                                                               [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/test_r_pe_bench_20_2_the_bench0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/b103_inc9_w_defc0')
+
+    @slow
+    def test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends(tmp_path, defc_dir):
+        """LARGE selected: `decoding 1048576 values …` first (control), then the window line of EX-H5."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await pick(pilot, sheet, LARGE)
+            seen = f"decoding {LARGE_COUNT} values …" in body_text(app)
+            await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 120)
+            await pilot.pause(0.3)
+            return seen, body_text(app)
+    
+>       seen, painted = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:104: in body
+    await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 120)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends.<locals>.body.<locals>.<lambda> at 0x7fd4b1c9f880>
+what = "LARGE's values", timeout = 120, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 120 s: LARGE's values
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_ test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw1/test_r_pe_bench_29_1_a_cursor_0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw1/b103_inc9_w_defc0')
+
+    @timed
+    @slow
+    def test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second(tmp_path, defc_dir):
+        """Set `7` previewed over 4,096 cells of LARGE; `right` is handled in 0.5 s (quiet host, load recorded)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_with_selection(pilot, sheet)
+            await wait_for(pilot, lambda: st(sheet, LARGE).preview is not None, "the preview result", 240)
+            await pilot.pause(0.3)
+            return await timed_press(pilot, "right"), await timed_press(pilot, "left")
+    
+>       right, left = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:259: in body
+    await large_with_selection(pilot, sheet)
+tests/test_b103_inc9_w_jobs.py:55: in large_with_selection
+    await open_bench(pilot, sheet, LARGE)
+tests/support/b103_inc9_w.py:131: in open_bench
+    await wait_for(pilot, lambda: has_values(sheet, name), f"the values of {name}", 90)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function open_bench.<locals>.<lambda> at 0x7f8df83ee160>
+what = 'the values of LARGE', timeout = 90, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 90 s: the values of LARGE
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_ test_r_pe_bench_82_1_a_key_is_handled_within_half_a_second_while_a_record_encode_runs _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw1/test_r_pe_bench_82_1_a_key_is_0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw1/b103_inc9_w_defc0')
+
+    @timed
+    @slow
+    def test_r_pe_bench_82_1_a_key_is_handled_within_half_a_second_while_a_record_encode_runs(tmp_path, defc_dir):
+        """LARGE, Set `7` on 256 x 16 cells, alt+s: `down` / `up` pressed until the record is written, each <= 0.5 s."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_with_selection(pilot, sheet)
+            await wait_for(pilot, lambda: st(sheet, LARGE).preview is not None, "the preview result", 240)
+            await pilot.press("alt+s")
+            times = await keys_until(pilot, "down", lambda: len(entries_of(app)) == 1)
+            return times, entries_of(app)
+    
+>       times, entries = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:295: in body
+    await large_with_selection(pilot, sheet)
+tests/test_b103_inc9_w_jobs.py:55: in large_with_selection
+    await open_bench(pilot, sheet, LARGE)
+tests/support/b103_inc9_w.py:131: in open_bench
+    await wait_for(pilot, lambda: has_values(sheet, name), f"the values of {name}", 90)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function open_bench.<locals>.<lambda> at 0x7f8e007a68e0>
+what = 'the values of LARGE', timeout = 90, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 90 s: the values of LARGE
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_____ test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/test_r_pe_bench_26_2_a_deselec0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/b103_inc9_w_defc0')
+
+    @slow
+    def test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values(tmp_path, defc_dir):
+        """LARGE decoded, then SMALL_BLK selected: LARGE's values and staged values are None and the retained memory
+        (`tracemalloc`, after `gc.collect()`) is at most 1 MiB above the level before LARGE. Control: with LARGE
+        selected the retained memory is well above that (the numbers are kept)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            gc.collect()
+            tracemalloc.start()
+            try:
+                base = tracemalloc.get_traced_memory()[0]
+                await pick(pilot, sheet, LARGE)
+                await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 240)
+                gc.collect()
+                held = tracemalloc.get_traced_memory()[0] - base
+                await pick(pilot, sheet, "SMALL_BLK")
+                await wait_for(pilot, lambda: has_values(sheet, "SMALL_BLK"), "SMALL_BLK's values", 60)
+                gc.collect()
+                return held, tracemalloc.get_traced_memory()[0] - base, st(sheet, LARGE)
+            finally:
+                tracemalloc.stop()
+    
+>       held, after, state = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:186: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:176: in body
+    await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", 240)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values.<locals>.body.<locals>.<lambda> at 0x7fd488a1c180>
+what = "LARGE's values", timeout = 240, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 240 s: LARGE's values
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_ test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/test_r_pe_bench_29_2_a_cursor_0')
+defc_dir = PosixPath('~/work/zq-e4-9w-int/tmp/pytest-of-<user>/pytest-25/popen-gw0/b103_inc9_w_defc0')
+
+    @timed
+    @slow
+    def test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second(tmp_path, defc_dir):
+        """`right` pressed again and again while the preview result of LARGE is on its way: every press <= 0.5 s,
+        and more than two presses were made before the result arrived (so the arrival was inside the loop)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await open_bench(pilot, sheet, LARGE)
+            await pilot.press(*(["shift+right"] * 15 + ["shift+down"] * 255))
+            await apply_tool(pilot, sheet, "s", "7")
+            return await keys_until(pilot, "right", lambda: st(sheet, LARGE).preview is not None)
+    
+>       times = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_jobs.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_jobs.py:277: in body
+    await open_bench(pilot, sheet, LARGE)
+tests/support/b103_inc9_w.py:131: in open_bench
+    await wait_for(pilot, lambda: has_values(sheet, name), f"the values of {name}", 90)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function open_bench.<locals>.<lambda> at 0x7fd4b1f86660>
+what = 'the values of LARGE', timeout = 90, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 90 s: the values of LARGE
+
+tests/support/b103_inc9_w.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_half_a_second_while_a_record_encode_runs
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second
+=================== 5 failed, 5 passed in 528.05s (0:08:48) ====================
+# rc=1 end 2026-11-13T23:22:02-06:00 load: load average: 3.57, 5.23, 5.80

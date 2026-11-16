@@ -1,0 +1,29 @@
+## mutant N-101: s19_app/tui/definition_sheet.py
+## - 'glyph = "●" if staged else "◆" if pending else " "'
+## + 'glyph = " " if staged else "◆" if pending else " "'
+## uptime:  03:01:38 up 2 days, 11:50,  3 users,  load average: 1.10, 0.91, 1.01
+## date: 2026-11-15T09:01:38Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-N-101/s19_app/__init__.py
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check ____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check(defc):
+        """R-PE-DEF.101/1 - a #54efae span lies on a line holding ``●`` or ``✓``."""
+        seen = False
+        for text in _verdict_lines(defc):
+            if GREEN in all_fg_hues(text):
+                seen = True
+>               assert _glyph_in_hue(text, "●✓", GREEN), text.plain
+E               AssertionError:   DISPLAY_0001              │VALUE     │143.5               │25.5            │deg C   │   -40  ├─────◆────────●─┤    150 │-118.0 staged       │
+E               assert False
+E                +  where False = _glyph_in_hue(<text '  DISPLAY_0001              │VALUE     │143.5               │25.5            │deg C   │   -40  ├─────◆────────●...), Span(114, 121, '#969aad'), Span(121, 122, '#91abec'), Span(122, 142, 'bold #54efae'), Span(142, 143, '#91abec')] ''>, '●✓', '#54efae')
+
+tests/test_b103_inc8b_s1.py:567: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_101_1_green_only_beside_a_dot_or_a_check
+1 failed, 3 passed, 94 deselected in 0.24s
+## rc=1
+## end: 2026-11-15T09:01:40Z  uptime:  03:01:40 up 2 days, 11:50,  2 users,  load average: 1.10, 0.91, 1.01

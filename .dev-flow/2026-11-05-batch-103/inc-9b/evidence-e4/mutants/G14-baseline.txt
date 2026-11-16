@@ -1,0 +1,21 @@
+DATE 2026-11-15T19:20:54.912739-06:00
+GROUP G14
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:20:37 up 3 days,  4:09,  3 users,  load average: 0.78, 0.78, 0.69
+LOAD_ONE 0.78
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 2
+S19_APP_FILE ~/work/zq-m9b/groups/G14/tree/s19_app/__init__.py
+PID 1031962
+SID 1031962
+TIMEOUT_S 300
+XDIST_N 0
+..                                                                       [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G14/baseline.xml ----
+============================= QC-TM timing margins =============================
+88.1%  0.036 s / 0.300 s  R-PE-BENCH.101/4 idle after a refused write  tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look
+90.6%  0.028 s / 0.300 s  R-PE-BENCH.101/3 idle after a refused write  tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look
+QC-TM: 2 bounds, 0 under 20 % margin
+2 passed in 15.61s
+EXIT_CODE 0

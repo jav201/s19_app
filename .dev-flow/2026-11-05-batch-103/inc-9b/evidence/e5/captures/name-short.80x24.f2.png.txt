@@ -1,0 +1,103 @@
+scene=name-short
+capture_seq=2
+phase=busy-f2
+png_name=name-short.80x24.f2.png
+commit=d05b5180e5f48d4a167d13e7fb45b24586293eb6
+fixture=name-short
+capture_timestamp=2026-11-16T03:20:09.998433+00:00
+monotonic=424090.796000
+requested_size=80x24
+app_size=80x24
+patch_sheet_win_region=5,4,72x12
+patch_sheet_win_size=70x10
+title_room_B=66
+body=143x8;content=143x8
+grid=scroll_x=0.0;size=70x9;virtual=143x8
+sheet_top=0
+focused=patch_sheet_body
+selected=N
+page_rows=N, OTHER
+sheet_subtitle=None
+painted_sheet_top_row=╭─ STAGING SHEET   ◓ BUSY · decode N · 0.7 s · keys still work  ───────╮
+painted_top_left_border_color=#f5c26b
+border_title_plain=STAGING SHEET  [rgb(10,14,27) on rgb(245,194,107) bold] ◓ BUSY · decode N · 0.7 s · keys still work [/rgb(10,14,27) on rgb(245,194,107) bold]
+pill_bold=True
+pill_foreground=#0a0e1b
+pill_background=#f5c26b
+spinner_glyph=◓
+job_word=decode
+busy_name=N
+pending_seconds=0.7
+different_from_f1=True
+same_job_name=True
+elapsed_nondecreasing=True
+frame_pair_valid=True
+frame_delta_s=0.515000
+idle_title=False
+busy_absent=False
+idle_border_not_busy=False
+active_job=('decode', 'N')
+record_hold=False
+record_stage_name=None
+bench_state=cursor:(0, 0);anchor:(0, 0);tool:s;focus:False;edit:{};undo:0;job:decode
+values_present=False
+preview_result_kind=None
+document_entry_count_before=0
+document_entry_count=0
+document_entries=
+ledger_row_count=0
+staged_mark=False
+write_landed_before_busy=False
+held_refresh_callbacks=0
+held_refresh_callback_invocations=0
+capture_frame_hold=True
+presentation_settle_s=0.2
+frame_hold_painted_stable=True
+decode_gate_target=['N']
+encode_gate_target=[]
+decode_gate_entered=['N']
+encode_gate_entered=[]
+decode_gate_released=False
+encode_gate_released=False
+capture_interposition=I-2 result-preserving gate; released after f2 ACK
+keys_sent=tab | tab | tab | down | up
+stub_os_writes=0
+app_is_running=True
+widget_#patch_sheet=size:70x10;classes:[];subtitle:None
+widget_#patch_inspector=size:68x4;classes:[];subtitle:'0 entries'
+widget_#patch_editor_panel=size:74x9;classes:['-bench'];subtitle:None
+status=A2L loaded: name-short.a2l
+status=Loaded name-short.s19
+screen_text_begin
+
+  ⭘                             Hex Edit Tool
+    │                    Patch Editor                      ?  📂 Open patches/
+ ▏◫ │
+ ▏≡ │╭─ STAGING SHEET   ◓ BUSY · decode N · 0.7 s · keys still work  ───────╮▂▂
+ ▏◉ ││  Parameter                 │Kind      │Current             │New      │
+ ▏▤ ││━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━│
+ ▏! ││▶ N                         │VAL_BLK   │… 5000              │·        │
+ ▏✎ ││  ┊ └ NO_COMPU_METHOD phys = raw · UBYTE u8 big-endian · RL_U8 · 0x00…│▅▅
+ ▏✔ ││  ┊ decoding 5000 values …                                            │
+ ▏⏚ ││  OTHER                     │VAL_BLK   │5000 values         │·        │
+ ▏✦ ││                                                                      │
+    ││                                                                      │
+ ──────────────────────────────────────────────────────────────────────────────
+  Loaded name-short.s19 (S19 only)                   (none)  |  name-short.a2l
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+
+  A2L loaded: name-short.a2l
+  Loaded name-short.s19 (S19 only)
+  Loaded name-short.s19
+  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+
+screen_text_end
+surface=ready
+
+png_width=769
+png_height=521
+capture_method=PrintWindow
+png_bytes=39941
+png_captured_at=2026-11-15T21:20:10.0527276-06:00

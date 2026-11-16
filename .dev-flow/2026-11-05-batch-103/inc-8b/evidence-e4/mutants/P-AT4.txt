@@ -1,0 +1,58 @@
+# mutant P-AT4  rows: AT-B103-I8B-4 (proposed)
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:86; s19_app/tui/screens_directionb/patch_editor/sheet.py:87
+# -k: at_b103_i8b_4_
+# uptime: 02:02:14 up 2 days, 10:50,  3 users,  load average: 1.52, 1.22, 1.30
+s19_app.__file__ = ~/work/zq-m8b/m/P-AT4/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_at_b103_i8b_4_home_end_in_the_formula_input_move_its_cursor_not_the_grid _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-73/popen-gw0/test_at_b103_i8b_4_home_end_in0')
+defc = {'a2l': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-73/popen-gw0/defc0/definitions.a2l'), 'nam... ...], 's19': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-73/popen-gw0/defc0/definitions.s19')}
+
+    def test_at_b103_i8b_4_home_end_in_the_formula_input_move_its_cursor_not_the_grid(tmp_path: Path, defc) -> None:
+        """AT-B103-I8B-4 (R-PE-DEF.94/5). The operator is typing `25.5` and presses Home: the cursor goes to the start
+        of the text and the grid stays where End put it (x = `G.end.118cols`), then End moves the cursor to the end,
+        still without scrolling. A sheet-level Home/End binding that wins over the input would snap the grid to x 0
+        under the operator's typing."""
+    
+        async def body(app, pilot, panel):
+            names = defc["names"]
+            await open_sheet(pilot, app, panel, names)
+            grid = need(panel, GRID)
+            await select_row(pilot, panel, names, "DISPLAY_0001")
+            await pilot.press("end")
+            x_set = grid.scroll_x
+            await pilot.press("enter")
+            await settle(pilot, 2)
+            focus_in_input = app.focused.id if app.focused is not None else None
+            await pilot.press(*"25.5")
+            await settle(pilot, 2)
+            field = need(panel, INPUT, Input)
+            await pilot.press("home")
+            after_home = (field.cursor_position, grid.scroll_x, field.value)
+            await pilot.press("end")
+            after_end = (field.cursor_position, grid.scroll_x)
+            return x_set, focus_in_input, after_home, after_end
+    
+        x_set, focus_in_input, after_home, after_end = run(tmp_path, defc, body)
+        assert x_set == EX["G.end.118cols"] != 0, (x_set, "control: the grid was scrolled by End before the test")
+        assert focus_in_input == "patch_sheet_input", focus_in_input
+>       assert after_home == (0, x_set, "25.5"), after_home
+E       AssertionError: (4, 0, '25.5')
+E       assert (4, 0, '25.5') == (0, 33, '25.5')
+E         
+E         At index 0 diff: 4 != 0
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_at.py:466: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_at.py::test_at_b103_i8b_4_home_end_in_the_formula_input_move_its_cursor_not_the_grid
+1 failed in 9.88s
+
+# exit=1

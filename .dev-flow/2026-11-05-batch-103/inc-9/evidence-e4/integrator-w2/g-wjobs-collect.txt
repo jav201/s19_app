@@ -1,0 +1,10 @@
+# run g-wjobs-collect tree=tip 2026-11-14T00:32:41-06:00 load: load average: 10.50, 11.04, 10.92
+~/work/zq-e4-9w-int2/tip/s19_app/__init__.py
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_half_a_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_half_a_second_while_a_record_encode_runs
+
+5/10 tests collected (5 deselected) in 0.07s
+# rc=0 end 2026-11-14T00:32:43-06:00 load: load average: 10.54, 11.04, 10.92

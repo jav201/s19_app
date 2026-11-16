@@ -1,0 +1,4 @@
+diff -r od/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py marr/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py
+218a219,220
+>         if kind == 'preview':
+>             __import__('time').sleep(0.8)  # X9 MUTANT

@@ -1,0 +1,62 @@
+# mutant N-94b  rows: R-PE-DEF.94
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:280
+# -k: r_pe_def_94_ or at_b103_i8b_1_ or at_b103_i8b_2_ or at_b103_i8b_3_
+# uptime: 01:55:45 up 2 days, 10:44,  3 users,  load average: 1.14, 0.65, 1.26
+s19_app.__file__ = ~/work/zq-m8b/m/N-94b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+__ test_at_b103_i8b_2_grid_80x24_shows_scrollbar_and_end_goes_to_last_columns __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw1/test_at_b103_i8b_2_grid_80x24_0')
+defc = {'a2l': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw1/defc0/definitions.a2l'), 'nam... ...], 's19': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw1/defc0/definitions.s19')}
+
+    def test_at_b103_i8b_2_grid_80x24_shows_scrollbar_and_end_goes_to_last_columns(tmp_path: Path, defc) -> None:
+        """AT-B103-I8B-2 (R-PE-DEF.92/2, R-PE-DEF.94/3). At 80×24 the view is only 70 cells, so the operator relies
+        on the scrollbar and End to reach Δ: the scrollbar shows over 143 cells and End lands at `G.end.80cols`."""
+        before, view, gutter, body_h, grid_h, after_end, settled, after_home, focus = _scroll_chain(
+            SIZE_80, 80, tmp_path, defc
+        )
+        scroll_x, shown, virtual = before
+        assert shown is True and virtual == EX["G.grid_width"], (shown, virtual)
+        assert gutter == 1, gutter
+        assert view == EX["G.view.80cols"], (view, "the sheet window's view at 80 columns")
+>       assert after_end == EX["G.end.80cols"] and settled == after_end, (after_end, settled)
+E       AssertionError: (1, 1)
+E       assert (1 == 73)
+
+tests/test_b103_inc8b_at.py:419: AssertionError
+_ test_at_b103_i8b_1_grid_118x54_shows_scrollbar_end_goes_to_last_columns_home_back _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw0/test_at_b103_i8b_1_grid_118x540')
+defc = {'a2l': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw0/defc0/definitions.a2l'), 'nam... ...], 's19': PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-14/popen-gw0/defc0/definitions.s19')}
+
+    def test_at_b103_i8b_1_grid_118x54_shows_scrollbar_end_goes_to_last_columns_home_back(tmp_path: Path, defc) -> None:
+        """AT-B103-I8B-1 (US-103-05; R-PE-DEF.92/1, R-PE-DEF.94/1, /2, /6). The operator needs to read the Limits and
+        Δ columns the 143-cell grid pushes past the 110-cell view at 118 columns: the scroller shows a horizontal
+        scrollbar over the 143-cell grid, End (body focused) puts the grid at its last columns at once (`G.end.118cols`,
+        read right after the key: no animation), Home returns it to the first column, and the body keeps the focus."""
+        before, view, gutter, body_h, grid_h, after_end, settled, after_home, focus = _scroll_chain(
+            SIZE_118, 118, tmp_path, defc
+        )
+        scroll_x, shown, virtual = before
+        assert shown is True and virtual == EX["G.grid_width"], (shown, virtual, "R-PE-DEF.92/1: bar shown, virtual 143")
+        assert scroll_x == 0, before
+        assert gutter == 1 and body_h == grid_h, (gutter, body_h, grid_h, "the body fills the scroller less the bar row")
+        assert view == EX["G.view.118cols"], (view, "the sheet window's view at 118 columns")
+>       assert after_end == EX["G.end.118cols"], (after_end, "R-PE-DEF.94/1 + .94/6: x right after End, no wait")
+E       AssertionError: (1, 'R-PE-DEF.94/1 + .94/6: x right after End, no wait')
+E       assert 1 == 33
+
+tests/test_b103_inc8b_at.py:402: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_at.py::test_at_b103_i8b_2_grid_80x24_shows_scrollbar_and_end_goes_to_last_columns
+FAILED tests/test_b103_inc8b_at.py::test_at_b103_i8b_1_grid_118x54_shows_scrollbar_end_goes_to_last_columns_home_back
+2 failed, 1 passed in 14.00s
+
+# exit=1

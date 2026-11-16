@@ -1,0 +1,5 @@
+c01 rc2 3 s FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_38_6_the_bytes_line_stays_last_while_the_window_line_shows[8]
+c02 survived 105 s 
+c03 rc2 3 s FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_38_6_the_bytes_line_stays_last_while_the_window_line_shows[8]
+c04 rc2 3 s FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_38_5_the_bytes_line_stays_last_while_the_whole_grid_fits[10]
+c05 survived 104 s 

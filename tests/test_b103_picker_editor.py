@@ -240,7 +240,9 @@ def _picker(panel, prefix: str = "patch_param") -> A2LParameterPicker:
 
 
 async def _show_patch_a2l(panel, pilot) -> None:
-    _need(panel, "#patch_tab_a2l", Button).press()
+    # Inc 8 R-TUI-063.3 / R-PE-DEF.3: #patch_tab_a2l (retired) -> #patch_tab_inspector,
+    # the tab that now holds the Use row and its status line.
+    _need(panel, "#patch_tab_inspector", Button).press()
     await pilot.pause()
     await pilot.pause()
 
@@ -257,6 +259,20 @@ async def _filter_to(panel, pilot, name: str, prefix: str = "patch_param") -> No
     table.focus()
     table.move_cursor(row=0)
     await pilot.pause()
+
+
+async def _tab_to_patch_include(app, pilot, panel) -> None:
+    """Inc 8 R-PE-DEF.2 (ruling RR-4 / r011): the Patch picker's table is hidden and outside the
+    focus chain, so the keyboard include route is the filter row's include control, reached by Tab
+    from the filter input and fired by space / enter."""
+    _need(panel, "#patch_param_filter", Input).focus()
+    await pilot.pause()
+    for _ in range(8):
+        if getattr(app.focused, "id", None) == "patch_param_include_button":
+            break
+        await pilot.press("tab")
+        await pilot.pause()
+    assert getattr(app.focused, "id", None) == "patch_param_include_button", getattr(app.focused, "id", None)
 
 
 def _plain(value) -> str:
@@ -561,11 +577,14 @@ def test_r011_patch_pick_controls_and_id_isolation(tmp_path: Path, case: str, mo
             assert is_displayed(include) and not include.disabled
             assert include.region.width > 0 and include.region.height > 0
             await _filter_to(panel, pilot, "ARR12")
-            table = _need(panel, "#patch_param_table", DataTable)
+            await _tab_to_patch_include(app, pilot, panel)  # Inc 8 R-PE-DEF.2, ruling RR-4
             await pilot.press("space")
             await pilot.pause()
             assert picker.picked_params == ["ARR12"]
+            await pilot.pause()
+            assert getattr(app.focused, "id", None) == "patch_param_include_button", app.focused
             await pilot.press("enter")
+            await pilot.pause()
             await pilot.pause()
             assert picker.picked_params == []
             assert events == [("ARR12",), ()]
@@ -574,8 +593,7 @@ def test_r011_patch_pick_controls_and_id_isolation(tmp_path: Path, case: str, mo
         check = app.query_one("#check_editor_panel")
         check_events = _spy_selections(monkeypatch, check._picker)
         await _filter_to(panel, pilot, "ARR12")
-        patch_table = _need(panel, "#patch_param_table", DataTable)
-        patch_table.focus()
+        await _tab_to_patch_include(app, pilot, panel)  # Inc 8 R-PE-DEF.2, ruling RR-4
         await pilot.press("space")
         app.action_show_screen("check_editor")
         await pilot.pause()
@@ -770,8 +788,12 @@ def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str
         )
         assert _use_status(panel) == over_cap
         assert _need(panel, "#patch_param_use_status").region.height >= 3
+        # Inc 8 R-PE-DEF.2: the picker's table and full-name line stay mounted but are
+        # not shown, so they leave the contained list (was: displayed, non-zero region).
+        assert not is_displayed(_need(panel, "#patch_param_table")), "table hidden (R-PE-DEF.2)"
+        assert not is_displayed(_need(panel, "#patch_param_full_name_line")), "full-name hidden (R-PE-DEF.2)"
         selectors = [
-            "#patch_param_filter", "#patch_param_table", "#patch_param_full_name_line",
+            "#patch_param_filter",
             "#patch_param_status", "#patch_param_page_prev_button", "#patch_param_page_label",
             "#patch_param_page_next_button", "#patch_param_include_button", "#patch_param_bulk_button",
             "#patch_param_use_button", "#patch_param_use_status",
@@ -781,7 +803,13 @@ def test_r020_patch_surfaces_fit_real_terminal_regions(tmp_path: Path, case: str
             panel, "#patch_param_use_button", Button
         ).region.y
         widgets = [_need(panel, selector) for selector in selectors]
+        # Inc 8 R-PICKER-CORRECT.020 / R-TUI-064.3: the Use row sits in the Inspector
+        # pane, which scrolls; measure "after scrolling" (was: the A2L tab, no scroll).
+        # E4 integration: at 80x24 the panel itself scrolls (R-TUI-064.3), so bringing the Use
+        # row into view scrolls the filter row out; each surface is measured after scrolling it.
         for widget in widgets:
+            widget.scroll_visible(animate=False)
+            await pilot.pause()
             region = widget.region
             assert is_displayed(widget), (size, widget.id, "not displayed")
             assert region.width > 0 and region.height > 0, (size, widget.id, region)

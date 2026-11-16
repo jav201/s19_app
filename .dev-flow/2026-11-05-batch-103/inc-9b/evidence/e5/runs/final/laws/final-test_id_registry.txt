@@ -1,0 +1,22 @@
+DATE 2026-11-15T21:35:55-06:00
+HEAD 6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+TREE <runner-home>/work/zq-x9b/final-exact
+DIRTY_BEGIN
+DIRTY_END
+ 21:35:55 up 3 days,  6:24,  2 users,  load average: 1.45, 1.40, 1.22
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/final-exact/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_id_registry.py
+XDIST_N 2
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/final-exact
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [12 items]
+
+............                                                             [100%]
+============================== 12 passed in 7.81s ==============================
+EXIT_CODE 0

@@ -1,0 +1,29 @@
+DATE 2026-11-15T19:30:15.461832-06:00
+GROUP G22
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:30:14 up 3 days,  4:18,  3 users,  load average: 0.81, 0.87, 0.79
+LOAD_ONE 0.81
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G22/tree/s19_app/__init__.py
+PID 1034445
+SID 1034445
+TIMEOUT_S 300
+XDIST_N 0
+ImportError while loading conftest '~/work/zq-m9b/groups/G22/tree/tests/conftest.py'.
+tests/conftest.py:46: in <module>
+    from tests.support.b103_clipboard import (  # noqa: E402
+tests/support/b103_clipboard.py:58: in <module>
+    from s19_app.tui.capped_text_area import CappedTextArea
+s19_app/tui/__init__.py:16: in <module>
+    from .app import S19TuiApp, main
+s19_app/tui/app/__init__.py:358: in <module>
+    from .core import (
+s19_app/tui/app/core.py:40: in <module>
+    from .patch import (PatchMixin)
+E     File "~/work/zq-m9b/groups/G22/tree/s19_app/tui/app/patch.py", line 762
+E       if index < len(steps):
+E       ^^
+E   SyntaxError: expected 'except' or 'finally' block
+EXIT_CODE 4

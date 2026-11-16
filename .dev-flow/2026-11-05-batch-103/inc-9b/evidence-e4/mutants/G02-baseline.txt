@@ -1,0 +1,20 @@
+DATE 2026-11-15T19:00:07.213515-06:00
+GROUP G02
+PHASE baseline
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 18:59:18 up 3 days,  3:48,  2 users,  load average: 0.54, 0.18, 0.15
+LOAD_ONE 0.54
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G02/tree/s19_app/__init__.py
+PID 1026443
+SID 1026443
+TIMEOUT_S 300
+XDIST_N 0
+.                                                                        [100%]
+---- generated xml file: ~/work/zq-m9b/groups/G02/baseline.xml ----
+============================= QC-TM timing margins =============================
+39.7%  0.302 s / 0.500 s  R-PE-BENCH.94/1 cue after the key  tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 47.90s
+EXIT_CODE 0

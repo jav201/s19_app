@@ -1,0 +1,11 @@
+s19_app/tui/a2l_parameter_picker.py
+s19_app/tui/app/core.py
+s19_app/tui/app/patch.py
+s19_app/tui/definition_sheet.py
+s19_app/tui/screens_directionb/patch_editor/a2l_picker.py
+s19_app/tui/screens_directionb/patch_editor/layout.py
+s19_app/tui/screens_directionb/patch_editor/panel.py
+s19_app/tui/screens_directionb/patch_editor/sheet.py
+s19_app/tui/services/change_service.py
+s19_app/tui/styles.tcss
+s19_app/tui/window_help.py

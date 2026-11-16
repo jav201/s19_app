@@ -1,0 +1,64 @@
+# mutant N-102b  rows: R-PE-DEF.102
+# edits: s19_app/tui/definition_sheet.py:61
+# -k: r_pe_def_102_
+# uptime: 01:58:57 up 2 days, 10:47,  3 users,  load average: 1.24, 0.87, 1.23
+s19_app.__file__ = ~/work/zq-m8b/m/N-102b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F.F.                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_102_2_the_after_bits_that_differ_from_the_image_are_underlined _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_102_2_the_after_bits_that_differ_from_the_image_are_underlined(defc):
+        """R-PE-DEF.102/2 (EX-8B-B1) - MASK_FIELD_0001 pending 255 -> bits 10, 8, 4 of the after row underlined, no other.
+    
+        The pending style needs a cue that is not a colour (colour-blind operator, NO_COLOR): the underline is it.
+        """
+        row, pv = with_pending(defc, "MASK_FIELD_0001", "255")
+        columns, after = mask_after_style_columns(painted(row, pv))
+        underlined = sorted((b for b, c in columns.items() if style_at(after, c).underline), reverse=True)
+>       assert underlined == OT["B.MASK_FIELD_0001.pending255.changed_bits"] == [10, 8, 4]
+E       assert [] == [10, 8, 4]
+E         
+E         Right contains 3 more items, first extra item: 10
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_s2.py:265: AssertionError
+_____ test_r_pe_def_102_1_the_changed_bytes_and_their_ascii_are_underlined _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_102_1_the_changed_bytes_and_their_ascii_are_underlined(v171):
+        """R-PE-DEF.102/1 (EX-8B-T2) - V171 pending `ABC` -> offsets 0..9 and their ASCII characters underlined, no other."""
+        row, pv = row_and_preview(v171["def"], v171["a2l"], v171["image"], "ABC")
+        rows = hex_rows(painted(row, pv))
+        assert len(rows) == 3
+        under_hex, under_ascii = [], []
+        for offset, guide, cols, ascii_col, ln in rows:
+            for index, column in enumerate(cols):
+                if style_at(ln, column).underline:
+                    under_hex.append(offset + index)
+            count = len(cols)
+            for index in range(count):
+                if style_at(ln, ascii_col + index).underline:
+                    under_ascii.append(offset + index)
+        expected = OT["T.V171.pendingABC.changed_offsets"]
+>       assert under_hex == expected and under_ascii == expected
+E       assert ([] == [0, 1, 2, 3, 4, 5, ...]
+E         
+E         Right contains 10 more items, first extra item: 0
+E         Use -v to get more diff)
+
+tests/test_b103_inc8b_s2.py:339: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_102_2_the_after_bits_that_differ_from_the_image_are_underlined
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_102_1_the_changed_bytes_and_their_ascii_are_underlined
+2 failed, 2 passed in 1.82s
+
+# exit=1

@@ -1,0 +1,13 @@
+# WIDE re-run of mutant N-115b  rows: R-PE-DEF.115
+# edits: s19_app/tui/definition_sheet.py:573
+# uptime: 02:05:10 up 2 days, 10:53,  2 users,  load average: 1.24, 1.13, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/W-N-115b/s19_app/__init__.py
+## group fast+bench: exit=0 | 516 passed in 117.14s (0:01:57)
+## group inc8b_bw: exit=0 | 30 passed in 45.47s
+## group inc8b_at: exit=0 | 12 passed in 100.69s (0:01:40)
+## group inc8_a2_app: exit=0 | 23 passed in 75.69s (0:01:15)
+## group inc8_at: exit=0 | 11 passed in 52.12s
+## group inc8_p_layout+p_wiring: exit=0 | 43 passed in 114.72s (0:01:54)
+## group inc9_w_keys+w_select: exit=0 | 33 passed in 114.25s (0:01:54)
+## group inc9_w_stage+w_mutants: exit=0 | 40 passed in 185.81s (0:03:05)
+# verdict: SURVIVED-WIDE 

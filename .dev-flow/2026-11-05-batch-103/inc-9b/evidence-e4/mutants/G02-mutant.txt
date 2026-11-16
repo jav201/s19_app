@@ -1,0 +1,44 @@
+DATE 2026-11-15T19:00:50.047717-06:00
+GROUP G02
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:00:07 up 3 days,  3:48,  2 users,  load average: 0.83, 0.32, 0.20
+LOAD_ONE 0.83
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G02/tree/s19_app/__init__.py
+PID 1026667
+SID 1026667
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-3/test_r_pe_bench_94_1_large_sel0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-3/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second(tmp_path, defc_dir):
+        """R-PE-BENCH.94/1. LARGE selected by a key (its real decode runs): the painted top border holds a busy title
+        with `decode LARGE` and the border corner is the busy colour #f5c26b, first painted 0.2-0.5 s after the key.
+        Operator need (P-127): while LARGE decodes the window must say it is working, or the user forces the app closed.
+        Negative control: no cue tick -> never shown (RED); grace 0 -> shown before 0.2 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            return await large_decode_window(pilot, app, sheet_of(panel), 0.0)
+    
+        t_send, snaps, first = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        last = snaps[-1]
+>       assert first is not None, f"no `decode LARGE` busy title within 6 s of the key; last top row {last.row!r} ({load()})"
+E       AssertionError: no `decode LARGE` busy title within 6 s of the key; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 0.92 0.41 0.24)
+E       assert None is not None
+
+tests/test_b103_inc9b_at.py:238: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G02/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+1 failed in 41.66s
+EXIT_CODE 1

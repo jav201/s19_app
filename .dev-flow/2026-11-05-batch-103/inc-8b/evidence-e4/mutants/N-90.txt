@@ -1,0 +1,32 @@
+# mutant N-90  rows: R-PE-DEF.90
+# edits: s19_app/tui/definition_sheet.py:1092
+# -k: r_pe_def_90_
+# uptime: 01:54:33 up 2 days, 10:43,  2 users,  load average: 0.23, 0.40, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/N-90/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter(defc):
+        """R-PE-DEF.90/2 - a row named with 40 characters keeps ``│`` at 28 (the clip keeps the gutter)."""
+        line, _, _ = paint(defc, display(defc, name="N" * 40))
+>       assert gutter_cells(line.plain) == GUTTERS
+E       assert [38, 59, 76, 85, 120, 141] == [28, 39, 60, 77, 86, 121, ...]
+E         
+E         At index 0 diff: 38 != 28
+E         Right contains one more item: 142
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_s1.py:285: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_90_2_a_long_name_does_not_move_the_first_gutter
+1 failed, 1 passed in 1.80s
+
+# exit=1

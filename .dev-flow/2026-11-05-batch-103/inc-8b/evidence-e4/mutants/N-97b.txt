@@ -1,0 +1,37 @@
+# mutant N-97b  rows: R-PE-DEF.97
+# edits: s19_app/tui/definition_sheet.py:1094
+# -k: r_pe_def_97_
+# uptime: 01:58:33 up 2 days, 10:47,  3 users,  load average: 1.06, 0.80, 1.22
+s19_app.__file__ = ~/work/zq-m8b/m/N-97b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.......F.                                                                [100%]
+=================================== FAILURES ===================================
+____________ test_r_pe_def_97_6_zebra_ground_on_odd_positions_only _____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_97_6_zebra_ground_on_odd_positions_only(defc):
+        """R-PE-DEF.97/6 - the ground #131a2c is on an odd page position, none on an even one.
+    
+        On the base ``row_line`` has no ``odd`` keyword (RED = absent keyword)."""
+        odd, _, _ = paint(defc, display(defc), odd=True)
+        even, _, _ = paint(defc, display(defc), odd=False)
+>       assert {bg(odd, c) for c in range(GRID)} == {ODD_GROUND}
+E       AssertionError: assert {None} == {'#131a2c'}
+E         
+E         Extra items in the left set:
+E         None
+E         Extra items in the right set:
+E         '#131a2c'
+E         Use -v to get more diff
+
+tests/test_b103_inc8b_s1.py:420: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_97_6_zebra_ground_on_odd_positions_only
+1 failed, 8 passed in 1.79s
+
+# exit=1

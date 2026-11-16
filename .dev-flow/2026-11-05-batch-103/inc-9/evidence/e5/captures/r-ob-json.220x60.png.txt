@@ -1,0 +1,90 @@
+scene=ob-json
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=ab62093b
+requested_size=220x60
+time=2026-11-14 14:59:23
+app_size=220x60
+json_view_target=(7, 4) its_match=(12, 4) (the nearest pair)
+json_view_scroll_y=10 height=3
+json_view_class=ReadOnlyJsonView read_only=True lines=15
+json_view_cursor=(7, 4) char='{' target=(7, 4)
+json_view_matching_bracket_location=None
+json_view_textual_match_would_be=(12, 4)
+focused=patch_json_view
+selected=VAL_BLK_DEF_0001
+bench_state: cursor=(1, 0) anchor=(0, 0) tool=d focus=False edit={} undo=0
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=194x32 classes=[] subtitle=None
+widget #patch_inspector: size=192x4 classes=[] subtitle='v2 schema'
+widget #patch_editor_panel: size=196x45 classes=['-bench'] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down | enter | shift+right | d enter | <set op input to '1'> | enter | escape | alt+s | escape | <focus #patch_tab_json> | enter | <focus #patch_json_view> | down down down down down down down | home | <scroll #patch_json_view to y=10; the cursor stays>
+status_lines_this_run=3
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: VAL_BLK_DEF_0001 staged as 2 values (12 B at 0x800090).
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                                                                   Hex Edit Tool
+                        │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/
+   ▏ ◫  Workspace       │
+   ▏ ≡  A2L Explorer    │ draft · change
+   ▏ ◉  MAC View        │ Filter _0001                                                                                                                                  7 of 7 shown  <    Page 1/1   >    Pick   Add list
+   ▏ ▤  Memory Map      │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏ !  Issues Report   ││  Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                      │
+   ▏ ✎  Patch Editor    ││  ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                               │
+   ▏ ✔  Check Editor    ││  MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                               │
+   ▏ ⏚  A2B Diff        ││  MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                             │
+   ▏ ✦  Flow Builder    ││  DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                           │
+   ▏ ▶  Flow Execution  ││  CURVE_DEF_0001          CURVE     ▅▇▄█▁ 5                                     ·                           0 … 65.5k                                                                             │
+   ▏ ☑  Checks          ││  MAP_DEF_0001            MAP 4x3   ████ 12                                     ·                           -1.00k … 1.00k                                                                        │
+   ▏ ⊕  CRC Designer    ││▶●VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       ·                   units   -50 … 50                                                       max |Δ| 1 staged       │
+                        ││└ LINEAR phys = 0.05*raw · SWORD s16 big-endian · RL_DEF_S16_ROW · 0x00800090 · 12 B                                                                                                              │
+                        ││               0                    1                    2                                                                                                                                        │
+                        ││     0       37.9*                12.0*                 31.8                                                                                                                                      │
+                        ││      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                                                                                                                                   │
+                        ││     1       -20.7                -19.8                -10.7                                                                                                                                      │
+                        ││                                                                                                                                                                                                  │
+                        ││shade ████████████ -20.7 … 36.9 units   sel x0..1,y0   * / bold = edited                                                                                                                          │
+                        ││ s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select                                                                                                             │
+                        ││no edit yet · bytes appear here                                                                                                                                                                   │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││VAL_BLK_DEF_0001[x0..1,y0] op =  1                units  +Δ on 2 cells   enter apply  alt+s stage record                                                                                          │
+                        │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+                        │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+                        ││   Patch script    Inspector    JSON    Checks                                                                                                                                                    │
+                        ││       "bytes": "02 F6 00 F0 02 7C FE 63 FE 75 FF 2A",                                                                                                                                         ▇▇ │
+                        ││       "symbol": "VAL_BLK_DEF_0001"                                                                                                                                                           ▃▇▇ │
+                        ││     }                                                                                                                                                                                        ▃   │
+                        │╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── v2 schema ─╯
+                        │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh
+                        │  Validate   Apply loaded changes   Save
+                        │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                                                                                                                                                             (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    Patch Editor: VAL_BLK_DEF_0001 staged as 2 values (12 B at 0x800090).
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

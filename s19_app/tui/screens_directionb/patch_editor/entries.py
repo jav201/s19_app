@@ -268,7 +268,7 @@ class EntriesMixin:
         mem = self._mem_map
         card.show_entry(
             address,
-            [mem.get(a) for a in range(address, span_end)],
+            list(map(mem.get, range(address, span_end))),
             after,
             per_row,
             lead=[mem.get(a) for a in range(row_start, address)],

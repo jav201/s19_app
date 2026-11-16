@@ -1,0 +1,15 @@
+uptime:  13:45:34 up 22:34,  3 users,  load average: 7.95, 7.83, 7.96
+s19_app.__file__ = ~/work/zq-e3r2-8/clone/s19_app/__init__.py
+loadavg = (7.94873046875, 7.8330078125, 7.9609375)
+W2.row_window(40, 0, 20, 1) = top 22; detail lines painted 1; selected row on body line 18
+W2.row_window(18, 0, 20, 3) = top 2; detail lines painted 3; selected row on body line 16
+W2.row_window(5, 0, 20, 3) = top 0; detail lines painted 3; selected row on body line 5
+W2.row_window(3, 0, 3, 3) = top 3; detail lines painted 2; selected row on body line 0
+W2.row_window(10, 0, 8, 10) = top 10; detail lines painted 7; selected row on body line 0
+R12.DISPLAY_0001.raw287.factor_0.5 = 143.5; factor_1.0 = 287
+S.bounded_row = Current '1048576 B'; staged True; image lookups per row 42
+S.bounded_200_rows.median_s = 0.000855; max_s = 0.000894
+S.decode_1MiB.median_s = 0.1558; max_s = 0.1600
+S.negative_control.full_decode_200_rows_x2.estimate_s = 62.3 (400 × S.decode_1MiB)
+PROBE_DONE
+exit=0

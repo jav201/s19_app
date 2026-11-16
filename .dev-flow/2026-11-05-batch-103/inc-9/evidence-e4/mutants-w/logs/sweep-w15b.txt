@@ -1,0 +1,13 @@
+w01 rc2 163 s FAILED tests/test_b103_inc9_i.py::test_r_pe_bench_1_1_the_sheet_window_subtitle_names_the_bench[118x54]
+w03a rc2 10 s FAILED tests/test_b103_inc9_a9.py::test_r_pe_bench_70_1_set_10_stages_the_whole_record_with_its_symbol
+w03b rc2 90 s FAILED tests/test_b103_inc9_a9.py::test_r_pe_bench_6_1_and_def_60_5_a_record_stage_keeps_the_row_selected_and_its_bench_
+w03c rc2 19 s FAILED tests/test_b103_inc9_a9.py::test_r_pe_bench_70_1_set_10_stages_the_whole_record_with_its_symbol
+w03d rc2 211 s FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_3_4_after_import_the_three_bench_kinds_are_registered
+w05 survived 298 s 
+w06 survived 307 s 
+w09a rc2 101 s FAILED tests/test_b103_inc9_a9.py::test_r_pe_bench_70_4_a_second_stage_asked_during_the_first_ones_held_encode_is_staged
+w09b rc2 218 s FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_9_3_a_page_without_the_row_drops_its_state
+w09c rc2 222 s FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_9_1_a_filter_keystroke_that_keeps_the_row_keeps_its_state
+Terminated                 MUT_N=2 MUT_TO=900 MUT_MARK="not serial_timing and not slow" ~/miniconda3/envs/s19ci/bin/python -I -B drv/mw9_run.py run clone mt2 out/sweep tests/test_b103_inc9_a9.py tests/test_b103_inc9_i.py tests/test_b103_inc9_w_keys.py tests/test_b103_inc9_w_select.py tests/test_b103_inc9_w_stage.py tests/test_b103_inc9_w_jobs.py
+---
+w15b rc2 372 s FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_24_3_a_text_row_left_with_its_row_fill_unchanged_is_not_pend

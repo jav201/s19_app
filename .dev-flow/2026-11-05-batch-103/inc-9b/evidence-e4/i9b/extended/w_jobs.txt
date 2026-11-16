@@ -1,0 +1,158 @@
+### LABEL: w_jobs
+### CLONE: ~/work/zq-i9b/tip
+### DATE: 2026-11-15T12:57:05-06:00
+### UPTIME:  12:57:05 up 2 days, 21:45,  3 users,  load average: 1.52, 1.51, 1.21
+### HEAD: c19503f0f786e85cf4fffc6a9359b5f3947cdf0b
+### STATUS-BEGIN
+### STATUS-END
+### S19_APP_FILE:
+~/work/zq-i9b/tip/s19_app/__init__.py
+### HEADER-END
+### COLLECT tests/test_b103_inc9_w_jobs.py
+### COLLECT rc=0
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_3_a_page_holding_large_decodes_nothing_on_the_ui_thread
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_1_at_most_one_bench_job_runs_at_any_time
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_2_twenty_large_rows_and_twenty_down_keys_stay_within_320_mib
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+
+10 tests collected in 0.06s
+--- begin nodes ---
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+============================= QC-TM timing margins =============================
+69.3%  0.153 s / 0.500 s  R-PE-BENCH.20/1 key during a LARGE decode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 7.83s ===============================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_2_the_bench_shows_its_values_when_the_decode_ends
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+
+============================== 1 passed in 59.38s ==============================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_3_a_page_holding_large_decodes_nothing_on_the_ui_thread
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+
+============================== 1 passed in 21.61s ==============================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+============================= QC-TM timing margins =============================
+98.5%  0.008 s / 0.500 s  R-PE-BENCH.23/2 page paint of 200 names  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 5.35s ===============================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py --- rc=124
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_1_at_most_one_bench_job_runs_at_any_time
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+
+============================== 1 passed in 13.79s ==============================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_28_2_twenty_large_rows_and_twenty_down_keys_stay_within_320_mib
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+
+========================= 1 passed in 92.75s (0:01:32) =========================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+============================= QC-TM timing margins =============================
+65.2%  0.174 s / 0.500 s  R-PE-BENCH.29/1 cursor key over a LARGE preview  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 117.30s (0:01:57) =========================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+============================= QC-TM timing margins =============================
+38.3%  0.617 s / 1.000 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 122.80s (0:02:02) =========================
+--- rc=0
+=== tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-i9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9_w_jobs.py .                                         [100%]
+============================= QC-TM timing margins =============================
+30.0%  0.700 s / 1.000 s  R-PE-BENCH.82/1 key during a record encode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 149.35s (0:02:29) =========================
+--- rc=0
+--- end nodes ---

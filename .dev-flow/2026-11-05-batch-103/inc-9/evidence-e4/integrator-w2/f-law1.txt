@@ -1,0 +1,13 @@
+# run f-law1 tree=fin 2026-11-14T00:55:30-06:00 load: load average: 9.98, 10.49, 10.98
+~/work/zq-e4-9w-int2/fin/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/fin
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [25 items]
+
+s........................                                                [100%]
+======================== 24 passed, 1 skipped in 54.89s ========================
+# rc=0 end 2026-11-14T00:56:27-06:00 load: load average: 9.47, 10.30, 10.89

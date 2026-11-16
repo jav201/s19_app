@@ -1,0 +1,46 @@
+g-b103_inc8_a1_service: 23 passed in 1.17s
+g-b103_inc8_a2_app: 23 passed in 73.95s (0:01:13)
+g-b103_inc8_a3_help: 9 passed in 1.08s
+g-b103_inc8_at_help: 2 passed in 4.98s
+g-b103_inc8_at: 11 passed in 51.85s
+g-b103_inc8b_at: 13 passed in 103.12s (0:01:43)
+g-b103_inc8b_bw: 32 passed in 48.24s
+g-b103_inc8b_s1: 98 passed in 1.31s
+g-b103_inc8b_s2: 38 passed in 1.25s
+g-b103_inc8_p_layout: 31 passed in 76.78s (0:01:16)
+g-b103_inc8_p_ledger: 10 passed in 34.31s
+g-b103_inc8_p_wiring: 12 passed in 35.99s
+g-b103_inc8_s1_detail: 43 passed in 1.17s
+g-b103_inc8_s1: 122 passed in 1.35s
+g-b103_inc8_s2_picker_definitions: 6 passed in 1.09s
+g-b103_inc8_s2_sheet_formula: 27 passed in 12.42s
+g-b103_inc8_s2_sheet_keys: 22 passed in 11.73s
+g-b103_inc8_s2_sheet_rows: 35 passed in 7.59s
+g-b103_inc9_a9: 29 passed in 103.37s (0:01:43)
+g-b103_inc9_b_canvas: 42 passed in 1.18s
+g-b103_inc9_b_cells: 40 passed in 96.09s (0:01:36)
+g-b103_inc9_b_detail: 54 passed in 1.32s
+g-b103_inc9_b_model: 20 passed in 1.05s
+g-b103_inc9_b_tools: 59 passed in 1.14s
+g-b103_inc9_i: 3 passed in 9.65s
+g-b103_inc9_ob_json_view: 2 passed in 4.77s
+g-b103_inc9_w_jobs: 4 passed in 79.18s (0:01:19)
+g-b103_inc9_w_keys: 19 passed in 66.78s (0:01:06)
+g-b103_inc9_w_mutants: 29 passed in 136.32s (0:02:16)
+g-b103_inc9_w_select: 14 passed in 43.48s
+g-b103_inc9_w_stage: 11 passed in 43.21s
+g-tui_patch_json: 3 failed, 14 passed in 16.41s
+law-address_census: 1 failed, 22 passed in 30.44s
+law-b101_doc_hygiene: 45 passed in 3.23s
+law-b101_help_legend_docs: 71 passed in 50.46s
+law-b97_key_bar: 38 passed in 199.97s (0:03:19)
+law-deps_seam_law: 6 passed in 8.08s
+law-docs_canon: 2 passed in 1.13s
+law-engine_unchanged: 1 passed in 0.85s
+law-filename_markup_safety: 2 passed in 3.35s
+law-id_registry: 12 passed in 7.82s
+law-no_private_tokens: 2 passed in 42.50s
+law-report_markup_safety: 166 passed in 1.27s
+law-requirements_canon: 1 failed, 10 passed in 1.31s
+law-suite_hygiene: 1 failed, 66 passed in 156.48s (0:02:36)
+summary: 

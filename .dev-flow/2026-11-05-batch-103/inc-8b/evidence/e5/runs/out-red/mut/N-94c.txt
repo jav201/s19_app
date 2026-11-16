@@ -1,0 +1,42 @@
+## mutant N-94c: s19_app/tui/screens_directionb/patch_editor/sheet.py
+## - 'self._grid.scroll_to(x=x, animate=False, immediate=True)'
+## + 'self._grid.scroll_to(x=x, animate=True, immediate=True)'
+## uptime:  03:01:45 up 2 days, 11:50,  2 users,  load average: 1.09, 0.91, 1.01
+## date: 2026-11-15T09:01:45Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-N-94c/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_r_pe_def_94_6_end_and_home_move_the_grid_at_once_with_no_animation ____
+
+tmp_path = PosixPath('~/work/zq-x8b/tmp/pytest-of-<user>/pytest-14/test_r_pe_def_94_6_end_and_hom0')
+defc = {'a2l': PosixPath('~/work/zq-x8b/tmp/pytest-of-<user>/pytest-14/defc0/definitions.a2l'), 'names': ['ENU...DEF_0001', ...], 's19': PosixPath('~/work/zq-x8b/tmp/pytest-of-<user>/pytest-14/defc0/definitions.s19')}
+
+    def test_r_pe_def_94_6_end_and_home_move_the_grid_at_once_with_no_animation(tmp_path: Path, defc) -> None:
+        """R-PE-DEF.94/6 (E5, X8b: Pilot's `press` waits for the animator before it returns, so the AT nodes above read
+        x only after any animation has ended and `scroll_to(..., animate=True)` survived them). The End and Home
+        actions are run with no event-loop turn after them: x is already `G.end.118cols`, then already 0. An animated
+        scroll is still at its start here, and on a real terminal the operator would watch the grid slide."""
+    
+        async def body(app, pilot, panel):
+            await open_sheet(pilot, app, panel, defc["names"])
+            grid = need(panel, GRID)
+            sheet = grid.parent
+            sheet.action_scroll_grid("end")
+            at_once = grid.scroll_x
+            await settle(pilot, 3)
+            settled = grid.scroll_x
+            sheet.action_scroll_grid("home")
+            return at_once, settled, grid.scroll_x
+    
+        at_once, settled, back = run(tmp_path, defc, body)
+        assert settled == EX["G.end.118cols"] != 0, (settled, "control: the End action reaches the last columns")
+>       assert at_once == settled, (at_once, settled, "x right after the End action, before any loop turn")
+E       AssertionError: (0.0, 33, 'x right after the End action, before any loop turn')
+E       assert 0.0 == 33
+
+tests/test_b103_inc8b_at.py:457: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_at.py::test_r_pe_def_94_6_end_and_home_move_the_grid_at_once_with_no_animation
+1 failed, 12 deselected in 6.45s
+## rc=1
+## end: 2026-11-15T09:01:53Z  uptime:  03:01:53 up 2 days, 11:50,  2 users,  load average: 1.08, 0.92, 1.01

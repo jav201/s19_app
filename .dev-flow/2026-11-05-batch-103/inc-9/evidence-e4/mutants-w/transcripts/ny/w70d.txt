@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+...........F..
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt3/tests/test_b103_inc9_w_mutants.py:480: AssertionError: ([(8388752, b'\x00\xc8\x00\xdb\x02|\xfec\xfeu\xff*')], {'10': Encoded(address=8388752, data=b'\x00\xc8\x00\xdb\x02|\xfec\xfeu\xff*', notices=()), '20': Encoded(address=8388752, data=b'\x01\x90\x00\xdb\x02|\xfec\xfeu\xff*', notices=())})
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_70_6_a_second_alt_s_before_the_first_record_starts_stages_the_newer_edit
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+1 failed, 13 passed in 106.47s (0:01:46)

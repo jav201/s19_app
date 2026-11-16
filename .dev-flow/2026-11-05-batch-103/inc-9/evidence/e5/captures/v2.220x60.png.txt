@@ -1,0 +1,83 @@
+scene=v2
+fixture=defc
+os_clipboard=stubbed (never touched)
+commit=811198b5
+requested_size=220x60
+time=2026-11-14 08:26:31
+app_size=220x60
+focused=patch_sheet_body
+selected=DISPLAY_0001
+page_rows=ENUM_0001, MASK_BIT_0001, MASK_FIELD_0001, DISPLAY_0001, CURVE_DEF_0001, MAP_DEF_0001, VAL_BLK_DEF_0001
+subtitle=None
+widget #patch_sheet: size=194x29 classes=[] subtitle=None
+widget #patch_inspector: size=192x7 classes=[] subtitle='1 entry ●'
+widget #patch_editor_panel: size=196x45 classes=[] subtitle=None
+keys_sent: <type filter '_0001'> | tab | tab | tab | down | down | down | down | down | down | enter | d enter | <set op input to '1'> | enter | escape | alt+s | escape | up | enter | s enter | <set op input to '5'> | enter | escape | escape | up | up
+status_lines_this_run=3
+status: A2L loaded: definitions.a2l
+status: Loaded definitions.s19
+status: Patch Editor: VAL_BLK_DEF_0001 staged as 1 value (12 B at 0x800090).
+stub_os_writes=0
+screen_text_begin
+  
+    ⭘                                                                                                   Hex Edit Tool
+                        │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/
+   ▏ ◫  Workspace       │
+   ▏ ≡  A2L Explorer    │ draft · change
+   ▏ ◉  MAC View        │ Filter _0001                                                                                                                                  7 of 7 shown  <    Page 1/1   >    Pick   Add list
+   ▏ ▤  Memory Map      │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   ▏ !  Issues Report   ││  Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                      │
+   ▏ ✎  Patch Editor    ││  ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                               │
+   ▏ ✔  Check Editor    ││  MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                               │
+   ▏ ⏚  A2B Diff        ││  MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                             │
+   ▏ ✦  Flow Builder    ││▶ DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                           │
+   ▏ ▶  Flow Execution  ││└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B                                                                                                                                 │
+   ▏ ☑  Checks          ││  CURVE_DEF_0001          CURVE     ▅▇▄█▁ 5                                     ·                           0 … 65.5k                                                                             │
+   ▏ ⊕  CRC Designer    ││ ◆MAP_DEF_0001            MAP 4x3   ████ 12                                     1 cells                     -1.00k … 1.00k                                                 max |Δ| 467            │
+                        ││ ●VAL_BLK_DEF_0001        VAL_BLK   ███ 6                                       ·                   units   -50 … 50                                                       max |Δ| 1 staged       │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││DISPLAY_0001 new =                   deg C  (-40 … 150)                                                                                                                                           │
+                        │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row · arrays open the bench ─╯
+                        │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+                        ││   Patch script    Inspector    JSON    Checks                                                                                                                                                    │
+                        ││  Kind      Address     Value / bytes                                                                                                                                          Status   Linkage   │
+                        ││  · bytes   0x800090    02 F6 00 DB 02 7C FE 63 .. (12 bytes)                                                                                                                  inside   -         │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        ││                                                                                                                                                                                                  │
+                        │╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 1 entry ● ─╯
+                        │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh
+                        │  Validate   Apply loaded changes   Save
+                        │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded definitions.s19 (S19 only)                                                                                                                                                             (none)  |  definitions.a2l
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+    A2L loaded: definitions.a2l
+    Loaded definitions.s19 (S19 only)
+    Loaded definitions.s19
+    Patch Editor: VAL_BLK_DEF_0001 staged as 1 value (12 B at 0x800090).
+    ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+    Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+  
+screen_text_end
+surface=ready

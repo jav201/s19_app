@@ -1,0 +1,34 @@
+# mutant N-109  rows: R-PE-DEF.109
+# edits: s19_app/tui/definition_sheet.py:644; s19_app/tui/definition_sheet.py:646
+# -k: r_pe_def_109_
+# uptime: 02:00:02 up 2 days, 10:48,  3 users,  load average: 1.51, 1.02, 1.25
+s19_app.__file__ = ~/work/zq-m8b/m/N-109/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_r_pe_def_109_1_a_32_bit_mask_word_is_two_blocks_of_16_high_bits_first __
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_109_1_a_32_bit_mask_word_is_two_blocks_of_16_high_bits_first(defc):
+        """R-PE-DEF.109/1 (EX-8B-B2) - a ULONG copy, mask 0x00FF0000, word `12 34 56 78`, pending 0x12 -> 8 lines.
+    
+        A 32-bit word on one row is 123 cells wide and would be cut; one block per 16 bits, hex on the first block only.
+        """
+        lines = _ulong_mask_case(defc, "18")
+        table = [ln.plain for ln in lines if ln.plain.startswith(BAR + "│ ") and not ln.plain.startswith(BAR + "│ ↔")]
+>       assert len(table) == 8, [ln.plain for ln in lines]
+E       AssertionError: ['  ┊ └ IDENTICAL phys = (word & 0x00FF0000) >> 16 · ULONG u32 big-endian · 0x00800010 · 4 B                          ... 0  1  0 │  0  0  0  1 │  0  0  1  0 │  0  1  0  1 │  0  1  1  0 │  0  1  1  1 │  1  0  0  0 │ 12 12 56 78 │    ', ...]
+E       assert 4 == 8
+E        +  where 4 = len(['  ┊ │ bit     31 30 29 28 │ 27 26 25 24 │ 23 22 21 20 │ 19 18 17 16 │ 15 14 13 12 │ 11 10  9  8 │  7  6  5  4 │  3  ...│  0  0  1  0 │  0  0  0  1 │  0  0  1  0 │  0  1  0  1 │  0  1  1  0 │  0  1  1  1 │  1  0  0  0 │ 12 12 56 78 │    '])
+
+tests/test_b103_inc8b_s2.py:292: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_109_1_a_32_bit_mask_word_is_two_blocks_of_16_high_bits_first
+1 failed in 1.78s
+
+# exit=1

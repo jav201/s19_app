@@ -1,0 +1,198 @@
+Cloning into '<runner-home>/work/zq-x9b/residual-stall-serialize'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at a211b3d6 batch-103 Inc 9b E5: test same-call document-load repaint
+APPLIED stall-serialize s19_app/tui/app/patch.py anchors=1
+QUIET_LOAD 0.13134765625
+QUIET_PREFLIGHT_RC 0
+DATE 2026-11-15T20:35:02-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-stall-serialize
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:35:02 up 3 days,  5:23,  2 users,  load average: 0.13, 0.54, 0.62
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-stall-serialize/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-stall-serialize
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_at.py F                                            [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second _
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-stall-serialize/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_99_1_a_key_pre0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-stall-serialize/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second(tmp_path, defc_dir):
+        """R-PE-BENCH.99/1. R-PE-BENCH.98/1's scenario, `down` sent the moment the record's write lands in the change
+        document: the bench handles it (the sheet's key action returns) within 1.0 s of that write.
+        Operator need (P-127): the pill says "keys still work"; a window that ignores keys through the refresh makes
+        the user force the app closed. The base's one-call block is 0.67 s, inside the bound, so this node is a
+        guard on base; its negative control is a 1.3 s stall added to one refresh step (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_record_ready(pilot, sheet)
+            handled: list = []
+            real = sheet.action_move
+    
+            def timed(*args):
+                real(*args)
+                handled.append(time.monotonic())
+    
+            sheet.action_move = timed
+            watcher = WriteWatch(app, "down").start()
+            try:
+                send(app, "alt+s")
+                await wait_for(pilot, lambda: bool(handled), "the `down` sent at the write to be handled", 180)
+            finally:
+                watcher.stop()
+                del sheet.action_move
+            return watcher.t_write, handled[0]
+    
+        t_write, t_handled = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        latency = t_handled - t_write
+>       assert latency <= report_margin("R-PE-BENCH.99/1 key at the write step", latency, timing_bound(1.0)), (
+            f"`down` handled {latency:.3f} s after the write ({load()}); load-sensitive, unverified on a loaded host"
+        )
+E       AssertionError: `down` handled 1.585 s after the write (load 0.88 0.69 0.66); load-sensitive, unverified on a loaded host
+E       assert 1.5845821170369163 <= 1.0
+E        +  where 1.0 = report_margin('R-PE-BENCH.99/1 key at the write step', 1.5845821170369163, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b103_inc9b_at.py:458: AssertionError
+============================= QC-TM timing margins =============================
+LOW -58.5%  1.585 s / 1.000 s  R-PE-BENCH.99/1 key at the write step  tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_99_1_a_key_pressed_when_the_write_step_ends_is_handled_within_one_second
+======================== 1 failed in 163.05s (0:02:43) =========================
+EXIT_CODE 1
+STALL_SERIALIZE_RC 1
+CONTROL_PHASE chain-scheduler
+DATE 2026-11-15T20:37:47-06:00
+HEAD a211b3d681ab5a58ba8222a5e37da8b0eb116049
+TREE <runner-home>/work/zq-x9b/residual-chain
+DIRTY_BEGIN
+ M s19_app/tui/app/patch.py
+DIRTY_END
+ 20:37:47 up 3 days,  5:26,  2 users,  load average: 0.88, 0.69, 0.66
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/residual-chain/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/residual-chain
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+tests/test_b103_inc9b_s.py F                                             [100%]
+
+=================================== FAILURES ===================================
+__ test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once ___
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-chain-scheduler/tmp/pytest-of-<runner>/pytest-0/test_r_pe_bench_98_2_a_later_s0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-chain-scheduler/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8a53d1bb10>
+
+    def test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.98/2 scheduler contract: a raise in a timer step calls on_done once and re-raises."""
+    
+        async def body(app, pilot, panel):
+            callbacks, calls = [], []
+            monkeypatch.setattr(app, "set_timer", lambda _delay, callback: callbacks.append(callback))
+    
+            def raises():
+                calls.append("raise")
+                raise RuntimeError("later refresh step")
+    
+            try:
+                app._run_refresh_steps(
+                    [lambda: calls.append("first"), raises, lambda: calls.append("unreached")],
+                    lambda: calls.append("done"),
+                )
+                assert len(callbacks) == 1
+                with pytest.raises(RuntimeError, match="later refresh step"):
+                    callbacks.pop(0)()
+            finally:
+                app.__dict__.pop("set_timer", None)
+            return calls, callbacks
+    
+>       calls, callbacks = run(tmp_path, defc_dir, body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9b_s.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = PatchEditorPanel(id='patch_editor_panel')
+
+    async def body(app, pilot, panel):
+        callbacks, calls = [], []
+        monkeypatch.setattr(app, "set_timer", lambda _delay, callback: callbacks.append(callback))
+    
+        def raises():
+            calls.append("raise")
+            raise RuntimeError("later refresh step")
+    
+        try:
+            app._run_refresh_steps(
+                [lambda: calls.append("first"), raises, lambda: calls.append("unreached")],
+                lambda: calls.append("done"),
+            )
+>           assert len(callbacks) == 1
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+tests/test_b103_inc9b_s.py:451: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once
+============================== 1 failed in 4.18s ===============================
+EXIT_CODE 1
+CHAIN_SCHEDULER_RC 1

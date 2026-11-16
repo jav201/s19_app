@@ -1,0 +1,55 @@
+DATE 2026-11-15T19:01:49.164984-06:00
+GROUP G05
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:01:32 up 3 days,  3:50,  2 users,  load average: 0.91, 0.48, 0.27
+LOAD_ONE 0.91
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G05/tree/s19_app/__init__.py
+PID 1027120
+SID 1027120
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-8/test_r_pe_bench_96_1_the_busy_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-8/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4cb4696110>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.96/1, EX-BC4: LARGE's decode held until its pending time reaches 1.7 s: the painted title is
+        `STAGING SHEET` + two spaces + ` <f> BUSY · decode LARGE · 1.7 s · keys still work ` (one space before <f> and
+        after `work`, the seconds with one decimal and NO padding). Operator need (P-127): the user reads what runs, on
+        what, for how long, and that the keys are not lost. Negative control: `{s:4.1f}` pads to ` 1.7`."""
+        a2l, s19 = case(tmp_path, "LARGE", "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, "LARGE", "OTHER")
+            try:
+                gate.hold.add("LARGE")
+                await reselect(pilot, sheet, "LARGE", "OTHER")
+                await cue_shown(pilot, app, "decode", "LARGE")
+                took = await until(pilot, lambda: (m := TITLE.search(top_row(app))) is not None and float(m.group(4)) >= 1.7, 8.0)
+                return took, top_row(app)
+            finally:
+                gate.release()
+    
+        took, row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        found = TITLE.search(row)
+>       assert took is not None and found is not None, f"no busy title with a pending time of 1.7 s: {row!r}"
+E       AssertionError: no busy title with a pending time of 1.7 s: '╭─ STAGING SHEET   ◐ BUSY · decode LARGE ·  8.3 s · keys still work  ──────────────────────────────────────────╮'
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:422: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G05/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work
+1 failed in 15.11s
+EXIT_CODE 1

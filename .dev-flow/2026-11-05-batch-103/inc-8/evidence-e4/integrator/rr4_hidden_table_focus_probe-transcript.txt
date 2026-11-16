@@ -1,0 +1,10 @@
+cwd=~/work/zq-e4-8-int/wt
+ 16:55:09 up 1 day,  1:43,  3 users,  load average: 1.17, 1.35, 1.80
+~/work/zq-e4-8-int/wt/s19_app/__init__.py
+RR4.table.display = False
+RR4.table.in_focus_chain = False
+RR4.table.focused_after_programmatic_focus = True
+RR4.table.reached_by_40_tabs = False
+.
+1 passed in 9.55s
+exit=0

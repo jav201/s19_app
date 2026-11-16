@@ -1,0 +1,13 @@
+bringing up nodes...
+bringing up nodes...
+
+......FF
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/support/b103_inc9_w.py:92: AssertionError: did not settle within 60 s: BIG's first decode
+~/work/zq-mw9/mt/tests/support/b103_inc9_w.py:92: AssertionError: did not settle within 90 s: the values of BIG
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_22_3_a_decode_made_stale_by_the_selection_key_alone_runs_again_for_the_selected_row
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_5_2_the_cursor_stays_on_a_painted_row_while_it_walks_down_a_tall_grid
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 2 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+2 failed, 6 passed in 152.11s (0:02:32)

@@ -1,0 +1,100 @@
+load before: 1.53 1.62 1.69 1/638 537262
+~/work/zq-fx9c/baseclone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....s.F.                                                                 [100%]
+=================================== FAILURES ===================================
+______________________________ test_tc081_2_strip ______________________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-fx9c/tmp/pytest-of-<user>/pytest-73/popen-gw1/test_tc081_2_strip0')
+
+    def test_tc081_2_strip(tmp_path: Path) -> None:
+        """The strip resolves once, above its buttons, fed by a defaulted parameter.
+    
+        Intent (LLR-081.2, C-7): DOM order is asserted because "the strip labels
+        the Undo/Redo row" is a reading-order claim no functional AT can see (the
+        Inc-4 M-5 lesson). The panel is a VIEW: it must not import the service layer
+        nor reach ``self.app``, or the Patch screen stops being testable without a
+        full app.
+    
+        The ``_nodes``/``_context`` arm is §2.4-10 — those names shadow Textual
+        ``Widget`` internals and produce a silent mount crash / idle boot deadlock
+        with NO traceback. The literal is BOUND to the class first (the Inc-4 F3
+        fix): a bare ``names & set(dir(Widget))`` check is constant-true and passes
+        without importing anything.
+        """
+    
+        async def _drive() -> tuple[int, list[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                strips = list(app.query("#patch_history_strip").results())
+                # batch-94 (the pe_b rework): the strip/controls moved OUT of
+                # ``#patch_win_script`` to the JSON window's docked rows
+                # (siblings of its body, never inside the scrolling body — the
+                # B2 invariant). The walk re-aims at the rework's home; the
+                # intent is unchanged: the strip exists, docked directly ABOVE
+                # the Undo/Redo row it describes, in DOM order.
+                window = app.query_one("#patch_win_json")
+                order = [
+                    child.id
+                    for child in window.children
+                    if child.id in ("patch_history_strip", "patch_history_controls")
+                ]
+                return len(strips), order
+    
+        count, order = asyncio.run(_drive())
+    
+        assert count == 1, f"the strip must resolve EXACTLY once; got {count} nodes"
+        assert order == ["patch_history_strip", "patch_history_controls"], (
+            "the strip must sit directly ABOVE the Undo/Redo row it describes, as "
+            f"a docked sibling (never inside the scrolling body); DOM order is {order!r}"
+        )
+    
+        signature = inspect.signature(PatchEditorPanel.set_undo_redo_enabled)
+        parameter = signature.parameters.get("depths")
+        assert parameter is not None, (
+            "set_undo_redo_enabled must take a `depths` parameter — the strip and "
+            f"the buttons ride ONE seam (LLR-081.3); signature is {signature!r}"
+        )
+        assert parameter.default is None, (
+            "the parameter must be DEFAULTED so no existing caller breaks; its "
+            f"default is {parameter.default!r}"
+        )
+    
+        # C-7 purity over the panel's own AST — 0 `self.app`, 0 service imports.
+        # AST, not `"self.app" not in source`: a substring probe matches the phrase
+        # inside this batch's own docstrings and reports on prose, not code (the
+        # Inc-4 finding, three oracles deep).
+        from tests.support import package_source as ps
+    
+        panel_tree = ps.mro_class_tree(
+            PatchEditorPanel,
+            "s19_app.tui.screens_directionb.patch_editor",
+            ps.MIN_PATCH_EDITOR_CLASSES,
+        )
+        self_app = [
+            node
+            for node in ast.walk(panel_tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert not self_app, (
+            "the panel must not reach `self.app` — it is a view widget and its "
+            f"data is threaded in (C-7); found {len(self_app)} access(es)"
+        )
+E       AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es)
+E       assert not [<ast.Attribute object at 0x7fde747d64d0>, <ast.Attribute object at 0x7fde6f616590>]
+
+tests/test_tui_patch_history_strip.py:544: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE...
+1 failed, 6 passed, 1 skipped in 19.88s
+rc=1
+load after: 1.58 1.63 1.69 1/636 537349

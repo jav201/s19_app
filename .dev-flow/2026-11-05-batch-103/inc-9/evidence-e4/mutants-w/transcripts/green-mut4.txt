@@ -1,0 +1,9 @@
+# load: 3.37
+~/work/zq-mw9/mt/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.............................                                            [100%]
+29 passed in 136.76s (0:02:16)
+rc=0
+# load end: 2.98

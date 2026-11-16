@@ -1,0 +1,6 @@
+uptime:  13:15:27 up 22:04,  4 users,  load average: 8.87, 8.53, 8.09
+code-wire: v3.1.0-8-gb6cd30d
+6 marks written, 0 nodes without code
+marks=6 graph_nodes=6 calls=0 findings=2 parse_failures=0
+extract exit=1
+exit=0

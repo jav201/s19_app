@@ -1,0 +1,8 @@
+== g1-detail  Fri Nov 13 09:16:04 PM CST 2026  load: 2.44 1.35 1.05
+s19_app.__file__ = ~/work/zq-e4-9-int/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................                                 [100%]
+40 passed in 1.30s
+rc=0

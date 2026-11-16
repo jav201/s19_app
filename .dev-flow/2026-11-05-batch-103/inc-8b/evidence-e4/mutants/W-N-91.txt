@@ -1,0 +1,9 @@
+# WIDE re-run of mutant N-91  rows: R-PE-DEF.91
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:351
+# uptime: 02:05:10 up 2 days, 10:53,  2 users,  load average: 1.24, 1.13, 1.24
+s19_app.__file__ = ~/work/zq-m8b/m/W-N-91/s19_app/__init__.py
+## group fast+bench: exit=1 | 3 failed, 513 passed in 115.23s (0:01:55)
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row
+   FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says
+# verdict: KILLED-WIDE fast+bench: tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body

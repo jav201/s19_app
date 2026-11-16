@@ -1,0 +1,1 @@
+FAILED tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe

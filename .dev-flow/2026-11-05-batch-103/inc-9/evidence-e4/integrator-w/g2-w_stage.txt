@@ -1,0 +1,13 @@
+# run g2-w_stage tree=g2 2026-11-13T23:12:17-06:00 load: load average: 9.77, 8.42, 6.31
+~/work/zq-e4-9w-int/g2/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int/g2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [11 items]
+
+...........                                                              [100%]
+============================= 11 passed in 54.97s ==============================
+# rc=0 end 2026-11-13T23:13:13-06:00 load: load average: 8.68, 8.40, 6.43

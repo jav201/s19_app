@@ -1,0 +1,15 @@
+2026-11-15T11:55:06-06:00
+ 11:55:06 up 2 days, 20:43,  2 users,  load average: 0.10, 0.10, 0.03
+~/work/zq-i9b/tree/s19_app/__init__.py
+............F.........                                                   [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/test_b103_inc9b_w.py:686: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.310 s after the key (bound 0.3 s, load 0.61 0.29 0.11); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.028522475011413917 is not None and 0.309966508008074 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed, 21 passed in 182.40s (0:03:02)
+exit=1

@@ -1,0 +1,274 @@
+# mutant N-B17  rows: R-PE-BENCH.17
+# edits: s19_app/tui/definition_bench.py:638
+# -k: r_pe_bench_17_
+# uptime: 01:59:31 up 2 days, 10:48,  3 users,  load average: 1.31, 0.93, 1.23
+s19_app.__file__ = ~/work/zq-m8b/m/N-B17/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+______ test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16 _______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16(defc):
+        """R-PE-BENCH.17/3 - an array with no limits -> ``-`` at offset 16 of the 34-cell Limits cell."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        none = replace(o.d, limits=Limits(None, None, "", ""))
+        row = sheet_row(none, o.a2l, o.image)
+        cell = db.bench_cells(row, view_state(o), ds.sheet_widths(111))[LIMITS].plain
+>       assert cell == TR["L.cell.no_limits"] and cell.index("-") == TR["L.offset.range_mark"]
+E       AssertionError: assert ('-' == '            ...             '
+E         
+E         -                 -                 
+E         + -)
+
+tests/test_b103_inc8b_s1.py:939: AssertionError
+_ test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[CURVE_DEF_0001-None] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001', lower_text = None
+
+    @pytest.mark.parametrize(("name", "lower_text"), [("CURVE_DEF_0001", None), ("MAP_DEF_0001", None)])
+    def test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form(defc, name, lower_text):
+        """R-PE-BENCH.17/1, /2 - CURVE_DEF_0001 and MAP_DEF_0001 -> ``L.bench.*`` (``…`` at 16), in the row at column 87."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        line = ds.row_line(row, ds.sheet_widths(111), False, None, None, state=view_state(o))
+>       assert cell_slice(line.plain, START["Limits"], LIMITS_W) == TR[f"L.bench.{name}"]
+E       AssertionError: assert '0 … 65.5k   ...             ' == '     0      ...        65.5k'
+E         
+E         -      0          …            65.5k
+E         + 0 … 65.5k
+
+tests/test_b103_inc8b_s1.py:930: AssertionError
+________ test_r_pe_bench_17_the_limits_cell_is_the_range_form[1-curve] _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+                             ids=["1-curve", "2-map", "3-valblk"])
+    def test_r_pe_bench_17_the_limits_cell_is_the_range_form(defc, name):
+        """R-PE-BENCH.17/1,2 - a bench row's Limits cell is the range form of CTX-PE-DEF (the same 34 cells as
+        a scalar row, `…` at offset 16): CURVE_DEF_0001 `L.bench.CURVE_DEF_0001`, MAP_DEF_0001 and VAL_BLK
+        the same way. Why: Inc 9's `0 … 65.5k` broke the column the operator scans down."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, strip_state(o, name), ds.sheet_widths(118))[LIMITS].plain
+>       assert cell == T[f"L.bench.{name}"]
+E       AssertionError: assert '0 … 65.5k' == '     0      ...        65.5k'
+E         
+E         -      0          …            65.5k
+E         + 0 … 65.5k
+
+tests/test_b103_inc8b_bw.py:208: AssertionError
+_ test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[MAP_DEF_0001-None] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001', lower_text = None
+
+    @pytest.mark.parametrize(("name", "lower_text"), [("CURVE_DEF_0001", None), ("MAP_DEF_0001", None)])
+    def test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form(defc, name, lower_text):
+        """R-PE-BENCH.17/1, /2 - CURVE_DEF_0001 and MAP_DEF_0001 -> ``L.bench.*`` (``…`` at 16), in the row at column 87."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        line = ds.row_line(row, ds.sheet_widths(111), False, None, None, state=view_state(o))
+>       assert cell_slice(line.plain, START["Limits"], LIMITS_W) == TR[f"L.bench.{name}"]
+E       AssertionError: assert '-1.00k … 1.0...             ' == ' -1.00k     ...        1.00k'
+E         
+E         -  -1.00k         …            1.00k
+E         + -1.00k … 1.00k
+
+tests/test_b103_inc8b_s1.py:930: AssertionError
+_________ test_r_pe_bench_17_the_limits_cell_is_the_range_form[2-map] __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+                             ids=["1-curve", "2-map", "3-valblk"])
+    def test_r_pe_bench_17_the_limits_cell_is_the_range_form(defc, name):
+        """R-PE-BENCH.17/1,2 - a bench row's Limits cell is the range form of CTX-PE-DEF (the same 34 cells as
+        a scalar row, `…` at offset 16): CURVE_DEF_0001 `L.bench.CURVE_DEF_0001`, MAP_DEF_0001 and VAL_BLK
+        the same way. Why: Inc 9's `0 … 65.5k` broke the column the operator scans down."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, strip_state(o, name), ds.sheet_widths(118))[LIMITS].plain
+>       assert cell == T[f"L.bench.{name}"]
+E       AssertionError: assert '-1.00k … 1.00k' == ' -1.00k     ...        1.00k'
+E         
+E         -  -1.00k         …            1.00k
+E         + -1.00k … 1.00k
+
+tests/test_b103_inc8b_bw.py:208: AssertionError
+____ test_r_pe_bench_17_3_an_array_without_limits_shows_a_dash_at_offset_16 ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_17_3_an_array_without_limits_shows_a_dash_at_offset_16(defc):
+        """R-PE-BENCH.17/3 - an array with no limits -> the no-limits form: `-` at offset 16 (`L.cell.no_limits`)."""
+        from s19_app.tui.a2l_definition import Limits
+        import dataclasses
+    
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        none = dataclasses.replace(o.d, limits=Limits(None, None, "", ""))
+        row = sheet_row(none, o.a2l, o.image)
+        cell = db.bench_cells(row, strip_state(o, "VAL_BLK_DEF_0001"), ds.sheet_widths(118))[LIMITS].plain
+>       assert cell.index("-") == T["L.cell.no_limits.offsets"]["-"]
+E       AssertionError: assert 0 == 16
+E        +  where 0 = <built-in method index of str object at 0x55d267a3c1e0>('-')
+E        +    where <built-in method index of str object at 0x55d267a3c1e0> = '-'.index
+
+tests/test_b103_inc8b_bw.py:221: AssertionError
+________ test_r_pe_bench_17_the_limits_cell_is_the_range_form[3-valblk] ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'VAL_BLK_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001", "VAL_BLK_DEF_0001"],
+                             ids=["1-curve", "2-map", "3-valblk"])
+    def test_r_pe_bench_17_the_limits_cell_is_the_range_form(defc, name):
+        """R-PE-BENCH.17/1,2 - a bench row's Limits cell is the range form of CTX-PE-DEF (the same 34 cells as
+        a scalar row, `…` at offset 16): CURVE_DEF_0001 `L.bench.CURVE_DEF_0001`, MAP_DEF_0001 and VAL_BLK
+        the same way. Why: Inc 9's `0 … 65.5k` broke the column the operator scans down."""
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, strip_state(o, name), ds.sheet_widths(118))[LIMITS].plain
+>       assert cell == T[f"L.bench.{name}"]
+E       AssertionError: assert '-50 … 50' == '   -50      ...          50 '
+E         
+E         -    -50          …              50 
+E         + -50 … 50
+
+tests/test_b103_inc8b_bw.py:208: AssertionError
+______________ test_r_pe_bench_17_the_limits_cell[CURVE_DEF_0001] ______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001"])
+    def test_r_pe_bench_17_the_limits_cell(defc, name):
+        """R-PE-BENCH.17/1,2 (changed at Inc 8b E1) - the range form: both slots, `…` at offset 16 (`L.bench.CURVE_DEF_0001`, `L.bench.MAP_DEF_0001`).
+    
+        Why: the operator asked for the Limits column to stay aligned for every row kind; Inc 9's `0 … 65.5k`
+        started at the column start while scalar rows put their lower limit in a right-aligned slot.
+        """
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell == fact(f"L.bench.{name}") and len(cell) == 34 and cell.index("…") == 16
+E       AssertionError: assert ('0 … 65.5k' == '     0      ...        65.5k'
+E         
+E         -      0          …            65.5k
+E         + 0 … 65.5k)
+
+tests/test_b103_inc9_b_cells.py:227: AssertionError
+_______________ test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001] _______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001"])
+    def test_r_pe_bench_17_the_limits_cell(defc, name):
+        """R-PE-BENCH.17/1,2 (changed at Inc 8b E1) - the range form: both slots, `…` at offset 16 (`L.bench.CURVE_DEF_0001`, `L.bench.MAP_DEF_0001`).
+    
+        Why: the operator asked for the Limits column to stay aligned for every row kind; Inc 9's `0 … 65.5k`
+        started at the column start while scalar rows put their lower limit in a right-aligned slot.
+        """
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell == fact(f"L.bench.{name}") and len(cell) == 34 and cell.index("…") == 16
+E       AssertionError: assert ('-1.00k … 1.00k' == ' -1.00k     ...        1.00k'
+E         
+E         -  -1.00k         …            1.00k
+E         + -1.00k … 1.00k)
+
+tests/test_b103_inc9_b_cells.py:227: AssertionError
+__________ test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits0] __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+limits = Limits(lower=0.0, upper=None, lower_text='', upper_text='')
+
+    @pytest.mark.parametrize("limits", [Limits(0.0, None, "", ""), Limits(None, 5.0, "", "")])
+    def test_r_pe_bench_17_4_one_limit_alone_shows_a_dash(defc, limits):
+        """R-PE-BENCH.17 (M9, mutant m17: `or` for `and`) - `-` without BOTH limits: only a lower, only an upper."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(dataclasses.replace(o.d, limits=limits), o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55c50e7af1e0>('-')
+E        +    where <built-in method index of str object at 0x55c50e7af1e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:406: AssertionError
+__________ test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash(defc):
+        """R-PE-BENCH.17/3 (changed at Inc 8b E1) - an array with no limits -> the no-limits form: `-` at offset 16 of 34 cells."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        none = dataclasses.replace(o.d, limits=Limits(None, None, "", ""))
+        row = sheet_row(none, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55d267a3c1e0>('-')
+E        +    where <built-in method index of str object at 0x55d267a3c1e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:236: AssertionError
+__________ test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits1] __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+limits = Limits(lower=None, upper=5.0, lower_text='', upper_text='')
+
+    @pytest.mark.parametrize("limits", [Limits(0.0, None, "", ""), Limits(None, 5.0, "", "")])
+    def test_r_pe_bench_17_4_one_limit_alone_shows_a_dash(defc, limits):
+        """R-PE-BENCH.17 (M9, mutant m17: `or` for `and`) - `-` without BOTH limits: only a lower, only an upper."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(dataclasses.replace(o.d, limits=limits), o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55c50e7af1e0>('-')
+E        +    where <built-in method index of str object at 0x55c50e7af1e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:406: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_3_an_array_without_limits_shows_the_dash_at_16
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[CURVE_DEF_0001-None]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_17_the_limits_cell_is_the_range_form[1-curve]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_bench_17_1_2_the_bench_limits_are_the_range_form[MAP_DEF_0001-None]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_17_the_limits_cell_is_the_range_form[2-map]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_17_3_an_array_without_limits_shows_a_dash_at_offset_16
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_17_the_limits_cell_is_the_range_form[3-valblk]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_the_limits_cell[CURVE_DEF_0001]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits0]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits1]
+12 failed in 2.27s
+
+# exit=1

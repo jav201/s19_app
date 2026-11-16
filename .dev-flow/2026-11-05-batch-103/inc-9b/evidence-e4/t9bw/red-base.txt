@@ -1,0 +1,696 @@
+ 04:46:34 up 2 days, 13:35,  2 users,  load average: 1.04, 1.30, 1.54
+~/work/zq-e4-9b-t9bw/tree/s19_app/__init__.py
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs  04:46:35  load average: 1.04, 1.30, 1.54
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs _
+tests/test_b103_inc9b_w.py:273: in test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+    assert took is not None and seen <= timing_bound(0.5), (
+E   AssertionError: no cue `decode MID` within 0.5 s of its ask while LARGE's summary ran (running=1, load 1.03 1.29 1.54); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec
+E   assert (None is not None)
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+1 failed in 7.42s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue  04:46:44  load average: 1.03, 1.29, 1.54
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue _
+tests/test_b103_inc9b_w.py:304: in test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+    run(tmp_path, defc_dir, body)
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:297: in body
+    await cue_shown(pilot, app, "decode", MAP)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode MAP_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 1.03 1.28 1.53)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+1 failed in 10.39s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue  04:46:55  load average: 1.03, 1.28, 1.53
+.                                                                        [100%]
+1 passed in 8.26s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs  04:47:05  load average: 1.02, 1.27, 1.52
+.                                                                        [100%]
+1 passed in 7.06s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work  04:47:13  load average: 1.02, 1.26, 1.52
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work _
+tests/test_b103_inc9b_w.py:412: in test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work
+    took, row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:406: in body
+    await cue_shown(pilot, app, "decode", "LARGE")
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode LARGE` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.93 1.24 1.51)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work
+1 failed in 10.05s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour  04:47:24  load average: 0.93, 1.24, 1.51
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour _
+tests/test_b103_inc9b_w.py:444: in test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour
+    idle_title, pill, title, row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:438: in body
+    await cue_shown(pilot, app, "decode", "LARGE")
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode LARGE` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.86 1.21 1.50)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour
+1 failed in 10.49s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage  04:47:36  load average: 0.86, 1.21, 1.50
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_pe_bench_96_3_the_job_words_are_preview_and_stage ___________
+tests/test_b103_inc9b_w.py:483: in test_r_pe_bench_96_3_the_job_words_are_preview_and_stage
+    preview_row, stage_row = run(tmp_path, defc_dir, body)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:467: in body
+    await cue_shown(pilot, app, "preview", VB)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `preview VAL_BLK_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.89 1.20 1.49)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage
+1 failed in 10.30s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped  04:47:47  load average: 0.89, 1.20, 1.49
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped _
+tests/test_b103_inc9b_w.py:523: in test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped
+    seen = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:513: in body
+    await cue_shown(pilot, app, "decode", "LARGE")
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode LARGE` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.91 1.19 1.48)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped
+1 failed in 10.06s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show  04:47:58  load average: 0.91, 1.19, 1.48
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show _
+tests/test_b103_inc9b_w.py:564: in test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+    lag, values, row, colour = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:555: in body
+    await cue_shown(pilot, app, "decode", "LARGE")
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode LARGE` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.93 1.19 1.48)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+1 failed in 10.23s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result  04:48:10  load average: 0.93, 1.19, 1.48
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result _____
+tests/test_b103_inc9b_w.py:592: in test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+    lag, row, colour = run(tmp_path, defc_dir, body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:584: in body
+    await cue_shown(pilot, app, "preview", VB)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `preview VAL_BLK_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.94 1.18 1.47)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+1 failed in 10.47s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s  04:48:22  load average: 0.94, 1.18, 1.47
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s __
+tests/test_b103_inc9b_w.py:622: in test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+    lag, row, colour, preview = run(tmp_path, defc_dir, body)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:614: in body
+    await cue_shown(pilot, app, "preview", VB)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `preview VAL_BLK_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.95 1.17 1.46)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+1 failed in 10.35s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s  04:48:33  load average: 0.95, 1.17, 1.46
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s _
+tests/test_b103_inc9b_w.py:650: in test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+    lag, row, colour, running = run(tmp_path, defc_dir, body)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:642: in body
+    await cue_shown(pilot, app, "decode", MAP)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode MAP_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.96 1.16 1.46)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+1 failed in 10.44s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs  04:48:45  load average: 0.96, 1.16, 1.45
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/test_b103_inc9b_w.py:681: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    took, after, released, running, row, colour = run(tmp_path, defc_dir, body)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:673: in body
+    await cue_shown(pilot, app, "decode", VB)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode VAL_BLK_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.97 1.16 1.45)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 10.62s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s  04:48:56  load average: 0.97, 1.16, 1.45
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s _
+tests/test_b103_inc9b_w.py:712: in test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+    took, after, still, released, row, colour = run(tmp_path, defc_dir, body)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:703: in body
+    await cue_shown(pilot, app, "decode", MAP)
+tests/test_b103_inc9b_w.py:208: in cue_shown
+    assert took is not None, (
+E   AssertionError: no busy cue `decode MAP_DEF_0001` (colour #f5c26b) within 3.0 s of the ask; top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.90 1.13 1.44)
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+1 failed in 10.40s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link  04:49:08  load average: 0.90, 1.13, 1.44
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link ______
+tests/test_b103_inc9b_w.py:758: in test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link
+    row, after, running, exited = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:749: in body
+    row = await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row '[@click=app.quit]X[/]': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.92 1.13 1.43)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link
+1 failed in 10.12s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally  04:49:19  load average: 0.92, 1.13, 1.43
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally _________
+tests/test_b103_inc9b_w.py:779: in test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally
+    row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:775: in body
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'A[b]B': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 1.00 1.14 1.43)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally
+1 failed in 10.19s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd  04:49:31  load average: 1.00, 1.14, 1.43
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd _____
+tests/test_b103_inc9b_w.py:799: in test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd
+    row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:795: in body
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'A\x1b[2J': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 1.00 1.14 1.43)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd
+1 failed in 10.13s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd  04:49:42  load average: 1.00, 1.13, 1.43
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd ________
+tests/test_b103_inc9b_w.py:819: in test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd
+    row = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:815: in body
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'B\x85C': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.92 1.11 1.42)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd
+1 failed in 10.17s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]  04:49:53  load average: 0.92, 1.11, 1.42
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24] _
+tests/test_b103_inc9b_w.py:857: in test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits
+    row = run(tmp_path, defc_dir, body, size=size, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:853: in body
+    return await long_name_row(app, pilot, sheet, gate, name, room)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:834: in long_name_row
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN': top border '                                                                        ', painted corner None (load 0.85 1.09 1.41)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]
+1 failed in 9.96s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]  04:50:04  load average: 0.85, 1.09, 1.41
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54] _
+tests/test_b103_inc9b_w.py:857: in test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits
+    row = run(tmp_path, defc_dir, body, size=size, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:853: in body
+    return await long_name_row(app, pilot, sheet, gate, name, room)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:834: in long_name_row
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.88 1.09 1.40)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]
+1 failed in 10.04s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]  04:50:16  load average: 0.88, 1.09, 1.40
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60] _
+tests/test_b103_inc9b_w.py:857: in test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits
+    row = run(tmp_path, defc_dir, body, size=size, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:853: in body
+    return await long_name_row(app, pilot, sheet, gate, name, room)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:834: in long_name_row
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN': top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮', painted corner #91abec (load 0.81 1.07 1.39)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]
+1 failed in 9.61s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_4_a_one_character_name_is_not_cut  04:50:27  load average: 0.81, 1.07, 1.39
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_pe_bench_105_4_a_one_character_name_is_not_cut _____________
+tests/test_b103_inc9b_w.py:878: in test_r_pe_bench_105_4_a_one_character_name_is_not_cut
+    row = run(tmp_path, defc_dir, body, size=MIN_SIZE, a2l=a2l, image=s19)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:874: in body
+    return await long_name_row(app, pilot, sheet, gate, "N", 66)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:834: in long_name_row
+    return await held_cue_of(app, pilot, sheet, gate, name, "OTHER")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9b_w.py:730: in held_cue_of
+    assert busy_now(app), (
+E   AssertionError: no busy cue for the row 'N': top border '                                                                        ', painted corner None (load 0.85 1.06 1.38)
+E   assert False
+E    +  where False = busy_now(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_105_4_a_one_character_name_is_not_cut
+1 failed in 10.01s
+--- rc=1
+ALLDONE

@@ -1,0 +1,78 @@
+$ python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-8/01-requirements.md --tests tests --ids "R-PE-DEF.*" "R-TUI-063.*" "R-PE-04*" "R-PE-03*" "R-PICKER-CORRECT.011" "R-PICKER-CORRECT.020"   (E1: no test exists yet; every TEST gap is expected until E4)
+TEST   R-PE-034 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-035 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-041 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.1 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.10 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.11 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.12 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.13 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.14 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.15 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.16 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.17 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.18 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.19 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.2 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.20 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.21 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.22 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.23 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.24 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.25 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.26 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.27 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.28 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.3 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.30 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.31 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.32 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.33 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.34 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.35 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.36 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.37 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.38 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.39 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.4 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.40 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.41 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.42 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.45 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.46 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.47 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.48 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.49 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.5 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.50 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.51 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.52 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.53 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.54 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.55 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.56 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.57 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.58 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.59 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.6 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.60 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.61 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.62 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.63 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.64 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.7 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.70 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.71 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.72 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-PE-DEF.73 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-063.1 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-063.3 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-063.4 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-063.6 is named by no file under tests, and neither is a TC/AT id it lists
+trace_check: 72 active requirements match --ids, checks run: CASE, TEST, 70 gap(s)
+exit=1
+
+$ python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-8/01-requirements.md --tests tests --base 91d5ae56 --src s19_app
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-8/01-requirements.md
+trace_check: 2 US, 72 active requirements (2 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 71 gap(s)
+exit=1 (its TEST lines are the 70 above)

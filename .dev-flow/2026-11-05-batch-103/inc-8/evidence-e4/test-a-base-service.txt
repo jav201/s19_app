@@ -1,0 +1,32 @@
+$ [base tree d5d48685 + group A tests] pytest tests/test_b103_inc8_a1_service.py   (new functions: AttributeError expected, no RED claimed; the control passes)
+~/work/zq-e4-8-test-a/tree/s19_app/__init__.py
+    def stage(service, defc, name, text, image=None):
+>       return service.stage_definition(defc["defs"][name], defc["a2l"], text, defc["image"] if image is None else image)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'ChangeService' object has no attribute 'stage_definition'
+
+tests/test_b103_inc8_a1_service.py:48: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_50_1_display_25_5_stages_one_bytes_entry
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_50_3_masked_field_255_stages_1f_f7
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_50_2_enum_run_stages_02
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_51_1_field_then_bit_decode_as_typed
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_51_2_bit_then_field_decode_as_typed
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_50_4_v171_ascii_abc_stages_42_bytes
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_51_3_apply_remove_then_bit_over_the_source_view
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_1_second_stage_of_one_span_replaces_the_entry
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_53_1_no_intersect_appends_with_the_row_name_as_symbol
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_2_two_masked_fields_make_one_entry
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_54_1_replace_keeps_the_old_symbol
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_52_3_string_entry_replaced_by_bytes_entry_round_trips
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_55_1_entry_inside_the_span_refuses
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_55_2_entry_straddling_the_start_refuses
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_56_1_abc_leaves_the_document_unchanged
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_56_2_250_leaves_the_document_unchanged
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_56_3_walk_leaves_the_document_unchanged
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_58_1_message_of_a_display_stage
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_58_2_message_of_an_enum_stage
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_58_3_shown_text_of_300_chars_is_clipped_to_256_and_an_ellipsis
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_61_1_stage_adds_one_undo_step_and_undo_restores
+FAILED tests/test_b103_inc8_a1_service.py::test_r_pe_def_59_1_notice_is_in_notices_not_in_issues
+22 failed, 1 passed in 1.53s

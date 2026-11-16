@@ -1,7 +1,7 @@
 """s19_app.tui.screens_directionb.patch_editor.panel - the thin PatchEditorPanel (class-level statements and lifecycle methods moved verbatim from patch_editor.py at 2dbd7d5a)."""
 from __future__ import annotations
 
-from typing import List, Mapping, Optional, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple, Union
 from textual import events
 from textual.containers import Container, ScrollableContainer
 from textual.message import Message
@@ -11,7 +11,8 @@ from ...insight_style import DGRAY, GREEN, RED, YELLOW, label_value
 from ...os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS
 from ....utils import safe_text
 from ..shared import CheckLayout
-from .shared import PatchLayout
+from .shared import PatchLayout, _Unset, _UNSET
+from .bench_sheet import ArrayBenchSheet
 from .layout import LayoutMixin
 from .a2l_picker import A2lPickerMixin
 from .document import DocumentMixin
@@ -104,14 +105,15 @@ class PatchEditorPanel(
     #: The Checks tab's state line before any run (LLR-148.9).
     CHECKS_NO_RUN_TEXT = "No check run yet: press Run checks."
 
-    #: The inspector's four tabs: (chip id, label, pane id, border title).
-    #: The A2L tab (batch-102 Inc 5, US-102-05) embeds the shared parameter
-    #: picker in pick mode beside the Check Editor's pick-mode one.
+    #: The landing pane's four tabs: (chip id, label, pane id, border title).
+    #: batch-103 Inc 8 (R-TUI-063.3, .6): Patch script (the ledger) first;
+    #: every title is ``LANDS IN``. The A2L tab left: the shared picker rides
+    #: the filter row and ``Use parameter`` the Inspector tab (D-1 A).
     _TABS = (
-        ("patch_tab_inspector", "Inspector", "patch_pane_inspector", "INSPECTOR"),
-        ("patch_tab_json", "JSON", "patch_win_json", "JSON"),
-        ("patch_tab_checks", "Checks", "patch_win_checks", "CHECKS"),
-        ("patch_tab_a2l", "A2L", "patch_win_a2l", "A2L"),
+        ("patch_tab_script", "Patch script", "patch_win_script", "LANDS IN"),
+        ("patch_tab_inspector", "Inspector", "patch_pane_inspector", "LANDS IN"),
+        ("patch_tab_json", "JSON", "patch_win_json", "LANDS IN"),
+        ("patch_tab_checks", "Checks", "patch_win_checks", "LANDS IN"),
     )
 
 
@@ -483,6 +485,9 @@ class PatchEditorPanel(
             show_bulk_button=True,
             layout_provider=self._a2l_widths,
         )
+        #: batch-103 Inc 8 (R-TUI-063.1): the staging sheet, composed in
+        #: ``#patch_sheet_win``; its rows follow the picker's shown page.
+        self._sheet = ArrayBenchSheet(id="patch_sheet")
         #: The last derived A2L-tab widths; ``None`` until the tab is measured.
         self._a2l_layout: Optional[CheckLayout] = None
         #: The last ``Use parameter`` outcome line painted on
@@ -505,10 +510,11 @@ class PatchEditorPanel(
         #: (LLR-174.1c), by three readers: the app's load guard,
         #: ``_handle_save_dialog`` and the change-file dropdown guard
         #: (LLR-174.2t).
-        #: Writer census (C-15.1, five sites): w1 ``request_action`` (entry
+        #: Writer census (C-15.1, six sites): w1 ``request_action`` (entry
         #: edit) · w2 ``on_text_area_changed`` (paste typing) · w3
         #: ``mark_saved`` · w4 ``mark_loaded`` · w5 ``mark_pasted`` (Parse
-        #: pasted, batch-97 Inc-4).
+        #: pasted, batch-97 Inc-4) · w6 ``note_staged`` (a stage, batch-103
+        #: Inc 8, R-PE-034).
         self._dirty: bool = False
         #: The loaded image's sparse memory map, RETAINED from
         #: ``refresh_entries``' parameter for the before/after strip
@@ -621,14 +627,18 @@ class PatchEditorPanel(
         self._refresh_inspector_subtitle()
 
     def _refresh_inspector_subtitle(self) -> None:
-        """The inspector's border subtitle follows the tab (LLR-075.1): the
-        JSON tab shows the schema token, the Checks tab its run state."""
+        """The landing pane's border subtitle follows the tab (LLR-075.1,
+        R-PE-041): Patch script and Inspector show the ledger subtitle
+        (``N entries``, `` ●`` while dirty), the JSON tab the schema token,
+        the Checks tab its run state."""
         switchers = self.query("#patch_tab_switcher")
         if not switchers:
             return
         current = switchers.first(ContentSwitcher).current
         subtitle = ""
-        if current == "patch_win_json":
+        if current in ("patch_win_script", "patch_pane_inspector"):
+            subtitle = self.query_one("#patch_win_script", Container).border_subtitle or ""
+        elif current == "patch_win_json":
             subtitle = self._JSON_SCHEMA_SUBTITLE
         elif current == "patch_win_checks":
             subtitle = self.query_one("#patch_win_checks", Container).border_subtitle or ""
@@ -677,8 +687,60 @@ class PatchEditorPanel(
         a later ``Use parameter`` seeds Bytes from no map and paints the
         ``image bytes unavailable`` line instead of the unloaded image's
         stale bytes. Tolerates a not-yet-mounted tree (headless unit path).
+        batch-103 Inc 8 (R-PE-DEF.18, .62): the staging sheet rebuilds its
+        rows over the new map and the current entries.
         """
         self._mem_map = mem_map
+        self._sheet.set_document(self._sheet_entries(self._entry_rows), mem_map)
+
+    def refresh_entries(
+        self,
+        rows: Sequence[object],
+        mem_map: Union[Mapping[int, int], None, _Unset] = _UNSET,
+        document: object = _UNSET,
+        *,
+        sheet: bool = True,
+    ) -> None:
+        """The ledger refresh (:meth:`EntriesMixin.refresh_entries`), then the
+        staging sheet's staged state over the new document (R-PE-DEF.62).
+
+        Every document change reaches this override (the six refresh sites),
+        so the sheet never tracks staged rows of its own. ``sheet=False``
+        skips the sheet's half (R-PE-BENCH.98): the stepped record-stage
+        refresh runs it later as :meth:`refresh_sheet_document`.
+        """
+        super().refresh_entries(rows, mem_map, document)
+        if sheet:
+            self._sheet.set_document(self._sheet_entries(rows), self._mem_map)
+
+    def refresh_sheet_document(self) -> None:
+        """The sheet's half of :meth:`refresh_entries`, over the rows and map
+        the last refresh kept (R-PE-BENCH.98, .106)."""
+        self._sheet.set_document(self._sheet_entries(self._entry_rows), self._mem_map)
+
+    @staticmethod
+    def _sheet_entries(rows: Sequence[object]) -> List[Tuple[int, Tuple[int, ...]]]:
+        """The document's ``(address, bytes)`` pairs, in document order."""
+        return [(row.address, tuple(row.encoded_bytes)) for row in rows]
+
+    def note_staged(self, name: str, advance: bool = True) -> None:
+        """A stage wrote the document (R-PE-034, R-PE-DEF.60; I-8.4).
+
+        Dirty writer w6: sets the flag and repaints its indicator. With
+        ``advance`` the sheet selects the row after ``name`` (a formula-bar
+        stage); without it (Inc 9's record stage) the selection and the
+        pending text stay.
+        """
+        self._dirty = True
+        self._refresh_dirty_indicator()
+        if advance:
+            self._sheet.select_after(name)
+
+    def _refresh_dirty_indicator(self) -> None:
+        """The ledger's dirty marker (:meth:`ActionsMixin._refresh_dirty_indicator`),
+        then the landing pane's copy of the ledger subtitle (R-PE-041)."""
+        super()._refresh_dirty_indicator()
+        self._refresh_inspector_subtitle()
 
     def on_resize(self, event: events.Resize) -> None:
         self.call_after_refresh(self._apply_layout)
@@ -709,17 +771,13 @@ class PatchEditorPanel(
     # ------------------------------------------------------------------
 
     def _show_tab(self, chip_id: str) -> None:
-        """Switch the inspector to ``chip_id``'s pane; its title follows the tab."""
+        """Switch the landing pane to ``chip_id``'s pane (title ``LANDS IN``)."""
         for tab_id, _label, pane, title in self._TABS:
             selected = tab_id == chip_id
             self.query_one(f"#{tab_id}").set_class(selected, "chip-selected")
             if selected:
                 self.query_one("#patch_tab_switcher", ContentSwitcher).current = pane
                 self.query_one("#patch_inspector").border_title = title
-                if pane == "patch_win_a2l":
-                    # The A2L ledger measures only while its tab is shown
-                    # (batch-102 Inc 5, E3 ruling 1).
-                    self.call_after_refresh(self._apply_a2l_layout)
         self._refresh_inspector_subtitle()
 
     class DirtyLoadRequested(Message):

@@ -1,0 +1,336 @@
+# mutant N-81b  rows: R-PE-DEF.81
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:348
+# -k: r_pe_def_81_
+# uptime: 01:57:55 up 2 days, 10:46,  3 users,  load average: 0.92, 0.74, 1.21
+s19_app.__file__ = ~/work/zq-m8b/m/N-81b/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+.........F...FF.                                                         [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+            sheet.show_page(names, defs, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(len(names) - 1):
+                await pilot.press("down")
+            assert sheet.selected_name == "ENUM_0001"
+            lines, height = _inside(sheet)
+            assert len(lines) <= height, (len(lines), height)
+>           at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           StopIteration
+
+tests/test_b103_inc8_s2_sheet_keys.py:360: StopIteration
+
+The above exception was the direct cause of the following exception:
+
+defc = Case(a2l={'path': '~/work/zq-m8b/tmp/pytest-of-<user>/pytest-21/popen-gw0/s2_defc0/definitions.a2l', 's...())}, path=PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-21/popen-gw0/s2_defc0/definitions.a2l'))
+
+    def test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines(defc):
+        """R-PE-DEF.81/3 (changed at Inc 8b E1) - an enum row on the window's last line: its definition line and its 4-line card fit the grid body (8)."""
+        clones = {f"DISP_{i:02d}": dataclasses.replace(defc.defs["DISPLAY_0001"], name=f"DISP_{i:02d}") for i in range(8)}
+        defs = {**clones, "ENUM_0001": defc.defs["ENUM_0001"]}
+        names = list(defs)
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+                sheet.show_page(names, defs, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(len(names) - 1):
+                    await pilot.press("down")
+                assert sheet.selected_name == "ENUM_0001"
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert len(lines) - at - 1 == 5, lines  # the definition line and the four card lines, none cut
+                assert "choose" in lines[-2] and lines[-1].lstrip().startswith("┊ ╰")
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-1' coro=<test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines.<lo...ork/zq-m8b/m/N-81b/tests/test_b103_inc8_s2_sheet_keys.py:348> exception=RuntimeError('coroutine raised StopIteration')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+E       RuntimeError: coroutine raised StopIteration
+
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: RuntimeError
+_ test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            assert sheet.selected_name == names[40]
+            lines, height = _inside(sheet)
+            assert len(lines) <= height, (len(lines), height)
+>           at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           StopIteration
+
+tests/test_b103_inc8_s2_sheet_keys.py:306: StopIteration
+
+The above exception was the direct cause of the following exception:
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body(softa_page):
+        """R-PE-DEF.81/1 (changed at Inc 8b E1: visible = body - 2, the header rule takes a line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                assert sheet.selected_name == names[40]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert lines[at][lines[0].index("Parameter"):].startswith(names[40][:12])
+                assert at >= 2, "the header line and the rule come first"
+                assert lines[1].startswith("━"), "the header rule is the body's second line (R-PE-DEF.91)"
+                first_painted = 40 - (at - 2)
+                assert first_painted > 0  # the window scrolled: row 0 is no longer painted
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-1' coro=<test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_bo...ork/zq-m8b/m/N-81b/tests/test_b103_inc8_s2_sheet_keys.py:294> exception=RuntimeError('coroutine raised StopIteration')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+E       RuntimeError: coroutine raised StopIteration
+
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: RuntimeError
+_ test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            lines, _height = _inside(sheet)
+>           at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           StopIteration
+
+tests/test_b103_inc8_s2_sheet_keys.py:330: StopIteration
+
+The above exception was the direct cause of the following exception:
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row(softa_page):
+        """R-PE-DEF.81/2 (changed at Inc 8b E1: the first painted row is the third body line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                lines, _height = _inside(sheet)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                first_painted = 40 - (at - 2)
+                for _ in range(40 - first_painted + 1):
+                    await pilot.press("up")
+                assert sheet.selected_name == names[first_painted - 1]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height
+                assert lines[2].startswith("▶")  # the selected row is the first painted row (after the header and its rule)
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-165' coro=<test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row.<...ork/zq-m8b/m/N-81b/tests/test_b103_inc8_s2_sheet_keys.py:320> exception=RuntimeError('coroutine raised StopIteration')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+E       RuntimeError: coroutine raised StopIteration
+
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row
+3 failed, 13 passed in 14.41s
+
+# exit=1

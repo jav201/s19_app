@@ -45,7 +45,9 @@ from tests.b97_probes import chip_style, is_displayed, painted_rows, painted_sty
 from tests.test_b97_check_editor import need
 
 SIZES = ((118, 54), (220, 60))
+# Inc 8 R-TUI-063.3: three chips -> four, Patch script first (the ledger's tab; A2L is gone).
 TABS = (
+    ("patch_tab_script", "patch_win_script"),
     ("patch_tab_inspector", "patch_pane_inspector"),
     ("patch_tab_json", "patch_win_json"),
     ("patch_tab_checks", "patch_win_checks"),
@@ -148,12 +150,69 @@ def ledger_lines(app, panel) -> list:
     return [row for row in painted_rows(app, table)[1:] if row.strip()]
 
 
-def strip_reading(app, panel) -> list:
-    """The strip as painted: one dict per byte row (address, offsets, was, now
-    tokens and the ``now`` / ``was`` cells' bold flags)."""
+async def strip_on_inspector(app, pilot, panel) -> list:
+    """The strip as painted with the Inspector tab shown, then back to the ledger's tab.
+
+    Inc 8 R-TUI-063.3 / R-TUI-063.4: the card lives in the Inspector tab and the ledger in the
+    Patch script tab (was: both shown at once), so a test that moves the ledger highlight and
+    reads the strip reads the strip with its own tab open and returns to the ledger.
+    """
+    await show_tab(panel, pilot, "patch_tab_inspector")
+    reading = strip_reading(app, panel)
+    await show_tab(panel, pilot, "patch_tab_script")
+    return reading
+
+
+async def scroll_into_view(pilot, widget) -> None:
+    """Inc 8 R-PE-DEF.1.1: the landing pane is 9 rows, so a tab's content scrolls inside it; the
+    operator scrolls a control into view before using or reading it (E4 integration, test side)."""
+    widget.scroll_visible(animate=False)
+    await settle(pilot, 2)
+
+
+async def click_visible(pilot, panel, selector: str) -> bool:
+    await scroll_into_view(pilot, panel.query_one(selector))
+    return await pilot.click(selector)
+
+
+def strip_row_bytes(panel) -> int:
+    """The strip's bytes per row, derived here by the D5 (f) rule (the largest of
+    ``STRIP_ROW_BYTES`` whose ``3·k + 8`` line fits ``#patch_inspector``'s content width − 3) from
+    the measured width. Inc 8 R-PE-DEF.1.1: the Inspector pane is the landing pane's full width
+    (was: a column beside the ledger, 8 bytes at 118 columns), ruling RR-2."""
+    width = panel.query_one("#patch_inspector").content_region.width
+    return max(k for k in sdb.STRIP_ROW_BYTES if 3 * k + 8 <= width - 3)
+
+
+def strip_rows_for(address: int, count: int, per_row: int) -> list:
+    """The aligned ``(row address, per_row)`` byte rows a ``count``-byte entry at ``address`` spans."""
+    return [(a, per_row) for a in range(address - address % per_row, address + count, per_row)]
+
+
+async def strip_reading_scrolled(app, pilot, panel, pane) -> list:
+    """The strip read at every scroll offset of ``pane``, each byte row kept from the first offset
+    that paints it whole. Inc 8 R-PE-DEF.1.1: the capped strip is taller than the 9-row landing pane."""
     card = panel.query_one("#patch_before_after_card")
-    rows = painted_rows(app, card)
-    region = card.region
+    await scroll_into_view(pilot, pane)  # at 80x24 the panel itself scrolls (R-TUI-064.3)
+    seen = {}
+    for y in range(pane.max_scroll_y + 1):
+        pane.scroll_to(y=y, animate=False)
+        await settle(pilot, 2)
+        clip = card.region.intersection(pane.content_region)
+        for reading in strip_reading(app, panel, clip):
+            seen.setdefault(reading["address"], reading)
+    pane.scroll_home(animate=False)
+    await settle(pilot, 2)
+    return [seen[a] for a in sorted(seen)]
+
+
+def strip_reading(app, panel, region=None) -> list:
+    """The strip as painted: one dict per byte row (address, offsets, was, now
+    tokens and the ``now`` / ``was`` cells' bold flags). ``region`` (default: the card's)
+    limits the reading to the rows on screen."""
+    card = panel.query_one("#patch_before_after_card")
+    region = card.region if region is None else region
+    rows = painted_rows(app, card, region)
     out = []
     for index, line in enumerate(rows):
         text = line[1:].rstrip()  # the card's 1-cell left padding
@@ -217,9 +276,10 @@ def test_tc_b97_01_shipped_ids_and_container_types(tmp_path: Path, size) -> None
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
 def test_tc_b97_02_ledger_grows_with_the_panel(tmp_path: Path, size) -> None:
     """TC-B97-02 (LLR-144.2): with the 6-entry fixture loaded the ledger table
-    is at least ``rows + 1`` and at least 7 rows tall, and all 6 rows paint
-    without scrolling. The 118x53 arm is the body height 118x54 keeps once the
-    two-row key bar lands (PC-24).
+    fills the Patch script tab of the 9-row landing pane and paints as many rows
+    as that height leaves under its header (Inc 8 R-PE-DEF.1.1; was: at least
+    ``rows + 1`` and 7 rows tall, all 6 painted). The 118x53 arm is the body
+    height 118x54 keeps once the two-row key bar lands (PC-24).
 
     RED on main: ``table region height 3`` with 6 rows (P-8).
     """
@@ -227,18 +287,24 @@ def test_tc_b97_02_ledger_grows_with_the_panel(tmp_path: Path, size) -> None:
     async def body(app, pilot, panel):
         await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
         table = panel.query_one("#patch_doc_entries_table", DataTable)
-        return table.region.height, table.row_count, len(ledger_lines(app, panel))
+        landing = panel.query_one("#patch_inspector")
+        room = landing.content_region.height - panel.query_one("#patch_tab_script").region.height
+        return table.region.height, table.row_count, len(ledger_lines(app, panel)), landing.region.height, room
 
-    height, rows, painted = run(tmp_path, size, body)
+    height, rows, painted, landing, room = run(tmp_path, size, body)
     assert rows == 6
-    assert height >= rows + 1 and height >= 7, (height, rows)
-    assert painted == 6, painted
+    # Inc 8 R-PE-DEF.1.1 supersedes ``height >= rows + 1 and height >= 7`` and ``painted == 6``:
+    # the landing pane is 9 rows, the table takes the rows under the tab chips (ruling RR-1).
+    assert landing == 9, landing
+    assert height == room, (height, room)
+    assert painted == min(rows, height - 1), (painted, height)
 
 
 def test_tc_b97_02_tab_chips_nine_activations(tmp_path: Path) -> None:
-    """TC-B97-02 (LLR-144.2, tab arm): each of the three inspector tab chips
-    switches the one ``ContentSwitcher`` by click, ``enter`` and ``space`` —
-    9 of 9 — showing its pane and hiding the other two.
+    """TC-B97-02 (LLR-144.2, tab arm): each of the landing pane's tab chips
+    (Inc 8 R-TUI-063.3: four, was three) switches the one ``ContentSwitcher`` by
+    click, ``enter`` and ``space`` — 12 of 12, was 9 of 9 — showing its pane and
+    hiding the others.
 
     RED on main: no tab chip (P-33). Mutation: ``TabChip`` without ``space``.
     """
@@ -247,7 +313,7 @@ def test_tc_b97_02_tab_chips_nine_activations(tmp_path: Path) -> None:
         switcher = need(panel, "#patch_tab_switcher")
         results = []
         for index, (chip_id, _pane) in enumerate(TABS):
-            other = TABS[(index + 1) % 3][0]
+            other = TABS[(index + 1) % len(TABS)][0]  # Inc 8 R-TUI-063.3: % 3 -> % len(TABS)
             for how in ("click", "enter", "space"):
                 await show_tab(panel, pilot, other)
                 chip = need(panel, f"#{chip_id}")
@@ -266,7 +332,7 @@ def test_tc_b97_02_tab_chips_nine_activations(tmp_path: Path) -> None:
     for chip_id, how, current, shown in results:
         pane = dict(TABS)[chip_id]
         assert current == pane and shown == [pane], (chip_id, how, current, shown)
-    assert len(results) == 9
+    assert len(results) == 3 * len(TABS)  # Inc 8 R-TUI-063.3: 9 (3 chips) -> 12 (4 chips)
 
 
 # --------------------------------------------------------------------------- #
@@ -522,6 +588,8 @@ def test_tc_b97_05_paste_heading_names_the_example(tmp_path: Path) -> None:
         await settle(pilot, 2)
         await pilot.press("end", "z")
         await settle(pilot, 3)
+        # Inc 8 R-PE-DEF.1.1: the buffer's cursor scrolls the 9-row landing pane past the heading.
+        await scroll_into_view(pilot, head)
         return first, painted_rows(app, head)[0], panel.query_one("#patch_inspector").content_region
 
     (is_dummy, before, region), after, inspector = run(tmp_path, (118, 54), body)
@@ -841,18 +909,23 @@ def test_tc_b97_39_strip_follows_the_highlight(tmp_path: Path) -> None:
         for _ in range(3):
             await pilot.press("down")
             await settle(pilot, 3)
-            readings.append((table.cursor_row, strip_reading(app, panel)))
-        return readings, mem
+            row = table.cursor_row
+            # Inc 8 R-TUI-063.3: the strip is read on the Inspector tab, then the ledger is refocused.
+            readings.append((row, await strip_on_inspector(app, pilot, panel)))
+            table.focus()
+            await settle(pilot, 2)
+        return readings, mem, strip_row_bytes(panel)
 
-    readings, mem = run(tmp_path, (118, 54), body)
+    readings, mem, per_row = run(tmp_path, (118, 54), body)
     assert [row for row, _r in readings] == [1, 2, 3]
     for row, reading in readings:
         address, run_bytes = CALIB_ENTRIES[row]
         assert reading, f"row {row}: no strip painted"
         span = range(address, address + len(run_bytes))
         for byte_row in reading:
-            assert byte_row["address"] % 8 == 0 and len(byte_row["offsets"]) == 8, byte_row
-            for col in range(8):
+            # Inc 8 R-PE-DEF.1.1 supersedes ``8`` bytes per row: derived from the measured width (RR-2).
+            assert byte_row["address"] % per_row == 0 and len(byte_row["offsets"]) == per_row, byte_row
+            for col in range(per_row):
                 at = byte_row["address"] + col
                 image = mem.get(at)
                 was_token = "--" if image is None else f"{image:02X}"
@@ -876,29 +949,36 @@ def test_tc_b97_39_strip_follows_the_highlight(tmp_path: Path) -> None:
 
 def test_tc_b97_39_long_entry_stacks_rows_and_follows_a_resize(tmp_path: Path) -> None:
     """TC-B97-39 (D5 (b)(c)(f), PC-19): a 20-byte entry at ``0xEB14`` paints
-    3 stacked byte rows at 118 columns and 2 at 220 (16 bytes per row), re-read
-    after each resize, never elided to its first bytes.
+    its stacked byte rows at the bytes per row the measured width gives, re-read
+    after each resize, never elided to its first bytes. Inc 8 R-PE-DEF.1.1: the
+    Inspector pane is the landing pane's full width, so 118 and 220 columns both
+    give 32 bytes per row (was 8 and 16); the 80-column arm (16 per row) keeps a
+    resize that changes the rows (ruling RR-2: derived numbers, computed here).
 
     RED: rows elided to the first 8 bytes (the shipped ``max_bytes`` path,
     M14); the strip not re-rendered on resize (M15).
     """
 
     async def body(app, pilot, panel):
+        await show_tab(panel, pilot, "patch_tab_inspector")  # Inc 8 R-TUI-063.4: the strip is in this tab
         panel.query_one("#patch_entry_address_input", Input).value = "0xEB14"
         panel.query_one("#patch_entry_bytes_input", Input).value = " ".join(f"{i:02X}" for i in range(20))
         panel.query_one("#patch_entry_add_button", Button).press()
         await settle(pilot, 4)
         out = []
-        for size in ((118, 54), (220, 60), (118, 54)):
+        for size in ((118, 54), (220, 60), (118, 54), (80, 24)):
             await pilot.resize_terminal(*size)
             await settle(pilot, 6)
-            out.append([(r["address"], len(r["offsets"])) for r in strip_reading(app, panel)])
+            pane = panel.query_one("#patch_pane_inspector")
+            read = [(r["address"], len(r["offsets"])) for r in await strip_reading_scrolled(app, pilot, panel, pane)]
+            out.append((read, strip_rows_for(0xEB14, 20, strip_row_bytes(panel))))
         return out
 
-    small, large, back = run(tmp_path, (118, 54), body)
-    assert small == [(0xEB10, 8), (0xEB18, 8), (0xEB20, 8)], small
-    assert large == [(0xEB10, 16), (0xEB20, 16)], large
+    (small, small_x), (large, large_x), (back, _b), (narrow, narrow_x) = run(tmp_path, (118, 54), body)
+    assert small == small_x and len(small) >= 1, (small, small_x)
+    assert large == large_x, (large, large_x)
     assert back == small
+    assert narrow == narrow_x and narrow != small, (narrow, narrow_x, small)
 
 
 def test_tc_b97_39_strip_builder_states_and_cap() -> None:
@@ -1022,6 +1102,7 @@ def test_tc_b97_40_labelled_form_and_chips_in_the_inspector(tmp_path: Path, size
     from textual.widgets import Label
 
     async def body(app, pilot, panel):
+        await show_tab(panel, pilot, "patch_tab_inspector")  # Inc 8 R-TUI-063.4: opens on Patch script
         ancestors = {
             wid: [a.id for a in panel.query_one(f"#{wid}").ancestors if getattr(a, "id", None)]
             for wid, _l in FORM
@@ -1031,36 +1112,44 @@ def test_tc_b97_40_labelled_form_and_chips_in_the_inspector(tmp_path: Path, size
         if not all("patch_pane_inspector" in a for a in ancestors.values()):
             return ancestors, None, {}, {}
         pane = need(panel, "#patch_pane_inspector")
-        regions = {wid: panel.query_one(f"#{wid}").region for wid in [w for w, _ in FORM] + list(CHIPS)}
-        labels = {}
-        for wid, _name in FORM:
-            region = regions[wid]
-            labels[wid] = [
-                str(lab.render()).strip()
-                for lab in panel.query(Label)
-                if is_displayed(lab) and lab.region.y == region.y and lab.region.right <= region.x
-            ]
-        address = regions["patch_entry_address_input"]
-        backgrounds = (
-            painted_style(app, address.x + address.width - 2, address.y).bgcolor.triplet.hex,
-            painted_style(app, pane.region.right - 2, pane.region.y).bgcolor.triplet.hex,
-        )
-        return ancestors, pane.region, regions, labels, backgrounds
+        # Inc 8 R-PE-DEF.1.1: the form scrolls inside the 9-row landing pane, so each widget is
+        # scrolled into view before its containment, label and colour are read; its row is read
+        # in the pane's scrolled content (screen y + scroll offset) so the spacing stays comparable.
+        regions, rows, contained, labels = {}, {}, {}, {}
+        backgrounds = None
+        for wid in [w for w, _ in FORM] + list(CHIPS):
+            await scroll_into_view(pilot, panel.query_one(f"#{wid}"))
+            region = panel.query_one(f"#{wid}").region
+            regions[wid] = region
+            rows[wid] = region.y - pane.content_region.y + pane.scroll_offset.y
+            contained[wid] = (pane.region.contains_region(region), region, pane.region)
+            if wid in dict(FORM):
+                labels[wid] = [
+                    str(lab.render()).strip()
+                    for lab in panel.query(Label)
+                    if is_displayed(lab) and lab.region.y == region.y and lab.region.right <= region.x
+                ]
+            if wid == "patch_entry_address_input":
+                backgrounds = (
+                    painted_style(app, region.x + region.width - 2, region.y).bgcolor.triplet.hex,
+                    painted_style(app, pane.region.right - 2, pane.region.y).bgcolor.triplet.hex,
+                )
+        return ancestors, contained, rows, labels, backgrounds
 
-    ancestors, pane, regions, labels, backgrounds = run(tmp_path, size, body)
+    ancestors, contained, rows, labels, backgrounds = run(tmp_path, size, body)
     for wid, _name in FORM:
         assert "patch_pane_inspector" in ancestors[wid], (wid, ancestors[wid])
-    for wid, region in regions.items():
-        assert pane.contains_region(region), (wid, region, pane)
+    for wid, (inside, region, pane) in contained.items():
+        assert inside, (wid, region, pane)
     for wid, name in FORM:
         assert labels[wid] and labels[wid][-1] == name, (wid, labels[wid])
-    assert len({regions[c].y for c in CHIPS}) == 1
-    assert len({regions[w].y for w, _ in FORM}) == 3
+    assert len({rows[c] for c in CHIPS}) == 1
+    assert len({rows[w] for w, _ in FORM}) == 3
     # Inc-4 gate, operator decision 2: one spacer row between the three
     # input rows, and the inputs on a background lighter than the pane's,
     # the stylesheet's ``$rule`` token (RED pre-fold: consecutive rows, the
     # theme's #1e1e1e — M45, M46).
-    ys = [regions[w].y for w, _ in FORM]
+    ys = [rows[w] for w, _ in FORM]
     assert [b - a for a, b in zip(ys, ys[1:])] == [2, 2], ys
     field_bg, pane_bg = backgrounds
     assert _luminance(field_bg) > _luminance(pane_bg), backgrounds
@@ -1084,32 +1173,42 @@ def _css_token(name: str) -> str:
 #: batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row: 118x54 now has the
 #: body height 118x53 had (PC-24), and reads the operator-accepted 2 rows; the
 #: 118x53 arm reads one more (3), measured at Inc-8, flagged in its packet.
-_CHIPS_BELOW_FOLD = {(118, 53): 3, (118, 54): 2}
+_CHIPS_BELOW_FOLD = {(118, 53): 3, (118, 54): 2}  # the base layout's numbers; Inc 8 derives them (RR-2)
 
 
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
 def test_tc_b97_40_capped_strip_chips_reachable(tmp_path: Path, size) -> None:
-    """TC-B97-40 (LLR-144.9; Inc-4 gate, operator decision 2): with a 64-byte
-    entry selected the strip paints its 8 capped rows and its note; the entry chips then sit
-    exactly the accepted rows below the pane's fold at scroll 0 (2 at 118x53,
-    1 at 118x54) and come inside by ``tab`` focus and by scrolling the pane.
+    """TC-B97-40 (LLR-144.9; Inc-4 gate, operator decision 2): with an entry of
+    8 rows' bytes selected the strip paints its 8 capped rows and its note; the entry chips then sit
+    exactly the rows below the pane's fold at scroll 0 that the pane's own content stack gives
+    (Inc 8 R-PE-DEF.1.1, ruling RR-2: was the measured 2 at 118x54 and 3 at 118x53 beside the ledger)
+    and come inside by ``tab`` focus and by scrolling the pane.
 
     RED on the pre-fold tree: -1 / 0 rows (no spacer rows; the chips inside).
     """
 
     async def body(app, pilot, panel):
-        # 64 bytes from 0xEB14 span 9 aligned rows: the strip paints its cap
-        # of 8 and the note line — its tallest form.
+        await show_tab(panel, pilot, "patch_tab_inspector")  # Inc 8 R-TUI-063.4: the pane under test
+        # 8 rows' bytes from 0xEB14 span 9 aligned rows: the strip paints its cap
+        # of 8 and the note line — its tallest form (64 bytes at the base's 8 per row).
+        per_row = strip_row_bytes(panel)
         panel.query_one("#patch_entry_address_input", Input).value = "0xEB14"
-        panel.query_one("#patch_entry_bytes_input", Input).value = " ".join(["5A"] * 64)
+        panel.query_one("#patch_entry_bytes_input", Input).value = " ".join(["5A"] * (8 * per_row))
         panel.query_one("#patch_entry_add_button", Button).press()
         await settle(pilot, 4)
         pane = need(panel, "#patch_pane_inspector")
+        rows = len(await strip_reading_scrolled(app, pilot, panel, pane))
         pane.scroll_home(animate=False)
         await settle(pilot, 3)
-        rows = len(strip_reading(app, panel))
         bottom = pane.content_region.bottom
         below = max(panel.query_one(f"#{c}").region.bottom for c in CHIPS[:3]) - bottom
+        # The chips' row in the pane's scrolled content, read at another scroll offset.
+        await scroll_into_view(pilot, panel.query_one(f"#{CHIPS[0]}"))
+        offset = pane.scroll_offset.y
+        chips_bottom = max(panel.query_one(f"#{c}").region.bottom for c in CHIPS[:3])
+        stacked = chips_bottom - pane.content_region.y + offset - pane.content_region.height
+        pane.scroll_home(animate=False)
+        await settle(pilot, 2)
         panel.query_one("#patch_entry_bytes_input", Input).focus()
         await settle(pilot, 2)
         reached = []
@@ -1122,16 +1221,19 @@ def test_tc_b97_40_capped_strip_chips_reachable(tmp_path: Path, size) -> None:
             )
         pane.scroll_home(animate=False)
         await settle(pilot, 2)
-        pane.scroll_end(animate=False)
-        await settle(pilot, 3)
-        scrolled = all(
+        # Inc 8 R-PE-DEF.1.1: the Use parameter row and the tally follow the chips (R-PE-DEF.3), so the
+        # pane's end no longer shows them; the pane is scrolled to the chips' row instead.
+        await scroll_into_view(pilot, panel.query_one(f"#{CHIPS[0]}"))
+        scrolled = pane.scroll_offset.y > 0 and all(
             pane.content_region.contains_region(panel.query_one(f"#{c}").region) for c in CHIPS[:3]
         )
-        return rows, below, reached, scrolled
+        return rows, below, stacked, offset, reached, scrolled
 
-    rows, below, reached, scrolled = run(tmp_path, size, body)
+    rows, below, stacked, offset, reached, scrolled = run(tmp_path, size, body)
     assert rows == 8, rows
-    assert below == _CHIPS_BELOW_FOLD[size], (size, below)
+    # Inc 8 R-PE-DEF.1.1 supersedes ``_CHIPS_BELOW_FOLD[size]``: the rows under the fold are derived
+    # from the content stack read at another scroll offset (RR-2), and stay a cost (> 0).
+    assert offset > 0 and below == stacked and below > 0, (size, below, stacked, offset)
     assert reached == [(c, True) for c in CHIPS[:3]], reached
     assert scrolled
 
@@ -1146,8 +1248,14 @@ DOC_CONTROLS = ("patch_doc_validate_button", "patch_doc_apply_button", "patch_do
 TAB_CHIPS = tuple(c for c, _p in TABS)
 
 
+# Inc 8 R-TUI-063.1 / R-PE-DEF.2: the picker's filter row now sits above the sheet and the
+# tab chips; the ledger moved into the Patch script tab (was: a group before the chips).
+FILTER_ROW = ("patch_param_filter",)
+
+
 def _groups(tab: str) -> list:
     middle = {
+        "patch_tab_script": [("patch_doc_entries_table",)],
         "patch_tab_inspector": [
             ("patch_entry_address_input", "patch_entry_value_input", "patch_entry_bytes_input"),
             CHIPS,
@@ -1161,7 +1269,7 @@ def _groups(tab: str) -> list:
         ],
         "patch_tab_checks": [("patch_win_checks_body", "patch_checks_run_button")],
     }[tab]
-    return [HEADER, ("patch_doc_entries_table",), TAB_CHIPS] + middle + [FILE_ROW, DOC_CONTROLS]
+    return [HEADER, FILTER_ROW, TAB_CHIPS] + middle + [FILE_ROW, DOC_CONTROLS]
 
 
 def _reference_set(app, panel) -> set:
@@ -1331,7 +1439,8 @@ def test_tc_b97_42_save_is_the_one_filled_element(tmp_path: Path) -> None:
 # --------------------------------------------------------------------------- #
 
 HOMES = {
-    "patch_win_script": (("patch_doc_entries_table",), (), None),
+    # Inc 8 R-TUI-063.3: the ledger shows only on its own tab (was: beside the inspector at all times).
+    "patch_win_script": (("patch_doc_entries_table",), (), "patch_tab_script"),
     "patch_pane_inspector": (
         ("patch_entry_address_input", "patch_entry_value_input", "patch_entry_bytes_input") + CHIPS,
         ("patch_before_after_card",),
@@ -1355,7 +1464,7 @@ SAVEBACK = ("patch_saveback_name_input", "patch_saveback_width_button",
             "patch_saveback_confirm_button", "patch_saveback_decline_button")
 
 
-def _check_homes(app, panel, tab, homes, problems, seen_c, seen_r) -> None:
+async def _check_homes(app, pilot, panel, tab, homes, problems, seen_c, seen_r) -> None:
     chain = {w.id for w in app.screen.focus_chain}
     for home_id, (controls, readouts, when) in homes.items():
         if when is not None and when != tab:
@@ -1363,8 +1472,20 @@ def _check_homes(app, panel, tab, homes, problems, seen_c, seen_r) -> None:
         home = panel.query_one(f"#{home_id}")
         for wid in controls + readouts:
             w = panel.query_one(f"#{wid}")
+            if is_displayed(w):
+                await scroll_into_view(pilot, w)  # Inc 8 R-PE-DEF.1.1: tab content scrolls in the 9-row pane
             region = w.region
-            if not (is_displayed(w) and region.width and home.region.contains_region(region)):
+            inside = home.region.contains_region(region)
+            if region.height > home.region.height:
+                # Inc 8 R-PE-DEF.1.1: a widget taller than its home's 6 visible rows (the paste
+                # buffer) cannot be wholly inside it; it lies within the home's columns and covers
+                # every visible row of it once scrolled into view.
+                inside = (
+                    home.region.x <= region.x
+                    and region.right <= home.region.right
+                    and region.intersection(home.region).height == home.region.height
+                )
+            if not (is_displayed(w) and region.width and inside):
                 problems.append((tab, home_id, wid, region, home.region))
             if wid in controls:
                 seen_c.add(wid)
@@ -1402,7 +1523,7 @@ def test_tc_b97_60_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
             problems.append(("refused", "patch_doc_empty_state"))
         seen_r.add("patch_doc_empty_state")
         await show_tab(panel, pilot, "patch_tab_checks")
-        _check_homes(app, panel, "patch_tab_checks", {"patch_win_checks": HOMES["patch_win_checks"]}, problems, seen_c, seen_r)
+        await _check_homes(app, pilot, panel, "patch_tab_checks", {"patch_win_checks": HOMES["patch_win_checks"]}, problems, seen_c, seen_r)
         # state B: a pasted document (every control enabled), each tab
         await show_tab(panel, pilot, "patch_tab_json")
         paste = panel.query_one("#patch_paste_text", TextArea)
@@ -1415,16 +1536,16 @@ def test_tc_b97_60_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
         clean = dict(HOMES, patch_win_checks=(controls, tuple(r for r in readouts if r != "patch_doc_issues"), when))
         for chip_id, _pane in TABS:
             await show_tab(panel, pilot, chip_id)
-            _check_homes(app, panel, chip_id, clean, problems, seen_c, seen_r)
+            await _check_homes(app, pilot, panel, chip_id, clean, problems, seen_c, seen_r)
         # state C: the save-back offer (Apply on the loaded image)
         await show_tab(panel, pilot, "patch_tab_json")
         panel.query_one("#patch_doc_apply_button", Button).press()
         await settle(pilot, 6)
-        _check_homes(app, panel, "patch_tab_json", {"patch_win_json": (SAVEBACK, (), None)}, problems, seen_c, seen_r)
+        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_win_json": (SAVEBACK, (), None)}, problems, seen_c, seen_r)
         # state D: the before/after report offered (Write file)
         panel.query_one("#patch_saveback_confirm_button", Button).press()
         await settle(pilot, 8)
-        _check_homes(app, panel, "patch_tab_json", {"patch_win_json": (("patch_before_after_button",), (), None)}, problems, seen_c, seen_r)
+        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_win_json": (("patch_before_after_button",), (), None)}, problems, seen_c, seen_r)
         return typed, seen_c, seen_r, problems, read_only, parsed
 
     typed, controls, readouts, problems, read_only, parsed = run(tmp_path, size, body)
@@ -1443,8 +1564,9 @@ def test_tc_b97_60_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
 def test_at_b97_01_load_shows_every_entry_and_the_document(tmp_path: Path) -> None:
     """AT-B97-01 (HLR-144): the engineer picks ``calib_hotfix.json`` in the
     file list, and on the JSON tab reads the document: at 118x54 the ledger
-    paints all 6 rows, the read-only view parses to the file's six addresses,
-    and the stamp reads ``6 entries · HH:MM:SS · saved``.
+    paints the rows its 9-row landing pane leaves (Inc 8 R-PE-DEF.1.1; was: all
+    6) and shows the other entries by scrolling, the read-only view parses to
+    the file's six addresses, and the stamp reads ``6 entries · HH:MM:SS · saved``.
 
     RED on main: 2 of 6 rows painted, and the buffer stays the dummy template
     (P-4).
@@ -1459,13 +1581,22 @@ def test_at_b97_01_load_shows_every_entry_and_the_document(tmp_path: Path) -> No
         panel.query_one("#patch_doc_file_select", Select).value = "calib_hotfix.json"
         await settle(pilot, 6)
         rows = ledger_lines(app, panel)
+        table = panel.query_one("#patch_doc_entries_table", DataTable)
+        table.scroll_end(animate=False)
+        await settle(pilot, 2)
+        addresses = {m.group(0) for r in rows + ledger_lines(app, panel) for m in [re.search(r"0x[0-9A-F]+", r)] if m}
+        geometry = (table.region.height, panel.query_one("#patch_inspector").region.height)
         if panel.query("#patch_tab_json"):
             await pilot.click("#patch_tab_json")
             await settle(pilot, 3)
-        return rows, view_text(panel), stamp(panel), panel.query_one("#patch_paste_text", TextArea).text
+        return rows, addresses, geometry, view_text(panel), stamp(panel), panel.query_one("#patch_paste_text", TextArea).text
 
-    rows, text, stamp_text, buffer = run(tmp_path, (118, 54), body)
-    assert len(rows) == 6, rows
+    rows, addresses, (height, landing), text, stamp_text, buffer = run(tmp_path, (118, 54), body)
+    # Inc 8 R-PE-DEF.1.1 supersedes ``len(rows) == 6``: the 9-row landing pane (ruling RR-1);
+    # every entry is still shown, the rest by scrolling the ledger.
+    assert landing == 9, landing
+    assert len(rows) == min(6, height - 1), (rows, height)
+    assert len(addresses) == 6, sorted(addresses)
     assert text is not None and buffer is not None
     assert [e["address"] for e in json.loads(text)["entries"]] == CALIB_ADDRESSES
     match = STAMP_RE.match(stamp_text)
@@ -1485,14 +1616,16 @@ def test_at_b97_02_add_save_empty_and_legacy(tmp_path: Path) -> None:
 
     async def body(app, pilot, panel):
         await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
+        await show_tab(panel, pilot, "patch_tab_inspector")  # Inc 8 R-TUI-063.4: the entry form is in this tab
         panel.query_one("#patch_entry_address_input", Input).value = "0xED80"
         panel.query_one("#patch_entry_bytes_input", Input).value = "11 22"
-        await pilot.click("#patch_entry_add_button")
+        assert await click_visible(pilot, panel, "#patch_entry_add_button")  # Inc 8 R-PE-DEF.1.1
         await settle(pilot, 4)
         added = (view_text(panel), stamp(panel))
         await pilot.click("#patch_doc_save_button")
         await settle(pilot, 4)
         saved = stamp(panel)
+        await show_tab(panel, pilot, "patch_tab_script")  # Inc 8 R-TUI-063.3: the empty-state line is in the ledger's tab
         await load_change_file(app, pilot, panel, empty_changeset(tmp_path))
         empty = (view_text(panel), [r.strip() for r in painted_rows(app, panel.query_one("#patch_doc_empty_state")) if r.strip()])
         await load_change_file(app, pilot, panel, legacy_v1(tmp_path))
@@ -1567,6 +1700,11 @@ def test_at_b97_17_first_task_from_the_keyboard(tmp_path: Path) -> None:
         await pilot.press("q", "w")
         await settle(pilot, 2)
         buffer = panel.query_one("#patch_paste_text", TextArea).text
+        # Inc 8 R-TUI-063.3: the ledger lives in the Patch script tab, so its chip is
+        # activated first (was: the ledger stayed beside the inspector, always shown).
+        reached["script"] = await _focus_by_tab(app, pilot, "patch_tab_script", 80)
+        await pilot.press("space")
+        await settle(pilot, 3)
         reached["ledger"] = await _focus_by_tab(app, pilot, "patch_doc_entries_table", 80)
         card = panel.query_one("#patch_before_after_card")
         first = str(card.render())
@@ -1576,7 +1714,7 @@ def test_at_b97_17_first_task_from_the_keyboard(tmp_path: Path) -> None:
         return reached, view_text(panel), buffer, first, second
 
     reached, text, buffer, first, second = run(tmp_path, (118, 54), body)
-    assert reached == {"select": True, "json": True, "paste": True, "ledger": True}, reached
+    assert reached == {"select": True, "json": True, "paste": True, "script": True, "ledger": True}, reached
     assert [e["address"] for e in json.loads(text)["entries"]] == CALIB_ADDRESSES
     assert "qw" in buffer
     assert first != second and "0x0000EB40" in second, (first, second)

@@ -1,0 +1,31 @@
+# tree: clone @ 439614dd
+# uptime:  00:35:26 up 2 days,  9:24,  2 users,  load average: 0.15, 1.10, 1.61
+s19_app.__file__ = /home/<user>/work/zq-e4-8b-i8b/clone/s19_app/__init__.py
+# pytest -q -s -p no:xdist tests/test_zz_probe_geom.py
+(118, 54) ('Container', 'patch_sheet_grid', 110, 110, False, True, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('ArrayBenchSheet', 'patch_sheet', 110, 110, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('Container', 'patch_sheet_win', 112, 110, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', "Edges(top=('round', Color(27, 35, 58)), right=('round', Color(27, 35, 58)), bottom=('round', Color(27, 35, 58)), left=('round', Color(27, 35, 58)))")
+(118, 54) ('PatchEditorPanel', 'patch_editor_panel', 112, 112, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('WindowSection', 'screen_patch', 112, 112, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('Container', 'workspace_body', 112, 112, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('Horizontal', 'workspace_shell', 116, 116, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(118, 54) ('Screen', '_default', 118, 116, False, False, 'Spacing(top=1, right=1, bottom=1, left=1)', 'Edges()')
+.(80, 24) ('Container', 'patch_sheet_grid', 70, 70, False, True, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('ArrayBenchSheet', 'patch_sheet', 70, 70, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('Container', 'patch_sheet_win', 72, 70, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', "Edges(top=('round', Color(27, 35, 58)), right=('round', Color(27, 35, 58)), bottom=('round', Color(27, 35, 58)), left=('round', Color(27, 35, 58)))")
+(80, 24) ('PatchEditorPanel', 'patch_editor_panel', 74, 74, True, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('WindowSection', 'screen_patch', 74, 74, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('Container', 'workspace_body', 74, 74, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('Horizontal', 'workspace_shell', 78, 78, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(80, 24) ('Screen', '_default', 80, 78, False, False, 'Spacing(top=1, right=1, bottom=1, left=1)', 'Edges()')
+.(220, 60) ('Container', 'patch_sheet_grid', 194, 194, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('ArrayBenchSheet', 'patch_sheet', 194, 194, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('Container', 'patch_sheet_win', 196, 194, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', "Edges(top=('round', Color(27, 35, 58)), right=('round', Color(27, 35, 58)), bottom=('round', Color(27, 35, 58)), left=('round', Color(27, 35, 58)))")
+(220, 60) ('PatchEditorPanel', 'patch_editor_panel', 196, 196, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('WindowSection', 'screen_patch', 196, 196, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('Container', 'workspace_body', 196, 196, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('Horizontal', 'workspace_shell', 218, 218, False, False, 'Spacing(top=0, right=0, bottom=0, left=0)', 'Edges()')
+(220, 60) ('Screen', '_default', 220, 218, False, False, 'Spacing(top=1, right=1, bottom=1, left=1)', 'Edges()')
+.
+3 passed in 12.08s
+# exit=0

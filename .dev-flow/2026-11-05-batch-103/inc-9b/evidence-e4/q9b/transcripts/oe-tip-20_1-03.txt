@@ -1,0 +1,21 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=oe Q9B_SIDE=tip Q9B_LABEL=20_1 Q9B_RUN=03
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 17:11:13 up 3 days,  1:59,  3 users,  load average: 0.96, 0.87, 0.82
+Q9B_LOAD1=0.96
+Q9B_NODE=tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs PASSED
+============================= QC-TM timing margins =============================
+71.5%  0.142 s / 0.500 s  R-PE-BENCH.20/1 key during a LARGE decode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+QC-TM: 1 bounds, 0 under 20 % margin
+
+============================== 1 passed in 7.56s ===============================
+Q9B_RC=0
+Q9B_VALID=PASS

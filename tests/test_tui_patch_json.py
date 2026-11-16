@@ -826,6 +826,9 @@ _CLAIMED_HUES = {
     "orange3 (MAC ⚠ glyph + frozen MAC_ADDRESS_OVERLAY_STYLE)": _named_hex("orange3"),
     "rich 'green' (ValidationSeverity.OK + ✓ MAC glyph)": _named_hex("green"),
     "rich 'red' (ValidationSeverity.ERROR + ✗ MAC glyph)": _named_hex("red"),
+    # batch-103 Inc 9 (definition bench, C9 D-6): the edited-cell colour, a
+    # FOREGROUND style ("bold #f5c26b", definition_bench_view.py:54), so it claims.
+    "definition_bench_view.EDIT (edited-cell foreground)": "#f5c26b",
 }
 
 #: Colour literals in ``s19_app/`` that are deliberately NOT hue claimants, each
@@ -855,6 +858,17 @@ _EXCLUDED_LITERALS = {
     # is only confusable when it paints a FOREGROUND cue; this is a button
     # chrome fill (#sje_export) behind a label, never a cue itself.
     "#1a2340": "#sje_export button background (styles.tcss:2568) — background fill, not a foreground cue",
+    # --- batch-103 Inc 9 definition-bench ramp (definition_bench.py ramp_style):
+    # same law as the DEPTH stack. Step 0 is a BACKGROUND fill (val 21.9%); the
+    # dark text sits only on the light ramp cells (val 15.7%), near-black, a
+    # contrast colour against a pale fill, not a chromatic cue.
+    "#1c2438": "bench ramp step-0 background (definition_bench.py:469) — background fill (val 21.9%), not a foreground cue",
+    "#101828": "bench ramp dark text on light cells (definition_bench.py:477) — near-black contrast colour (val 15.7%), not a chromatic cue",
+    # --- batch-103 Inc 8b staging-sheet selected-row ground (definition_sheet.py _SELECTED_GROUND, E1-rulings
+    # section 4): same law as the DEPTH stack and #1c2438 — a BACKGROUND fill (val 27.8%, above the 22.7% the
+    # DEPTH comment names, so the value is stated), behind the row's own cues; it paints no glyph. No
+    # _CLAIMED_HUES entry is added: every foreground the sheet paints is already claimed or achromatic.
+    "#1c2547": "staging-sheet selected-row ground (definition_sheet.py) — background fill (val 27.8%), not a foreground cue",
     # --- Achromatic / near-achromatic: hue is not a meaningful coordinate below
     # ~20% saturation — these read as grey, so no hue distance protects anything.
     # (LBLUE is 19.4% and is nonetheless CLAIMED above: claimed beats excluded.)

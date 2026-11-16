@@ -1,0 +1,75 @@
+# tree: clone @ 439614dd
+# uptime:  00:44:26 up 2 days,  9:33,  3 users,  load average: 4.75, 3.73, 2.57
+s19_app.__file__ = /home/<user>/work/zq-e4-8b-i8b/clone/s19_app/__init__.py
+# pytest -n 2 -q tests/test_b103_inc8b_s1.py
+bringing up nodes...
+bringing up nodes...
+
+......................................................................F. [ 75%]
+...............F.......                                                  [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_117_1_3_a_span_wider_than_the_float_range_places_the_mark_by_its_proportion[span_overflow-21] _
+[gw0] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+key = 'span_overflow', mark = 21
+
+    @pytest.mark.parametrize(("key", "mark"), [("span_overflow", 21), ("span_overflow.lower_end", 9)])
+    def test_r_pe_def_117_1_3_a_span_wider_than_the_float_range_places_the_mark_by_its_proportion(defc, key, mark):
+        """R-PE-DEF.117/1, /3 (E4 ruling; was .114/2) - limits -1.7e308 .. 1.7e308: current 1e308 -> ``●`` at 21 (its
+        proportion 0.79 of the span), current -1.7e308 -> ``●`` at 9 (cell 1); ``┤`` at 25, no ``?``.
+    
+        Operator need: a hostile A2L with the widest float limits still shows where the value stands. The direct
+        (v - lower)/(upper - lower) overflows the span to inf: the position would be 0 (cell 1) or not finite (``?``)."""
+        cell = _the_cell(defc, key).plain
+>       assert cell == TR[f"L.cell.{key}"]
+E       AssertionError: assert '-2e308  ├───...────┤  2e308 ' == '-2e308  ├───...●───┤  2e308 '
+E         
+E         - -2e308  ├────────────●───┤  2e308 
+E         ?                      -
+E         + -2e308  ├───────?────────┤  2e308 
+E         ?                 +
+
+tests/test_b103_inc8b_s1.py:808: AssertionError
+_ test_r_pe_def_117_2_an_enum_bound_beyond_the_float_range_gives_the_range_form _
+[gw1] linux -- Python 3.11.18 /home/<user>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_117_2_an_enum_bound_beyond_the_float_range_gives_the_range_form(defc):
+        """R-PE-DEF.117/2 (E4 ruling) - ENUM_0001 with its last entry's raw 2**1100 -> ``L.cell.enum_beyond_float``
+        (`inf` in the upper slot, ``…`` at 16) and its row line paints, no OverflowError from ``isfinite``."""
+        d = defc["defs"]["ENUM_0001"]
+        entries = list(d.enum_entries)
+        entries[-1] = replace(entries[-1], raw=2**1100)
+        row, _ = make_row(replace(d, enum_entries=tuple(entries)), defc["a2l"], defc["image"])
+>       cell = ds.limits_cell(row, None, LIMITS_W).plain
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8b_s1.py:820: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = SheetRow(name='ENUM_0001', definition=Definition(name='ENUM_0001', section='CHARACTERISTIC', char_type='VALUE', kind='...ent=Decoded(stored=1, value='IDLE', text='IDLE'), staged=Decoded(stored=1, value='IDLE', text='IDLE'), is_staged=False)
+value = None, width = 34, tone = ''
+
+    def limits_cell(row: SheetRow, value: object, width: int, tone: str = "") -> Text:
+        """``<lower slot> <track> <upper slot>`` (34 cells) with ● at the current and ◆ at the new value.
+    
+        ``width`` is not used (the Limits width is fixed); kept so the call shape holds. ``tone`` is the
+        style of the ◆ (and of a ◀ ▶ it becomes). A limit that is not finite, or an upper not above the
+        lower, gives the range form; a value or a position that is not finite gives the no-position form.
+        """
+        bounds = _bounds(row)
+        if bounds is None:
+            return range_cell(None, None)
+        lower, upper = bounds
+>       if not (isfinite(lower) and isfinite(upper) and upper > lower):
+                                    ^^^^^^^^^^^^^^^
+E       OverflowError: int too large to convert to float
+
+s19_app/tui/definition_sheet.py:961: OverflowError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_1_3_a_span_wider_than_the_float_range_places_the_mark_by_its_proportion[span_overflow-21]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_2_an_enum_bound_beyond_the_float_range_gives_the_range_form
+2 failed, 93 passed in 1.68s
+# exit=1

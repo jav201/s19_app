@@ -1,0 +1,13 @@
+bringing up nodes...
+bringing up nodes...
+
+........................F.F
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:718: AssertionError: (8, 'rows 0..2 of 65536 · cols 0..15 of 16 · pgup/pgdn page')
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:718: AssertionError: (12, 'rows 0..6 of 65536 · cols 0..15 of 16 · pgup/pgdn page')
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_5_3_a_windowed_tall_grid_fills_its_room_and_its_window_line_counts_the_painted_rows[8]
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_5_3_a_windowed_tall_grid_fills_its_room_and_its_window_line_counts_the_painted_rows[12]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 2 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+2 failed, 25 passed in 136.90s (0:02:16)

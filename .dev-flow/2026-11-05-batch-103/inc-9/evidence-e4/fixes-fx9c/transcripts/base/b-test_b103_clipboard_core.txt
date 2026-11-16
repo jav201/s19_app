@@ -1,0 +1,44 @@
+load before: 1.50 1.62 1.73 1/635 534435
+~/work/zq-fx9c/baseclone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+................................................................F......F [ 82%]
+..........ss...                                                          [100%]
+=================================== FAILURES ===================================
+_________ test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes() -> None:
+        """R-PASTE.19/1 + .33/1: 47/47 text boxes are the two clipboard classes."""
+        counts = _census_text_box_constructions()
+>       assert counts["OsClipboardInput"] == 40, counts
+E       AssertionError: {'CappedTextArea': 6, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 41, ...}
+E       assert 41 == 40
+
+tests/test_b103_clipboard_core.py:1708: AssertionError
+_______ test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input() -> None:
+        """R-TUI-044.1/18: 0 stock ``Input``; every single-line box an ``OsClipboardInput``."""
+        counts = _census_text_box_constructions()
+>       assert counts["OsClipboardInput"] == 40, counts
+E       AssertionError: {'CappedTextArea': 6, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 41, ...}
+E       assert 41 == 40
+
+tests/test_b103_clipboard_core.py:1694: AssertionError
+============================= QC-TM timing margins =============================
+29.0%  0.236 s / 0.332 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+32.1%  0.220 s / 0.324 s  r_tui_043_10_1_a  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+32.6%  0.204 s / 0.303 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+35.1%  0.209 s / 0.322 s  r_paste_31_a  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+39.8%  0.194 s / 0.322 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+41.3%  0.194 s / 0.330 s  r_paste_27_3  tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+QC-TM: 6 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input
+2 failed, 83 passed, 2 skipped in 139.93s (0:02:19)
+rc=1
+load after: 1.63 1.66 1.72 1/636 535146

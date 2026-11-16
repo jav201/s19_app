@@ -1,0 +1,100 @@
+Cloning into '<runner-home>/work/zq-x9b/red-unicode'...
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+warning: remote HEAD refers to nonexistent ref, unable to checkout
+HEAD is now at f1161ee7 batch-103 Inc 9b E5: test busy-title Unicode cell widths
+DATE 2026-11-15T20:05:43-06:00
+HEAD f1161ee71290137f58921712d890699813b4463b
+TREE <runner-home>/work/zq-x9b/red-unicode
+DIRTY_BEGIN
+DIRTY_END
+ 20:05:44 up 3 days,  4:54,  2 users,  load average: 0.24, 0.12, 0.24
+PYTHON 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+S19_APP_FILE <runner-home>/work/zq-x9b/red-unicode/s19_app/__init__.py
+UTF8 utf-8
+TESTS_BEGIN tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_cuts_wide_names_by_painted_cells tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_does_not_cut_combining_text_that_fits
+XDIST_N 0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <runner-home>/work/zq-x9b/red-unicode
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_b103_inc9b_w.py FF                                            [100%]
+
+=================================== FAILURES ===================================
+____________ test_e5_9b_busy_title_cuts_wide_names_by_painted_cells ____________
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-red-unicode/tmp/pytest-of-<runner>/pytest-0/test_e5_9b_busy_title_cuts_wid0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-red-unicode/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7d73302bd0>
+
+    def test_e5_9b_busy_title_cuts_wide_names_by_painted_cells(tmp_path, defc_dir, monkeypatch):
+        """E5 regression of R-PE-BENCH.105: at 118 columns, B - F is 47 cells.
+    
+        A wide name therefore leaves 23 CJK characters plus one ellipsis; counting
+        characters instead of cells crops the seconds and the pill's suffix.
+        """
+        name = "界" * 300
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                return await long_name_row(app, pilot, sheet, gate, name, 106)
+            finally:
+                gate.release()
+    
+        row = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+>       assert f"decode {'界' * 23}… · " in row, row
+E       AssertionError: ╭─ STAGING SHEET   ◑ BUSY · decode 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界 … ─╮
+E       assert 'decode 界界界界界界界界界界界界界界界界界界界界界界界… · ' in '╭─ STAGING SHEET   ◑ BUSY · decode 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界 … ─╮'
+
+tests/test_b103_inc9b_w.py:929: AssertionError
+_________ test_e5_9b_busy_title_does_not_cut_combining_text_that_fits __________
+
+tmp_path = PosixPath('<runner-home>/work/zq-x9b/scratch-red-unicode/tmp/pytest-of-<runner>/pytest-0/test_e5_9b_busy_title_does_not0')
+defc_dir = PosixPath('<runner-home>/work/zq-x9b/scratch-red-unicode/tmp/pytest-of-<runner>/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7d71d2db90>
+
+    def test_e5_9b_busy_title_does_not_cut_combining_text_that_fits(tmp_path, defc_dir, monkeypatch):
+        """E5 regression of R-PE-BENCH.105: 60 code points can occupy 30 cells.
+    
+        The whole painted name fits in the 47-cell name room and must not gain an
+        ellipsis merely because its Python string length is greater than 47.
+        """
+        name = "e\u0301" * 30
+        a2l, s19 = case(tmp_path, name, "OTHER")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                return await long_name_row(app, pilot, sheet, gate, name, 106)
+            finally:
+                gate.release()
+    
+        row = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+>       assert f"decode {name} · " in row, row
+E       AssertionError: ╭─ STAGING SHEET   ◑ BUSY · decode ééééééééééééééééééééééé… · 0.4 s · keys still work  ────────────────────────╮
+E       assert 'decode éééééééééééééééééééééééééééééé · ' in '╭─ STAGING SHEET   ◑ BUSY · decode ééééééééééééééééééééééé… · 0.4 s · keys still work  ────────────────────────╮'
+
+tests/test_b103_inc9b_w.py:952: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_cuts_wide_names_by_painted_cells
+FAILED tests/test_b103_inc9b_w.py::test_e5_9b_busy_title_does_not_cut_combining_text_that_fits
+============================== 2 failed in 15.13s ==============================
+EXIT_CODE 1

@@ -1,0 +1,100 @@
+ 04:52:59 up 2 days, 13:41,  2 users,  load average: 0.32, 0.82, 1.24
+~/work/zq-e4-9b-t9bw/tree_g/s19_app/__init__.py
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs  04:53:00  load average: 0.32, 0.82, 1.24
+.                                                                        [100%]
+1 passed in 7.23s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue  04:53:08  load average: 0.43, 0.82, 1.24
+.                                                                        [100%]
+1 passed in 7.62s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_1_a_decode_that_ends_inside_the_grace_never_paints_the_cue  04:53:17  load average: 0.52, 0.83, 1.24
+.                                                                        [100%]
+1 passed in 8.44s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_95_2_summaries_of_a_page_turn_are_not_busy_jobs  04:53:27  load average: 0.56, 0.83, 1.24
+.                                                                        [100%]
+1 passed in 7.28s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work  04:53:35  load average: 0.54, 0.82, 1.23
+.                                                                        [100%]
+1 passed in 8.46s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour  04:53:45  load average: 0.61, 0.83, 1.22
+.                                                                        [100%]
+1 passed in 7.61s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage  04:53:54  load average: 0.59, 0.82, 1.22
+.                                                                        [100%]
+1 passed in 8.06s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped  04:54:03  load average: 0.58, 0.81, 1.21
+.                                                                        [100%]
+1 passed in 10.66s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show  04:54:15  load average: 0.57, 0.79, 1.20
+.                                                                        [100%]
+1 passed in 7.73s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result  04:54:24  load average: 0.63, 0.80, 1.20
+.                                                                        [100%]
+1 passed in 7.43s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s  04:54:32  load average: 0.76, 0.83, 1.20
+.                                                                        [100%]
+1 passed in 7.42s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s  04:54:41  load average: 0.78, 0.83, 1.20
+.                                                                        [100%]
+1 passed in 7.63s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs  04:54:50  load average: 0.74, 0.82, 1.19
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/test_b103_inc9b_w.py:686: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.397 s after the key (bound 0.3 s, load 0.86 0.84 1.19); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.0280702100135386 is not None and 0.3969089899910614 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 8.65s
+--- rc=1
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s  04:54:59  load average: 0.86, 0.84, 1.19
+.                                                                        [100%]
+1 passed in 7.50s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_103_1_a_markup_name_is_shown_literally_with_no_link  04:55:08  load average: 0.88, 0.85, 1.19
+.                                                                        [100%]
+1 passed in 8.24s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_103_2_brackets_in_a_name_are_shown_literally  04:55:17  load average: 0.90, 0.85, 1.19
+.                                                                        [100%]
+1 passed in 7.31s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_104_1_an_escape_sequence_in_a_name_is_painted_as_fffd  04:55:26  load average: 0.91, 0.85, 1.18
+.                                                                        [100%]
+1 passed in 7.58s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_104_2_a_c1_control_in_a_name_is_painted_as_fffd  04:55:35  load average: 0.92, 0.86, 1.18
+.                                                                        [100%]
+1 passed in 7.31s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[80x24]  04:55:43  load average: 0.93, 0.86, 1.18
+.                                                                        [100%]
+1 passed in 7.15s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]  04:55:51  load average: 0.94, 0.87, 1.18
+.                                                                        [100%]
+1 passed in 7.40s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[220x60]  04:56:00  load average: 0.87, 0.85, 1.17
+.                                                                        [100%]
+1 passed in 6.82s
+--- rc=0
+=== tests/test_b103_inc9b_w.py::test_r_pe_bench_105_4_a_one_character_name_is_not_cut  04:56:08  load average: 0.89, 0.86, 1.17
+.                                                                        [100%]
+1 passed in 7.17s
+--- rc=0
+ALLDONE

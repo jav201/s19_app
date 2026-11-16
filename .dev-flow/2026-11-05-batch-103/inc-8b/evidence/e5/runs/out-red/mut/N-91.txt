@@ -1,0 +1,40 @@
+## mutant N-91: s19_app/tui/screens_directionb/patch_editor/sheet.py
+## - 'lines = [header_line(widths), header_rule(widths)]'
+## + 'lines = [header_line(widths)]'
+## uptime:  03:01:35 up 2 days, 11:50,  2 users,  load average: 1.11, 0.91, 1.01
+## date: 2026-11-15T09:01:35Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-N-91/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_def_91_1_the_sheet_paints_the_header_rule_as_its_second_line ____
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_91_1_the_sheet_paints_the_header_rule_as_its_second_line(softa_page):
+        """R-PE-DEF.91/1 (E5, X8b: the model node checks ``header_rule`` alone, so a sheet that stopped painting it
+        survived) - the sheet alone at 118x54 with 200 names: body line 1 is the header, line 2 is ``G.header_rule``."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with grid_ctx(SIZE_118) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                return body_lines(sheet)
+    
+        lines = asyncio.run(drive())
+        assert lines[0].lstrip().startswith("Parameter"), lines[:2]
+>       assert lines[1] == T["G.header_rule"], lines[:2]
+E       AssertionError: ['  Parameter                 │Kind      │Current             │New             │Unit    │Limits                       ...B…│VALUE     │0                   │·               │        │     0  ├●───────────────┤    255 │                    │']
+E       assert '▶ AAD_UTRQ.H...            │' == '━━━━━━━━━━━━...━━━━━━━━━━━━┿'
+E         
+E         - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━┿
+E         + ▶ AAD_UTRQ.HWV_VIUF_C_PposB…│VALUE     │0                   │·               │        │     0  ├●───────────────┤    255 │                    │
+
+tests/test_b103_inc8b_bw.py:325: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_91_1_the_sheet_paints_the_header_rule_as_its_second_line
+1 failed, 31 deselected in 1.61s
+## rc=1
+## end: 2026-11-15T09:01:38Z  uptime:  03:01:38 up 2 days, 11:50,  3 users,  load average: 1.10, 0.91, 1.01

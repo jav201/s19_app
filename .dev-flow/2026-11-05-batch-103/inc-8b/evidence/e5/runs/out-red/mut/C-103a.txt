@@ -1,0 +1,126 @@
+## mutant C-103a: s19_app/tui/definition_sheet.py
+## - '_bit(msk, "■" if masked else "·", f"bold {_RULE}" if masked else _DIM)'
+## + '_bit(msk, " " if masked else "·", f"on {_RULE}" if masked else _DIM)'
+## uptime:  03:01:42 up 2 days, 11:50,  2 users,  load average: 1.09, 0.91, 1.01
+## date: 2026-11-15T09:01:42Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-C-103a/s19_app/__init__.py
+.......................................F................................ [ 73%]
+..FF......................                                               [100%]
+=================================== FAILURES ===================================
+___________ test_r_pe_def_103_1_the_card_cues_survive_without_colour ___________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_103_1_the_card_cues_survive_without_colour(defc):
+        """R-PE-DEF.103/1 (the card half; E5, X8b - the integrator's open item) - MASK_FIELD_0001 expanded with New 255
+        (current 174): painted with ``NO_COLOR`` and with colour, the bit card shows the same text with ``■`` on the mask
+        row and the same underlined cells (the after bits that differ), and only the colour render paints colour.
+    
+        Operator need: on a terminal with no colour, the mask bits and the bits the edit changes must still be told
+        apart; a cue drawn as colour only (``■`` replaced by a coloured space, an underline replaced by a hue) is lost."""
+        definition = defc["defs"]["MASK_FIELD_0001"]
+        row, overlay = make_row(definition, defc["a2l"], defc["image"])
+        pv = ds.preview(definition, defc["a2l"], "255", overlay)
+        lines = ds.detail_lines(row, pv, 111, None, 50)
+        raw = {}
+        for label, no_color in (("colour", False), ("mono", True)):
+            sink = io.StringIO()
+            console = Console(file=sink, color_system="truecolor", force_terminal=True, width=400, no_color=no_color)
+            for line in lines:
+                console.print(line, end="\n")
+            raw[label] = sink.getvalue()
+        assert "38;2;" in raw["colour"] and "38;2;" not in raw["mono"], "the control is live: colour in one render only"
+        (mono_text, mono_under), (colour_text, colour_under) = _mono_cues(raw["mono"]), _mono_cues(raw["colour"])
+        assert mono_text == colour_text
+>       assert "■" in mono_text, "the mask row's ■ is a glyph, not a colour"
+E       AssertionError: the mask row's ■ is a glyph, not a colour
+E       assert '■' in '  ┊ └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B                                ...─────────────────────────────────────────────────╯                                                                  \n'
+
+tests/test_b103_inc8b_s1.py:688: AssertionError
+_ test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[0.0-9] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+current = 0.0, mark = 9
+
+    @pytest.mark.parametrize(("current", "mark"), [(0.0, 9), (5e-324, 24)])
+    def test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion(defc, current, mark):
+        """R-PE-DEF.117/4 (E5, X8b finding) - limits 0 .. 5e-324 (the smallest subnormal span: its halves are both 0):
+        current 0 -> ``●`` at 9, current 5e-324 -> ``●`` at 24; no ``?``, no exception.
+    
+        Operator need: a hostile A2L limit pair must never stop the paint. Computing the position on halves only
+        divides by 0 here (``ZeroDivisionError`` in the paint path); the span itself is finite and nonzero."""
+>       cell = limits_of(defc, "DISPLAY_0001", lower=0.0, upper=5e-324, current=current).plain
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8b_s1.py:903: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8b_s1.py:198: in limits_of
+    return ds.limits_cell(row, value, limits_width)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in limits_cell
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in <genexpr>
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:934: in _has_position
+    return isfinite(_position(value, lower, upper))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0.0, lower = 0.0, upper = 5e-324
+
+    def _position(value: float, lower: float, upper: float) -> float:
+        """(value - lower) / (upper - lower) on halves, so a finite span never overflows (R-PE-DEF.117)."""
+>       return (value / 2 - lower / 2) / (upper / 2 - lower / 2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ZeroDivisionError: float division by zero
+
+s19_app/tui/definition_sheet.py:925: ZeroDivisionError
+_ test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[5e-324-24] _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+current = 5e-324, mark = 24
+
+    @pytest.mark.parametrize(("current", "mark"), [(0.0, 9), (5e-324, 24)])
+    def test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion(defc, current, mark):
+        """R-PE-DEF.117/4 (E5, X8b finding) - limits 0 .. 5e-324 (the smallest subnormal span: its halves are both 0):
+        current 0 -> ``●`` at 9, current 5e-324 -> ``●`` at 24; no ``?``, no exception.
+    
+        Operator need: a hostile A2L limit pair must never stop the paint. Computing the position on halves only
+        divides by 0 here (``ZeroDivisionError`` in the paint path); the span itself is finite and nonzero."""
+>       cell = limits_of(defc, "DISPLAY_0001", lower=0.0, upper=5e-324, current=current).plain
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8b_s1.py:903: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8b_s1.py:198: in limits_of
+    return ds.limits_cell(row, value, limits_width)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in limits_cell
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:981: in <genexpr>
+    if not all(_has_position(number, lower, upper) for number, _glyph, _style in marks):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_sheet.py:934: in _has_position
+    return isfinite(_position(value, lower, upper))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 5e-324, lower = 0.0, upper = 5e-324
+
+    def _position(value: float, lower: float, upper: float) -> float:
+        """(value - lower) / (upper - lower) on halves, so a finite span never overflows (R-PE-DEF.117)."""
+>       return (value / 2 - lower / 2) / (upper / 2 - lower / 2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ZeroDivisionError: float division by zero
+
+s19_app/tui/definition_sheet.py:925: ZeroDivisionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_the_card_cues_survive_without_colour
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[0.0-9]
+FAILED tests/test_b103_inc8b_s1.py::test_r_pe_def_117_4_a_span_whose_halves_vanish_places_the_mark_by_its_proportion[5e-324-24]
+3 failed, 95 passed in 0.53s
+## rc=1
+## end: 2026-11-15T09:01:43Z  uptime:  03:01:43 up 2 days, 11:50,  2 users,  load average: 1.09, 0.91, 1.01

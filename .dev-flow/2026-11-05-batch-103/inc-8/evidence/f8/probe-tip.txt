@@ -1,0 +1,268 @@
+TREE -n 2026-11-14T06:06:50Z load: 9.18 9.19 9.48
+~/work/zq-f8/tip/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-f8/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 3 items
+
+tests/probe_f8.py PROBE (118, 54) screen Region(x=0, y=0, width=118, height=54) panel Region(x=5, y=4, width=112, height=39) panel.scroll_y 0.0 pane Region(x=7, y=33, width=108, height=6) content Region(x=7, y=33, width=108, height=6) scroll_y 0.0 max 7 virtual Size(width=107, height=13)
+PROBE (118, 54) OUT patch_doc_file_row Region(x=5, y=40, width=112, height=1)
+PROBE (118, 54) OUT patch_doc_path_input Region(x=42, y=40, width=56, height=1)
+PROBE (118, 54) OUT patch_doc_controls Region(x=5, y=41, width=112, height=1)
+PROBE (118, 54) OUT patch_doc_validate_button Region(x=6, y=41, width=10, height=1)
+PROBE (118, 54) IN patch_before_after_card BeforeAfterCard Region(x=7, y=33, width=107, height=2) inside_pane True hit patch_before_after_card
+PROBE (118, 54) IN patch_doc_entry_inputs Vertical Region(x=7, y=36, width=107, height=5) inside_pane False hit patch_entry_value_input
+PROBE (118, 54) IN patch_entry_address_input OsClipboardInput Region(x=15, y=36, width=99, height=1) inside_pane True hit patch_entry_address_input
+PROBE (118, 54) IN patch_entry_value_input OsClipboardInput Region(x=15, y=38, width=99, height=1) inside_pane True hit patch_entry_value_input
+PROBE (118, 54) IN patch_entry_bytes_input OsClipboardInput Region(x=15, y=40, width=99, height=1) inside_pane False hit patch_doc_path_input
+PROBE (118, 54) IN patch_doc_entry_buttons Horizontal Region(x=7, y=41, width=107, height=1) inside_pane False hit patch_doc_controls
+PROBE (118, 54) IN patch_entry_add_button Button Region(x=7, y=41, width=5, height=1) inside_pane False hit patch_doc_validate_button
+PROBE (118, 54) IN patch_entry_edit_button Button Region(x=13, y=41, width=6, height=1) inside_pane False hit patch_doc_controls
+PROBE (118, 54) IN patch_entry_remove_button Button Region(x=20, y=41, width=8, height=1) inside_pane False hit patch_doc_apply_button
+PROBE (118, 54) IN patch_entry_edit_json_button Button Region(x=29, y=41, width=11, height=1) inside_pane False hit patch_doc_apply_button
+PROBE (118, 54) IN patch_param_use_row Horizontal Region(x=7, y=42, width=107, height=1) inside_pane False hit patch_legend
+PROBE (118, 54) IN patch_param_use_button Button Region(x=7, y=42, width=15, height=1) inside_pane False hit patch_legend
+PROBE (118, 54) IN patch_doc_tally Static Region(x=7, y=44, width=107, height=2) inside_pane False hit workspace_status_bar
+ROW 00|                                                                                                                      
+ROW 01|  ⭘                                                Hex Edit Tool                                                      
+ROW 02|    │                                       Patch Editor                                         ?  📂 Open patches/  
+ROW 03| ▏◫ │                                                                                                                 
+ROW 04| ▏≡ │ draft · change                                                                                                  
+ROW 05| ▏◉ │ Filter filter parameters                                  8 of 8 shown  <    Page 1/1   >    Pick   Add list    
+ROW 06| ▏▤ │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ROW 07| ▏! ││  Parameter         Kind     Current           New          Unit   Limits                    Δ                │ 
+ROW 08| ▏✎ ││▶ ENUM_0001         VALUE    1 IDLE            ·                   0 ├────●───────┤ 3                         │ 
+ROW 09| ▏✔ ││└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B                                                   │ 
+ROW 10| ▏⏚ ││( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE"                                    │ 
+ROW 11| ▏✦ ││↔ choose · enter stage                                                                                        │ 
+ROW 12| ▏▶ ││  MASK_BIT_0001     VALUE    1 (0x01)          ·                   0 ├───────────●┤ 1                         │ 
+ROW 13| ▏☑ ││  MASK_FIELD_0001   VALUE    174 (0xAE)        ·                   0 ├────────●───┤ 255                       │ 
+ROW 14| ▏⊕ ││  DISPLAY_0001      VALUE    143.5             ·            deg C  -40 ├───────────●┤ 150                     │ 
+ROW 15|    ││  CURVE_DEF_0001    CURVE    5 values          ·                   -                                          │ 
+ROW 16|    ││  CURVE_DEF_0002    CURVE    5 values          ·                   -                                          │ 
+ROW 17|    ││  MAP_DEF_0001      MAP      12 values         ·                   -                                          │ 
+ROW 18|    ││  VAL_BLK_DEF_0001  VAL_BLK  6 values          ·            units  -                                          │ 
+ROW 19|    ││                                                                                                              │ 
+ROW 20|    ││                                                                                                              │ 
+ROW 21|    ││                                                                                                              │ 
+ROW 22|    ││                                                                                                              │ 
+ROW 23|    ││                                                                                                              │ 
+ROW 24|    ││                                                                                                              │ 
+ROW 25|    ││                                                                                                              │ 
+ROW 26|    ││                                                                                                              │ 
+ROW 27|    ││                                                                                                              │ 
+ROW 28|    ││                                                                                                              │ 
+ROW 29|    ││ENUM_0001 new =                                                                                               │ 
+ROW 30|    │╰──────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row ─╯ 
+ROW 31|    │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ROW 32|    ││   Patch script    Inspector    JSON    Checks                                                                │ 
+ROW 33|    ││ ─BEFORE → AFTER────────────────────────────────────────────────────────────────────────────────────────────  │ 
+ROW 34|    ││  No entry yet: Add one or Load a file.                                                                       │ 
+ROW 35|    ││                                                                                                            ▁ │ 
+ROW 36|    ││ Address 0x100                                                                                                │ 
+ROW 37|    ││                                                                                                              │ 
+ROW 38|    ││ String  text (document encoding)                                                                             │ 
+ROW 39|    │╰────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯ 
+ROW 40|    │ File    Change files in patches/ ▼  or type a path to the same change-set JSON (alternative   Load   Refresh    
+ROW 41|    │  Validate   Apply loaded changes   Save                                                                         
+ROW 42|    │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                      
+ROW 43| ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ROW 44|  Loaded definitions.s19 (S19 only)                                                       (none)  |  definitions.a2l  
+ROW 45|                                                                                                                      
+ROW 46|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                                                               
+ROW 47|                                                                                                                      
+ROW 48|  A2L loaded: definitions.a2l                                                                                         
+ROW 49|  Loaded definitions.s19 (S19 only)                                                                                   
+ROW 50|  Loaded definitions.s19                                                                                              
+ROW 51|  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette                          
+ROW 52|  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks                           
+ROW 53|                                                                                                                      
+.PROBE (220, 60) screen Region(x=0, y=0, width=220, height=60) panel Region(x=23, y=4, width=196, height=45) panel.scroll_y 0.0 pane Region(x=25, y=39, width=192, height=6) content Region(x=25, y=39, width=192, height=6) scroll_y 0.0 max 7 virtual Size(width=191, height=13)
+PROBE (220, 60) OUT patch_doc_file_row Region(x=23, y=46, width=196, height=1)
+PROBE (220, 60) OUT patch_doc_path_input Region(x=88, y=46, width=112, height=1)
+PROBE (220, 60) OUT patch_doc_controls Region(x=23, y=47, width=196, height=1)
+PROBE (220, 60) OUT patch_doc_validate_button Region(x=24, y=47, width=10, height=1)
+PROBE (220, 60) IN patch_before_after_card BeforeAfterCard Region(x=25, y=39, width=191, height=2) inside_pane True hit patch_before_after_card
+PROBE (220, 60) IN patch_doc_entry_inputs Vertical Region(x=25, y=42, width=191, height=5) inside_pane False hit patch_entry_value_input
+PROBE (220, 60) IN patch_entry_address_input OsClipboardInput Region(x=33, y=42, width=183, height=1) inside_pane True hit patch_entry_address_input
+PROBE (220, 60) IN patch_entry_value_input OsClipboardInput Region(x=33, y=44, width=183, height=1) inside_pane True hit patch_entry_value_input
+PROBE (220, 60) IN patch_entry_bytes_input OsClipboardInput Region(x=33, y=46, width=183, height=1) inside_pane False hit patch_doc_path_input
+PROBE (220, 60) IN patch_doc_entry_buttons Horizontal Region(x=25, y=47, width=191, height=1) inside_pane False hit patch_doc_controls
+PROBE (220, 60) IN patch_entry_add_button Button Region(x=25, y=47, width=5, height=1) inside_pane False hit patch_doc_validate_button
+PROBE (220, 60) IN patch_entry_edit_button Button Region(x=31, y=47, width=6, height=1) inside_pane False hit patch_doc_controls
+PROBE (220, 60) IN patch_entry_remove_button Button Region(x=38, y=47, width=8, height=1) inside_pane False hit patch_doc_apply_button
+PROBE (220, 60) IN patch_entry_edit_json_button Button Region(x=47, y=47, width=11, height=1) inside_pane False hit patch_doc_apply_button
+PROBE (220, 60) IN patch_param_use_row Horizontal Region(x=25, y=48, width=191, height=1) inside_pane False hit patch_legend
+PROBE (220, 60) IN patch_param_use_button Button Region(x=25, y=48, width=15, height=1) inside_pane False hit patch_legend
+PROBE (220, 60) IN patch_doc_tally Static Region(x=25, y=50, width=191, height=2) inside_pane False hit workspace_status_bar
+ROW 00|                                                                                                                                                                                                                            
+ROW 01|  ⭘                                                                                                   Hex Edit Tool                                                                                                         
+ROW 02|                      │                                                                                 Patch Editor                                                                                   ?  📂 Open patches/  
+ROW 03| ▏ ◫  Workspace       │                                                                                                                                                                                                     
+ROW 04| ▏ ≡  A2L Explorer    │ draft · change                                                                                                                                                                                      
+ROW 05| ▏ ◉  MAC View        │ Filter filter parameters                                                                                                                      8 of 8 shown  <    Page 1/1   >    Pick   Add list    
+ROW 06| ▏ ▤  Memory Map      │╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ROW 07| ▏ !  Issues Report   ││  Parameter               Kind      Current                                     New                 Unit    Limits                                                         Δ                      │ 
+ROW 08| ▏ ✎  Patch Editor    ││▶ ENUM_0001               VALUE     1 IDLE                                      ·                           0 ├────────────────●────────────────────────────────┤ 3                               │ 
+ROW 09| ▏ ✔  Check Editor    ││└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B                                                                                                                                       │ 
+ROW 10| ▏ ⏚  A2B Diff        ││( ) 0 OFF   (●) 1 IDLE   ( ) 2 RUN   ( ) 3 FAULT   default "UNKNOWN_STATE"                                                                                                                        │ 
+ROW 11| ▏ ✦  Flow Builder    ││↔ choose · enter stage                                                                                                                                                                            │ 
+ROW 12| ▏ ▶  Flow Execution  ││  MASK_BIT_0001           VALUE     1 (0x01)                                    ·                           0 ├────────────────────────────────────────────────●┤ 1                               │ 
+ROW 13| ▏ ☑  Checks          ││  MASK_FIELD_0001         VALUE     174 (0xAE)                                  ·                           0 ├─────────────────────────────────●───────────────┤ 255                             │ 
+ROW 14| ▏ ⊕  CRC Designer    ││  DISPLAY_0001            VALUE     143.5                                       ·                   deg C   -40 ├──────────────────────────────────────────────●──┤ 150                           │ 
+ROW 15|                      ││  CURVE_DEF_0001          CURVE     5 values                                    ·                           -                                                                                     │ 
+ROW 16|                      ││  CURVE_DEF_0002          CURVE     5 values                                    ·                           -                                                                                     │ 
+ROW 17|                      ││  MAP_DEF_0001            MAP       12 values                                   ·                           -                                                                                     │ 
+ROW 18|                      ││  VAL_BLK_DEF_0001        VAL_BLK   6 values                                    ·                   units   -                                                                                     │ 
+ROW 19|                      ││                                                                                                                                                                                                  │ 
+ROW 20|                      ││                                                                                                                                                                                                  │ 
+ROW 21|                      ││                                                                                                                                                                                                  │ 
+ROW 22|                      ││                                                                                                                                                                                                  │ 
+ROW 23|                      ││                                                                                                                                                                                                  │ 
+ROW 24|                      ││                                                                                                                                                                                                  │ 
+ROW 25|                      ││                                                                                                                                                                                                  │ 
+ROW 26|                      ││                                                                                                                                                                                                  │ 
+ROW 27|                      ││                                                                                                                                                                                                  │ 
+ROW 28|                      ││                                                                                                                                                                                                  │ 
+ROW 29|                      ││                                                                                                                                                                                                  │ 
+ROW 30|                      ││                                                                                                                                                                                                  │ 
+ROW 31|                      ││                                                                                                                                                                                                  │ 
+ROW 32|                      ││                                                                                                                                                                                                  │ 
+ROW 33|                      ││                                                                                                                                                                                                  │ 
+ROW 34|                      ││                                                                                                                                                                                                  │ 
+ROW 35|                      ││ENUM_0001 new =                   (0 … 3)                                                                                                                                                         │ 
+ROW 36|                      │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── enter edit · ↑↓ row ─╯ 
+ROW 37|                      │╭─ LANDS IN ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ROW 38|                      ││   Patch script    Inspector    JSON    Checks                                                                                                                                                    │ 
+ROW 39|                      ││ ─BEFORE → AFTER────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  │ 
+ROW 40|                      ││  No entry yet: Add one or Load a file.                                                                                                                                                           │ 
+ROW 41|                      ││                                                                                                                                                                                                ▁ │ 
+ROW 42|                      ││ Address 0x100                                                                                                                                                                                    │ 
+ROW 43|                      ││                                                                                                                                                                                                  │ 
+ROW 44|                      ││ String  text (document encoding)                                                                                                                                                                 │ 
+ROW 45|                      │╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 0 entries ─╯ 
+ROW 46|                      │ File    Change files in patches/                             ▼  or type a path to the same change-set JSON (alternative to the patches/ dropdown)                                 Load   Refresh    
+ROW 47|                      │  Validate   Apply loaded changes   Save                                                                                                                                                             
+ROW 48|                      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                                                                                                          
+ROW 49| ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ROW 50|  Loaded definitions.s19 (S19 only)                                                                                                                                                             (none)  |  definitions.a2l  
+ROW 51|                                                                                                                                                                                                                            
+ROW 52|  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                                                                                                                                                                     
+ROW 53|                                                                                                                                                                                                                            
+ROW 54|  A2L loaded: definitions.a2l                                                                                                                                                                                               
+ROW 55|  Loaded definitions.s19 (S19 only)                                                                                                                                                                                         
+ROW 56|  Loaded definitions.s19                                                                                                                                                                                                    
+ROW 57|  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette                                                                                                                                
+ROW 58|  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks                                                                                                                                 
+ROW 59|                                                                                                                                                                                                                            
+.PROBE (80, 24) screen Region(x=0, y=0, width=80, height=24) panel Region(x=5, y=4, width=74, height=9) panel.scroll_y 7.0 pane Region(x=7, y=13, width=68, height=6) content Region(x=7, y=13, width=68, height=6) scroll_y 0.0 max 7 virtual Size(width=67, height=13)
+PROBE (80, 24) OUT patch_doc_file_row Region(x=5, y=20, width=72, height=1)
+PROBE (80, 24) OUT patch_doc_path_input Region(x=29, y=20, width=29, height=1)
+PROBE (80, 24) OUT patch_doc_controls Region(x=5, y=21, width=72, height=1)
+PROBE (80, 24) OUT patch_doc_validate_button Region(x=6, y=21, width=10, height=1)
+PROBE (80, 24) IN patch_before_after_card BeforeAfterCard Region(x=7, y=13, width=67, height=2) inside_pane True hit status_text
+PROBE (80, 24) IN patch_doc_entry_inputs Vertical Region(x=7, y=16, width=67, height=5) inside_pane False hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_address_input OsClipboardInput Region(x=15, y=16, width=59, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_value_input OsClipboardInput Region(x=15, y=18, width=59, height=1) inside_pane True hit workspace_status_bar
+PROBE (80, 24) IN patch_entry_bytes_input OsClipboardInput Region(x=15, y=20, width=59, height=1) inside_pane False hit workspace_status_bar
+PROBE (80, 24) IN patch_doc_entry_buttons Horizontal Region(x=7, y=21, width=67, height=1) inside_pane False hit key_bar_global
+PROBE (80, 24) IN patch_entry_add_button Button Region(x=7, y=21, width=5, height=1) inside_pane False hit key_bar_global
+PROBE (80, 24) IN patch_entry_edit_button Button Region(x=13, y=21, width=6, height=1) inside_pane False hit key_bar_global
+PROBE (80, 24) IN patch_entry_remove_button Button Region(x=20, y=21, width=8, height=1) inside_pane False hit key_bar_global
+PROBE (80, 24) IN patch_entry_edit_json_button Button Region(x=29, y=21, width=11, height=1) inside_pane False hit key_bar_global
+PROBE (80, 24) IN patch_param_use_row Horizontal Region(x=7, y=22, width=67, height=1) inside_pane False hit key_bar_window
+PROBE (80, 24) IN patch_param_use_button Button Region(x=7, y=22, width=15, height=1) inside_pane False hit key_bar_window
+F
+
+=================================== FAILURES ===================================
+______________________________ test_probe[size2] _______________________________
+
+tmp_path = PosixPath('~/work/zq-f8/tmp/pytest-of-<user>/pytest-0/test_probe_size2_0')
+size = (80, 24)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60), (80, 24)])
+    def test_probe(tmp_path, size):
+        defc = p.build_defc(tmp_path / "defc")
+    
+        async def body(app, pilot, panel):
+            await p.show_tab(pilot, "patch_tab_inspector")
+            pane = app.screen.query_one("#patch_pane_inspector")
+            print("PROBE", size, "screen", app.screen.region, "panel", panel.region, "panel.scroll_y", panel.scroll_y,
+                  "pane", pane.region, "content", pane.content_region, "scroll_y", pane.scroll_y, "max", pane.max_scroll_y,
+                  "virtual", pane.virtual_size)
+            for wid in ("patch_doc_file_row", "patch_doc_path_input", "patch_doc_controls", "patch_doc_validate_button"):
+                w = app.screen.query_one("#" + wid)
+                print("PROBE", size, "OUT", wid, w.region)
+            for w in pane.query("*"):
+                if not w.display or w.id is None:
+                    continue
+                r = w.region
+                hit = app.get_widget_at(*r.center)[0] if r.area else None
+                inside = pane.region.contains_region(r) if r.area else None
+                print("PROBE", size, "IN", w.id, type(w).__name__, r, "inside_pane", inside, "hit", getattr(hit, "id", None))
+            for i, line in enumerate(painted_rows(app, app.screen)):
+                print("ROW %02d|%s" % (i, line))
+            return None
+    
+>       p.drive(tmp_path, size, body, a2l=defc / "definitions.a2l", image=defc / "definitions.s19")
+
+tests/probe_f8.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/probe_f8.py:25: in body
+    hit = app.get_widget_at(*r.center)[0] if r.area else None
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3905: in get_widget_at
+    return self.screen.get_widget_at(x, y)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/screen.py:646: in get_widget_at
+    return self._compositor.get_widget_at(x, y)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Compositor size=Size(width=80, height=24) widgets=set()>, x = 40.5
+y = 25.0
+
+    def get_widget_at(self, x: int, y: int) -> tuple[Widget, Region]:
+        """Get the widget under a given coordinate.
+    
+        Args:
+            x: X Coordinate.
+            y: Y Coordinate.
+    
+        Raises:
+            errors.NoWidget: If there is not widget underneath (x, y).
+    
+        Returns:
+            A tuple of the widget and its region.
+        """
+    
+        contains = Region.contains
+        if len(self.layers_visible) > y >= 0:
+            for widget, cropped_region, region in self.layers_visible[int(y)]:
+                if contains(cropped_region, x, y) and widget.visible:
+                    return widget, region
+>       raise errors.NoWidget(f"No widget under screen coordinate ({x}, {y})")
+E       textual.errors.NoWidget: No widget under screen coordinate (40.5, 25.0)
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_compositor.py:848: NoWidget
+=========================== short test summary info ============================
+FAILED tests/probe_f8.py::test_probe[size2] - textual.errors.NoWidget: No wid...
+========================= 1 failed, 2 passed in 20.19s =========================
+RC=1

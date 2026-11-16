@@ -1,0 +1,3 @@
+CAP9B_VALIDATION sequences=22 png=54 sidecars=54 verdict=PASS
+pairs=22 spinner_order=PASS elapsed_nondecreasing=PASS exact_sidecars=PASS
+idle=10 hostile=8 long=3 short=1 stage_post_write=2

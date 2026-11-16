@@ -1,0 +1,13 @@
+bringing up nodes...
+bringing up nodes...
+
+................FF
+=================================== FAILURES ===================================
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:550: AssertionError: ['A2L loaded: definitions.a2l', 'Loaded definitions.s19']
+~/work/zq-mw9/mt/tests/test_b103_inc9_w_mutants.py:550: AssertionError: ['A2L loaded: definitions.a2l', 'Loaded definitions.s19']
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_62_6_a_refused_operand_shows_its_status_with_the_operand_echo[abc]
+FAILED tests/test_b103_inc9_w_mutants.py::test_r_pe_bench_62_6_a_refused_operand_shows_its_status_with_the_operand_echo[\x1b999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 2 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+2 failed, 16 passed in 98.42s (0:01:38)

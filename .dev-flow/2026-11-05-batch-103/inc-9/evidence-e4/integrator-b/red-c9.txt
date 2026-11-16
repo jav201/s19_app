@@ -1,0 +1,753 @@
+== red-c9  Fri Nov 13 09:25:22 PM CST 2026  load: 0.72 1.07 1.06
+s19_app.__file__ = ~/work/zq-e4-9-int/c9/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFF....F............F............F........F..........F.....F..FFFFF... [ 75%]
+.......F............                                                     [ 95%]
+=================================== FAILURES ===================================
+________ test_r_pe_bench_14_a_refused_decode_shows_two_dashes[no image] ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+case = 'no image'
+
+    @pytest.mark.parametrize("case", ["no image", "last byte missing"])
+    def test_r_pe_bench_14_a_refused_decode_shows_two_dashes(defc, case):
+        """R-PE-BENCH.14/1,2 - the bench decode of VAL_BLK_DEF_0001 is a refusal: no image; an image missing the
+        last byte (`A2L-DEF-BYTES`) -> Current `--`, never `refused`. The refusal is carried by ``BenchState.refusal``
+        with ``values`` None (graph-inc9 §Interfaces, ruling P-056 T9 F-1); Inc 8's ``row.current`` is None for a bench
+        row (no I-2 call at ``build_row``, E3A-01), so it cannot carry it."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        last = o.d.address + o.d.byte_length - 1
+        image = {} if case == "no image" else {a: b for a, b in o.image.items() if a != last}
+        refusal = decode_values(o.d, o.a2l, image)
+        assert isinstance(refusal, Refusal) and refusal.code == "A2L-DEF-BYTES"
+        row = sheet_row(o.d, o.a2l, image)
+        assert row.current is None, "Inc 8 does not decode a bench row"
+>       assert db.bench_cells(row, blank_state(refusal=refusal), WIDTHS)[CURRENT].plain.strip() == "--"
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+over = {'refusal': Refusal(code='A2L-DEF-BYTES', message='VAL_BLK_DEF_0001: 12 of its 12 bytes are not in the image')}
+names = {'anchor', 'axes', 'cursor', 'edit', 'focus', 'hi', ...}
+
+    def blank_state(**over):
+        """A ``BenchState`` of a fresh row (cursor (0,0), tool Set, empty edit) with ``over`` applied."""
+        names = {f.name for f in dataclasses.fields(db.BenchState)}
+>       assert set(over) <= names, f"BenchState has no field {set(over) - names}"
+               ^^^^^^^^^^^^^^^^^^
+E       AssertionError: BenchState has no field {'refusal'}
+
+tests/support/b103_inc9_b.py:71: AssertionError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele0')
+tool = 'i'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'i', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = None
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='i', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+                    v = values.numbers[c + grid.nx * r]
+                    number = v * factor if tool == "p" else v + operand_number
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "i":
+            span = hi_c - lo_c
+            for r in range(lo_r, hi_r + 1):
+                v0 = values.numbers[lo_c + grid.nx * r]
+>               v1 = values.numbers[hi_c + grid.nx * r]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:277: IndexError
+___ test_r_pe_bench_14_a_refused_decode_shows_two_dashes[last byte missing] ____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+case = 'last byte missing'
+
+    @pytest.mark.parametrize("case", ["no image", "last byte missing"])
+    def test_r_pe_bench_14_a_refused_decode_shows_two_dashes(defc, case):
+        """R-PE-BENCH.14/1,2 - the bench decode of VAL_BLK_DEF_0001 is a refusal: no image; an image missing the
+        last byte (`A2L-DEF-BYTES`) -> Current `--`, never `refused`. The refusal is carried by ``BenchState.refusal``
+        with ``values`` None (graph-inc9 §Interfaces, ruling P-056 T9 F-1); Inc 8's ``row.current`` is None for a bench
+        row (no I-2 call at ``build_row``, E3A-01), so it cannot carry it."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        last = o.d.address + o.d.byte_length - 1
+        image = {} if case == "no image" else {a: b for a, b in o.image.items() if a != last}
+        refusal = decode_values(o.d, o.a2l, image)
+        assert isinstance(refusal, Refusal) and refusal.code == "A2L-DEF-BYTES"
+        row = sheet_row(o.d, o.a2l, image)
+        assert row.current is None, "Inc 8 does not decode a bench row"
+>       assert db.bench_cells(row, blank_state(refusal=refusal), WIDTHS)[CURRENT].plain.strip() == "--"
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+over = {'refusal': Refusal(code='A2L-DEF-BYTES', message='VAL_BLK_DEF_0001: 1 of its 12 bytes are not in the image')}
+names = {'anchor', 'axes', 'cursor', 'edit', 'focus', 'hi', ...}
+
+    def blank_state(**over):
+        """A ``BenchState`` of a fresh row (cursor (0,0), tool Set, empty edit) with ``over`` applied."""
+        names = {f.name for f in dataclasses.fields(db.BenchState)}
+>       assert set(over) <= names, f"BenchState has no field {set(over) - names}"
+               ^^^^^^^^^^^^^^^^^^
+E       AssertionError: BenchState has no field {'refusal'}
+
+tests/support/b103_inc9_b.py:71: AssertionError
+__________ test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells(defc):
+        """R-PE-BENCH.15/2 - VAL_BLK_DEF_0001 +Δ 5 on (0,0), (1,0) -> `2 cells`; a cell whose text is unchanged is not counted."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        edit = {(0, 0): "41.9", (1, 0): "16.0"}
+        assert cells_of(o, summarised(o, edit=edit))[0][NEW] == "2 cells"
+        same_text = {**edit, (2, 0): "31.8"}  # 31.8 is the current text of (2,0)
+>       assert cells_of(o, summarised(o, edit=same_text))[0][NEW] == "2 cells", "count the changed cells, not the selection"
+E       AssertionError: count the changed cells, not the selection
+E       assert '3 cells' == '2 cells'
+E         
+E         - 2 cells
+E         ? ^
+E         + 3 cells
+E         ? ^
+
+tests/test_b103_inc9_b_cells.py:168: AssertionError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[m] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele1')
+tool = 'm'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'm', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = None
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='m', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+                    v = values.numbers[c + grid.nx * r]
+                    number = v * factor if tool == "p" else v + operand_number
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "i":
+            span = hi_c - lo_c
+            for r in range(lo_r, hi_r + 1):
+                v0 = values.numbers[lo_c + grid.nx * r]
+                v1 = values.numbers[hi_c + grid.nx * r]
+                for c in range(lo_c + 1, hi_c):
+                    number = v0 + (v1 - v0) * (c - lo_c) / span
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "m":
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c + 1, hi_c):
+                    number = (
+                        values.numbers[c - 1 + grid.nx * r]
+>                       + values.numbers[c + grid.nx * r]
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        + values.numbers[c + 1 + grid.nx * r]
+                    ) / 3
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:286: IndexError
+___________ test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw0/test_r_pe_bench_19_1_nan_colum0')
+
+    def test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip(tmp_path):
+        """R-PE-BENCH.19/1 - EX-N1: F32_BLK `1`, `nan`, `3` -> the strip: block, space, block, no exception."""
+        o = hand_object(tmp_path, "F32_BLK", "RL_F32", 3, bytes.fromhex("3F800000FFFFFFFF40400000"))
+>       strip = db.summary_strip(o.values, o.grid, 40)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+values = BenchValues(numbers=array('d', [1.0, nan, 3.0]), texts=None, missing=frozenset())
+grid = Grid(mode='grid', nx=16, ny=1, count=3, layout='flat'), width = 40
+
+    def summary_strip(values: BenchValues, grid: Grid, width: int) -> Text:
+        """A one-line summary of the values, at most ``width`` cells: a chart shows
+        an eighth block per k-th point (k = ceil(n/width)); a grid shows a styled █
+        per k-th column in the ramp step of its finite mean; lo/hi over the finite
+        values only (a non-finite point or an all-missing column is a space)."""
+        if width <= 0:
+            return Text()
+        lo, hi = finite_range(values.numbers, values.missing)
+        line = Text()
+        if grid.mode == "chart":
+            k = max(1, math.ceil(grid.nx / width))
+            for point in range(0, grid.nx, k):
+                value = values.numbers[point]
+                if point in values.missing or not math.isfinite(value):
+                    line.append(" ")
+                    continue
+                t = 0.0 if lo == hi else (value - lo) / (hi - lo)
+                line.append(_BLOCKS[round(t * 7)])
+            return line
+        k = max(1, math.ceil(grid.nx / width))
+        for column in range(0, grid.nx, k):
+            total = 0.0
+            count = 0
+            for row in range(grid.ny):
+                index = column + grid.nx * row
+>               value = values.numbers[index]
+                        ^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:507: IndexError
+_______ test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw0/test_r_pe_bench_19_3_every_val0')
+
+    def test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip(tmp_path):
+        """R-PE-BENCH.19/3 - three `FFFFFFFF` floats: no exception, nothing shaded (lo = hi = 0)."""
+        o = hand_object(tmp_path, "F32_BLK", "RL_F32", 3, bytes.fromhex("FFFFFFFF" * 3))
+>       strip = db.summary_strip(o.values, o.grid, 40)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_cells.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+values = BenchValues(numbers=array('d', [nan, nan, nan]), texts=None, missing=frozenset())
+grid = Grid(mode='grid', nx=16, ny=1, count=3, layout='flat'), width = 40
+
+    def summary_strip(values: BenchValues, grid: Grid, width: int) -> Text:
+        """A one-line summary of the values, at most ``width`` cells: a chart shows
+        an eighth block per k-th point (k = ceil(n/width)); a grid shows a styled █
+        per k-th column in the ramp step of its finite mean; lo/hi over the finite
+        values only (a non-finite point or an all-missing column is a space)."""
+        if width <= 0:
+            return Text()
+        lo, hi = finite_range(values.numbers, values.missing)
+        line = Text()
+        if grid.mode == "chart":
+            k = max(1, math.ceil(grid.nx / width))
+            for point in range(0, grid.nx, k):
+                value = values.numbers[point]
+                if point in values.missing or not math.isfinite(value):
+                    line.append(" ")
+                    continue
+                t = 0.0 if lo == hi else (value - lo) / (hi - lo)
+                line.append(_BLOCKS[round(t * 7)])
+            return line
+        k = max(1, math.ceil(grid.nx / width))
+        for column in range(0, grid.nx, k):
+            total = 0.0
+            count = 0
+            for row in range(grid.ny):
+                index = column + grid.nx * row
+>               value = values.numbers[index]
+                        ^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:507: IndexError
+_____ test_r_pe_bench_30_2_the_chart_labels_hi_on_top_and_lo_at_the_bottom _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_30_2_the_chart_labels_hi_on_top_and_lo_at_the_bottom(defc):
+        """R-PE-BENCH.30/2 - top label `58106`, bottom label `11719` (hi on the top row, lo on the bottom row)."""
+        lines = chart_lines(defc_obj(defc, "CURVE_DEF_0001"), width=114, room=20)
+        top, bottom = locate(lines, "58106")[0], locate(lines, "11719")[0]
+        assert top < bottom
+        assert lines[top].plain.split()[0] == "58106"
+>       assert lines[bottom].plain.split()[0] == "11719"
+E       AssertionError: assert '11719███████...█████████████' == '11719'
+E         
+E         - 11719
+E         + 11719██████████████████████████████
+
+tests/test_b103_inc9_b_canvas.py:277: AssertionError
+_ test_r_pe_bench_19_2_a_point_that_is_not_finite_has_no_bar_and_a_question_mark _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_19_2_a_point_that_is_not_finite_has_no_bar_and_a_question_mark(defc):
+        """R-PE-BENCH.19/2 - EX-N2: a CURVE copy 1, inf, 3: point 1 drawn `?` on the base line, top label 3, bottom label 1."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        d = dataclasses.replace(o.d, shape=(3,), element_count=3)
+        grid = db.bench_grid(d)
+        values = db.BenchValues.from_decoded(decoded_of((1.0, "1"), (math.inf, "inf"), (3.0, "3")))
+        state = blank_state(values=values, lo=1.0, hi=3.0, labels=dv.axis_labels(d, (), grid))
+        lines = dv.chart_canvas(d, grid, values, None, state, 114, 20)
+        mark_line, mark_at = locate(lines, "?")
+        bottom = bottom_bar_line(lines)
+        groups = bar_groups(lines)
+        assert len(groups) == 2, "points 0 and 2 have bars, point 1 has none"
+>       assert mark_line == bottom, "the `?` sits on the base line"
+E       AssertionError: the `?` sits on the base line
+E       assert 16 == 15
+
+tests/test_b103_inc9_b_canvas.py:308: AssertionError
+________ test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge[118] _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+width = 118
+
+    @pytest.mark.parametrize("width", [118, 220])
+    def test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge(defc, width):
+        """R-PE-BENCH.93/1,2 - CURVE_DEF_0001 Set `x` × 300: a refusal verdict (294 characters; the case says 289, on
+        the wording list) ends in `…` and is cut AT the bar's right edge at 118 / 220. Ruling P-056 T9 F-7: ``width`` is
+        the tail's width, the name not included (I-8.5 ``bar(row, state, width)``: Inc 8's sheet passes the tail
+        widget's width, as for ``formula_tail``; EX-H3: width 100 -> length 100)."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        refusal = encode_values(o.d, o.a2l, {(0,): "x" * 300}, o.image)
+        assert isinstance(refusal, Refusal) and len(refusal.message) > 200
+        name, tail = tail_of(o, view_state(o, tool="s", preview=refusal, edit={(0,): "x" * 300}), width=width)
+        assert tail.plain.endswith("…") and tail.plain.count("…") == 1
+>       assert cell_len(tail.plain) == width, "cut at the bar's right edge, not inside it"
+E       AssertionError: cut at the bar's right edge, not inside it
+E       assert 100 == 118
+E        +  where 100 = cell_len("Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…")
+E        +    where "Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…" = <text "Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…" [] ''>.plain
+
+tests/test_b103_inc9_b_detail.py:324: AssertionError
+________ test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge[220] _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+width = 220
+
+    @pytest.mark.parametrize("width", [118, 220])
+    def test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge(defc, width):
+        """R-PE-BENCH.93/1,2 - CURVE_DEF_0001 Set `x` × 300: a refusal verdict (294 characters; the case says 289, on
+        the wording list) ends in `…` and is cut AT the bar's right edge at 118 / 220. Ruling P-056 T9 F-7: ``width`` is
+        the tail's width, the name not included (I-8.5 ``bar(row, state, width)``: Inc 8's sheet passes the tail
+        widget's width, as for ``formula_tail``; EX-H3: width 100 -> length 100)."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        refusal = encode_values(o.d, o.a2l, {(0,): "x" * 300}, o.image)
+        assert isinstance(refusal, Refusal) and len(refusal.message) > 200
+        name, tail = tail_of(o, view_state(o, tool="s", preview=refusal, edit={(0,): "x" * 300}), width=width)
+        assert tail.plain.endswith("…") and tail.plain.count("…") == 1
+>       assert cell_len(tail.plain) == width, "cut at the bar's right edge, not inside it"
+E       AssertionError: cut at the bar's right edge, not inside it
+E       assert 202 == 220
+E        +  where 202 = cell_len("Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…")
+E        +    where "Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…" = <text "Set on 1 pts ✗ CURVE_DEF_0001[0]: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…" [] ''>.plain
+
+tests/test_b103_inc9_b_detail.py:324: AssertionError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[d] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw0/test_r_pe_bench_53_a_flat_sele0')
+tool = 'd'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'd', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = 1.0
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='d', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+>                   v = values.numbers[c + grid.nx * r]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:270: IndexError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[d] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele2')
+tool = 'd'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'd', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = 1.0
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='d', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+>                   v = values.numbers[c + grid.nx * r]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:270: IndexError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[p] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele3')
+tool = 'p'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'p', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = 1.0
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='p', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+>                   v = values.numbers[c + grid.nx * r]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:270: IndexError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele4')
+tool = 'i'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'i', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = None
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='i', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+                    v = values.numbers[c + grid.nx * r]
+                    number = v * factor if tool == "p" else v + operand_number
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "i":
+            span = hi_c - lo_c
+            for r in range(lo_r, hi_r + 1):
+                v0 = values.numbers[lo_c + grid.nx * r]
+>               v1 = values.numbers[hi_c + grid.nx * r]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:277: IndexError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[p] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw0/test_r_pe_bench_53_a_flat_sele1')
+tool = 'p'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'p', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = 1.0
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='p', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+>                   v = values.numbers[c + grid.nx * r]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:270: IndexError
+_ test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[m] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-9-int/tmp/pytest-of-<runner>/pytest-11/popen-gw1/test_r_pe_bench_53_a_flat_sele5')
+tool = 'm'
+
+    @pytest.mark.parametrize("tool", ["d", "p", "i", "m"])
+    def test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count(tmp_path, tool):
+        """R-PE-BENCH.53 ... .56 (CTX-PE-BENCH grid: a flat grid's last row may be short) - a 1-D FLOAT32 array of 18
+        elements (rows of 16 and 2), selection (15,0)..(1,1): no exception, no position past element 17. Integrator
+        finding W9-F1: the tools read the rectangle's cells past the count (IndexError on base 3d345667)."""
+        o = hand_object(tmp_path, "F32_18", "RL_F32", 18, struct.pack(">18f", *(k * k for k in range(1, 19))))
+>       after = run(o, tool, "1", (1, 1), (15, 0))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_tools.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc9_b_tools.py:43: in run
+    return db.apply_tool(o.d, state, o.grid, shown, operand)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/definition_bench.py:411: in apply_tool
+    for position, number in _tool_results(state.tool, grid, values, operand_number, state).items():
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'm', grid = Grid(mode='grid', nx=16, ny=2, count=18, layout='flat')
+values = BenchValues(numbers=array('d', [1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0, 225.0, 256.0, 289.0, 324.0]), texts=None, missing=frozenset())
+operand_number = None
+state = BenchState(cursor=(1, 1), anchor=(15, 0), tool='m', edit={}, undo=(), origin=(0, 0), focus=False, values=BenchValues(n...zenset()), staged=None, axes=(), preview=None, job=None, runs=(), lo=0.0, hi=0.0, strip=None, labels=None, status=None)
+
+    def _tool_results(
+        tool: str,
+        grid: Grid,
+        values: BenchValues,
+        operand_number: float | None,
+        state: BenchState,
+    ) -> dict:
+        """The tool's number for each cell it changes, in element order."""
+        lo_c, hi_c = sorted((state.anchor[0], state.cursor[0]))
+        lo_r, hi_r = sorted((state.anchor[1], state.cursor[1]))
+        results: dict = {}
+        if tool in ("d", "p"):
+            factor = 1 + operand_number / 100 if tool == "p" else 1.0
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c, hi_c + 1):
+                    v = values.numbers[c + grid.nx * r]
+                    number = v * factor if tool == "p" else v + operand_number
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "i":
+            span = hi_c - lo_c
+            for r in range(lo_r, hi_r + 1):
+                v0 = values.numbers[lo_c + grid.nx * r]
+                v1 = values.numbers[hi_c + grid.nx * r]
+                for c in range(lo_c + 1, hi_c):
+                    number = v0 + (v1 - v0) * (c - lo_c) / span
+                    results[_position_of(grid, r, c)] = number
+        elif tool == "m":
+            for r in range(lo_r, hi_r + 1):
+                for c in range(lo_c + 1, hi_c):
+                    number = (
+                        values.numbers[c - 1 + grid.nx * r]
+>                       + values.numbers[c + grid.nx * r]
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        + values.numbers[c + 1 + grid.nx * r]
+                    ) / 3
+E                   IndexError: array index out of range
+
+s19_app/tui/definition_bench.py:286: IndexError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_14_a_refused_decode_shows_two_dashes[no image]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_14_a_refused_decode_shows_two_dashes[last byte missing]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_15_2_the_new_cell_counts_the_changed_cells
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[m]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_3_every_value_not_finite_gives_a_blank_strip
+FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_30_2_the_chart_labels_hi_on_top_and_lo_at_the_bottom
+FAILED tests/test_b103_inc9_b_canvas.py::test_r_pe_bench_19_2_a_point_that_is_not_finite_has_no_bar_and_a_question_mark
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge[118]
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_93_1_2_a_long_verdict_is_cut_at_the_edge[220]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[d]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[d]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[p]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[i]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[p]
+FAILED tests/test_b103_inc9_b_tools.py::test_r_pe_bench_53_a_flat_selection_over_the_short_last_row_leaves_out_the_cells_past_the_count[m]
+17 failed, 75 passed in 1.57s
+rc=1

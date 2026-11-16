@@ -1,0 +1,14 @@
+baseclone 16b00234 start 11:45:22 load 1.15 1.59 1.72 1/633 534143
+base test_b100_session_reset 3 failed, 17 passed in 66.16s (0:01:06)
+base test_b103_clipboard_core 2 failed, 83 passed, 2 skipped in 139.93s (0:02:19)
+base test_b103_copy_paste_matrix 7 failed, 7 passed, 15 skipped in 120.96s (0:02:00)
+base test_b97_chips_help 1 failed, 78 passed in 213.56s (0:03:33)
+base test_b99_editor_image 2 failed, 6 passed in 32.72s
+base test_tui_patch_card 1 failed, 25 passed in 30.73s
+base test_tui_patch_editor_b94 1 failed, 16 passed in 30.19s
+base test_tui_patch_history_strip 1 failed, 6 passed, 1 skipped in 19.88s
+base test_tui_patch_json 4 failed, 13 passed in 15.68s
+base test_tui_snapshot 6 failed, 25 passed, 2 xfailed in 70.66s (0:01:10)
+base test_b97_width 145 passed in 625.92s (0:10:25)
+head test_b97_width 145 passed in 596.90s (0:09:56)
+CHAIN3_DONE 12:18:17 load 0.90 1.46 1.61 1/632 543596

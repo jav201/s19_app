@@ -1,0 +1,47 @@
+2026-11-15T12:05:09-06:00
+~/work/zq-i9b/tree/s19_app/__init__.py
+=== PROBE_RUN=1
+ 12:05:09 up 2 days, 20:53,  2 users,  load average: 0.48, 0.72, 0.44
+[DEBUG-i9b102] events [('paint_busy', -0.7592), ('selection_enter', -0.755), ('selection_exit', -0.7533), ('paint_busy', -0.7038), ('idle_enter', -0.6913), ('idle_exit', -0.6912), ('paint_idle', -0.6462), ('idle_enter', -0.567), ('idle_exit', -0.567), ('selection_enter', -0.4974), ('selection_exit', -0.4958), ('paint_idle', -0.4558), ('idle_enter', -0.4544), ('idle_exit', -0.4544), ('paint_idle', -0.3977), ('idle_enter', -0.3916), ('idle_exit', -0.3916), ('paint_busy', -0.2537), ('selection_enter', -0.2274), ('selection_exit', -0.2258), ('paint_busy', -0.2004), ('idle_enter', -0.1912), ('idle_exit', -0.1911), ('paint_idle', -0.1455), ('idle_enter', -0.0657), ('idle_exit', -0.0657), ('selection_enter', 0.0033), ('selection_exit', 0.0592), ('paint_idle', 0.1027), ('idle_enter', 0.1035), ('idle_exit', 0.1035), ('paint_idle', 0.1597)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:719: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.353 s after the key (bound 0.3 s, load 0.56 0.73 0.45); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.02802849598811008 is not None and 0.3527206870203372 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 8.96s
+exit=1
+=== PROBE_RUN=2
+ 12:05:19 up 2 days, 20:54,  2 users,  load average: 0.56, 0.73, 0.45
+[DEBUG-i9b102] events [('paint_busy', -0.7839), ('selection_enter', -0.7794), ('selection_exit', -0.7778), ('idle_enter', -0.773), ('idle_exit', -0.7728), ('paint_idle', -0.7209), ('paint_idle', -0.662), ('idle_enter', -0.6619), ('idle_exit', -0.6619), ('paint_busy', -0.5182), ('selection_enter', -0.492), ('selection_exit', -0.4903), ('paint_busy', -0.4673), ('idle_enter', -0.4665), ('idle_exit', -0.4663), ('paint_idle', -0.4068), ('idle_enter', -0.328), ('idle_exit', -0.328), ('paint_busy', -0.2544), ('selection_enter', -0.2302), ('selection_exit', -0.2286), ('paint_busy', -0.1991), ('idle_enter', -0.1728), ('idle_exit', -0.1725), ('paint_idle', -0.1437), ('idle_enter', -0.0652), ('idle_exit', -0.0652), ('selection_enter', 0.0033), ('selection_exit', 0.0627), ('paint_idle', 0.1057), ('idle_enter', 0.1064), ('idle_exit', 0.1064), ('paint_idle', 0.1628)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:719: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.355 s after the key (bound 0.3 s, load 0.63 0.74 0.45); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.027520134986843914 is not None and 0.3546251670049969 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 9.01s
+exit=1
+=== PROBE_RUN=3
+ 12:05:29 up 2 days, 20:54,  2 users,  load average: 0.63, 0.74, 0.45
+[DEBUG-i9b102] events [('selection_enter', -0.8454), ('selection_exit', -0.8437), ('paint_busy', -0.821), ('paint_busy', -0.7829), ('idle_enter', -0.689), ('idle_exit', -0.6888), ('paint_idle', -0.6032), ('paint_busy', -0.5676), ('selection_enter', -0.5435), ('selection_exit', -0.5419), ('idle_enter', -0.5403), ('idle_exit', -0.5401), ('paint_idle', -0.4982), ('paint_idle', -0.4388), ('idle_enter', -0.4387), ('idle_exit', -0.4387), ('paint_busy', -0.2902), ('selection_enter', -0.2659), ('selection_exit', -0.2643), ('paint_busy', -0.2411), ('idle_enter', -0.2401), ('idle_exit', -0.2399), ('paint_idle', -0.1867), ('idle_enter', -0.0936), ('idle_exit', -0.0936), ('paint_busy', -0.0202), ('selection_enter', 0.0033), ('selection_exit', 0.055), ('paint_busy', 0.0857), ('idle_enter', 0.0918), ('idle_exit', 0.0919), ('paint_idle', 0.1529)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:719: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.439 s after the key (bound 0.3 s, load 0.61 0.73 0.46); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.027644706016872078 is not None and 0.4386297049932182 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 9.03s
+exit=1

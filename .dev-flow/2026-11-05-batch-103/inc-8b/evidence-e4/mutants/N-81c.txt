@@ -1,0 +1,109 @@
+# mutant N-81c  rows: R-PE-DEF.81
+# edits: s19_app/tui/screens_directionb/patch_editor/sheet.py:72
+# -k: r_pe_def_81_
+# uptime: 01:58:11 up 2 days, 10:46,  3 users,  load average: 1.08, 0.79, 1.22
+s19_app.__file__ = ~/work/zq-m8b/m/N-81c/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+...........F..F.                                                         [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says(softa_page):
+        """R-PE-DEF.81/5 (E3-8b-05) - the host at 118x54 (no chrome): grid 53, body 52, visible 50 (`W.harness_118x54.*`).
+    
+        Why: the body must fill the scroller less its scrollbar row, and the window must paint exactly
+        visible = body - 2 sheet lines; a body as tall as its own text would leave the window shorter
+        than the room the operator has. The harness gives the body no height of its own.
+        """
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                grids = list(sheet.query("#patch_sheet_grid"))
+                assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+                body = sheet.query_one("#patch_sheet_body")
+                assert grids[0].outer_size.height == fact("W.harness_118x54.grid")
+                assert body.outer_size.height == fact("W.harness_118x54.body")
+                lines = body_lines(sheet)
+                assert len(lines) == fact("W.harness_118x54.visible") + 2
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:416: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            await pilot.pause()
+            grids = list(sheet.query("#patch_sheet_grid"))
+            assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+            body = sheet.query_one("#patch_sheet_body")
+            assert grids[0].outer_size.height == fact("W.harness_118x54.grid")
+>           assert body.outer_size.height == fact("W.harness_118x54.body")
+E           AssertionError: assert 3 == 52
+E            +  where 3 = Size(width=143, height=3).height
+E            +    where Size(width=143, height=3) = _SheetBody(id='patch_sheet_body').outer_size
+E            +  and   52 = fact('W.harness_118x54.body')
+
+tests/test_b103_inc8_s2_sheet_keys.py:412: AssertionError
+____ test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row(softa_page):
+        """R-PE-DEF.81/5 (E3-8b-05) - the host at 118x54 with no chrome and no body rule: the sheet is
+        `W.harness_118x54.sheet` rows, the grid scroller `.grid`, the body `.body`, and 200 names paint
+        `.visible` rows under the header and its rule. Why: without a height rule for the body under the
+        scroller it is as tall as its own text, the window paints every row and the selection runs off screen."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with grid_ctx(SIZE_118) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                body = sheet.query_one("#patch_sheet_body")
+                grids = list(sheet.query("#patch_sheet_grid"))
+                return (sheet.size.height, grids[0].size.height if grids else None, body.size.height,
+                        len(body_lines(sheet)))
+    
+        sheet_h, grid_h, body_h, painted = asyncio.run(drive())
+>       assert body_h == T["W.harness_118x54.body"], body_h
+E       AssertionError: 3
+E       assert 3 == 52
+
+tests/test_b103_inc8b_bw.py:304: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_def_81_5_the_body_fills_the_scroller_less_its_scrollbar_row
+2 failed, 14 passed in 17.89s
+
+# exit=1

@@ -1,0 +1,77 @@
+# load: 1.27
+~/work/zq-mw9/clone/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-mw9/clone
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values FAILED [100%]
+
+=================================== FAILURES ===================================
+_____ test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values _____
+
+tmp_path = PosixPath('~/work/zq-mw9/tmp/pytest-of-<user>/pytest-5/test_r_pe_bench_26_2_a_deselec0')
+defc_dir = PosixPath('~/work/zq-mw9/tmp/pytest-of-<user>/pytest-5/b103_inc9_w_defc0')
+
+    @slow
+    def test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values(tmp_path, defc_dir):
+        """LARGE decoded, then SMALL_BLK selected: LARGE's values and staged values are None and the retained memory
+        (`tracemalloc` on the allocations of `s19_app`, after `gc.collect()`) is at most 1 MiB above the level before LARGE. Control: with LARGE
+        selected the retained memory is well above that (the numbers are kept).
+    
+        Two runs of the same decode (F-I9b-1, ruling P-077): run 1 is untraced and holds the time bound (the values
+        show within ``DECODE_WAIT_S``, then deselecting drops them); run 2 is traced and holds the 1 MiB memory bound
+        with no time bound of its own (``TRACED_WAIT_S`` only guards a hang). Neither bound is loosened."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def untraced(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await pick(pilot, sheet, LARGE)
+            await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values", DECODE_WAIT_S)
+            await pick(pilot, sheet, "SMALL_BLK")
+            await wait_for(pilot, lambda: has_values(sheet, "SMALL_BLK"), "SMALL_BLK's values", 60)
+            return st(sheet, LARGE)
+    
+        def product_bytes() -> int:
+            """Bytes traced from allocation sites in ``s19_app`` only. The Textual internals (message queue, caches)
+            grow by about 4 MiB over a traced decode of several minutes whatever the row; they are not LARGE's."""
+            shot = tracemalloc.take_snapshot().filter_traces([tracemalloc.Filter(True, "*/s19_app/*")])
+            return sum(stat.size for stat in shot.statistics("filename"))
+    
+        async def traced(app, pilot, panel):
+            sheet = sheet_of(panel)
+            gc.collect()
+            tracemalloc.start()
+            try:
+                base, base_all = product_bytes(), tracemalloc.get_traced_memory()[0]
+                await pick(pilot, sheet, LARGE)
+                await wait_for(pilot, lambda: has_values(sheet, LARGE), "LARGE's values (traced)", TRACED_WAIT_S)
+                gc.collect()
+                held = product_bytes() - base
+                await pick(pilot, sheet, "SMALL_BLK")
+                await wait_for(pilot, lambda: has_values(sheet, "SMALL_BLK"), "SMALL_BLK's values", 600)
+                gc.collect()
+                return held, product_bytes() - base, tracemalloc.get_traced_memory()[0] - base_all, st(sheet, LARGE)
+            finally:
+                tracemalloc.stop()
+    
+        first = run(tmp_path, defc_dir, untraced, a2l=a2l, image=s19)
+        assert first.values is None and first.staged is None, "run 1: LARGE kept values after SMALL_BLK was selected"
+        held, after, after_all, state = run(tmp_path, defc_dir, traced, a2l=a2l, image=s19)
+        assert held > 1 << 20, "control: LARGE's values were held while selected"
+        assert state.values is None and state.staged is None
+>       assert after <= 1 << 20, (
+            f"{after / (1 << 20):.1f} MiB allocated by s19_app are still retained after deselecting LARGE "
+            f"(all allocations: {after_all / (1 << 20):.1f} MiB)"
+        )
+E       AssertionError: 4.0 MiB allocated by s19_app are still retained after deselecting LARGE (all allocations: 7.8 MiB)
+E       assert 4171578 <= (1 << 20)
+
+tests/test_b103_inc9_w_jobs.py:212: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_26_2_a_deselected_large_row_keeps_none_of_its_values
+======================== 1 failed in 474.95s (0:07:54) =========================
+rc=1
+# load end: 2.62

@@ -1,0 +1,1519 @@
+2026-11-15T12:20:37-06:00
+ 12:20:37 up 2 days, 21:09,  2 users,  load average: 0.03, 0.39, 0.51
+~/work/zq-i9b/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.....F.F                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+tests/test_b103_inc9b_s.py:293: in test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere
+    (before, rows_at_write, settled, full, tokens), entries = run(tmp_path, defc_dir, body)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:116: in _drive
+    async with app.run_test(size=size) as pilot:
+../../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app/patch.py:765: in <lambda>
+    self.set_timer(STEP_GAP_S, lambda: run(index))
+                                       ^^^^^^^^^^
+s19_app/tui/app/patch.py:759: in run
+    steps[index]()
+s19_app/tui/app/patch.py:721: in ledger
+    panel.refresh_entries(
+tests/test_b103_inc9b_s.py:253: in gated_refresh
+    raise AssertionError("the test did not release the ledger-step gate")
+E   AssertionError: the test did not release the ledger-step gate
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:765 in <lambda>     │
+│                                                                              │
+│    762 │   │   │   │   on_done()                                             │
+│    763 │   │   │   │   raise                                                 │
+│    764 │   │   │   if index < len(steps):                                    │
+│ ❱  765 │   │   │   │   self.set_timer(STEP_GAP_S, lambda: run(index))        │
+│    766 │   │   │   else:                                                     │
+│    767 │   │   │   │   on_done()                                             │
+│    768                                                                       │
+│                                                                              │
+│ ╭─ locals ──╮                                                                │
+│ │ index = 1 │                                                                │
+│ ╰───────────╯                                                                │
+│                                                                              │
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:759 in run          │
+│                                                                              │
+│    756 │   │   │   │   ):                                                    │
+│    757 │   │   │   │   │   index = len(steps)                                │
+│    758 │   │   │   │   else:                                                 │
+│ ❱  759 │   │   │   │   │   steps[index]()                                    │
+│    760 │   │   │   │   │   index += 1                                        │
+│    761 │   │   │   except BaseException:                                     │
+│    762 │   │   │   │   on_done()                                             │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ index = 1                                                                │ │
+│ │  self = S19TuiApp(                                                       │ │
+│ │         │   title='Hex Edit Tool',                                       │ │
+│ │         │   classes={'-dark-mode'},                                      │ │
+│ │         │   pseudo_classes={'focus', 'dark'}                             │ │
+│ │         )                                                                │ │
+│ │ steps = [                                                                │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.serialize │ │
+│ │         at 0x7f29d5fd6ca0>,                                              │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.ledger at │ │
+│ │         0x7f29d73947c0>,                                                 │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.sheet at  │ │
+│ │         0x7f29c747db20>,                                                 │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.tail at   │ │
+│ │         0x7f29c747cf40>                                                  │ │
+│ │         ]                                                                │ │
+│ │ token = (                                                                │ │
+│ │         │   139817685602784,                                             │ │
+│ │         │   (('back', 1), ('bound', 20), ('forward', 0)),                │ │
+│ │         │   139817671675280                                              │ │
+│ │         )                                                                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:721 in ledger       │
+│                                                                              │
+│    718 │   │   │   loaded_ranges = loaded.ranges if loaded is not None else  │
+│    719 │   │   │   panel = self.query_one("#patch_editor_panel", PatchEditor │
+│    720 │   │   │   # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh │
+│ ❱  721 │   │   │   panel.refresh_entries(                                    │
+│    722 │   │   │   │   service.rows(loaded_ranges),                          │
+│    723 │   │   │   │   # batch-99 HLR-157 (LLR-157.4): the strip reads the j │
+│    724 │   │   │   │   # overlay — source bytes at every address an apply wr │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          held = {                                                        │ │
+│ │                 │   'view': PatchDocumentView(                           │ │
+│ │                 │   │   name=None,                                       │ │
+│ │                 │   │   kind='change',                                   │ │
+│ │                 │   │   json_text='{\n  "format": "s19app-changeset",\n  │ │
+│ │                 "version": "2.0",\n  "kind": "change",\n  "enc'+215,     │ │
+│ │                 │   │   entry_count=1                                    │ │
+│ │                 │   )                                                    │ │
+│ │                 }                                                        │ │
+│ │        loaded = LoadedFile(                                              │ │
+│ │                 │                                                        │ │
+│ │                 path=PosixPath('~/work/zq-i9b/tmp/pytest-o… │ │
+│ │                 │   file_type='s19',                                     │ │
+│ │                 │   mem_map={                                            │ │
+│ │                 │   │   8388608: 1,                                      │ │
+│ │                 │   │   8388609: 77,                                     │ │
+│ │                 │   │   8388610: 80,                                     │ │
+│ │                 │   │   8388611: 238,                                    │ │
+│ │                 │   │   8388612: 187,                                    │ │
+│ │                 │   │   8388613: 73,                                     │ │
+│ │                 │   │   8388614: 60,                                     │ │
+│ │                 │   │   8388615: 112,                                    │ │
+│ │                 │   │   8388616: 5,                                      │ │
+│ │                 │   │   8388617: 22,                                     │ │
+│ │                 │   │   ... +246                                         │ │
+│ │                 │   },                                                   │ │
+│ │                 │   row_bases=[                                          │ │
+│ │                 │   │   8388608,                                         │ │
+│ │                 │   │   8388624,                                         │ │
+│ │                 │   │   8388640,                                         │ │
+│ │                 │   │   8388656,                                         │ │
+│ │                 │   │   8388672,                                         │ │
+│ │                 │   │   8388688,                                         │ │
+│ │                 │   │   8388704,                                         │ │
+│ │                 │   │   8388720,                                         │ │
+│ │                 │   │   8388736,                                         │ │
+│ │                 │   │   8388752,                                         │ │
+│ │                 │   │   ... +6                                           │ │
+│ │                 │   ],                                                   │ │
+│ │                 │   ranges=[(8388608, 8388864)],                         │ │
+│ │                 │   range_validity=[True],                               │ │
+│ │                 │   errors=[],                                           │ │
+│ │                 │                                                        │ │
+│ │                 a2l_path=PosixPath('~/work/zq-i9b/tmp/pyte… │ │
+│ │                 │   a2l_data={                                           │ │
+│ │                 │   │   'path':                                          │ │
+│ │                 '~/work/zq-i9b/tmp/pytest-of-<runner>/pyte… │ │
+│ │                 │   │   'sections': [                                    │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'name': 'PROJECT',                       │ │
+│ │                 │   │   │   │   'meta': 'SYNTH_DEFINITIONS_DEMO          │ │
+│ │                 "Synthetic definitions demo project"',                   │ │
+│ │                 │   │   │   │   'meta_line': 2,                          │ │
+│ │                 │   │   │   │   'start_line': 2,                         │ │
+│ │                 │   │   │   │   'end_line': 105,                         │ │
+│ │                 │   │   │   │   'lines': [''],                           │ │
+│ │                 │   │   │   │   'line_numbers': [3],                     │ │
+│ │                 │   │   │   │   'children': [                            │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'name': 'MODULE',                │ │
+│ │                 │   │   │   │   │   │   'meta': 'ECU_DEFINITIONS         │ │
+│ │                 "Synthetic definitions demo module"',                    │ │
+│ │                 │   │   │   │   │   │   'meta_line': 3,                  │ │
+│ │                 │   │   │   │   │   │   'start_line': 3,                 │ │
+│ │                 │   │   │   │   │   │   'end_line': 104,                 │ │
+│ │                 │   │   │   │   │   │   'lines': [                       │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'line_numbers': [                │ │
+│ │                 │   │   │   │   │   │   │   4,                           │ │
+│ │                 │   │   │   │   │   │   │   9,                           │ │
+│ │                 │   │   │   │   │   │   │   11,                          │ │
+│ │                 │   │   │   │   │   │   │   14,                          │ │
+│ │                 │   │   │   │   │   │   │   17,                          │ │
+│ │                 │   │   │   │   │   │   │   20,                          │ │
+│ │                 │   │   │   │   │   │   │   24,                          │ │
+│ │                 │   │   │   │   │   │   │   28,                          │ │
+│ │                 │   │   │   │   │   │   │   31,                          │ │
+│ │                 │   │   │   │   │   │   │   35,                          │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'children': [                    │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': '""',            │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 4,          │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 4,         │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 8,           │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'BYTE_ORDER          │ │
+│ │                 MSB_FIRST',                                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   'ALIGNMENT_BYTE 1',  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'ALIGNMENT_WORD 2'   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   5,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   6,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   7                    │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name':                  │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'cal DATA FLASH  │ │
+│ │                 INTERN FLASH 0x00800000 0x000100',                       │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 9,          │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 9,         │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 10,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [],             │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [],      │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_U8',         │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 11,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 11,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 13,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 UBYTE  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [12],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_U16',        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 14,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 14,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 16,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 UWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [15],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_S16',        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 17,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 17,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 19,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 SWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [18],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_DEF_AXIS',   │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 20,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 20,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 23,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'NO_AXIS_PTS_X 1     │ │
+│ │                 UWORD',                                                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'AXIS_PTS_X 2 UWORD  │ │
+│ │                 INDEX_INCR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   21,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   22                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_DEF_MAP',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 24,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 24,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 27,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'AXIS_PTS_X 1 UWORD  │ │
+│ │                 INDEX_INCR DIRECT',                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 2 SWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   25,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   26                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta':                  │ │
+│ │                 'RL_DEF_S16_ROW',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 28,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 28,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 30,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 SWORD  │ │
+│ │                 ROW_DIR DIRECT'                                          │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [29],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',  │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'CM_DEF_ENUM     │ │
+│ │                 "synthetic verbal conversion"',                          │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 31,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 31,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 34,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'TAB_VERB "%.0" ""', │ │
+│ │                 │   │   │   │   │   │   │   │   │   'COMPU_TAB_REF       │ │
+│ │                 VT_DEF_STATE'                                            │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   32,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   33                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'COMPU_VTAB',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'VT_DEF_STATE    │ │
+│ │                 "synthetic states"',                                     │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 35,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 35,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 42,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'TAB_VERB 4',        │ │
+│ │                 │   │   │   │   │   │   │   │   │   '0 "OFF"',           │ │
+│ │                 │   │   │   │   │   │   │   │   │   '1 "IDLE"',          │ │
+│ │                 │   │   │   │   │   │   │   │   │   '2 "RUN"',           │ │
+│ │                 │   │   │   │   │   │   │   │   │   '3 "FAULT"',         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'DEFAULT_VALUE       │ │
+│ │                 "UNKNOWN_STATE"'                                         │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   36,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   37,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   38,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   39,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   40,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   41                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ]                                │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   ],                                               │ │
+│ │                 │   │   'errors': [],                                    │ │
+│ │                 │   │   'tags': [                                        │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388608,                      │ │
+│ │                 │   │   │   │   'length': 1,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '3',                      │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U8',                      │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_ENUM',             │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388624,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '1',                      │ │
+│ │                 │   │   │   │   'bit_org': '0x0001',                     │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388624,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '255',                    │ │
+│ │                 │   │   │   │   'bit_org': '0x0FF0',                     │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388640,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-40',                    │ │
+│ │                 │   │   │   │   'upper_limit': '150',                    │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_S16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_LIN',              │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388688,                      │ │
+│ │                 │   │   │   │   'length': None,                          │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '65535',                  │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388704,                      │ │
+│ │                 │   │   │   │   'length': None,                          │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '65535',                  │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388720,                      │ │
+│ │                 │   │   │   │   'length': 32,                            │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-1000',                  │ │
+│ │                 │   │   │   │   'upper_limit': '1000',                   │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_DEF_MAP',                 │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388752,                      │ │
+│ │                 │   │   │   │   'length': 12,                            │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-50',                    │ │
+│ │                 │   │   │   │   'upper_limit': '50',                     │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_DEF_S16_ROW',             │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_FINE',             │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   ],                                               │ │
+│ │                 │   │   'declared_spans': [],                            │ │
+│ │                 │   │   'record_layouts_by_name': {                      │ │
+│ │                 │   │   │   'RL_U8': {                                   │ │
+│ │                 │   │   │   │   'name': 'RL_U8',                         │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UBYTE',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 UBYTE COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_U16': {                                  │ │
+│ │                 │   │   │   │   'name': 'RL_U16',                        │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 UWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_S16': {                                  │ │
+│ │                 │   │   │   │   'name': 'RL_S16',                        │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'SWORD',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 SWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_AXIS': {                             │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_AXIS',                   │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'NO_AXIS_PTS_X',                     │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD'                              │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'NO_AXIS_PTS_X 1 UWORD',             │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X 2 UWORD INDEX_INCR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_MAP': {                              │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_MAP',                    │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD',                             │ │
+│ │                 │   │   │   │   │   'INDEX_INCR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X 1 UWORD INDEX_INCR       │ │
+│ │                 DIRECT',                                                 │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 2 SWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_S16_ROW': {                          │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_S16_ROW',                │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'SWORD',                             │ │
+│ │                 │   │   │   │   │   'ROW_DIR',                           │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 SWORD ROW_DIR DIRECT'  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   },                                               │ │
+│ │                 │   │   'compu_methods_by_name': {                       │ │
+│ │                 │   │   │   'CM_DEF_ENUM': {                             │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_ENUM',                   │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic verbal     │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'TAB_VERB',           │ │
+│ │                 │   │   │   │   'format': '%.0',                         │ │
+│ │                 │   │   │   │   'unit': '',                              │ │
+│ │                 │   │   │   │   'coeffs_linear': None,                   │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': 'VT_DEF_STATE',         │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'TAB_VERB "%.0" ""',                 │ │
+│ │                 │   │   │   │   │   'COMPU_TAB_REF VT_DEF_STATE'         │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_IDENT': {                            │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_IDENT',                  │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic IDENTICAL  │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'IDENTICAL',          │ │
+│ │                 │   │   │   │   'format': '%.0',                         │ │
+│ │                 │   │   │   │   'unit': '',                              │ │
+│ │                 │   │   │   │   'coeffs_linear': None,                   │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': ['IDENTICAL "%.0" ""']          │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_LIN': {                              │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_LIN',                    │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic LINEAR     │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'LINEAR',             │ │
+│ │                 │   │   │   │   'format': '%.3',                         │ │
+│ │                 │   │   │   │   'unit': 'units',                         │ │
+│ │                 │   │   │   │   'coeffs_linear': [0.5, 0.0],             │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'LINEAR "%.3" "units"',              │ │
+│ │                 │   │   │   │   │   'COEFFS_LINEAR 0.5 0'                │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_FINE': {                             │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_FINE',                   │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic fine       │ │
+│ │                 LINEAR conversion',                                      │ │
+│ │                 │   │   │   │   'conversion_type': 'LINEAR',             │ │
+│ │                 │   │   │   │   'format': '%.3',                         │ │
+│ │                 │   │   │   │   'unit': 'units',                         │ │
+│ │                 │   │   │   │   'coeffs_linear': [0.05, 0.0],            │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'LINEAR "%.3" "units"',              │ │
+│ │                 │   │   │   │   │   'COEFFS_LINEAR 0.05 0'               │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   },                                               │ │
+│ │                 │   │   'compu_tabs_by_name': {                          │ │
+│ │                 │   │   │   'VT_DEF_STATE': {                            │ │
+│ │                 │   │   │   │   'name': 'VT_DEF_STATE',                  │ │
+│ │                 │   │   │   │   'section': 'COMPU_VTAB',                 │ │
+│ │                 │   │   │   │   'kind': 'TAB_VERB',                      │ │
+│ │                 │   │   │   │   'entries': [                             │ │
+│ │                 │   │   │   │   │   (0.0, 'OFF'),                        │ │
+│ │                 │   │   │   │   │   (1.0, 'IDLE'),                       │ │
+│ │                 │   │   │   │   │   (2.0, 'RUN'),                        │ │
+│ │                 │   │   │   │   │   (3.0, 'FAULT')                       │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'TAB_VERB 4',                        │ │
+│ │                 │   │   │   │   │   '0 "OFF"',                           │ │
+│ │                 │   │   │   │   │   '1 "IDLE"',                          │ │
+│ │                 │   │   │   │   │   '2 "RUN"',                           │ │
+│ │                 │   │   │   │   │   '3 "FAULT"',                         │ │
+│ │                 │   │   │   │   │   'DEFAULT_VALUE "UNKNOWN_STATE"'      │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   }                                                │ │
+│ │                 │   },                                                   │ │
+│ │                 │   mac_path=None,                                       │ │
+│ │                 │   mac_records=[],                                      │ │
+│ │                 │   mac_diagnostics=[],                                  │ │
+│ │                 │   variant_id=None,                                     │ │
+│ │                 │   source_s0_header=b'S19TOOL_RELEASE_DEMO',            │ │
+│ │                 │   entropy_windows=[                                    │ │
+│ │                 │   │   EntropyWindow(                                   │ │
+│ │                 │   │   │   start=8388608,                               │ │
+│ │                 │   │   │   end=8388864,                                 │ │
+│ │                 │   │   │   sample_count=256,                            │ │
+│ │                 │   │   │   entropy=7.1634678361103035,                  │ │
+│ │                 │   │   │   band='medium',                               │ │
+│ │                 │   │   │   low_confidence=False                         │ │
+│ │                 │   │   )                                                │ │
+│ │                 │   ],                                                   │ │
+│ │                 │   out_of_order_count=0,                                │ │
+│ │                 │   entry_point=0                                        │ │
+│ │                 )                                                        │ │
+│ │ loaded_ranges = [(8388608, 8388864)]                                     │ │
+│ │         panel = PatchEditorPanel(                                        │ │
+│ │                 │   id='patch_editor_panel',                             │ │
+│ │                 │   classes='-bench'                                     │ │
+│ │                 )                                                        │ │
+│ │          self = S19TuiApp(                                               │ │
+│ │                 │   title='Hex Edit Tool',                               │ │
+│ │                 │   classes={'-dark-mode'},                              │ │
+│ │                 │   pseudo_classes={'focus', 'dark'}                     │ │
+│ │                 )                                                        │ │
+│ │       service = <s19_app.tui.services.change_service.ChangeService       │ │
+│ │                 object at 0x7f29d77fb9d0>                                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-i9b/tree/tests/test_b103_inc9b_s.py:253 in            │
+│ gated_refresh                                                                │
+│                                                                              │
+│   250 │   │   if kwargs.get("sheet") is False:                               │
+│   251 │   │   │   entered.set()                                              │
+│   252 │   │   │   if not release.wait(10):                                   │
+│ ❱ 253 │   │   │   │   raise AssertionError("the test did not release the led │
+│   254 │   │   return real_refresh(*args, **kwargs)                           │
+│   255 │                                                                      │
+│   256 │   def token_probe():                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │         args = (                                                         │ │
+│ │                │   [                                                     │ │
+│ │                │   │   ChangeEntryRow(                                   │ │
+│ │                │   │   │   kind_text='bytes',                            │ │
+│ │                │   │   │   address_text='0x800090',                      │ │
+│ │                │   │   │   value_text='00 C8 00 DB 02 7C FE 63 .. (12    │ │
+│ │                bytes)',                                                  │ │
+│ │                │   │   │   status_text='inside',                         │ │
+│ │                │   │   │   linkage_text='-',                             │ │
+│ │                │   │   │   check_glyph='·',                              │ │
+│ │                │   │   │   address=8388752,                              │ │
+│ │                │   │   │   encoded_bytes=(                               │ │
+│ │                │   │   │   │   0,                                        │ │
+│ │                │   │   │   │   200,                                      │ │
+│ │                │   │   │   │   0,                                        │ │
+│ │                │   │   │   │   219,                                      │ │
+│ │                │   │   │   │   2,                                        │ │
+│ │                │   │   │   │   124,                                      │ │
+│ │                │   │   │   │   254,                                      │ │
+│ │                │   │   │   │   99,                                       │ │
+│ │                │   │   │   │   254,                                      │ │
+│ │                │   │   │   │   117,                                      │ │
+│ │                │   │   │   │   ... +2                                    │ │
+│ │                │   │   │   )                                             │ │
+│ │                │   │   )                                                 │ │
+│ │                │   ],                                                    │ │
+│ │                )                                                         │ │
+│ │      entered = <threading.Event at 0x7f29c757b310: set>                  │ │
+│ │       kwargs = {                                                         │ │
+│ │                │   'mem_map': {                                          │ │
+│ │                │   │   8388608: 1,                                       │ │
+│ │                │   │   8388609: 77,                                      │ │
+│ │                │   │   8388610: 80,                                      │ │
+│ │                │   │   8388611: 238,                                     │ │
+│ │                │   │   8388612: 187,                                     │ │
+│ │                │   │   8388613: 73,                                      │ │
+│ │                │   │   8388614: 60,                                      │ │
+│ │                │   │   8388615: 112,                                     │ │
+│ │                │   │   8388616: 5,                                       │ │
+│ │                │   │   8388617: 22,                                      │ │
+│ │                │   │   ... +246                                          │ │
+│ │                │   },                                                    │ │
+│ │                │   'document': PatchDocumentView(                        │ │
+│ │                │   │   name=None,                                        │ │
+│ │                │   │   kind='change',                                    │ │
+│ │                │   │   json_text='{\n  "format": "s19app-changeset",\n   │ │
+│ │                "version": "2.0",\n  "kind": "change",\n  "enc'+215,      │ │
+│ │                │   │   entry_count=1                                     │ │
+│ │                │   ),                                                    │ │
+│ │                │   'sheet': False                                        │ │
+│ │                }                                                         │ │
+│ │ real_refresh = <bound method PatchEditorPanel.refresh_entries of         │ │
+│ │                PatchEditorPanel(id='patch_editor_panel',                 │ │
+│ │                classes='-bench')>                                        │ │
+│ │      release = <threading.Event at 0x7f29c757a890: unset>                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+AssertionError: the test did not release the ledger-step gate
+_ test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+tests/test_b103_inc9b_s.py:317: in test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere
+    (before, rows_at_write, settled, full, tokens), entries = run(tmp_path, defc_dir, body)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:116: in _drive
+    async with app.run_test(size=size) as pilot:
+../../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app/patch.py:765: in <lambda>
+    self.set_timer(STEP_GAP_S, lambda: run(index))
+                                       ^^^^^^^^^^
+s19_app/tui/app/patch.py:759: in run
+    steps[index]()
+s19_app/tui/app/patch.py:721: in ledger
+    panel.refresh_entries(
+tests/test_b103_inc9b_s.py:253: in gated_refresh
+    raise AssertionError("the test did not release the ledger-step gate")
+E   AssertionError: the test did not release the ledger-step gate
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:765 in <lambda>     │
+│                                                                              │
+│    762 │   │   │   │   on_done()                                             │
+│    763 │   │   │   │   raise                                                 │
+│    764 │   │   │   if index < len(steps):                                    │
+│ ❱  765 │   │   │   │   self.set_timer(STEP_GAP_S, lambda: run(index))        │
+│    766 │   │   │   else:                                                     │
+│    767 │   │   │   │   on_done()                                             │
+│    768                                                                       │
+│                                                                              │
+│ ╭─ locals ──╮                                                                │
+│ │ index = 1 │                                                                │
+│ ╰───────────╯                                                                │
+│                                                                              │
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:759 in run          │
+│                                                                              │
+│    756 │   │   │   │   ):                                                    │
+│    757 │   │   │   │   │   index = len(steps)                                │
+│    758 │   │   │   │   else:                                                 │
+│ ❱  759 │   │   │   │   │   steps[index]()                                    │
+│    760 │   │   │   │   │   index += 1                                        │
+│    761 │   │   │   except BaseException:                                     │
+│    762 │   │   │   │   on_done()                                             │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ index = 1                                                                │ │
+│ │  self = S19TuiApp(                                                       │ │
+│ │         │   title='Hex Edit Tool',                                       │ │
+│ │         │   classes={'-dark-mode'},                                      │ │
+│ │         │   pseudo_classes={'focus', 'dark'}                             │ │
+│ │         )                                                                │ │
+│ │ steps = [                                                                │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.serialize │ │
+│ │         at 0x7f29c68da020>,                                              │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.ledger at │ │
+│ │         0x7f29d71d2b60>,                                                 │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.sheet at  │ │
+│ │         0x7f29d4358d60>,                                                 │ │
+│ │         │   <function PatchMixin._patch_refresh_steps.<locals>.tail at   │ │
+│ │         0x7f29d67d3a60>                                                  │ │
+│ │         ]                                                                │ │
+│ │ token = (                                                                │ │
+│ │         │   139817410971104,                                             │ │
+│ │         │   (('back', 1), ('bound', 20), ('forward', 0)),                │ │
+│ │         │   139817413014736                                              │ │
+│ │         )                                                                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-i9b/tree/s19_app/tui/app/patch.py:721 in ledger       │
+│                                                                              │
+│    718 │   │   │   loaded_ranges = loaded.ranges if loaded is not None else  │
+│    719 │   │   │   panel = self.query_one("#patch_editor_panel", PatchEditor │
+│    720 │   │   │   # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh │
+│ ❱  721 │   │   │   panel.refresh_entries(                                    │
+│    722 │   │   │   │   service.rows(loaded_ranges),                          │
+│    723 │   │   │   │   # batch-99 HLR-157 (LLR-157.4): the strip reads the j │
+│    724 │   │   │   │   # overlay — source bytes at every address an apply wr │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          held = {                                                        │ │
+│ │                 │   'view': PatchDocumentView(                           │ │
+│ │                 │   │   name=None,                                       │ │
+│ │                 │   │   kind='change',                                   │ │
+│ │                 │   │   json_text='{\n  "format": "s19app-changeset",\n  │ │
+│ │                 "version": "2.0",\n  "kind": "change",\n  "enc'+215,     │ │
+│ │                 │   │   entry_count=1                                    │ │
+│ │                 │   )                                                    │ │
+│ │                 }                                                        │ │
+│ │        loaded = LoadedFile(                                              │ │
+│ │                 │                                                        │ │
+│ │                 path=PosixPath('~/work/zq-i9b/tmp/pytest-o… │ │
+│ │                 │   file_type='s19',                                     │ │
+│ │                 │   mem_map={                                            │ │
+│ │                 │   │   8388608: 1,                                      │ │
+│ │                 │   │   8388609: 77,                                     │ │
+│ │                 │   │   8388610: 80,                                     │ │
+│ │                 │   │   8388611: 238,                                    │ │
+│ │                 │   │   8388612: 187,                                    │ │
+│ │                 │   │   8388613: 73,                                     │ │
+│ │                 │   │   8388614: 60,                                     │ │
+│ │                 │   │   8388615: 112,                                    │ │
+│ │                 │   │   8388616: 5,                                      │ │
+│ │                 │   │   8388617: 22,                                     │ │
+│ │                 │   │   ... +246                                         │ │
+│ │                 │   },                                                   │ │
+│ │                 │   row_bases=[                                          │ │
+│ │                 │   │   8388608,                                         │ │
+│ │                 │   │   8388624,                                         │ │
+│ │                 │   │   8388640,                                         │ │
+│ │                 │   │   8388656,                                         │ │
+│ │                 │   │   8388672,                                         │ │
+│ │                 │   │   8388688,                                         │ │
+│ │                 │   │   8388704,                                         │ │
+│ │                 │   │   8388720,                                         │ │
+│ │                 │   │   8388736,                                         │ │
+│ │                 │   │   8388752,                                         │ │
+│ │                 │   │   ... +6                                           │ │
+│ │                 │   ],                                                   │ │
+│ │                 │   ranges=[(8388608, 8388864)],                         │ │
+│ │                 │   range_validity=[True],                               │ │
+│ │                 │   errors=[],                                           │ │
+│ │                 │                                                        │ │
+│ │                 a2l_path=PosixPath('~/work/zq-i9b/tmp/pyte… │ │
+│ │                 │   a2l_data={                                           │ │
+│ │                 │   │   'path':                                          │ │
+│ │                 '~/work/zq-i9b/tmp/pytest-of-<runner>/pyte… │ │
+│ │                 │   │   'sections': [                                    │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'name': 'PROJECT',                       │ │
+│ │                 │   │   │   │   'meta': 'SYNTH_DEFINITIONS_DEMO          │ │
+│ │                 "Synthetic definitions demo project"',                   │ │
+│ │                 │   │   │   │   'meta_line': 2,                          │ │
+│ │                 │   │   │   │   'start_line': 2,                         │ │
+│ │                 │   │   │   │   'end_line': 105,                         │ │
+│ │                 │   │   │   │   'lines': [''],                           │ │
+│ │                 │   │   │   │   'line_numbers': [3],                     │ │
+│ │                 │   │   │   │   'children': [                            │ │
+│ │                 │   │   │   │   │   {                                    │ │
+│ │                 │   │   │   │   │   │   'name': 'MODULE',                │ │
+│ │                 │   │   │   │   │   │   'meta': 'ECU_DEFINITIONS         │ │
+│ │                 "Synthetic definitions demo module"',                    │ │
+│ │                 │   │   │   │   │   │   'meta_line': 3,                  │ │
+│ │                 │   │   │   │   │   │   'start_line': 3,                 │ │
+│ │                 │   │   │   │   │   │   'end_line': 104,                 │ │
+│ │                 │   │   │   │   │   │   'lines': [                       │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   '',                          │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'line_numbers': [                │ │
+│ │                 │   │   │   │   │   │   │   4,                           │ │
+│ │                 │   │   │   │   │   │   │   9,                           │ │
+│ │                 │   │   │   │   │   │   │   11,                          │ │
+│ │                 │   │   │   │   │   │   │   14,                          │ │
+│ │                 │   │   │   │   │   │   │   17,                          │ │
+│ │                 │   │   │   │   │   │   │   20,                          │ │
+│ │                 │   │   │   │   │   │   │   24,                          │ │
+│ │                 │   │   │   │   │   │   │   28,                          │ │
+│ │                 │   │   │   │   │   │   │   31,                          │ │
+│ │                 │   │   │   │   │   │   │   35,                          │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ],                               │ │
+│ │                 │   │   │   │   │   │   'children': [                    │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': '""',            │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 4,          │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 4,         │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 8,           │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'BYTE_ORDER          │ │
+│ │                 MSB_FIRST',                                              │ │
+│ │                 │   │   │   │   │   │   │   │   │   'ALIGNMENT_BYTE 1',  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'ALIGNMENT_WORD 2'   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   5,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   6,                   │ │
+│ │                 │   │   │   │   │   │   │   │   │   7                    │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name':                  │ │
+│ │                 'MEMORY_SEGMENT',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'cal DATA FLASH  │ │
+│ │                 INTERN FLASH 0x00800000 0x000100',                       │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 9,          │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 9,         │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 10,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [],             │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [],      │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_U8',         │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 11,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 11,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 13,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 UBYTE  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [12],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_U16',        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 14,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 14,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 16,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 UWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [15],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_S16',        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 17,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 17,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 19,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 SWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [18],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_DEF_AXIS',   │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 20,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 20,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 23,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'NO_AXIS_PTS_X 1     │ │
+│ │                 UWORD',                                                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   'AXIS_PTS_X 2 UWORD  │ │
+│ │                 INDEX_INCR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   21,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   22                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'RL_DEF_MAP',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 24,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 24,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 27,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'AXIS_PTS_X 1 UWORD  │ │
+│ │                 INDEX_INCR DIRECT',                                      │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 2 SWORD  │ │
+│ │                 COLUMN_DIR DIRECT'                                       │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   25,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   26                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT', │ │
+│ │                 │   │   │   │   │   │   │   │   'meta':                  │ │
+│ │                 'RL_DEF_S16_ROW',                                        │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 28,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 28,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 30,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'FNC_VALUES 1 SWORD  │ │
+│ │                 ROW_DIR DIRECT'                                          │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [29],    │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',  │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'CM_DEF_ENUM     │ │
+│ │                 "synthetic verbal conversion"',                          │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 31,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 31,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 34,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'TAB_VERB "%.0" ""', │ │
+│ │                 │   │   │   │   │   │   │   │   │   'COMPU_TAB_REF       │ │
+│ │                 VT_DEF_STATE'                                            │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   32,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   33                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   {                            │ │
+│ │                 │   │   │   │   │   │   │   │   'name': 'COMPU_VTAB',    │ │
+│ │                 │   │   │   │   │   │   │   │   'meta': 'VT_DEF_STATE    │ │
+│ │                 "synthetic states"',                                     │ │
+│ │                 │   │   │   │   │   │   │   │   'meta_line': 35,         │ │
+│ │                 │   │   │   │   │   │   │   │   'start_line': 35,        │ │
+│ │                 │   │   │   │   │   │   │   │   'end_line': 42,          │ │
+│ │                 │   │   │   │   │   │   │   │   'lines': [               │ │
+│ │                 │   │   │   │   │   │   │   │   │   'TAB_VERB 4',        │ │
+│ │                 │   │   │   │   │   │   │   │   │   '0 "OFF"',           │ │
+│ │                 │   │   │   │   │   │   │   │   │   '1 "IDLE"',          │ │
+│ │                 │   │   │   │   │   │   │   │   │   '2 "RUN"',           │ │
+│ │                 │   │   │   │   │   │   │   │   │   '3 "FAULT"',         │ │
+│ │                 │   │   │   │   │   │   │   │   │   'DEFAULT_VALUE       │ │
+│ │                 "UNKNOWN_STATE"'                                         │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'line_numbers': [        │ │
+│ │                 │   │   │   │   │   │   │   │   │   36,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   37,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   38,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   39,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   40,                  │ │
+│ │                 │   │   │   │   │   │   │   │   │   41                   │ │
+│ │                 │   │   │   │   │   │   │   │   ],                       │ │
+│ │                 │   │   │   │   │   │   │   │   'children': []           │ │
+│ │                 │   │   │   │   │   │   │   },                           │ │
+│ │                 │   │   │   │   │   │   │   ... +12                      │ │
+│ │                 │   │   │   │   │   │   ]                                │ │
+│ │                 │   │   │   │   │   }                                    │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   ],                                               │ │
+│ │                 │   │   'errors': [],                                    │ │
+│ │                 │   │   'tags': [                                        │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388608,                      │ │
+│ │                 │   │   │   │   'length': 1,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '3',                      │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U8',                      │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_ENUM',             │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388624,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '1',                      │ │
+│ │                 │   │   │   │   'bit_org': '0x0001',                     │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388624,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '255',                    │ │
+│ │                 │   │   │   │   'bit_org': '0x0FF0',                     │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388640,                      │ │
+│ │                 │   │   │   │   'length': 2,                             │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-40',                    │ │
+│ │                 │   │   │   │   'upper_limit': '150',                    │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_S16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_LIN',              │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388688,                      │ │
+│ │                 │   │   │   │   'length': None,                          │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '65535',                  │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388704,                      │ │
+│ │                 │   │   │   │   'length': None,                          │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '0',                      │ │
+│ │                 │   │   │   │   'upper_limit': '65535',                  │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_U16',                     │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388720,                      │ │
+│ │                 │   │   │   │   'length': 32,                            │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-1000',                  │ │
+│ │                 │   │   │   │   'upper_limit': '1000',                   │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_DEF_MAP',                 │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_IDENT',            │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   {                                            │ │
+│ │                 │   │   │   │   'address': 8388752,                      │ │
+│ │                 │   │   │   │   'length': 12,                            │ │
+│ │                 │   │   │   │   'source': 'formula',                     │ │
+│ │                 │   │   │   │   'unit': None,                            │ │
+│ │                 │   │   │   │   'lower_limit': '-50',                    │ │
+│ │                 │   │   │   │   'upper_limit': '50',                     │ │
+│ │                 │   │   │   │   'bit_org': None,                         │ │
+│ │                 │   │   │   │   'datatype': None,                        │ │
+│ │                 │   │   │   │   'deposit': 'RL_DEF_S16_ROW',             │ │
+│ │                 │   │   │   │   'conversion': 'CM_DEF_FINE',             │ │
+│ │                 │   │   │   │   ... +18                                  │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   ],                                               │ │
+│ │                 │   │   'declared_spans': [],                            │ │
+│ │                 │   │   'record_layouts_by_name': {                      │ │
+│ │                 │   │   │   'RL_U8': {                                   │ │
+│ │                 │   │   │   │   'name': 'RL_U8',                         │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UBYTE',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 UBYTE COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_U16': {                                  │ │
+│ │                 │   │   │   │   'name': 'RL_U16',                        │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 UWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_S16': {                                  │ │
+│ │                 │   │   │   │   'name': 'RL_S16',                        │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'SWORD',                             │ │
+│ │                 │   │   │   │   │   'COLUMN_DIR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 SWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_AXIS': {                             │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_AXIS',                   │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'NO_AXIS_PTS_X',                     │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD'                              │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'NO_AXIS_PTS_X 1 UWORD',             │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X 2 UWORD INDEX_INCR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_MAP': {                              │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_MAP',                    │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'UWORD',                             │ │
+│ │                 │   │   │   │   │   'INDEX_INCR',                        │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'AXIS_PTS_X 1 UWORD INDEX_INCR       │ │
+│ │                 DIRECT',                                                 │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 2 SWORD COLUMN_DIR       │ │
+│ │                 DIRECT'                                                  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'RL_DEF_S16_ROW': {                          │ │
+│ │                 │   │   │   │   'name': 'RL_DEF_S16_ROW',                │ │
+│ │                 │   │   │   │   'tokens': [                              │ │
+│ │                 │   │   │   │   │   'FNC_VALUES',                        │ │
+│ │                 │   │   │   │   │   '1',                                 │ │
+│ │                 │   │   │   │   │   'SWORD',                             │ │
+│ │                 │   │   │   │   │   'ROW_DIR',                           │ │
+│ │                 │   │   │   │   │   'DIRECT'                             │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'FNC_VALUES 1 SWORD ROW_DIR DIRECT'  │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'byte_order': None                       │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   },                                               │ │
+│ │                 │   │   'compu_methods_by_name': {                       │ │
+│ │                 │   │   │   'CM_DEF_ENUM': {                             │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_ENUM',                   │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic verbal     │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'TAB_VERB',           │ │
+│ │                 │   │   │   │   'format': '%.0',                         │ │
+│ │                 │   │   │   │   'unit': '',                              │ │
+│ │                 │   │   │   │   'coeffs_linear': None,                   │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': 'VT_DEF_STATE',         │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'TAB_VERB "%.0" ""',                 │ │
+│ │                 │   │   │   │   │   'COMPU_TAB_REF VT_DEF_STATE'         │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_IDENT': {                            │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_IDENT',                  │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic IDENTICAL  │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'IDENTICAL',          │ │
+│ │                 │   │   │   │   'format': '%.0',                         │ │
+│ │                 │   │   │   │   'unit': '',                              │ │
+│ │                 │   │   │   │   'coeffs_linear': None,                   │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': ['IDENTICAL "%.0" ""']          │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_LIN': {                              │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_LIN',                    │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic LINEAR     │ │
+│ │                 conversion',                                             │ │
+│ │                 │   │   │   │   'conversion_type': 'LINEAR',             │ │
+│ │                 │   │   │   │   'format': '%.3',                         │ │
+│ │                 │   │   │   │   'unit': 'units',                         │ │
+│ │                 │   │   │   │   'coeffs_linear': [0.5, 0.0],             │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'LINEAR "%.3" "units"',              │ │
+│ │                 │   │   │   │   │   'COEFFS_LINEAR 0.5 0'                │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   },                                           │ │
+│ │                 │   │   │   'CM_DEF_FINE': {                             │ │
+│ │                 │   │   │   │   'name': 'CM_DEF_FINE',                   │ │
+│ │                 │   │   │   │   'long_identifier': 'synthetic fine       │ │
+│ │                 LINEAR conversion',                                      │ │
+│ │                 │   │   │   │   'conversion_type': 'LINEAR',             │ │
+│ │                 │   │   │   │   'format': '%.3',                         │ │
+│ │                 │   │   │   │   'unit': 'units',                         │ │
+│ │                 │   │   │   │   'coeffs_linear': [0.05, 0.0],            │ │
+│ │                 │   │   │   │   'coeffs': None,                          │ │
+│ │                 │   │   │   │   'compu_tab_ref': None,                   │ │
+│ │                 │   │   │   │   'formula': None,                         │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'LINEAR "%.3" "units"',              │ │
+│ │                 │   │   │   │   │   'COEFFS_LINEAR 0.05 0'               │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   },                                               │ │
+│ │                 │   │   'compu_tabs_by_name': {                          │ │
+│ │                 │   │   │   'VT_DEF_STATE': {                            │ │
+│ │                 │   │   │   │   'name': 'VT_DEF_STATE',                  │ │
+│ │                 │   │   │   │   'section': 'COMPU_VTAB',                 │ │
+│ │                 │   │   │   │   'kind': 'TAB_VERB',                      │ │
+│ │                 │   │   │   │   'entries': [                             │ │
+│ │                 │   │   │   │   │   (0.0, 'OFF'),                        │ │
+│ │                 │   │   │   │   │   (1.0, 'IDLE'),                       │ │
+│ │                 │   │   │   │   │   (2.0, 'RUN'),                        │ │
+│ │                 │   │   │   │   │   (3.0, 'FAULT')                       │ │
+│ │                 │   │   │   │   ],                                       │ │
+│ │                 │   │   │   │   'lines': [                               │ │
+│ │                 │   │   │   │   │   'TAB_VERB 4',                        │ │
+│ │                 │   │   │   │   │   '0 "OFF"',                           │ │
+│ │                 │   │   │   │   │   '1 "IDLE"',                          │ │
+│ │                 │   │   │   │   │   '2 "RUN"',                           │ │
+│ │                 │   │   │   │   │   '3 "FAULT"',                         │ │
+│ │                 │   │   │   │   │   'DEFAULT_VALUE "UNKNOWN_STATE"'      │ │
+│ │                 │   │   │   │   ]                                        │ │
+│ │                 │   │   │   }                                            │ │
+│ │                 │   │   }                                                │ │
+│ │                 │   },                                                   │ │
+│ │                 │   mac_path=None,                                       │ │
+│ │                 │   mac_records=[],                                      │ │
+│ │                 │   mac_diagnostics=[],                                  │ │
+│ │                 │   variant_id=None,                                     │ │
+│ │                 │   source_s0_header=b'S19TOOL_RELEASE_DEMO',            │ │
+│ │                 │   entropy_windows=[                                    │ │
+│ │                 │   │   EntropyWindow(                                   │ │
+│ │                 │   │   │   start=8388608,                               │ │
+│ │                 │   │   │   end=8388864,                                 │ │
+│ │                 │   │   │   sample_count=256,                            │ │
+│ │                 │   │   │   entropy=7.1634678361103035,                  │ │
+│ │                 │   │   │   band='medium',                               │ │
+│ │                 │   │   │   low_confidence=False                         │ │
+│ │                 │   │   )                                                │ │
+│ │                 │   ],                                                   │ │
+│ │                 │   out_of_order_count=0,                                │ │
+│ │                 │   entry_point=0                                        │ │
+│ │                 )                                                        │ │
+│ │ loaded_ranges = [(8388608, 8388864)]                                     │ │
+│ │         panel = PatchEditorPanel(                                        │ │
+│ │                 │   id='patch_editor_panel',                             │ │
+│ │                 │   classes='-bench'                                     │ │
+│ │                 )                                                        │ │
+│ │          self = S19TuiApp(                                               │ │
+│ │                 │   title='Hex Edit Tool',                               │ │
+│ │                 │   classes={'-dark-mode'},                              │ │
+│ │                 │   pseudo_classes={'focus', 'dark'}                     │ │
+│ │                 )                                                        │ │
+│ │       service = <s19_app.tui.services.change_service.ChangeService       │ │
+│ │                 object at 0x7f29c680ea90>                                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-i9b/tree/tests/test_b103_inc9b_s.py:253 in            │
+│ gated_refresh                                                                │
+│                                                                              │
+│   250 │   │   if kwargs.get("sheet") is False:                               │
+│   251 │   │   │   entered.set()                                              │
+│   252 │   │   │   if not release.wait(10):                                   │
+│ ❱ 253 │   │   │   │   raise AssertionError("the test did not release the led │
+│   254 │   │   return real_refresh(*args, **kwargs)                           │
+│   255 │                                                                      │
+│   256 │   def token_probe():                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │         args = (                                                         │ │
+│ │                │   [                                                     │ │
+│ │                │   │   ChangeEntryRow(                                   │ │
+│ │                │   │   │   kind_text='bytes',                            │ │
+│ │                │   │   │   address_text='0x800090',                      │ │
+│ │                │   │   │   value_text='00 C8 00 DB 02 7C FE 63 .. (12    │ │
+│ │                bytes)',                                                  │ │
+│ │                │   │   │   status_text='inside',                         │ │
+│ │                │   │   │   linkage_text='-',                             │ │
+│ │                │   │   │   check_glyph='·',                              │ │
+│ │                │   │   │   address=8388752,                              │ │
+│ │                │   │   │   encoded_bytes=(                               │ │
+│ │                │   │   │   │   0,                                        │ │
+│ │                │   │   │   │   200,                                      │ │
+│ │                │   │   │   │   0,                                        │ │
+│ │                │   │   │   │   219,                                      │ │
+│ │                │   │   │   │   2,                                        │ │
+│ │                │   │   │   │   124,                                      │ │
+│ │                │   │   │   │   254,                                      │ │
+│ │                │   │   │   │   99,                                       │ │
+│ │                │   │   │   │   254,                                      │ │
+│ │                │   │   │   │   117,                                      │ │
+│ │                │   │   │   │   ... +2                                    │ │
+│ │                │   │   │   )                                             │ │
+│ │                │   │   )                                                 │ │
+│ │                │   ],                                                    │ │
+│ │                )                                                         │ │
+│ │      entered = <threading.Event at 0x7f29d7195a90: set>                  │ │
+│ │       kwargs = {                                                         │ │
+│ │                │   'mem_map': {                                          │ │
+│ │                │   │   8388608: 1,                                       │ │
+│ │                │   │   8388609: 77,                                      │ │
+│ │                │   │   8388610: 80,                                      │ │
+│ │                │   │   8388611: 238,                                     │ │
+│ │                │   │   8388612: 187,                                     │ │
+│ │                │   │   8388613: 73,                                      │ │
+│ │                │   │   8388614: 60,                                      │ │
+│ │                │   │   8388615: 112,                                     │ │
+│ │                │   │   8388616: 5,                                       │ │
+│ │                │   │   8388617: 22,                                      │ │
+│ │                │   │   ... +246                                          │ │
+│ │                │   },                                                    │ │
+│ │                │   'document': PatchDocumentView(                        │ │
+│ │                │   │   name=None,                                        │ │
+│ │                │   │   kind='change',                                    │ │
+│ │                │   │   json_text='{\n  "format": "s19app-changeset",\n   │ │
+│ │                "version": "2.0",\n  "kind": "change",\n  "enc'+215,      │ │
+│ │                │   │   entry_count=1                                     │ │
+│ │                │   ),                                                    │ │
+│ │                │   'sheet': False                                        │ │
+│ │                }                                                         │ │
+│ │ real_refresh = <bound method PatchEditorPanel.refresh_entries of         │ │
+│ │                PatchEditorPanel(id='patch_editor_panel',                 │ │
+│ │                classes='-bench')>                                        │ │
+│ │      release = <threading.Event at 0x7f29c69c9750: unset>                │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+AssertionError: the test did not release the ledger-step gate
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_106_1_an_undo_between_two_refresh_steps_leaves_the_undone_document_everywhere
+FAILED tests/test_b103_inc9b_s.py::test_r_pe_bench_106_2_an_apply_between_two_refresh_steps_leaves_the_applied_document_everywhere
+2 failed, 6 passed in 49.13s
+exit=1

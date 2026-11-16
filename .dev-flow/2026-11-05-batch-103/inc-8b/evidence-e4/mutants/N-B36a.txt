@@ -1,0 +1,61 @@
+# mutant N-B36a  rows: R-PE-BENCH.36
+# edits: s19_app/tui/screens_directionb/patch_editor/bench_sheet.py:307
+# -k: r_pe_bench_36_
+# uptime: 02:00:50 up 2 days, 10:49,  3 users,  load average: 1.60, 1.12, 1.28
+s19_app.__file__ = ~/work/zq-m8b/m/N-B36a/s19_app/__init__.py
+# cmd: timeout 300 ~/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -n 2 -q -k ... <files>
+bringing up nodes...
+bringing up nodes...
+
+F..F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_36_4_at_80x24_the_window_follows_the_cursor_and_paints_its_cell[right] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-67/popen-gw0/test_r_pe_bench_36_4_at_80x24_0')
+defc_dir = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-67/popen-gw0/b103_inc9_w_defc0')
+axis = 'x'
+
+    @pytest.mark.parametrize("axis", ["x", "y"], ids=["right", "down"])
+    def test_r_pe_bench_36_4_at_80x24_the_window_follows_the_cursor_and_paints_its_cell(tmp_path, defc_dir, axis):
+        """R-PE-BENCH.36/4 (EX-8B-W2, V = 73) - LARGE-like at 80x24, the cursor moved past the last painted
+        column (right) or row (down): the window's first column (row) moves by 1 and the cursor's cell lies in
+        the painted window. Why: the window must be shaped for the detail the sheet paints; shaped for the
+        body's 143 cells it leaves the cursor in a column the canvas does not draw (E3-8b-02).
+        NOTE: this holds on the base too (no scroller yet), so it is a guard, not a RED."""
+        first, after, (col, row) = walk_off_the_window(tmp_path, defc_dir, SIZE_80, axis)
+        a0, b0, ny, c0, d0, nx = first
+        a1, b1, _, c1, d1, _ = after
+>       assert a1 <= row <= b1 and c1 <= col <= d1, (first, after, (col, row))
+E       AssertionError: ((0, 0, 4375, 0, 9, 16), (0, 0, 4375, 0, 9, 16), (10, 0))
+E       assert (0 <= 0 and 10 <= 9)
+
+tests/test_b103_inc8b_bw.py:442: AssertionError
+_ test_r_pe_bench_36_5_at_118x54_the_window_follows_the_cursor_and_paints_its_cell[down] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-67/popen-gw1/test_r_pe_bench_36_5_at_118x541')
+defc_dir = PosixPath('~/work/zq-m8b/tmp/pytest-of-<user>/pytest-67/popen-gw1/b103_inc9_w_defc0')
+axis = 'y'
+
+    @pytest.mark.parametrize("axis", ["x", "y"], ids=["right", "down"])
+    def test_r_pe_bench_36_5_at_118x54_the_window_follows_the_cursor_and_paints_its_cell(tmp_path, defc_dir, axis):
+        """R-PE-BENCH.36/5 (EX-8B-W2, V = 111) - the same at 118x54. DEVIATION from the case text ("cursor right"):
+        at V = 111 a 16-column grid shows all its columns (`grid_geometry(107)` -> 16), so no column lies past
+        the last painted one; `right` is checked as 'the cursor stays painted, the first column stays 0' and the
+        row direction (`down`, the axis with a window at 118) carries the 'first row +1' check.
+        NOTE: this holds on the base too, so it is a guard, not a RED."""
+        first, after, (col, row) = walk_off_the_window(tmp_path, defc_dir, SIZE_118, axis)
+        a0, b0, ny, c0, d0, nx = first
+        a1, b1, _, c1, d1, _ = after
+>       assert a1 <= row <= b1 and c1 <= col <= d1, (first, after, (col, row))
+E       AssertionError: ((0, 14, 4375, 0, 15, 16), (0, 14, 4375, 0, 15, 16), (0, 15))
+E       assert (15 <= 14)
+
+tests/test_b103_inc8b_bw.py:460: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_36_4_at_80x24_the_window_follows_the_cursor_and_paints_its_cell[right]
+FAILED tests/test_b103_inc8b_bw.py::test_r_pe_bench_36_5_at_118x54_the_window_follows_the_cursor_and_paints_its_cell[down]
+2 failed, 2 passed in 24.38s
+
+# exit=1

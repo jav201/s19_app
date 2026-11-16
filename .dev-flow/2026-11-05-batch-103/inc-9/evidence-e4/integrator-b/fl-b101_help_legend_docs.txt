@@ -1,0 +1,8 @@
+== fl-b101_help_legend_docs  Fri Nov 13 09:54:56 PM CST 2026  load: 7.13 7.61 5.95
+s19_app.__file__ = ~/work/zq-e4-9-int/fin2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.......................................................................  [100%]
+71 passed in 67.09s (0:01:07)
+rc=0

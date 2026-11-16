@@ -1,0 +1,6 @@
+{
+  "errors": [],
+  "status_rows": 127,
+  "valid_rows": 124,
+  "measurement_rows": 127
+}

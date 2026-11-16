@@ -1,0 +1,45 @@
+DATE 2026-11-15T19:03:58.074537-06:00
+GROUP G07
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 19:03:11 up 3 days,  3:51,  3 users,  load average: 0.98, 0.60, 0.33
+LOAD_ONE 0.98
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 1
+S19_APP_FILE ~/work/zq-m9b/groups/G07/tree/s19_app/__init__.py
+PID 1027591
+SID 1027591
+TIMEOUT_S 300
+XDIST_N 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-12/test_r_pe_bench_97_1_every_tic0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-12/b103_inc9_w_defc0')
+
+    @timing
+    @slow
+    def test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title(tmp_path, defc_dir):
+        """R-PE-BENCH.97/1. LARGE's real decode, 5 s from the cue's first tick: the painted busy titles keep changing
+        - at least one change per 0.5 s (the max-gap bound of .97/3, so at least 10 in 5 s), and between any two
+        successive painted titles the spinner glyph differs and the pending time does not go back.
+        Operator need (P-127): a cue painted once looks like a frozen window and the user forces the app closed.
+        Negative control: the title painted once when the cue appears -> 1 change (RED); the decode on the UI
+        thread -> max gap about 10 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            return await large_decode_window(pilot, app, sheet_of(panel), 5.0)
+    
+        _, snaps, first = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+>       assert first is not None, f"no `decode LARGE` busy title within 6 s of the key; last top row {snaps[-1].row!r} ({load()})"
+E       AssertionError: no `decode LARGE` busy title within 6 s of the key; last top row '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮' (load 0.99 0.66 0.37)
+E       assert None is not None
+
+tests/test_b103_inc9b_at.py:332: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G07/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_97_1_every_tick_of_larges_real_decode_paints_a_different_title
+1 failed in 45.83s
+EXIT_CODE 1

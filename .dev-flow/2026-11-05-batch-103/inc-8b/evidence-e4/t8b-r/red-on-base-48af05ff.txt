@@ -1,0 +1,2794 @@
+#### test_b103_inc8_a3_help.txt
+<scratch>/red/s19_app/__init__.py
+ 00:19:17 up 2 days,  9:07,  4 users,  load average: 2.35, 2.68, 1.53
+bringing up nodes...
+bringing up nodes...
+
+.......F.                                                                [100%]
+=================================== FAILURES ===================================
+_____________ test_r_pe_def_85_1_staging_sheet_line_names_the_keys _____________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_pe_def_85_1_staging_sheet_line_names_the_keys():
+        lines = patch_lines()
+        assert "STAGING SHEET" in lines, sorted(lines)
+        effect = lines["STAGING SHEET"]
+        for word in ("↑↓", "←→"):
+            assert word in effect, (word, effect)
+        # Inc 8b (R-PE-DEF.85, changed at E1): Home and End scroll the grid, which is wider than the view at 118 columns.
+        for word in ("home", "end"):
+>           assert word in effect.lower(), (word, effect)
+E           AssertionError: ('home', '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.')
+E           assert 'home' in '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.'
+E            +  where '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.' = <built-in method lower of str object at 0x7f19a680dfb0>()
+E            +    where <built-in method lower of str object at 0x7f19a680dfb0> = '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.'.lower
+
+tests/test_b103_inc8_a3_help.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_a3_help.py::test_r_pe_def_85_1_staging_sheet_line_names_the_keys
+1 failed, 8 passed in 1.10s
+EXIT=1
+#### test_b103_inc8_at_help.txt
+<scratch>/red/s19_app/__init__.py
+ 00:19:19 up 2 days,  9:08,  3 users,  load average: 2.48, 2.70, 1.54
+bringing up nodes...
+bringing up nodes...
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_at_b103_i8_6_help_window_shows_the_new_rows _______________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-28/popen-gw0/test_at_b103_i8_6_help_window_0')
+
+    def test_at_b103_i8_6_help_window_shows_the_new_rows(tmp_path: Path) -> None:
+        """AT-B103-I8-6 (R-PE-DEF.83/1-2, .84/1, .85/1, .86/1-3, .87/1): the Patch Editor's help window, opened from its
+        chip, names the filter row / STAGING SHEET / LANDS IN and the four tabs in its first step (and none of the
+        retired A2L-tab wording), and carries the `Patch script`, `STAGING SHEET`, `new =`, `field =`, `text =` and
+        `Use parameter` lines the requirements pin.
+        """
+        steps, lines = _parse(_open_help(tmp_path, "patch"))
+        assert steps, "the help window painted no numbered step"
+        first = steps[0]
+        first_lower = first.lower()
+        # R-PE-DEF.83/1
+        assert "filter row" in first_lower, first
+        assert "STAGING SHEET" in first, first
+        assert "LANDS IN" in first, first
+        for tab in ("Patch script", "Inspector", "JSON", "Checks"):
+            assert tab in first, (tab, first)
+        # R-PE-DEF.83/2: no step names the retired layout
+        for step in steps:
+            low = step.lower()
+            for retired in ("a2l tab", "a2l parameters", "on the left", "on the right"):
+                assert retired not in low, (retired, step)
+        # R-PE-DEF.84/1
+        assert "Patch script" in lines and "entries" in lines["Patch script"], lines.get("Patch script")
+        # R-PE-DEF.85/1
+        sheet = lines.get("STAGING SHEET", "")
+        for token in ("↑↓", "enter", "←→", "home", "end", "esc"):
+>           assert token in sheet.lower() or token in sheet, (token, sheet)
+E           AssertionError: ('home', '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.')
+E           assert ('home' in '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.' or 'home' in '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.')
+E            +  where '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.' = <built-in method lower of str object at 0x7f492e5402d0>()
+E            +    where <built-in method lower of str object at 0x7f492e5402d0> = '↑↓ select a row, enter moves to the formula input, ←→ choose an enum entry, esc returns from the formula input to the sheet.'.lower
+
+tests/test_b103_inc8_at_help.py:104: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_at_help.py::test_at_b103_i8_6_help_window_shows_the_new_rows
+1 failed, 1 passed in 5.24s
+EXIT=1
+#### test_b103_inc8_at.txt
+<scratch>/red/s19_app/__init__.py
+ 00:21:25 up 2 days,  9:10,  3 users,  load average: 3.25, 2.90, 1.76
+bringing up nodes...
+bringing up nodes...
+
+...........                                                              [100%]
+11 passed in 52.10s
+EXIT=0
+#### test_b103_inc8_s1_detail.txt
+<scratch>/red/s19_app/__init__.py
+ 00:18:55 up 2 days,  9:07,  3 users,  load average: 2.00, 2.64, 1.49
+bringing up nodes...
+bringing up nodes...
+
+.........FFFFFFFFFFFFFFFFF....F............                              [100%]
+=================================== FAILURES ===================================
+_________________ test_r_pe_def_31_definition_line_of_a_number _________________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_31_definition_line_of_a_number(defc):
+        """R-PE-DEF.31/1 - DISPLAY_0001 -> `└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B`."""
+        d = defc["defs"]["DISPLAY_0001"]
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+>       assert lines_of(row, None) == [f"└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x{d.address:08X} · {d.byte_length} B"]
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+__ test_r_pe_def_33_enum_options_mark_the_current_entry_and_end_with_the_hint __
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_33_enum_options_mark_the_current_entry_and_end_with_the_hint(defc):
+        """R-PE-DEF.33/1 (changed at Inc 8b E1) - ENUM_0001 at start: the definition line, then the card `E.card.ENUM_0001.line0..3`.
+    
+        Why: the operator wants the enum choice set apart in B's frame; the options row still marks the
+        current entry `(●) 1 IDLE`, shows the default, and the second row is the key hint.
+        """
+        d = defc["defs"]["ENUM_0001"]
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+>       lines = lines_of(row, None)
+                ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_________________ test_r_pe_def_31_definition_line_of_an_enum __________________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_31_definition_line_of_an_enum(defc):
+        """R-PE-DEF.31/2 - ENUM_0001 -> `└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B` first."""
+        d = defc["defs"]["ENUM_0001"]
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+>       assert lines_of(row, None)[0] == f"└ TAB_VERB {len(d.enum_entries)} pairs · UBYTE u8 big-endian · 0x{d.address:08X} · 1 B"
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+__________ test_r_pe_def_33_enum_options_follow_the_previewed_choice ___________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_33_enum_options_follow_the_previewed_choice(defc):
+        """R-PE-DEF.33/2 - after choosing RUN the card's options row marks `(●) 2 RUN` and not IDLE."""
+        d, a2l, img = defc["defs"]["ENUM_0001"], defc["a2l"], defc["image"]
+        row, pv = row_and_preview(d, a2l, img, "RUN")
+>       lines = lines_of(row, pv)
+                ^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_____ test_r_pe_def_31_definition_line_of_a_bit_mask_names_the_masked_word _____
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_31_definition_line_of_a_bit_mask_names_the_masked_word(defc):
+        """R-PE-DEF.31/3 - MASK_FIELD_0001 -> `└ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B`."""
+        d = defc["defs"]["MASK_FIELD_0001"]
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+        shift = (d.bit_mask & -d.bit_mask).bit_length() - 1
+>       assert lines_of(row, None)[0] == (
+               ^^^^^^^^^^^^^^^^^^^
+            f"└ IDENTICAL phys = (word & 0x{d.bit_mask:04X}) >> {shift} · UWORD u16 big-endian · 0x{d.address:08X} · 2 B"
+        )
+
+tests/test_b103_inc8_s1_detail.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+__________ test_r_pe_def_34_bit_strip_shows_the_word_before_and_after __________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_bit_strip_shows_the_word_before_and_after(defc):
+        """R-PE-DEF.34/1 (changed at Inc 8b E1) - MASK_FIELD_0001 at start -> the bit table in its card (`B.MASK_FIELD_0001.start.line0..3`).
+    
+        Why: bit by bit the operator must see the word before, the mask and the word after, with nibble guides;
+        Inc 8's one-line strip (`bit 15…0 …   word 1A E7 → 1A E7`) is retired.
+        """
+        d, a2l, img = defc["defs"]["MASK_FIELD_0001"], defc["a2l"], defc["image"]
+        row, _ = make_row(d, a2l, img)
+>       lines = lines_of(row, None)
+                ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_ test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field(defc):
+        """R-PE-DEF.34/2 (changed at Inc 8b E1) - pending 255 -> the card `B.card.MASK_FIELD_0001.line0..5`, its after row ending `1F F7`.
+    
+        Why: the after row is the whole word with the field replaced and the other bits kept (1F F7), never the
+        field alone (the Inc 8 negative control: reading the unmasked word only gives 1A E7).
+        """
+        d, a2l, img = defc["defs"]["MASK_FIELD_0001"], defc["a2l"], defc["image"]
+        row, pv = row_and_preview(d, a2l, img, "255")
+        after = f"{EX.after_field:04X}"
+        expect_after = f"{after[:2]} {after[2:]}"
+>       lines = lines_of(row, pv)
+                ^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ IDENTICAL phys = (word & 0x0FF0) >> 4 · UWORD u16 big-endian · 0x00800010 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+________________ test_r_pe_def_31_definition_line_of_a_text_row ________________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_31_definition_line_of_a_text_row(v171):
+        """R-PE-DEF.31/4 - V171 ASCII -> `└ text · 0x00810200 · 42 B` first."""
+        d = v171["def"]
+        row, _ = make_row(d, v171["a2l"], v171["image"])
+>       assert lines_of(row, None)[0] == f"└ text · 0x{d.address:08X} · {d.byte_length} B"
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 42 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 42 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+______ test_r_pe_def_31_a_named_record_layout_comes_after_the_byte_order _______
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_31_a_named_record_layout_comes_after_the_byte_order(defc):
+        """R-PE-DEF.31/5 - a DISPLAY_0001 copy naming record layout `RL_U16` -> `… big-endian · RL_U16 · 0x00800020 · 2 B`."""
+        d = replace(defc["defs"]["DISPLAY_0001"], record_layout="RL_U16")
+        row, _ = make_row(d, defc["a2l"], defc["image"])
+>       assert lines_of(row, None) == [
+               ^^^^^^^^^^^^^^^^^^^
+            f"└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · RL_U16 · 0x{d.address:08X} · 2 B"
+        ]
+
+tests/test_b103_inc8_s1_detail.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · RL_U16 · 0x00800020 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · RL_U16 · 0x00800020 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+__________ test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row __________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row(v171):
+        """R-PE-DEF.35/1 (changed at Inc 8b E1) - V171 ASCII at start -> the hex grid in its card (`T.V171.start.line0..3`), no pending style.
+    
+        Why: the operator reads a text span as bytes and characters side by side, 16 per row with the ASCII
+        guide at one column; Inc 8's `+00 <bytes>` rows had no ASCII column.
+        """
+        d, img = v171["def"], v171["image"]
+        row, _ = make_row(d, v171["a2l"], img)
+        out = ds.detail_lines(row, None, WIDE, None, ROOM)
+        data = span_bytes(d, img)
+>       lines = [content(t.plain) for t in out]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:282: in <listcomp>
+    lines = [content(t.plain) for t in out]
+             ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 42 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 42 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_ test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style(v171):
+        """R-PE-DEF.35/2 (changed at Inc 8b E1) - pending `ABC` -> `T.V171.pendingABC.line1` (`+00 │ 41 42 43 00 …`); the 10 changed bytes share a style the others lack."""
+        d, a2l, img = v171["def"], v171["a2l"], v171["image"]
+        row, pv = row_and_preview(d, a2l, img, "ABC")
+        assert bytes(pv.result.data) == EX.after
+        out = ds.detail_lines(row, pv, WIDE, None, ROOM)
+        rows = _data_rows(out)
+>       assert content(rows[0].plain)[2:-2].rstrip() == fact("T.V171.pendingABC.line1")
+                       ^^^^^^^
+E       IndexError: list index out of range
+
+tests/test_b103_inc8_s1_detail.py:299: IndexError
+________ test_r_pe_def_32_a_refused_row_shows_its_message_as_the_detail ________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_32_a_refused_row_shows_its_message_as_the_detail(defc):
+        """R-PE-DEF.32/1 (real I-2 refusal: an unknown name) - the one detail line `└ <message>`."""
+        from s19_app.tui.a2l_definition import describe_definition
+    
+        refused = describe_definition("NO_SUCH_PARAMETER_0001", defc["a2l"])
+        row, _ = make_row(refused, defc["a2l"], defc["image"])
+>       assert lines_of(row, None) == ["└ " + ds.plain(refused.refusal.message)]
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ NO_SUCH_PARAMETER_0001: no tag of that name in the A2L'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ NO_SUCH_PARAMETER_0001: no tag of that name in the A2L
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+____ test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[65] ____
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+length = 65
+
+    @pytest.mark.parametrize("length", [65, 4097, 1048576])
+    def test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line(v171, length):
+        """R-PE-DEF.79/1..3 (changed at Inc 8b E1) - 65, 4,097 and 1,048,576 bytes -> 4 hex rows, `… <n-64> more B` as the card's last row, 9 detail lines in all.
+    
+        Why: a huge span must never be read or painted whole; the operator sees the first 64 bytes and how
+        many more there are, inside the same frame (definition line, top, head, 4 rows, cut row, bottom).
+        """
+        d = widen(v171["def"], length)
+        img = SpanImage(d.address, length, 0x41)
+        row, _ = make_row(d, v171["a2l"], img)
+>       out = lines_of(row, None)
+              ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:320: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 65 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 65 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_________ test_r_pe_def_79_a_span_of_exactly_64_bytes_has_no_cut_line __________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_79_a_span_of_exactly_64_bytes_has_no_cut_line(v171):
+        """R-PE-DEF.79 boundary - 64 bytes -> definition line and the card (top, head, 4 rows, bottom) = 8 lines, no cut row."""
+        d = widen(v171["def"], 64)
+        row, _ = make_row(d, v171["a2l"], SpanImage(d.address, 64, 0x41))
+>       out = lines_of(row, None)
+              ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:332: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 64 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 64 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+___ test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[4097] ___
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+length = 4097
+
+    @pytest.mark.parametrize("length", [65, 4097, 1048576])
+    def test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line(v171, length):
+        """R-PE-DEF.79/1..3 (changed at Inc 8b E1) - 65, 4,097 and 1,048,576 bytes -> 4 hex rows, `… <n-64> more B` as the card's last row, 9 detail lines in all.
+    
+        Why: a huge span must never be read or painted whole; the operator sees the first 64 bytes and how
+        many more there are, inside the same frame (definition line, top, head, 4 rows, cut row, bottom).
+        """
+        d = widen(v171["def"], length)
+        img = SpanImage(d.address, length, 0x41)
+        row, _ = make_row(d, v171["a2l"], img)
+>       out = lines_of(row, None)
+              ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:320: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 4097 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 4097 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_________ test_r_pe_def_35_text_rows_of_a_refused_row_are_not_painted __________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_35_text_rows_of_a_refused_row_are_not_painted(defc):
+        """R-PE-DEF.32 - a refused row gives its message line only (no kind lines)."""
+        from s19_app.tui.a2l_definition import describe_definition
+    
+        refused = describe_definition("NO_SUCH_PARAMETER_0001", defc["a2l"])
+        row, _ = make_row(refused, defc["a2l"], defc["image"])
+>       assert len(lines_of(row, None)) == 1
+                   ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ NO_SUCH_PARAMETER_0001: no tag of that name in the A2L'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ NO_SUCH_PARAMETER_0001: no tag of that name in the A2L
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+_ test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[1048576] __
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+length = 1048576
+
+    @pytest.mark.parametrize("length", [65, 4097, 1048576])
+    def test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line(v171, length):
+        """R-PE-DEF.79/1..3 (changed at Inc 8b E1) - 65, 4,097 and 1,048,576 bytes -> 4 hex rows, `… <n-64> more B` as the card's last row, 9 detail lines in all.
+    
+        Why: a huge span must never be read or painted whole; the operator sees the first 64 bytes and how
+        many more there are, inside the same frame (definition line, top, head, 4 rows, cut row, bottom).
+        """
+        d = widen(v171["def"], length)
+        img = SpanImage(d.address, length, 0x41)
+        row, _ = make_row(d, v171["a2l"], img)
+>       out = lines_of(row, None)
+              ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:320: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ text · 0x00810200 · 1048576 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ text · 0x00810200 · 1048576 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+________ test_r_pe_def_31_a_fallback_row_gives_the_definition_line_only ________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_31_a_fallback_row_gives_the_definition_line_only(defc):
+        """I-8.5 fallback detail - the `cuboid` copy: the definition line, nothing else."""
+        cuboid = replace(defc["defs"]["DISPLAY_0001"], kind="cuboid", element_count=24)
+        row, _ = make_row(cuboid, defc["a2l"], defc["image"])
+>       assert len(lines_of(row, None)) == 1
+                   ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc8_s1_detail.py:349: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s1_detail.py:54: in lines_of
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_s1_detail.py:54: in <listcomp>
+    return [content(t.plain) for t in ds.detail_lines(row, pv, width, None, ROOM)]
+            ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ LINEAR phys = 0.5*raw · SWORD s16 big-endian · 0x00800020 · 2 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_definition_line_of_a_number
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_33_enum_options_mark_the_current_entry_and_end_with_the_hint
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_definition_line_of_an_enum
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_33_enum_options_follow_the_previewed_choice
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_definition_line_of_a_bit_mask_names_the_masked_word
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_34_bit_strip_shows_the_word_before_and_after
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_34_bit_strip_after_word_is_the_whole_masked_word_not_the_field
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_definition_line_of_a_text_row
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_a_named_record_layout_comes_after_the_byte_order
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_text_rows_show_the_image_bytes_16_per_row
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_pending_text_rows_paint_the_changed_bytes_in_one_other_style
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_32_a_refused_row_shows_its_message_as_the_detail
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[65]
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_span_of_exactly_64_bytes_has_no_cut_line
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[4097]
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_35_text_rows_of_a_refused_row_are_not_painted
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_79_a_long_text_span_shows_four_rows_and_the_cut_line[1048576]
+FAILED tests/test_b103_inc8_s1_detail.py::test_r_pe_def_31_a_fallback_row_gives_the_definition_line_only
+18 failed, 25 passed in 1.50s
+EXIT=1
+#### test_b103_inc8_s1.txt
+<scratch>/red/s19_app/__init__.py
+ 00:18:52 up 2 days,  9:07,  3 users,  load average: 1.83, 2.62, 1.47
+bringing up nodes...
+bringing up nodes...
+
+..................................FFF..........F...........FFF.FF......F [ 59%]
+FFFFFFFFFFFFF..........F........F.........F....FF.                       [100%]
+=================================== FAILURES ===================================
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[73] _________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 73
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 18, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 14} != {'current': 20}
+E         {'limits': 18} != {'limits': 34}
+E         {'name': 16} != {'name': 26}
+E         {'unit': 0} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[80] _________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 80
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 25, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 14} != {'current': 20}
+E         {'limits': 25} != {'limits': 34}
+E         {'name': 16} != {'name': 26}
+E         {'unit': 0} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[96] _________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 96
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 41, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 14} != {'current': 20}
+E         {'limits': 41} != {'limits': 34}
+E         {'name': 16} != {'name': 26}
+E         {'unit': 0} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[99] _________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 99
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 44, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 14} != {'current': 20}
+E         {'limits': 44} != {'limits': 34}
+E         {'name': 16} != {'name': 26}
+E         {'unit': 0} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[100] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 100
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 16, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 18} != {'current': 20}
+E         {'limits': 16} != {'limits': 34}
+E         {'name': 18} != {'name': 26}
+E         {'unit': 7} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[111] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 111
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 27, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 18} != {'current': 20}
+E         {'limits': 27} != {'limits': 34}
+E         {'name': 18} != {'name': 26}
+E         {'unit': 7} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+___________ test_r_pe_def_15_a_long_name_is_clipped_with_an_ellipsis ___________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+
+    def test_r_pe_def_15_a_long_name_is_clipped_with_an_ellipsis(v171):
+        """R-PE-DEF.15/1 - `ASAM.C.ASCII.UBYTE.NUMBER_42` (28 characters) in the 26-cell Parameter column -> its first 25 cells and `…`.
+    
+        Why: Inc 8b widened Parameter from 18 to 26 (R-PE-DEF.89); the clip rule is the one of R-PE-DEF.96, the
+        oracle's ``fit`` (a name that fits is shown whole, a longer one ends in one `…`).
+        """
+        got = paint(v171["def"], v171["a2l"], v171["image"])[0]["name"].strip()
+>       assert got == EXB.fit(V171_NAME, 26).strip()
+E       AssertionError: assert 'ASAM.C.ASCII.UBYT…' == 'ASAM.C.ASCII.UBYTE.NUMBER…'
+E         
+E         - ASAM.C.ASCII.UBYTE.NUMBER…
+E         ?                  --------
+E         + ASAM.C.ASCII.UBYT…
+
+tests/test_b103_inc8_s1.py:377: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[118] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 118
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 34, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'current': 18} != {'current': 20}
+E         {'name': 18} != {'name': 26}
+E         {'unit': 7} != {'unit': 8}
+E         {'delta': 16} != {'delta': 20}...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+______ test_r_pe_def_7_wide_characters_are_clipped_by_cells_not_by_length ______
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_7_wide_characters_are_clipped_by_cells_not_by_length(defc):
+        """R-PE-DEF.7/4 (retired at Inc 8b E1; its wide-character case moves to R-PE-DEF.96/1, /2).
+    
+        Why: a name or unit of wide characters must stop inside its column in terminal cells, never in
+        characters (a `len()` clip leaves it twice as wide and pushes the gutter and the next cell right).
+        The columns are the grid's (Parameter 26, Unit 8): `温度`x14 -> `C.name_wide.fit26`, `温度温度温度` -> `C.unit_wide.fit8`.
+        """
+        renamed = replace(defc["defs"]["DISPLAY_0001"], name="温度" * 14, unit="温度温度温度")
+        got = paint(renamed, defc["a2l"], defc["image"])[0]
+>       assert got["name"].rstrip() == fact("C.name_wide.fit26").rstrip() and cell_len(got["name"].rstrip()) <= 26
+E       AssertionError: assert ('温度温度温度温度…' == '温度温度温度温度温度温度…'
+E         
+E         - 温度温度温度温度温度温度…
+E         ? ----
+E         + 温度温度温度温度…)
+
+tests/test_b103_inc8_s1.py:401: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[159] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 159
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 1...its': 64, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'current': 18} != {'current': 20}
+E         {'limits': 64} != {'limits': 34}
+E         {'name': 18} != {'name': 26}
+E         {'unit': 7} != {'unit': 8}...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+_________ test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[73] __________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+w = 73
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet(defc, v171, w):
+        """R-PE-DEF.7/1..3 (retired at Inc 8b E1; replaced by R-PE-DEF.89, .96) - every row line and the header are exactly the grid's 143 cells.
+    
+        Why: the grid is wider than the view at 118 and scrolls sideways; what must hold now is that no row,
+        whatever its text (wide names, a 300-character refusal tail), grows past the grid or ends short of it,
+        or the gutters and the horizontal scroll range would move row by row.
+        """
+        widths = ds.sheet_widths(w)
+>       assert cell_len(ds.header_line(widths).plain) == GRID_WIDTH
+E       AssertionError: assert 72 == 143
+E        +  where 72 = cell_len('  Parameter       Current       New         Limits            Δ         ')
+E        +    where '  Parameter       Current       New         Limits            Δ         ' = <text '  Parameter       Current       New         Limits            Δ         ' [Span(2, 18, 'bold'), Span(18, 32, 'bold'), Span(32, 44, 'bold'), Span(44, 62, 'bold'), Span(62, 72, 'bold')] 'bold'>.plain
+E        +      where <text '  Parameter       Current       New         Limits            Δ         ' [Span(2, 18, 'bold'), Span(18, 32, 'bold'), Span(32, 44, 'bold'), Span(44, 62, 'bold'), Span(62, 72, 'bold')] 'bold'> = <function header_line at 0x7fa475f52200>(SheetWidths(mark=2, name=16, kind=0, current=14, new=12, unit=0, limits=18, delta=10))
+E        +        where <function header_line at 0x7fa475f52200> = ds.header_line
+
+tests/test_b103_inc8_s1.py:457: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[160] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 160
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 4...its': 29, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'current': 44} != {'current': 20}
+E         {'limits': 29} != {'limits': 34}
+E         {'name': 24} != {'name': 26}
+E         {'delta': 22} != {'delta': 20}
+E         {'new': 20} != {'new': 16}
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[195] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 195
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 4...its': 64, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'current': 44} != {'current': 20}
+E         {'limits': 64} != {'limits': 34}
+E         {'name': 24} != {'name': 26}
+E         {'delta': 22} != {'delta': 20}
+E         {'new': 20} != {'new': 16}
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+_________ test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[111] _________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+w = 111
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet(defc, v171, w):
+        """R-PE-DEF.7/1..3 (retired at Inc 8b E1; replaced by R-PE-DEF.89, .96) - every row line and the header are exactly the grid's 143 cells.
+    
+        Why: the grid is wider than the view at 118 and scrolls sideways; what must hold now is that no row,
+        whatever its text (wide names, a 300-character refusal tail), grows past the grid or ends short of it,
+        or the gutters and the horizontal scroll range would move row by row.
+        """
+        widths = ds.sheet_widths(w)
+>       assert cell_len(ds.header_line(widths).plain) == GRID_WIDTH
+E       AssertionError: assert 110 == 143
+E        +  where 110 = cell_len('  Parameter         Kind     Current           New          Unit   Limits                     Δ               ')
+E        +    where '  Parameter         Kind     Current           New          Unit   Limits                     Δ               ' = <text '  Parameter         Kind     Current           New          Unit   Limits                     Δ               '... Span(29, 47, 'bold'), Span(47, 60, 'bold'), Span(60, 67, 'bold'), Span(67, 94, 'bold'), Span(94, 110, 'bold')] 'bold'>.plain
+E        +      where <text '  Parameter         Kind     Current           New          Unit   Limits                     Δ               '... Span(29, 47, 'bold'), Span(47, 60, 'bold'), Span(60, 67, 'bold'), Span(67, 94, 'bold'), Span(94, 110, 'bold')] 'bold'> = <function header_line at 0x7fa475f52200>(SheetWidths(mark=2, name=18, kind=9, current=18, new=13, unit=7, limits=27, delta=16))
+E        +        where <function header_line at 0x7fa475f52200> = ds.header_line
+
+tests/test_b103_inc8_s1.py:457: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[200] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 200
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 4...its': 64, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'current': 44} != {'current': 20}
+E         {'limits': 64} != {'limits': 34}
+E         {'name': 24} != {'name': 26}
+E         {'delta': 22} != {'delta': 20}
+E         {'new': 20} != {'new': 16}
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+________ test_r_pe_def_6_widths_follow_the_examples_of_every_class[220] ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 220
+
+    @pytest.mark.parametrize("w", [73, 80, 96, 99, 100, 111, 118, 159, 160, 195, 200, 220])
+    def test_r_pe_def_6_widths_follow_the_examples_of_every_class(w):
+        """R-PE-DEF.6 (retired at Inc 8b E1, replaced by R-PE-DEF.89; E1-rulings section 2) - the columns do not depend on the view.
+    
+        Why: the operator chose the grid (variant D): fixed natural widths at every view width, with the
+        sheet scrolling sideways instead of hiding Kind and Unit. The width classes of Inc 8 (96 -> Kind and
+        Unit hidden, 200 -> Limits capped at 64) must be gone: the widths are the oracle's, whatever W is.
+        """
+        expect = {"mark": EXB.MARK, **{_COLUMN_KEYS[label]: width for label, width in EXB.COLUMNS}}
+>       assert ds.sheet_widths(w)._asdict() == expect
+E       AssertionError: assert {'current': 4...its': 64, ...} == {'current': 2...its': 34, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'current': 44} != {'current': 20}
+E         {'limits': 64} != {'limits': 34}
+E         {'name': 24} != {'name': 26}
+E         {'delta': 22} != {'delta': 20}
+E         {'new': 20} != {'new': 16}
+E         Use -v to get more diff
+
+tests/test_b103_inc8_s1.py:80: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[73] _______
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 73
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...   Δ         ' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         +   Parameter       Current       New         Limits            Δ
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+_________ test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[195] _________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+v171 = {'a2l': {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, ...TATUS_STRING', refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}
+w = 195
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet(defc, v171, w):
+        """R-PE-DEF.7/1..3 (retired at Inc 8b E1; replaced by R-PE-DEF.89, .96) - every row line and the header are exactly the grid's 143 cells.
+    
+        Why: the grid is wider than the view at 118 and scrolls sideways; what must hold now is that no row,
+        whatever its text (wide names, a 300-character refusal tail), grows past the grid or ends short of it,
+        or the gutters and the horizontal scroll range would move row by row.
+        """
+        widths = ds.sheet_widths(w)
+>       assert cell_len(ds.header_line(widths).plain) == GRID_WIDTH
+E       AssertionError: assert 194 == 143
+E        +  where 194 = cell_len('  Parameter               Kind      Current                                     New                 Unit    Limits                                                          Δ                     ')
+E        +    where '  Parameter               Kind      Current                                     New                 Unit    Limits                                                          Δ                     ' = <text '  Parameter               Kind      Current                                     New                 Unit    Lim...36, 80, 'bold'), Span(80, 100, 'bold'), Span(100, 108, 'bold'), Span(108, 172, 'bold'), Span(172, 194, 'bold')] 'bold'>.plain
+E        +      where <text '  Parameter               Kind      Current                                     New                 Unit    Lim...36, 80, 'bold'), Span(80, 100, 'bold'), Span(100, 108, 'bold'), Span(108, 172, 'bold'), Span(172, 194, 'bold')] 'bold'> = <function header_line at 0x7fa475f52200>(SheetWidths(mark=2, name=24, kind=10, current=44, new=20, unit=8, limits=64, delta=22))
+E        +        where <function header_line at 0x7fa475f52200> = ds.header_line
+
+tests/test_b103_inc8_s1.py:457: AssertionError
+_ test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell _
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell(defc):
+        """R-PE-DEF.21/1 (changed at Inc 8b E1) - DISPLAY_0001 at its current 143.5: `L.cell.DISPLAY_0001.cur143.5`.
+    
+        Why: the operator asked for every Limits cell to line up down the column: two 7-cell slots (number
+        right-aligned, unit letter last) and an 18-cell track at fixed offsets, `├` at 8 whatever the lower
+        limit's width. Inc 8's cell started the track after the lower limit's own text.
+        """
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"])
+>       assert cell == fact("L.cell.DISPLAY_0001.cur143.5") and len(cell) == fact("L.cell.DISPLAY_0001.cur143.5.len") == 34
+E       AssertionError: assert ('-40 ├───────...──────●─┤ 150' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├──────────────●─┤    150 
+E         ? ---    -                   ---   -
+E         + -40 ├──────────────────●─┤ 150
+E         ?      ++++)
+
+tests/test_b103_inc8_s1.py:492: AssertionError
+________ test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell ________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell(defc):
+        """R-PE-DEF.21/1 - a preview of 25.5 -> `L.cell.DISPLAY_0001.cur143.5.new25.5` (`◆` on its cell, `●` on the current value's)."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], EX.new)
+        marks = fact("L.cell.DISPLAY_0001.cur143.5.new25.5.marks")
+>       assert cell == fact("L.cell.DISPLAY_0001.cur143.5.new25.5")
+E       AssertionError: assert '-40 ├───────...──────●─┤ 150' == '   -40  ├───...──●─┤    150 '
+E         
+E         -    -40  ├─────◆────────●─┤    150 
+E         ? ---    -                   ---   -
+E         + -40 ├───────◆──────────●─┤ 150
+E         ?      ++              ++
+
+tests/test_b103_inc8_s1.py:501: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[111] ______
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 111
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...             ' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                     ---------         --                  ---             ----       --                           --------                -----
+E         +   Parameter         Kind     Current           New          Unit   Limits                     Δ
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+______ test_r_pe_def_5_header_labels_start_where_the_widths_put_them[195] ______
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+w = 195
+
+    @pytest.mark.parametrize("w", [73, 111, 195])
+    def test_r_pe_def_5_header_labels_start_where_the_widths_put_them(w):
+        """R-PE-DEF.5/1..3 (changed at Inc 8b E1) - the header line is the oracle's `G.header_line` at V = 73, 111, 195.
+    
+        Why: the labels sit at the fixed column starts with a `│` after each column; Kind and Unit are shown at
+        every width (Inc 8 hid them below W 100).
+        """
+        line = ds.header_line(ds.sheet_widths(w)).plain
+>       assert line == fact("G.header_line") == EXB.header_line()
+E       AssertionError: assert '  Parameter ...             ' == '  Parameter ...            │'
+E         
+E         -   Parameter                 │Kind      │Current             │New             │Unit    │Limits                            │Δ                   │
+E         ?                           ---          -                    ^                ^        -                                  ^                    ^
+E         +   Parameter               Kind      Current                                     New                 Unit    Limits                                                          Δ                     
+E         ?                                                         ^^^^^^^^^^^^^^^^^^^^^^^^        ...
+E         
+E         ...Full output truncated (1 line hidden), use '-vv' to show
+
+tests/test_b103_inc8_s1.py:92: AssertionError
+_____ test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end _____
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end(defc):
+        """R-PE-DEF.21/4 - a preview of 175 (above 150) -> `▶` at offset 25 (the track's right end), no `◆`; `L.cell.DISPLAY_0001.new175`."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], 175)
+>       assert cell == fact("L.cell.DISPLAY_0001.new175")
+E       AssertionError: assert '-40 ├───────...──────●─▶ 150' == '   -40  ├───...──●─▶    150 '
+E         
+E         -    -40  ├──────────────●─▶    150 
+E         ? ---    -                   ---   -
+E         + -40 ├──────────────────●─▶ 150
+E         ?      ++++
+
+tests/test_b103_inc8_s1.py:508: AssertionError
+_____ test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end ______
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end(defc):
+        """R-PE-DEF.21/5 - below the lower limit -> `◀` at offset 8 (the track's left end); `L.cell.DISPLAY_0001.new-45`."""
+        cell = _limits(defc["defs"]["DISPLAY_0001"], defc["a2l"], defc["image"], -45)
+>       assert cell == fact("L.cell.DISPLAY_0001.new-45")
+E       AssertionError: assert '-40 ◀───────...──────●─┤ 150' == '   -40  ◀───...──●─┤    150 '
+E         
+E         -    -40  ◀──────────────●─┤    150 
+E         ? ---    -                   ---   -
+E         + -40 ◀──────────────────●─┤ 150
+E         ?      ++++
+
+tests/test_b103_inc8_s1.py:515: AssertionError
+_________ test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form _________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form(defc):
+        """R-PE-DEF.21/2 (the case is gone at Inc 8b E1; E3-8b-10) - the Limits width is fixed, so the `width` argument changes nothing.
+    
+        Why: Inc 8 drew `-40 … 150` when the Limits column was narrower than 18. The column is 34 cells at
+        every view width now: asking for width 16, 34 or 200 must give the same aligned cell, never the old
+        dots form.
+        """
+        display = defc["defs"]["DISPLAY_0001"]
+        narrow = _limits(display, defc["a2l"], defc["image"], None, 16)
+>       assert narrow == _limits(display, defc["a2l"], defc["image"], None, 34)
+E       AssertionError: assert '-40 … 150' == '-40 ├───────...──────●─┤ 150'
+E         
+E         - -40 ├──────────────────●─┤ 150
+E         + -40 … 150
+
+tests/test_b103_inc8_s1.py:528: AssertionError
+___________________ test_r_pe_def_21_no_limits_shows_a_dash ____________________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_def_21_no_limits_shows_a_dash(defc):
+        """R-PE-DEF.21/3 - an object with no lower or upper limit -> the no-limits form: 34 cells, `-` at offset 16 (`L.cell.no_limits`)."""
+        nolimits = replace(defc["defs"]["DISPLAY_0001"], limits=Limits(None, None, "", ""))
+        cell = _limits(nolimits, defc["a2l"], defc["image"])
+>       assert cell == fact("L.cell.no_limits") and cell.strip() == "-" and cell.index("-") == 16
+E       AssertionError: assert ('-' == '            ...             '
+E         
+E         -                 -                 
+E         + -)
+
+tests/test_b103_inc8_s1.py:537: AssertionError
+_ test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[5.0-5.0-L.cell.limits_5_5] _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = 5.0, upper = 5.0, key = 'L.cell.limits_5_5'
+
+    @pytest.mark.parametrize("lower, upper, key", [(5.0, 5.0, "L.cell.limits_5_5"), (9.0, 1.0, "L.cell.limits_9_1")])
+    def test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division(defc, lower, upper, key):
+        """R-PE-DEF.76/1, /2 (changed at Inc 8b E1) - limits `5 5` and `9 1` -> the range form (both slots, `…` at offset 16); no ZeroDivisionError.
+    
+        Why: an upper limit that is not above the lower gives no scale to place a value on, so the cell shows
+        the limits only; Inc 8 wrote `5 … 5` from the column start, which broke the column's alignment.
+        """
+        flat = replace(defc["defs"]["DISPLAY_0001"], limits=Limits(lower, upper, str(int(lower)), str(int(upper))))
+        for value in (None, EX.new):
+            cell = _limits(flat, defc["a2l"], defc["image"], value)
+>           assert cell == fact(key) and cell.index("…") == 16
+E           AssertionError: assert ('5 … 5' == '     5      ...           5 '
+E             
+E             -      5          …               5 
+E             + 5 … 5)
+
+tests/test_b103_inc8_s1.py:550: AssertionError
+_ test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[9.0-1.0-L.cell.limits_9_1] _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+lower = 9.0, upper = 1.0, key = 'L.cell.limits_9_1'
+
+    @pytest.mark.parametrize("lower, upper, key", [(5.0, 5.0, "L.cell.limits_5_5"), (9.0, 1.0, "L.cell.limits_9_1")])
+    def test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division(defc, lower, upper, key):
+        """R-PE-DEF.76/1, /2 (changed at Inc 8b E1) - limits `5 5` and `9 1` -> the range form (both slots, `…` at offset 16); no ZeroDivisionError.
+    
+        Why: an upper limit that is not above the lower gives no scale to place a value on, so the cell shows
+        the limits only; Inc 8 wrote `5 … 5` from the column start, which broke the column's alignment.
+        """
+        flat = replace(defc["defs"]["DISPLAY_0001"], limits=Limits(lower, upper, str(int(lower)), str(int(upper))))
+        for value in (None, EX.new):
+            cell = _limits(flat, defc["a2l"], defc["image"], value)
+>           assert cell == fact(key) and cell.index("…") == 16
+E           AssertionError: assert ('9 … 1' == '     9      ...           1 '
+E             
+E             -      9          …               1 
+E             + 9 … 1)
+
+tests/test_b103_inc8_s1.py:550: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[73]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[80]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[96]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[99]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[100]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[111]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_15_a_long_name_is_clipped_with_an_ellipsis
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[118]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_7_wide_characters_are_clipped_by_cells_not_by_length
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[159]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[73]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[160]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[195]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[111]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[200]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_6_widths_follow_the_examples_of_every_class[220]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[73]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_7_no_painted_line_is_wider_than_the_sheet[195]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_holds_the_short_limits_and_the_current_mark_on_its_cell
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_limits_cell_puts_the_preview_mark_on_its_cell
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[111]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_5_header_labels_start_where_the_widths_put_them[195]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_value_above_the_upper_limit_sits_on_the_right_end
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_value_below_the_lower_limit_sits_on_the_left_end
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_a_track_under_six_cells_gives_the_dots_form
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_21_no_limits_shows_a_dash - ...
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[5.0-5.0-L.cell.limits_5_5]
+FAILED tests/test_b103_inc8_s1.py::test_r_pe_def_76_limits_not_ascending_paint_the_dots_form_without_a_division[9.0-1.0-L.cell.limits_9_1]
+28 failed, 94 passed in 1.62s
+EXIT=1
+#### test_b103_inc8_s2_sheet_keys.txt
+<scratch>/red/s19_app/__init__.py
+ 00:18:57 up 2 days,  9:07,  3 users,  load average: 2.00, 2.64, 1.49
+bringing up nodes...
+bringing up nodes...
+
+................FFF.FF                                                   [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body _
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body(softa_page):
+        """R-PE-DEF.81/1 (changed at Inc 8b E1: visible = body - 2, the header rule takes a line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                assert sheet.selected_name == names[40]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert lines[at][lines[0].index("Parameter"):].startswith(names[40][:12])
+                assert at >= 2, "the header line and the rule come first"
+                assert lines[1].startswith("━"), "the header rule is the body's second line (R-PE-DEF.91)"
+                first_painted = 40 - (at - 2)
+                assert first_painted > 0  # the window scrolled: row 0 is no longer painted
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            assert sheet.selected_name == names[40]
+            lines, height = _inside(sheet)
+            assert len(lines) <= height, (len(lines), height)
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+            assert lines[at][lines[0].index("Parameter"):].startswith(names[40][:12])
+            assert at >= 2, "the header line and the rule come first"
+>           assert lines[1].startswith("━"), "the header rule is the body's second line (R-PE-DEF.91)"
+E           AssertionError: the header rule is the body's second line (R-PE-DEF.91)
+E           assert False
+E            +  where False = <built-in method startswith of str object at 0x7feadfba34b0>('━')
+E            +    where <built-in method startswith of str object at 0x7feadfba34b0> = '  AcippJgtn.TcpzwRr…ASCII    ""                ·                   -                                                 '.startswith
+
+tests/test_b103_inc8_s2_sheet_keys.py:309: AssertionError
+_ test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines _
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '<scratch>/tmp/pytest-of-<runner>/pytest-25/popen-gw1/s2_defc0/definitions....th=PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-25/popen-gw1/s2_defc0/definitions.a2l'))
+
+    def test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines(defc):
+        """R-PE-DEF.81/3 (changed at Inc 8b E1) - an enum row on the window's last line: its definition line and its 4-line card fit the grid body (8)."""
+        clones = {f"DISP_{i:02d}": dataclasses.replace(defc.defs["DISPLAY_0001"], name=f"DISP_{i:02d}") for i in range(8)}
+        defs = {**clones, "ENUM_0001": defc.defs["ENUM_0001"]}
+        names = list(defs)
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+                sheet.show_page(names, defs, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(len(names) - 1):
+                    await pilot.press("down")
+                assert sheet.selected_name == "ENUM_0001"
+                lines, height = _inside(sheet)
+                assert len(lines) <= height, (len(lines), height)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                assert len(lines) - at - 1 == 5, lines  # the definition line and the four card lines, none cut
+                assert "choose" in lines[-2] and lines[-1].lstrip().startswith("┊ ╰")
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):
+            sheet.show_page(names, defs, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(len(names) - 1):
+                await pilot.press("down")
+            assert sheet.selected_name == "ENUM_0001"
+            lines, height = _inside(sheet)
+            assert len(lines) <= height, (len(lines), height)
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+>           assert len(lines) - at - 1 == 5, lines  # the definition line and the four card lines, none cut
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: ['  Parameter         Kind     Current           New          Unit   Limits                            Δ              ... ├──────●─────────────┤ 3                        ', '└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B', ...]
+E           assert ((8 - 4) - 1) == 5
+E            +  where 8 = len(['  Parameter         Kind     Current           New          Unit   Limits                            Δ              ... ├──────●─────────────┤ 3                        ', '└ TAB_VERB 4 pairs · UBYTE u8 big-endian · 0x00800000 · 1 B', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:361: AssertionError
+_ test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says _
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says(softa_page):
+        """R-PE-DEF.81/5 (E3-8b-05) - the host at 118x54 (no chrome): grid 53, body 52, visible 50 (`W.harness_118x54.*`).
+    
+        Why: the body must fill the scroller less its scrollbar row, and the window must paint exactly
+        visible = body - 2 sheet lines; a body as tall as its own text would leave the window shorter
+        than the room the operator has. The harness gives the body no height of its own.
+        """
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                await pilot.pause()
+                grids = list(sheet.query("#patch_sheet_grid"))
+                assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+                body = sheet.query_one("#patch_sheet_body")
+                assert grids[0].outer_size.height == fact("W.harness_118x54.grid")
+                assert body.outer_size.height == fact("W.harness_118x54.body")
+                lines = body_lines(sheet)
+                assert len(lines) == fact("W.harness_118x54.visible") + 2
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:416: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            await pilot.pause()
+            grids = list(sheet.query("#patch_sheet_grid"))
+>           assert len(grids) == 1, "the grid scroller of R-PE-DEF.92"
+E           AssertionError: the grid scroller of R-PE-DEF.92
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+tests/test_b103_inc8_s2_sheet_keys.py:409: AssertionError
+_ test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    def test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row(softa_page):
+        """R-PE-DEF.81/2 (changed at Inc 8b E1: the first painted row is the third body line)."""
+        a2l, names, defs, image = softa_page
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+                sheet.show_page(names, defs, a2l, image)
+                sheet.set_document([], image)
+                await pilot.pause()
+                sheet.query_one("#patch_sheet_body").focus()
+                await pilot.pause()
+                for _ in range(40):
+                    await pilot.press("down")
+                lines, _height = _inside(sheet)
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+                first_painted = 40 - (at - 2)
+                for _ in range(40 - first_painted + 1):
+                    await pilot.press("up")
+                assert sheet.selected_name == names[first_painted - 1]
+                lines, height = _inside(sheet)
+                assert len(lines) <= height
+                assert lines[2].startswith("▶")  # the selected row is the first painted row (after the header and its rule)
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=22) as (app, pilot, sheet):  # visible 20 sheet lines (EX-K4)
+            sheet.show_page(names, defs, a2l, image)
+            sheet.set_document([], image)
+            await pilot.pause()
+            sheet.query_one("#patch_sheet_body").focus()
+            await pilot.pause()
+            for _ in range(40):
+                await pilot.press("down")
+            lines, _height = _inside(sheet)
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))
+            first_painted = 40 - (at - 2)
+            for _ in range(40 - first_painted + 1):
+                await pilot.press("up")
+            assert sheet.selected_name == names[first_painted - 1]
+            lines, height = _inside(sheet)
+            assert len(lines) <= height
+>           assert lines[2].startswith("▶")  # the selected row is the first painted row (after the header and its rule)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: assert False
+E            +  where False = <built-in method startswith of str object at 0x7ff0c3f29630>('▶')
+E            +    where <built-in method startswith of str object at 0x7ff0c3f29630> = '└ text · 0x00000000 · 15 B'.startswith
+
+tests/test_b103_inc8_s2_sheet_keys.py:337: AssertionError
+_ test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '<scratch>/tmp/pytest-of-<runner>/pytest-25/popen-gw0/s2_defc0/definitions....th=PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-25/popen-gw0/s2_defc0/definitions.a2l'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff0c43af290>
+
+    def test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted(defc, monkeypatch):
+        from s19_app.tui import definition_sheet as ds
+    
+        ops = ds.ops_for("number")._replace(
+            detail=lambda row, preview, width, state, room: [Text(f"detail {i}") for i in range(10)]
+        )
+        monkeypatch.setitem(ds._KIND_OPS, "standin", ops)
+        standin = dataclasses.replace(defc.defs["DISPLAY_0001"], name="STANDIN_0001", kind="standin")
+    
+        async def drive():
+            async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):  # the 12-row minimum: visible 6
+                sheet.show_page(["STANDIN_0001"], {"STANDIN_0001": standin}, defc.a2l, defc.image)
+                sheet.set_document([], defc.image)
+                await pilot.pause()
+                assert sheet.selected_name == "STANDIN_0001"
+                lines, height = _inside(sheet)
+                visible = height - 2  # the header line and the header rule are not row lines (R-PE-DEF.81)
+                assert visible == 6 and fact("W.standin_10_detail.h8.painted") == visible - 1
+                at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))  # the row is painted
+                assert len(lines) <= height
+                assert len(lines) - at - 1 == visible - 1  # the detail cut to room = visible - 1
+                assert lines[-1].strip().endswith(f"detail {visible - 2}")  # the cut keeps the first lines
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_keys.py:390: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_keys.py:43: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54), body_height=8) as (app, pilot, sheet):  # the 12-row minimum: visible 6
+            sheet.show_page(["STANDIN_0001"], {"STANDIN_0001": standin}, defc.a2l, defc.image)
+            sheet.set_document([], defc.image)
+            await pilot.pause()
+            assert sheet.selected_name == "STANDIN_0001"
+            lines, height = _inside(sheet)
+            visible = height - 2  # the header line and the header rule are not row lines (R-PE-DEF.81)
+            assert visible == 6 and fact("W.standin_10_detail.h8.painted") == visible - 1
+            at = next(i for i, ln in enumerate(lines) if ln.startswith("▶"))  # the row is painted
+            assert len(lines) <= height
+>           assert len(lines) - at - 1 == visible - 1  # the detail cut to room = visible - 1
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: assert ((8 - 1) - 1) == (6 - 1)
+E            +  where 8 = len(['  Parameter         Kind     Current           New          Unit   Limits                            Δ              ...       deg C  -                                                 ', 'detail 0', 'detail 1', 'detail 2', 'detail 3', ...])
+
+tests/test_b103_inc8_s2_sheet_keys.py:387: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_1_after_40_downs_the_selected_row_and_its_detail_lie_inside_the_body
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_3_an_enum_row_reached_from_above_paints_its_three_detail_lines
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_5_the_test_host_at_118x54_gives_the_grid_body_the_height_the_rule_says
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_2_up_past_the_first_painted_row_makes_it_the_first_painted_row
+FAILED tests/test_b103_inc8_s2_sheet_keys.py::test_r_pe_def_81_4_a_detail_taller_than_the_window_is_cut_and_the_row_stays_painted
+5 failed, 17 passed in 11.32s
+EXIT=1
+#### test_b103_inc8_s2_sheet_rows.txt
+<scratch>/red/s19_app/__init__.py
+ 00:19:10 up 2 days,  9:07,  3 users,  load average: 2.29, 2.68, 1.52
+bringing up nodes...
+bringing up nodes...
+
+......F............................                                      [100%]
+=================================== FAILURES ===================================
+____________ test_r_pe_def_30_1_the_detail_moves_with_the_selection ____________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = Case(a2l={'path': '<scratch>/tmp/pytest-of-<runner>/pytest-26/popen-gw0/s2_defc0/definitions....th=PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-26/popen-gw0/s2_defc0/definitions.a2l'))
+
+    def test_r_pe_def_30_1_the_detail_moves_with_the_selection(defc):
+        """R-PE-DEF.30/1, /2 - select row 1, then row 3: the detail lines sit under the selected row only, and
+        row 1 has none after the move. Added at E4 integration (trace_check: no test named R-PE-DEF.30).
+        Fails if every expanded row keeps its detail, or if no detail is painted."""
+    
+        async def drive():
+            async with sheet_ctx(size=(160, 50)) as (app, pilot, sheet):
+                await show(pilot, sheet, defc)
+                first, third = DEFC_NAMES[0], DEFC_NAMES[2]
+                await select(pilot, sheet, first)
+                assert _rows_with_detail(sheet) == [first], body_lines(sheet)
+                await select(pilot, sheet, third)
+                assert _rows_with_detail(sheet) == [third], body_lines(sheet)
+    
+>       run(drive)
+
+tests/test_b103_inc8_s2_sheet_rows.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_s2_sheet_rows.py:62: in run
+    return asyncio.run(coro_fn())
+           ^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def drive():
+        async with sheet_ctx(size=(160, 50)) as (app, pilot, sheet):
+            await show(pilot, sheet, defc)
+            first, third = DEFC_NAMES[0], DEFC_NAMES[2]
+            await select(pilot, sheet, first)
+>           assert _rows_with_detail(sheet) == [first], body_lines(sheet)
+E           AssertionError: ['  Parameter               Kind      Current                                     New                 Unit    Limits  ...1)                                    ·                           0 ├──────────────●┤ 1                              ']
+E           assert [] == ['DISPLAY_0001']
+E             
+E             Right contains one more item: 'DISPLAY_0001'
+E             Use -v to get more diff
+
+tests/test_b103_inc8_s2_sheet_rows.py:247: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_30_1_the_detail_moves_with_the_selection
+1 failed, 34 passed in 6.70s
+EXIT=1
+#### test_b103_inc9_b_cells.txt
+<scratch>/red/s19_app/__init__.py
+ 00:19:26 up 2 days,  9:08,  3 users,  load average: 2.60, 2.73, 1.55
+bringing up nodes...
+bringing up nodes...
+
+...F..F....F.........FFFF.F..FF.F..FF...                                 [100%]
+=================================== FAILURES ===================================
+_________ test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks _________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks(defc):
+        """R-PE-BENCH.11/3 (changed at Inc 8b E1) - VAL_BLK_DEF_0001 -> `▄▃▄ 6` (`S.after.current.VAL_BLK_DEF_0001`)."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[CURRENT]
+>       assert cell.plain.strip() == fact("S.after.current.VAL_BLK_DEF_0001") == "▄▃▄ 6"
+E       AssertionError: assert '███ 6' == '▄▃▄ 6'
+E         
+E         - ▄▃▄ 6
+E         + ███ 6
+
+tests/test_b103_inc9_b_cells.py:109: AssertionError
+______________ test_r_pe_bench_11_1_the_curve_strip_and_its_count ______________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_1_the_curve_strip_and_its_count(defc):
+        """R-PE-BENCH.11/1 (changed at Inc 8b E1, F-R14-1) - CURVE_DEF_0001 -> `▄▆▃▇▁ 5` (`S.after.current.CURVE_DEF_0001`).
+    
+        Why: with eight levels the tallest block `█` filled its cell and the strips of two stacked rows fused
+        into a white bar; seven levels keep a gap. The Current width is 20 now, so the strip is 17 cells wide.
+        """
+        o = defc_obj(defc, "CURVE_DEF_0001")
+>       assert strip_width(o) == fact("S.strip_width.CURVE_DEF_0001") == 17
+E       AssertionError: assert 15 == 17
+E        +  where 15 = strip_width(Obj(d=Definition(name='CURVE_DEF_0001', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=8388688, by...ext='348.000'), Decoded(stored=828, value=414.0, text='414.000'), Decoded(stored=901, value=450.5, text='450.500'))),)))
+E        +  and   17 = fact('S.strip_width.CURVE_DEF_0001')
+
+tests/test_b103_inc9_b_cells.py:89: AssertionError
+__________ test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks ___________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks(defc):
+        """R-PE-BENCH.11/2 (changed at Inc 8b E1) - MAP_DEF_0001 -> `▆▃▅▃ 12`: one block per grid column at the level of its mean (`S.after.current.MAP_DEF_0001`)."""
+        o = defc_obj(defc, "MAP_DEF_0001")
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[CURRENT]
+>       assert cell.plain.strip() == fact("S.after.current.MAP_DEF_0001") == "▆▃▅▃ 12"
+E       AssertionError: assert '████ 12' == '▆▃▅▃ 12'
+E         
+E         - ▆▃▅▃ 12
+E         + ████ 12
+
+tests/test_b103_inc9_b_cells.py:100: AssertionError
+______________ test_r_pe_bench_17_the_limits_cell[CURVE_DEF_0001] ______________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'CURVE_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001"])
+    def test_r_pe_bench_17_the_limits_cell(defc, name):
+        """R-PE-BENCH.17/1,2 (changed at Inc 8b E1) - the range form: both slots, `…` at offset 16 (`L.bench.CURVE_DEF_0001`, `L.bench.MAP_DEF_0001`).
+    
+        Why: the operator asked for the Limits column to stay aligned for every row kind; Inc 9's `0 … 65.5k`
+        started at the column start while scalar rows put their lower limit in a right-aligned slot.
+        """
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell == fact(f"L.bench.{name}") and len(cell) == 34 and cell.index("…") == 16
+E       AssertionError: assert ('0 … 65.5k' == '     0      ...        65.5k'
+E         
+E         -      0          …            65.5k
+E         + 0 … 65.5k)
+
+tests/test_b103_inc9_b_cells.py:227: AssertionError
+_______ test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip ________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip(defc):
+        """R-PE-BENCH.11 (B13, changed at Inc 8b E1) - width 17 -> the 7-level oracle strip `▄▆▃▇▁`; wider than the points: one block per point."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+>       assert db.summary_strip(o.values, o.grid, 17).plain.rstrip() == EXB.chart_strip(EX.CURVE, 17, EXB.BLOCKS7)
+E       AssertionError: assert '▅▇▄█▁' == '▄▆▃▇▁'
+E         
+E         - ▄▆▃▇▁
+E         + ▅▇▄█▁
+
+tests/test_b103_inc9_b_cells.py:289: AssertionError
+_______________ test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001] _______________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+name = 'MAP_DEF_0001'
+
+    @pytest.mark.parametrize("name", ["CURVE_DEF_0001", "MAP_DEF_0001"])
+    def test_r_pe_bench_17_the_limits_cell(defc, name):
+        """R-PE-BENCH.17/1,2 (changed at Inc 8b E1) - the range form: both slots, `…` at offset 16 (`L.bench.CURVE_DEF_0001`, `L.bench.MAP_DEF_0001`).
+    
+        Why: the operator asked for the Limits column to stay aligned for every row kind; Inc 9's `0 … 65.5k`
+        started at the column start while scalar rows put their lower limit in a right-aligned slot.
+        """
+        o = defc_obj(defc, name)
+        row = sheet_row(o.d, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell == fact(f"L.bench.{name}") and len(cell) == 34 and cell.index("…") == 16
+E       AssertionError: assert ('-1.00k … 1.00k' == ' -1.00k     ...        1.00k'
+E         
+E         -  -1.00k         …            1.00k
+E         + -1.00k … 1.00k)
+
+tests/test_b103_inc9_b_cells.py:227: AssertionError
+__________ test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash ___________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash(defc):
+        """R-PE-BENCH.17/3 (changed at Inc 8b E1) - an array with no limits -> the no-limits form: `-` at offset 16 of 34 cells."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        none = dataclasses.replace(o.d, limits=Limits(None, None, "", ""))
+        row = sheet_row(none, o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55a3ff2b51e0>('-')
+E        +    where <built-in method index of str object at 0x55a3ff2b51e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:236: AssertionError
+___________ test_r_pe_bench_11_summary_strip_samples_every_kth_point ___________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_11_summary_strip_samples_every_kth_point(defc):
+        """R-PE-BENCH.11 (B13) - 5 points in a strip of width 2: every k-th point, k = ceil(5 / 2) = 3 (the oracle's rule)."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+>       assert db.summary_strip(o.values, o.grid, 2).plain.rstrip() == EXB.chart_strip(EX.CURVE, 2, EXB.BLOCKS7)
+E       AssertionError: assert '▅█' == '▄▇'
+E         
+E         - ▄▇
+E         + ▅█
+
+tests/test_b103_inc9_b_cells.py:297: AssertionError
+___________ test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip ____________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-29/popen-gw0/test_r_pe_bench_19_1_nan_colum0')
+
+    def test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip(tmp_path):
+        """R-PE-BENCH.19/1 - EX-N1: F32_BLK `1`, `nan`, `3` -> the strip: block, space, block, no exception."""
+        o = hand_object(tmp_path, "F32_BLK", "RL_F32", 3, bytes.fromhex("3F800000FFFFFFFF40400000"))
+        strip = db.summary_strip(o.values, o.grid, 40)
+>       assert strip.plain[:3] == "▁ ▇", "levels 1 and 7 (lo 1, hi 3 over the finite values only), a space for the NaN"
+E       AssertionError: levels 1 and 7 (lo 1, hi 3 over the finite values only), a space for the NaN
+E       assert '█ █' == '▁ ▇'
+E         
+E         - ▁ ▇
+E         + █ █
+
+tests/test_b103_inc9_b_cells.py:304: AssertionError
+____________ test_r_pe_bench_19_equal_values_do_not_divide_by_zero _____________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_19_equal_values_do_not_divide_by_zero(defc):
+        """R-PE-BENCH.19 / EX-G13 (Inc 8b: seven levels) - values all `7`: a grid strip and a chart are all level 1 (`▁`)."""
+        vb = defc_obj(defc, "VAL_BLK_DEF_0001")
+        values = db.BenchValues.from_decoded(decoded_of(*[(7.0, "7")] * 6))
+        strip = db.summary_strip(values, vb.grid, 15)
+>       assert strip.plain.strip() == "▁▁▁", "lo = hi: every block at level 1 (t = 0)"
+E       AssertionError: lo = hi: every block at level 1 (t = 0)
+E       assert '███' == '▁▁▁'
+E         
+E         - ▁▁▁
+E         + ███
+
+tests/test_b103_inc9_b_cells.py:328: AssertionError
+_ test_r_pe_bench_19_2_a_curve_strip_leaves_a_space_for_a_point_that_is_not_finite _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+
+    def test_r_pe_bench_19_2_a_curve_strip_leaves_a_space_for_a_point_that_is_not_finite(defc):
+        """R-PE-BENCH.19/2 - EX-N2: a CURVE of 3 points 1, inf, 3 -> seven-level blocks `▁`, space, `▇` (Inc 8b: never `█`)."""
+        o = defc_obj(defc, "CURVE_DEF_0001")
+        grid = db.bench_grid(dataclasses.replace(o.d, shape=(3,), element_count=3))
+        values = db.BenchValues.from_decoded(decoded_of((1.0, "1"), (math.inf, "inf"), (3.0, "3")))
+>       assert db.summary_strip(values, grid, 15).plain.rstrip() == "▁ ▇"
+E       AssertionError: assert '▁ █' == '▁ ▇'
+E         
+E         - ▁ ▇
+E         + ▁ █
+
+tests/test_b103_inc9_b_cells.py:312: AssertionError
+__________ test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits0] __________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+limits = Limits(lower=0.0, upper=None, lower_text='', upper_text='')
+
+    @pytest.mark.parametrize("limits", [Limits(0.0, None, "", ""), Limits(None, 5.0, "", "")])
+    def test_r_pe_bench_17_4_one_limit_alone_shows_a_dash(defc, limits):
+        """R-PE-BENCH.17 (M9, mutant m17: `or` for `and`) - `-` without BOTH limits: only a lower, only an upper."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(dataclasses.replace(o.d, limits=limits), o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55d323bbc1e0>('-')
+E        +    where <built-in method index of str object at 0x55d323bbc1e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:406: AssertionError
+__________ test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits1] __________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+limits = Limits(lower=None, upper=5.0, lower_text='', upper_text='')
+
+    @pytest.mark.parametrize("limits", [Limits(0.0, None, "", ""), Limits(None, 5.0, "", "")])
+    def test_r_pe_bench_17_4_one_limit_alone_shows_a_dash(defc, limits):
+        """R-PE-BENCH.17 (M9, mutant m17: `or` for `and`) - `-` without BOTH limits: only a lower, only an upper."""
+        o = defc_obj(defc, "VAL_BLK_DEF_0001")
+        row = sheet_row(dataclasses.replace(o.d, limits=limits), o.a2l, o.image)
+        cell = db.bench_cells(row, summarised(o), WIDTHS)[LIMITS].plain
+>       assert cell.strip() == "-" and cell.index("-") == 16 and len(cell) == 34
+E       AssertionError: assert ('-' == '-'
+E         
+E           - and 0 == 16)
+E        +  where 0 = <built-in method index of str object at 0x55d323bbc1e0>('-')
+E        +    where <built-in method index of str object at 0x55d323bbc1e0> = '-'.index
+
+tests/test_b103_inc9_b_cells.py:406: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_3_the_array_strip_has_three_shaded_blocks
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_1_the_curve_strip_and_its_count
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_2_the_map_strip_has_four_shaded_blocks
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_the_limits_cell[CURVE_DEF_0001]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_summary_strip_of_a_curve_is_the_oracle_strip
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_the_limits_cell[MAP_DEF_0001]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_3_an_array_with_no_limits_shows_a_dash
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_11_summary_strip_samples_every_kth_point
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_1_nan_column_is_a_space_in_the_strip
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_equal_values_do_not_divide_by_zero
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_19_2_a_curve_strip_leaves_a_space_for_a_point_that_is_not_finite
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits0]
+FAILED tests/test_b103_inc9_b_cells.py::test_r_pe_bench_17_4_one_limit_alone_shows_a_dash[limits1]
+13 failed, 27 passed in 98.53s (0:01:38)
+EXIT=1
+#### test_b103_inc9_b_detail.txt
+<scratch>/red/s19_app/__init__.py
+ 00:21:05 up 2 days,  9:09,  3 users,  load average: 2.96, 2.82, 1.71
+bringing up nodes...
+bringing up nodes...
+
+...................F...............F..........F..F....                   [100%]
+=================================== FAILURES ===================================
+______ test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[73] _______
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-30/popen-gw1/test_r_pe_bench_5_1_2_3_no_ben0')
+view = 73
+
+    @pytest.mark.parametrize("view", [73, 111, 195])
+    def test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet(defc, tmp_path, view):
+        """R-PE-BENCH.5/1..3 (changed at Inc 8b E1) - at 80, 118 and 220 columns (V = 73, 111, 195): MAP_DEF_0001 and LARGE.
+    
+        Why: the sheet lays the bench out for V - 4 cells (so its canvas never needs the grid's horizontal
+        scroll) and the expanded ground pads each line to max(143, V); the content, once that ground is
+        trimmed, is the bar plus at most V - 4 cells. Laying the bench out for the 139-cell card cap would put
+        LARGE at 80 columns 66 cells off screen.
+        """
+        o = defc_obj(defc, "MAP_DEF_0001")
+        lines = detail(o, view_state(o), width=view - 4, room=50)
+        assert lines and max_cells(lines) <= view - 4, "the kind's own contract: its width is V - 4"
+        big_row, big_state = large_case(tmp_path)
+        assert dv.bench_detail(big_row, None, view - 4, big_state, 50)
+        for row, state in ((sheet_row(o.d, o.a2l, o.image), view_state(o)), (big_row, big_state)):
+            painted = through_sheet(row, state, view, 50)
+>           assert painted and all(t.plain.startswith(BAR) for t in painted), "every expanded line carries the bar"
+E           AssertionError: every expanded line carries the bar
+E           assert ([<text '└ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 …' [] ''>, <text '            224     ... '#ffffff on #313D59')] ''>, <text '                                                                     ' [] ''>, ...] and False)
+E            +  where False = all(<generator object test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet.<locals>.<genexpr> at 0x7fb20a48b4c0>)
+
+tests/test_b103_inc9_b_detail.py:126: AssertionError
+______ test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[111] ______
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-30/popen-gw1/test_r_pe_bench_5_1_2_3_no_ben1')
+view = 111
+
+    @pytest.mark.parametrize("view", [73, 111, 195])
+    def test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet(defc, tmp_path, view):
+        """R-PE-BENCH.5/1..3 (changed at Inc 8b E1) - at 80, 118 and 220 columns (V = 73, 111, 195): MAP_DEF_0001 and LARGE.
+    
+        Why: the sheet lays the bench out for V - 4 cells (so its canvas never needs the grid's horizontal
+        scroll) and the expanded ground pads each line to max(143, V); the content, once that ground is
+        trimmed, is the bar plus at most V - 4 cells. Laying the bench out for the 139-cell card cap would put
+        LARGE at 80 columns 66 cells off screen.
+        """
+        o = defc_obj(defc, "MAP_DEF_0001")
+        lines = detail(o, view_state(o), width=view - 4, room=50)
+        assert lines and max_cells(lines) <= view - 4, "the kind's own contract: its width is V - 4"
+        big_row, big_state = large_case(tmp_path)
+        assert dv.bench_detail(big_row, None, view - 4, big_state, 50)
+        for row, state in ((sheet_row(o.d, o.a2l, o.image), view_state(o)), (big_row, big_state)):
+            painted = through_sheet(row, state, view, 50)
+>           assert painted and all(t.plain.startswith(BAR) for t in painted), "every expanded line carries the bar"
+E           AssertionError: every expanded line carries the bar
+E           assert ([<text '└ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B' [] ''>, <text '              2...')] ''>, <text '                                                                                         ' [] ''>, ...] and False)
+E            +  where False = all(<generator object test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet.<locals>.<genexpr> at 0x7fb20a1a8120>)
+
+tests/test_b103_inc9_b_detail.py:126: AssertionError
+______ test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[195] ______
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-30/popen-gw1/test_r_pe_bench_5_1_2_3_no_ben2')
+view = 195
+
+    @pytest.mark.parametrize("view", [73, 111, 195])
+    def test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet(defc, tmp_path, view):
+        """R-PE-BENCH.5/1..3 (changed at Inc 8b E1) - at 80, 118 and 220 columns (V = 73, 111, 195): MAP_DEF_0001 and LARGE.
+    
+        Why: the sheet lays the bench out for V - 4 cells (so its canvas never needs the grid's horizontal
+        scroll) and the expanded ground pads each line to max(143, V); the content, once that ground is
+        trimmed, is the bar plus at most V - 4 cells. Laying the bench out for the 139-cell card cap would put
+        LARGE at 80 columns 66 cells off screen.
+        """
+        o = defc_obj(defc, "MAP_DEF_0001")
+        lines = detail(o, view_state(o), width=view - 4, room=50)
+        assert lines and max_cells(lines) <= view - 4, "the kind's own contract: its width is V - 4"
+        big_row, big_state = large_case(tmp_path)
+        assert dv.bench_detail(big_row, None, view - 4, big_state, 50)
+        for row, state in ((sheet_row(o.d, o.a2l, o.image), view_state(o)), (big_row, big_state)):
+            painted = through_sheet(row, state, view, 50)
+>           assert painted and all(t.plain.startswith(BAR) for t in painted), "every expanded line carries the bar"
+E           AssertionError: every expanded line carries the bar
+E           assert ([<text '└ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B' [] ''>, <text '              2...')] ''>, <text '                                                                                         ' [] ''>, ...] and False)
+E            +  where False = all(<generator object test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet.<locals>.<genexpr> at 0x7fb20a1a8e40>)
+
+tests/test_b103_inc9_b_detail.py:126: AssertionError
+_________ test_r_pe_bench_5_4_room_one_shows_the_definition_line_only __________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...alues_offset=0, record_layout=None, axes=()), ...}, 'image': {8388608: 1, 8388609: 77, 8388610: 80, 8388611: 238, ...}}
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-30/popen-gw1/test_r_pe_bench_5_4_room_one_s0')
+
+    def test_r_pe_bench_5_4_room_one_shows_the_definition_line_only(defc, tmp_path):
+        """R-PE-BENCH.5/4 - room 1: MAP_DEF_0001 and LARGE give exactly the definition line (after the bar), no exception."""
+        o = defc_obj(defc, "MAP_DEF_0001")
+        lines = detail(o, view_state(o), room=1)
+        assert len(lines) == 1 and lines[0].plain.startswith("└ ")
+        big_row, big_state = large_case(tmp_path)
+        big = dv.bench_detail(big_row, None, 114, big_state, 1)
+        assert len(big) == 1 and big[0].plain.startswith("└ ")
+        for row, state in ((sheet_row(o.d, o.a2l, o.image), view_state(o)), (big_row, big_state)):
+            painted = through_sheet(row, state, 111, 1)
+>           assert len(painted) == 1 and content(painted[0].plain).startswith("└ ")
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_b_detail.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+line = '└ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B'
+
+    def content(line: str) -> str:
+        """One expanded-object line as its content: the bar ``  ┊ `` removed, the ground spaces trimmed."""
+>       assert line.startswith(BAR), line
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: └ IDENTICAL phys = raw · SWORD s16 big-endian · RL_DEF_MAP · 0x00800070 · 32 B
+
+tests/support/b103_inc8b_r.py:72: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[73]
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[111]
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_5_1_2_3_no_bench_line_is_wider_than_the_sheet[195]
+FAILED tests/test_b103_inc9_b_detail.py::test_r_pe_bench_5_4_room_one_shows_the_definition_line_only
+4 failed, 50 passed in 1.37s
+EXIT=1
+#### test_b103_inc9_w_mutants.txt
+<scratch>/red/s19_app/__init__.py
+ 00:23:55 up 2 days,  9:12,  3 users,  load average: 3.73, 3.24, 2.06
+bringing up nodes...
+bringing up nodes...
+
+.............................                                            [100%]
+29 passed in 139.36s (0:02:19)
+EXIT=0
+#### test_b103_inc9_w_select.txt
+<scratch>/red/s19_app/__init__.py
+ 00:22:18 up 2 days,  9:11,  3 users,  load average: 3.25, 2.97, 1.85
+bringing up nodes...
+bringing up nodes...
+
+......F.FF..F.                                                           [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw0/test_r_pe_bench_11_a_strip_of_0')
+defc_dir = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw0/b103_inc9_w_defc0')
+
+    def test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible(tmp_path, defc_dir):
+        """FX9b F-X9-5 (X9 capture `v2`): a 40-element 1-D array (16 grid columns) on the sheet. CTX-PE-BENCH array row
+        cells: strip width = the Current width - 1 - the count's width - 1, every k-th column, k = ceil(nx / that width).
+        The painted Current cell is that many strip blocks then ` 100`: the count is the operator's only size cue, so a
+        strip drawn at the whole Current width (the count cut away) is the defect.
+    
+        Retargeted at Inc 8b (R-PE-BENCH.11): the Current width is 20 and the blocks are the seven levels, never `█`.
+        A 2-digit count would leave the strip 16 cells, as many as the 16 flat-grid columns, so the case uses 100
+        elements (a 3-digit count: room 15 < 16 columns, k = 2)."""
+        a2l, s19 = hand_case(tmp_path, [valblk_block("VB1D", 0x100000, 100)], [(0x100000, bytes(range(100)))])
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await wait_for(pilot, lambda: st(sheet, "VB1D") is not None and st(sheet, "VB1D").strip is not None,
+                           "the summary of VB1D", 30)
+            await pilot.pause(0.2)
+            row = next(r for r in sheet.rows if r.name == "VB1D")
+            width = need(panel, "#patch_sheet_body").content_size.width
+            return row_text(app, "VB1D"), db.bench_grid(row.definition).nx, ds.sheet_widths(width).current
+    
+        painted, nx, current = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+        room = current - 1 - len("100") - 1
+        k = -(-nx // room)
+        blocks = len(range(0, nx, k))
+        assert nx > room, f"the case needs more grid columns ({nx}) than the strip's room ({room})"
+        found = re.search(r"([▁▂▃▄▅▆▇]+) 100", painted)
+>       assert found is not None, painted
+E       AssertionError: ▶ VB1D              VAL_BLK  ████████ 100      ·                   0 … 255                                    
+E       assert None is not None
+
+tests/test_b103_inc9_w_select.py:244: AssertionError
+_ test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order __
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw1/test_r_pe_bench_23_1_the_page_0')
+defc_dir = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbff7945e10>
+
+    def test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order(tmp_path, defc_dir, monkeypatch):
+        """The three DEFC bench rows show their strips and counts; every decode ran off the UI thread; the page order
+        holds (the selected row's own decode may go first)."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            # Inc 8b (R-PE-BENCH.11, F-R14-1): seven levels, column-mean levels, Current 20 wide
+            want = {CURVE: STRIP_CURVE, MAP: STRIP_MAP, VB: STRIP_VB}
+            await wait_for(pilot, lambda: all(text in body_text(app) for text in want.values()), "the three strips", 30)
+            return [row.name for row in sheet.rows], want, {n: row_text(app, n) for n in want}
+    
+>       page, want, painted = run(tmp_path, defc_dir, body)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:206: in body
+    await wait_for(pilot, lambda: all(text in body_text(app) for text in want.values()), "the three strips", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order.<locals>.body.<locals>.<lambda> at 0x7fbfe7d6cae0>
+what = 'the three strips', timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the three strips
+
+tests/support/b103_inc9_w.py:92: AssertionError
+_ test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other _
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw0/test_r_pe_bench_25_2_a_raw_ent0')
+defc_dir = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8e1df15890>
+
+    def test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other(tmp_path, defc_dir, monkeypatch):
+        """A raw bytes entry at 0x800090 (inside VAL_BLK_DEF_0001 only): `●` on that row, MAP_DEF_0001 not decoded again."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await wait_for(pilot, lambda: STRIP_VB in body_text(app) and STRIP_MAP in body_text(app), "the page summaries", 30)
+            await pilot.pause(0.5)
+            before = gate.names("decode_values").count(MAP)
+            service_of(app).add_entry("0x800090", "", "AA 55")
+            app._refresh_patch_history_view()
+            await wait_for(pilot, lambda: "●" in mark_of(app, VB), "the dot on VAL_BLK_DEF_0001", 30)
+            await pilot.pause(0.5)
+            return mark_of(app, MAP), before, gate.names("decode_values").count(MAP), gate.names("decode_values").count(VB)
+    
+>       map_mark, before, after, vb_calls = run(tmp_path, defc_dir, body)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:303: in body
+    await wait_for(pilot, lambda: STRIP_VB in body_text(app) and STRIP_MAP in body_text(app), "the page summaries", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other.<locals>.body.<locals>.<lambda> at 0x7f8e1c523240>
+what = 'the page summaries', timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the page summaries
+
+tests/support/b103_inc9_w.py:92: AssertionError
+__ test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip ___
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw1/test_r_pe_bench_24_1_a_page_tu0')
+defc_dir = PosixPath('<scratch>/tmp/pytest-of-<runner>/pytest-33/popen-gw1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbfe7946e90>
+
+    def test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip(tmp_path, defc_dir, monkeypatch):
+        """CURVE_DEF_0001's summary is held, the page turns to [VAL_BLK_DEF_0001], the decode is released: the new page
+        shows VAL_BLK_DEF_0001's own strip and nothing of CURVE_DEF_0001's (`▄▆▃▇▁`)."""
+        gate = Gate(monkeypatch, "decode_values", hold={CURVE})
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            a2l, image = app.current_a2l_data, app.current_file.mem_map
+            try:
+                sheet.show_page([CURVE, VB, MAP], describe_definitions([CURVE, VB, MAP], a2l), a2l, image)
+                await wait_for(pilot, gate.entered.is_set, "CURVE_DEF_0001's summary held")
+                sheet.show_page([VB], describe_definitions([VB], a2l), a2l, image)
+                await pilot.pause()
+            finally:
+                gate.release()
+            await wait_for(pilot, lambda: STRIP_VB in body_text(app), "the new page's strip", 30)
+            await pilot.pause(0.3)
+            return body_text(app)
+    
+>       painted = run(tmp_path, defc_dir, body)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc9_w_select.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests/support/b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc9_w_select.py:263: in body
+    await wait_for(pilot, lambda: STRIP_VB in body_text(app), "the new page's strip", 30)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip.<locals>.body.<locals>.<lambda> at 0x7fbff415a020>
+what = "the new page's strip", timeout = 30, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -> None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 30 s: the new page's strip
+
+tests/support/b103_inc9_w.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_11_a_strip_of_more_columns_than_its_room_keeps_the_count_visible
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_23_1_the_page_is_summarised_off_the_ui_thread_in_page_order
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_25_2_a_raw_entry_over_one_row_marks_that_row_and_decodes_no_other
+FAILED tests/test_b103_inc9_w_select.py::test_r_pe_bench_24_1_a_page_turn_during_a_held_summary_shows_no_old_strip
+4 failed, 10 passed in 95.56s (0:01:35)
+EXIT=1
+#### test_tui_patch_json.txt
+<scratch>/red/s19_app/__init__.py
+ 00:21:08 up 2 days,  9:09,  3 users,  load average: 2.96, 2.82, 1.71
+bringing up nodes...
+bringing up nodes...
+
+......F...F...F.F                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_tc079_5c_hue_census_is_complete _____________________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_tc079_5c_hue_census_is_complete() -> None:
+        """Every colour literal in ``s19_app/`` is CLAIMED or EXCLUDED-with-a-reason.
+    
+        ⚠ **This test exists because Inc-5's census was hand-curated and wrong, and
+        nothing could see it.** ``test_tc079_5_magenta_hue_distance`` certifies a
+        universal ("MAGENTA is far from EVERY claimant"), and a universal is only as
+        true as its input set. Mutating the code under test cannot catch a missing
+        input — the mutant passes. The only oracle for a census is a sweep of the
+        thing being censused, so that is what this is.
+    
+        It does NOT replace the hand-written census: a sweep cannot tell a live rule
+        from a commented-out one (``styles.tcss`` says ``was #4ec9d4`` right next to
+        a live ``#4ec9d4``), and it cannot see rich's NAMED colours at all. What it
+        CAN do is make the hand-curation checkable — a new colour literal lands in
+        neither dict and this fails, forcing a human to classify it rather than
+        letting it be omitted in silence.
+    
+        ⚠ **Known gap, stated rather than papered over:** rich named styles
+        (``"orange3"``, ``"green"``, ``"red"``, ``"grey50"``) are invisible to a hex
+        sweep. They are enumerated in ``_CLAIMED_HUES`` by hand from
+        ``app.py::_SEVERITY_TO_RICH_STYLE`` and the ``_MAC_GLYPH_*`` pairs, and a new
+        named chromatic style would NOT be caught here. Widening the sweep to resolve
+        named colours is the honest next step; it is out of Inc-5b's scope.
+    
+        # TC-79c
+        """
+        source_root = pathlib.Path(__file__).resolve().parents[1] / "s19_app"
+        assert source_root.is_dir(), f"cannot locate the package at {source_root}"
+    
+        literal = re.compile(r"#[0-9a-fA-F]{6}\b")
+        swept: dict[str, list[str]] = {}
+        for path in sorted(source_root.rglob("*")):
+            if path.suffix not in (".py", ".tcss"):
+                continue
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                for match in literal.findall(line):
+                    swept.setdefault(match.lower(), []).append(
+                        f"{path.relative_to(source_root).as_posix()}:{number}"
+                    )
+        assert swept, "the sweep found no colour literals at all — it is broken"
+    
+        # MAGENTA is the SUBJECT of the census, not a claimant against itself.
+        accounted = (
+            {c.lower() for c in _CLAIMED_HUES.values()}
+            | set(_EXCLUDED_LITERALS)
+            | {MAGENTA.lower()}
+        )
+        unaccounted = {c: sites for c, sites in swept.items() if c not in accounted}
+        assert not unaccounted, (
+            f"colour literals in s19_app/ are in NEITHER _CLAIMED_HUES nor "
+            f"_EXCLUDED_LITERALS: { {c: s[:2] for c, s in unaccounted.items()} }. "
+            f"Add each to _CLAIMED_HUES (if it paints a foreground cue an analyst "
+            f"could confuse with the gauge) or to _EXCLUDED_LITERALS WITH A REASON. "
+            f"Do not omit it — an omitted claimant is exactly the Inc-5 defect this "
+            f"guard exists to prevent: it makes the hue test certify a universal "
+            f"that is false. If you add a claimant, re-run "
+            f"test_tc079_5_magenta_hue_distance: MAGENTA may need to move."
+        )
+    
+        # The excluded set may not rot into a list of colours nobody paints any
+        # more: a stale exclusion is a reason nobody re-examines.
+        stale = set(_EXCLUDED_LITERALS) - set(swept)
+>       assert not stale, (
+            f"_EXCLUDED_LITERALS names colours that no longer appear in s19_app/: "
+            f"{sorted(stale)}. Drop them — a stale exclusion is dead justification"
+        )
+E       AssertionError: _EXCLUDED_LITERALS names colours that no longer appear in s19_app/: ['#1c2547']. Drop them — a stale exclusion is dead justification
+E       assert not {'#1c2547'}
+
+tests/test_tui_patch_json.py:1098: AssertionError
+______________ test_ac1_editor_fills_json_window_when_room_exists ______________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+        """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    
+        C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+        region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+        is 26 rows and its bottom is flush with the JSON body's content region; under
+        a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+        by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+        which also fails the ``> 8`` assertion — so this arm cannot green on an
+        invisible widget.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+>       assert editor_h > 8, (
+            f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+            f"has free vertical space (120x50); painted region.height is {editor_h}"
+        )
+E       AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1295: AssertionError
+________________ test_ac3_fill_does_not_leak_to_sibling_windows ________________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+        """Each tab's scroll body fills ITS tab; the JSON fill stays JSON-scoped.
+    
+        batch-97 Inc-4 (named supersession, HLR-144 / design §3): the three windows
+        became the ledger and two tabs of one inspector. By design every body now
+        fills its own region — the ledger body (the hero), the JSON body (the paste
+        buffer's share of the JSON tab) and the Checks body (the Checks tab's scroll
+        view). What this arm keeps from the batch-48 C-30 intent: the JSON body
+        never claims the read-only view's share (it ends where the tab's docked
+        rows begin, below the view), and no Patch rule leaks to another screen
+        (the scope arm of TC-B97-04, ``tests/test_b97_patch_editor.py``).
+        """
+    
+        async def _run() -> dict[str, object]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                bodies = _json_window_bodies(app)
+                view = app.query_one("#patch_json_view", TextArea)
+                controls = app.query_one("#patch_paste_controls")
+                out = {
+                    "json": (bodies["patch_win_json"].region, view.region, controls.region),
+                    "script": (
+                        app.query_one("#patch_win_script").content_region.height,
+                        bodies["patch_win_script"].region.height,
+                    ),
+                }
+                app.query_one("#patch_tab_checks", Button).press()
+                await pilot.pause()
+                out["checks"] = (
+                    app.query_one("#patch_win_checks").content_region.height,
+                    bodies["patch_win_checks"].region.height,
+                    app.query_one("#patch_checks_controls").region.height,
+                )
+                return out
+    
+        dims = asyncio.run(_run())
+        json_body, view, controls = dims["json"]
+        assert json_body.y >= view.bottom, (
+            f"the JSON body must sit below the read-only view, not claim it: "
+            f"body {json_body} vs view {view}"
+        )
+        assert json_body.bottom <= controls.y, (
+            f"the JSON body must end where the docked paste controls begin: "
+            f"body {json_body} vs controls {controls}"
+        )
+>       assert view.height >= 8 and json_body.height >= 8, (view, json_body)
+E       AssertionError: (Region(x=7, y=35, width=108, height=3), Region(x=7, y=38, width=108, height=9))
+E       assert (3 >= 8)
+E        +  where 3 = Region(x=7, y=35, width=108, height=3).height
+
+tests/test_tui_patch_json.py:1431: AssertionError
+______________________ test_ac5_gauge_stays_above_editor _______________________
+[gw0] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac5_gauge_stays_above_editor() -> None:
+        """The cap gauge renders above the (now taller) editor and is not overlapped.
+    
+        MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+        region sits strictly above the editor's, so the editor's growth pushes DOWN
+        from the gauge rather than displacing or overlapping it.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                gauge = app.query_one("#patch_paste_gauge", Static)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                return gauge.region.bottom, editor.region.y, editor.region.height
+    
+        gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+>       assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+E       AssertionError: precondition: the editor must have grown at 120x50
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1504: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_json.py::test_tc079_5c_hue_census_is_complete - A...
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+4 failed, 13 passed in 16.49s
+EXIT=1
+#### base test_tui_patch_json (pre-existing check)
+<scratch>/base/s19_app/__init__.py
+ 00:26:52 up 2 days,  9:15,  3 users,  load average: 2.46, 3.04, 2.20
+bringing up nodes...
+bringing up nodes...
+
+..........F...F.F                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_ac1_editor_fills_json_window_when_room_exists ______________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+        """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    
+        C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+        region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+        is 26 rows and its bottom is flush with the JSON body's content region; under
+        a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+        by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+        which also fails the ``> 8`` assertion — so this arm cannot green on an
+        invisible widget.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+>       assert editor_h > 8, (
+            f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+            f"has free vertical space (120x50); painted region.height is {editor_h}"
+        )
+E       AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1290: AssertionError
+________________ test_ac3_fill_does_not_leak_to_sibling_windows ________________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+        """Each tab's scroll body fills ITS tab; the JSON fill stays JSON-scoped.
+    
+        batch-97 Inc-4 (named supersession, HLR-144 / design §3): the three windows
+        became the ledger and two tabs of one inspector. By design every body now
+        fills its own region — the ledger body (the hero), the JSON body (the paste
+        buffer's share of the JSON tab) and the Checks body (the Checks tab's scroll
+        view). What this arm keeps from the batch-48 C-30 intent: the JSON body
+        never claims the read-only view's share (it ends where the tab's docked
+        rows begin, below the view), and no Patch rule leaks to another screen
+        (the scope arm of TC-B97-04, ``tests/test_b97_patch_editor.py``).
+        """
+    
+        async def _run() -> dict[str, object]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                bodies = _json_window_bodies(app)
+                view = app.query_one("#patch_json_view", TextArea)
+                controls = app.query_one("#patch_paste_controls")
+                out = {
+                    "json": (bodies["patch_win_json"].region, view.region, controls.region),
+                    "script": (
+                        app.query_one("#patch_win_script").content_region.height,
+                        bodies["patch_win_script"].region.height,
+                    ),
+                }
+                app.query_one("#patch_tab_checks", Button).press()
+                await pilot.pause()
+                out["checks"] = (
+                    app.query_one("#patch_win_checks").content_region.height,
+                    bodies["patch_win_checks"].region.height,
+                    app.query_one("#patch_checks_controls").region.height,
+                )
+                return out
+    
+        dims = asyncio.run(_run())
+        json_body, view, controls = dims["json"]
+        assert json_body.y >= view.bottom, (
+            f"the JSON body must sit below the read-only view, not claim it: "
+            f"body {json_body} vs view {view}"
+        )
+        assert json_body.bottom <= controls.y, (
+            f"the JSON body must end where the docked paste controls begin: "
+            f"body {json_body} vs controls {controls}"
+        )
+>       assert view.height >= 8 and json_body.height >= 8, (view, json_body)
+E       AssertionError: (Region(x=7, y=35, width=106, height=3), Region(x=7, y=38, width=106, height=9))
+E       assert (3 >= 8)
+E        +  where 3 = Region(x=7, y=35, width=106, height=3).height
+
+tests/test_tui_patch_json.py:1426: AssertionError
+______________________ test_ac5_gauge_stays_above_editor _______________________
+[gw1] linux -- Python 3.11.18 /home/<runner>/miniconda3/envs/s19ci/bin/python
+
+    def test_ac5_gauge_stays_above_editor() -> None:
+        """The cap gauge renders above the (now taller) editor and is not overlapped.
+    
+        MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+        region sits strictly above the editor's, so the editor's growth pushes DOWN
+        from the gauge rather than displacing or overlapping it.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                await _show_patch_json(app, pilot)
+                gauge = app.query_one("#patch_paste_gauge", Static)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                return gauge.region.bottom, editor.region.y, editor.region.height
+    
+        gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+>       assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+E       AssertionError: precondition: the editor must have grown at 120x50
+E       assert 8 > 8
+
+tests/test_tui_patch_json.py:1499: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+3 failed, 14 passed in 16.19s
+EXIT=1

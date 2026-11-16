@@ -2095,6 +2095,61 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     )
     pe_picker = inserted("/* --- Patch A2L tab (batch-102 Inc 5", "#patch_editor_panel #patch_param_controls,\n#patch_editor_panel #patch_param_use_row", "db1a8f7 patch picker block")
     old = supersede(old, "#patch_editor_panel #patch_json_view,", pe_picker + "#patch_editor_panel #patch_json_view,", "db1a8f7 patch picker anchor")
+    # 894bb3db (batch-103 Inc 8, group P: the staging sheet over LANDS IN; R-TUI-063.1, .3,
+    # R-PE-DEF.1.1, .2, .74, R-PE-041): one named supersession per in-place edit of a b514b07
+    # rule (E4 integration, ruling RR-5; reconciled with evidence-e4/impl-p/css_law_probe.py).
+    # Each `before` is the exact old text, located exactly once; the `startswith` assertion
+    # below is not edited. The `.ce-row` / `.ce-label` re-scope (#patch_win_a2l ->
+    # #patch_filter_row) lies inside db1a8f7's inserted block, read from the sheet: no entry.
+    old = supersede(
+        old,
+        "#patch_editor_panel #patch_main {\n    height: 1fr;\n    min-height: 12;\n}\n",
+        "/* batch-103 Inc 8: the STAGING SHEET window takes every row the other\n"
+        " * regions leave, never fewer than 12 (R-PE-DEF.1.1, .74); it scrolls with\n"
+        " * the panel below that. */\n"
+        "#patch_editor_panel #patch_sheet_win {\n    height: 1fr;\n    min-height: 12;\n    padding: 0;\n"
+        "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+        "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+        "894bb3db Inc 8 R-TUI-063.1 #patch_main -> #patch_sheet_win",
+    )
+    old = supersede(
+        old,
+        "#patch_editor_panel #patch_win_script {\n    width: 3fr;\n    height: 100%;\n    padding: 0;\n"
+        "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+        "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+        "/* batch-103 Inc 8: the ledger is the Patch script tab, with no border of\n"
+        " * its own; its subtitle rides the landing pane (R-PE-041). */\n"
+        "#patch_editor_panel #patch_win_script {\n    height: 100%;\n    padding: 0;\n}\n",
+        "894bb3db Inc 8 R-PE-041 borderless #patch_win_script",
+    )
+    old = supersede(
+        old,
+        "/* The 45-cell floor keeps the pane's 41 content cells, so the execute row\n"
+        " * and the strip's 8-byte rows fit at 120-133 columns too, where the rail\n"
+        " * widens; the ledger then pays (its table scrolls sideways there). */\n"
+        "#patch_editor_panel #patch_inspector {\n    width: 2fr;\n    min-width: 45;\n    height: 100%;\n"
+        "    padding: 0 1;\n    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n}\n",
+        "/* batch-103 Inc 8: LANDS IN, the landing pane, spans the panel in 9 rows\n"
+        " * (R-PE-DEF.1.1): the chips and 6 content rows inside its border. */\n"
+        "#patch_editor_panel #patch_inspector {\n    width: 100%;\n    height: 9;\n    padding: 0 1;\n"
+        "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+        "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+        "894bb3db Inc 8 R-PE-DEF.1.1 #patch_inspector 9-row LANDS IN",
+    )
+    old = supersede(
+        old,
+        "#patch_editor_panel #patch_win_script:focus-within,\n",
+        "#patch_editor_panel #patch_sheet_win:focus-within,\n",
+        "894bb3db Inc 8 R-PE-DEF.4 focus rule follows the sheet window",
+    )
+    old = supersede(
+        old,
+        "#patch_editor_panel #patch_win_checks,\n#patch_editor_panel #patch_win_a2l {\n    height: 100%;",
+        "#patch_editor_panel #patch_win_checks {\n    height: 100%;",
+        "894bb3db Inc 8 R-TUI-063.3 #patch_win_a2l leaves the tab-window height rule",
+    )
+    inc8 = inserted("/* --- Filter row and bench state (batch-103 Inc 8", "#patch_editor_panel.-bench #patch_inspector", "894bb3db Inc 8 block")
+    old = supersede(old, "/* batch-97 flow_builder", inc8 + "/* batch-97 flow_builder", "894bb3db Inc 8 anchor")
     assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
     for head in (".flow-name-strip {", ".modal-hint", ".patch-docked-row, .patch-docked-group", ".sev-ok", ".sev-warning", ".sev-error", ".sev-neutral"):
         assert block(sheet, head) == block(old, head), head

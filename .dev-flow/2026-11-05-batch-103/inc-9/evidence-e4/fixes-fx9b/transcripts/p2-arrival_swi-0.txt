@@ -1,0 +1,15 @@
+load before: 1.78 1.89 1.97 1/639 472392
+~/work/zq-fx9b/probe/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9b/probe
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items / 1 deselected / 1 selected
+
+tests/test_fx9b_probe2.py FX9BSWI {"swi": 0.0, "n_keys": 79, "encode_s": 24.2, "max": 0.484, "p50": 0.182, "top5": [0.34800000000000003, 0.35, 0.39799999999999996, 0.402, 0.484], "wait_top5": [0.265, 0.267, 0.288, 0.334, 0.362], "action_top5": [0.082, 0.085, 0.196, 0.202, 0.234]}
+.
+
+================= 1 passed, 1 deselected in 109.73s (0:01:49) ==================
+rc=0
+load after: 1.10 1.61 1.85 1/640 473043

@@ -1,0 +1,6 @@
+test_no_private_tokens	rc=0	jobs=2	tests/test_no_private_tokens.py
+test_id_registry	rc=0	jobs=2	tests/test_id_registry.py
+test_suite_hygiene	rc=1	jobs=2	tests/test_suite_hygiene.py
+test_b103_inc9b_w	rc=0	jobs=0	tests/test_b103_inc9b_w.py
+test_b103_inc9b_s	rc=0	jobs=2	tests/test_b103_inc9b_s.py
+test_b103_inc9b_at	rc=0	jobs=0-per-node	nodes=10	tests/test_b103_inc9b_at.py

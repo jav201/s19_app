@@ -57,10 +57,18 @@ from ..changes import (
     verify_written_image,
     write_change_document,
 )
+from ..a2l_definition import (
+    Definition,
+    Encoded,
+    Refusal,
+    decode_definition,
+    encode_definition,
+)
 from ..changes.check import run_check_document
 from ..changes.io import parse_change_document
 from ..changes.model import CHECK_AGGREGATE_KEYS
 from ..color_policy import css_class_for_severity
+from ..definition_sheet import StagedOverlay, name_echo
 from ..workspace import PlacementResult
 
 #: The two v2 entry kinds (LLR-001.2 wire field ``type``).
@@ -367,6 +375,10 @@ class ChangeActionResult:
     message: str
     issues: list[ValidationIssue]
     ok: bool
+    #: Inc 8 (E3A-10): encode notices of a stage, each already worded as a
+    #: status line ``Patch Editor: <notice>``; kept apart from ``issues`` so
+    #: the app prints them as lines of their own, not as issue lines.
+    notices: tuple[str, ...] = ()
 
 
 @dataclass(slots=True)
@@ -1325,6 +1337,160 @@ class ChangeService:
                 f"({len(entry.encoded_bytes)} bytes)"
             ),
             issues=resolved.issues,
+            ok=True,
+        )
+
+    def stage_definition(
+        self,
+        definition: Definition,
+        a2l_data: dict,
+        text: str,
+        image: Optional[Mapping[int, int]],
+    ) -> ChangeActionResult:
+        """
+        Summary:
+            Stage one formula-bar edit (Inc 8, R-PE-DEF.50 / .51 / .56 / .57 /
+            .59): encode ``text`` over the staged overlay (``image`` = the
+            SOURCE view plus every entry of the document) through I-2's
+            ``encode_definition`` — never the pre-I-2 physical encode — and
+            hand the span to :meth:`_stage_encoded`.
+
+        Args:
+            definition (Definition): The row's fresh definition.
+            a2l_data (dict): The A2L payload the definition came from.
+            text (str): The operator's formula text.
+            image (Optional[Mapping[int, int]]): The source view of the
+                loaded image; ``None`` without an image.
+
+        Returns:
+            ChangeActionResult: ``ok`` False with ``Patch Editor: <refusal>``
+                and no write on a refusal; else the stage result, with each
+                encode notice in ``notices``.
+
+        Dependencies:
+            Uses:
+                - StagedOverlay / encode_definition / decode_definition /
+                  _stage_encoded
+            Used by:
+                - PatchMixin.on_staging_sheet_stage_requested
+        """
+        entries = [
+            (entry.address, entry.encoded_bytes)
+            for entry in self.document.entries
+        ]
+        encoded = encode_definition(
+            definition, a2l_data, text, StagedOverlay(image, entries)
+        )
+        if isinstance(encoded, Refusal):
+            return ChangeActionResult(
+                message=f"Patch Editor: {encoded.message}", issues=[], ok=False
+            )
+        staged = StagedOverlay(image, entries + [(encoded.address, encoded.data)])
+        decoded = decode_definition(definition, a2l_data, staged)
+        shown = text if isinstance(decoded, Refusal) else decoded.text
+        result = self._stage_encoded(definition.name, encoded, shown)
+        if result.ok:
+            result.notices = tuple(
+                f"Patch Editor: {notice}" for notice in encoded.notices
+            )
+        return result
+
+    def stage_record(
+        self, name: str, encoded: Encoded, count: int
+    ) -> ChangeActionResult:
+        """
+        Summary:
+            Stage one encoded bench record (Inc 9): hand the span and a
+            ``count``-worded display text to :meth:`_stage_encoded`, then fold
+            any encode notices into a single status line.
+
+        Args:
+            name (str): The row's name.
+            encoded (Encoded): The whole span to write.
+            count (int): The number of values the record holds — words the
+                ``shown`` text as ``1 value`` / ``N values``.
+
+        Returns:
+            ChangeActionResult: The stage result; on success with notices,
+                ``notices`` holds one line naming the first notice and any
+                remainder.
+
+        Dependencies:
+            Uses:
+                - _stage_encoded
+            Used by:
+                - PatchMixin._stage_bench_record
+        """
+        word = "value" if count == 1 else "values"
+        result = self._stage_encoded(name, encoded, f"{count} {word}")
+        if result.ok and encoded.notices:
+            first = encoded.notices[0]
+            extra = len(encoded.notices) - 1
+            text = f"Patch Editor: {first}" + (f" (+{extra} more)" if extra else "")
+            result.notices = (text,)
+        return result
+
+    def _stage_encoded(
+        self, name: str, encoded: Encoded, shown: str
+    ) -> ChangeActionResult:
+        """
+        Summary:
+            The stage seam (I-8.2, shared with Inc 9): write an encoded span
+            into the document. An equal span replaces that entry with a bytes
+            entry that keeps the old symbol; a span meeting no entry appends
+            a bytes entry whose symbol is ``name``; a partial overlap is
+            refused. It writes, refuses or reports only: no decode, no
+            encode, no image.
+
+        Args:
+            name (str): The row's name (the symbol of an appended entry).
+            encoded (Encoded): The whole span to write.
+            shown (str): The caller's display text for the status message.
+
+        Returns:
+            ChangeActionResult: The status message; ``ok`` False on a
+                partial overlap, with no history step.
+
+        Dependencies:
+            Uses:
+                - _push_history / name_echo
+            Used by:
+                - ChangeService.stage_definition (Inc 9: stage_values)
+        """
+        start = encoded.address
+        end = start + len(encoded.data)
+        equal_index: Optional[int] = None
+        for index, entry in enumerate(self.document.entries):
+            low, high = entry.addressed_range
+            if high <= start or low >= end:
+                continue
+            if (low, high) != (start, end):
+                return ChangeActionResult(
+                    message=(
+                        f"Patch Editor: {name_echo(name)} overlaps the entry "
+                        f"at 0x{entry.address:X} — remove that entry first."
+                    ),
+                    issues=[],
+                    ok=False,
+                )
+            if equal_index is None:
+                equal_index = index
+        self._push_history()
+        if equal_index is None:
+            self.document.entries.append(
+                ChangeEntry("bytes", start, tuple(encoded.data), symbol=name)
+            )
+        else:
+            old = self.document.entries[equal_index]
+            self.document.entries[equal_index] = ChangeEntry(
+                "bytes", start, tuple(encoded.data), symbol=old.symbol
+            )
+        return ChangeActionResult(
+            message=(
+                f"Patch Editor: {name_echo(name)} staged as "
+                f"{name_echo(shown)} ({len(encoded.data)} B at 0x{start:X})."
+            ),
+            issues=[],
             ok=True,
         )
 

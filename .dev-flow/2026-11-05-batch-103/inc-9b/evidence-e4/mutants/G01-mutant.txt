@@ -1,0 +1,172 @@
+DATE 2026-11-15T18:59:15.996146-06:00
+GROUP G01
+PHASE mutant
+COMMIT 2e80b0d68370c0d4c3eebbc5cf6e325b712769d0
+UPTIME 18:58:50 up 3 days,  3:47,  2 users,  load average: 0.34, 0.11, 0.13
+LOAD_ONE 0.34
+OTHER_TEST_JOBS 0
+RESOLVED_NODE_INPUTS 3
+S19_APP_FILE ~/work/zq-m9b/groups/G01/tree/s19_app/__init__.py
+PID 1026328
+SID 1026328
+TIMEOUT_S 300
+XDIST_N 0
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/test_r_pe_bench_94_4_a_queued_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f45e870b1d0>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.94/4, EX-BC2: LARGE is selected while another row's summary decode is gated running, so LARGE's own
+        decode has not started: the cue still shows `decode LARGE`, within 0.5 s of the ask. Operator need (P-127): the
+        window that waits for a queued decode must still say it is working. Negative control: a cue keyed on the running
+        job shows nothing for the queued row."""
+        a2l, s19 = case(tmp_path, "LARGE", "MID", "ZZZ")
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, "LARGE", "MID", "ZZZ")
+            stamps = Stamps(sheet)
+            try:
+                # a page turn that drops LARGE and MID: both are new on the next page, their summaries are held
+                definitions = describe_definitions(["ZZZ"], app.current_a2l_data)
+                sheet.show_page(["ZZZ"], definitions, app.current_a2l_data, app.current_file.mem_map)
+                await pilot.pause(0.2)
+                gate.hold.update({"LARGE", "MID"})
+                both = ["LARGE", "MID"]
+                sheet.show_page(both, describe_definitions(both, app.current_a2l_data), app.current_a2l_data,
+                                app.current_file.mem_map)
+                await wait_for(pilot, gate.entered.is_set, "a summary held in its worker", 20)
+                running = gate.calls[-1][1]
+                target = "MID" if running == "LARGE" else "LARGE"
+                assert gate.running == 1 and running in both, (gate.calls, gate.running)
+                if sheet.selected_name != target:
+                    await pick(pilot, sheet, target)
+                asked = stamps.asked.get(("decode", target))
+                assert asked is not None, f"selecting {target} did not ask its decode: {sorted(stamps.asked)}"
+                deadline = timing_bound(0.5)
+                took = await until(pilot, lambda: cue_now(app, "decode", target), max(0.0, asked + deadline - time.monotonic()))
+                seen = time.monotonic() - asked
+                return took, seen, target, running, top_row(app), border_hex(app), gate.running
+            finally:
+                gate.release()
+                stamps.close()
+    
+        took, seen, target, running, row, colour, running_now = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert took is not None and seen <= report_margin(
+            "R-PE-BENCH.94/4 queued decode cue", seen, timing_bound(0.5)
+        ), (
+            f"no cue `decode {target}` within 0.5 s of its ask while {running}'s summary ran (running={running_now}, {load()}); "
+            f"top border {row!r}, painted corner {colour}"
+        )
+E       AssertionError: no cue `decode MID` within 0.5 s of its ask while LARGE's summary ran (running=1, load 0.44 0.14 0.14); top border '╭─ STAGING SHEET   ◒ BUSY · decode LARGE · 0.8 s · keys still work  ───────────────────────────────────────────╮', painted corner #f5c26b
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:277: AssertionError
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/test_r_pe_bench_102_1_leaving_0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f45e5a59c10>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.102/1, EX-BC10: VAL_BLK_DEF_0001's decode is held running; `down`/`up` to DISPLAY_0001 (a scalar
+        row): the idle look is back within 0.3 s of the key, while the worker is still held. Operator need (P-127): the
+        cue describes what the user is looking at; amber over a scalar row says nothing true. Negative control: a cue
+        keyed on the running worker stays until the gate opens. The compositor hook timestamps the actual idle paint;
+        Pilot's return after its own pause is not the paint time."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            screen = app.screen
+            real_refresh = screen._compositor_refresh
+            paints = []
+    
+            def record_paint():
+                real_refresh()
+                if sheet.selected_name == DISPLAY:
+                    paints.append((time.monotonic(), idle_now(app)))
+    
+            prime(app)
+            await decoded(pilot, sheet, VB)
+            try:
+                gate.hold.add(VB)
+                await reselect(pilot, sheet, VB, DISPLAY)
+                await cue_shown(pilot, app, "decode", VB)
+                screen._compositor_refresh = record_paint
+                key_at = await move_to(pilot, sheet, DISPLAY)
+                deadline = key_at + timing_bound(0.3)
+                while time.monotonic() < deadline and not any(at >= key_at and idle for at, idle in paints):
+                    await pilot.pause(0.01)
+                lag = next((at - key_at for at, idle in paints if at >= key_at and idle), None)
+                return lag, gate.released.is_set(), gate.running, top_row(app), border_hex(app)
+            finally:
+                screen.__dict__.pop("_compositor_refresh", None)
+                gate.release()
+    
+        lag, released, running, row, colour = run(tmp_path, defc_dir, body)
+        assert not released and running == 1, f"the worker did not run on while the selection moved (running={running})"
+>       assert lag is not None and lag <= timing_bound(0.3), (
+            f"idle paint {lag!r} s after the key (bound 0.3 s, {load()}); top border {row!r}, corner {colour}"
+        )
+E       AssertionError: idle paint None s after the key (bound 0.3 s, load 0.41 0.14 0.14); top border '╭─ STAGING SHEET   ◑ BUSY · decode VAL_BLK_DEF_0001 · 1.4 s · keys still work  ────────────────────────────────╮', corner #f5c26b
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:708: AssertionError
+_ test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s _
+
+tmp_path = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/test_r_pe_bench_102_2_a_filter0')
+defc_dir = PosixPath('~/work/zq-m9b/tmp/pytest-of-<user>/pytest-1/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f45e5125110>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.102/2, EX-BC10: MAP_DEF_0001's decode is held; the filter `CURVE` leaves MAP_DEF_0001 off the page:
+        the idle look is back within 0.3 s of the keystroke while the worker is held. Operator need (P-127): a row that
+        left the page cannot be the thing the window is working on. Negative control: the cue keyed on the running
+        worker."""
+        gate = Gate(monkeypatch, "decode_values")
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            prime(app)
+            await decoded(pilot, sheet, MAP)
+            try:
+                gate.hold.add(MAP)
+                await reselect(pilot, sheet, MAP, DISPLAY)
+                await cue_shown(pilot, app, "decode", MAP)
+                key_at = time.monotonic()
+                need(panel, FILTER).value = "CURVE"
+                took = await until(pilot, lambda: idle_now(app), max(0.0, key_at + timing_bound(0.3) - time.monotonic()))
+                seen_after = time.monotonic() - key_at
+                return took, seen_after, MAP in [r.name for r in sheet.rows], gate.released.is_set(), top_row(app), border_hex(app)
+            finally:
+                gate.release()
+    
+        took, after, still, released, row, colour = run(tmp_path, defc_dir, body)
+        assert not still, "the filter did not leave MAP_DEF_0001 off the page"
+        assert not released, "the held worker ended before the check"
+>       assert took is not None and after <= report_margin(
+            "R-PE-BENCH.102/2 idle after the filter keystroke", after, timing_bound(0.3)
+        ), (
+            f"idle look {after:.3f} s after the filter keystroke (bound 0.3 s, {load()}); top border {row!r}, corner {colour}"
+        )
+E       AssertionError: idle look 0.326 s after the filter keystroke (bound 0.3 s, load 0.50 0.17 0.15); top border '╭─ STAGING SHEET   ◑ BUSY · decode MAP_DEF_0001 · 0.6 s · keys still work  ────────────────────────────────────╮', corner #f5c26b
+E       assert (None is not None)
+
+tests/test_b103_inc9b_w.py:740: AssertionError
+----- generated xml file: ~/work/zq-m9b/groups/G01/mutant.xml -----
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+FAILED tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+3 failed in 24.01s
+EXIT_CODE 1

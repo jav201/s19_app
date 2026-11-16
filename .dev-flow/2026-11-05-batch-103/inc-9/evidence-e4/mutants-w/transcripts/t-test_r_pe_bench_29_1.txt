@@ -1,0 +1,49 @@
+# load: 1.26
+~/work/zq-mw9/clone/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-mw9/clone
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 10 items / 9 deselected / 1 selected
+
+tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second FAILED [100%]
+
+=================================== FAILURES ===================================
+_ test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second _
+
+tmp_path = PosixPath('~/work/zq-mw9/tmp/pytest-of-<user>/pytest-203/test_r_pe_bench_29_1_a_cursor_0')
+defc_dir = PosixPath('~/work/zq-mw9/tmp/pytest-of-<user>/pytest-203/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second(tmp_path, defc_dir):
+        """Set `7` previewed over 4,096 cells of LARGE; `right` is handled in 0.5 s (quiet host, load recorded)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+    
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            await large_with_selection(pilot, sheet)
+            await wait_for(pilot, lambda: st(sheet, LARGE).preview is not None, "the preview result", 240)
+            await pilot.pause(0.3)
+            return await timed_press(pilot, "right"), await timed_press(pilot, "left")
+    
+        right, left = run(tmp_path, defc_dir, body, a2l=a2l, image=s19)
+>       assert max(right, left) <= report_margin(
+            "R-PE-BENCH.29/1 cursor key over a LARGE preview", max(right, left), KEY_LIMIT_S
+        ), f"right {right:.3f} s, left {left:.3f} s ({load()}); load-sensitive"
+E       AssertionError: right 2.190 s, left 2.228 s (load 1.38 1.93 3.15); load-sensitive
+E       assert 2.227612071990734 <= 0.5
+E        +  where 2.227612071990734 = max(2.1900004689814523, 2.227612071990734)
+E        +  and   0.5 = report_margin('R-PE-BENCH.29/1 cursor key over a LARGE preview', 2.227612071990734, 0.5)
+E        +    where 2.227612071990734 = max(2.1900004689814523, 2.227612071990734)
+
+tests/test_b103_inc9_w_jobs.py:290: AssertionError
+============================= QC-TM timing margins =============================
+LOW -345.5%  2.228 s / 0.500 s  R-PE-BENCH.29/1 cursor key over a LARGE preview  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_1_a_cursor_key_over_a_previewed_large_edit_is_handled_within_half_a_second
+================== 1 failed, 9 deselected in 98.56s (0:01:38) ==================
+rc=1
+# load end: 1.38

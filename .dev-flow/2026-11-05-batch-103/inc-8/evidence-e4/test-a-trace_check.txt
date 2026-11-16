@@ -1,0 +1,3 @@
+$ python <skill>/trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-8/01-requirements.md --tests tests --ids "R-PE-DEF.5[0-9]" "R-PE-DEF.6[0-4]" R-PE-DEF.73 "R-PE-DEF.8[3-7]" R-PE-034 R-PE-035 R-PE-110
+trace_check: 24 active requirements match --ids, checks run: CASE, TEST, 0 gap(s)
+exit=0

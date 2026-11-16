@@ -1,0 +1,4 @@
+diff -r head/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py mstall/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py
+99a100,101
+>         if self._active_job is not None:
+>             __import__("time").sleep(0.8)  # FX9 MUTANT: UI-thread work while a bench job runs

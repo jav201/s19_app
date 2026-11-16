@@ -1,0 +1,9 @@
+load before: 1.80 1.79 1.80 1/635 533575
+~/work/zq-fx9c/clone/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......                                                                   [100%]
+6 passed in 7.93s
+rc=0
+load after: 1.75 1.78 1.79 1/635 533650

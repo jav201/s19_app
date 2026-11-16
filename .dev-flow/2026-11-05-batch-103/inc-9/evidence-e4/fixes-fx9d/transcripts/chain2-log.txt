@@ -1,0 +1,63 @@
+clone 0ba56c8c start 12:35:20 load 0.72 0.89 1.06 1/635 548387
+test_b103_inc9_a9 29 passed in 103.48s (0:01:43)
+test_b103_inc9_b_canvas 42 passed in 1.19s
+test_b103_inc9_b_cells 39 passed in 1.65s
+test_b103_inc9_b_detail 54 passed in 1.21s
+test_b103_inc9_b_model 20 passed in 1.10s
+test_b103_inc9_b_tools 59 passed in 1.13s
+test_b103_inc9_i 3 passed in 9.47s
+test_b103_inc9_ob_json_view 2 passed in 4.64s
+test_b103_inc9_w_jobs 2 passed in 22.53s
+test_b103_inc9_w_keys 19 passed in 64.55s (0:01:04)
+test_b103_inc9_w_mutants 29 passed in 133.17s (0:02:13)
+test_b103_inc9_w_select 14 passed in 42.87s
+test_b103_inc9_w_stage 11 passed in 43.10s
+test_b103_inc8_a1_service 23 passed in 1.17s
+test_b103_inc8_a2_app 23 passed in 72.12s (0:01:12)
+test_b103_inc8_a3_help 9 passed in 1.02s
+test_b103_inc8_at_help 2 passed in 4.97s
+test_b103_inc8_at 11 passed in 50.60s
+test_b103_inc8_p_layout 31 passed in 76.24s (0:01:16)
+test_b103_inc8_p_ledger 10 passed in 33.93s
+test_b103_inc8_p_wiring 12 passed in 34.76s
+test_b103_inc8_s1_detail 43 passed in 1.16s
+test_b103_inc8_s1 118 passed in 1.27s
+test_b103_inc8_s2_picker_definitions 6 passed in 1.12s
+test_b103_inc8_s2_sheet_formula 27 passed in 8.99s
+test_b103_inc8_s2_sheet_keys 21 passed in 10.90s
+test_b103_inc8_s2_sheet_rows 35 passed in 6.72s
+test_b100_active_variant 6 failed, 65 passed, 3 skipped in 165.12s (0:02:45)
+test_b100_document 4 failed, 146 passed, 13 skipped in 86.94s (0:01:26)
+test_b100_session_reset 3 failed, 17 passed in 66.59s (0:01:06)
+test_b101_designer_writes 11 failed, 3 passed in 576.65s (0:09:36)
+test_b101_inplace_views 4 failed, 18 passed in 582.31s (0:09:42)
+test_b101_symbol_reads 24 passed in 248.83s (0:04:08)
+test_b103_clipboard_core 2 failed, 83 passed, 2 skipped in 136.91s (0:02:16)
+test_b103_clipboard_tail 27 passed, 4 skipped in 180.69s (0:03:00)
+test_b103_copy_paste_matrix 7 failed, 7 passed, 15 skipped in 119.14s (0:01:59)
+test_b103_copy_quit_dialog 28 passed in 141.59s (0:02:21)
+test_b103_copy_views 54 passed in 240.09s (0:04:00)
+test_b97_chips_help 1 failed, 78 passed in 213.67s (0:03:33)
+test_b97_flow_execution 75 passed in 254.89s (0:04:14)
+test_b97_key_bar 38 passed in 197.08s (0:03:17)
+test_b97_patch_editor 38 passed in 193.06s (0:03:13)
+test_b97_width 145 passed in 604.92s (0:10:04)
+test_b99_editor_image 2 failed, 6 passed in 32.72s
+test_b99_s0 1 failed, 5 passed in 12.76s
+test_b99_staging 1 failed, 31 passed in 46.37s
+test_tui_patch_big 24 passed in 31.94s
+test_tui_patch_card 1 failed, 25 passed in 29.79s
+test_tui_patch_editor_b94 1 failed, 16 passed in 30.39s
+test_tui_patch_editor_v2 52 passed in 83.69s (0:01:23)
+test_tui_patch_history_strip 1 failed, 6 passed, 1 skipped in 20.20s
+test_tui_patch_json 4 failed, 13 passed in 15.76s
+test_tui_patch_layout 9 passed in 24.52s
+test_tui_patch_variant 11 passed in 31.37s
+test_id_registry 1 failed, 11 passed in 8.25s
+test_suite_hygiene 65 passed, 2 skipped in 150.51s (0:02:30)
+test_requirements_canon 1 failed, 10 passed in 1.30s
+test_address_census 1 failed, 22 passed in 30.13s
+test_deps_seam_law 6 passed in 7.89s
+test_no_private_tokens 2 passed in 41.14s
+test_engine_unchanged 
+CHAIN2_DONE 14:05:21 load 1.37 1.63 1.66 1/669 576840

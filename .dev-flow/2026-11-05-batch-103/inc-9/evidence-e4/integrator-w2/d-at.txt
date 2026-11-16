@@ -1,0 +1,121 @@
+# run d-at tree=tip 2026-11-14T00:14:21-06:00 load: load average: 10.77, 10.22, 9.86
+~/work/zq-e4-9w-int2/tip/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-e4-9w-int2/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_b103_inc8_at.py F
+
+=================================== FAILURES ===================================
+___ test_at_b103_i8_1_filter_page_row_formula_stage_advances_and_marks_dirty ___
+
+tmp_path = PosixPath('~/work/zq-e4-9w-int2/tmp/pytest-of-<user>/pytest-0/test_at_b103_i8_1_filter_page_0')
+defc = {'a2l': PosixPath('~/work/zq-e4-9w-int2/tmp/pytest-of-<user>/pytest-0/defc0/definitions.a2l'), 'names':...01', ...], 's19': PosixPath('~/work/zq-e4-9w-int2/tmp/pytest-of-<user>/pytest-0/defc0/definitions.s19')}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb1f2930050>
+
+    def test_at_b103_i8_1_filter_page_row_formula_stage_advances_and_marks_dirty(tmp_path: Path, defc, monkeypatch) -> None:
+        """AT-B103-I8-1 (US-103-05; R-PE-DEF.10/2, .22, .23/1, .40/1, .45, .46, .50/1, .53/1, .58/1, .60/1, .82/2,
+        R-PE-034/1, R-PE-041/2 and /4).
+    
+        Filter `_0001` -> the page's rows -> Tab to the sheet -> down to DISPLAY_0001 -> Enter -> type `25.5` -> the tail
+        reads in-limits -> Enter stages: the ledger holds the model's entry, the status line names it, the selection
+        moved to the next row, DISPLAY_0001 shows `●` and its staged text, the input is empty again, the ledger
+        subtitle shows one entry and the dirty mark.
+        """
+        statuses = record_statuses(monkeypatch)
+        names = defc["names"]
+    
+        async def body(app, pilot, panel):
+            order = await open_sheet(pilot, app, panel, names)
+            # before the trigger: nothing staged, not dirty (the controls of the after-state below)
+            before = (len(document_entries(app)), need(panel, LEDGER, DataTable).row_count, list(subtitles(app)))
+            marks_before = [m[0] for m, _, _ in body_rows(panel, names)]
+            first = selected(panel, names)
+            await select_row(pilot, panel, names, "DISPLAY_0001")
+            await pilot.press("enter")
+            await settle(pilot, 2)
+            focus_after_enter = app.focused.id if app.focused is not None else None
+            await pilot.press(*"25.5")
+            await settle(pilot, 3)
+            tail_text = sheet_text(panel)
+            typed = need(panel, INPUT, Input).value
+            await pilot.press("enter")
+            await settle(pilot, 4)
+            after = {
+                "entries": document_entries(app),
+                "ledger_rows": need(panel, LEDGER, DataTable).row_count,
+                "subtitles": subtitles(app),
+                "selected": selected(panel, names),
+                "display_mark": row_mark(panel, names, "DISPLAY_0001"),
+                "display_line": row_line(panel, names, "DISPLAY_0001"),
+                "input": need(panel, INPUT, Input).value,
+            }
+            # re-select the staged row: the pending text is cleared (R-PE-DEF.82/2)
+            await select_row(pilot, panel, names, "DISPLAY_0001")
+            reselected_input = need(panel, INPUT, Input).value
+            definition, a2l, encoded = model_encode(app, "DISPLAY_0001", "25.5")
+            return order, before, marks_before, first, focus_after_enter, typed, tail_text, after, reselected_input, encoded
+    
+>       order, before, marks_before, first, focus_after_enter, typed, tail_text, after, reselected_input, encoded = run(
+            tmp_path, defc, body
+        )
+
+tests/test_b103_inc8_at.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc8_at.py:104: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_inc8_at.py:102: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc8_at.py:365: in body
+    await select_row(pilot, panel, names, "DISPLAY_0001")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = PatchEditorPanel(id='patch_editor_panel', classes='-bench')
+names = ['ENUM_0001', 'MASK_BIT_0001', 'MASK_FIELD_0001', 'DISPLAY_0001', 'AXIS_DEF_0001', 'CURVE_DEF_0001', ...]
+target = 'DISPLAY_0001', limit = 30
+
+    async def select_row(pilot, panel, names, target: str, limit: int = 30) -> None:
+        """Press down (or up) on the sheet until ``target`` carries ``▶``."""
+        order = row_names(panel, names)
+        assert target in order, f"{target} is not on the painted page {order}"
+        # A stage leaves the focus in the formula input (I-8.4 select_after: focus unchanged), and up/down move
+        # rows only while the sheet holds the focus (R-PE-DEF.45): the operator first goes back with Escape
+        # (R-PE-DEF.48). E4 integration, test side: the reader pressed arrows into the input.
+        if getattr(pilot.app.focused, "id", None) == "patch_sheet_input":
+            await pilot.press("escape")
+            await settle(pilot, 2)
+        for _ in range(limit):
+            current = selected(panel, names)
+            if current == target:
+                return
+            key = "down" if current is None or order.index(current) < order.index(target) else "up"
+            await pilot.press(key)
+            await settle(pilot, 2)
+>       assert selected(panel, names) == target, f"could not select {target}: selected {selected(panel, names)}"
+E       AssertionError: could not select DISPLAY_0001: selected CURVE_DEF_0001
+E       assert 'CURVE_DEF_0001' == 'DISPLAY_0001'
+E         
+E         - DISPLAY_0001
+E         + CURVE_DEF_0001
+
+tests/test_b103_inc8_at.py:286: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8_at.py::test_at_b103_i8_1_filter_page_row_formula_stage_advances_and_marks_dirty
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+============================== 1 failed in 25.49s ==============================
+# rc=1 end 2026-11-14T00:14:48-06:00 load: load average: 10.60, 10.24, 9.88

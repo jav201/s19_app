@@ -33,7 +33,8 @@ from __future__ import annotations
 
 from math import ceil
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, NamedTuple, Optional, Protocol, Sequence, runtime_checkable
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Callable, Mapping, NamedTuple, Optional, Protocol, Sequence, runtime_checkable
 
 from rich.cells import cell_len, set_cell_size
 from rich.text import Text
@@ -271,6 +272,14 @@ class IncludeTable(DataTable):
         self.post_message(self.IncludeToggled())
 
 
+class IncludeButton(Button):
+    """The include control: ``enter`` (Button's own) and ``space`` press it, the two keys
+    the ledger toggles with (R-PICKER-CORRECT.011/1). batch-103 Inc 8: the Patch Editor
+    hides its table (R-PE-DEF.2), so this control is the keyboard include route there."""
+
+    BINDINGS = [Binding("space", "press", "Press", show=False)]
+
+
 @dataclass(frozen=True)
 class _PickerIds:
     """The picker's child ids, all derived from the caller's ``id_prefix``.
@@ -485,10 +494,23 @@ class A2LParameterPicker(Vertical):
         self._fmt_longest = 0
         #: The pending filter debounce timer, if any.
         self._filter_timer: Optional[Timer] = None
+        self._definitions: Mapping[str, Definition] = MappingProxyType({})
+        self._definitions_source: Optional[dict] = None
 
     # ------------------------------------------------------------------
     # State read by the host (compatibility surface)
     # ------------------------------------------------------------------
+
+    @property
+    def definitions(self) -> Mapping[str, Definition]:
+        """The population's own describe, read only (Inc 8, E3A-04): the
+        definitions of the last real population, ``{}`` without A2L data."""
+        return self._definitions
+
+    @property
+    def definitions_source(self) -> Optional[dict]:
+        """The ``a2l_data`` that describe used (E3A-13); ``None`` without it."""
+        return self._definitions_source
 
     @property
     def param_rows(self) -> dict:
@@ -606,6 +628,8 @@ class A2LParameterPicker(Vertical):
         definitions = (
             describe_definitions(names, a2l_data) if a2l_data is not None else {}
         )
+        self._definitions = MappingProxyType(definitions)
+        self._definitions_source = a2l_data
         for row, name in zip(rows, names):
             address = row.get("address")
             address = (
@@ -713,8 +737,8 @@ class A2LParameterPicker(Vertical):
                 compact=compact,
             )
             if self._show_include_button:
-                yield Button(
-                    "Pick" if compact else "Include parameter",
+                yield IncludeButton(
+                    "▽ Pick" if compact else "Include parameter",
                     id=ids.include,
                     classes="patch-chip",
                     compact=compact,

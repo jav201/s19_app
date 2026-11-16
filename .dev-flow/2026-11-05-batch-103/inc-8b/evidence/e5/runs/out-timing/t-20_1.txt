@@ -1,0 +1,15 @@
+## uptime:  02:59:40 up 2 days, 11:48,  2 users,  load average: 1.06, 0.81, 1.01
+## date: 2026-11-15T08:59:40Z  head: 7c4e377c
+## s19_app.__file__ = ~/work/zq-x8b/t0/s19_app/__init__.py
+.
+============================= QC-TM timing margins =============================
+71.5%  0.142 s / 0.500 s  R-PE-BENCH.20/1 key during a LARGE decode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+QC-TM: 1 bounds, 0 under 20 % margin
+============================== slowest durations ===============================
+7.21s call     tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+0.05s setup    tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_20_1_a_key_is_handled_within_half_a_second_while_a_large_decode_runs
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+1 passed in 7.32s
+## rc=0
+## end: 2026-11-15T08:59:49Z  uptime:  02:59:49 up 2 days, 11:48,  2 users,  load average: 1.05, 0.82, 1.00

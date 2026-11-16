@@ -37,6 +37,7 @@ from s19_app.tui.screens_directionb import (
     CARD_NO_IMAGE,
     CARD_NO_SELECTION,
     CARD_UNMAPPED_TOKEN,
+    STRIP_ROW_BYTES,
     BeforeAfterCard,
     PatchEditorPanel,
     before_after_card_text,
@@ -97,7 +98,12 @@ async def _open_patch(app: S19TuiApp, pilot) -> PatchEditorPanel:
     await pilot.pause()
     app.action_show_screen("patch")
     await pilot.pause()
-    return app.query_one("#patch_editor_panel", PatchEditorPanel)
+    panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    # Inc 8 R-TUI-063.4: the Patch Editor opens on the Patch script tab (was: the Inspector
+    # tab, where the before/after card lives), so the card's tab is selected through its chip.
+    panel.query_one("#patch_tab_inspector", Button).press()
+    await pilot.pause()
+    return panel
 
 
 async def _select_row(app: S19TuiApp, pilot, index: int) -> None:
@@ -409,10 +415,11 @@ _CARD_NEIGHBORS = {
 #: never the ledger's scroll body.
 _BUTTON_HOMES = (
     "patch_tabs",
+    "patch_filter_row",  # Inc 8 R-PE-DEF.2: the picker's controls live in the filter row
     "patch_pane_inspector",
     "patch_win_json",
     "patch_win_checks",
-    "patch_win_a2l",
+    # Inc 8 R-TUI-063.3: "patch_win_a2l" leaves (the A2L tab is retired, D-1 A)
     "patch_doc_file_row",
     "patch_doc_controls",
 )
@@ -575,6 +582,10 @@ def test_at080d_reachable_with_card(tmp_path: Path, size) -> None:
 #: strip; its content width at these two below-range sizes, measured on the
 #: re-composed tree (the 45-cell inspector floor), and the strip's own line
 #: width ``3·per_row + 8`` must fit it.
+#: Inc 8 R-PE-DEF.1.1 supersedes these numbers (the base layout's): the Inspector pane is the
+#: landing pane's full width, so the budget is derived in the test by the D5 (f) rule from the
+#: measured ``#patch_inspector`` content width (minus the pane's scrollbar gutter and the card's
+#: padding, 3 cells), ruling RR-2.
 _MEASURED_CARD_BUDGET = {(80, 24): 38, (120, 30): 38}
 
 
@@ -610,6 +621,7 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
             plain = _card_plain(app)
             return {
                 "card_parent": card.parent.id,
+                "budget": app.query_one("#patch_inspector").content_region.width - 3,
                 "content_w": card.content_region.width,
                 "region_h": card.region.height,
                 "widest": max((len(x) for x in plain.splitlines()), default=0),
@@ -617,7 +629,7 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
             }
 
     out = asyncio.run(_run())
-    budget = _MEASURED_CARD_BUDGET[size]
+    budget = out["budget"]  # was _MEASURED_CARD_BUDGET[size]; see the note above it
     assert out["card_parent"] == "patch_pane_inspector", (
         f"@{size}: the card's measured container is the Inspector pane at "
         f"batch-97; got {out['card_parent']!r}"
@@ -631,11 +643,18 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
         f"container — it will wrap. The strip's per_row or its summary is too wide"
     )
     assert out["region_h"] > 0, f"@{size}: the card paints no rows"
-    # batch-97 D5 (b)(c): a 64-byte run at 0xFFFFFFFF (7 context bytes lead
-    # its aligned row) needs 9 rows of 3 lines; the strip paints the cap of
-    # 8, one ``showing N of M bytes`` note line and the summary line.
-    assert out["lines"] == 3 * 8 + 2, (
-        f"@{size}: expected 8 stacked byte rows + note + summary; got {out['lines']} lines"
+    # batch-97 D5 (b)(c): a 64-byte run at 0xFFFFFFFF (0xFFFFFFFF % per_row
+    # context bytes lead its aligned row) needs ceil((lead + 64) / per_row) rows
+    # of 3 lines; past the cap of 8 the strip paints 8, one ``showing N of M
+    # bytes`` note line, then the summary line. Inc 8 R-PE-DEF.1.1 supersedes
+    # ``3 * 8 + 2`` (9 rows at 8 bytes per row beside the ledger): per_row is
+    # derived from the measured width by D5 (f) (ruling RR-2).
+    per_row = max(k for k in STRIP_ROW_BYTES if 3 * k + 8 <= budget)
+    rows = -(-(0xFFFFFFFF % per_row + 64) // per_row)
+    expected_lines = 3 * min(rows, 8) + (1 if rows > 8 else 0) + 1
+    assert out["lines"] == expected_lines, (
+        f"@{size}: expected {min(rows, 8)} stacked byte rows at {per_row} per row"
+        f"{' + note' if rows > 8 else ''} + summary; got {out['lines']} lines"
     )
 
 

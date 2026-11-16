@@ -13,6 +13,17 @@ from ..shared import cap_json_lines
 from .shared import json_stamp_text
 
 
+class ReadOnlyJsonView(TextArea):
+    """The read-only JSON view: no bracket matching.
+
+    Textual runs ``find_matching_bracket`` on every selection change whatever ``match_cursor_bracket`` says
+    (8.2.8), and over a large document the scan blocks the UI thread for ~0.5 s at the record stage.
+    """
+
+    def find_matching_bracket(self, bracket: str, search_from: tuple[int, int]) -> None:
+        return None
+
+
 class DocumentMixin:
     """Mixin: the panel's change-set document: JSON view, paste buffer and gauge."""
 
@@ -312,7 +323,7 @@ class DocumentMixin:
         )
         # D3: literal by construction (no markup parser, C-17),
         # focusable and scrolled by the arrow keys (LLR-144.10).
-        yield TextArea(
+        yield ReadOnlyJsonView(
             self.JSON_VIEW_EMPTY_TEXT,
             id="patch_json_view",
             read_only=True,

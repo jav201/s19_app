@@ -1,0 +1,70 @@
+load before: 0.52 1.07 1.88 2/654 469122
+~/work/zq-fx9b/probe/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-fx9b/probe
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items / 1 deselected / 1 selected
+
+tests/test_fx9b_probe.py FX9BREC {"keys_over_0.3": [[3.177, 0.289, 0.029], [4.673, 0.204, 0.182], [5.373, 0.249, 0.066], [9.339, 0.157, 0.191], [11.832, 0.263, 0.055], [12.576, 0.305, 0.049], [15.551, 0.247, 0.246], [17.929, 0.281, 0.068], [20.461, 0.228, 0.077], [22.607, 0.271, 0.065], [23.767, 0.406, 0.057], [25.04, 0.243, 0.067], [30.023, 0.239, 0.065], [30.753, 0.273, 0.065], [31.153, 0.359, 0.037], [32.053, 0.265, 0.052], [36.499, 0.344, 0.03], [39.39, 0.207, 0.302], [42.143, 4.768, 0.256]], "n_keys": 144, "steps": [["_stage_bench_record", 42.221, 4.548]], "paints_over_0.1": [[7.032, 0.182], [11.651, 0.19], [17.952, 0.246], [41.752, 0.302], [48.214, 0.696], [49.065, 0.256]]}
+FX9BPROF
+         14959581 function calls (14959133 primitive calls) in 4.541 seconds
+
+   Ordered by: cumulative time
+   List reduced from 809 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    4.547    4.547 ~/work/zq-fx9b/probe/s19_app/tui/app/patch.py:404(_stage_bench_record)
+        1    0.000    0.000    4.455    4.455 ~/work/zq-fx9b/probe/s19_app/tui/app/patch.py:654(_refresh_patch_history_view)
+        1    0.000    0.000    4.132    4.132 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/panel.py:696(refresh_entries)
+        1    0.000    0.000    2.691    2.691 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/entries.py:115(refresh_entries)
+        1    0.000    0.000    1.822    1.822 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/document.py:36(_show_document)
+        1    0.000    0.000    1.816    1.816 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:1204(load_text)
+        1    0.000    0.000    1.816    1.816 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:1123(_set_document)
+    16/14    0.000    0.000    1.675    0.120 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:371(__set__)
+    16/14    0.000    0.000    1.675    0.120 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:316(_set)
+        1    0.000    0.000    1.675    1.675 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:2052(move_cursor)
+        5    0.000    0.000    1.675    0.335 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:376(_check_watchers)
+        4    0.000    0.000    1.675    0.419 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:90(invoke_watcher)
+        1    0.000    0.000    1.675    1.675 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:865(_watch_selection)
+        1    0.715    0.715    1.674    1.674 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:916(find_matching_bracket)
+        1    0.000    0.000    1.440    1.440 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py:520(set_document)
+        1    0.000    0.000    1.440    1.440 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/sheet.py:176(set_document)
+  3145962    0.787    0.000    0.960    0.000 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_text_area.py:1246(_yield_character_locations)
+        1    0.002    0.002    0.851    0.851 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/entries.py:222(_render_before_after_card)
+        2    0.000    0.000    0.721    0.361 ~/work/zq-fx9b/probe/tests/test_fx9b_probe.py:43(wrap)
+        2    0.000    0.000    0.721    0.361 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/bench_sheet.py:99(_paint)
+        2    0.000    0.000    0.721    0.360 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/sheet.py:312(_paint)
+        2    0.000    0.000    0.675    0.337 ~/work/zq-fx9b/probe/s19_app/tui/definition_sheet.py:812(row_line)
+        2    0.000    0.000    0.674    0.337 ~/work/zq-fx9b/probe/s19_app/tui/definition_bench.py:588(bench_cells)
+        2    0.000    0.000    0.674    0.337 ~/work/zq-fx9b/probe/s19_app/tui/definition_bench.py:571(_delta_text)
+        1    0.508    0.508    0.674    0.674 ~/work/zq-fx9b/probe/s19_app/tui/definition_bench.py:547(_max_staged_delta)
+        1    0.016    0.016    0.649    0.649 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/shared.py:62(show_entry)
+        1    0.018    0.018    0.625    0.625 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/shared.py:466(before_after_card_text)
+        1    0.000    0.000    0.546    0.546 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/sheet.py:187(<listcomp>)
+        2    0.000    0.000    0.546    0.273 ~/work/zq-fx9b/probe/s19_app/tui/definition_sheet.py:630(build_row)
+        2    0.248    0.124    0.546    0.273 ~/work/zq-fx9b/probe/s19_app/tui/definition_sheet.py:385(_staged_by_bytes)
+        1    0.000    0.000    0.311    0.311 ~/work/zq-fx9b/probe/s19_app/tui/app/patch.py:1626(_patch_document_view)
+        1    0.001    0.001    0.311    0.311 ~/work/zq-fx9b/probe/s19_app/tui/changes/io.py:1448(serialize_change_document)
+        9    0.000    0.000    0.306    0.034 {built-in method builtins.sum}
+     4097    0.256    0.000    0.306    0.000 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/shared.py:568(<genexpr>)
+      985    0.104    0.000    0.305    0.000 {method 'join' of 'str' objects}
+        1    0.000    0.000    0.305    0.305 ~/work/zq-fx9b/probe/s19_app/tui/changes/io.py:1501(<listcomp>)
+        1    0.000    0.000    0.305    0.305 ~/work/zq-fx9b/probe/s19_app/tui/changes/io.py:1507(_encode_entry)
+  1048578    0.298    0.000    0.298    0.000 ~/work/zq-fx9b/probe/s19_app/tui/definition_sheet.py:200(written_in)
+        1    0.246    0.246    0.297    0.297 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/shared.py:531(<listcomp>)
+5266763/5266759    0.277    0.000    0.278    0.000 {built-in method builtins.len}
+  1048577    0.201    0.000    0.201    0.000 ~/work/zq-fx9b/probe/s19_app/tui/changes/io.py:1554(<genexpr>)
+        1    0.134    0.134    0.197    0.197 ~/work/zq-fx9b/probe/s19_app/tui/screens_directionb/patch_editor/entries.py:271(<listcomp>)
+        1    0.187    0.187    0.187    0.187 ~/work/zq-fx9b/probe/s19_app/tui/definition_sheet.py:165(__init__)
+        2    0.000    0.000    0.119    0.060 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/document/_wrapped_document.py:80(wrap)
+       32    0.000    0.000    0.119    0.004 ~/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/expand_tabs.py:11(get_tab_widths)
+
+
+
+.
+
+================= 1 passed, 1 deselected in 175.13s (0:02:55) ==================
+rc=0
+load after: 2.08 1.55 1.93 2/654 470206

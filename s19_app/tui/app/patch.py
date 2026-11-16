@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Mapping, Optional
+from typing import TYPE_CHECKING, Callable, List, Mapping, Optional
 from textual import work
 from textual.widgets import DataTable, Select, Static, TextArea
 from ...compare import DIFF_KIND_DOMAIN
+from ..a2l_definition import Refusal, describe_definition
+from ..definition_sheet import name_echo
 from ..changes import STATUS_VERIFIED, VerifyResult
 from ..changes.io import (
     SYMBOL_NO_A2L_CONTEXT_TEXT,
@@ -35,6 +37,12 @@ from ..services.variant_execution_service import (
 from . import deps
 from .shared import (_SAVEBACK_S0_MAX_BYTES)
 
+if TYPE_CHECKING:
+    from ..screens_directionb.patch_editor.sheet import StagingSheet
+
+
+#: Gap between the record stage's refresh steps: one bench cue tick (F-9b-4).
+STEP_GAP_S = 0.1
 
 #: The Patch Editor's routable action set (LLR-003.2) — the eight v2
 #: actions of increment E3a extended by ``execute_scope`` at E6 (the stated
@@ -90,6 +98,7 @@ def _synth_s0_header_from_filename(filename: str) -> bytes:
 
 
 class PatchMixin:
+    _image_write_generation = 0
 
     def on_patch_editor_panel_action_requested(
         self, event: PatchEditorPanel.ActionRequested
@@ -314,6 +323,136 @@ class PatchMixin:
         # ONLY for a paste-authored / empty document — disable it whenever the
         # document is file-backed so a per-entry edit cannot clobber it.
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
+
+    def on_staging_sheet_stage_requested(
+        self, event: "StagingSheet.StageRequested"
+    ) -> None:
+        """
+        Summary:
+            Stage one formula-bar edit of the staging sheet (Inc 8,
+            R-PE-DEF.51 / .57 … .64 / .73, R-PE-110): refuse while a session
+            action runs, describe the row again with the A2L loaded now,
+            stage over the SOURCE view, report, and select the row after the
+            staged one.
+
+        Args:
+            event (StagingSheet.StageRequested): The row's ``name`` and the
+                operator's formula ``text``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_refuse_if_busy`` first (the Patch gate); no A2L → the
+              ``nothing staged`` status; else ``describe_definition`` fresh,
+              ``ChangeService.stage_definition`` over ``_strip_source_map``,
+              ``_report_change_result`` then one status line per notice;
+              ok → ``PatchEditorPanel.note_staged(name)``; always
+              ``_refresh_patch_history_view``.
+            - Nothing of the formula text is logged.
+
+        Dependencies:
+            Uses:
+                - describe_definition / ChangeService.stage_definition /
+                  _strip_source_map / _report_change_result
+                - PatchEditorPanel.note_staged
+            Used by:
+                - Textual message dispatch for ``StagingSheet``
+        """
+        if self._refuse_if_busy():
+            return
+        a2l_data = self.current_a2l_data
+        if not a2l_data:
+            self.set_status("Patch Editor: no A2L is loaded — nothing staged.")
+            return
+        definition = describe_definition(event.name, a2l_data)
+        result = self._change_service.stage_definition(
+            definition,
+            a2l_data,
+            event.text,
+            self._strip_source_map(self.current_file),
+        )
+        self._report_change_result(result)
+        for notice in result.notices:
+            self.set_status(notice)
+        if result.ok:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.note_staged(event.name)
+        self._refresh_patch_history_view()
+
+    def on_array_bench_sheet_record_stage_requested(self, event) -> None:
+        """
+        Summary:
+            Stage one encoded bench record (Inc 9): run the guarded record
+            stage, then always release the sheet's record hold.
+
+        Args:
+            event (ArrayBenchSheet.RecordStageRequested): The row's name,
+                definition, count, encoded outcome, generation and edit.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - _stage_bench_record / ArrayBenchSheet.record_done
+            Used by:
+                - Textual message dispatch for ``ArrayBenchSheet``
+        """
+        sheet = self.query_one("#patch_sheet")
+        wrote = False
+        try:
+            wrote = self._stage_bench_record(event, sheet)
+        finally:
+            if not wrote:
+                sheet.record_done(event.name)
+        if not wrote:
+            return
+        self._run_refresh_steps(
+            self._patch_refresh_steps(), lambda: sheet.record_done(event.name)
+        )
+
+    def _stage_bench_record(self, event, sheet) -> bool:
+        """Stage one encoded bench record, guarded; a refusal writes nothing.
+
+        Returns True when the service ran (the refresh steps follow), else False.
+        """
+        if self._refuse_if_busy():
+            return False
+        a2l_data = self.current_a2l_data
+        if not a2l_data:
+            self.set_status("Patch Editor: no A2L is loaded — nothing staged.")
+            return False
+        if event.generation != sheet.generation:
+            self.set_status(
+                f"Patch Editor: the change document or the image changed while "
+                f"{name_echo(event.name)} was encoding — stage it again."
+            )
+            return False
+        if describe_definition(event.name, a2l_data) != event.definition:
+            self.set_status(
+                f"Patch Editor: {name_echo(event.name)} changed in the A2L — "
+                "select it again to reload its values."
+            )
+            return False
+        if isinstance(event.outcome, Refusal):
+            self.set_status(f"Patch Editor: {event.outcome.message}")
+            return False
+        if event.outcome.address != event.definition.address or len(event.outcome.data) != event.definition.byte_length:
+            self.set_status(
+                f"Patch Editor: {name_echo(event.name)} encoded outside its "
+                "span — nothing staged."
+            )
+            return False
+        result = self._change_service.stage_record(event.name, event.outcome, event.count)
+        self._report_change_result(result)
+        for notice in result.notices:
+            self.set_status(notice)
+        if result.ok:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.note_staged(event.name, advance=False)
+            sheet.record_staged(event.name, event.edit)
+        return True
 
     def on_patch_editor_panel_save_back_decision(
         self, event: PatchEditorPanel.SaveBackDecision
@@ -559,18 +698,91 @@ class PatchMixin:
             Used by:
                 - ``on_patch_editor_panel_undo_requested`` / ``..._redo_requested``
         """
+        for step in self._patch_refresh_steps():
+            step()
+
+    def _patch_refresh_steps(self) -> List[Callable[[], None]]:
+        """The Patch Editor refresh as four steps (R-PE-BENCH.98, .106).
+
+        Each step reads the service and the loaded file when it runs.
+        :meth:`_refresh_patch_history_view` runs them at once; the record
+        stage chains them with :meth:`_run_refresh_steps`.
+        """
+        held: dict = {}
+
+        def serialize() -> None:
+            held["view"] = self._patch_document_view()
+
+        def ledger() -> None:
+            service = self._change_service
+            loaded = self.current_file
+            loaded_ranges = loaded.ranges if loaded is not None else None
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh path).
+            panel.refresh_entries(
+                service.rows(loaded_ranges),
+                # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
+                # overlay — source bytes at every address an apply wrote.
+                mem_map=self._strip_source_map(loaded),
+                document=held["view"],
+                sheet=False,
+            )
+
+        def sheet() -> None:
+            self.query_one("#patch_editor_panel", PatchEditorPanel).refresh_sheet_document()
+
+        def tail() -> None:
+            self._patch_refresh_tail()
+
+        return [serialize, ledger, sheet, tail]
+
+    def _run_refresh_steps(
+        self, steps: List[Callable[[], None]], on_done: Callable[[], None]
+    ) -> None:
+        """Run ``steps`` with a ``STEP_GAP_S`` gap between them (R-PE-BENCH.98, .99).
+
+        The first runs now. A later step runs from ``set_timer`` so ticks, keys
+        and paints get a turn in the gap (``call_after_refresh`` and
+        ``set_timer(0, ...)`` do not, pilot P1). A changed document token skips
+        the rest (.106), and so does a panel that is gone (app closing). ``on_done`` runs exactly once, after the last step, a
+        skip or a raise (a raise is re-raised after it).
+        """
+        token = self._patch_document_token()
+
+        def run(index: int) -> None:
+            try:
+                if index and (
+                    self._patch_document_token() != token
+                    or not self.query("#patch_editor_panel")
+                ):
+                    index = len(steps)
+                else:
+                    steps[index]()
+                    index += 1
+            except BaseException:
+                on_done()
+                raise
+            if index < len(steps):
+                self.set_timer(STEP_GAP_S, lambda: run(index))
+            else:
+                on_done()
+
+        run(0)
+
+    def _patch_document_token(self) -> tuple:
+        """Document and image identity, including writes that mutate ``current_file`` in place."""
         service = self._change_service
-        loaded = self.current_file
-        loaded_ranges = loaded.ranges if loaded is not None else None
-        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh path).
-        panel.refresh_entries(
-            service.rows(loaded_ranges),
-            # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
-            # overlay — source bytes at every address an apply wrote.
-            mem_map=self._strip_source_map(loaded),
-            document=self._patch_document_view(),
+        return (
+            id(service.document),
+            tuple(sorted(service.history_depths().items())),
+            id(self.current_file),
+            self._image_write_generation,
         )
+
+    def _patch_refresh_tail(self) -> None:
+        """Step 4 of the refresh: bindings, issues, checks and enable states."""
+        service = self._change_service
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
         # document's source, which this refresh may have changed.
         self.refresh_bindings()
@@ -1657,6 +1869,7 @@ class PatchMixin:
                 - ``on_patch_editor_panel_save_back_decision``
                 - ``_on_project_saved``
         """
+        self._image_write_generation += 1
         try:
             split_window = self.query_one("#screen_split_join", SplitJoinWindow)
         except Exception:

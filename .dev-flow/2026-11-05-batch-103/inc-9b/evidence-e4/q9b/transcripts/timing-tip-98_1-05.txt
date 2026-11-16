@@ -1,0 +1,21 @@
+~/work/zq-q9b/tip/s19_app/__init__.py
+Q9B_FAMILY=timing Q9B_SIDE=tip Q9B_LABEL=98_1 Q9B_RUN=05
+Q9B_HEAD=31f28f5e9209eb6eaa7957a0362656fa30973df9
+ 17:49:45 up 3 days,  2:38,  3 users,  load average: 0.95, 0.80, 0.77
+Q9B_LOAD1=0.95
+Q9B_NODE=tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-q9b/tip
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 1 item
+
+tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record PASSED
+============================= QC-TM timing margins =============================
+24.7%  0.377 s / 0.500 s  R-PE-BENCH.98/1 max gap write-to-leave  tests/test_b103_inc9b_at.py::test_r_pe_bench_98_1_the_cue_keeps_ticking_through_the_write_and_refresh_of_a_large_record
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 1 passed in 146.52s (0:02:26) =========================
+Q9B_RC=0
+Q9B_VALID=PASS

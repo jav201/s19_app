@@ -1,0 +1,26 @@
+## mutant N-115b: s19_app/tui/definition_sheet.py
+## - '    row.plain = plain(row.plain)\n'
+## + '    row.plain = row.plain\n'
+## uptime:  03:01:53 up 2 days, 11:50,  2 users,  load average: 1.08, 0.92, 1.01
+## date: 2026-11-15T09:01:53Z  head: a63f1841
+## s19_app.__file__ = ~/work/zq-x8b/out-red/mut/copy-N-115b/s19_app/__init__.py
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+_________ test_r_pe_def_115_2_card_lines_cleans_a_raw_row_it_is_handed _________
+
+    def test_r_pe_def_115_2_card_lines_cleans_a_raw_row_it_is_handed():
+        """R-PE-DEF.115/2 (E5, X8b: the shipped enum rows are cleaned before they reach the card, so a card that left
+        its rows raw survived every node) - ``card_lines`` handed a row holding ``\x1b`` paints ``A�[2J``, no ESC.
+        Why: the card is the contract that every row it paints is plain text, whoever builds the rows."""
+        lines = ds.card_lines("T", [Text("A\x1b[2J")], 60)
+>       assert "A\ufffd[2J" in lines[1].plain, lines[1].plain
+E       AssertionError: │ A[2J  │
+E       assert 'A�[2J' in '│ A\x1b[2J  │'
+E        +  where '│ A\x1b[2J  │' = <text '│ A\x1b[2J  │' [Span(0, 10, 'on #0f1525'), Span(2, 7, '#e9e9e9'), Span(8, 10, '#91abec')] '#91abec'>.plain
+
+tests/test_b103_inc8b_s2.py:441: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc8b_s2.py::test_r_pe_def_115_2_card_lines_cleans_a_raw_row_it_is_handed
+1 failed, 3 passed, 34 deselected in 0.19s
+## rc=1
+## end: 2026-11-15T09:01:54Z  uptime:  03:01:54 up 2 days, 11:50,  2 users,  load average: 1.08, 0.92, 1.01

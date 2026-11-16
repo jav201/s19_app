@@ -1,0 +1,13 @@
+## uptime:  03:15:58 up 2 days, 12:04,  2 users,  load average: 1.24, 1.31, 1.19
+## date: 2026-11-15T09:15:58Z  head: ab0aa3d0
+## s19_app.__file__ = ~/work/zq-x8b/t2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+============================= QC-TM timing margins =============================
+98.4%  0.008 s / 0.500 s  R-PE-BENCH.23/2 page paint of 200 names  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_23_2_the_page_paint_of_200_names_stays_within_half_a_second
+QC-TM: 1 bounds, 0 under 20 % margin
+4 passed in 79.18s (0:01:19)
+## rc=0
+## end: 2026-11-15T09:17:18Z  uptime:  03:17:18 up 2 days, 12:06,  2 users,  load average: 1.17, 1.29, 1.19

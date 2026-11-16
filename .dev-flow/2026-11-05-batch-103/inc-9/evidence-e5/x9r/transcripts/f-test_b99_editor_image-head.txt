@@ -1,0 +1,2 @@
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_save_back_keeps_editor_image
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_verify_mismatch_status_still_names_entries

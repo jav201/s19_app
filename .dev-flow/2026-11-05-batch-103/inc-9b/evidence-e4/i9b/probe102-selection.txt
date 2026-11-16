@@ -1,0 +1,47 @@
+2026-11-15T12:03:44-06:00
+~/work/zq-i9b/tree/s19_app/__init__.py
+=== PROBE_RUN=1
+ 12:03:44 up 2 days, 20:52,  2 users,  load average: 0.90, 0.81, 0.44
+[DEBUG-i9b102] events [('selection_enter', -0.6551), ('selection_exit', -0.6535), ('idle_enter', -0.5184), ('idle_exit', -0.5182), ('selection_enter', -0.4436), ('selection_exit', -0.442), ('idle_enter', -0.4292), ('idle_exit', -0.4292), ('idle_enter', -0.3061), ('idle_exit', -0.3061), ('selection_enter', -0.2361), ('selection_exit', -0.2345), ('idle_enter', -0.2231), ('idle_exit', -0.2231), ('idle_enter', -0.0872), ('idle_exit', -0.0872), ('selection_enter', 0.0033), ('selection_exit', 0.062), ('idle_enter', 0.0855), ('idle_exit', 0.0856)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:710: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.318 s after the key (bound 0.3 s, load 1.00 0.83 0.45); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.029536875983467326 is not None and 0.31794427798013203 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 8.83s
+exit=1
+=== PROBE_RUN=2
+ 12:03:54 up 2 days, 20:52,  2 users,  load average: 1.00, 0.83, 0.45
+[DEBUG-i9b102] events [('selection_enter', -0.6513), ('selection_exit', -0.6496), ('idle_enter', -0.5059), ('idle_exit', -0.5056), ('idle_enter', -0.4556), ('idle_exit', -0.4556), ('selection_enter', -0.4313), ('selection_exit', -0.4297), ('idle_enter', -0.3661), ('idle_exit', -0.3661), ('idle_enter', -0.2394), ('idle_exit', -0.2394), ('selection_enter', -0.2152), ('selection_exit', -0.2136), ('idle_enter', -0.1661), ('idle_exit', -0.1661), ('idle_enter', -0.0201), ('idle_exit', -0.0201), ('selection_enter', 0.0032), ('selection_exit', 0.0566), ('idle_enter', 0.0767), ('idle_exit', 0.0767)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:710: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.311 s after the key (bound 0.3 s, load 1.00 0.84 0.46); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.027333931997418404 is not None and 0.31142470199847594 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 8.58s
+exit=1
+=== PROBE_RUN=3
+ 12:04:04 up 2 days, 20:52,  2 users,  load average: 1.00, 0.84, 0.46
+[DEBUG-i9b102] events [('selection_enter', -0.6358), ('selection_exit', -0.6341), ('idle_enter', -0.4548), ('idle_exit', -0.4546), ('selection_enter', -0.4103), ('selection_exit', -0.4087), ('idle_enter', -0.3921), ('idle_exit', -0.3921), ('idle_enter', -0.2727), ('idle_exit', -0.2727), ('selection_enter', -0.2032), ('selection_exit', -0.2016), ('idle_enter', -0.1898), ('idle_exit', -0.1898), ('idle_enter', -0.0653), ('idle_exit', -0.0653), ('selection_enter', 0.0032), ('selection_exit', 0.0564), ('idle_enter', 0.0764), ('idle_exit', 0.0764)]
+F
+=================================== FAILURES ===================================
+_ test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs _
+tests/probe_w.py:710: in test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+    assert took is not None and after <= timing_bound(0.3), (
+E   AssertionError: idle look 0.311 s after the key (bound 0.3 s, load 1.00 0.85 0.46); top border '╭─ STAGING SHEET ──────────────────────────────────────────────────────────────────────────────────────────────╮', corner #91abec
+E   assert (0.02807917501195334 is not None and 0.31081705598626286 <= 0.3)
+E    +  where 0.3 = timing_bound(0.3)
+=========================== short test summary info ============================
+FAILED tests/probe_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs
+1 failed in 8.57s
+exit=1

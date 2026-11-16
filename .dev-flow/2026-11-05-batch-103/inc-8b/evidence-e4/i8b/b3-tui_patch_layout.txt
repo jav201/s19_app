@@ -1,0 +1,10 @@
+# tree: base @ 48af05ff
+# uptime:  00:52:37 up 2 days,  9:41,  3 users,  load average: 8.81, 6.51, 4.25
+s19_app.__file__ = ~/work/zq-e4-8b-i8b/base/s19_app/__init__.py
+# pytest -n 2 -q tests/test_tui_patch_layout.py
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 28.45s
+# exit=0
