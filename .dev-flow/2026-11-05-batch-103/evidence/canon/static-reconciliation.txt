@@ -1,0 +1,2 @@
+static canon reconciliation: 747 final ids, 739 active, 8 withdrawn
+duplicates=[]; malformed=['R-TUI-068.2', 'R-MAC-050', 'R-VAL-033', 'R-CMP-005.9', 'R-CMP-004.12', 'R-BEFORE-AFTER-REPORT-001.16', 'R-BEFORE-AFTER-REPORT-001.22', 'R-BEFORE-AFTER-REPORT-001.29', 'R-FLOW-EXT.1']; mismatches=[]

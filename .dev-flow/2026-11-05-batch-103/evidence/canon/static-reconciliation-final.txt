@@ -1,0 +1,3 @@
+static canon reconciliation: 747 final ids, 739 active, 8 withdrawn
+duplicates=[]; batch_malformed=[]; mismatches=[]
+outside_batch_literal_pipe_rows=9 (pre-existing; not edited)
