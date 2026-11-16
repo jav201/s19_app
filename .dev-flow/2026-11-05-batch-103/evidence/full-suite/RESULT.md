@@ -2,7 +2,8 @@
 
 **CURRENT STATE: BLOCKED — SSH connectivity to the registered hosts; there is no suite verdict.**
 
-- The central backup exists. The distributed runner is prepared for eight chunks on two hosts, four per host, but its self-test and the suite execution are **not run**.
+- The central backup exists. The distributed runner is prepared for eight chunks on two hosts, four per host, but its self-test and the suite execution are **not run** because of SSH connectivity.
+- **Review page: PREPARADA — [g3-review.html](../review/g3-review.html).** The integrated review lane preserves its verified 39/39 browser checks. This page does not change the gate verdict: G3 remains **BLOCKED**, AT-I1b-8 remains **not_run**, and **approve is blocked** on the page.
 - No claim is made that an earlier runner process remains alive or has terminated. No host endpoint is copied into this record.
 - The initial batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. The corrected full trace is `g3-batch-trace-final.txt`: **0 gaps**, with exit status 0. G3 is still not closed because the suite remains blocked.
 - No product or test file changed for this integration. No local pytest, dynamic runner self-test, app or clipboard access was performed.
