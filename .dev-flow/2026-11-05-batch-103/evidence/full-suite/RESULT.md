@@ -4,8 +4,18 @@
 
 - The central backup exists. The distributed runner is prepared for eight chunks on two hosts, four per host, but its self-test and the suite execution are **not run**.
 - No claim is made that an earlier runner process remains alive or has terminated. No host endpoint is copied into this record.
-- The new batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. There are no EVID or CANON gaps in that output. G3 is not closed.
+- The initial batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. The corrected full trace is `g3-batch-trace-final.txt`: **0 gaps**, with exit status 0. G3 is still not closed because the suite remains blocked.
 - No product or test file changed for this integration. No local pytest, dynamic runner self-test, app or clipboard access was performed.
+
+## G3 trace correction invocation
+
+The batch-end correction record is `g3-modular-fixes.md`. It maps the 23 SLICE paths from the first run to their modular/P3a origins and the stage-2 integration decision. The complete final invocation is:
+
+```text
+python -I -B "$HOME/.claude/skills/dev-flow/trace_check.py" --req .dev-flow/2026-11-05-batch-103/inc-*/01-requirements.md --base 0c3a6bd4674c3f2df90a7399898fc98429f5a200 --src s19_app --canon REQUIREMENTS.md --fixes .dev-flow/2026-11-05-batch-103/evidence/full-suite/g3-modular-fixes.md .dev-flow/2026-11-12-batch-modular/review/E5-slice-record.md .dev-flow/2026-11-05-batch-103/inc-7/evidence-remap/i7-remap-census-transcript.txt
+```
+
+The `--req` glob expands to the 15 increment requirement files. The first correction pass, archived as `g3-batch-trace-with-fixes.txt`, exited 1 with three additional `__init__.py` SLICE gaps. Their existing origin records were therefore added as the other two applicable `--fixes` inputs: `E5-slice-record.md` for the app and screens_directionb package initializers, and the Inc 7 remap census for the patch_editor initializer. The final real output is `g3-batch-trace-final.txt`; the initial 23-gap output remains unchanged as `g3-batch-trace.txt`.
 
 ---
 

@@ -1,0 +1,4 @@
+SLICE  s19_app/tui/app/__init__.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/__init__.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/patch_editor/__init__.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+trace_check: 14 US, 752 active requirements (10 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, CANON, 3 gap(s)
