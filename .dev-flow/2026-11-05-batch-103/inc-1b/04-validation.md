@@ -4,7 +4,7 @@ Batch 2026-11-05-batch-103, increment 1b. _Registro previo, conservado como cont
 
 **Cierre documental WinCI posterior.** La rama de integración es `b103-inc1b-close`, desde el cierre publicado `caae1bf9`. Commit y tree probado no se confunden: el árbol WinCI de la corrección P-001 fue `b2d6eb25`; los árboles de ejecutores de mutantes fueron `db4a8ebc` (run 43911226514) y `0271fe71` (run 43912736749). Este cierre añade tooling/workflows/evidencia y registros; no es otro árbol de producto probado ni una ejecución nueva de la suite.
 
-**Verdict: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25`: R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 is CLEARED after the historical residual was fixed; trace 0 gaps. P-005 is executed: GW-W01/W02/W03/W04 **4/4 KILLED**; final mutation total **71 KILLED / 1 SURVIVED equivalent / 1 BAD blocked by design**. AT-I1b-8 remains manual `not_run`; P-059 and the eight captures still await the operator's final verdict. This is not a full-release acceptance.
+**Verdict: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25`: R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 is CLEARED after the historical residual was fixed; trace 0 gaps. P-005 is executed: GW-W01/W02/W03/W04 **4/4 KILLED**; final mutation total **71 KILLED / 1 SURVIVED equivalent / 1 BAD blocked by design**. **P-059 and all eight captures are APPROVED by the operator** after review of the explorer and packet/captures («Aprobados.»). AT-I1b-8 remains manual `not_run`; this visual approval is not a full-release acceptance.
 
 _Superseded verdict (Z1, 22:37), historical pre-fix output:_ **Verdict: OPEN.** Reason: `redact_e5.py --check` on the then-current tree FAILED (residual 1: the synthetic payload `VISIBLE<NUL>SECRET-SUFFIX` in `evidence-e5/captures/capture_i1b_driver.py`, added after 53bd5fc8). The residual was subsequently cleared as recorded below. WinCI round #3 on `b2d6eb25` shows R-PASTE.13/101 0/10 and every gated node 0/10, the re-review is PASS-WITH-NOTES, the manifest check passes and the trace has 0 gaps. AT-I1b-8 and the captures remain pending the operator's final verdict.
 
@@ -34,6 +34,8 @@ The case ledger (`02-test-cases.md`) was updated in place with the executed WinC
 ## Operator decisions this record rests on
 
 The quit-dialog wording and the question variants were fixed by the operator's G2 round 2 verdict (`q3_body=B`, `q4_q=B`): `../evidence/G2/veredicto-b103-r2.json`. The captures below show that wording.
+
+**Final visual decision, P-059 only:** after reviewing the explorer and this packet/captures, the operator wrote «Aprobados.». This approves P-059 and all eight captures below. It does not execute or approve AT-I1b-8, whose six-step manual report is still absent.
 
 ## Real captures (HT-10)
 
@@ -88,7 +90,7 @@ Historical reading: the `files` count grew 295 -> 305 because close-out commit c
 - **RR-2** (LOW): no Linux test pins the `[t_start, t_end]` tick window; narrowing it is caught only on WinCI by the >= 10 ticks rule.
 - **RR-3** (LOW): `raise AssertionError(...) from None` in the R-PASTE.13/101 wrappers drops the original traceback (the message stays unique).
 - **RR-4** (LOW, records): `steps.log` entries of 2026-11-13 06:31 and 06:32 say `files=304`; the committed tree reports `files=295` (the earlier count included untracked files). Correction by this note only; `steps.log` is append-only and the lines are not edited (PP-06).
-- **P-004** (AT-I1b-8) remains manual and `not_run`; **P-059 and the captures await the operator's final verdict**. The canon fold and G3 batch-end gate remain separate. P-103 does not belong to Inc 1b.
+- **P-004** (AT-I1b-8) remains manual and `not_run`; **P-059 and all eight captures are APPROVED by the operator** («Aprobados.»). The canon fold and G3 batch-end gate remain separate. P-103 does not belong to Inc 1b.
 - **DF-06: CLEARED.** Orchestrator ruling (relevo-11, DF-04 a): the driver's tail was renamed to `HIDDEN-TAIL` with an in-file note (the refusal depends only on the NUL; the payload text appears in no capture or sidecar). Not an exception in `redact_e5.py`: that file is pinned in `evidence-e5/SHA256SUMS.txt`. Historical pre-fix FAIL above was followed by `REDACTION_CHECK PASS files=305 residual=0 exceptions=8`; `MANIFEST_VERIFY_RESULT PASS manifests=6 files=83`.
 
 ## Trace check

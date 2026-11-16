@@ -2,7 +2,7 @@
 
 Batch 2026-11-05-batch-103, increment 1b: copy from every view (US-103-01). _Previous close-out, historical:_ branch `b103-inc1b-push`, base `dc44b364`, tree `290d80ae` plus its records (relevo-9, P-003). **Documentary close:** branch `b103-inc1b-close` from published `caae1bf9`; the tested P-001 WinCI tree is `b2d6eb25`, while mutant executors ran at `db4a8ebc` and `0271fe71`. This documentary commit is not a newly tested product tree. The validation record is `04-validation.md`; the requirements, `01-requirements.md`; the cases and ledger, `02-test-cases.md`.
 
-**Status: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25` R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 CLEARED after the historical residual fix; trace 0 gaps. P-005 executed **4/4 KILLED**, bringing the final total to **71 KILLED / 1 equivalent SURVIVED / 1 BAD by design**. AT-I1b-8 stays manual `not_run`; P-059 and the 8 captures await the operator's final verdict. No full-release acceptance is declared.
+**Status: PASS-WITH-NOTES.** WinCI round #3 on `b2d6eb25` R-PASTE.13/101 0/10 and every gated node 0/10; re-review PASS-WITH-NOTES; DF-06 CLEARED after the historical residual fix; trace 0 gaps. P-005 executed **4/4 KILLED**, bringing the final total to **71 KILLED / 1 equivalent SURVIVED / 1 BAD by design**. **P-059 and all 8 captures are APPROVED by the operator** after review of the explorer and packet/captures («Aprobados.»). AT-I1b-8 stays manual `not_run`; no full-release acceptance is declared.
 
 ## 1. What changed
 
@@ -39,7 +39,7 @@ State words per `/dev-flow`: `executed`, `not-run`, `blocked`, `planned`.
 | Linux mutants | executed: 67 KILLED / 1 SURVIVED (equivalent) / 1 blocked, of 69 | `evidence-e5/mutants/VALIDATION.md` |
 | WinCI P-005 mutants | executed: **4/4 KILLED**; final total 71 KILLED / 1 equivalent SURVIVED / 1 BAD by design | `evidence-e5/mutants/VALIDATION.md`; runs 43911226514 and 43912736749 |
 | WinCI N=10 on `7804b500`, `3c064348`, `53bd5fc8` (N=9 valid) | executed; gated R-PASTE.14 nodes 0 failures in 29 valid runs; R-PASTE.13/101 failed 1/10, 2/10, 0/9 | `E5-winci-7804b500-n10.md`, `E5-winci-3c064348-n10.md`, `E5-winci-53bd5fc8-n10.md` |
-| Real captures, 4 surfaces x 2 sizes | executed: 8/8 `surface=ready`; operator verdict still pending | `evidence-e5/captures/*.png.txt` |
+| Real captures, 4 surfaces x 2 sizes | executed: 8/8 `surface=ready`; **operator APPROVED P-059 and all 8 captures** («Aprobados.») | `evidence-e5/captures/*.png.txt` |
 | WinCI round #2, `53bd5fc8` N=10 | executed; R-PASTE.13/101 2/10 (43548702062, 43548712365), every other gated node 0/10; RR-1 confirmed (H5) | `E5-winci-53bd5fc8-n10-2.md` |
 | WinCI round #3, `b2d6eb25` N=10 (post-fix) | executed; **R-PASTE.13/101 0/10**, every gated node 0/10, 10/10 PASS 108/108; `notice_wait_s` 0.0 to 0.093 s | `E5-winci-b2d6eb25-n10.md` |
 | P-101 re-review | executed: PASS-WITH-NOTES, no HIGH; RR-1 MEDIUM fixed, RR-2..RR-4 LOW open | `E5-rereview-final.md` |
@@ -60,7 +60,7 @@ State words per `/dev-flow`: `executed`, `not-run`, `blocked`, `planned`.
 
 ## 6. Pending items
 
-- **P-004** (AT-I1b-8, the operator's) remains manual `not_run`. **P-059 and the 8 captures await the operator's final verdict.** Canon fold and the separate G3 batch-end gate remain pending; no full-release acceptance is declared.
+- **P-004** (AT-I1b-8, the operator's) remains manual `not_run`. **P-059 and all 8 captures are APPROVED by the operator** («Aprobados.») after review of the explorer and packet/captures. Canon fold and the separate G3 batch-end gate remain pending; no full-release acceptance is declared.
 - **P-005 is closed as executed**: 4/4 KILLED. GC-C14 remains BAD/blocked by design, and GA-A11 remains an equivalent SURVIVED.
 - **P-001**: cause found (H5), fixed in `b2d6eb25`, diagnosed pre-fix 2/10 and post-fix 0/10; conservative partial/intermittent status is retained.
 - **RR-2** (LOW): no Linux test pins the `[t_start, t_end]` tick window. **RR-3** (LOW): `from None` drops the traceback. **RR-4** (LOW, records): `steps.log` 06:31 and 06:32 say `files=304`, the tree says 295; `steps.log` is append-only, corrected by the note in `04-validation.md`.
@@ -68,4 +68,4 @@ State words per `/dev-flow`: `executed`, `not-run`, `blocked`, `planned`.
 
 ## 7. Suggested next task
 
-Obtain the operator's AT-I1b-8 result (P-004) and final P-059/capture verdicts, then complete the canon fold and evaluate the separate G3 batch-end gate. Do not treat the documentary WinCI close or the mutant total as full-release acceptance.
+Obtain only the operator's six-step manual AT-I1b-8 acceptance (P-004), which remains `not_run`; after that acceptance, evaluate the separate G3 batch-end gate. Do not start G3 as part of this P-059 visual approval.
