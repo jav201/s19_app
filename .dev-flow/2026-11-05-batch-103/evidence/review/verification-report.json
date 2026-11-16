@@ -1,0 +1,299 @@
+{
+  "schema": "s19.batch103.g3-browser-verification.v1",
+  "page": "g3-review.html",
+  "commit": "bd9a51153390b8e9430c332490bcd40e09eaa7a7",
+  "browser": "headless browser-automation / patchright",
+  "result": "PASS",
+  "checks": [
+    {
+      "name": "controles accesibles presentes",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "title",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "body renderizado",
+      "result": "PASS",
+      "detail": {
+        "bodyChars": 9437
+      }
+    },
+    {
+      "name": "cabecera BLOCKED",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "commit completo",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "sin declaración de release",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "ocho capturas",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "imágenes cargadas y embebidas",
+      "result": "PASS",
+      "detail": [
+        {
+          "complete": true,
+          "naturalWidth": 1111,
+          "naturalHeight": 1091,
+          "size": "118x54",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 2029,
+          "naturalHeight": 1205,
+          "size": "220x60",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 1111,
+          "naturalHeight": 1091,
+          "size": "118x54",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 2029,
+          "naturalHeight": 1205,
+          "size": "220x60",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 1111,
+          "naturalHeight": 1091,
+          "size": "118x54",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 2029,
+          "naturalHeight": 1205,
+          "size": "220x60",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 1111,
+          "naturalHeight": 1091,
+          "size": "118x54",
+          "dataUri": true
+        },
+        {
+          "complete": true,
+          "naturalWidth": 2029,
+          "naturalHeight": 1205,
+          "size": "220x60",
+          "dataUri": true
+        }
+      ]
+    },
+    {
+      "name": "dimensiones naturales por geometría",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "siete anchors de navegación",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "todos los anchors resuelven",
+      "result": "PASS",
+      "detail": {
+        "missingAnchors": []
+      }
+    },
+    {
+      "name": "navegación por ancla",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "tres tabs",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "tab Mutantes visible",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "resultado 71/1/1 visible",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "teclado en tabs",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "métricas WinCI exactas",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "cuatro grupos de capturas abiertos",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "details se cierra",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "details se abre",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "checklist de seis pasos",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "checklist no altera AT",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "approve deshabilitado",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "explicación visible del bloqueo",
+      "result": "PASS",
+      "detail": {
+        "blockReason": "Por qué approve está bloqueado: faltan una ejecución completa de full-suite (incluido el self-test del runner distribuido) y el resultado manual 6/6 de AT-I1b-8. Marcar el checklist visual no cambia ninguna de esas evidencias."
+      }
+    },
+    {
+      "name": "sin overflow horizontal desktop",
+      "result": "PASS",
+      "detail": {
+        "scrollWidth": 1440,
+        "innerWidth": 1440
+      }
+    },
+    {
+      "name": "sin overflow horizontal móvil",
+      "result": "PASS",
+      "detail": {
+        "scrollWidth": 390,
+        "innerWidth": 390
+      }
+    },
+    {
+      "name": "galería móvil en una columna",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "nombre de descarga JSON",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "exportación request-changes real",
+      "result": "PASS",
+      "detail": {
+        "decision": "request-changes",
+        "notes": "Solicito ejecutar la full-suite y registrar AT-I1b-8 antes de reconsiderar G3."
+      }
+    },
+    {
+      "name": "JSON conserva bloqueos",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "estado de exportación visible",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "reload conserva ocho imágenes",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "reload no persiste notas ni checklist",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "approve sigue bloqueado tras reload",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "name": "print CSS legible y completo",
+      "result": "PASS",
+      "detail": {
+        "topbarPosition": "static",
+        "actionsDisplay": "none",
+        "hiddenPanelDisplay": "block",
+        "navDisplay": "none"
+      }
+    },
+    {
+      "name": "sin console.error",
+      "result": "PASS",
+      "detail": {
+        "consoleErrors": []
+      }
+    },
+    {
+      "name": "sin excepciones",
+      "result": "PASS",
+      "detail": {
+        "pageErrors": []
+      }
+    },
+    {
+      "name": "sin requests fallidos",
+      "result": "PASS",
+      "detail": {
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "sin red externa",
+      "result": "PASS",
+      "detail": {
+        "requestProtocols": [
+          "file:"
+        ]
+      }
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "request_failures": [],
+  "request_protocols": [
+    "file:"
+  ],
+  "screenshot": "g3-review-desktop.png",
+  "privacy": "Sin URLs, rutas personales, hosts, IPs ni cuentas en este reporte."
+}
