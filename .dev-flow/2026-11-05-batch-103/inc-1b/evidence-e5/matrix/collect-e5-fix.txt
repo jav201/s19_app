@@ -1,0 +1,33 @@
+s19_app.__file__ = [HOME]/work/b103-e5-matrix-0d4d4e7c/src-lf/s19_app/__init__.py
+textual.__version__ = 8.2.8
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance
+
+29 tests collected in 0.03s

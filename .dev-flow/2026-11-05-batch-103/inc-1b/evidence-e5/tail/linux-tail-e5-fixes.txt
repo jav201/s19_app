@@ -1,0 +1,9 @@
+<HOME>/Github/s19_app-b103-inc1b-integration/s19_app/__init__.py
+platform=linux python=3.12.7
+sha256 tests/test_b103_clipboard_tail.py cf597223d2c119cdbfe43d3a8bd8276e7375a324d96ffaee5cc678994ec2b5d9
+sha256 tests/support/b103_clipboard.py 0a663371c8f33deb7111dd30325901f186b9589fcf3ff5e1d124ae7d1d566005
+pytest=9.2.0 textual=8.2.8
+..........................ssss                                           [100%]
+=========================== short test summary info ============================
+SKIPPED [4] tests/test_b103_clipboard_tail.py:1201: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+26 passed, 4 skipped, 1 deselected in 269.46s (0:04:29)

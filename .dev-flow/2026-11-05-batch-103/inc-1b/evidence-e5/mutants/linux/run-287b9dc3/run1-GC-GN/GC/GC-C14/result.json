@@ -1,0 +1,12 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GC",
+  "id": "GC-C14",
+  "reason": "Pending external time plus worker/iteration cap with override/tail cardinality captured at the cap; a bare timeout is not a kill.",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_copy_07_4_direct_input_copy_notice",
+    "tests/test_b103_clipboard_tail.py::test_r_copy_07_3_hex_key_notice"
+  ],
+  "verdict": "BAD"
+}

@@ -1,0 +1,23 @@
+Done. Implemented `E4-brief-clipboard.md` exactly, touching only `s19_app/tui/os_clipboard_input.py`.
+
+## Changes
+
+**New `_copy_notice_text(text: str) -> str`** (pure helper, no I/O, no `s19_app` import):
+- Over-cap (`len > 65536`) → `Copied the first 65,536 characters to the clipboard (<N> in all).` with `<N = len(text):,>`.
+- Otherwise `<n> = count("\n") + 1`, minus one for a trailing `\n`; `Copied 1 line…` vs `Copied <n> lines…`.
+
+**Changed `_mirror_and_write_os_clipboard`**:
+- Preserves `original_text = text` across the await; derives `capped_text = original_text[:_CLIPBOARD_CAP_CHARS]` once.
+- **NUL refusal** immediately after cap, before any sink: zero base/writer/OSC 52/process/helper, one 6s warning `Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.`, one WARNING `OS clipboard copy refused; payload contains NUL`, both seeds untouched, no payload logged. Tests only `capped_text`, so NUL beyond the cap follows the normal path.
+- Non-NUL: exactly one unbound `App.copy_to_clipboard(app, capped_text)` (never the override), exactly one awaited `loop.run_in_executor(None, write_os_clipboard, capped_text)`.
+- `True` → exactly one `app.notify(_copy_notice_text(original_text), severity="information")` (original length supplies `<N>`). `False` → existing `_WRITE_FAIL_NOTIFICATION` 6s warning + existing WARNING only.
+- Docstrings updated with NUL refusal, base mirror, one executor write, success/cut/failure notices, all four box actions + group-A `S19TuiApp.copy_to_clipboard` as callers.
+
+## Checks (static only, per brief)
+
+- `python -m py_compile s19_app/tui/os_clipboard_input.py` → **OK**.
+- Forbidden-import check: only `from textual.app import App` (toolkit base) and `from s19_app.utils import _CONTROL_SCRUB`; no `s19_app.tui.app` / `.app` import. → **clean**.
+- Cardinality: exactly **1** `App.copy_to_clipboard(app, capped_text)` base call, **1** executor `write_os_clipboard` call, **1** `_copy_notice_text` call site, **3** disjoint `app.notify` arms (NUL / success / failure), **1** NUL guard `if "\x00" in capped_text:`.
+- Exact strings verified (em dash U+2014, no hyphen variant).
+
+No pytest/app/probe/clipboard runtime or `s19_app` import was performed, and nothing was committed. No deviation file was needed.

@@ -1,0 +1,378 @@
+{
+  "binary_files_skipped": [],
+  "control_canary_exceptions": [
+    {
+      "path": "matrix/contract_probe.py",
+      "reason": "executable mismatch/probe/gate controls",
+      "retained_canary_hits": 5,
+      "rules": {
+        "canary_suffix": 2,
+        "clipboard_content_canary": 1,
+        "standalone_secret": 2
+      }
+    },
+    {
+      "path": "quit/validate_routes.py",
+      "reason": "executable probe-redaction route control",
+      "retained_canary_hits": 2,
+      "rules": {
+        "canary_suffix": 2
+      }
+    },
+    {
+      "path": "legacy/redaction_runtime_probe.py",
+      "reason": "executable legacy redaction control",
+      "retained_canary_hits": 1,
+      "rules": {
+        "canary_suffix": 1
+      }
+    }
+  ],
+  "files_scanned": 298,
+  "known_absent_pass": true,
+  "known_present_self_census": {
+    "cases": 17,
+    "passed": 17
+  },
+  "modified_file_count": 102,
+  "modified_files": {
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A01/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A02/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A03/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A04/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A05/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A06/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A07/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A08/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A09/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A10/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A11/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A12/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A13/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A14/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A15/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/GA-A16/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GA/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q01/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q02/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q03/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q04/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q05/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q06/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q07/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q08/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q09/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q10/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q11/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q12/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q13/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q14/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/GQ-Q15/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GQ/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GT/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/GT/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run1-GA-GT-GQ/summary.json": {
+      "unix_home": 279
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C01/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C02/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C03/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C04/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C05/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C06/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C07/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C08/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C09/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C10/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C11/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C12/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C13/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C15/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C16/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C17/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C18/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C19/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C20/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/GC-C21/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GC/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N01/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N02/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N03/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N04/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N05/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N06/result.json": {
+      "unix_home": 3
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N07/result.json": {
+      "unix_home": 3
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N08/result.json": {
+      "unix_home": 3
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/GN-N09/result.json": {
+      "unix_home": 3
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/GN/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run1-GC-GN/summary.json": {
+      "unix_home": 237
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GN/GN/baseline-junit.xml": {
+      "pytest_temp_account": 9,
+      "unix_home": 28,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GN/GN/baseline-pytest.txt": {
+      "pytest_temp_account": 98,
+      "unix_home": 99
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GN/GN/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GT/GT/baseline-junit.xml": {
+      "pytest_temp_account": 9,
+      "unix_home": 28,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GT/GT/baseline-pytest.txt": {
+      "pytest_temp_account": 92,
+      "unix_home": 93
+    },
+    "mutants/linux/run-287b9dc3/run2-loaded-GT/GT/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/GN-N06/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/GN-N07/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/GN-N08/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/GN-N09/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/GN/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run3-GN/summary.json": {
+      "unix_home": 36
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T01/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T02/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T03/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T04/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T05/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T06/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T07/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/GT-T08/result.json": {
+      "unix_home": 9
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/baseline-junit.xml": {
+      "unix_home": 19,
+      "xml_hostname": 1
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/baseline-pytest.txt": {
+      "unix_home": 1
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/GT/baseline.json": {
+      "unix_home": 5
+    },
+    "mutants/linux/run-287b9dc3/run3-GT/summary.json": {
+      "unix_home": 72
+    }
+  },
+  "post_hits_outside_exceptions": {},
+  "pre_hits_outside_exceptions": {
+    "discovered_identity": 1670,
+    "pytest_temp_account": 208,
+    "unix_home": 1662,
+    "xml_hostname": 8
+  },
+  "redacted_non_applicable_patches": [
+    "integration-pre-ci.patch",
+    "matrix/integration-e5-fix.patch"
+  ],
+  "redaction_verdict": "PASS_WITH_DECLARED_CONTROL_EXCEPTIONS",
+  "redactor_exclusion": {
+    "path": "redact_e5.py",
+    "reason": "generic detector definitions are not rewritten or scanned as payload"
+  },
+  "replacement_count": 1878,
+  "retained_exception_hits": 8,
+  "schema": 1,
+  "scope": "evidence-e5 bytes; NUL-containing files skipped"
+}

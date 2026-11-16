@@ -1,0 +1,24 @@
+WINCI_GATE tests=142 passed=122 failed=1 errors=0 skipped=19 at_nodes=28
+ALLOWED_SKIP category=at-i1b-8-manual node=tests.test_b103_copy_paste_matrix::test_manual_windows_terminal_operator_acceptance
+VIOLATION PYTEST_EXIT code=1
+VIOLATION FAILURE node=tests.test_b103_clipboard_tail::test_e5_powershell_preserves_lf_and_emits_bom_free_readers
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_clipboard_tail::test_r_paste_13_101_held_row_copy_warns_within_bound
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_clipboard_tail::test_r_paste_14_101_view_key_write_stays_responsive
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_clipboard_tail::test_r_paste_14_102_view_right_write_stays_responsive
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_clipboard_tail::test_r_paste_14_103_row_right_write_stays_responsive
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2]
+VIOLATION DISALLOWED_SKIP node=tests.test_b103_copy_paste_matrix::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2]
+WINCI_GATE_RESULT FAIL violations=20 pytest_exit=1 gate_exit=1
+REAL_LINUX_JUNIT_NEGATIVE=PASS

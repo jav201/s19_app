@@ -1,0 +1,40 @@
+{
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GN",
+  "id": "GN-N08",
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GN/GN-N08/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GN/GN-N08/pre/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+      "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 180.119,
+    "nodes": {},
+    "parse_error": null,
+    "returncode": -15,
+    "timeout": true,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GN/GN-N08/pre/pytest.txt"
+  },
+  "reason": "pre target is not a complete green oracle: {'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0}",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+    "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+  ],
+  "verdict": "BAD"
+}

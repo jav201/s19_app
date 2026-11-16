@@ -1,0 +1,3095 @@
+s19_app.__file__ = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tree/s19_app/__init__.py
+platform = Linux-7.3.3-1-cachyos-x86_64-with-glibc2.44
+python = 3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+HOME = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/home
+TMPDIR = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp
+XDG_CONFIG_HOME = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/xdg-config
+XDG_DATA_HOME = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/xdg-data
+XDG_CACHE_HOME = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/xdg-cache
+LOCALAPPDATA = <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/local-app-data
+DISPLAY = None WAYLAND_DISPLAY = None
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 29 items
+
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] FAILED [  3%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [  6%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] FAILED [ 10%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 13%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] FAILED [ 17%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 20%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] FAILED [ 24%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 27%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] FAILED [ 31%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 34%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] FAILED [ 37%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 41%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] FAILED [ 44%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 48%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] FAILED [ 51%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 55%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] FAILED [ 58%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 62%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] FAILED [ 65%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 68%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] FAILED [ 72%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 75%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] FAILED [ 79%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 82%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] FAILED [ 86%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/2-T1-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 89%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] FAILED [ 93%]
+tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/4-T2-P2] SKIPPEDact on isolated WinCI; Linux has no
+permitted OS read)                                                       [ 96%]
+tests/test_b103_copy_paste_matrix.py::test_manual_windows_terminal_operator_acceptance SKIPPEDminal steps and choose to use his own clipboard;
+no agent access)                                                         [100%]
+
+=================================== FAILURES ===================================
+______________ test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel0')
+source = 1, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b9accc50>
+coro = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-1' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tree/t...  11                      01 3A                    |.       .:      |\n  -   0x000017F0  FF FF FF FF FF FF FF AA 0E ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel0')
+source = 1, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-1: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+E             
+E             + SEED-1b
+E             - 0x00000000                                                   |                |
+E             -   0x000017E0  11                      01 3A                    |.       .:      |
+E             -   0x000017F0  FF FF FF FF FF FF FF AA 0E
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel2')
+source = 1, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b7519950>
+coro = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-4786' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tre...  11                      01 3A                    |.       .:      |\n  -   0x000017F0  FF FF FF FF FF FF FF AA 0E ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel2')
+source = 1, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-1: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+E             
+E             + SEED-1b
+E             - 0x00000000                                                   |                |
+E             -   0x000017E0  11                      01 3A                    |.       .:      |
+E             -   0x000017F0  FF FF FF FF FF FF FF AA 0E
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel4')
+source = 2, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b88b4ed0>
+coro = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-9571' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tre... + SEED-1b\n  - Coverage: 6.68%\n  - Ranges: 11\n  - Errors: 2\n  - Warnings: 17\n  - Loader 0 err · ⚠4 OOO · Entry ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel4')
+source = 2, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-2: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'Coverage: 6.68%\nRanges: 11\nErrors: 2\nWarnings: 17\nLoader 0 err · ⚠4 OOO · Entry '
+E             
+E             + SEED-1b
+E             - Coverage: 6.68%
+E             - Ranges: 11
+E             - Errors: 2
+E             - Warnings: 17
+E             - Loader 0 err · ⚠4 OOO · Entry
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel6')
+source = 2, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b6500710>
+coro = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-14356' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr... + SEED-1b\n  - Coverage: 6.68%\n  - Ranges: 11\n  - Errors: 2\n  - Warnings: 17\n  - Loader 0 err · ⚠4 OOO · Entry ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel6')
+source = 2, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-2: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'Coverage: 6.68%\nRanges: 11\nErrors: 2\nWarnings: 17\nLoader 0 err · ⚠4 OOO · Entry '
+E             
+E             + SEED-1b
+E             - Coverage: 6.68%
+E             - Ranges: 11
+E             - Errors: 2
+E             - Warnings: 17
+E             - Loader 0 err · ⚠4 OOO · Entry
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel8')
+source = 3, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b8b6d690>
+coro = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-19141' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...----------------------------'\n  \n  + SEED-1b\n  - A2L summary lines 1-500 / 533\n  - -----------------------------")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel8')
+source = 3, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-3: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'A2L summary lines 1-500 / 533\n-----------------------------'
+E             
+E             + SEED-1b
+E             - A2L summary lines 1-500 / 533
+E             - -----------------------------
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel10')
+source = 3, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b8611050>
+coro = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-23924' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...----------------------------'\n  \n  + SEED-1b\n  - A2L summary lines 1-500 / 533\n  - -----------------------------")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel10')
+source = 3, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-3: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'A2L summary lines 1-500 / 533\n-----------------------------'
+E             
+E             + SEED-1b
+E             - A2L summary lines 1-500 / 533
+E             - -----------------------------
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel12')
+source = 4, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b667ed10>
+coro = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-28711' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr....M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'\n  \n  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING\n  + SEED-1b")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel12')
+source = 4, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-4: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E             
+E             - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+E             + SEED-1b
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel14')
+source = 4, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b70b1150>
+coro = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-33483' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr....M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'\n  \n  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING\n  + SEED-1b")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel14')
+source = 4, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-4: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+E             
+E             - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+E             + SEED-1b
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel16')
+source = 5, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b468e910>
+coro = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-38253' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...ntly captured source before paste\nassert 'SEED-1b' == 'Curve_ExternalAxis'\n  \n  - Curve_ExternalAxis\n  + SEED-1b")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel16')
+source = 5, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-5: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'Curve_ExternalAxis'
+E             
+E             - Curve_ExternalAxis
+E             + SEED-1b
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel18')
+source = 5, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b50d6410>
+coro = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-43023' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...ntly captured source before paste\nassert 'SEED-1b' == 'Curve_ExternalAxis'\n  \n  - Curve_ExternalAxis\n  + SEED-1b")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel18')
+source = 5, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-5: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == 'Curve_ExternalAxis'
+E             
+E             - Curve_ExternalAxis
+E             + SEED-1b
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel20')
+source = 6, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b5883790>
+coro = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-47793' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...hangeset",\\n  "version": "2.0",\\n\'\n  \n  + SEED-1b\n  -   "format": "s19app-changeset",\n  -   "version": "2.0",')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel20')
+source = 6, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-6: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '  "format": "s19app-changeset",\n  "version": "2.0",\n'
+E             
+E             + SEED-1b
+E             -   "format": "s19app-changeset",
+E             -   "version": "2.0",
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel22')
+source = 6, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b8119590>
+coro = <coroutine object _run_cell at 0x7f26b9683c40>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-52598' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...hangeset",\\n  "version": "2.0",\\n\'\n  \n  + SEED-1b\n  -   "format": "s19app-changeset",\n  -   "version": "2.0",')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel22')
+source = 6, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-6: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '  "format": "s19app-changeset",\n  "version": "2.0",\n'
+E             
+E             + SEED-1b
+E             -   "format": "s19app-changeset",
+E             -   "version": "2.0",
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel24')
+source = 7, target = 'T1', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b72bd550>
+coro = <coroutine object _run_cell at 0x7f26ba3dd8a0>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-57403' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...panel with their diagnostics.\n  - \n  - 2. Save a project (`^S` / `s`) to gather the loaded files into one project ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel24')
+source = 7, target = 'T1', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-7: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project '
+E             
+E             + SEED-1b
+E             - 1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.
+E             - 
+E             - 2. Save a project (`^S` / `s`) to gather the loaded files into one project
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+______________ test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] _______________
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel26')
+source = 7, target = 'T2', route = 'P1'
+
+    @pytest.mark.parametrize(
+        ("source", "target", "route"),
+        [
+            pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+            pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+            pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+            pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+            pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+            pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+            pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+            pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+            pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+            pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+            pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+            pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+            pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+            pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+            pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+            pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+            pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+            pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+            pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+            pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+            pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+            pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+            pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+            pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+            pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+            pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+            pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+            pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+        ],
+    )
+    def test_copy_paste_acceptance_cell(
+        tmp_path: Path, source: int, target: str, route: str
+    ) -> None:
+        _coverage_or_skip(route)
+>       asyncio.run(_run_cell(tmp_path, source, target, route))
+
+tests/test_b103_copy_paste_matrix.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(main, *, debug=None):
+        """Execute the coroutine and return the result.
+    
+        This function runs the passed coroutine, taking care of
+        managing the asyncio event loop and finalizing asynchronous
+        generators.
+    
+        This function cannot be called when another asyncio event loop is
+        running in the same thread.
+    
+        If debug is True, the event loop will be run in debug mode.
+    
+        This function always creates a new event loop and closes it at the end.
+        It should be used as a main entry point for asyncio programs, and should
+        ideally only be called once.
+    
+        Example:
+    
+            async def main():
+                await asyncio.sleep(1)
+                print('hello')
+    
+            asyncio.run(main())
+        """
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "asyncio.run() cannot be called from a running event loop")
+    
+        with Runner(debug=debug) as runner:
+>           return runner.run(main)
+                   ^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <asyncio.runners.Runner object at 0x7f26b6ae3b10>
+coro = <coroutine object _run_cell at 0x7f26b9683e20>
+
+    def run(self, coro, *, context=None):
+        """Run a coroutine inside the embedded event loop."""
+        if not coroutines.iscoroutine(coro):
+            raise ValueError("a coroutine was expected, got {!r}".format(coro))
+    
+        if events._get_running_loop() is not None:
+            # fail fast with short traceback
+            raise RuntimeError(
+                "Runner.run() cannot be called from a running event loop")
+    
+        self._lazy_init()
+    
+        if context is None:
+            context = self._context
+        task = self._loop.create_task(coro, context=context)
+    
+        if (threading.current_thread() is threading.main_thread()
+            and signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        ):
+            sigint_handler = functools.partial(self._on_sigint, main_task=task)
+            try:
+                signal.signal(signal.SIGINT, sigint_handler)
+            except ValueError:
+                # `signal.signal` may throw if `threading.main_thread` does
+                # not support signals (e.g. embedded interpreter with signals
+                # not registered - see gh-91880)
+                sigint_handler = None
+        else:
+            sigint_handler = None
+    
+        self._interrupt_count = 0
+        try:
+>           return self._loop.run_until_complete(task)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+future = <Task finished name='Task-62304' coro=<_run_cell() done, defined at <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tr...panel with their diagnostics.\n  - \n  - 2. Save a project (`^S` / `s`) to gather the loaded files into one project ")>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('<HOME>/work/b103-inc1b-e4-matrix-cq9kSP/tmp/pytest-of-<USER>/pytest-11/test_copy_paste_acceptance_cel26')
+source = 7, target = 'T2', route = 'P1'
+
+    async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
+        from s19_app.tui.app import S19TuiApp
+        from textual import events
+        from textual.app import App
+    
+        root = Path(__file__).resolve().parents[1]
+        examples = root / "examples" / "case_00_public"
+        _check_model_oracles(examples)
+        if _is_winci():
+            _seed_os_clipboard()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await _settle(pilot)
+            await _load_census(app, pilot, examples)
+            App.copy_to_clipboard(app, SEED)
+            expected, source_widget, offset = await _arm_source(app, pilot, source)
+            before = list(app._notifications)
+            await _right_click(app, pilot, source_widget, offset)
+            if source == 7:
+                await pilot.press("escape")
+                await _settle(pilot)
+            if _is_winci():
+                _assert_copy_notice(app, before, expected)
+>           assert app.clipboard == expected, (
+                f"AT-I1b-{source}: right-click copy must replace the app seed with "
+                "the independently captured source before paste"
+            )
+E           AssertionError: AT-I1b-7: right-click copy must replace the app seed with the independently captured source before paste
+E           assert 'SEED-1b' == '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project '
+E             
+E             + SEED-1b
+E             - 1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.
+E             - 
+E             - 2. Save a project (`^S` / `s`) to gather the loaded files into one project
+
+tests/test_b103_copy_paste_matrix.py:386: AssertionError
+- generated xml file: <HOME>/work/b103-inc1b-e4-matrix-cq9kSP/evidence/red-junit.xml -
+=========================== short test summary info ============================
+SKIPPED [14] tests/test_b103_copy_paste_matrix.py:33: not_run: terminal paste requires the real copy->separate OS read artifact on isolated WinCI; Linux has no permitted OS read
+SKIPPED [1] tests/test_b103_copy_paste_matrix.py:454: AT-I1b-8 manual not_run: only the operator may run the six Windows Terminal steps and choose to use his own clipboard; no agent access
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/1-T1-P1] - AssertionError: AT-I1b-1: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+  
+  + SEED-1b
+  - 0x00000000                                                   |                |
+  -   0x000017E0  11                      01 3A                    |.       .:      |
+  -   0x000017F0  FF FF FF FF FF FF FF AA 0E
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-1/3-T2-P1] - AssertionError: AT-I1b-1: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA 0E '
+  
+  + SEED-1b
+  - 0x00000000                                                   |                |
+  -   0x000017E0  11                      01 3A                    |.       .:      |
+  -   0x000017F0  FF FF FF FF FF FF FF AA 0E
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/1-T1-P1] - AssertionError: AT-I1b-2: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'Coverage: 6.68%\nRanges: 11\nErrors: 2\nWarnings: 17\nLoader 0 err · ⚠4 OOO · Entry '
+  
+  + SEED-1b
+  - Coverage: 6.68%
+  - Ranges: 11
+  - Errors: 2
+  - Warnings: 17
+  - Loader 0 err · ⚠4 OOO · Entry
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-2/3-T2-P1] - AssertionError: AT-I1b-2: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'Coverage: 6.68%\nRanges: 11\nErrors: 2\nWarnings: 17\nLoader 0 err · ⚠4 OOO · Entry '
+  
+  + SEED-1b
+  - Coverage: 6.68%
+  - Ranges: 11
+  - Errors: 2
+  - Warnings: 17
+  - Loader 0 err · ⚠4 OOO · Entry
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/1-T1-P1] - AssertionError: AT-I1b-3: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'A2L summary lines 1-500 / 533\n-----------------------------'
+  
+  + SEED-1b
+  - A2L summary lines 1-500 / 533
+  - -----------------------------
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-3/3-T2-P1] - AssertionError: AT-I1b-3: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'A2L summary lines 1-500 / 533\n-----------------------------'
+  
+  + SEED-1b
+  - A2L summary lines 1-500 / 533
+  - -----------------------------
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/1-T1-P1] - AssertionError: AT-I1b-4: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+  + SEED-1b
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-4/3-T2-P1] - AssertionError: AT-I1b-4: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING'
+  
+  - ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING
+  + SEED-1b
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/1-T1-P1] - AssertionError: AT-I1b-5: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'Curve_ExternalAxis'
+  
+  - Curve_ExternalAxis
+  + SEED-1b
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-5/3-T2-P1] - AssertionError: AT-I1b-5: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == 'Curve_ExternalAxis'
+  
+  - Curve_ExternalAxis
+  + SEED-1b
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/1-T1-P1] - AssertionError: AT-I1b-6: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '  "format": "s19app-changeset",\n  "version": "2.0",\n'
+  
+  + SEED-1b
+  -   "format": "s19app-changeset",
+  -   "version": "2.0",
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-6/3-T2-P1] - AssertionError: AT-I1b-6: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '  "format": "s19app-changeset",\n  "version": "2.0",\n'
+  
+  + SEED-1b
+  -   "format": "s19app-changeset",
+  -   "version": "2.0",
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/1-T1-P1] - AssertionError: AT-I1b-7: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project '
+  
+  + SEED-1b
+  - 1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.
+  - 
+  - 2. Save a project (`^S` / `s`) to gather the loaded files into one project
+FAILED tests/test_b103_copy_paste_matrix.py::test_copy_paste_acceptance_cell[AT-I1b-7/3-T2-P1] - AssertionError: AT-I1b-7: right-click copy must replace the app seed with the independently captured source before paste
+assert 'SEED-1b' == '1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.\n\n2. Save a project (`^S` / `s`) to gather the loaded files into one project '
+  
+  + SEED-1b
+  - 1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.
+  - 
+  - 2. Save a project (`^S` / `s`) to gather the loaded files into one project
+================== 14 failed, 15 skipped in 196.31s (0:03:16) ==================
+
+POST_RUN_HEAD=c062293be6c122ecceca5701ea8afd0c6700f008
+POST_RUN_STATUS:
+?? tests/test_b103_copy_paste_matrix.py
+PYTEST_EXIT=1

@@ -1,0 +1,2245 @@
+{
+  "nodes": [
+    {
+      "name": "S19TuiApp.copy_to_clipboard",
+      "reqs": [
+        "R-COPY.1",
+        "R-COPY.2",
+        "R-COPY.6",
+        "R-COPY.7",
+        "R-COPY.8",
+        "R-COPY.9",
+        "R-COPY.10",
+        "R-COPY.16",
+        "R-COPY.20",
+        "R-PASTE.9",
+        "R-PASTE.10",
+        "R-PASTE.13",
+        "R-PASTE.14",
+        "R-TUI-043.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str text (original,",
+          "name": "untruncated)",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None after one started clipboard worker per non-empty copy; textual.actions.SkipAction for an empty",
+        "names": [
+          "string"
+        ],
+        "raw": "None after one started clipboard worker per non-empty copy; textual.actions.SkipAction for an empty string"
+      },
+      "func": "**new override.** Keep the toolkit method's synchronous signature and bind the real exception with `from textual.actions import SkipAction`. If `text == \"\"`, execute `raise SkipAction` before constructing a coroutine or worker; do not return normally, because that would mark Ctrl+C handled and suppress N8. A missing import or resulting `NameError` is a RED implementation defect, not a SkipAction. Otherwise import and pass `_mirror_and_write_os_clipboard(self, text)` once to inherited `run_worker` with its default immediate start and non-exclusive behavior; do not await it. Return `None` after scheduling. Never call `super().copy_to_clipboard`, `App.copy_to_clipboard`, `write_os_clipboard` or `notify`, and never slice or sanitize `text`: C1 alone owns those effects, the original length and the consumed R-COPY.25 refusal. C1's explicit base-class call cannot re-enter this override.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.6/1 empty-screen-selection arm, R-COPY.16/1) idle, no session action, `screen.selections` present but `get_selected_text() == \"\"`; Ctrl+C → N1 raises `textual.actions.SkipAction` before coroutine/worker construction, the chain reaches N8 once and opens exactly one body-B N9; app and OS clipboards remain `SEED-1b` while it is open and after `n`, with zero workers/base calls/writes/OSC 52 requests/notices; replacing the raise with `return` consumes the action, opens zero dialogs and goes RED",
+        "(R-COPY.20/1 empty-screen-selection arm) the Workspace help modal is topmost and its present selection extracts `\"\"`; Ctrl+C → the same early `SkipAction`, zero workers/base calls/writes/OSC 52 requests/notices and unchanged seeds, while C4 stops before N8 so the original help remains the only modal and zero N9/second dialogs open",
+        "(R-COPY.1/1) three hex rows selected, Ctrl+C → `Screen.action_copy_text` calls this override once with exactly those three selected lines; C1's separate Windows read equals them",
+        "(R-COPY.1/2) the whole five-line `#ws_stats` selection, Ctrl+C → N1 receives exactly those five lines once and the separate Windows read equals them, not a whole-view substitute",
+        "(R-COPY.1/3) the selected `#a2l_tags_summary` lines, Ctrl+C → N1 receives the exact summary selection once and the separate Windows read equals it, including the painted `Page 1/1 | tags 1-118 / 118 …` line when selected",
+        "(R-COPY.1/4) two lines selected in `#a2l_detail_card`, Ctrl+C → N1 receives exactly those two detail-card lines once and the separate Windows read equals them, never the whole card or the highlighted row name",
+        "(R-COPY.1/6, R-COPY.20/1 selected arm) the first two lines selected in the Workspace help modal, Ctrl+C → N1 receives exactly those two lines once and the separate Windows read equals them; the original help stays open and zero N9/second dialogs appear",
+        "(R-COPY.2/2) right-click a three-row hex selection with matching press/release → app clipboard receives exactly the same three-line snapshot once",
+        "(R-COPY.2/4, R-COPY.7/8, R-PASTE.9/103) right-click A2L row 3 with the OS writer failing → app clipboard still receives exactly `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING`, the OS seed remains, no notice starts `Copied`, and exactly one 6-second warning says `Clipboard write failed — copied inside the app only.`; substituting a selection-right-click for this row-plus-failure arm is not equivalent coverage",
+        "(R-COPY.7/1, /2, /3) one row name → exactly one `Copied 1 line to the clipboard.`; five selected stats lines → exactly one `Copied 5 lines to the clipboard.`; three hex lines by Ctrl+C → exactly one `Copied 3 lines to the clipboard.`",
+        "(R-COPY.8/1, /2) JSON selection length `75,210`, copied by Ctrl+C and then by right-click → this override passes all 75,210 characters to C1; app clipboard, OSC 52 payload and separate OS read each equal only the first 65,536",
+        "(R-COPY.9/1, /2) the same two copies → exactly one `Copied the first 65,536 characters to the clipboard (75,210 in all).` per copy and no ordinary copy notice; pre-truncating in N1 would lose `75,210` and go RED",
+        "(R-COPY.10/1, /2, /3) Ctrl+C selection, right-click selection and right-click row → exactly one OSC 52 request per gesture, decoding to the copied text; calling `super()` here as well as C1 would make two and go RED",
+        "(R-PASTE.10/101, R-TUI-043.13/101) failing copy of `SECRET-COPY-43` → at least one WARNING naming the write failure, zero log records containing either that payload or its first 16 characters",
+        "(R-PASTE.13/101) third A2L row copied while another program holds the clipboard → warning within 2.5 s (CI timing bound 5.0 s), no success notice",
+        "(R-PASTE.14/101, /102, /103) held clipboard during Ctrl+C selection, right-click selection and right-click row → the synchronous override only schedules; a 50 ms screen timer is late by at most 100 ms per tick until each copy ends"
+      ],
+      "modify": [
+        {
+          "target": "[Data: clipboard copy requests] (append only for non-empty text)",
+          "assign": null
+        },
+        {
+          "target": "[Data: S19TuiApp session attributes] (unchanged by N1)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._right_click_text",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.12",
+        "R-COPY.13",
+        "R-COPY.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "x",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int y (top-screen cell, read on the not-forwarded",
+          "name": "press)",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str] text to copy; None means no clipboard",
+        "names": [
+          "action"
+        ],
+        "raw": "Optional[str] text to copy; None means no clipboard action"
+      },
+      "func": "**new read-only helper.** Resolve `widget, _ = self.screen.get_widget_at(x, y)` and read `self.screen.get_style_at(x, y).meta`, the compositor metadata Textual assigns to the forwarded mouse event (`textual/screen.py:714-724`, `:1940`). First return `None` when the clicked widget or an ancestor is an Inc 1a `OsClipboardInput` or `CappedTextArea` (import the latter; no app import back into either module), before reading any other selection or row name. For `#patch_json_view`, return its non-empty `selected_text`, else `None`. For `#a2l_tags_list` / `#mac_records_list`, require integer row/column metadata, `0 <= row < table.row_count`, `column >= 0` and `not meta.get(\"out_of_bounds\", False)` before resolving a row key or reading a cell. `out_of_bounds=True` is empty space and returns `None` even when the row number exists; headers, absent metadata and other empty space also return `None`. A2L obtains the key with `coordinate_to_cell_key((row, 0))`, normalizes `row_key.value` or the key itself, and returns the mapped tag's non-empty full `name` from `_a2l_row_key_to_tag`; column 0 is only a key lookup, never an assumption about the Tag column. For MAC, read `cell = table.get_row_at(row)[0]` and normalize with `painted = cell.plain if isinstance(cell, Text) else str(cell)`. Require one status-glyph-plus-space prefix actually emitted by `_populate_mac_datatable` (`app.py:21069-21073`), remove exactly that matched prefix once, and return the complete remaining `str`, including internal spaces; if no producer prefix matches or the remaining name is empty, return `None`. Never delete two arbitrary characters or add a tab. For any other widget, return `self.screen.get_selected_text()` only when that widget is a key in `self.screen.selections` and the result is non-empty; otherwise `None`. Never log, notify, move a cursor, clear a selection or write a clipboard here.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4/1) cursor on A2L row 1, right-click row 3 whose key maps to `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING` → that exact full name, one line, no glyph, no tab, independent of the old cursor",
+        "(R-COPY.4/3, shortened-cell control) cursor on row 2; right-click row 5, key `a2l:4` mapped to full name `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING` while painted Tag reads `· ASAM.M.S…STATUS_STRING` → the full mapped name, never the shortened cell, `a2l:4`, or row 2's name",
+        "(R-COPY.4/2) MAC row 3 Rich `Text` cell `⚠ Curve_ExternalAxis` → `.plain` yields `⚠ Curve_ExternalAxis`, removal of the exact producer prefix `⚠ ` yields the `str` `Curve_ExternalAxis`; no address cell, glyph, tab or currently highlighted row is used",
+        "(R-COPY.4/2 MAC long-name arm) a stored Rich `Text` cell whose `.plain` is `⚠ Curve External Axis With A Very Long Full Name`, deliberately longer than its painted column → exact `str` `Curve External Axis With A Very Long Full Name`, preserving every internal space with no glyph, truncation or arbitrary two-character slice; a non-`Text` cell follows the explicit `str(cell)` arm",
+        "(E3A-02 negative, R-COPY.13/5, R-COPY.14/5) for A2L row 3 and independently MAC row 3, use valid `row=2`, `column=0` but `out_of_bounds=True` → N2 returns `None` before key/cell resolution, N1/base/writer/OSC 52/notice counts are zero and both seeds remain unchanged",
+        "(E3A-02 positive control, R-COPY.4/1, /2) repeat each preceding fixture with the sole change `out_of_bounds=False` → N2 returns respectively the full A2L row-3 name and `Curve_ExternalAxis`, and a valid release produces one copy/write/OSC 52/notice",
+        "(R-COPY.12/1, /6) three selected hex rows → all three lines; a selection spanning `#ws_stats` and `#a2l_view`, right-click on `#a2l_view` → the whole two-view selection, not only the clicked widget's part",
+        "(R-COPY.12/3) two lines selected in `#a2l_detail_card`, button-3 press/release inside that selection → N2 returns exactly those two detail lines and the separate Windows read equals them, never the whole card, a row name or another view's selection",
+        "(R-COPY.12/4) two lines selected with Shift+Down in stock `#patch_json_view` → its own two selected lines; an empty JSON selection returns `None`",
+        "(R-COPY.12/5) two lines selected in the Workspace help dialog → those two lines from the top modal screen, not the window behind it",
+        "(R-COPY.13/4, R-COPY.14/4) three hex rows selected but right-click on unselected `#ws_stats` → `None`, both clipboards keep `SEED-1b`, zero notices; a global `get_selected_text()` without membership would wrongly copy the hex rows",
+        "(R-COPY.13/5, /6, R-COPY.14/5, /6) right-click A2L header (`row=-1`) or a table with zero rows → `None`, seed unchanged, zero notices",
+        "(R-COPY.13/1, /2, /3, R-COPY.14/1, /2, /3) empty hex view, empty JSON selection and empty help-window selection → `None`, no write and no notice",
+        "(E3-03, R-TUI-043.13/102) an A2L model name combining `[red]`, ESC, BEL, an OSC-52-looking sequence and LF, with no NUL, copied by valid right-click with `out_of_bounds=False` → N2 supplies that exact raw full name, not the U+FFFD painted projection; through consumed C1 the app clipboard, decoded OSC 52 and separate Windows read equal it exactly, base/writer/OSC 52 counts are `1/1/1` and exactly one notice says `Copied 2 lines to the clipboard.`; the forced-PowerShell arm uses a static `shell=False` command with payload on stdin only and absent from every argv, emits no extra terminal sequence, and logs neither the full name nor any payload prefix; do not sanitize markup or any representable C0 control",
+        "(E3A-24(c), R-COPY.7/7 cross-increment) an unrelated three-row hex selection exists while `abc` is selected in `#a2l_tags_filter_input`; right-click `abc` → this helper returns `None`, the box performs one direct-tail copy of `abc`, no hex text is copied, exactly one copy notice"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_event",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.11",
+        "R-COPY.12",
+        "R-COPY.13",
+        "R-COPY.14",
+        "R-COPY.15"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Event",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None; every event forwarded exactly",
+        "names": [
+          "once"
+        ],
+        "raw": "None; every event forwarded exactly once"
+      },
+      "func": "**new async override with one private transient candidate.** Initialize no other app/session attribute. `_right_gesture` is either `None` or one record containing `text`, `screen_offset`, `screen`, `widget` and `valid`. On every not-forwarded `events.MouseDown`, first clear any old candidate; a non-button-3 press leaves it cleared. On button 3 only, before any toolkit forwarding, capture `screen = self.screen`, the widget returned by `screen.get_widget_at(event.screen_x, event.screen_y)`, `screen_offset = event.screen_offset`, and `text = N2(event.screen_x, event.screen_y)`, storing one fresh candidate with `valid=True`; N2 retains its early text-box exclusion and returns either non-empty text or `None`. Do not call N1 on `MouseDown`. On every `events.MouseMove` with a candidate, if `event.screen_offset != candidate.screen_offset`, set only `valid=False`; never restore it on a later move, even to the original offset. On every not-forwarded `events.MouseUp`, first copy the candidate to a local and set `_right_gesture = None`, consuming it before any possible N1 call. Call N1 once only when `event.button == 3`, a candidate exists, `candidate.valid` is true, its text is non-empty, and the release has the same `screen_offset`, the identical current screen and the identical widget from `get_widget_at` at the release coordinates. Different offset/screen/widget, a `None` text, any invalidated drag, a replayed release and every forwarded release copy nothing. N3 does not stop/prevent events, synthesize clicks, await C1 or handle `Click`; every event path, including keys, pastes, forwarded events, invalid gestures and the path that calls N1, finishes with exactly one `await super().on_event(event)`. Back-to-back behavior is preserved because the press snapshots before its superclass forward and the matching release calls N1 before its own superclass forward clears the selection.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.12/7, R-COPY.15/1) three hex rows selected; button-3 `MouseDown` and `MouseUp` posted back-to-back with no pause and identical offset/screen/widget → press stores all three lines without copying, release consumes/clears the candidate then schedules exactly one N1/C1/base/writer/OSC 52/notice, and each event has exactly one superclass forward before the toolkit release clears the selection; copying on press or reading after release goes RED",
+        "(R-COPY.12/4, R-COPY.15/3) two JSON lines selected; matching press/release posted back-to-back → two lines captured before the stock TextArea press clears its selection, one copy on valid release, final `selected_text` empty",
+        "(R-COPY.12/2, R-COPY.15/2) five stats lines selected and right-clicked with matching press/release → five lines copied once, top-screen selection none after forwarding",
+        "(R-COPY.13/1, R-COPY.14/1) empty button-3 press/release → N2 stores `None`, zero N1 calls/notices/writes, but exactly one superclass forward per event so ordinary mouse behavior is not disabled",
+        "(R-COPY.4/1) matching button-3 press/release on row 3 → its name is snapshotted on press and copied once on release before the later click moves the highlight; copying `cursor_row` after forwarding would copy the wrong row in the discriminating row-2/row-5 case",
+        "(E3-01 right-drag selection negative) a previous selection contains `SECRET-SELECTION-MARKER`; button-3 press inside it, move to another cell, release there → the offset change makes `valid=False`, N1/tail/base/writer/OSC 52/notice counts are zero and both clipboard seeds remain unchanged; each mouse event is still forwarded exactly once",
+        "(E3-01 out-and-return negative) button-3 press at offset A, MouseMove to B and back to A, release at A → the first change permanently invalidates the candidate and returning does not revalidate it; zero N1/tail/base/writer/OSC 52/notices and both seeds remain",
+        "(E3-01 right-drag row negative) repeat the move-away/release arm on an otherwise valid A2L row and independently on a MAC row with `out_of_bounds=False` → no row name reaches N1 or any clipboard sink, both seeds remain and zero copy notices appear; the row fixture alone must not turn a drag into a click",
+        "(E3-01 context negative) with no intervening move, release at the captured offset but with a different resolved widget or on a different screen → the candidate is consumed/cleared and zero N1/copy effects occur; equality of offset alone is insufficient",
+        "(E3-01 reentry control) button-3 down at A followed by a second button-3 down at B replaces A's candidate; release at A consumes B without copying, then a fresh matching press/release at B copies B exactly once; a replayed or forwarded release finds no candidate and adds no N1/tail/base/writer/OSC 52/notice, while every event still delegates once",
+        "(R-COPY.11/1) left-drag over three hex rows without Ctrl+C → the initial non-button-3 down leaves no right candidate, moves and release cause zero N1/tail/base/writer/OSC 52/notices, both seeds remain and the selection is left for a later explicit copy",
+        "(R-COPY.11/3) F7 in `#patch_json_view` selects the document without any copy key → N3 takes only its one superclass route, N1/tail/base/writer/OSC 52/notice counts remain zero and both seeds remain unchanged"
+      ],
+      "modify": [
+        {
+          "target": "[Data: S19TuiApp._right_gesture] (replace, invalidate, consume or clear)",
+          "assign": null
+        },
+        {
+          "target": "[Data: clipboard copy requests] (append only for a valid non-empty release snapshot)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_CopyRowTable",
+      "reqs": [
+        "R-COPY.21",
+        "R-COPY.22"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable constructor arguments,",
+          "name": "unchanged",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "one shared row-copy table",
+        "names": [
+          "type"
+        ],
+        "raw": "one shared row-copy table type"
+      },
+      "func": "**new class.** Declare `_CopyRowTable(DataTable)` before `A2LTagTable`; N5 is its only new behavior. It adds no app/session state, selection handler, row-name policy or second A2L subclass. N2 owns name resolution; this class owns only non-left click behavior shared by A2L and MAC.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.21/1, R-COPY.22/1) `#a2l_tags_list` is an `A2LTagTable` and an instance of both `_CopyRowTable` and `DataTable`; its MRO contains exactly one DataTable chain",
+        "(R-COPY.21/2, R-COPY.22/2) `#mac_records_list` is a direct `_CopyRowTable`; both widgets therefore execute N5 while only A2L retains its `Measured`, `on_resize` and `_highlight_row` specializations"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_CopyRowTable.on_click",
+      "reqs": [
+        "R-COPY.11",
+        "R-COPY.21",
+        "R-COPY.22"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Click",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None; valid non-left in-bounds row cursor moved, toolkit default prevented; out-of-bounds click has no cursor/selection",
+        "names": [
+          "effect"
+        ],
+        "raw": "None; valid non-left in-bounds row cursor moved, toolkit default prevented; out-of-bounds click has no cursor/selection effect"
+      },
+      "func": "**new.** Read `meta = event.style.meta`. First, if `meta.get(\"out_of_bounds\", False)` is true, call `event.prevent_default()` and return without `move_cursor`: this is empty space even when its row number exists, and it produces no copy, cursor movement, `RowSelected` or hex jump on any button. For an in-bounds `event.button == 1`, return without preventing the default: Textual continues to `DataTable._on_click`, including its existing highlighted-row `RowSelected` and hex jump. For any other button, read integer `row` and `column` from `meta`; unless `0 <= row < self.row_count` and `column >= 0`, return without copying or special handling. On a valid row with `out_of_bounds=False` or no flag, call public `move_cursor(row=row, column=column, animate=True)` so `RowHighlighted` and cursor scrolling still occur, then `event.prevent_default()` before MRO dispatch can reach `DataTable._on_click`. Do not call `_post_selected_message`, `super()._on_click`, `event.stop`, or any app jump helper. `prevent_default`, not `stop`, is what suppresses the private toolkit default (`textual/message_pump.py:758-800`).",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E3A-02 negative, R-COPY.13/5, R-COPY.14/5, R-COPY.21/1, R-COPY.22/1) with A2L row 1 and independently MAC row 1 highlighted, click metadata for row 3 (`row=2`, `column=0`) with `out_of_bounds=True` → N5 prevents the default and returns, N1=0, both seeds unchanged, zero notices/writes/OSC 52, `cursor_row` and every relevant first painted hex line unchanged, and zero `RowSelected`; treating this padding as a valid row goes RED",
+        "(E3A-02 positive control, R-COPY.4/1, /2, R-COPY.21/1, /2, R-COPY.22/1, /2) repeat each fixture with the sole change `out_of_bounds=False` and a valid button-3 press/release → the clicked A2L/MAC row 3 highlights and copies its exact name once, while zero `RowSelected` and unchanged first painted hex lines prevent a jump",
+        "(R-COPY.21/1) A2L cursor on row 1, right-click row 5 with valid in-bounds metadata → `cursor_row == 4` and the detail card shows row 5's tag through unchanged `RowHighlighted`",
+        "(R-COPY.21/2) MAC right-click row 3 with valid in-bounds metadata → `cursor_row == 2`; the clicked row, not the previously highlighted row, is highlighted",
+        "(R-COPY.22/1) A2L row 3 already highlighted, main/A2L hex first painted lines recorded, right-click that row → zero `RowSelected`, both first painted lines unchanged; allowing `DataTable._on_click` would post on the highlight-click and jump",
+        "(R-COPY.22/2) MAC row 3 highlighted and right-clicked → zero `RowSelected`, MAC hex first painted line unchanged",
+        "(R-COPY.11/4) left-click A2L row 5 with valid in-bounds metadata → N5 does not prevent the toolkit route, row 5 highlights, zero copy requests and the OS seed remains; existing left-click selection/jump behavior is not removed"
+      ],
+      "modify": [
+        {
+          "target": "[Data: DataTable.cursor_coordinate] (replace only on valid non-left in-bounds row, unchanged when out_of_bounds=True)",
+          "assign": null
+        },
+        {
+          "target": "[Data: DataTable.RowSelected] (suppressed on valid non-left rows and all out-of-bounds clicks)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LTagTable",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.21",
+        "R-COPY.22",
+        "R-TUI-042a.5",
+        "R-TUI-042a.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "unchanged constructor and existing A2L",
+          "name": "methods/messages",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": null,
+        "names": [
+          "A2LTagTable(_CopyRowTable)"
+        ],
+        "raw": "A2LTagTable(_CopyRowTable)"
+      },
+      "func": "**changed class base only.** Was `A2LTagTable(DataTable)` at `app.py:1456`; now `A2LTagTable(_CopyRowTable)`. Keep nested `Measured`, `suppress_row_highlight`, `_highlight_row` and `on_resize` byte-for-byte behavior. Do not move N5 into this subclass and do not create another A2L DataTable subclass. N6 inherits N5; its own `on_resize` still wins at its MRO level and posts the same bubbling measurement message.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4/3) shortened A2L cell still resolves through C6's row-key map, so changing the base cannot regress copy to the painted abbreviation or internal key",
+        "(R-COPY.21/1, R-COPY.22/1) right-click row 5 invokes inherited N5: row 5 highlights and no hex jump occurs, with no duplicate `on_click` in `A2LTagTable`",
+        "(R-TUI-042a.5/6 regression) at 220×60 then 80×54, the same `A2LTagTable.on_resize` posts one `Measured` and the existing fit yields `✓ SYN_MA…LLL_END` within the visible Tag width; the new base adds no competing resize handler",
+        "(R-TUI-042a.6 regression) a hostile tag's painted cell remains the existing literal U+FFFD projection with zero markup spans/raw controls, while N2 copies the mapped full name rather than reparsing that painted cell"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._compose_screen_mac",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.21",
+        "R-COPY.22"
+      ],
+      "in": [
+        {
+          "kind": "untyped",
+          "type": null,
+          "name": "none",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Container screen; MAC table is",
+        "names": [
+          "_CopyRowTable"
+        ],
+        "raw": "Container screen; MAC table is _CopyRowTable"
+      },
+      "func": "**changed one construction.** At `app.py:8860`, replace `DataTable(id=\"mac_records_list\", zebra_stripes=True, cursor_type=\"row\")` with `_CopyRowTable` and the identical arguments. Every other widget, renderer, row key, column and jump helper stays unchanged. `_compose_screen_a2l` is not changed.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4/2) MAC screen mounts `#mac_records_list` as `_CopyRowTable`; right-click row 3 still reads `⚠ Curve_ExternalAxis` from the same producer and copies `Curve_ExternalAxis`",
+        "(R-COPY.21/2, R-COPY.22/2) right-click MAC row 3 highlights it through N5 while `#mac_hex_view` keeps its first painted line; no MAC-specific click subclass is introduced"
+      ],
+      "modify": [
+        {
+          "target": "[Data: MAC records table widget class]",
+          "assign": "replace"
+        },
+        {
+          "target": "[Data: MAC widget ids/columns] (unchanged)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_help_quit",
+      "reqs": [
+        "R-COPY.6",
+        "R-COPY.16",
+        "R-COPY.17",
+        "R-COPY.19",
+        "R-COPY.20",
+        "R-COPY.23",
+        "R-DLG.14",
+        "R-QUIT.8"
+      ],
+      "in": [
+        {
+          "kind": "untyped",
+          "type": null,
+          "name": "none",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "q directly with selection present or",
+          "name": "absent",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Ctrl+C only after focused copy and screen selection copy raised",
+          "name": "SkipAction",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None; one existing busy question or one new idle copy-quit screen pushed per reachable",
+        "names": [
+          "invocation"
+        ],
+        "raw": "None; one existing busy question or one new idle copy-quit screen pushed per reachable invocation"
+      },
+      "func": "**new override shared by the toolkit Ctrl+C fallback and N10's product q binding.** Do not call the base hint and do not inspect or copy selections: Ctrl+C reaching this method means no non-empty selected text, including N1's present-but-empty `SkipAction`, while q must ask with a selection present or absent. Read `run = self._running_session_action()`. If non-`None`, push the existing `_QuitQuestionScreen(_QUIT_TITLE, _QUIT_BODY.format(label=run.label), _QUIT_YES, _QUIT_NO)` with `self._answer_quit`. Otherwise push `_CopyQuitScreen(_QUIT_TITLE, _COPY_QUIT_BODY, _QUIT_YES, _QUIT_NO)` with the same callback. No extra priority binding and no explicit modal-stack branch: C4 prevents both q and Ctrl+C from reaching this action while a modal is open, keeping exactly one dialog. N9's subclass is covered by the existing `action_quit` isinstance guard. N10 leaves Ctrl+Q and palette Quit on `action_quit`, whose body is unchanged.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.6/3, R-COPY.16/3) A2L row 3 highlighted but no view/text selection, idle, Ctrl+C → one N9 dialog, zero copy calls; app and OS clipboards remain `SEED-1b` while it is open and after `n`",
+        "(R-COPY.6/1, /2, /4) independently arm `#search_button` focused with nothing selected, no widget focused, and an empty `#a2l_tags_filter_input`; each idle Ctrl+C opens exactly one body-B N9, and both app and OS clipboards equal `SEED-1b` at two independent observations, while the dialog is open and again after `n`, with zero copy workers/writes/OSC 52/notices",
+        "(R-COPY.16/1, /2, /4, /5, /6) focus on `#search_button`, no focus, empty filter, empty JSON selection, or non-empty `#patch_paste_text` with no selection → the same one N9 with exact G2 body B and no `Do you want to quit?` notice",
+        "(R-COPY.16/1 empty-screen-selection arm) `screen.selections` is present but extracts `\"\"` → N1's `SkipAction`, not a normal return, reaches this action once and opens the same single body-B N9 with both seeds unchanged before and after `n`",
+        "(R-COPY.16/1 geometry) at 118×54 and 220×60 body B `Quit the app? Nothing is selected to copy.` fits on one line, with `Quit (y)` and `Stay (n)` wholly painted, contained and operable; these are E4 measurement targets retained from historical G2 notes, not measurements or current-note claims; current G2 r2 has `notes={}` and an empty general note",
+        "(R-COPY.17/1) idle dialog answered `y` → `_answer_quit(True)` exits with return code 0 within 1 s; N8 itself does not exit before an answer",
+        "(R-COPY.19/1) held `Loading <name>` session action, nothing selected, Ctrl+C → existing busy question with `still working: Loading <name> — wait, or quit after it finishes`; zero `_CopyQuitScreen` instances",
+        "(R-COPY.23/1) idle, `#search_button` focused, nothing selected, q → N8 opens exactly one N9 with body B, zero immediate exits and zero busy questions; keeping `q → quit` would exit and go RED",
+        "(R-COPY.23/2) idle with three hex rows selected, q → the same one N9 without inspecting/copying the selection; a second q while N9 is open does not reach N8, so still one dialog, app running, `app.clipboard == \"SEED-1b\"`, zero copy notices",
+        "(R-QUIT.8/101) answer the Ctrl+C-opened busy question `y`, then release the held load → app remains running until the load completes, then exits 0 through unchanged C5",
+        "(R-COPY.20/1, /2, /3, /4) Ctrl+C with help, Load, N9 or the busy question on top, including a present-but-empty screen selection → C4 does not reach N8; original top screen remains, no second dialog is added and both clipboard seeds remain unchanged",
+        "(R-DLG.14/101) dialog census finds N9's construction in this shared reachable action with openers from Ctrl+C without selection and q while idle; current 21-dialog census plus N9 gives 22, with zero dialogs lacking an opener"
+      ],
+      "modify": [
+        {
+          "target": "[Data: App.screen_stack] (append on reachable idle/busy route)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_CopyQuitScreen",
+      "reqs": [
+        "R-COPY.16",
+        "R-COPY.17",
+        "R-COPY.18",
+        "R-COPY.23",
+        "R-DLG.1",
+        "R-DLG.2",
+        "R-DLG.6",
+        "R-DLG.9",
+        "R-DLG.11",
+        "R-DLG.12"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "title/body/yes/no strings supplied by",
+          "name": "N8",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "modal bool answer through inherited ConfirmQuestionScreen",
+        "names": [
+          "behavior"
+        ],
+        "raw": "modal bool answer through inherited ConfirmQuestionScreen behavior"
+      },
+      "func": "**new class beside `_QuitQuestionScreen`, with new module constant `_COPY_QUIT_BODY`.** Declare `_CopyQuitScreen(_QuitQuestionScreen)` with no methods. `_COPY_QUIT_BODY` is exactly `Quit the app? Nothing is selected to copy.` N8 constructs it with `_QUIT_TITLE`, that body, `_QUIT_YES`, `_QUIT_NO`. Inherit `AUTO_FOCUS = \"#confirm_no\"`, `PRIMARY_BUTTON = \"confirm_no\"`, `y/n/escape` bindings, plain-text `markup=False` labels, `Text` button labels and the one-answer `_dismissed` guard. Do not alter `_QuitQuestionScreen`, `ConfirmQuestionScreen` or the body of `action_quit`.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.16/1, R-COPY.23/1) top dialog has title `Quit?`, exact body B `Quit the app? Nothing is selected to copy.`, buttons `Quit (y)` and `Stay (n)`, no markup transformation and exactly one instance on the stack",
+        "(R-COPY.17/1, /2, /3) `y`, Tab then Enter on `Quit (y)`, and click on `Quit (y)` each dismiss `True` once and exit 0 within 1 s",
+        "(R-COPY.18/1) `#confirm_no` / `Stay (n)` carries `modal-confirm`; `#confirm_yes` / `Quit (y)` does not",
+        "(R-DLG.1/101, R-COPY.23/2) with N9 open, keys `1`, `2`, `/` and a second `q` leave the shown window and N9 unchanged and the app running; no key of the window behind acts and no second modal is stacked",
+        "(R-DLG.2/101) Escape dismisses `False`, restores focus to `#search_button`, leaves both seeded clipboards unchanged and keeps the app running",
+        "(R-DLG.6/101) opening N9 puts initial focus on `#confirm_no` / `Stay (n)`, not Quit",
+        "(R-DLG.9/101) click `Stay (n)` → main screen only, previous window and scroll unchanged, no clipboard or pending-quit side effect",
+        "(R-DLG.11/101) visible button labels are exactly `Quit (y)` and `Stay (n)`, each exposing its key",
+        "(R-DLG.12/101, /102) `n` presses Stay and closes without exiting; `y` presses Quit and exits 0; a repeated second answer is ignored by inherited `_dismissed`"
+      ],
+      "modify": [
+        {
+          "target": "[Data: _CopyQuitScreen._dismissed] (inherited, False then True once)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.BINDINGS",
+      "reqs": [
+        "R-COPY.23",
+        "R-COPY.24"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "existing S19TuiApp.BINDINGS and _build_palette_entries",
+          "name": "projection",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "q → help_quit; Ctrl+Q and palette Quit → quit; visible q Quit token",
+        "names": [
+          "unchanged"
+        ],
+        "raw": "q → help_quit; Ctrl+Q and palette Quit → quit; visible q Quit token unchanged"
+      },
+      "func": "**changed binding and its existing palette projection.** At `app.py:2902`, replace `('q', 'quit', 'Quit')` with `('q', 'help_quit', 'Quit')`; the key and description do not change, so the visible key-bar token remains `q Quit`. q now reaches N8 directly with a selection present or absent; the toolkit Ctrl+C fallback is unchanged. Ctrl+Q retains its inherited priority `quit` binding. Because `_build_palette_entries` currently turns each binding action into a same-action `PaletteEntry` (`app.py:10219-10229`), preserve palette Quit by projecting only this new `help_quit` entry to the existing `PaletteEntry(\"Quit\", \"quit\")` in that builder; do not append a duplicate Quit and do not let the palette inherit `help_quit`. This palette projection is part of N10, not another node. `action_quit` keeps its body and its Ctrl+Q/palette busy and idle branches.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.23/1) idle, nothing selected, q → N8 opens one body-B N9, app running, zero immediate exits; the old tuple would quit before confirmation",
+        "(R-COPY.23/2) idle with three hex rows selected, q then a second q → one N9 after each key, no selection copy, no added modal and `app.clipboard == \"SEED-1b\"`; either copying the selection or stacking/quitting on the second q goes RED",
+        "(R-COPY.24/1) idle, no dialog open, Ctrl+Q → unchanged `action_quit` exits with return code 0 within 1 s, zero N9 and zero busy questions; routing Ctrl+Q to N8 would instead ask and go RED",
+        "(R-COPY.24/2) idle, open palette and choose `Quit` → N10 supplies `PaletteEntry(\"Quit\", \"quit\")`, so unchanged `action_quit` exits 0 within 1 s with zero dialogs; propagating raw `help_quit` from BINDINGS would open N9 and go RED",
+        "(R-COPY.23 key-bar regression) after the tuple change, the visible token remains exactly `q Quit`; no additional palette command appears and the existing palette has one `Quit` entry whose action is `quit`",
+        "(R-QUIT.1 context, no new case) busy q reaches N8's existing busy question, while busy Ctrl+Q/palette Quit reaches the unchanged `action_quit` busy branch; neither route gains a new immediate-exit behavior"
+      ],
+      "modify": [
+        {
+          "target": "[Data: S19TuiApp.BINDINGS] (replace the q action only)",
+          "assign": null
+        },
+        {
+          "target": "[Data: palette Quit action] (preserve quit, one entry)",
+          "assign": null
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "Screen.action_copy_text / TextArea.action_copy / App.on_event",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "toolkit selection state and driver",
+          "name": "events",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "selected text to N1; events to focused/top",
+        "names": [
+          "screen"
+        ],
+        "raw": "selected text to N1; events to focused/top screen"
+      },
+      "func": "**unchanged context.** `Screen.action_copy_text` raises `SkipAction` only for `None` and otherwise calls `app.copy_to_clipboard` (`screen.py:985-991`); stock `TextArea.action_copy` does the same for non-empty selected text (`_text_area.py:2653-2659`). Therefore N1, not toolkit context, must raise `textual.actions.SkipAction` when the extracted value is `\"\"`. `Screen.selections` maps widgets to selections, and `get_selected_text` joins all parts (`screen.py:963-983`). `App.on_event` handles a not-forwarded `MouseDown` before `screen._forward_event` (`app.py:4073-4082`), which is why N3 snapshots on press and then always delegates; its matching release is also consumed before the superclass route.",
+      "module": "textual 8.2.8",
+      "examples": [
+        "(R-COPY.1/5) two JSON lines selected with Shift+Down, Ctrl+C → stock TextArea calls N1 with those two lines",
+        "(R-COPY.6/5) JSON has no selection → stock copy raises `SkipAction`; the fallback opens one body-B N9, no empty string is copied, and both app/OS seeds remain `SEED-1b` while the dialog is open and after `n`",
+        "(R-COPY.12/6) selection map contains `#ws_stats` and `#a2l_view` → `get_selected_text` returns both parts in order; N2 returns it only for a containing widget",
+        "(R-COPY.15/1, /3) after N3 forwards, toolkit release clears the screen selection and stock JSON press clears its own selection; no custom clearing code is needed"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput / CappedTextArea copy, cut and right-click",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "text-box selection/cut text and button-3",
+          "name": "press",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "direct C1 call or paste",
+        "names": [
+          "action"
+        ],
+        "raw": "direct C1 call or paste action"
+      },
+      "func": "**unchanged context.** Copy/cut actions call C1 directly (`os_clipboard_input.py:891-916`; `capped_text_area.py:242-308`). Their button-3 handlers stop only later bubbled handling (`os_clipboard_input.py:861-889`; `capped_text_area.py:310-335`); N3 has already seen the press, hence N2's upfront type/ancestor exclusion. These classes never call the N1 override.",
+      "module": "s19_app/tui/os_clipboard_input.py; s19_app/tui/capped_text_area.py",
+      "examples": [
+        "(R-COPY.7/4, /5, /6, /7) `abc` copy in single-line, `L1\\nL2\\nL3` copy in multi-line, `abc` cut, and right-click copy of selected `abc` → one direct C1 call and exactly one notice each (`1`, `3`, `1`, `1` lines respectively)",
+        "(E3A-24(c) negative) with a hex view selection also present, right-click the text box → N2 returns `None`; only the box's one copy or paste act occurs, never a second view copy"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "App.action_help_quit / Screen._modal_binding_chain",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Ctrl+C and non-priority product q binding",
+          "name": "resolution",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "active screen",
+          "name": "stack",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "fallback only when no modal truncates the",
+        "names": [
+          "chain"
+        ],
+        "raw": "fallback only when no modal truncates the chain"
+      },
+      "func": "**unchanged context.** App owns the non-priority `ctrl+c → help_quit` binding (`app.py:463`); its base body only paints the quit hint (`:3990-4002`) and is not called by N8. N10's product q binding is also non-priority. `_modal_binding_chain` cuts the chain at the last modal (`screen.py:448-455`), so an open dialog keeps both Ctrl+C and q away from the App fallback without a product priority binding or a second modal.",
+      "module": "textual 8.2.8",
+      "examples": [
+        "(R-COPY.20/1, /2) help or Load modal open, nothing selected, Ctrl+C → zero N8 calls, zero new dialogs and no notice",
+        "(R-COPY.20/3, /4) N9 or busy quit question open, second Ctrl+C → still exactly the original one dialog",
+        "(R-COPY.23/2) N9 open after idle q with a selection, second q → modal chain stops before N8; still one N9, app running and zero copy notices"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_QuitQuestionScreen / action_quit / _answer_quit / _exit_if_quit_pending",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[bool]",
+          "name": "answer",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "current session-action",
+          "name": "run",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "deferred or immediate exit; Stay leaves app",
+        "names": [
+          "running"
+        ],
+        "raw": "deferred or immediate exit; Stay leaves app running"
+      },
+      "func": "**unchanged context.** `_QuitQuestionScreen` makes Stay primary (`app.py:462-470`); `ConfirmQuestionScreen` supplies its bindings/focus/plain labels/answer guard (`screens.py:2254-2318`). After N10, `action_quit` remains the route for Ctrl+Q and palette Quit, not q; its body is unchanged: exit immediately when idle and use the busy question when a session action runs. Its isinstance stack guard also recognizes N9 (`app.py:23017-23035`). `_answer_quit` remains exactly the shared callback for N8 and the existing busy route: assign `_quit_pending = bool(quit)` and call `_exit_if_quit_pending`; that exits only when pending is true and no session action runs (`:23037-23045`).",
+      "module": "s19_app/tui/app.py; s19_app/tui/screens.py",
+      "examples": [
+        "(R-COPY.17/1) idle N9 answer `True` → pending true, no running action, immediate exit 0; `False`/`None` → pending false and no exit",
+        "(R-QUIT.8/101) busy answer `True` → pending true but no immediate exit while load runs; completion calls the same exit check and then exits 0",
+        "(O-1=B, R-COPY.23/1) idle q follows N10 → N8 and opens N9 instead of reaching `action_quit`; busy q follows N8 to the existing busy question, leaving R-QUIT.1 unchanged",
+        "(R-COPY.24/1, /2) idle Ctrl+Q and palette Quit both reach unchanged `action_quit` → exit 0 within 1 s, zero N9 and zero busy questions; their busy branch still uses the existing CTX-BUSY question"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._compose_screen_a2l / update_a2l_tags_view / _build_a2l_table_cells",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "enriched A2L tags and current visible",
+          "name": "page",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "unchanged A2LTagTable, row-key map and painted",
+        "names": [
+          "cells"
+        ],
+        "raw": "unchanged A2LTagTable, row-key map and painted cells"
+      },
+      "func": "**unchanged context.** `_compose_screen_a2l` already constructs `A2LTagTable` with its id/padding/fixed columns (`app.py:8764-8770`). `update_a2l_tags_view` stores `a2l:<absolute index> → tag` and adds the row under that key (`:21490-21507`). `_build_a2l_table_cells` puts Tag at column 2 and may shorten its painted name (`:21806-21809`, `:21835`). N2 therefore performs a key lookup at column 0 and reads the full mapped tag name, never a Tag-cell index or text.",
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4/3) key `a2l:4` and painted `· ASAM.M.S…STATUS_STRING` → copy the map's full `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING`; the abbreviated pixels are not the data model",
+        "(R-COPY.21/1) the same row key drives unchanged `on_data_table_row_highlighted` at `app.py:17167-17178`, so the card identifies row 5 after N5 moves the cursor"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "DataTable._on_click / S19TuiApp row handlers / _populate_mac_datatable",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Click metadata including out_of_bounds, RowSelected/RowHighlighted, MAC visible",
+          "name": "rows",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "cursor highlight versus explicit selection jump; MAC painted",
+        "names": [
+          "name"
+        ],
+        "raw": "cursor highlight versus explicit selection jump; MAC painted name"
+      },
+      "func": "**unchanged context.** Toolkit metadata marks horizontal row padding `out_of_bounds=True` even with an existing row (`_data_table.py:2350-2390`). Toolkit `_on_click` sets the clicked coordinate and posts `RowSelected` only when that coordinate was already highlighted (`_data_table.py:2694-2702`). App `on_data_table_row_selected` performs A2L/MAC hex jumps (`app.py:17089-17132`), while `on_data_table_row_highlighted` only updates the A2L card (`:17134-17178`). MAC producer writes column 0 as Rich `Text` containing glyph + space + full record name (`:21069-21073`) and keeps row key/address separately (`:21079-21090`); N2 therefore uses `.plain`/`str`, not a painted truncation.",
+      "module": "textual 8.2.8; s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.11/2) `down` three times in A2L moves only the highlight → zero N1 calls and OS clipboard remains seeded",
+        "(R-COPY.21/1, R-COPY.22/1) N5 produces `RowHighlighted` for the clicked in-bounds row but prevents `RowSelected`; detail card follows while both hex views keep their first painted rows",
+        "(E3A-02) `out_of_bounds=True` takes N2's `None` and N5's prevent/default-return route, while the sole flag change to `False` is the valid-row control",
+        "(R-COPY.4/2) producer cell `⚠ Curve_ExternalAxis`, row key `mac:2`, address metadata separate → `.plain` and exact prefix removal copy only `Curve_ExternalAxis`, never key or address"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_copy_notice_text",
+      "reqs": [
+        "R-COPY.7",
+        "R-COPY.9"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "notice_text"
+        ],
+        "raw": "str notice_text"
+      },
+      "func": "**new pure helper.** Take the original, uncapped copied text. Read no app/widget state and perform no I/O. If `len(text) > _CLIPBOARD_CAP_CHARS`, return exactly `Copied the first 65,536 characters to the clipboard (<N> in all).`, with `<N>` the original `len(text)` formatted by `:,`. Otherwise count `text.count(\"\\n\") + 1`, subtracting one when `text.endswith(\"\\n\")`; return `Copied 1 line to the clipboard.` for one line, else `Copied <n> lines to the clipboard.`. The over-cap branch takes precedence over line counting. Do not slice `text` inside this helper and never use a capped length for `<N>`.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-COPY.7/1) `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING` → exactly `Copied 1 line to the clipboard.`",
+        "(R-COPY.7/2) `s1\\ns2\\ns3\\ns4\\ns5` → exactly `Copied 5 lines to the clipboard.`",
+        "(R-COPY.7/5) `L1\\nL2\\nL3` and `L1\\nL2\\nL3\\n` → both exactly `Copied 3 lines to the clipboard.`, never four lines",
+        "(R-COPY.7/1 neg) singular rendered as `Copied 1 lines to the clipboard.` → exact-string assertion RED",
+        "(R-COPY.7/5 neg) counting the final LF without the exclusion → `Copied 4 lines to the clipboard.` → RED",
+        "(R-COPY.9/1) `J75210` → exactly `Copied the first 65,536 characters to the clipboard (75,210 in all).`",
+        "(R-COPY.9/1 boundary) `P65536` → `Copied 1 line to the clipboard.`; `P65537` → `Copied the first 65,536 characters to the clipboard (65,537 in all).`",
+        "(R-COPY.9/1 neg) passing `J75210[:65536]` as `text`, or formatting the capped length, → `(65,536 in all)` instead of `(75,210 in all)` → RED"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_mirror_and_write_os_clipboard",
+      "reqs": [
+        "R-COPY.1",
+        "R-COPY.2",
+        "R-COPY.4",
+        "R-COPY.7",
+        "R-COPY.8",
+        "R-COPY.9",
+        "R-COPY.10",
+        "R-COPY.12",
+        "R-COPY.25",
+        "R-PASTE.9",
+        "R-PASTE.10",
+        "R-PASTE.12",
+        "R-PASTE.13",
+        "R-PASTE.14",
+        "R-TUI-043.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "App",
+          "name": "app",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**changed.** Preserve `original_text = text` and therefore its original length for the entire call, including across the await. Derive one local `capped_text = original_text[:_CLIPBOARD_CAP_CHARS]`. Immediately after that derivation and before any base/writer/helper call, if `\"\\x00\" in capped_text`, make zero base/writer/OSC 52/process/helper calls, emit exactly one `app.notify(\"Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.\", severity=\"warning\", timeout=6.0)`, log exactly one fixed WARNING `OS clipboard copy refused; payload contains NUL`, and return. Emit no ordinary/cut success notice and leave both the app and OS clipboard seeds unchanged; never write a sanitized or truncated replacement. Test only `capped_text`, so NUL solely beyond the cap does not refuse. On the non-NUL path, make exactly one unbound base `App.copy_to_clipboard(app, capped_text)` call, retaining the existing DEBUG-only best-effort mirror failure behavior; then make exactly one default-executor `write_os_clipboard(capped_text)` call and await it. On `True`, call `_copy_notice_text(original_text)` and emit its one result as information; the original, not `capped_text`, supplies `<N>`, including when a discarded suffix contains NUL. On `False`, emit only `_WRITE_FAIL_NOTIFICATION` as a 6-second warning and retain the exact existing WARNING `OS clipboard write failed; retained Textual internal clipboard only`. Keep the writer's WARNING and its strategy/time budgets unchanged. Never log `original_text`, `capped_text`, a prefix, or an escaped representation of either. No direct writer call on the event-loop thread, no `app.copy_to_clipboard` dispatch, no second tail schedule, no notification before the non-NUL writer result, and no import from `app.py`. Do not sanitize or refuse any other C0 character, markup, ESC/BEL/OSC-like text, or LF. Update this function's docstring Data Flow/Dependencies to name the capped-NUL refusal, base mirror, one executor write, success/cut/failure notices, and all four box actions plus the group-A override as callers.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-COPY.1/1, R-COPY.2/1, R-COPY.7/3, R-COPY.10/1) WinCI, view `S3`, Ctrl+C → separate read and app clipboard equal `S3`; base/write/OSC 52 counts `1/1/1`; exactly one information `Copied 3 lines to the clipboard.`; override/tail counts `1/1`",
+        "(R-COPY.12/1, R-COPY.2/2, R-COPY.10/2) WinCI, the same `S3`, button-3 press and release posted back to back → the same clipboard, OSC 52, and one-notice result; the release cannot change the already captured payload",
+        "(R-COPY.12/6) WinCI, cross-view `S6`, right-click on the A2L part → separate read equals all of `S6`, including `stats_first` before `a2l_first`, one write and one notice; the clicked fragment alone is a failed oracle",
+        "(R-COPY.12/7) WinCI, `S3` captured before posting press/release with no pause → separate read still equals `S3`; app override 1, tail 1, writer 1",
+        "(R-COPY.4/1, R-COPY.7/1, R-COPY.10/3) WinCI, A2L row 3 while row 1 is highlighted → separate read/app clipboard/OSC 52 payload exactly `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING`, with no glyph or tab; one write and one `Copied 1 line to the clipboard.`",
+        "(R-COPY.4/2) WinCI, MAC row 3 → exactly `Curve_ExternalAxis`; (R-COPY.4/3) row 5 while row 2 is highlighted → row 5's full mapped tag, neither row 2's name nor a shortened painted cell",
+        "(E3-03, R-COPY.4 raw-name arm) WinCI, A2L model row `HOSTILE` with a deliberately different U+FFFD painted projection → app clipboard, decoded OSC 52, and separate read each equal the exact raw `HOSTILE`, including `[red]`, ESC/BEL/OSC-like text, and LF; base/write/OSC 52 counts `1/1/1`; exactly one information `Copied 2 lines to the clipboard.`; no additional terminal sequence and no raw/prefix/escaped payload in any log record",
+        "(E3-03, R-COPY.4 forced-PowerShell arm) WinCI, wrap the one tail writer call so it delegates to the unchanged writer with `strategies=((\"powershell\", _write_via_powershell),)` for the same `HOSTILE` → win32 strategy 0, PowerShell strategy/process 1, tail writer 1; argv is only the absolute system executable plus the existing static `_POWERSHELL_WRITE_COMMAND`, with no payload, and stdin is exactly `HOSTILE`; app clipboard, decoded OSC 52, and separate read equal `HOSTILE`; one two-line information notice, no extra terminal sequence, and no payload logs",
+        "(R-COPY.7/4) WinCI, single-line `abc`, Ctrl+C → base/write/OSC 52 `1/1/1`, exactly one information `Copied 1 line to the clipboard.`, override 0, box value and selection unchanged",
+        "(R-COPY.7/5) WinCI, multi-line `L1\\nL2\\nL3`, Ctrl+C → one write and exactly one information `Copied 3 lines to the clipboard.`, override 0, document unchanged",
+        "(R-COPY.7/6) WinCI, single-line `abc`, Ctrl+X → one write and one `Copied 1 line to the clipboard.`, box empty, override 0; repeat on `CappedTextArea` selection and line-cut routes → the same cardinality and one result notice per cut",
+        "(R-COPY.7/7) WinCI, single-line selected `abc`, Inc 1a right-click route → one tail entry, one write, one information notice; no group-A view copy and no second notice",
+        "(R-COPY.2/4, R-COPY.7/8, R-PASTE.9/101, R-PASTE.9/102, R-PASTE.9/103) Linux, clear notices then fail a view-key copy, a view-right-click copy, and a row-right-click copy in turn → per gesture app clipboard holds the copied text and OSC 52 count is 1, writer count is 1, `Copied…` count is 0, and exactly one warning says `Clipboard write failed — copied inside the app only.` with timeout `6.0`",
+        "(R-COPY.8/1, R-COPY.8/2, R-COPY.9/1, R-COPY.9/2) WinCI, `J75210` selected with F7 then copied by Ctrl+C, and separately by right-click → app clipboard, decoded OSC 52, and separate read each have length `65536` and equal `J75210[:65536]`; one write; exactly one information `Copied the first 65,536 characters to the clipboard (75,210 in all).`; zero ordinary copy notices",
+        "(R-COPY.8/1 boundary) `P65536` reaches base/writer uncut and produces the ordinary one-line notice; `P65537` reaches both as exactly 65,536 x characters and produces `(65,537 in all)`, proving `>` rather than `>=`",
+        "(R-COPY.9/1 failure arm) over-cap `J75210` with a failing writer → no cut or ordinary success notice, only the one existing failure warning; a cut notice is conditional on a successful capped write",
+        "(E3-02 view refusal) WinCI, seed app/OS with `SEED-APP-1b`/`SEED-OS-1b`, then copy `NUL3` from a view by Ctrl+C and separately by button 3, and from an A2L row by button 3 → per gesture override/tail `1/1`, base/writer/OSC 52/process/helper `0/0/0/0/0`, zero success notices, exactly one 6.0-second warning `Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.`, exactly one WARNING `OS clipboard copy refused; payload contains NUL`, both seeds intact, and no payload/prefix/escaped payload logged",
+        "(E3-02 direct-box refusal) Repeat independently for `OsClipboardInput` and `CappedTextArea`, selected `NUL3`, Ctrl+C, right-click copy, and Ctrl+X → per gesture override 0, tail 1, base/writer/OSC 52/process/helper 0, the same one fixed warning/WARNING, zero success, both seeds intact; copies preserve value/selection, while each local cut stays deleted and is not restored by refusal",
+        "(E3-02 after-cap boundary) WinCI, view and each direct box class copying `NUL_AFTER` → no refusal; base/write/OSC 52/helper counts `1/1/1/1`, app clipboard/decoded OSC 52/separate read each exactly `P65536`, zero refusal warnings, and exactly one information `Copied the first 65,536 characters to the clipboard (65,537 in all).`; checking `original_text` instead of `capped_text` makes this arm RED",
+        "(E3-02 mutation controls) Move the guard after the base or writer, call the helper, emit ordinary/cut success, sanitize NUL, or interpolate the payload into either fixed message → respectively nonzero sink counts/changed seeds, helper count 1, forbidden success, altered OS content, or exact-message/log-absence assertions go RED",
+        "(R-PASTE.9/1 regression) Linux, single-line and multi-line boxes, copy and cut with a non-empty selection in each class → each of the four gestures mirrors its exact selected text, calls the writer once, emits zero `Copied…` notices, and emits exactly one `Clipboard write failed — copied inside the app only.` warning with timeout `6.0`; each local cut stays deleted",
+        "(R-PASTE.12/1) Linux and WinCI, single-line and multi-line boxes holding `P70000`, Ctrl+C in each → app clipboard and decoded OSC 52 are each `P70000[:65536]`; one write and one information `Copied the first 65,536 characters to the clipboard (70,000 in all).` per copy",
+        "(R-PASTE.12/2) WinCI, the same two box copies → separate read is `P70000[:65536]` in each class, with the kept prefix independently asserted",
+        "(R-PASTE.12/3) Linux and WinCI, the same payload copied by each class's right-click route → app clipboard/OSC 52 and WinCI separate read are each capped identically; one write and one cut notice per copy",
+        "(R-COPY.7/6 over-cap arm) WinCI, `P70000`, Ctrl+X in each box class → local selection deleted, one write, and exactly one information `Copied the first 65,536 characters to the clipboard (70,000 in all).` per cut; no ordinary copy notice",
+        "(R-PASTE.10/101, R-TUI-043.13/101) Linux, copy `SECRET-COPY-43` with a failing writer → WARNING records include the exact tail line and the writer cascade line, while no record contains `SECRET-COPY-43` or its first 16 characters",
+        "(R-TUI-043.13/101 success arm) WinCI, DEBUG log capture during successful view-key, view-right-click, and row-right-click copies of `SECRET-COPY-43` → every route writes the exact payload once, and no log record contains the payload or its first 16 characters",
+        "(R-PASTE.13/101) WinCI, 8-second held clipboard, row-name copy → writer returns `False` and the one failure warning appears within `timing_bound(2.5)` seconds of the gesture (`5.0` seconds on CI); no success/cut notice and no extra retry/write",
+        "(R-PASTE.14/101, R-PASTE.14/102, R-PASTE.14/103) WinCI, held clipboard and a 50 ms timer during view-key, view-right-click, and row-right-click copies → writer runs off the event-loop thread and every tick until completion is late by at most `timing_bound(0.1)` seconds; one write/notice per gesture",
+        "(AT-I1b-6/2, cited R-PASTE.1) WinCI, right-click a two-line JSON selection, separately read the OS result, then post that text as one terminal `events.Paste` to empty single-line T1 → T1 contains exactly the selection's first line once, with no second line and no duplicated text; the tail's emitted OS artifact, not a direct helper injection, is the paste input"
+      ],
+      "modify": [
+        {
+          "target": "[Data: App._clipboard]",
+          "assign": "replace"
+        },
+        {
+          "target": "[I/O: terminal]",
+          "assign": "append"
+        },
+        {
+          "target": "[I/O: Windows clipboard]",
+          "assign": "replace"
+        },
+        {
+          "target": "[I/O: user notices]",
+          "assign": "append"
+        }
+      ],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "write_os_clipboard",
+      "reqs": [
+        "R-COPY.1",
+        "R-COPY.4",
+        "R-COPY.8",
+        "R-COPY.12",
+        "R-PASTE.9",
+        "R-PASTE.10",
+        "R-PASTE.12",
+        "R-PASTE.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[tuple[tuple[str, Callable[[str], bool]], ...]]",
+          "name": "strategies",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "written"
+        ],
+        "raw": "bool written"
+      },
+      "func": "**unchanged context.** Existing blocking cascade at `os_clipboard_input.py:638-695`: cap once, try ordered strategies, return `True` at first success, otherwise log the cascade WARNING and return `False`; no app mirror, notice, executor, or second public entry is added here. The tail is its only new caller path in this delta.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-COPY.8/1 neg) removing only the tail cap still leaves this writer's defensive cap, so the OS read can remain correct while app clipboard/OSC 52 wrongly hold `J75210`; those two independent surfaces must go RED",
+        "(R-PASTE.13/101 neg) retrying Win32 until the 8-second holder releases → warning at about 8 seconds, one held-clipboard timing assertion RED"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput.action_copy",
+      "reqs": [
+        "R-COPY.7",
+        "R-PASTE.12"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**unchanged context.** At `os_clipboard_input.py:891-916`, empty selection raises `SkipAction`; otherwise await the tail once. Copy does not modify value or selection. Right-click copy reaches this same action, not the group-A override.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-COPY.7/4 neg) routing this action through `self.app.copy_to_clipboard` after the tail → override entries greater than 0, two base/write/notice effects or recursion → cardinality assertions RED"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput.action_cut",
+      "reqs": [
+        "R-COPY.7",
+        "R-PASTE.12"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**unchanged context.** At `os_clipboard_input.py:918-944`, preserve local deletion and empty-selection `SkipAction`; await the tail once with the captured text. Clipboard failure does not restore the deleted text.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-COPY.7/6 neg) suppressing the tail for cuts → box empty but writer 0 and notices 0 → RED; adding a second tail to report the cut → writer 2 and notices 2 → RED"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CappedTextArea.action_copy",
+      "reqs": [
+        "R-COPY.7",
+        "R-PASTE.12"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**unchanged external context.** At `capped_text_area.py:242-270`, empty selection raises `SkipAction`; otherwise await this module's tail once. No edit to `capped_text_area.py` is authorized in this group.",
+      "module": "s19_app/tui/capped_text_area.py",
+      "examples": [
+        "(R-COPY.7/5) three lines copied through this action produce one tail entry, one write, one OSC 52 request, and one `Copied 3 lines to the clipboard.`; document unchanged"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CappedTextArea.action_cut",
+      "reqs": [
+        "R-COPY.7",
+        "R-PASTE.12"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**unchanged external context.** At `capped_text_area.py:272-308`, preserve read-only return, selection/line deletion, and exactly one direct tail await with `edit_result.replaced_text`. No new notice or writer belongs in this action.",
+      "module": "s19_app/tui/capped_text_area.py",
+      "examples": [
+        "(R-COPY.7/6) a multi-line selection cut and a cursor-line cut each produce one write and one information result; read-only and failed edit-result routes produce no copy effects"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput._on_paste",
+      "reqs": [
+        "R-PASTE.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Paste",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "**unchanged context.** Existing terminal-paste first-line behavior at `os_clipboard_input.py:834-859`; it is a consumer in the acceptance chain, not a new clipboard writer and not changed by this delta.",
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(AT-I1b-1/2, cited R-PASTE.1) copy `S3` through the real tail, separately read it, and post the read text as a terminal paste → single-line T1 holds only `S3.split(\"\\n\", 1)[0]` once; this assertion consumes the OS artifact rather than trusting the copy helper's own report"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "entities": [
+    {
+      "name": "[Data: clipboard copy requests]",
+      "kind": "Data",
+      "in": "original selected text or clicked row name",
+      "desc": "one immutable text snapshot per accepted gesture; N1 schedules C1 once for non-empty text and retains no copy snapshot, while N3's single candidate below owns the pre-dispatch snapshot until release",
+      "sequence": [
+        {
+          "event": "keySelection",
+          "steps": [
+            {
+              "node": "Screen.action_copy_text / TextArea.action_copy",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.copy_to_clipboard",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_mirror_and_write_os_clipboard",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "rightSelection",
+          "steps": [
+            {
+              "node": "driver MouseDown",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.on_event",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp._right_click_text",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_right_gesture; valid matching MouseUp",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "consume/clear candidate",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.copy_to_clipboard",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_mirror_and_write_os_clipboard",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "superclass forwarding clears selection",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "textBox",
+          "steps": [
+            {
+              "node": "OsClipboardInput/CappedTextArea.action_copy/action_cut",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_mirror_and_write_os_clipboard",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "emptyRight",
+          "steps": [
+            {
+              "node": "S19TuiApp._right_click_text returns None",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "valid release consumes candidate without N1",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "superclass forwarding only",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "emptyKey",
+          "steps": [
+            {
+              "node": "S19TuiApp.copy_to_clipboard(\"\")",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "raise textual.actions.SkipAction before coroutine/worker",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "no copy request",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Data: S19TuiApp._right_gesture]",
+      "kind": "Data",
+      "in": "Optional[str] text; Offset screen_offset; Screen screen; Widget widget; bool valid",
+      "desc": "exactly one new private transient N3 candidate, initially/absent as None and consumed to None on every not-forwarded MouseUp; not session-action state, not a global clipboard guard and not a new function node",
+      "sequence": [
+        {
+          "event": "press",
+          "steps": [
+            {
+              "node": "any not-forwarded MouseDown",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "clear old candidate; button 3 only",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "N2 snapshot + screen_offset/screen/widget + valid=True",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "one superclass forward, zero N1",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "move",
+          "steps": [
+            {
+              "node": "any MouseMove with different screen_offset",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "valid=False permanently, including later return to the original offset",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "one superclass forward",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "validRelease",
+          "steps": [
+            {
+              "node": "not-forwarded button-3 MouseUp with same offset/screen/widget and non-empty text",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "consume/clear candidate",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "N1 once",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "one superclass forward",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "cancelledRelease",
+          "steps": [
+            {
+              "node": "any not-forwarded MouseUp with missing/invalid/mismatched candidate or non-button-3",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "consume/clear without N1",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "one superclass forward; replayed/forwarded releases cannot copy",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Data: Screen.selections]",
+      "kind": "Data",
+      "in": "widget → Selection map on the top screen",
+      "desc": "membership determines whether right-click may copy; get_selected_text supplies all parts, while stock JSON uses its own selected_text; a present selection extracting empty still reaches N1's SkipAction on Ctrl+C",
+      "sequence": [
+        {
+          "event": "spanningSelection",
+          "steps": [
+            {
+              "node": "MouseDown on contained widget",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp._right_click_text",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "whole get_selected_text stored in _right_gesture",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "matching MouseUp copies snapshot",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "outsideSelection",
+          "steps": [
+            {
+              "node": "MouseDown on unrelated widget",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "None; valid release copies nothing and both clipboards unchanged, zero notices",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "emptySelectionCtrlC",
+          "steps": [
+            {
+              "node": "present map with get_selected_text()==\"\"",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "N1 raises SkipAction",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "idle body-B fallback or modal no-dialog route",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Data: S19TuiApp._a2l_row_key_to_tag]",
+      "kind": "Data",
+      "in": "a2l:<absolute index> → enriched tag dict",
+      "desc": "canonical full-name source; painted Tag may be shortened and internal row key is never copied",
+      "sequence": [
+        {
+          "event": "rightA2LRow",
+          "steps": [
+            {
+              "node": "MouseDown in-bounds metadata row",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "coordinate_to_cell_key((row, 0))",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_a2l_row_key_to_tag",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "tag[name] stored in _right_gesture",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "valid matching MouseUp",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.copy_to_clipboard",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Interface: copy row tables]",
+      "kind": "Interface",
+      "in": null,
+      "desc": "A2LTagTable → _CopyRowTable → DataTable and MAC _CopyRowTable → DataTable; one shared non-left in-bounds click policy plus the out_of_bounds empty-space guard",
+      "sequence": [
+        {
+          "event": "rightRow",
+          "steps": [
+            {
+              "node": "MouseDown snapshots name without N1",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "valid MouseUp consumes/clears and calls N1",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "superclass forwarding synthesizes Click",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_CopyRowTable.on_click",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "move_cursor",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "RowHighlighted; DataTable._on_click prevented",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "no RowSelected",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "no hex jump",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "outOfBounds",
+          "steps": [
+            {
+              "node": "out_of_bounds=True",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "N2 returns None and N5 prevent_default/returns",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "no copy, cursor move, RowSelected or hex jump",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "leftRow",
+          "steps": [
+            {
+              "node": "in-bounds _CopyRowTable.on_click returns",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "DataTable._on_click unchanged",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "RowHighlighted and, on an already highlighted row, RowSelected/jump; zero copy",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Interface: copy quit dialog]",
+      "kind": "Interface",
+      "in": null,
+      "desc": "_CopyQuitScreen(_QuitQuestionScreen), exact G2 body B `Quit the app? Nothing is selected to copy.`, title/buttons, Stay focus/emphasis, plain labels and one-answer guard",
+      "sequence": [
+        {
+          "event": "idleCtrlC",
+          "steps": [
+            {
+              "node": "widget/screen copy SkipAction or N1 empty-string SkipAction",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.action_help_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_CopyQuitScreen",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_answer_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_exit_if_quit_pending",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "idleQ",
+          "steps": [
+            {
+              "node": "q with selection present or absent",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.BINDINGS(help_quit)",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.action_help_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "one _CopyQuitScreen",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_answer_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_exit_if_quit_pending",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "busyHelpQuit",
+          "steps": [
+            {
+              "node": "q or widget/screen/N1 copy SkipAction",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.action_help_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_QuitQuestionScreen",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_answer_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "wait for session action",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "_exit_if_quit_pending",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "immediateQuit",
+          "steps": [
+            {
+              "node": "idle Ctrl+Q or palette Quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "S19TuiApp.action_quit",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "exit 0 within 1 s; no dialog",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "modalQorCtrlC",
+          "steps": [
+            {
+              "node": "Screen._modal_binding_chain stops before App fallback, including N1 empty-string SkipAction",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "original modal only, no second dialog",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    },
+    {
+      "name": "[Data: S19TuiApp._quit_pending]",
+      "kind": "Data",
+      "in": "bool(Optional[bool] answer)",
+      "desc": "existing shared pending-quit state, unchanged; no second callback or dialog-specific answer state",
+      "sequence": [
+        {
+          "event": "stay",
+          "steps": [
+            {
+              "node": "_answer_quit(False or None)",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "pending False",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "app running",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "quitIdle",
+          "steps": [
+            {
+              "node": "_answer_quit(True)",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "pending True",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "exit now",
+              "wins": false,
+              "early": false
+            }
+          ]
+        },
+        {
+          "event": "quitBusy",
+          "steps": [
+            {
+              "node": "_answer_quit(True)",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "pending True",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "session action completes",
+              "wins": false,
+              "early": false
+            },
+            {
+              "node": "exit",
+              "wins": false,
+              "early": false
+            }
+          ]
+        }
+      ],
+      "offers": []
+    }
+  ],
+  "edges": [
+    {
+      "src": {
+        "node": "S19TuiApp.copy_to_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": "group A schedules exactly once for a view-selection or row-name copy; the override itself does not mirror, write, or notify",
+      "raw": "S19TuiApp.copy_to_clipboard ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "OsClipboardInput.action_copy",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "OsClipboardInput.action_copy ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "OsClipboardInput.action_cut",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "OsClipboardInput.action_cut ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "CappedTextArea.action_copy",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "CappedTextArea.action_copy ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "CappedTextArea.action_cut",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": "all four box actions enter directly and await once; none passes through S19TuiApp.copy_to_clipboard",
+      "raw": "CappedTextArea.action_cut ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": null,
+        "port": null,
+        "entity": "[Data: _CLIPBOARD_CAP_CHARS]",
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "[Data: _CLIPBOARD_CAP_CHARS] ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": null,
+        "port": null,
+        "entity": "[Data: _CLIPBOARD_CAP_CHARS]",
+        "field": null
+      },
+      "dst": {
+        "node": "_copy_notice_text",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "[Data: _CLIPBOARD_CAP_CHARS] ──▶ _copy_notice_text"
+    },
+    {
+      "src": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": null,
+        "port": null,
+        "entity": "[Data: App._clipboard]",
+        "field": null
+      },
+      "when": "non-NUL capped_text only; exactly one unbound toolkit base App.copy_to_clipboard call; a capped-NUL refusal returns before this edge and preserves the app seed",
+      "raw": "_mirror_and_write_os_clipboard ──▶ [Data: App._clipboard]"
+    },
+    {
+      "src": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": null,
+        "port": null,
+        "entity": "[I/O: terminal]",
+        "field": null
+      },
+      "when": "the same single non-NUL base call emits one OSC 52 request; capped NUL emits zero and hostile raw text adds no terminal sequence",
+      "raw": "_mirror_and_write_os_clipboard ──▶ [I/O: terminal]"
+    },
+    {
+      "src": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": "non-NUL capped_text only; exactly one call in the default executor, never inline on the UI thread; capped NUL emits zero writer calls/processes and preserves the OS seed",
+      "raw": "_mirror_and_write_os_clipboard ──▶ write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": null,
+        "port": null,
+        "entity": "[I/O: Windows clipboard]",
+        "field": null
+      },
+      "when": null,
+      "raw": "write_os_clipboard ──▶ [I/O: Windows clipboard]"
+    },
+    {
+      "src": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": "_copy_notice_text",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": "the non-NUL awaited writer returned True; pass original_text, never capped_text, including an after-cap NUL suffix; capped NUL never reaches this edge",
+      "raw": "_mirror_and_write_os_clipboard ──▶ _copy_notice_text"
+    },
+    {
+      "src": {
+        "node": "_copy_notice_text",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": null,
+        "port": null,
+        "entity": "[I/O: user notices]",
+        "field": null
+      },
+      "when": "exactly one information notice; over-cap text selects the cut form instead of the ordinary form",
+      "raw": "_copy_notice_text ──▶ [I/O: user notices]"
+    },
+    {
+      "src": {
+        "node": null,
+        "port": null,
+        "entity": "[Data: _WRITE_FAIL_NOTIFICATION]",
+        "field": null
+      },
+      "dst": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": null,
+      "raw": "[Data: _WRITE_FAIL_NOTIFICATION] ──▶ _mirror_and_write_os_clipboard"
+    },
+    {
+      "src": {
+        "node": "_mirror_and_write_os_clipboard",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "dst": {
+        "node": null,
+        "port": null,
+        "entity": "[I/O: user notices]",
+        "field": null
+      },
+      "when": "disjoint arms: non-NUL writer False emits exactly one existing 6-second warning and zero Copied notices; capped NUL emits exactly one 6-second warning `Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.` and zero Copied notices before any sink",
+      "raw": "_mirror_and_write_os_clipboard ──▶ [I/O: user notices]"
+    },
+    {
+      "src": {
+        "node": null,
+        "port": null,
+        "entity": "[I/O: Windows clipboard]",
+        "field": null
+      },
+      "dst": {
+        "node": "OsClipboardInput._on_paste",
+        "port": null,
+        "entity": null,
+        "field": null
+      },
+      "when": "acceptance only, through the existing read route and a terminal Paste event; unchanged consumer",
+      "raw": "[I/O: Windows clipboard] ──▶ OsClipboardInput._on_paste"
+    }
+  ],
+  "findings": [
+    {
+      "id": "R-COPY.1",
+      "title": null,
+      "anchor": "N1, C2",
+      "seen": "explicit examples cover Ctrl+C of three hex rows, five stats lines, the A2L summary, two detail-card lines, two stock-JSON lines and two Workspace-help-modal lines; each reaches N1 once with its exact source and has an independent Windows-read oracle, and modal copy opens no N9",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples for all six sources, not by route equivalence alone"
+    },
+    {
+      "id": "R-COPY.2",
+      "title": null,
+      "anchor": "N1, N3, C1",
+      "seen": "matching right-click release fills app clipboard with the three-line selection; R-COPY.2/4 independently right-clicks A2L row 3 with a failing writer and retains the exact row name in app clipboard while the OS seed remains",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete selection and row-plus-failure examples jointly with group B"
+    },
+    {
+      "id": "R-COPY.4",
+      "title": null,
+      "anchor": "N2, N6, N7, C6, C7",
+      "seen": "clicked A2L row key yields full mapped name despite shortened cell; MAC Rich Text is normalized by .plain/str and loses exactly one known producer prefix, including on a long name with spaces; out_of_bounds=False is the positive control and highlighted-row/tab/truncation mutants go RED",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.6",
+      "title": null,
+      "anchor": "N1, N8, C2",
+      "seen": "button/no-focus/highlighted-table/empty-box/empty-JSON routes and the new present-but-empty screen-selection arm open one body-B N9 with both app/OS seeds observed unchanged while open and after n; N1 raises SkipAction before coroutine/worker rather than returning",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples; the return mutant suppresses the idle dialog and goes RED"
+    },
+    {
+      "id": "R-COPY.7",
+      "title": null,
+      "anchor": "N1, C1, C3",
+      "seen": "one/five/three-line view notices and text-box copy/cut/right-click each exactly one; failure gives no success notice",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B; app supplies one schedule and no notice"
+    },
+    {
+      "id": "R-COPY.8",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "75,210-character JSON passed whole to C1 and capped to 65,536 on every clipboard surface for key/right-click",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B; N1 never truncates"
+    },
+    {
+      "id": "R-COPY.9",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "exact cut notice retains grouped original total 75,210 and excludes ordinary copy notice",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B"
+    },
+    {
+      "id": "R-COPY.10",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "one OSC 52 per key/right-click/row; super-call mutant gives two",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B"
+    },
+    {
+      "id": "R-COPY.11",
+      "title": null,
+      "anchor": "N3, N5, C7",
+      "seen": "explicit left-drag, down-key, F7 and valid-left-click examples schedule no copy; right-drag, out-and-return and reentry negatives preserve both seeds with zero N1/tail/base/writer/OSC 52/notices; the valid in-bounds left-click toolkit route remains",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples, including the E3-01 release-only copy oracle"
+    },
+    {
+      "id": "R-COPY.12",
+      "title": null,
+      "anchor": "N2, N3, C2",
+      "seen": "whole spanning selection, explicit detail-card/modal/JSON selections and back-to-back press/release are captured on MouseDown but copied only after a valid matching MouseUp consumes/clears the candidate",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.13",
+      "title": null,
+      "anchor": "N2, N3, N5",
+      "seen": "unrelated view, header, zero-row table and A2L/MAC row padding with out_of_bounds=True return None and preserve both seeds; no candidate can turn right-drag padding into a copy",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.14",
+      "title": null,
+      "anchor": "N2, N3, N5",
+      "seen": "the same empty gestures plus out_of_bounds=True schedule zero tail/base/writer/OSC 52 and show zero notices; the sole flag change to False is the positive copy/highlight control",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete positive and negative design examples"
+    },
+    {
+      "id": "R-COPY.15",
+      "title": null,
+      "anchor": "N3, C2",
+      "seen": "exactly one unconditional superclass forwarding per event lets toolkit clear hex/stats/JSON selections after the valid release has consumed the candidate and called N1 with its press snapshot",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.16",
+      "title": null,
+      "anchor": "N1, N8, N9",
+      "seen": "idle no-selection routes show exactly one body-B Quit? dialog with `Quit the app? Nothing is selected to copy.`, including highlighted table, non-empty unselected text box and a present screen selection extracting empty through N1 SkipAction; geometry at 118×54/220×60 remains a historical-note E4 target, while current G2 notes={}",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples; empty-copy normal return is a RED mutant"
+    },
+    {
+      "id": "R-COPY.17",
+      "title": null,
+      "anchor": "N8, N9, C5",
+      "seen": "y, Tab+Enter and click Quit share one answer and exit 0 within 1 s",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.18",
+      "title": null,
+      "anchor": "N9",
+      "seen": "Stay has modal-confirm and Quit does not through inherited PRIMARY_BUTTON",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.19",
+      "title": null,
+      "anchor": "N8, C5",
+      "seen": "held Loading opens existing busy question and zero N9",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.20",
+      "title": null,
+      "anchor": "N1, C4, N8",
+      "seen": "help/Load/N9/busy modal prevents reaching N8 even when a present screen selection extracts empty and N1 raises SkipAction; no second dialog, no copy effects and both seeds unchanged; selected help text copies without opening N9",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples; no product modal branch added"
+    },
+    {
+      "id": "R-COPY.21",
+      "title": null,
+      "anchor": "N5, N6, N7, C7",
+      "seen": "clicked in-bounds A2L/MAC row with out_of_bounds=False moves cursor and RowHighlighted updates detail without using old highlight as copy source; True prevents default and leaves cursor unchanged with zero RowSelected",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete positive and negative design examples"
+    },
+    {
+      "id": "R-COPY.22",
+      "title": null,
+      "anchor": "N5, N6, N7",
+      "seen": "second right-click on a highlighted valid row prevents RowSelected and all three hex views retain first painted rows; out_of_bounds=True likewise gives no selection/jump but also no cursor move; valid left route unchanged",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples"
+    },
+    {
+      "id": "R-COPY.23",
+      "title": null,
+      "anchor": "N8, N9, N10, C4",
+      "seen": "idle q with nothing selected and with three hex rows selected opens one body-B N9 without copying or exiting; second q cannot stack another modal or quit; q Quit token unchanged",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by discriminating examples; old q → quit and selection-copy/suppression mutants go RED"
+    },
+    {
+      "id": "R-COPY.24",
+      "title": null,
+      "anchor": "N10, C5",
+      "seen": "idle Ctrl+Q and palette Quit each exit 0 within 1 s with zero N9/busy questions; palette remains PaletteEntry(\"Quit\", \"quit\"), not raw help_quit",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by discriminating examples; N10 preserves action_quit and its busy body while preventing the palette-propagation regression"
+    },
+    {
+      "id": "R-COPY.25",
+      "title": "(consumed corrective tail contract)",
+      "anchor": "C1, N1",
+      "seen": "NUL in capped payload from either N1 or a direct text box gives zero base/writer/OSC 52/process/success notices and unchanged seeds, one 6-second `Clipboard copy refused — NUL cannot be represented in the Windows text clipboard.` warning and fixed WARNING `OS clipboard copy refused; payload contains NUL`; NUL only after cap writes the capped prefix with one cut notice; other C0/markup remains raw",
+      "cause": null,
+      "effect": null,
+      "decision": "consumed jointly with group B through I-1; group A adds no internal tail, NUL, writer or notification design and no function node"
+    },
+    {
+      "id": "R-PASTE.9",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "failing view/key/right-click/row writes produce one exact warning and no success notice",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B through I-1"
+    },
+    {
+      "id": "R-PASTE.10",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "failing view copy emits WARNING without copied payload",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B through I-1"
+    },
+    {
+      "id": "R-PASTE.13",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "held OS clipboard ends with warning within 2.5 s and no success notice",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B through I-1"
+    },
+    {
+      "id": "R-PASTE.14",
+      "title": null,
+      "anchor": "N1, C1",
+      "seen": "synchronous schedule plus I-1 async tail keeps 50 ms timer lateness ≤100 ms on all three view-copy routes",
+      "cause": null,
+      "effect": null,
+      "decision": "covered jointly with group B through I-1"
+    },
+    {
+      "id": "R-TUI-043.13",
+      "title": null,
+      "anchor": "N1-N3, C1",
+      "seen": "SECRET-COPY-43 and its first 16 characters occur in zero log records; the E3-03 model fixture with [red], ESC, BEL, OSC-looking text and LF but no NUL is observed raw at app clipboard, decoded OSC 52 and separate Windows read, including forced PowerShell, with no payload process argument, extra terminal sequence or name/prefix in logs",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples through consumed C1; no markup or representable-C0 sanitization is added"
+    },
+    {
+      "id": "R-DLG.1",
+      "title": null,
+      "anchor": "N9, C4",
+      "seen": "window keys and q do not act behind N9",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by inherited modal behavior and concrete example"
+    },
+    {
+      "id": "R-DLG.2",
+      "title": null,
+      "anchor": "N9, C5",
+      "seen": "Escape equals Stay, restores focus and preserves both clipboards",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by inherited bindings and concrete example"
+    },
+    {
+      "id": "R-DLG.6",
+      "title": null,
+      "anchor": "N9",
+      "seen": "initial focus is Stay through inherited AUTO_FOCUS",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design example"
+    },
+    {
+      "id": "R-DLG.9",
+      "title": null,
+      "anchor": "N9, C5",
+      "seen": "Stay closes only N9, preserving window/scroll and pending state",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design example"
+    },
+    {
+      "id": "R-DLG.11",
+      "title": null,
+      "anchor": "N9",
+      "seen": "exact visible labels Quit (y) and Stay (n)",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design example"
+    },
+    {
+      "id": "R-DLG.12",
+      "title": null,
+      "anchor": "N9",
+      "seen": "n stays, y quits and repeated answer is guarded",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by inherited bindings/guard and concrete example"
+    },
+    {
+      "id": "R-DLG.14",
+      "title": null,
+      "anchor": "N8, N9, N10",
+      "seen": "N9 has the shared action_help_quit opener reached by Ctrl+C without selection and by q while idle; current census 21 becomes 22",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by concrete design examples for both opener routes"
+    },
+    {
+      "id": "R-QUIT.8",
+      "title": null,
+      "anchor": "N8, C5",
+      "seen": "busy Quit waits for held load completion before exit 0",
+      "cause": null,
+      "effect": null,
+      "decision": "covered by unchanged shared _answer_quit and concrete example"
+    },
+    {
+      "id": "R-TUI-042a.5",
+      "title": "(regression pin)",
+      "anchor": "N6, C6",
+      "seen": "base-class change adds no resize competitor; existing Measured/fit still clips at 80×54",
+      "cause": null,
+      "effect": null,
+      "decision": "regression covered by concrete design example; not a new Inc 1b requirement"
+    },
+    {
+      "id": "R-TUI-042a.6",
+      "title": "(regression pin)",
+      "anchor": "N2, N6, C6",
+      "seen": "literal safe painted cell stays unchanged while copy reads the raw full model name rather than the U+FFFD projection; only capped NUL is refused under consumed R-COPY.25",
+      "cause": null,
+      "effect": null,
+      "decision": "regression covered by concrete design example; not a new Inc 1b requirement and not a general sanitizer"
+    },
+    {
+      "id": "E2-1",
+      "title": "(superseded E1 and historical G2 sketches)",
+      "anchor": "N1, N4, N6, N7, N10, C6",
+      "seen": "the old second writer/two-composition sketch conflicts with Resume reconciliation; first-G2 dialog/q choices are historical, while current G2 r2 and E2-interfaces already agree on body B and q=B/O-1=B; current G2 notes={} and its general note is empty, so old geometry/A2L notes are not current",
+      "cause": null,
+      "effect": null,
+      "decision": "resolved by pinned I-1/I-12.2 without superseding the aligned interfaces; N10 remains the only G2 r2 node added to the previous 16"
+    },
+    {
+      "id": "E2-2",
+      "title": "(cross-increment text-box exclusion)",
+      "anchor": "N2, N3, C3",
+      "seen": "App.on_event sees the press before a text box can stop bubbling, but N2 returns None before any other selection read and N3 never calls N1 on press; an unrelated view selection must not become a second copy on release",
+      "cause": null,
+      "effect": null,
+      "decision": "N2 preserves the early text-box exclusion and the box's direct route; E3A-24(c) has a discriminating example"
+    },
+    {
+      "id": "COVERAGE",
+      "title": null,
+      "anchor": "24 unique integrated function nodes; group A has 17 fragment entries (N1-N10 implementation and C1-C7 context) and contributes 16 integrated nodes after C1 yields to group B's changed tail",
+      "seen": "the E2 baseline was 22 rows/100 cases (82 R-COPY + 9 cited clipboard + 9 cited dialog); the current corrective ledger is 23 active R-COPY rows and 112 cases (93 R-COPY + 10 cited clipboard/security + 9 dialog/quit), with all E3A-03 source arms, R-COPY.25/1…3 and R-TUI-043.13/102 explicit; R-COPY.25 is consumed through I-1 without a requirements/test edit in this lane; 13 cited clipboard/security/dialog/quit rows, 2 Inc 12 regression pins, 7 copy-source ATs and manual AT-I1b-8 remain represented; integrated source census is 2 changed files (one per group), with 1 app source file in group A",
+      "cause": null,
+      "effect": null,
+      "decision": "16 group-A integrated nodes plus 8 group-B nodes give 24 unique nodes below the 40-node cap across 2 changed source files; the 17-entry fragment count includes the consumed C1 boundary and is not an additional integrated node; _right_gesture is a data entity and adds no function node; no further split, no runtime claim and E3 re-review remains required"
+    }
+  ],
+  "unread": []
+}

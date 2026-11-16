@@ -1,0 +1,20 @@
+Cloning into '<HOME>/work/e4-tail-final-1794495765-535/tree'...
+done.
+Note: switching to 'c062293be6c122ecceca5701ea8afd0c6700f008'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at c062293b batch-103 Inc 6 E5: record zero-gap traces

@@ -1,0 +1,4 @@
+PASS content mismatch redacted; metadata: synthetic: content mismatch; expected chars=8, line_breaks=0, actual chars=31, line_breaks=1
+PASS log mismatch redacted; metadata: synthetic: clipboard content in 1 of 1 captured messages at indexes [0]
+PASS probe mismatch redacted; metadata: stage=round-trip-mismatch, result_chars=66
+summary total=4 passed=4 failed=0 clipboard_calls=0 powershell_calls=0

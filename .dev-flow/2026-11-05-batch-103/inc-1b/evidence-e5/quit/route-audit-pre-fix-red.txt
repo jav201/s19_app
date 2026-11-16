@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/tmp/b103-quit-e5-pre-Ke2fr3/validate_routes.py", line 205, in <module>
+    main()
+  File "/tmp/b103-quit-e5-pre-Ke2fr3/validate_routes.py", line 190, in main
+    _static_audit(tree)
+  File "/tmp/b103-quit-e5-pre-Ke2fr3/validate_routes.py", line 81, in _static_audit
+    assert skips == [], skips
+           ^^^^^^^^^^^
+AssertionError: [146, 89, 144, 162]

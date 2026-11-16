@@ -1,0 +1,3635 @@
+{
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "baseline_only": false,
+  "baselines": [
+    {
+      "group": "GA",
+      "verdict": "PASS"
+    },
+    {
+      "group": "GQ",
+      "verdict": "PASS"
+    },
+    {
+      "group": "GT",
+      "verdict": "BAD"
+    }
+  ],
+  "blocked_count": 0,
+  "executed_mutants": 31,
+  "manifest_sha256": "2d96df60e7544885cbbc270e8ee4c87ffc7c8015c2c9e0dfb87b5f3656efd543",
+  "results": [
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A01",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 18.471,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 17.819,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 17.891,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A01/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "e0731fa1e88a47c07988787355514aa4e68714f0c9d9f2d942b5e130a46afe81",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/4]",
+        "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/4]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A02",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/post/junit.xml",
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 28.37,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/pre/junit.xml",
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 29.341,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/restored/junit.xml",
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 27.948,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A02/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "14688637fc1279aecb6056da61084ece4d510931b0d229e846f7eb2115577798",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A03",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.866,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.743,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.444,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A03/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "46438b89dae15d09a93355cea484591b586f34442ca9ef345245bee2408674bb",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A04",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]",
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 3,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 53.324,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]",
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 50.798,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]",
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 49.457,
+        "nodes": {
+          "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A04/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "7dcf0ece5ff0bce2c4d743338cc16e14709420c59f441e072fed26b00ee34e59",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]",
+        "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A05",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.736,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.72,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.619,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A05/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "bfd08cf5079a705ac31e39cc1e38bef76f360f5059a860d42b6f19123b23cff3",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A06",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 20.857,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 20.764,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.622,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A06/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "558b576129f34ad4257af5e9bf5b9eee15b0d7ef467178afb3a4289644c1948d",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A07",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.079,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.765,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 12.036,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A07/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "13d22ba0922091e7865664ecde98579af9bf13dc28847a8397a4df01e56b435b",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A08",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 3,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 35.683,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 43.363,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 43.691,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A08/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "675676ca30199e29ce7341b998cb952ea5ffc7bc30b1851417fc9c191cc62c3c",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5]",
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7]",
+        "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A09",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.971,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 19.727,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.566,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A09/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "ca2cea4717882c1692330bd375c0b2108a595d460a687e3968a657e1f2716a8a",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A10",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 29.026,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 26.21,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 26.516,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A10/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "4279d5b41d4a33e7e43735e35220b61e3bd3c9a8f6244f2e2cc77ea554bb035e",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+        "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A11",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 24.55,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 23.661,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/pre/pytest.txt"
+      },
+      "reason": "all selected nodes passed",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 22.526,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A11/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "df69660bf0d4848fa8ad318b932c69025f29fb18c57570c7e61ef3b8ba8d5646",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8]",
+        "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "SURVIVED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A12",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 17.771,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 16.167,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 16.389,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A12/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "790ab0ec0f24e73538eb670f14ca935d7a07c7ca8e05a0ee422dbb1dc8e96f59",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A13",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.23,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 16.021,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 15.891,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A13/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "bc57b5dcc139e6afc13f23bc8cbda43168d2ae4bd0b4ec16d8f00f2bf6940138",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A14",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/post/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 3,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 4.035,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]": "failed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/pre/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 34.303,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/restored/junit.xml",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 26.729,
+        "nodes": {
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]": "passed",
+          "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A14/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "f26e00635a1e4b4b0b8bd1940d065e441b16fb9cd527bd40c2c31ca63e55e331",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2]",
+        "tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3]"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A15",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 54.056,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 55.337,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 55.023,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A15/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "01f3b1847ab5fc963f010dc1363701c4ac5abc6d653c046285c3fdd596441749",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GA",
+      "id": "GA-A16",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 35.391,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 36.809,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 37.624,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GA/GA-A16/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "f8ea6a8c187c7b6903fedd613f380b2f93d892a5a590ec74c4d06346a25b02c5",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q01",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 24.029,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 24.274,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 23.523,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q01/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "973f840ea7cc4b381391e4aa0eaaeb86bf6a4b339fbbcb4d2b18a6ac7745aef8",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_19_1_busy_ctrl_c_opens_busy_question",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q02",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.052,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.533,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.164,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q02/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "b366c9a6e7e5f99d60b5d5a7c10c343d431ef678f144424804f4314d468da055",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_quit_8_101_confirmed_busy_quit_waits_for_load"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q03",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 3,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 29.254,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 27.953,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 3,
+          "skipped": 0
+        },
+        "elapsed_seconds": 25.67,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q03/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "337c80797bee2fd2399ca35cebac3032db4cf068b056fa6b50b1dc7e63f854eb",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_1_y_quits_within_one_second",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_2_tab_enter_on_quit",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_17_3_click_quit"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q04",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.133,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 8.805,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 8.892,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q04/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "40e4d34bb8aadac47c7509313cb21ee0a3a70519fe2f76c7b70aa14421865a8b",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_18_1_stay_has_confirm_emphasis"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q05",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 18.911,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.811,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.145,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q05/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "26eacb89cf69eca9a215e6537b00557fa73f4d2f1ff82b8c2ee0488a824a4a40",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_1_idle_q_asks_without_selection",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q06",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.954,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 12.498,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 12.393,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q06/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "82737c6538536d0ec41695f69ce77914d2179a5098d5f1a37fa4982cd6ec6042",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q07",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.071,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 21.485,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 20.879,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q07/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "2d4c3fd4decbc44164b086a3ddeff05b8a2ca628c8cb7cd5111d22a74b29a957",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_23_2_q_with_selection_and_second_q_stays_single",
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_1_101_window_keys_do_not_act_behind_dialog"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q08",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 13.0,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.344,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 11.619,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q08/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "308cb55a701990abd7b5b9362ed4480dbb0d6ee85216f556515af54f03cfc8ba",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q09",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 22.64,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 20.295,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 20.201,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q09/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "f6c1ff46c7317dc0f9550fab711a6206d5876dc3b26c55305e04f64720b16c26",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_1_ctrl_q_quits_immediately",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_24_2_palette_quit_quits_immediately"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q10",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 4,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 38.018,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 4,
+          "skipped": 0
+        },
+        "elapsed_seconds": 49.988,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 4,
+          "skipped": 0
+        },
+        "elapsed_seconds": 50.855,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q10/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "ce110dd5124d77e0c903731db14147af1afb8cfe6279e9d28f5026fddc980aea",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_2_load_dialog_stays_top",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_3_existing_copy_quit_stays_single",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_20_4_busy_question_stays_top"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q11",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.427,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.406,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.346,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q11/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "fc2da73b61a6c213ba260a82d378ecb3da40e94b7985b178f35469f57f2c30ac",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_6_101_initial_focus_is_stay"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q12",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 19.21,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 19.802,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 19.734,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q12/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "63c95f4a41e12b981a4574c97ffc7e4fcbe4a426b1aeabaf9f8cc0588d74c92e",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_9_101_click_stay_preserves_window_scroll_and_state",
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_12_101_n_presses_stay"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q13",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.48,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.213,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 10.237,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q13/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "0ebb0159438f299a21b2a547a72372fd3df755a554da879db6944cd7bbf0614c",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_2_101_escape_answers_stay"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q14",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 1,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.502,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.052,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 9.171,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q14/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "2c54f34527b2ef621c3aaa350530d93098dd2a2c980256d0631aebd79f73ea58",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_11_101_buttons_expose_exact_keys"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 1,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "bytecode_disabled": true,
+      "group": "GQ",
+      "id": "GQ-Q15",
+      "new_bytecode": [],
+      "no_new_bytecode": true,
+      "post": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/post/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 2,
+          "passed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 37.153,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "failed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener": "failed"
+        },
+        "parse_error": null,
+        "returncode": 1,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/post/pytest.txt"
+      },
+      "pre": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/pre/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 40.778,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/pre/pytest.txt"
+      },
+      "reason": "assertion failure in the complete selected node set",
+      "restore_ok": true,
+      "restored_run": {
+        "command": [
+          "/data/miniconda3/envs/s19ci/bin/python",
+          "-I",
+          "-B",
+          "-c",
+          "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+          "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/tree",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--junitxml=<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/restored/junit.xml",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener",
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+        ],
+        "counts": {
+          "error": 0,
+          "failed": 0,
+          "passed": 2,
+          "skipped": 0
+        },
+        "elapsed_seconds": 41.989,
+        "nodes": {
+          "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection": "passed",
+          "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener": "passed"
+        },
+        "parse_error": null,
+        "returncode": 0,
+        "timeout": false,
+        "transcript": "<HOME>/work/zq-mut/GA-GT-GQ/GQ/GQ-Q15/restored/pytest.txt"
+      },
+      "restored_target_green": true,
+      "source": "s19_app/tui/app.py",
+      "source_sha256_before": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "source_sha256_mutated": "4693d49057b4c96e11feba6d91593c5c81b0e2cca4af615a8e4b41e47b420fd1",
+      "source_sha256_restored": "a5609f33aa7005d47b098bcae0596b93dd3793cbe661c7224eb384686d762dcd",
+      "tests": [
+        "tests/test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener",
+        "tests/test_b103_copy_quit_dialog.py::test_r_copy_16_1_button_and_materialized_empty_selection"
+      ],
+      "tracked_tree_clean": true,
+      "verdict": "KILLED"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T01",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]",
+        "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T02",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T03",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T04",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T05",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T06",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T07",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T08",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+      ],
+      "verdict": "BAD"
+    }
+  ],
+  "selected_count": 39,
+  "verdicts": {
+    "BAD": 8,
+    "CRASH": 0,
+    "KILLED": 30,
+    "SURVIVED": 1
+  }
+}

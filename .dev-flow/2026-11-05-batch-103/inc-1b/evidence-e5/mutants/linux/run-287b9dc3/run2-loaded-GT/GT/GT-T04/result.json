@@ -1,0 +1,12 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GT",
+  "id": "GT-T04",
+  "reason": "group baseline BAD; mutant never applied",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]",
+    "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]"
+  ],
+  "verdict": "BAD"
+}

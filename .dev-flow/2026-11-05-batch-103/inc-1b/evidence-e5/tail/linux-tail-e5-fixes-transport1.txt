@@ -1,0 +1,3 @@
+fatal: not a git repository: <HOME>/Github/s19_app-b103-inc1b-integration/<LOCAL_HOME>/Github/s19_app/.git/worktrees/s19_app-b103-inc1b-integration
+tar: This does not look like a tar archive
+tar: Exiting with failure status due to previous errors

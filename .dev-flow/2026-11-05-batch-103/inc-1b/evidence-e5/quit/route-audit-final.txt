@@ -1,0 +1,16 @@
+s19_app.__file__ = /tmp/b103-quit-e5-final-26tD1o/tree/s19_app/__init__.py
+ROUTE_AUDIT PASS: 28 Linux nodes; exactly 9 explicit WinCI seed routes
+ROUTE PASS R-COPY.16/1: test_r_copy_16_1_button_and_materialized_empty_selection; WinCI=not_run
+ROUTE PASS R-COPY.16/2: test_r_copy_16_2_no_widget_focused; WinCI=not_run
+ROUTE PASS R-COPY.16/3: test_r_copy_16_3_highlighted_table_row_is_not_selection; WinCI=not_run
+ROUTE PASS R-COPY.16/4: test_r_copy_16_4_empty_single_line_input; WinCI=not_run
+ROUTE PASS R-COPY.16/5: test_r_copy_16_5_empty_json_selection; WinCI=not_run
+ROUTE PASS R-COPY.16/6: test_r_copy_16_6_multiline_text_without_selection; WinCI=not_run
+ROUTE PASS R-COPY.20/1: test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection; WinCI=not_run
+ROUTE PASS R-COPY.20/2: test_r_copy_20_2_load_dialog_stays_top; WinCI=not_run
+ROUTE PASS R-COPY.20/3: test_r_copy_20_3_existing_copy_quit_stays_single; WinCI=not_run
+MODAL_CLOSURE_AUDIT PASS: .20/1-2 have 3 observations; .20/3 closes with n
+EXACT_READER_SIMULATED PASS: UTF8Encoding(false); Unicode/CR/LF/final LF preserved
+INFRASTRUCTURE_AUDIT PASS: probe/seed/read/isolation errors fail, never skip
+EXTERNAL_SEED_SIMULATED PASS: distinct Set-Clipboard and Get-Clipboard processes
+WINCI not_run: no real Windows clipboard or PowerShell was used

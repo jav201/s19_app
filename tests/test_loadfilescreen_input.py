@@ -463,12 +463,14 @@ def test_ctrl_v_notifies_user_when_every_clipboard_source_is_empty(
 def test_powershell_layer_does_not_require_wt_or_windows_terminal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """R-TUI-043-m: the PowerShell fallback must invoke ``powershell.exe`` only.
+    """R-TUI-043-m: invoke system PowerShell with exact binary stdout transport.
 
     On a machine without Windows Terminal (``wt``) or the more modern
     ``pwsh``, the fallback must still work because ``powershell.exe``
-    ships with every Windows install. We inspect the argv the layer
-    would use rather than actually executing.
+    ships with every Windows install. The fake returns UTF-8 bytes, a CRLF
+    belonging to the payload and one invalid trailing byte. Decoding must
+    preserve the CRLF, decode Unicode and replace only the invalid byte,
+    without universal-newline normalization or the old trailing ``rstrip``.
     """
     from s19_app.tui import os_clipboard_input as os_clip_mod
 
@@ -476,8 +478,8 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
 
     class _FakeResult:
         returncode = 0
-        stdout = "PS_CLIPBOARD_TEXT\r\n"
-        stderr = ""
+        stdout = "PS_CLIPBOARD_TEXT_Ñ\r\n".encode("utf-8") + b"\xff"
+        stderr = b""
 
     def _fake_run(argv, **kwargs) -> _FakeResult:  # type: ignore[no-untyped-def]
         captured["argv"] = list(argv)
@@ -489,22 +491,33 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
     monkeypatch.setattr(os_clip_mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     text = os_clip_mod._read_via_powershell()
-    assert text == "PS_CLIPBOARD_TEXT"
-    assert captured["argv"][0] == "C:\\PS\\powershell.exe", (  # type: ignore[index]
+    assert text == "PS_CLIPBOARD_TEXT_Ñ\r\n\ufffd"
+    argv = captured["argv"]
+    assert isinstance(argv, list)
+    assert argv[0] == "C:\\PS\\powershell.exe", (
         f"PowerShell layer must invoke the system PowerShell (not `wt`, `pwsh` or a bare name); "
-        f"got {captured['argv']!r}"
+        f"got {argv!r}"
     )
+    command = " ".join(map(str, argv[1:]))
+    assert "[Console]::Out.Write((Get-Clipboard -Raw))" in command, (
+        "PowerShell must emit the raw clipboard through Out.Write, which "
+        f"adds no newline; argv={argv!r}"
+    )
+    assert "Out.WriteLine" not in command
     kwargs = captured["kwargs"]
     assert isinstance(kwargs, dict)
     assert "timeout" in kwargs, "PowerShell layer must set a timeout to prevent hangs"
-    # F1 (audit): encoding must be UTF-8 explicit so unicode paths
-    # survive the round-trip on non-UTF-8 locales (cp1252, cp850, etc.).
-    assert kwargs.get("encoding") == "utf-8", (
-        f"PowerShell layer must set encoding='utf-8'; got {kwargs.get('encoding')!r}"
+    assert not kwargs.get("text", False), (
+        "Binary stdout is required to preserve CR/LF exactly"
     )
-    assert kwargs.get("errors") == "replace", (
-        "PowerShell layer must set errors='replace' so a stray decode "
-        "issue does not raise"
+    assert not kwargs.get("universal_newlines", False), (
+        "Universal-newline mode would normalize the clipboard payload"
+    )
+    assert kwargs.get("encoding") is None, (
+        "UTF-8 decoding must happen after binary subprocess capture"
+    )
+    assert kwargs.get("errors") is None, (
+        "subprocess text-mode error handling must not enable newline translation"
     )
 
 

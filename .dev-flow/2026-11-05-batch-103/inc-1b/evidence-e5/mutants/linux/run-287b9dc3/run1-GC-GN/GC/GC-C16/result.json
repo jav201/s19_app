@@ -1,0 +1,108 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GC",
+  "id": "GC-C16",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C16/post/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 1,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 7.086,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C16/pre/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0
+    },
+    "elapsed_seconds": 6.951,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C16/restored/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0
+    },
+    "elapsed_seconds": 6.736,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C16/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_sha256_before": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "source_sha256_mutated": "b2102534af3447113536f79ce11f0b42bc9939bdb915b982cefcc724c05229af",
+  "source_sha256_restored": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

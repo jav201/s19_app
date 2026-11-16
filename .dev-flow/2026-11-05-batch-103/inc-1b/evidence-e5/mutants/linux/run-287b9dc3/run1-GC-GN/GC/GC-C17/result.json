@@ -1,0 +1,115 @@
+{
+  "applied_count": 1,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "bytecode_disabled": true,
+  "group": "GC",
+  "id": "GC-C17",
+  "new_bytecode": [],
+  "no_new_bytecode": true,
+  "post": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C17/post/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 2,
+      "passed": 0,
+      "skipped": 0
+    },
+    "elapsed_seconds": 36.957,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "failed",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs": "failed"
+    },
+    "parse_error": null,
+    "returncode": 1,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/post/pytest.txt"
+  },
+  "pre": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C17/pre/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 36.731,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/pre/pytest.txt"
+  },
+  "reason": "assertion failure in the complete selected node set",
+  "restore_ok": true,
+  "restored_run": {
+    "command": [
+      "/data/miniconda3/envs/s19ci/bin/python",
+      "-I",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0, sys.argv.pop(1)); import s19_app; print('s19_app.__file__=' + s19_app.__file__, flush=True); import pytest; raise SystemExit(pytest.main(sys.argv[1:]))",
+      "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/tree",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml=<HOME>/work/zq-mut/GC-GN/GC/GC-C17/restored/junit.xml",
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs"
+    ],
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0
+    },
+    "elapsed_seconds": 37.025,
+    "nodes": {
+      "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload": "passed",
+      "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs": "passed"
+    },
+    "parse_error": null,
+    "returncode": 0,
+    "timeout": false,
+    "transcript": "<HOME>/work/zq-mut/GC-GN/GC/GC-C17/restored/pytest.txt"
+  },
+  "restored_target_green": true,
+  "source": "s19_app/tui/os_clipboard_input.py",
+  "source_sha256_before": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "source_sha256_mutated": "3d04abbe68495c77b4cbe95adcae3cc86db02e8163a75e99f24e2cc88a3368b4",
+  "source_sha256_restored": "19c759261104d3ef9de109695b530704c1a086c5c62f970bb0de55c6d4a71348",
+  "tests": [
+    "tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload",
+    "tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs"
+  ],
+  "tracked_tree_clean": true,
+  "verdict": "KILLED"
+}

@@ -1,0 +1,1 @@
+ .strip()); import s19_app; print(s19_app.__file__: -c: line 1: unexpected EOF while looking for matching `"'

@@ -1,0 +1,118 @@
+{
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "baseline_only": false,
+  "baselines": [
+    {
+      "group": "GT",
+      "verdict": "BAD"
+    }
+  ],
+  "blocked_count": 0,
+  "executed_mutants": 0,
+  "manifest_sha256": "2d96df60e7544885cbbc270e8ee4c87ffc7c8015c2c9e0dfb87b5f3656efd543",
+  "results": [
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T01",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]",
+        "tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T02",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T03",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T04",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T05",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T06",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T07",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4]"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GT",
+      "id": "GT-T08",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/1]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/2]",
+        "tests/test_b103_copy_views.py::test_r_copy_4_full_row_names[R-COPY.4/3]"
+      ],
+      "verdict": "BAD"
+    }
+  ],
+  "selected_count": 8,
+  "verdicts": {
+    "BAD": 8,
+    "CRASH": 0,
+    "KILLED": 0,
+    "SURVIVED": 0
+  }
+}

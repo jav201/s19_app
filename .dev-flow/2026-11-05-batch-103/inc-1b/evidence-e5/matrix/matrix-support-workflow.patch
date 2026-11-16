@@ -1,0 +1,343 @@
+diff --git a/.github/workflows/clipboard-windows.yml b/.github/workflows/clipboard-windows.yml
+index 62f289d1..5bc4a72e 100644
+--- a/.github/workflows/clipboard-windows.yml
++++ b/.github/workflows/clipboard-windows.yml
+@@ -7,29 +7,37 @@ on:
+   workflow_dispatch:
+   push:
+     paths:
+-      - "s19_app/tui/app.py"
+-      - "s19_app/tui/os_clipboard_input.py"
+-      - "s19_app/tui/capped_text_area.py"
+-      - "tests/support/b103_clipboard.py"
++      - "s19_app/**/*.py"
++      - "tests/__init__.py"
++      - "tests/conftest.py"
++      - "tests/support/**"
+       - "tests/test_b103_clipboard_windows.py"
+       - "tests/test_b103_clipboard_matrix.py"
+       - "tests/test_b103_copy_views.py"
+       - "tests/test_b103_clipboard_tail.py"
+       - "tests/test_b103_copy_quit_dialog.py"
+       - "tests/test_b103_copy_paste_matrix.py"
++      - "examples/case_00_public/**"
++      - "requirements.txt"
++      - "pyproject.toml"
++      - "setup.py"
+       - ".github/workflows/clipboard-windows.yml"
+   pull_request:
+     paths:
+-      - "s19_app/tui/app.py"
+-      - "s19_app/tui/os_clipboard_input.py"
+-      - "s19_app/tui/capped_text_area.py"
+-      - "tests/support/b103_clipboard.py"
++      - "s19_app/**/*.py"
++      - "tests/__init__.py"
++      - "tests/conftest.py"
++      - "tests/support/**"
+       - "tests/test_b103_clipboard_windows.py"
+       - "tests/test_b103_clipboard_matrix.py"
+       - "tests/test_b103_copy_views.py"
+       - "tests/test_b103_clipboard_tail.py"
+       - "tests/test_b103_copy_quit_dialog.py"
+       - "tests/test_b103_copy_paste_matrix.py"
++      - "examples/case_00_public/**"
++      - "requirements.txt"
++      - "pyproject.toml"
++      - "setup.py"
+       - ".github/workflows/clipboard-windows.yml"
+ 
+ permissions:
+@@ -54,11 +62,16 @@ jobs:
+         run: |
+           python -m pip install --upgrade pip
+           python -m pip install -r requirements.txt
+-          python -m pip install pytest
+-          python -m pip install -e .
++          python -m pip install pytest "textual==8.2.8"
++          python -m pip install -e . "textual==8.2.8"
+ 
+-      - name: Print the toolkit version the design rests on (E3A-10 a)
+-        run: python -c "import sys, textual; print(sys.version, textual.__version__)"
++      - name: Print and verify the toolkit version the design rests on (E3A-10 a)
++        run: python -c "import sys, textual; print(sys.version, textual.__version__); assert textual.__version__ == '8.2.8', textual.__version__"
++
++      - name: Validate exactly 28 acceptance-matrix nodes
++        timeout-minutes: 5
++        run: python -c "import subprocess, sys; result = subprocess.run([sys.executable, '-m', 'pytest', '-p', 'no:cacheprovider', '--collect-only', '-q', 'tests/test_b103_copy_paste_matrix.py'], check=True, capture_output=True, text=True); print(result.stdout, end=''); nodes = [line for line in result.stdout.splitlines() if '::test_copy_paste_acceptance_cell[AT-I1b-' in line]; assert len(nodes) == 28 and len(set(nodes)) == 28, f'expected exactly 28 unique AT nodes, got {len(nodes)}'; print('AT_NODES=28')"
+ 
+       - name: Run the OS clipboard tests (serial, every outcome listed)
++        timeout-minutes: 45
+         run: pytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py tests/test_b103_copy_views.py tests/test_b103_clipboard_tail.py tests/test_b103_copy_quit_dialog.py tests/test_b103_copy_paste_matrix.py
+diff --git a/tests/support/b103_clipboard.py b/tests/support/b103_clipboard.py
+index c47fb0ca..60507858 100644
+--- a/tests/support/b103_clipboard.py
++++ b/tests/support/b103_clipboard.py
+@@ -502,6 +502,12 @@ async def _poll_until(pilot, predicate: Callable[[], bool], timeout: float = 10.
+     raise AssertionError("poll predicate not satisfied within timeout")
+ 
+ 
++async def wait_for_copy_tail(pilot, marker: dict, timeout: float = 10.0) -> None:
++    """Wait for an instrumented copy tail to start and finish."""
++    await _poll_until(pilot, lambda: bool(marker.get("started")), timeout)
++    await _poll_until(pilot, lambda: bool(marker.get("ended")), timeout)
++
++
+ async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
+     """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
+ 
+@@ -582,17 +588,35 @@ def other_program_write(text: str) -> None:
+ 
+ 
+ def other_program_read() -> str:
+-    """A separate system PowerShell ``Get-Clipboard -Raw`` (UTF-8 output)."""
++    """Read exact clipboard text through a separate system PowerShell."""
+     _require_windows()
+     path = _system_powershell_path()
++    command = (
++        "$ErrorActionPreference='Stop'; "
++        "[Console]::OutputEncoding=[Text.Encoding]::UTF8; "
++        "$text=[string](Get-Clipboard -Raw); "
++        "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($text))"
++    )
+     result = subprocess.run(
+-        [path, "-NoProfile", "-NonInteractive", "-Command",
+-         "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;Get-Clipboard -Raw"],
++        [path, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", command],
+         capture_output=True, text=True, encoding="utf-8",
+-        errors="replace", timeout=10.0, shell=False,
++        errors="strict", timeout=10.0, shell=False,
+         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+     )
+-    return result.stdout.rstrip("\r\n")
++    if result.returncode:
++        detail = (result.stderr or "").strip()[:500]
++        raise AssertionError(
++            "other_program_read: PowerShell exit "
++            f"{result.returncode}: {detail}"
++        )
++    try:
++        return base64.b64decode(
++            "".join(result.stdout.split()), validate=True
++        ).decode("utf-8")
++    except (ValueError, UnicodeError) as exc:
++        raise AssertionError(
++            "other_program_read: PowerShell output was not Base64 UTF-8"
++        ) from exc
+ 
+ 
+ def _own_write(text: str) -> bool:
+diff --git a/tests/test_b103_copy_paste_matrix.py b/tests/test_b103_copy_paste_matrix.py
+index e492cca1..63d4c26e 100644
+--- a/tests/test_b103_copy_paste_matrix.py
++++ b/tests/test_b103_copy_paste_matrix.py
+@@ -11,6 +11,14 @@ from pathlib import Path
+ 
+ import pytest
+ 
++from tests.support.b103_clipboard import (
++    _system_powershell_path,
++    clipboard_isolated,
++    other_program_read,
++    require_isolated_clipboard,
++    wait_for_copy_tail,
++)
++
+ SEED = "SEED-1b"
+ A2L_THIRD_ROW = "ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING"
+ MAC_THIRD_ROW = "Curve_ExternalAxis"
+@@ -18,15 +26,12 @@ SIZE = (118, 54)
+ 
+ 
+ def _is_winci() -> bool:
+-    return (
+-        sys.platform == "win32"
+-        and os.environ.get("GITHUB_ACTIONS") == "true"
+-        and os.environ.get("RUNNER_ENVIRONMENT") == "github-hosted"
+-    )
++    return clipboard_isolated("windows")[0]
+ 
+ 
+ def _coverage_or_skip(route: str) -> str:
+-    if _is_winci():
++    if sys.platform == "win32":
++        require_isolated_clipboard("windows")
+         return "full"
+     if sys.platform.startswith("linux"):
+         if route == "P2":
+@@ -47,13 +52,7 @@ def _coverage_or_skip(route: str) -> str:
+ 
+ 
+ def _powershell() -> Path:
+-    for name in ("powershell.exe", "powershell"):
+-        found = shutil.which(name)
+-        if found:
+-            path = Path(found).resolve()
+-            if path.is_absolute() and path.is_file():
+-                return path
+-    pytest.skip("not_run: isolated WinCI has no absolute system PowerShell")
++    return Path(_system_powershell_path())
+ 
+ 
+ def _run_powershell(script: str) -> str:
+@@ -97,15 +96,7 @@ def _seed_os_clipboard() -> None:
+ 
+ 
+ def _read_os_clipboard() -> str:
+-    output = _run_powershell(
+-        "[Console]::OutputEncoding=[Text.Encoding]::UTF8; "
+-        "$text=[string](Get-Clipboard -Raw); "
+-        "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($text))"
+-    )
+-    try:
+-        return base64.b64decode("".join(output.split()), validate=True).decode("utf-8")
+-    except (ValueError, UnicodeError) as exc:
+-        pytest.skip(f"not_run: isolated WinCI separate read was not decodable: {exc}")
++    return other_program_read()
+ 
+ 
+ def _check_model_oracles(examples: Path) -> None:
+@@ -313,7 +304,7 @@ async def _right_click(app, pilot, widget, offset: tuple[int, int]) -> None:
+                 screen_y=y,
+             )
+         )
+-    await _settle(pilot, 12)
++    await pilot.pause()
+ 
+ 
+ def _copy_notice(expected: str) -> str:
+@@ -362,7 +353,15 @@ async def _prepare_target(app, pilot, target: str):
+     return widget
+ 
+ 
+-async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
++async def _run_cell(
++    tmp_path: Path,
++    source: int,
++    target: str,
++    route: str,
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    from s19_app.tui import app as app_module
++    from s19_app.tui import os_clipboard_input as clipboard_module
+     from s19_app.tui.app import S19TuiApp
+     from textual import events
+     from textual.app import App
+@@ -372,6 +371,22 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+     _check_model_oracles(examples)
+     if _is_winci():
+         _seed_os_clipboard()
++    original_tail = clipboard_module._mirror_and_write_os_clipboard
++    tail_marker = {"started": False, "ended": False}
++    tail_payloads = []
++
++    async def marked_tail(app, text):
++        tail_payloads.append(text)
++        tail_marker["started"] = True
++        try:
++            return await original_tail(app, text)
++        finally:
++            tail_marker["ended"] = True
++
++    monkeypatch.setattr(
++        clipboard_module, "_mirror_and_write_os_clipboard", marked_tail
++    )
++    monkeypatch.setattr(app_module, "_mirror_and_write_os_clipboard", marked_tail)
+     app = S19TuiApp(base_dir=tmp_path)
+     async with app.run_test(size=SIZE) as pilot:
+         await _settle(pilot)
+@@ -380,6 +395,8 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+         expected, source_widget, offset = await _arm_source(app, pilot, source)
+         before = list(app._notifications)
+         await _right_click(app, pilot, source_widget, offset)
++        await wait_for_copy_tail(pilot, tail_marker)
++        assert tail_payloads == [expected]
+         if source == 7:
+             await pilot.press("escape")
+             await _settle(pilot)
+@@ -413,44 +430,50 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+         )
+ 
+ 
+-@pytest.mark.parametrize(
+-    ("source", "target", "route"),
+-    [
+-        pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+-        pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+-        pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+-        pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+-        pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+-        pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+-        pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+-        pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+-        pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+-        pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+-        pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+-        pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+-        pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+-        pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+-        pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+-        pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+-        pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+-        pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+-        pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+-        pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+-        pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+-        pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+-        pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+-        pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+-        pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+-        pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+-        pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+-        pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+-    ],
+-)
++AT_CELLS = [
++    pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
++    pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
++    pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
++    pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
++    pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
++    pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
++    pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
++    pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
++    pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
++    pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
++    pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
++    pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
++    pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
++    pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
++    pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
++    pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
++    pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
++    pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
++    pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
++    pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
++    pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
++    pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
++    pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
++    pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
++    pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
++    pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
++    pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
++    pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
++]
++assert len(AT_CELLS) == 28
++assert len({cell.id for cell in AT_CELLS}) == 28
++
++
++@pytest.mark.parametrize(("source", "target", "route"), AT_CELLS)
+ def test_copy_paste_acceptance_cell(
+-    tmp_path: Path, source: int, target: str, route: str
++    tmp_path: Path,
++    source: int,
++    target: str,
++    route: str,
++    monkeypatch: pytest.MonkeyPatch,
+ ) -> None:
+     _coverage_or_skip(route)
+-    asyncio.run(_run_cell(tmp_path, source, target, route))
++    asyncio.run(_run_cell(tmp_path, source, target, route, monkeypatch))
+ 
+ 
+ @pytest.mark.skip(

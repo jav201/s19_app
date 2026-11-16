@@ -1,0 +1,8 @@
+source_head=0d4d4e7c800b27040769a1a10117e62884cc7326
+tail_blob=5ab8c60887b0ebd222fddd8dad8caaf928b1dd9e
+runner_blob=af2cefa337dc40618c3f8ec8e9ef5a05c7d8c82f
+<HOME>/work/b103-tail-e5-NFXKbI/tree/s19_app/__init__.py
+..........................ssss                                           [100%]
+=========================== short test summary info ============================
+SKIPPED [4] tests/test_b103_clipboard_tail.py:1135: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+26 passed, 4 skipped in 379.32s (0:06:19)

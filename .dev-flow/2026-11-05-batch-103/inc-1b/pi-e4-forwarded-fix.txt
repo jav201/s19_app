@@ -1,0 +1,34 @@
+Done. `py_compile` passes.
+
+## Exact changes (s19_app/tui/app.py only)
+
+**1. E4CR-01 — MouseMove forwarded filter removed (line ~23345)**
+```diff
+-        elif isinstance(event, events.MouseMove) and not event.is_forwarded:
++        elif isinstance(event, events.MouseMove):
+```
+MouseDown/MouseUp filters untouched. Any MouseMove (forwarded or not) whose `screen_offset` differs from the candidate now sets `valid=False` via `replace`, including exit-return.
+
+**2. E4CR-02 — two stale `_CopyRowTable` docstrings corrected**
+
+Class docstring (~1512):
+```diff
+-        left clicks and ``out_of_bounds=True`` padding keep their existing
+-        behaviour. Row-name resolution stays in
++        left clicks keep the toolkit default and ``out_of_bounds=True``
++        padding is prevented from default and returns without moving the
++        cursor or emitting ``RowSelected``. Row-name resolution stays in
+```
+
+`on_click` docstring Summary (~1535):
+```diff
+-            suppresses only the toolkit's selection route; left clicks and
+-            ``out_of_bounds=True`` padding keep their existing behaviour
+-            (Inc 1b, R-COPY.21 / R-COPY.22).
++            suppresses only the toolkit's selection route; left clicks keep
++            the toolkit default, while ``out_of_bounds=True`` padding is
++            prevented from default and returns without moving the cursor or
++            emitting ``RowSelected`` (Inc 1b, R-COPY.21 / R-COPY.22).
+```
+
+No tests, docs, other files, or git refs touched. No pytest, no commit.

@@ -1,0 +1,23 @@
+Cloning into '<HOME>/work/e4-tail-29ce-green-1794501691-1965/tree'...
+done.
+Note: switching to 'c062293be6c122ecceca5701ea8afd0c6700f008'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+From <HOME>/work/integration-29ce-e4.bundle
+ * branch              b103-inc1b-integration -> FETCH_HEAD
+Previous HEAD position was c062293b batch-103 Inc 6 E5: record zero-gap traces
+HEAD is now at 29ce6448 Merge branch 'b103-inc1b-tests' into batch-103

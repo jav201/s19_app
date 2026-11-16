@@ -1,0 +1,11 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GT",
+  "id": "GT-T07",
+  "reason": "group baseline BAD; mutant never applied",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/4]"
+  ],
+  "verdict": "BAD"
+}

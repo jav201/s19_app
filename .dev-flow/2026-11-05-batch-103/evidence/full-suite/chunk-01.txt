@@ -1,0 +1,59 @@
+/tmp/b103-inc6-merge-final/s19_app/__init__.py
+...............................ss.......sF.....F........................ [  3%]
+..........................................................F............. [  7%]
+............................F.......................s.....s............. [ 10%]
+......................s...............................s................. [ 14%]
+.........................................F..F........................... [ 17%]
+........F............................................................... [ 21%]
+..................................s..s...............s.................. [ 25%]
+.ss.........s......ss.................s.s.sss...............F........F.. [ 28%]
+..........................s............................................. [ 32%]
+....................s....................s....s..s....ss......s......... [ 35%]
+............................s..s.....................................s.. [ 39%]
+............................................................s........... [ 43%]
+.......................ss.sF...F.sss...............ssss.ss.........ss... [ 46%]
+...............s.ssssssss....ss..........s...sssss...Fs.....ssss...s.... [ 50%]
+......s.............sssssssssssssssssssssssssss..............s........ss [ 53%]
+s...ss.....s..s..ss.s..s.sss.......sss...s...s.ssssss.s.ss.....ss....... [ 57%]
+....ss..sss......................................s........ssss.......s.s [ 61%]
+sssss.........s.......s..s....................s..........s......s..s.... [ 64%]
+................................................................ss...... [ 68%]
+.........................................s..............s..sssssss..s.s. [ 71%]
+sss......s..............s.....................................s...F..... [ 75%]
+...................s.........s.......s.....F.......................FFFFF [ 78%]
+FFFF.FFFFFFFFFFFssFFFFFxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 82%]
+FF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEEE [ 86%]
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEFFF...FEFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 89%]
+FF.FFFFE.F.F.EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE.....FF.................... [ 93%]
+................FFFF.F..FF.F.F.F.F.F.F.F.F.F.F.F.F.F.F.F.F.F.F.Fs...F.F. [ 96%]
+FFFFFFFFFFF.FFFFF.............................................           [100%]
+==================================== ERRORS ====================================
+____________ ERROR at setup of test_r_val_032_2_corpus_has_37_files ____________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7f7f90c486d0>, _basetemp=PosixPath('/tmp/pytest-of-<USER>/pytest-796'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def demo_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+        """The release demo from the repo's own generator (standard library only)."""
+        d = tmp_path_factory.mktemp("b101_inc11_demo")
+>       gen.generate(d, SEED, DEMO_SIZE_MB)
+
+tests/test_b101_a2l_blocks_and_segments.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/synth/make_release_case.py:1626: in generate
+    paths["s19"].write_text(emit_s19(regions, BOOT_BASE), encoding="utf-8")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-<USER>/pytest-796/b101_inc11_demo0/firmware.s19')
+data = 'S0170000533139544F4F4C5F52454C454153455F44454D4F09\nS32500000000333139544F4F4C20424F4F542076312E300000009F87000000000...FFFFFFFFFFFFFFFFFF6B\nS32500C00FE0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4B\nS70500000000FA\n'
+encoding = 'utf-8', errors = None, newline = None
+
+    def write_text(self, data, encoding=None, errors=None, newline=None):
+        """
+        Open the file in text mode, write to it, and close the file.
+        """
+        if not isinstance(data, str):
+            raise TypeError('data must be str, not %s' %
+                            data.__class__.__name__)
+        encoding = io.text_encoding(encoding)
+        with self.open(mode='w', encoding=enco

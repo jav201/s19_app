@@ -1,0 +1,70 @@
+{
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "baseline_only": false,
+  "baselines": [
+    {
+      "group": "GN",
+      "verdict": "BAD"
+    }
+  ],
+  "blocked_count": 0,
+  "executed_mutants": 0,
+  "manifest_sha256": "2d96df60e7544885cbbc270e8ee4c87ffc7c8015c2c9e0dfb87b5f3656efd543",
+  "results": [
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GN",
+      "id": "GN-N06",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GN",
+      "id": "GN-N07",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GN",
+      "id": "GN-N08",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+      ],
+      "verdict": "BAD"
+    },
+    {
+      "applied_count": 0,
+      "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+      "group": "GN",
+      "id": "GN-N09",
+      "reason": "group baseline BAD; mutant never applied",
+      "tests": [
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed",
+        "tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed"
+      ],
+      "verdict": "BAD"
+    }
+  ],
+  "selected_count": 4,
+  "verdicts": {
+    "BAD": 4,
+    "CRASH": 0,
+    "KILLED": 0,
+    "SURVIVED": 0
+  }
+}

@@ -1,0 +1,12 @@
+c062293be6c122ecceca5701ea8afd0c6700f008
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/b103-inc6-merge-final/.dev-flow/2026-11-05-batch-103/evidence/full-suite/run_sequential.py", line 44, in <module>
+    (OUT / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+  File "<HOME>/miniconda3/envs/s19ci/lib/python3.11/pathlib.py", line 1078, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+OSError: [Errno 28] No space left on device
+full_suite_exit=1

@@ -1,0 +1,100 @@
+s19_app.__file__ = <HOME>/work/b103-e4-views-29ce-MPzaTc/tree/s19_app/__init__.py
+INTEGRATION_HEAD = 29ce6448e49cc8a67ecf7a5a7c38a4f31833368c
+ISOLATION = {'TMPDIR': '<HOME>/work/b103-e4-views-29ce-MPzaTc/tmp', 'HOME': '<HOME>/work/b103-e4-views-29ce-MPzaTc/home', 'XDG_CONFIG_HOME': '<HOME>/work/b103-e4-views-29ce-MPzaTc/xdg-config', 'XDG_DATA_HOME': '<HOME>/work/b103-e4-views-29ce-MPzaTc/xdg-data', 'XDG_CACHE_HOME': '<HOME>/work/b103-e4-views-29ce-MPzaTc/xdg-cache', 'LOCALAPPDATA': '<HOME>/work/b103-e4-views-29ce-MPzaTc/localappdata', 'DISPLAY': None, 'WAYLAND_DISPLAY': None}
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/b103-e4-views-29ce-MPzaTc/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 12 items
+
+tests/test_b103_copy_views.py::test_r_copy_11_selection_and_highlight_do_not_copy[R-COPY.11/5] PASSED [  8%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/7] PASSED [ 16%]
+tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8] FAILED [ 25%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/7] PASSED [ 33%]
+tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8] FAILED [ 41%]
+tests/test_b103_copy_views.py::test_r_copy_12_7_back_to_back_and_reentry PASSED [ 50%]
+tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality PASSED [ 58%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/1] PASSED [ 66%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/2] PASSED [ 75%]
+tests/test_b103_copy_views.py::test_r_copy_15_right_click_clears_selection[R-COPY.15/3] PASSED [ 83%]
+tests/test_b103_copy_views.py::test_r_copy_1_ctrl_c_writes_each_view[R-COPY.1/4] PASSED [ 91%]
+tests/test_b103_copy_views.py::test_r_copy_12_right_click_selection[R-COPY.12/3] PASSED [100%]
+
+=================================== FAILURES ===================================
+___________ test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8] ___________
+tests/test_b103_copy_views.py:841: in test_r_copy_13_empty_and_cancelled_gestures
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:829: in drive
+    assert entry == tail == base == writes == []
+E   AssertionError: assert ['SECRET-SELECTION-MARKER row 0\nsecond row\nthird row'] == []
+E     
+E     Left contains one more item: 'SECRET-SELECTION-MARKER row 0\nsecond row\nthird row'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'SECRET-SELECTION-MARKER row 0\n'
+E     +     'second row\n'
+E     +     'third row',
+E     + ]
+___ test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8] ____
+tests/test_b103_copy_views.py:854: in test_r_copy_14_empty_and_cancelled_gestures_have_no_notice
+    asyncio.run(drive())
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_copy_views.py:852: in drive
+    assert notices == []
+E   AssertionError: assert [('Copied 3 lines to the clipboard.', 'information')] == []
+E     
+E     Left contains one more item: ('Copied 3 lines to the clipboard.', 'information')
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'Copied 3 lines to the clipboard.',
+E     +         'information',
+E     +     ),
+E     + ]
+=========================== short test summary info ============================
+FAILED tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/8] - AssertionError: assert ['SECRET-SELECTION-MARKER row 0\nsecond row\nthird row'] == []
+  
+  Left contains one more item: 'SECRET-SELECTION-MARKER row 0\nsecond row\nthird row'
+  
+  Full diff:
+  - []
+  + [
+  +     'SECRET-SELECTION-MARKER row 0\n'
+  +     'second row\n'
+  +     'third row',
+  + ]
+FAILED tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/8] - AssertionError: assert [('Copied 3 lines to the clipboard.', 'information')] == []
+  
+  Left contains one more item: ('Copied 3 lines to the clipboard.', 'information')
+  
+  Full diff:
+  - []
+  + [
+  +     (
+  +         'Copied 3 lines to the clipboard.',
+  +         'information',
+  +     ),
+  + ]
+=================== 2 failed, 10 passed in 119.27s (0:01:59) ===================

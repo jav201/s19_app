@@ -20,8 +20,10 @@ plus the mandatory Inc-1 addendas of
 * TC-B102-04/05 — the real PowerShell read/write rescues run under a
   ``>= 2.0`` s subprocess timeout (recorded by a ``subprocess.run`` fake),
   with a static command, ``shell=False`` and a hidden-window creation flag
-  (E3 addendum 5); the write layer passes the payload via stdin,
-  never interpolated into ``-Command``.
+  (E3 addendum 5). Binary stdout preserves the clipboard's exact CR/LF;
+  ``Out.Write`` adds no newline. The write layer passes UTF-8 bytes via
+  stdin to ``ReadToEnd`` + WPF ``SetText``, never ``Set-Clipboard`` or text
+  interpolated into ``-Command``.
 * TC-B102-06 — total OS write failure degrades to the internal clipboard
   and paints the exact warning
   ``Clipboard write failed — copied inside the app only.``
@@ -95,10 +97,10 @@ class _ClipboardHarness(App):
 
 
 class _FakeCompleted:
-    """Stand-in for ``subprocess.CompletedReturned`` from a faked ``run``."""
+    """Stand-in for binary ``subprocess.CompletedProcess`` results."""
 
     def __init__(
-        self, returncode: int = 0, stdout: str = "", stderr: str = ""
+        self, returncode: int = 0, stdout: bytes = b"", stderr: bytes = b""
     ) -> None:
         self.returncode = returncode
         self.stdout = stdout
@@ -570,10 +572,11 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
 ) -> None:
     """TC-B102-04 (R-B102-CLIP-005): read rescue gets >= 2.0 s.
 
-    ``subprocess.run`` is faked to record its ``timeout`` and return
-    ``OK_FROM_PS``; the tk/Win32 layers are irrelevant at this seam. The
-    recorded timeout is the real budget the layer hands the subprocess —
-    a 0.5 s residue (the mutant control) fails the assertion.
+    ``subprocess.run`` is faked to record its ``timeout`` and return the
+    bytes ``b"OK_FROM_PS\\r\\n"``; the tk/Win32 layers are irrelevant at
+    this seam. The result must retain that CRLF exactly. The recorded
+    timeout is the real budget the layer hands the subprocess — a 0.5 s
+    residue (the mutant control) fails the assertion.
     """
     from s19_app.tui import os_clipboard_input as mod
 
@@ -582,7 +585,9 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
     def _fake_run(argv, **kwargs):
         captured["argv"] = list(argv)
         captured["kwargs"] = dict(kwargs)
-        return _FakeCompleted(returncode=0, stdout="OK_FROM_PS\r\n", stderr="")
+        return _FakeCompleted(
+            returncode=0, stdout=b"OK_FROM_PS\r\n", stderr=b""
+        )
 
     monkeypatch.setattr(mod.subprocess, "run", _fake_run)
     monkeypatch.setattr(mod.sys, "platform", "win32")
@@ -590,7 +595,7 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
 
     text = mod._read_via_powershell()
 
-    assert text == "OK_FROM_PS", f"got {text!r}"
+    assert text == "OK_FROM_PS\r\n", f"got {text!r}"
     timeout = captured["kwargs"].get("timeout")
     assert timeout is not None and timeout >= 2.0, (
         f"The PowerShell read rescue must allow a cold process start of "
@@ -601,29 +606,46 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
     )
     argv = captured["argv"]
     assert argv[0] == "C:\\PS\\powershell.exe", f"argv={argv!r}"
-    assert any("Get-Clipboard" in str(part) for part in argv[1:]), (
-        f"The read command must stay the static Get-Clipboard form; argv={argv!r}"
+    command = " ".join(map(str, argv[1:]))
+    assert "[Console]::Out.Write((Get-Clipboard -Raw))" in command, (
+        "The read command must use raw Get-Clipboard plus Out.Write, which "
+        f"adds no newline; argv={argv!r}"
     )
+    assert "Out.WriteLine" not in command
     assert "OK_FROM_PS" not in " ".join(map(str, argv)), (
         "Clipboard-derived text must never be interpolated into the command."
     )
-    assert captured["kwargs"].get("shell") is False, (
-        f"The PowerShell subprocess must use shell=False; "
-        f"kwargs={captured['kwargs']!r}"
+    kwargs = captured["kwargs"]
+    assert not kwargs.get("text", False), (
+        "Binary stdout is required to preserve the clipboard's CR/LF exactly"
     )
-    _assert_hidden_window(captured["kwargs"])
+    assert not kwargs.get("universal_newlines", False), (
+        "Universal-newline mode would normalize the clipboard payload"
+    )
+    assert kwargs.get("encoding") is None, (
+        "UTF-8 decoding must happen after binary subprocess capture"
+    )
+    assert kwargs.get("errors") is None, (
+        "subprocess text-mode error handling must not enable newline translation"
+    )
+    assert kwargs.get("shell") is False, (
+        f"The PowerShell subprocess must use shell=False; kwargs={kwargs!r}"
+    )
+    _assert_hidden_window(kwargs)
 
 
 def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """TC-B102-05 (R-B102-CLIP-005): write rescue — 2.0 s, stdin payload.
+    """TC-B102-05 (R-B102-CLIP-005): write rescue — 2.0 s, UTF-8 stdin bytes.
 
     The copied text must reach PowerShell through the ``input`` (stdin)
-    kwarg as UTF-8, never interpolated into ``-Command``; the command
-    stays the static ``Set-Clipboard`` form; ``shell=False`` and a hidden
-    window are requested (E3 addendum 5). Imported lazily — the layer is
-    added by this increment, so RED is the ``ImportError``.
+    kwarg as UTF-8 bytes, never interpolated into ``-Command`` or through
+    universal-newline text mode. The static command reads stdin once with
+    ``ReadToEnd`` and writes it through WPF ``SetText``, never
+    ``Set-Clipboard``; ``shell=False`` and a hidden window are requested
+    (E3 addendum 5). Imported lazily — the layer is added by this increment,
+    so RED is the ``ImportError``.
     """
     from s19_app.tui import os_clipboard_input as mod
     from s19_app.tui.os_clipboard_input import _write_via_powershell
@@ -633,13 +655,14 @@ def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_std
     def _fake_run(argv, **kwargs):
         captured["argv"] = list(argv)
         captured["kwargs"] = dict(kwargs)
-        return _FakeCompleted(returncode=0, stdout="", stderr="")
+        return _FakeCompleted(returncode=0, stdout=b"", stderr=b"")
 
     monkeypatch.setattr(mod.subprocess, "run", _fake_run)
     monkeypatch.setattr(mod.sys, "platform", "win32")
     monkeypatch.setattr(mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
-    written = _write_via_powershell("payload")
+    payload = "payload-Ñ\r\n"
+    written = _write_via_powershell(payload)
 
     assert written is True, "exit 0 must yield a successful write"
     timeout = captured["kwargs"].get("timeout")
@@ -649,22 +672,41 @@ def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_std
     )
     argv = captured["argv"]
     assert argv[0] == "C:\\PS\\powershell.exe", f"argv={argv!r}"
-    assert any("Set-Clipboard" in str(part) for part in argv[1:]), (
-        f"The write command must stay the static Set-Clipboard form; argv={argv!r}"
+    command = " ".join(map(str, argv[1:]))
+    assert "[Console]::In.ReadToEnd()" in command, (
+        f"The writer must consume stdin once with ReadToEnd; argv={argv!r}"
     )
-    assert "payload" not in " ".join(map(str, argv)), (
+    assert "[Windows.Clipboard]::SetText($text)" in command, (
+        f"The writer must use WPF SetText; argv={argv!r}"
+    )
+    assert "Set-Clipboard" not in command, (
+        f"Set-Clipboard can rebuild line endings and is forbidden; argv={argv!r}"
+    )
+    assert payload not in " ".join(map(str, argv)), (
         "The copied text must travel via stdin, never interpolated into -Command; "
         f"argv={argv!r}"
     )
-    assert captured["kwargs"].get("input") == "payload", (
-        f"The payload must be passed through the stdin kwarg; "
-        f"kwargs={captured['kwargs']!r}"
+    kwargs = captured["kwargs"]
+    assert kwargs.get("input") == payload.encode("utf-8"), (
+        f"The payload must be exact UTF-8 bytes passed through stdin; "
+        f"kwargs={kwargs!r}"
     )
-    assert captured["kwargs"].get("shell") is False, (
-        f"The PowerShell subprocess must use shell=False; "
-        f"kwargs={captured['kwargs']!r}"
+    assert not kwargs.get("text", False), (
+        "Binary stdin is required to avoid universal-newline translation"
     )
-    _assert_hidden_window(captured["kwargs"])
+    assert not kwargs.get("universal_newlines", False), (
+        "Universal-newline mode would translate the outbound payload"
+    )
+    assert kwargs.get("encoding") is None, (
+        "The payload is encoded explicitly instead of through subprocess text mode"
+    )
+    assert kwargs.get("errors") is None, (
+        "subprocess text-mode error handling must not enable newline translation"
+    )
+    assert kwargs.get("shell") is False, (
+        f"The PowerShell subprocess must use shell=False; kwargs={kwargs!r}"
+    )
+    _assert_hidden_window(kwargs)
 
 
 # ---------------------------------------------------------------------------

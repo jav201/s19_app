@@ -1,0 +1,13 @@
+{
+  "applied_count": 0,
+  "baseline_commit": "287b9dc3c5e18614ea50a053ef183d80dac59dfc",
+  "group": "GT",
+  "id": "GT-T03",
+  "reason": "group baseline BAD; mutant never applied",
+  "tests": [
+    "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/1]",
+    "tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]",
+    "tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality"
+  ],
+  "verdict": "BAD"
+}

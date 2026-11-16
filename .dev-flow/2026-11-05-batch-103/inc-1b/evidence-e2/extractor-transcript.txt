@@ -1,0 +1,10 @@
+# Inc 1b E2 baseline py_compile + Code-Wire extractor
+# run 2026-11-12T11:57:33Z
+# throwaway repo: C:/Users/<user>/kimi/inc1b-e2-baseline-59d467f-1VoAS9/repo
+## py_compile (marked throwaway files only)
+exit=0
+
+## codewire_extract.py
+python -I C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo repo --graph baseline-graph.md --path s19_app/tui/app.py --path s19_app/tui/os_clipboard_input.py --path s19_app/tui/capped_text_area.py --out extractor
+marks=25 graph_nodes=25 calls=17 findings=0 parse_failures=0
+exit=0

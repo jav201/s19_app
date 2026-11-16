@@ -1,0 +1,2389 @@
+FINAL_SCRATCH=/tmp/b103-e5-matrix-final-LoTLyy
+BASE_HEAD=0d4d4e7c800b27040769a1a10117e62884cc7326
+Linux
+Python 3.11.18
+PASS external_read_preserves_payload
+PASS external_read_checks_returncode
+PASS matrix_uses_system_resolver
+PASS matrix_census_is_28
+PASS matrix_waits_before_read_and_paste
+PASS workflow_contract
+CONTRACT_FAILURES=0
+CONTRACT_EXIT=0
+POST_RUN_STATUS:
+ M .github/workflows/clipboard-windows.yml
+ M tests/support/b103_clipboard.py
+ M tests/test_b103_copy_paste_matrix.py
+POST_RUN_DIFF_CHECK:
+tests/support/b103_clipboard.py:1: trailing whitespace.
++"""Batch-103 Inc 1a clipboard test support (G-T; independent tester).
+tests/support/b103_clipboard.py:2: trailing whitespace.
++
+tests/support/b103_clipboard.py:3: trailing whitespace.
++Summary:
+tests/support/b103_clipboard.py:4: trailing whitespace.
++    Shared fixtures and helpers for the Inc 1a clipboard tests
+tests/support/b103_clipboard.py:5: trailing whitespace.
++    (``tests/test_b103_clipboard_core.py``, ``_windows.py``,
+tests/support/b103_clipboard.py:6: trailing whitespace.
++    ``_matrix.py``). One home for the OS-clipboard isolation predicate and
+tests/support/b103_clipboard.py:7: trailing whitespace.
++    guard (R-PASTE.21), the hosted-runner clipboard probe (R-PASTE.22,
+tests/support/b103_clipboard.py:8: trailing whitespace.
++    .23), the host-platform seam, and the black-box driving helpers of
+tests/support/b103_clipboard.py:9: trailing whitespace.
++    ``02-test-cases.md`` §Common fixtures: payloads, the one-box app
+tests/support/b103_clipboard.py:10: trailing whitespace.
++    (Box 1 / Box 2), the App-route right-click, the terminal paste, the
+tests/support/b103_clipboard.py:11: trailing whitespace.
++    OSC 52 spy, the process spy, notice and log capture, and the timing
+tests/support/b103_clipboard.py:12: trailing whitespace.
++    helpers (typed-key time, tick lateness).
+tests/support/b103_clipboard.py:13: trailing whitespace.
++
+tests/support/b103_clipboard.py:14: trailing whitespace.
++    Windows-only helpers (Other-program write/read, Own read/write, the
+tests/support/b103_clipboard.py:15: trailing whitespace.
++    held clipboard, the empty Unicode text) are declared here so the
+tests/support/b103_clipboard.py:16: trailing whitespace.
++    WinCI arms import them from one place; off Windows they raise a skip
+tests/support/b103_clipboard.py:17: trailing whitespace.
++    reason rather than touching a real clipboard. No helper in this module
+tests/support/b103_clipboard.py:18: trailing whitespace.
++    opens a clipboard unless ``require_isolated_clipboard`` first passed.
+tests/support/b103_clipboard.py:19: trailing whitespace.
++
+tests/support/b103_clipboard.py:20: trailing whitespace.
++Data Flow:
+tests/support/b103_clipboard.py:21: trailing whitespace.
++    - ``clipboard_isolated`` is the pure predicate; ``require_isolated_clipboard``
+tests/support/b103_clipboard.py:22: trailing whitespace.
++      wraps it with ``pytest.fail`` so an un-isolated test fails before any open.
+tests/support/b103_clipboard.py:23: trailing whitespace.
++    - ``clipboard_probe`` caches its one-shot result per session and is the
+tests/support/b103_clipboard.py:24: trailing whitespace.
++      body of the probe test and of the ``os_clipboard_ready`` skip fixture.
+tests/support/b103_clipboard.py:25: trailing whitespace.
++    - The driving helpers post real Textual events (keys, ``events.Paste``,
+tests/support/b103_clipboard.py:26: trailing whitespace.
++      ``MouseDown``/``MouseUp`` to the App) so the product code under test
+tests/support/b103_clipboard.py:27: trailing whitespace.
++      answers, never a stand-in.
+tests/support/b103_clipboard.py:28: trailing whitespace.
++
+tests/support/b103_clipboard.py:29: trailing whitespace.
++Dependencies:
+tests/support/b103_clipboard.py:30: trailing whitespace.
++    Uses:
+tests/support/b103_clipboard.py:31: trailing whitespace.
++        - ``textual`` (App, events)
+tests/support/b103_clipboard.py:32: trailing whitespace.
++        - ``s19_app.tui.os_clipboard_input`` / ``capped_text_area`` (under test)
+tests/support/b103_clipboard.py:33: trailing whitespace.
++        - ``tests.support.timing`` (``timing_bound``)
+tests/support/b103_clipboard.py:34: trailing whitespace.
++    Used by:
+tests/support/b103_clipboard.py:35: trailing whitespace.
++        - ``tests/test_b103_clipboard_core.py``
+tests/support/b103_clipboard.py:36: trailing whitespace.
++        - ``tests/test_b103_clipboard_windows.py``
+tests/support/b103_clipboard.py:37: trailing whitespace.
++        - ``tests/test_b103_clipboard_matrix.py``
+tests/support/b103_clipboard.py:38: trailing whitespace.
++"""
+tests/support/b103_clipboard.py:39: trailing whitespace.
++
+tests/support/b103_clipboard.py:40: trailing whitespace.
++from __future__ import annotations
+tests/support/b103_clipboard.py:41: trailing whitespace.
++
+tests/support/b103_clipboard.py:42: trailing whitespace.
++import asyncio
+tests/support/b103_clipboard.py:43: trailing whitespace.
++import base64
+tests/support/b103_clipboard.py:44: trailing whitespace.
++import logging
+tests/support/b103_clipboard.py:45: trailing whitespace.
++import os
+tests/support/b103_clipboard.py:46: trailing whitespace.
++import re
+tests/support/b103_clipboard.py:47: trailing whitespace.
++import subprocess
+tests/support/b103_clipboard.py:48: trailing whitespace.
++import sys
+tests/support/b103_clipboard.py:49: trailing whitespace.
++import time
+tests/support/b103_clipboard.py:50: trailing whitespace.
++from typing import Callable, Optional
+tests/support/b103_clipboard.py:51: trailing whitespace.
++
+tests/support/b103_clipboard.py:52: trailing whitespace.
++import pytest
+tests/support/b103_clipboard.py:53: trailing whitespace.
++from textual import events
+tests/support/b103_clipboard.py:54: trailing whitespace.
++from textual.app import App, ComposeResult
+tests/support/b103_clipboard.py:55: trailing whitespace.
++from textual.widgets import Button, Input, TextArea
+tests/support/b103_clipboard.py:56: trailing whitespace.
++
+tests/support/b103_clipboard.py:57: trailing whitespace.
++from s19_app.tui.capped_text_area import CappedTextArea
+tests/support/b103_clipboard.py:58: trailing whitespace.
++from s19_app.tui.os_clipboard_input import OsClipboardInput
+tests/support/b103_clipboard.py:59: trailing whitespace.
++
+tests/support/b103_clipboard.py:60: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:61: trailing whitespace.
++# Host platform seam and the isolation predicate / guard (R-PASTE.21)
+tests/support/b103_clipboard.py:62: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:63: trailing whitespace.
++
+tests/support/b103_clipboard.py:64: trailing whitespace.
++#: Environment override for the host-platform seam. The LinuxH pytester
+tests/support/b103_clipboard.py:65: trailing whitespace.
++#: runs (R-PASTE.21/4, R-PASTE.22/1, R-PASTE.23/1-2) set it in their
+tests/support/b103_clipboard.py:66: trailing whitespace.
++#: generated conftest so the suite-wide fixture sees ``win32`` at session
+tests/support/b103_clipboard.py:67: trailing whitespace.
++#: start without touching ``sys.platform``.
+tests/support/b103_clipboard.py:68: trailing whitespace.
++_HOST_PLATFORM_ENV = "B103_HOST_PLATFORM"
+tests/support/b103_clipboard.py:69: trailing whitespace.
++
+tests/support/b103_clipboard.py:70: trailing whitespace.
++
+tests/support/b103_clipboard.py:71: trailing whitespace.
++def host_platform() -> str:
+tests/support/b103_clipboard.py:72: trailing whitespace.
++    """``sys.platform`` by default; overridable through ``B103_HOST_PLATFORM``.
+tests/support/b103_clipboard.py:73: trailing whitespace.
++
+tests/support/b103_clipboard.py:74: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:75: trailing whitespace.
++        The one-line seam every isolation consumer reads (``clipboard_isolated``,
+tests/support/b103_clipboard.py:76: trailing whitespace.
++        the Windows-file setup skip, ``os_clipboard_ready``) so a LinuxH
+tests/support/b103_clipboard.py:77: trailing whitespace.
++        pytester run can pretend to be a Windows host without patching
+tests/support/b103_clipboard.py:78: trailing whitespace.
++        ``sys.platform`` in-process.
+tests/support/b103_clipboard.py:79: trailing whitespace.
++
+tests/support/b103_clipboard.py:80: trailing whitespace.
++    Returns:
+tests/support/b103_clipboard.py:81: trailing whitespace.
++        str: The host platform name, ``"win32"`` or otherwise.
+tests/support/b103_clipboard.py:82: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:83: trailing whitespace.
++    return os.environ.get(_HOST_PLATFORM_ENV, sys.platform)
+tests/support/b103_clipboard.py:84: trailing whitespace.
++
+tests/support/b103_clipboard.py:85: trailing whitespace.
++
+tests/support/b103_clipboard.py:86: trailing whitespace.
++def _logged_account() -> Optional[str]:
+tests/support/b103_clipboard.py:87: trailing whitespace.
++    """The logged-on account (``GetUserNameW`` / ``os.getlogin()``), not ``%USERNAME%``."""
+tests/support/b103_clipboard.py:88: trailing whitespace.
++    if sys.platform != "win32":
+tests/support/b103_clipboard.py:89: trailing whitespace.
++        return None
+tests/support/b103_clipboard.py:90: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:91: trailing whitespace.
++        import ctypes
+tests/support/b103_clipboard.py:92: trailing whitespace.
++        from ctypes import wintypes
+tests/support/b103_clipboard.py:93: trailing whitespace.
++
+tests/support/b103_clipboard.py:94: trailing whitespace.
++        size = wintypes.DWORD(256)
+tests/support/b103_clipboard.py:95: trailing whitespace.
++        buffer = ctypes.create_unicode_buffer(256)
+tests/support/b103_clipboard.py:96: trailing whitespace.
++        ctypes.windll.advapi32.GetUserNameW(buffer, ctypes.byref(size))
+tests/support/b103_clipboard.py:97: trailing whitespace.
++        return buffer.value
+tests/support/b103_clipboard.py:98: trailing whitespace.
++    except Exception:  # pragma: no cover - defensive
+tests/support/b103_clipboard.py:99: trailing whitespace.
++        try:
+tests/support/b103_clipboard.py:100: trailing whitespace.
++            return os.getlogin()
+tests/support/b103_clipboard.py:101: trailing whitespace.
++        except Exception:
+tests/support/b103_clipboard.py:102: trailing whitespace.
++            return None
+tests/support/b103_clipboard.py:103: trailing whitespace.
++
+tests/support/b103_clipboard.py:104: trailing whitespace.
++
+tests/support/b103_clipboard.py:105: trailing whitespace.
++def clipboard_isolated(
+tests/support/b103_clipboard.py:106: trailing whitespace.
++    kind: str,
+tests/support/b103_clipboard.py:107: trailing whitespace.
++    environ: Optional[dict] = None,
+tests/support/b103_clipboard.py:108: trailing whitespace.
++    platform: Optional[str] = None,
+tests/support/b103_clipboard.py:109: trailing whitespace.
++    account: Optional[str] = None,
+tests/support/b103_clipboard.py:110: trailing whitespace.
++) -> tuple:
+tests/support/b103_clipboard.py:111: trailing whitespace.
++    """The pure isolation predicate of R-PASTE.21; never fails a test.
+tests/support/b103_clipboard.py:112: trailing whitespace.
++
+tests/support/b103_clipboard.py:113: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:114: trailing whitespace.
++        ``kind="windows"``: isolated iff the platform is ``win32``,
+tests/support/b103_clipboard.py:115: trailing whitespace.
++        ``GITHUB_ACTIONS`` = ``true``, ``RUNNER_ENVIRONMENT`` =
+tests/support/b103_clipboard.py:116: trailing whitespace.
++        ``github-hosted`` and the logged-on account is ``<USER>``.
+tests/support/b103_clipboard.py:117: trailing whitespace.
++        ``kind="x"``: isolated iff ``DISPLAY`` equals the display the
+tests/support/b103_clipboard.py:118: trailing whitespace.
++        session's own Xvfb fixture started (none until it starts). The
+tests/support/b103_clipboard.py:119: trailing whitespace.
++        reason names the first term that fails; ``""`` when isolated.
+tests/support/b103_clipboard.py:120: trailing whitespace.
++
+tests/support/b103_clipboard.py:121: trailing whitespace.
++    Args:
+tests/support/b103_clipboard.py:122: trailing whitespace.
++        kind (str): ``"windows"`` or ``"x"``.
+tests/support/b103_clipboard.py:123: trailing whitespace.
++        environ (Optional[dict]): Environment mapping; defaults to ``os.environ``.
+tests/support/b103_clipboard.py:124: trailing whitespace.
++        platform (Optional[str]): Platform name; defaults to :func:`host_platform`.
+tests/support/b103_clipboard.py:125: trailing whitespace.
++        account (Optional[str]): Logged-on account; defaults to
+tests/support/b103_clipboard.py:126: trailing whitespace.
++            :func:`_logged_account` (Windows only).
+tests/support/b103_clipboard.py:127: trailing whitespace.
++
+tests/support/b103_clipboard.py:128: trailing whitespace.
++    Returns:
+tests/support/b103_clipboard.py:129: trailing whitespace.
++        tuple: ``(isolated: bool, reason: str)``.
+tests/support/b103_clipboard.py:130: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:131: trailing whitespace.
++    env = os.environ if environ is None else environ
+tests/support/b103_clipboard.py:132: trailing whitespace.
++    plat = host_platform() if platform is None else platform
+tests/support/b103_clipboard.py:133: trailing whitespace.
++    if kind == "windows":
+tests/support/b103_clipboard.py:134: trailing whitespace.
++        if plat != "win32":
+tests/support/b103_clipboard.py:135: trailing whitespace.
++            return False, f"platform='{plat}'"
+tests/support/b103_clipboard.py:136: trailing whitespace.
++        if env.get("GITHUB_ACTIONS", "").lower() != "true":
+tests/support/b103_clipboard.py:137: trailing whitespace.
++            return False, "GITHUB_ACTIONS != 'true'"
+tests/support/b103_clipboard.py:138: trailing whitespace.
++        if env.get("RUNNER_ENVIRONMENT") != "github-hosted":
+tests/support/b103_clipboard.py:139: trailing whitespace.
++            return False, f"RUNNER_ENVIRONMENT='{env.get('RUNNER_ENVIRONMENT')}'"
+tests/support/b103_clipboard.py:140: trailing whitespace.
++        acct = _logged_account() if account is None else account
+tests/support/b103_clipboard.py:141: trailing whitespace.
++        if acct != "<USER>":
+tests/support/b103_clipboard.py:142: trailing whitespace.
++            return False, f"account='{acct}'"
+tests/support/b103_clipboard.py:143: trailing whitespace.
++        return True, ""
+tests/support/b103_clipboard.py:144: trailing whitespace.
++    if kind == "x":
+tests/support/b103_clipboard.py:145: trailing whitespace.
++        display = env.get("DISPLAY")
+tests/support/b103_clipboard.py:146: trailing whitespace.
++        if not display:
+tests/support/b103_clipboard.py:147: trailing whitespace.
++            return False, "DISPLAY is not set"
+tests/support/b103_clipboard.py:148: trailing whitespace.
++        session_display = env.get("B103_XVFB_DISPLAY")
+tests/support/b103_clipboard.py:149: trailing whitespace.
++        if session_display is None or display != session_display:
+tests/support/b103_clipboard.py:150: trailing whitespace.
++            return False, "DISPLAY is not the session's private Xvfb display"
+tests/support/b103_clipboard.py:151: trailing whitespace.
++        return True, ""
+tests/support/b103_clipboard.py:152: trailing whitespace.
++    raise ValueError(f"unknown clipboard isolation kind: {kind!r}")
+tests/support/b103_clipboard.py:153: trailing whitespace.
++
+tests/support/b103_clipboard.py:154: trailing whitespace.
++
+tests/support/b103_clipboard.py:155: trailing whitespace.
++def require_isolated_clipboard(
+tests/support/b103_clipboard.py:156: trailing whitespace.
++    kind: str,
+tests/support/b103_clipboard.py:157: trailing whitespace.
++    environ: Optional[dict] = None,
+tests/support/b103_clipboard.py:158: trailing whitespace.
++    platform: Optional[str] = None,
+tests/support/b103_clipboard.py:159: trailing whitespace.
++    account: Optional[str] = None,
+tests/support/b103_clipboard.py:160: trailing whitespace.
++) -> None:
+tests/support/b103_clipboard.py:161: trailing whitespace.
++    """Fail the test (never skip) before anything opens a clipboard.
+tests/support/b103_clipboard.py:162: trailing whitespace.
++
+tests/support/b103_clipboard.py:163: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:164: trailing whitespace.
++        The isolation guard of this module's helpers: calls
+tests/support/b103_clipboard.py:165: trailing whitespace.
++        :func:`clipboard_isolated` and ``pytest.fail``s with
+tests/support/b103_clipboard.py:166: trailing whitespace.
++        ``OS clipboard not isolated: <reason>`` when it is not isolated. It
+tests/support/b103_clipboard.py:167: trailing whitespace.
++        opens nothing itself; every clipboard helper of this module calls it
+tests/support/b103_clipboard.py:168: trailing whitespace.
++        first.
+tests/support/b103_clipboard.py:169: trailing whitespace.
++
+tests/support/b103_clipboard.py:170: trailing whitespace.
++    Args:
+tests/support/b103_clipboard.py:171: trailing whitespace.
++        kind (str): ``"windows"`` or ``"x"``.
+tests/support/b103_clipboard.py:172: trailing whitespace.
++        environ (Optional[dict]): Passed through to :func:`clipboard_isolated`.
+tests/support/b103_clipboard.py:173: trailing whitespace.
++        platform (Optional[str]): Passed through.
+tests/support/b103_clipboard.py:174: trailing whitespace.
++        account (Optional[str]): Passed through.
+tests/support/b103_clipboard.py:175: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:176: trailing whitespace.
++    ok, reason = clipboard_isolated(kind, environ, platform, account)
+tests/support/b103_clipboard.py:177: trailing whitespace.
++    if not ok:
+tests/support/b103_clipboard.py:178: trailing whitespace.
++        pytest.fail(f"OS clipboard not isolated: {reason}")
+tests/support/b103_clipboard.py:179: trailing whitespace.
++
+tests/support/b103_clipboard.py:180: trailing whitespace.
++
+tests/support/b103_clipboard.py:181: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:182: trailing whitespace.
++# The hosted-runner clipboard probe (R-PASTE.22, .23)
+tests/support/b103_clipboard.py:183: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:184: trailing whitespace.
++
+tests/support/b103_clipboard.py:185: trailing whitespace.
++#: One-shot body of the probe, replaced by a stand-in in the LinuxH
+tests/support/b103_clipboard.py:186: trailing whitespace.
++#: pytester runs (E3A-28). Returns ``(usable: bool, result: str)``.
+tests/support/b103_clipboard.py:187: trailing whitespace.
++def _probe_once() -> tuple:
+tests/support/b103_clipboard.py:188: trailing whitespace.
++    """Write a nonce with the test's own Win32 code and read it back by a
+tests/support/b103_clipboard.py:189: trailing whitespace.
++    separate system PowerShell ``Get-Clipboard -Raw`` process."""
+tests/support/b103_clipboard.py:190: trailing whitespace.
++    require_isolated_clipboard("windows")
+tests/support/b103_clipboard.py:191: trailing whitespace.
++    nonce = "b103-probe-" + os.urandom(16).hex()
+tests/support/b103_clipboard.py:192: trailing whitespace.
++    # Write with the test process's own Win32 code (independent of the
+tests/support/b103_clipboard.py:193: trailing whitespace.
++    # product under test), then read back with a separate PowerShell.
+tests/support/b103_clipboard.py:194: trailing whitespace.
++    written = _own_write(nonce)
+tests/support/b103_clipboard.py:195: trailing whitespace.
++    if not written:
+tests/support/b103_clipboard.py:196: trailing whitespace.
++        return False, "win32 write failed"
+tests/support/b103_clipboard.py:197: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:198: trailing whitespace.
++        read_back = other_program_read()
+tests/support/b103_clipboard.py:199: trailing whitespace.
++    except Exception as exc:  # pragma: no cover - the layers report themselves
+tests/support/b103_clipboard.py:200: trailing whitespace.
++        return False, f"PowerShell read raised {exc!r}"
+tests/support/b103_clipboard.py:201: trailing whitespace.
++    if read_back == nonce:
+tests/support/b103_clipboard.py:202: trailing whitespace.
++        return True, f"win32 write ok, PowerShell read {nonce!r}"
+tests/support/b103_clipboard.py:203: trailing whitespace.
++    return False, f"win32 write ok, PowerShell read {read_back!r}"
+tests/support/b103_clipboard.py:204: trailing whitespace.
++
+tests/support/b103_clipboard.py:205: trailing whitespace.
++
+tests/support/b103_clipboard.py:206: trailing whitespace.
++_probe_cache: Optional[tuple] = None
+tests/support/b103_clipboard.py:207: trailing whitespace.
++
+tests/support/b103_clipboard.py:208: trailing whitespace.
++
+tests/support/b103_clipboard.py:209: trailing whitespace.
++def clipboard_probe() -> tuple:
+tests/support/b103_clipboard.py:210: trailing whitespace.
++    """The cached clipboard probe; ``(usable, result)``, once per session."""
+tests/support/b103_clipboard.py:211: trailing whitespace.
++    global _probe_cache
+tests/support/b103_clipboard.py:212: trailing whitespace.
++    if _probe_cache is None:
+tests/support/b103_clipboard.py:213: trailing whitespace.
++        _probe_cache = _probe_once()
+tests/support/b103_clipboard.py:214: trailing whitespace.
++    return _probe_cache
+tests/support/b103_clipboard.py:215: trailing whitespace.
++
+tests/support/b103_clipboard.py:216: trailing whitespace.
++
+tests/support/b103_clipboard.py:217: trailing whitespace.
++@pytest.fixture
+tests/support/b103_clipboard.py:218: trailing whitespace.
++def os_clipboard_ready() -> None:
+tests/support/b103_clipboard.py:219: trailing whitespace.
++    """Skip off Windows; fail (never skip) on a non-isolated Windows host;
+tests/support/b103_clipboard.py:220: trailing whitespace.
++    skip with ``runner clipboard unusable: <result>`` on a failed probe."""
+tests/support/b103_clipboard.py:221: trailing whitespace.
++    if host_platform() != "win32":
+tests/support/b103_clipboard.py:222: trailing whitespace.
++        pytest.skip("Windows only")
+tests/support/b103_clipboard.py:223: trailing whitespace.
++    require_isolated_clipboard("windows")
+tests/support/b103_clipboard.py:224: trailing whitespace.
++    usable, result = clipboard_probe()
+tests/support/b103_clipboard.py:225: trailing whitespace.
++    if not usable:
+tests/support/b103_clipboard.py:226: trailing whitespace.
++        pytest.skip(f"runner clipboard unusable: {result}")
+tests/support/b103_clipboard.py:227: trailing whitespace.
++
+tests/support/b103_clipboard.py:228: trailing whitespace.
++
+tests/support/b103_clipboard.py:229: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:230: trailing whitespace.
++# Contract literals and payloads (02-test-cases.md §Common fixtures)
+tests/support/b103_clipboard.py:231: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:232: trailing whitespace.
++
+tests/support/b103_clipboard.py:233: trailing whitespace.
++READ_FAIL_WARNING = "Clipboard read failed — try Ctrl+Shift+V or type the path manually."
+tests/support/b103_clipboard.py:234: trailing whitespace.
++WRITE_FAIL_WARNING = "Clipboard write failed — copied inside the app only."
+tests/support/b103_clipboard.py:235: trailing whitespace.
++CAP = 65536
+tests/support/b103_clipboard.py:236: trailing whitespace.
++
+tests/support/b103_clipboard.py:237: trailing whitespace.
++P1 = "COPY-1 Ñoño Ж 漢字 😀"
+tests/support/b103_clipboard.py:238: trailing whitespace.
++P2 = "L1 Ñ€\nL2 漢"
+tests/support/b103_clipboard.py:239: trailing whitespace.
++P1000 = "0123456789" * 100
+tests/support/b103_clipboard.py:240: trailing whitespace.
++P70K = "x" * 70000
+tests/support/b103_clipboard.py:241: trailing whitespace.
++P_CTRL = "A\x1b[13DB\x00C\u202e\uD800"
+tests/support/b103_clipboard.py:242: trailing whitespace.
++P_CTRL_W = "A\x1b[13DBC"
+tests/support/b103_clipboard.py:243: trailing whitespace.
++P_CTRL_L = "L1\x1b[2J\nL2"
+tests/support/b103_clipboard.py:244: trailing whitespace.
++P_CTRL_M = "A\x1b[13DB\x00C\tD\r\nE\u202e\uD800"
+tests/support/b103_clipboard.py:245: trailing whitespace.
++P_CTRL_MW = "A\x1b[13DBC\tD\r\nE\u202e\uD800"
+tests/support/b103_clipboard.py:246: trailing whitespace.
++P2_ESC = "L1 \u00d1\u20ac\x1b[2J\nL2 \u6f22"
+tests/support/b103_clipboard.py:247: trailing whitespace.
++
+tests/support/b103_clipboard.py:248: trailing whitespace.
++
+tests/support/b103_clipboard.py:249: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:250: trailing whitespace.
++# One-box app (Box 1 / Box 2) and the box accessors
+tests/support/b103_clipboard.py:251: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:252: trailing whitespace.
++
+tests/support/b103_clipboard.py:253: trailing whitespace.
++
+tests/support/b103_clipboard.py:254: trailing whitespace.
++class _OneBoxApp(App):
+tests/support/b103_clipboard.py:255: trailing whitespace.
++    """A Button ``#other`` plus one clipboard box; at least 20 content cells."""
+tests/support/b103_clipboard.py:256: trailing whitespace.
++
+tests/support/b103_clipboard.py:257: trailing whitespace.
++    def __init__(self, box_kind: str) -> None:
+tests/support/b103_clipboard.py:258: trailing whitespace.
++        super().__init__()
+tests/support/b103_clipboard.py:259: trailing whitespace.
++        self.box_kind = box_kind
+tests/support/b103_clipboard.py:260: trailing whitespace.
++
+tests/support/b103_clipboard.py:261: trailing whitespace.
++    def compose(self) -> ComposeResult:
+tests/support/b103_clipboard.py:262: trailing whitespace.
++        yield Button("other", id="other")
+tests/support/b103_clipboard.py:263: trailing whitespace.
++        if self.box_kind == "input":
+tests/support/b103_clipboard.py:264: trailing whitespace.
++            yield OsClipboardInput("", id="box")
+tests/support/b103_clipboard.py:265: trailing whitespace.
++        else:
+tests/support/b103_clipboard.py:266: trailing whitespace.
++            yield CappedTextArea("", id="box")
+tests/support/b103_clipboard.py:267: trailing whitespace.
++
+tests/support/b103_clipboard.py:268: trailing whitespace.
++
+tests/support/b103_clipboard.py:269: trailing whitespace.
++def _box(widget: object) -> str:
+tests/support/b103_clipboard.py:270: trailing whitespace.
++    """The editable value of a single- or multi-line box, as the oracle reads it."""
+tests/support/b103_clipboard.py:271: trailing whitespace.
++    if isinstance(widget, CappedTextArea):
+tests/support/b103_clipboard.py:272: trailing whitespace.
++        return widget.text
+tests/support/b103_clipboard.py:273: trailing whitespace.
++    return widget.value
+tests/support/b103_clipboard.py:274: trailing whitespace.
++
+tests/support/b103_clipboard.py:275: trailing whitespace.
++
+tests/support/b103_clipboard.py:276: trailing whitespace.
++def _set_box(widget: object, text: str) -> None:
+tests/support/b103_clipboard.py:277: trailing whitespace.
++    if isinstance(widget, CappedTextArea):
+tests/support/b103_clipboard.py:278: trailing whitespace.
++        widget.text = text
+tests/support/b103_clipboard.py:279: trailing whitespace.
++    else:
+tests/support/b103_clipboard.py:280: trailing whitespace.
++        widget.value = text
+tests/support/b103_clipboard.py:281: trailing whitespace.
++
+tests/support/b103_clipboard.py:282: trailing whitespace.
++
+tests/support/b103_clipboard.py:283: trailing whitespace.
++def _box_lines(widget: object) -> list:
+tests/support/b103_clipboard.py:284: trailing whitespace.
++    """The document lines of a multi-line box (its ``document.lines``)."""
+tests/support/b103_clipboard.py:285: trailing whitespace.
++    return list(widget.document.lines) if isinstance(widget, CappedTextArea) else None
+tests/support/b103_clipboard.py:286: trailing whitespace.
++
+tests/support/b103_clipboard.py:287: trailing whitespace.
++
+tests/support/b103_clipboard.py:288: trailing whitespace.
++async def _select_all(widget: object) -> None:
+tests/support/b103_clipboard.py:289: trailing whitespace.
++    if isinstance(widget, CappedTextArea):
+tests/support/b103_clipboard.py:290: trailing whitespace.
++        widget.select_all()
+tests/support/b103_clipboard.py:291: trailing whitespace.
++    else:
+tests/support/b103_clipboard.py:292: trailing whitespace.
++        widget.selection = (0, len(widget.value or ""))
+tests/support/b103_clipboard.py:293: trailing whitespace.
++
+tests/support/b103_clipboard.py:294: trailing whitespace.
++
+tests/support/b103_clipboard.py:295: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:296: trailing whitespace.
++# Terminal paste and the App-route right-click
+tests/support/b103_clipboard.py:297: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:298: trailing whitespace.
++
+tests/support/b103_clipboard.py:299: trailing whitespace.
++
+tests/support/b103_clipboard.py:300: trailing whitespace.
++async def terminal_paste(app: App, text: str) -> None:
+tests/support/b103_clipboard.py:301: trailing whitespace.
++    """Post ``events.Paste`` to the App, as Textual's driver posts it."""
+tests/support/b103_clipboard.py:302: trailing whitespace.
++    app.post_message(events.Paste(text))
+tests/support/b103_clipboard.py:303: trailing whitespace.
++
+tests/support/b103_clipboard.py:304: trailing whitespace.
++
+tests/support/b103_clipboard.py:305: trailing whitespace.
++async def show_sje_manual(app: App, pilot) -> None:
+tests/support/b103_clipboard.py:306: trailing whitespace.
++    """Open Split/Join/Export and switch to the manual-localities tab.
+tests/support/b103_clipboard.py:307: trailing whitespace.
++
+tests/support/b103_clipboard.py:308: trailing whitespace.
++    ``#sje_manual`` starts hidden on the default ranges tab; pressing ``t``
+tests/support/b103_clipboard.py:309: trailing whitespace.
++    cycles to the manual tab, which lays the box out and focuses it."""
+tests/support/b103_clipboard.py:310: trailing whitespace.
++    app.action_open_split_join_export()
+tests/support/b103_clipboard.py:311: trailing whitespace.
++    for _ in range(4):
+tests/support/b103_clipboard.py:312: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:313: trailing whitespace.
++    await pilot.press("t")
+tests/support/b103_clipboard.py:314: trailing whitespace.
++    for _ in range(4):
+tests/support/b103_clipboard.py:315: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:316: trailing whitespace.
++
+tests/support/b103_clipboard.py:317: trailing whitespace.
++
+tests/support/b103_clipboard.py:318: trailing whitespace.
++async def show_patch_paste(app: App, pilot) -> None:
+tests/support/b103_clipboard.py:319: trailing whitespace.
++    """Show the Patch screen's JSON tab so ``#patch_paste_text`` is laid out.
+tests/support/b103_clipboard.py:320: trailing whitespace.
++
+tests/support/b103_clipboard.py:321: trailing whitespace.
++    ``#patch_paste_text`` lives on the Patch screen's JSON tab and stays
+tests/support/b103_clipboard.py:322: trailing whitespace.
++    unmounted (region 0x0) until the ``#patch_tab_json`` chip is pressed;
+tests/support/b103_clipboard.py:323: trailing whitespace.
++    key-based paste reaches it through the focus, but a mouse right-click
+tests/support/b103_clipboard.py:324: trailing whitespace.
++    needs the box to be visible."""
+tests/support/b103_clipboard.py:325: trailing whitespace.
++    app.action_show_screen("patch")
+tests/support/b103_clipboard.py:326: trailing whitespace.
++    for _ in range(4):
+tests/support/b103_clipboard.py:327: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:328: trailing whitespace.
++    await pilot.click("#patch_tab_json")
+tests/support/b103_clipboard.py:329: trailing whitespace.
++    for _ in range(4):
+tests/support/b103_clipboard.py:330: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:331: trailing whitespace.
++
+tests/support/b103_clipboard.py:332: trailing whitespace.
++
+tests/support/b103_clipboard.py:333: trailing whitespace.
++async def right_click_app_route(app: App, pilot, widget: object) -> None:
+tests/support/b103_clipboard.py:334: trailing whitespace.
++    """Deliver the right-click through the App route: a button-3
+tests/support/b103_clipboard.py:335: trailing whitespace.
++    ``MouseDown`` then ``MouseUp`` posted to the App back to back (no
+tests/support/b103_clipboard.py:336: trailing whitespace.
++    pause), so ``App.on_event`` hit-tests the box and makes the ``Click``
+tests/support/b103_clipboard.py:337: trailing whitespace.
++    (E3A-11 d). The post is followed by ``pilot.pause()`` so the App's own
+tests/support/b103_clipboard.py:338: trailing whitespace.
++    run loop dispatches the pair — never ``app._process_messages()``, which
+tests/support/b103_clipboard.py:339: trailing whitespace.
++    re-composes the screen and raises ``MountError``."""
+tests/support/b103_clipboard.py:340: trailing whitespace.
++    region = widget.region
+tests/support/b103_clipboard.py:341: trailing whitespace.
++    x = region.x + max(0, min(2, region.width - 1))
+tests/support/b103_clipboard.py:342: trailing whitespace.
++    y = region.y
+tests/support/b103_clipboard.py:343: trailing whitespace.
++    down = events.MouseDown(widget, x, y, 0, 0, 3, False, False, False, x, y, None)
+tests/support/b103_clipboard.py:344: trailing whitespace.
++    up = events.MouseUp(widget, x, y, 0, 0, 3, False, False, False, x, y, None)
+tests/support/b103_clipboard.py:345: trailing whitespace.
++    app.post_message(down)
+tests/support/b103_clipboard.py:346: trailing whitespace.
++    app.post_message(up)
+tests/support/b103_clipboard.py:347: trailing whitespace.
++    await pilot.pause()
+tests/support/b103_clipboard.py:348: trailing whitespace.
++
+tests/support/b103_clipboard.py:349: trailing whitespace.
++
+tests/support/b103_clipboard.py:350: trailing whitespace.
++async def pilot_right_click(pilot, widget: object, *, offset: tuple = (2, 1)) -> None:
+tests/support/b103_clipboard.py:351: trailing whitespace.
++    """``pilot.click(..., button=3)`` — the Pilot route (bypasses ``App.on_event``)."""
+tests/support/b103_clipboard.py:352: trailing whitespace.
++    await pilot.click(widget, offset=offset, button=3)
+tests/support/b103_clipboard.py:353: trailing whitespace.
++
+tests/support/b103_clipboard.py:354: trailing whitespace.
++
+tests/support/b103_clipboard.py:355: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:356: trailing whitespace.
++# OSC 52 spy and the process spy
+tests/support/b103_clipboard.py:357: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:358: trailing whitespace.
++
+tests/support/b103_clipboard.py:359: trailing whitespace.
++_OSC52_RE = re.compile(rb"\x1b\]52;c;([A-Za-z0-9+/=]+)\x07")
+tests/support/b103_clipboard.py:360: trailing whitespace.
++
+tests/support/b103_clipboard.py:361: trailing whitespace.
++
+tests/support/b103_clipboard.py:362: trailing whitespace.
++def install_osc52_spy(app: App) -> list:
+tests/support/b103_clipboard.py:363: trailing whitespace.
++    """Wrap ``app._driver.write``; return the list of decoded OSC 52 payloads.
+tests/support/b103_clipboard.py:364: trailing whitespace.
++
+tests/support/b103_clipboard.py:365: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:366: trailing whitespace.
++        A pass-through wrapper that keeps every ``ESC ] 52 ; c ; <b64> BEL``
+tests/support/b103_clipboard.py:367: trailing whitespace.
++        sequence and decodes it; every other write is forwarded unchanged.
+tests/support/b103_clipboard.py:368: trailing whitespace.
++        The returned list is mutated as the copy tail writes.
+tests/support/b103_clipboard.py:369: trailing whitespace.
++
+tests/support/b103_clipboard.py:370: trailing whitespace.
++    Returns:
+tests/support/b103_clipboard.py:371: trailing whitespace.
++        list: Decoded OSC 52 request payloads, in order.
+tests/support/b103_clipboard.py:372: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:373: trailing whitespace.
++    original = app._driver.write
+tests/support/b103_clipboard.py:374: trailing whitespace.
++    decoded: list = []
+tests/support/b103_clipboard.py:375: trailing whitespace.
++
+tests/support/b103_clipboard.py:376: trailing whitespace.
++    def _spy(data) -> None:
+tests/support/b103_clipboard.py:377: trailing whitespace.
++        if isinstance(data, str):
+tests/support/b103_clipboard.py:378: trailing whitespace.
++            data = data.encode("utf-8")
+tests/support/b103_clipboard.py:379: trailing whitespace.
++        for match in _OSC52_RE.findall(data):
+tests/support/b103_clipboard.py:380: trailing whitespace.
++            try:
+tests/support/b103_clipboard.py:381: trailing whitespace.
++                decoded.append(base64.b64decode(match).decode("utf-8"))
+tests/support/b103_clipboard.py:382: trailing whitespace.
++            except Exception:
+tests/support/b103_clipboard.py:383: trailing whitespace.
++                decoded.append(match.decode("ascii", "replace"))
+tests/support/b103_clipboard.py:384: trailing whitespace.
++        return original(data)
+tests/support/b103_clipboard.py:385: trailing whitespace.
++
+tests/support/b103_clipboard.py:386: trailing whitespace.
++    app._driver.write = _spy  # type: ignore[method-assign]
+tests/support/b103_clipboard.py:387: trailing whitespace.
++    return decoded
+tests/support/b103_clipboard.py:388: trailing whitespace.
++
+tests/support/b103_clipboard.py:389: trailing whitespace.
++
+tests/support/b103_clipboard.py:390: trailing whitespace.
++def install_process_spy(module) -> list:
+tests/support/b103_clipboard.py:391: trailing whitespace.
++    """Wrap ``subprocess.run`` on ``module``; return the list of argv[0] paths.
+tests/support/b103_clipboard.py:392: trailing whitespace.
++
+tests/support/b103_clipboard.py:393: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:394: trailing whitespace.
++        A pass-through wrapper on process creation that records each program
+tests/support/b103_clipboard.py:395: trailing whitespace.
++        path (argv[0]) and then starts it unchanged. The spy belongs on the
+tests/support/b103_clipboard.py:396: trailing whitespace.
++        module whose ``subprocess.run`` the product under test uses
+tests/support/b103_clipboard.py:397: trailing whitespace.
++        (``s19_app.tui.os_clipboard_input``).
+tests/support/b103_clipboard.py:398: trailing whitespace.
++
+tests/support/b103_clipboard.py:399: trailing whitespace.
++    Returns:
+tests/support/b103_clipboard.py:400: trailing whitespace.
++        list: Each started program's argv[0], in order.
+tests/support/b103_clipboard.py:401: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:402: trailing whitespace.
++    original = module.subprocess.run
+tests/support/b103_clipboard.py:403: trailing whitespace.
++    started: list = []
+tests/support/b103_clipboard.py:404: trailing whitespace.
++
+tests/support/b103_clipboard.py:405: trailing whitespace.
++    def _spy(argv, **kwargs):
+tests/support/b103_clipboard.py:406: trailing whitespace.
++        started.append(list(argv)[0] if argv else None)
+tests/support/b103_clipboard.py:407: trailing whitespace.
++        return original(argv, **kwargs)
+tests/support/b103_clipboard.py:408: trailing whitespace.
++
+tests/support/b103_clipboard.py:409: trailing whitespace.
++    module.subprocess.run = _spy  # type: ignore[assignment]
+tests/support/b103_clipboard.py:410: trailing whitespace.
++    return started
+tests/support/b103_clipboard.py:411: trailing whitespace.
++
+tests/support/b103_clipboard.py:412: trailing whitespace.
++
+tests/support/b103_clipboard.py:413: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:414: trailing whitespace.
++# Notice and log capture
+tests/support/b103_clipboard.py:415: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:416: trailing whitespace.
++
+tests/support/b103_clipboard.py:417: trailing whitespace.
++
+tests/support/b103_clipboard.py:418: trailing whitespace.
++def install_notice_capture(app: App) -> list:
+tests/support/b103_clipboard.py:419: trailing whitespace.
++    """Record ``(severity, message)`` for every ``app.notify`` call."""
+tests/support/b103_clipboard.py:420: trailing whitespace.
++    original = app.notify
+tests/support/b103_clipboard.py:421: trailing whitespace.
++    records: list = []
+tests/support/b103_clipboard.py:422: trailing whitespace.
++
+tests/support/b103_clipboard.py:423: trailing whitespace.
++    def _spy(message: str, *, severity: str = "information", **kwargs) -> None:
+tests/support/b103_clipboard.py:424: trailing whitespace.
++        records.append((severity, str(message)))
+tests/support/b103_clipboard.py:425: trailing whitespace.
++        try:
+tests/support/b103_clipboard.py:426: trailing whitespace.
++            original(message, severity=severity, **kwargs)
+tests/support/b103_clipboard.py:427: trailing whitespace.
++        except Exception:
+tests/support/b103_clipboard.py:428: trailing whitespace.
++            pass
+tests/support/b103_clipboard.py:429: trailing whitespace.
++
+tests/support/b103_clipboard.py:430: trailing whitespace.
++    app.notify = _spy  # type: ignore[method-assign]
+tests/support/b103_clipboard.py:431: trailing whitespace.
++    return records
+tests/support/b103_clipboard.py:432: trailing whitespace.
++
+tests/support/b103_clipboard.py:433: trailing whitespace.
++
+tests/support/b103_clipboard.py:434: trailing whitespace.
++class _LogCapture(logging.Handler):
+tests/support/b103_clipboard.py:435: trailing whitespace.
++    """A DEBUG handler on the ``s19_app`` logger recording (logger, level, message)."""
+tests/support/b103_clipboard.py:436: trailing whitespace.
++
+tests/support/b103_clipboard.py:437: trailing whitespace.
++    def __init__(self, records: list) -> None:
+tests/support/b103_clipboard.py:438: trailing whitespace.
++        super().__init__(level=logging.DEBUG)
+tests/support/b103_clipboard.py:439: trailing whitespace.
++        self.records = records
+tests/support/b103_clipboard.py:440: trailing whitespace.
++
+tests/support/b103_clipboard.py:441: trailing whitespace.
++    def emit(self, record: logging.LogRecord) -> None:
+tests/support/b103_clipboard.py:442: trailing whitespace.
++        self.records.append((record.name, record.levelname, record.getMessage()))
+tests/support/b103_clipboard.py:443: trailing whitespace.
++
+tests/support/b103_clipboard.py:444: trailing whitespace.
++
+tests/support/b103_clipboard.py:445: trailing whitespace.
++def install_log_capture() -> list:
+tests/support/b103_clipboard.py:446: trailing whitespace.
++    """Attach a DEBUG handler to the ``s19_app`` logger; return the record list."""
+tests/support/b103_clipboard.py:447: trailing whitespace.
++    records: list = []
+tests/support/b103_clipboard.py:448: trailing whitespace.
++    handler = _LogCapture(records)
+tests/support/b103_clipboard.py:449: trailing whitespace.
++    logging.getLogger("s19_app").addHandler(handler)
+tests/support/b103_clipboard.py:450: trailing whitespace.
++    return records
+tests/support/b103_clipboard.py:451: trailing whitespace.
++
+tests/support/b103_clipboard.py:452: trailing whitespace.
++
+tests/support/b103_clipboard.py:453: trailing whitespace.
++def remove_log_capture(records: list) -> None:
+tests/support/b103_clipboard.py:454: trailing whitespace.
++    """Remove every handler whose records list is ``records``."""
+tests/support/b103_clipboard.py:455: trailing whitespace.
++    logger = logging.getLogger("s19_app")
+tests/support/b103_clipboard.py:456: trailing whitespace.
++    for handler in list(logger.handlers):
+tests/support/b103_clipboard.py:457: trailing whitespace.
++        if getattr(handler, "records", None) is records:
+tests/support/b103_clipboard.py:458: trailing whitespace.
++            logger.removeHandler(handler)
+tests/support/b103_clipboard.py:459: trailing whitespace.
++
+tests/support/b103_clipboard.py:460: trailing whitespace.
++
+tests/support/b103_clipboard.py:461: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:462: trailing whitespace.
++# Timing helpers (02-test-cases.md §Common fixtures)
+tests/support/b103_clipboard.py:463: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:464: trailing whitespace.
++
+tests/support/b103_clipboard.py:465: trailing whitespace.
++
+tests/support/b103_clipboard.py:466: trailing whitespace.
++async def typed_key_time(pilot, widget: object, app: App) -> float:
+tests/support/b103_clipboard.py:467: trailing whitespace.
++    """Median, over 10 warm presses of ``a``, of press → first 5 ms poll that
+tests/support/b103_clipboard.py:468: trailing whitespace.
++    holds ``a`` in the cleared box (2 discarded first)."""
+tests/support/b103_clipboard.py:469: trailing whitespace.
++    if isinstance(widget, CappedTextArea):
+tests/support/b103_clipboard.py:470: trailing whitespace.
++        widget.text = ""
+tests/support/b103_clipboard.py:471: trailing whitespace.
++        widget.focus()
+tests/support/b103_clipboard.py:472: trailing whitespace.
++    else:
+tests/support/b103_clipboard.py:473: trailing whitespace.
++        widget.value = ""
+tests/support/b103_clipboard.py:474: trailing whitespace.
++        widget.focus()
+tests/support/b103_clipboard.py:475: trailing whitespace.
++    await pilot.pause()
+tests/support/b103_clipboard.py:476: trailing whitespace.
++    samples: list = []
+tests/support/b103_clipboard.py:477: trailing whitespace.
++    for _ in range(10):
+tests/support/b103_clipboard.py:478: trailing whitespace.
++        _set_box(widget, "")
+tests/support/b103_clipboard.py:479: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:480: trailing whitespace.
++        start = time.monotonic()
+tests/support/b103_clipboard.py:481: trailing whitespace.
++        await pilot.press("a")
+tests/support/b103_clipboard.py:482: trailing whitespace.
++        deadline = time.monotonic() + 5.0
+tests/support/b103_clipboard.py:483: trailing whitespace.
++        while time.monotonic() < deadline:
+tests/support/b103_clipboard.py:484: trailing whitespace.
++            await asyncio.sleep(0.005)
+tests/support/b103_clipboard.py:485: trailing whitespace.
++            await pilot.pause()
+tests/support/b103_clipboard.py:486: trailing whitespace.
++            if "a" in _box(widget):
+tests/support/b103_clipboard.py:487: trailing whitespace.
++                break
+tests/support/b103_clipboard.py:488: trailing whitespace.
++        samples.append(time.monotonic() - start)
+tests/support/b103_clipboard.py:489: trailing whitespace.
++    samples = samples[2:]
+tests/support/b103_clipboard.py:490: trailing whitespace.
++    samples.sort()
+tests/support/b103_clipboard.py:491: trailing whitespace.
++    return samples[len(samples) // 2]
+tests/support/b103_clipboard.py:492: trailing whitespace.
++
+tests/support/b103_clipboard.py:493: trailing whitespace.
++
+tests/support/b103_clipboard.py:494: trailing whitespace.
++async def _poll_until(pilot, predicate: Callable[[], bool], timeout: float = 10.0) -> float:
+tests/support/b103_clipboard.py:495: trailing whitespace.
++    """Poll ``predicate`` every 5 ms until truthy; return elapsed seconds."""
+tests/support/b103_clipboard.py:496: trailing whitespace.
++    start = time.monotonic()
+tests/support/b103_clipboard.py:497: trailing whitespace.
++    while time.monotonic() - start < timeout:
+tests/support/b103_clipboard.py:498: trailing whitespace.
++        if predicate():
+tests/support/b103_clipboard.py:499: trailing whitespace.
++            return time.monotonic() - start
+tests/support/b103_clipboard.py:500: trailing whitespace.
++        await asyncio.sleep(0.005)
+tests/support/b103_clipboard.py:501: trailing whitespace.
++        await pilot.pause()
+tests/support/b103_clipboard.py:502: trailing whitespace.
++    raise AssertionError("poll predicate not satisfied within timeout")
+tests/support/b103_clipboard.py:503: trailing whitespace.
++
+tests/support/b103_clipboard.py:504: trailing whitespace.
++
+tests/support/b103_clipboard.py:505: trailing whitespace.
++async def wait_for_copy_tail(pilot, marker: dict, timeout: float = 10.0) -> None:
+tests/support/b103_clipboard.py:506: trailing whitespace.
++    """Wait for an instrumented copy tail to start and finish."""
+tests/support/b103_clipboard.py:507: trailing whitespace.
++    await _poll_until(pilot, lambda: bool(marker.get("started")), timeout)
+tests/support/b103_clipboard.py:508: trailing whitespace.
++    await _poll_until(pilot, lambda: bool(marker.get("ended")), timeout)
+tests/support/b103_clipboard.py:509: trailing whitespace.
++
+tests/support/b103_clipboard.py:510: trailing whitespace.
++
+tests/support/b103_clipboard.py:511: trailing whitespace.
++async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
+tests/support/b103_clipboard.py:512: trailing whitespace.
++    """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
+tests/support/b103_clipboard.py:513: trailing whitespace.
++
+tests/support/b103_clipboard.py:514: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:515: trailing whitespace.
++        The tick oracle is a repeating ``app.set_interval`` armed on the
+tests/support/b103_clipboard.py:516: trailing whitespace.
++        running app (not the screen), so each tick fires and is counted on the
+tests/support/b103_clipboard.py:517: trailing whitespace.
++        event loop; ``screen.set_interval`` never fires under ``run_test`` + the
+tests/support/b103_clipboard.py:518: trailing whitespace.
++        Pilot poll loop (run-4 triage), leaving ``lateness`` empty. ``marker`` is
+tests/support/b103_clipboard.py:519: trailing whitespace.
++        a dict the pass-through read/write entry flips to ``True`` once the
+tests/support/b103_clipboard.py:520: trailing whitespace.
++        clipboard layer started; a vacuous run (the marker never set before the
+tests/support/b103_clipboard.py:521: trailing whitespace.
++        end) fails in the test. Returns the list of lateness values (actual − due)."""
+tests/support/b103_clipboard.py:522: trailing whitespace.
++    lateness: list = []
+tests/support/b103_clipboard.py:523: trailing whitespace.
++    due = time.monotonic() + interval
+tests/support/b103_clipboard.py:524: trailing whitespace.
++
+tests/support/b103_clipboard.py:525: trailing whitespace.
++    def _tick():
+tests/support/b103_clipboard.py:526: trailing whitespace.
++        nonlocal due
+tests/support/b103_clipboard.py:527: trailing whitespace.
++        now = time.monotonic()
+tests/support/b103_clipboard.py:528: trailing whitespace.
++        lateness.append(now - due)
+tests/support/b103_clipboard.py:529: trailing whitespace.
++        due = now + interval
+tests/support/b103_clipboard.py:530: trailing whitespace.
++
+tests/support/b103_clipboard.py:531: trailing whitespace.
++    # A repeating timer owned by the running app (fires on the event loop).
+tests/support/b103_clipboard.py:532: trailing whitespace.
++    timer = app.set_interval(interval, _tick)
+tests/support/b103_clipboard.py:533: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:534: trailing whitespace.
++        yield lateness
+tests/support/b103_clipboard.py:535: trailing whitespace.
++    finally:
+tests/support/b103_clipboard.py:536: trailing whitespace.
++        timer.stop()
+tests/support/b103_clipboard.py:537: trailing whitespace.
++
+tests/support/b103_clipboard.py:538: trailing whitespace.
++
+tests/support/b103_clipboard.py:539: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:540: trailing whitespace.
++# Windows-only helpers (the WinCI arms; skipped off Windows)
+tests/support/b103_clipboard.py:541: trailing whitespace.
++# ---------------------------------------------------------------------------
+tests/support/b103_clipboard.py:542: trailing whitespace.
++
+tests/support/b103_clipboard.py:543: trailing whitespace.
++
+tests/support/b103_clipboard.py:544: trailing whitespace.
++def _require_windows() -> None:
+tests/support/b103_clipboard.py:545: trailing whitespace.
++    if host_platform() != "win32":
+tests/support/b103_clipboard.py:546: trailing whitespace.
++        pytest.skip("Windows only")
+tests/support/b103_clipboard.py:547: trailing whitespace.
++
+tests/support/b103_clipboard.py:548: trailing whitespace.
++
+tests/support/b103_clipboard.py:549: trailing whitespace.
++def _system_powershell_path() -> str:
+tests/support/b103_clipboard.py:550: trailing whitespace.
++    """The system PowerShell path from the module under test (Windows only)."""
+tests/support/b103_clipboard.py:551: trailing whitespace.
++    from s19_app.tui import os_clipboard_input as mod
+tests/support/b103_clipboard.py:552: trailing whitespace.
++
+tests/support/b103_clipboard.py:553: trailing whitespace.
++    path = mod._system_powershell()
+tests/support/b103_clipboard.py:554: trailing whitespace.
++    if not path:
+tests/support/b103_clipboard.py:555: trailing whitespace.
++        pytest.skip("system PowerShell not found on this host")
+tests/support/b103_clipboard.py:556: trailing whitespace.
++    return path
+tests/support/b103_clipboard.py:557: trailing whitespace.
++
+tests/support/b103_clipboard.py:558: trailing whitespace.
++
+tests/support/b103_clipboard.py:559: trailing whitespace.
++def other_program_write(text: str) -> None:
+tests/support/b103_clipboard.py:560: trailing whitespace.
++    """Write the clipboard for the "other program" role via :func:`_own_write`.
+tests/support/b103_clipboard.py:561: trailing whitespace.
++
+tests/support/b103_clipboard.py:562: trailing whitespace.
++    Summary:
+tests/support/b103_clipboard.py:563: trailing whitespace.
++        Run-3 triage C6: the previous PowerShell UTF-16LE stdin pipe decoded
+tests/support/b103_clipboard.py:564: trailing whitespace.
++        to a one-character payload (an embedded NUL after every char). This
+tests/support/b103_clipboard.py:565: trailing whitespace.
++        now delegates to :func:`_own_write` (ctypes ``CF_UNICODETEXT``,
+tests/support/b103_clipboard.py:566: trailing whitespace.
++        UTF-16LE, no PowerShell encoding trick) — the path the probe already
+tests/support/b103_clipboard.py:567: trailing whitespace.
++        proves round-trips through :func:`other_program_read` and the
+tests/support/b103_clipboard.py:568: trailing whitespace.
++        product's readers — and then self-checks the round-trip so a future
+tests/support/b103_clipboard.py:569: trailing whitespace.
++        encoding regression fails here instead of in 21 downstream tests.
+tests/support/b103_clipboard.py:570: trailing whitespace.
++
+tests/support/b103_clipboard.py:571: trailing whitespace.
++    Args:
+tests/support/b103_clipboard.py:572: trailing whitespace.
++        text (str): The payload to write to the clipboard.
+tests/support/b103_clipboard.py:573: trailing whitespace.
++
+tests/support/b103_clipboard.py:574: trailing whitespace.
++    Raises:
+tests/support/b103_clipboard.py:575: trailing whitespace.
++        AssertionError: When the Win32 write fails, or the value reads back
+tests/support/b103_clipboard.py:576: trailing whitespace.
++            different from ``text``.
+tests/support/b103_clipboard.py:577: trailing whitespace.
++    """
+tests/support/b103_clipboard.py:578: trailing whitespace.
++    _require_windows()
+tests/support/b103_clipboard.py:579: trailing whitespace.
++    if not _own_write(text):
+tests/support/b103_clipboard.py:580: trailing whitespace.
++        raise AssertionError("other_program_write: CF_UNICODETEXT write failed")
+tests/support/b103_clipboard.py:581: trailing whitespace.
++    read_back = own_read()
+tests/support/b103_clipboard.py:582: trailing whitespace.
++    if read_back != text:
+tests/support/b103_clipboard.py:583: trailing whitespace.
++        shown = read_back[:20] if read_back is not None else None
+tests/support/b103_clipboard.py:584: trailing whitespace.
++        raise AssertionError(
+tests/support/b103_clipboard.py:585: trailing whitespace.
++            "other_program_write round-trip failed: "
+tests/support/b103_clipboard.py:586: trailing whitespace.
++            f"wrote {text[:20]!r}, read back {shown!r}"
+tests/support/b103_clipboard.py:587: trailing whitespace.
++        )
+tests/support/b103_clipboard.py:588: trailing whitespace.
++
+tests/support/b103_clipboard.py:589: trailing whitespace.
++
+tests/support/b103_clipboard.py:590: trailing whitespace.
++def other_program_read() -> str:
+tests/support/b103_clipboard.py:591: trailing whitespace.
++    """Read exact clipboard text through a separate system PowerShell."""
+tests/support/b103_clipboard.py:592: trailing whitespace.
++    _require_windows()
+tests/support/b103_clipboard.py:593: trailing whitespace.
++    path = _system_powershell_path()
+tests/support/b103_clipboard.py:594: trailing whitespace.
++    command = (
+tests/support/b103_clipboard.py:595: trailing whitespace.
++        "$ErrorActionPreference='Stop'; "
+tests/support/b103_clipboard.py:596: trailing whitespace.
++        "[Console]::OutputEncoding=[Text.Encoding]::UTF8; "
+tests/support/b103_clipboard.py:597: trailing whitespace.
++        "$text=[string](Get-Clipboard -Raw); "
+tests/support/b103_clipboard.py:598: trailing whitespace.
++        "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($text))"
+tests/support/b103_clipboard.py:599: trailing whitespace.
++    )
+tests/support/b103_clipboard.py:600: trailing whitespace.
++    result = subprocess.run(
+tests/support/b103_clipboard.py:601: trailing whitespace.
++        [path, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", command],
+tests/support/b103_clipboard.py:602: trailing whitespace.
++        capture_output=True, text=True, encoding="utf-8",
+tests/support/b103_clipboard.py:603: trailing whitespace.
++        errors="strict", timeout=10.0, shell=False,
+tests/support/b103_clipboard.py:604: trailing whitespace.
++        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+tests/support/b103_clipboard.py:605: trailing whitespace.
++    )
+tests/support/b103_clipboard.py:606: trailing whitespace.
++    if result.returncode:
+tests/support/b103_clipboard.py:607: trailing whitespace.
++        detail = (result.stderr or "").strip()[:500]
+tests/support/b103_clipboard.py:608: trailing whitespace.
++        raise AssertionError(
+tests/support/b103_clipboard.py:609: trailing whitespace.
++            "other_program_read: PowerShell exit "
+tests/support/b103_clipboard.py:610: trailing whitespace.
++            f"{result.returncode}: {detail}"
+tests/support/b103_clipboard.py:611: trailing whitespace.
++        )
+tests/support/b103_clipboard.py:612: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:613: trailing whitespace.
++        return base64.b64decode(
+tests/support/b103_clipboard.py:614: trailing whitespace.
++            "".join(result.stdout.split()), validate=True
+tests/support/b103_clipboard.py:615: trailing whitespace.
++        ).decode("utf-8")
+tests/support/b103_clipboard.py:616: trailing whitespace.
++    except (ValueError, UnicodeError) as exc:
+tests/support/b103_clipboard.py:617: trailing whitespace.
++        raise AssertionError(
+tests/support/b103_clipboard.py:618: trailing whitespace.
++            "other_program_read: PowerShell output was not Base64 UTF-8"
+tests/support/b103_clipboard.py:619: trailing whitespace.
++        ) from exc
+tests/support/b103_clipboard.py:620: trailing whitespace.
++
+tests/support/b103_clipboard.py:621: trailing whitespace.
++
+tests/support/b103_clipboard.py:622: trailing whitespace.
++def _own_write(text: str) -> bool:
+tests/support/b103_clipboard.py:623: trailing whitespace.
++    """Write a ``CF_UNICODETEXT`` with the test's own Win32 code (UTF-16), so
+tests/support/b103_clipboard.py:624: trailing whitespace.
++    a lone surrogate survives; ``True`` on success."""
+tests/support/b103_clipboard.py:625: trailing whitespace.
++    _require_windows()
+tests/support/b103_clipboard.py:626: trailing whitespace.
++    import ctypes
+tests/support/b103_clipboard.py:627: trailing whitespace.
++    from ctypes import wintypes
+tests/support/b103_clipboard.py:628: trailing whitespace.
++
+tests/support/b103_clipboard.py:629: trailing whitespace.
++    user32 = ctypes.windll.user32
+tests/support/b103_clipboard.py:630: trailing whitespace.
++    kernel32 = ctypes.windll.kernel32
+tests/support/b103_clipboard.py:631: trailing whitespace.
++    user32.OpenClipboard.argtypes = [wintypes.HWND]
+tests/support/b103_clipboard.py:632: trailing whitespace.
++    user32.OpenClipboard.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:633: trailing whitespace.
++    user32.CloseClipboard.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:634: trailing whitespace.
++    user32.EmptyClipboard.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:635: trailing whitespace.
++    user32.SetClipboardData.argtypes = [wintypes.UINT, wintypes.HANDLE]
+tests/support/b103_clipboard.py:636: trailing whitespace.
++    user32.SetClipboardData.restype = wintypes.HANDLE
+tests/support/b103_clipboard.py:637: trailing whitespace.
++    kernel32.GlobalAlloc.argtypes = [wintypes.UINT, ctypes.c_size_t]
+tests/support/b103_clipboard.py:638: trailing whitespace.
++    kernel32.GlobalAlloc.restype = wintypes.HGLOBAL
+tests/support/b103_clipboard.py:639: trailing whitespace.
++    kernel32.GlobalLock.argtypes = [wintypes.HGLOBAL]
+tests/support/b103_clipboard.py:640: trailing whitespace.
++    kernel32.GlobalLock.restype = ctypes.c_void_p
+tests/support/b103_clipboard.py:641: trailing whitespace.
++    kernel32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
+tests/support/b103_clipboard.py:642: trailing whitespace.
++    kernel32.GlobalUnlock.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:643: trailing whitespace.
++    data = text.encode("utf-16-le", "surrogatepass") + b"\x00\x00"
+tests/support/b103_clipboard.py:644: trailing whitespace.
++    handle = kernel32.GlobalAlloc(0x0002, len(data))
+tests/support/b103_clipboard.py:645: trailing whitespace.
++    if not handle:
+tests/support/b103_clipboard.py:646: trailing whitespace.
++        return False
+tests/support/b103_clipboard.py:647: trailing whitespace.
++    pointer = kernel32.GlobalLock(handle)
+tests/support/b103_clipboard.py:648: trailing whitespace.
++    if not pointer:
+tests/support/b103_clipboard.py:649: trailing whitespace.
++        return False
+tests/support/b103_clipboard.py:650: trailing whitespace.
++    ctypes.memmove(pointer, data, len(data))
+tests/support/b103_clipboard.py:651: trailing whitespace.
++    kernel32.GlobalUnlock(handle)
+tests/support/b103_clipboard.py:652: trailing whitespace.
++    if not user32.OpenClipboard(None):
+tests/support/b103_clipboard.py:653: trailing whitespace.
++        return False
+tests/support/b103_clipboard.py:654: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:655: trailing whitespace.
++        user32.EmptyClipboard()
+tests/support/b103_clipboard.py:656: trailing whitespace.
++        return bool(user32.SetClipboardData(13, handle))
+tests/support/b103_clipboard.py:657: trailing whitespace.
++    finally:
+tests/support/b103_clipboard.py:658: trailing whitespace.
++        user32.CloseClipboard()
+tests/support/b103_clipboard.py:659: trailing whitespace.
++
+tests/support/b103_clipboard.py:660: trailing whitespace.
++
+tests/support/b103_clipboard.py:661: trailing whitespace.
++def own_read() -> str:
+tests/support/b103_clipboard.py:662: trailing whitespace.
++    """Read the clipboard with the test's own Win32 code (one read)."""
+tests/support/b103_clipboard.py:663: trailing whitespace.
++    _require_windows()
+tests/support/b103_clipboard.py:664: trailing whitespace.
++    import ctypes
+tests/support/b103_clipboard.py:665: trailing whitespace.
++    from ctypes import wintypes
+tests/support/b103_clipboard.py:666: trailing whitespace.
++
+tests/support/b103_clipboard.py:667: trailing whitespace.
++    user32 = ctypes.windll.user32
+tests/support/b103_clipboard.py:668: trailing whitespace.
++    kernel32 = ctypes.windll.kernel32
+tests/support/b103_clipboard.py:669: trailing whitespace.
++    user32.OpenClipboard.argtypes = [wintypes.HWND]
+tests/support/b103_clipboard.py:670: trailing whitespace.
++    user32.OpenClipboard.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:671: trailing whitespace.
++    user32.CloseClipboard.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:672: trailing whitespace.
++    user32.GetClipboardData.argtypes = [wintypes.UINT]
+tests/support/b103_clipboard.py:673: trailing whitespace.
++    user32.GetClipboardData.restype = wintypes.HANDLE
+tests/support/b103_clipboard.py:674: trailing whitespace.
++    kernel32.GlobalLock.argtypes = [wintypes.HGLOBAL]
+tests/support/b103_clipboard.py:675: trailing whitespace.
++    kernel32.GlobalLock.restype = ctypes.c_void_p
+tests/support/b103_clipboard.py:676: trailing whitespace.
++    kernel32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
+tests/support/b103_clipboard.py:677: trailing whitespace.
++    kernel32.GlobalUnlock.restype = wintypes.BOOL
+tests/support/b103_clipboard.py:678: trailing whitespace.
++    if not user32.OpenClipboard(None):
+tests/support/b103_clipboard.py:679: trailing whitespace.
++        return None
+tests/support/b103_clipboard.py:680: trailing whitespace.
++    try:
+tests/support/b103_clipboard.py:681: trailing whitespace.
++        handle = user32.GetClipboardData(13)
+tests/support/b103_clipboard.py:682: trailing whitespace.
++        if not handle:
+tests/support/b103_clipboard.py:683: trailing whitespace.
++            return None
+tests/support/b103_clipboard.py:684: trailing whitespace.
++        pointer = kernel32.GlobalLock(handle)
+tests/support/b103_clipboard.py:685: trailing whitespace.
++        if not pointer:
+tests/support/b103_clipboard.py:686: trailing whitespace.
++            return None
+tests/support/b103_clipboard.py:687: trailing whitespace.
++        try:
+tests/support/b103_clipboard.py:688: trailing whitespace.
++            return ctypes.wstring_at(pointer)
+tests/support/b103_clipboard.py:689: trailing whitespace.
++        finally:
+tests/support/b103_clipboard.py:690: trailing whitespace.
++            kernel32.GlobalUnlock(handle)
+tests/support/b103_clipboard.py:691: trailing whitespace.
++    finally:
+tests/support/b103_clipboard.py:692: trailing whitespace.
++        user32.CloseClipboard()
+tests/support/b103_clipboard.py:693: trailing whitespace.
++
+tests/support/b103_clipboard.py:694: trailing whitespace.
++
+tests/support/b103_clipboard.py:695: trailing whitespace.
++def clipboard_sequence_number() -> int:
+tests/support/b103_clipboard.py:696: trailing whitespace.
++    """``GetClipboardSequenceNumber()`` (Own-read detection of a copy's end)."""
+tests/support/b103_clipboard.py:697: trailing whitespace.
++    _require_windows()
+tests/support/b103_clipboard.py:698: trailing whitespace.
++    import ctypes
+tests/support/b103_clipboard.py:699: trailing whitespace.
++
+tests/support/b103_clipboard.py:700: trailing whitespace.
++    return int(ctypes.windll.user32.GetClipboardSequenceNumber())
+tests/test_b103_copy_paste_matrix.py:1: trailing whitespace.
++from __future__ import annotations
+tests/test_b103_copy_paste_matrix.py:2: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:3: trailing whitespace.
++import asyncio
+tests/test_b103_copy_paste_matrix.py:4: trailing whitespace.
++import base64
+tests/test_b103_copy_paste_matrix.py:5: trailing whitespace.
++import os
+tests/test_b103_copy_paste_matrix.py:6: trailing whitespace.
++import re
+tests/test_b103_copy_paste_matrix.py:7: trailing whitespace.
++import shutil
+tests/test_b103_copy_paste_matrix.py:8: trailing whitespace.
++import subprocess
+tests/test_b103_copy_paste_matrix.py:9: trailing whitespace.
++import sys
+tests/test_b103_copy_paste_matrix.py:10: trailing whitespace.
++from pathlib import Path
+tests/test_b103_copy_paste_matrix.py:11: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:12: trailing whitespace.
++import pytest
+tests/test_b103_copy_paste_matrix.py:13: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:14: trailing whitespace.
++from tests.support.b103_clipboard import (
+tests/test_b103_copy_paste_matrix.py:15: trailing whitespace.
++    _system_powershell_path,
+tests/test_b103_copy_paste_matrix.py:16: trailing whitespace.
++    clipboard_isolated,
+tests/test_b103_copy_paste_matrix.py:17: trailing whitespace.
++    other_program_read,
+tests/test_b103_copy_paste_matrix.py:18: trailing whitespace.
++    require_isolated_clipboard,
+tests/test_b103_copy_paste_matrix.py:19: trailing whitespace.
++    wait_for_copy_tail,
+tests/test_b103_copy_paste_matrix.py:20: trailing whitespace.
++)
+tests/test_b103_copy_paste_matrix.py:21: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:22: trailing whitespace.
++SEED = "SEED-1b"
+tests/test_b103_copy_paste_matrix.py:23: trailing whitespace.
++A2L_THIRD_ROW = "ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING"
+tests/test_b103_copy_paste_matrix.py:24: trailing whitespace.
++MAC_THIRD_ROW = "Curve_ExternalAxis"
+tests/test_b103_copy_paste_matrix.py:25: trailing whitespace.
++SIZE = (118, 54)
+tests/test_b103_copy_paste_matrix.py:26: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:27: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:28: trailing whitespace.
++def _is_winci() -> bool:
+tests/test_b103_copy_paste_matrix.py:29: trailing whitespace.
++    return clipboard_isolated("windows")[0]
+tests/test_b103_copy_paste_matrix.py:30: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:31: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:32: trailing whitespace.
++def _coverage_or_skip(route: str) -> str:
+tests/test_b103_copy_paste_matrix.py:33: trailing whitespace.
++    if sys.platform == "win32":
+tests/test_b103_copy_paste_matrix.py:34: trailing whitespace.
++        require_isolated_clipboard("windows")
+tests/test_b103_copy_paste_matrix.py:35: trailing whitespace.
++        return "full"
+tests/test_b103_copy_paste_matrix.py:36: trailing whitespace.
++    if sys.platform.startswith("linux"):
+tests/test_b103_copy_paste_matrix.py:37: trailing whitespace.
++        if route == "P2":
+tests/test_b103_copy_paste_matrix.py:38: trailing whitespace.
++            pytest.skip(
+tests/test_b103_copy_paste_matrix.py:39: trailing whitespace.
++                "not_run: terminal paste requires the real copy->separate OS read "
+tests/test_b103_copy_paste_matrix.py:40: trailing whitespace.
++                "artifact on isolated WinCI; Linux has no permitted OS read"
+tests/test_b103_copy_paste_matrix.py:41: trailing whitespace.
++            )
+tests/test_b103_copy_paste_matrix.py:42: trailing whitespace.
++        if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
+tests/test_b103_copy_paste_matrix.py:43: trailing whitespace.
++            pytest.skip(
+tests/test_b103_copy_paste_matrix.py:44: trailing whitespace.
++                "not_run: Linux P1 requires a headless neutral host with "
+tests/test_b103_copy_paste_matrix.py:45: trailing whitespace.
++                "DISPLAY and WAYLAND_DISPLAY unset"
+tests/test_b103_copy_paste_matrix.py:46: trailing whitespace.
++            )
+tests/test_b103_copy_paste_matrix.py:47: trailing whitespace.
++        return "partial"
+tests/test_b103_copy_paste_matrix.py:48: trailing whitespace.
++    pytest.skip(
+tests/test_b103_copy_paste_matrix.py:49: trailing whitespace.
++        "not_run: OS clipboard access is permitted only on isolated WinCI; "
+tests/test_b103_copy_paste_matrix.py:50: trailing whitespace.
++        "the only non-WinCI arm is headless Linux P1"
+tests/test_b103_copy_paste_matrix.py:51: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:52: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:53: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:54: trailing whitespace.
++def _powershell() -> Path:
+tests/test_b103_copy_paste_matrix.py:55: trailing whitespace.
++    return Path(_system_powershell_path())
+tests/test_b103_copy_paste_matrix.py:56: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:57: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:58: trailing whitespace.
++def _run_powershell(script: str) -> str:
+tests/test_b103_copy_paste_matrix.py:59: trailing whitespace.
++    try:
+tests/test_b103_copy_paste_matrix.py:60: trailing whitespace.
++        completed = subprocess.run(
+tests/test_b103_copy_paste_matrix.py:61: trailing whitespace.
++            [
+tests/test_b103_copy_paste_matrix.py:62: trailing whitespace.
++                str(_powershell()),
+tests/test_b103_copy_paste_matrix.py:63: trailing whitespace.
++                "-NoLogo",
+tests/test_b103_copy_paste_matrix.py:64: trailing whitespace.
++                "-NoProfile",
+tests/test_b103_copy_paste_matrix.py:65: trailing whitespace.
++                "-NonInteractive",
+tests/test_b103_copy_paste_matrix.py:66: trailing whitespace.
++                "-Command",
+tests/test_b103_copy_paste_matrix.py:67: trailing whitespace.
++                script,
+tests/test_b103_copy_paste_matrix.py:68: trailing whitespace.
++            ],
+tests/test_b103_copy_paste_matrix.py:69: trailing whitespace.
++            stdin=subprocess.DEVNULL,
+tests/test_b103_copy_paste_matrix.py:70: trailing whitespace.
++            stdout=subprocess.PIPE,
+tests/test_b103_copy_paste_matrix.py:71: trailing whitespace.
++            stderr=subprocess.PIPE,
+tests/test_b103_copy_paste_matrix.py:72: trailing whitespace.
++            encoding="utf-8",
+tests/test_b103_copy_paste_matrix.py:73: trailing whitespace.
++            errors="strict",
+tests/test_b103_copy_paste_matrix.py:74: trailing whitespace.
++            timeout=15,
+tests/test_b103_copy_paste_matrix.py:75: trailing whitespace.
++            check=False,
+tests/test_b103_copy_paste_matrix.py:76: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:77: trailing whitespace.
++    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
+tests/test_b103_copy_paste_matrix.py:78: trailing whitespace.
++        pytest.skip(f"not_run: isolated WinCI clipboard probe unusable: {exc}")
+tests/test_b103_copy_paste_matrix.py:79: trailing whitespace.
++    if completed.returncode:
+tests/test_b103_copy_paste_matrix.py:80: trailing whitespace.
++        detail = completed.stderr.strip()[:500]
+tests/test_b103_copy_paste_matrix.py:81: trailing whitespace.
++        pytest.skip(
+tests/test_b103_copy_paste_matrix.py:82: trailing whitespace.
++            "not_run: isolated WinCI clipboard probe unusable: "
+tests/test_b103_copy_paste_matrix.py:83: trailing whitespace.
++            f"PowerShell exit {completed.returncode}: {detail}"
+tests/test_b103_copy_paste_matrix.py:84: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:85: trailing whitespace.
++    return completed.stdout
+tests/test_b103_copy_paste_matrix.py:86: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:87: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:88: trailing whitespace.
++def _seed_os_clipboard() -> None:
+tests/test_b103_copy_paste_matrix.py:89: trailing whitespace.
++    encoded = base64.b64encode(SEED.encode("utf-8")).decode("ascii")
+tests/test_b103_copy_paste_matrix.py:90: trailing whitespace.
++    _run_powershell(
+tests/test_b103_copy_paste_matrix.py:91: trailing whitespace.
++        "$text=[Text.Encoding]::UTF8.GetString("
+tests/test_b103_copy_paste_matrix.py:92: trailing whitespace.
++        f"[Convert]::FromBase64String('{encoded}')); "
+tests/test_b103_copy_paste_matrix.py:93: trailing whitespace.
++        "Set-Clipboard -Value $text"
+tests/test_b103_copy_paste_matrix.py:94: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:95: trailing whitespace.
++    assert _read_os_clipboard() == SEED, "WinCI seed read-back failed before copy"
+tests/test_b103_copy_paste_matrix.py:96: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:97: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:98: trailing whitespace.
++def _read_os_clipboard() -> str:
+tests/test_b103_copy_paste_matrix.py:99: trailing whitespace.
++    return other_program_read()
+tests/test_b103_copy_paste_matrix.py:100: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:101: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:102: trailing whitespace.
++def _check_model_oracles(examples: Path) -> None:
+tests/test_b103_copy_paste_matrix.py:103: trailing whitespace.
++    a2l = (examples / "ASAP2_Demo_V171.a2l").read_text(encoding="utf-8")
+tests/test_b103_copy_paste_matrix.py:104: trailing whitespace.
++    names = set(
+tests/test_b103_copy_paste_matrix.py:105: trailing whitespace.
++        re.findall(
+tests/test_b103_copy_paste_matrix.py:106: trailing whitespace.
++            r"(?m)^\s*/begin\s+(?:MEASUREMENT|CHARACTERISTIC)\s+(\S+)",
+tests/test_b103_copy_paste_matrix.py:107: trailing whitespace.
++            a2l,
+tests/test_b103_copy_paste_matrix.py:108: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:109: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:110: trailing whitespace.
++    assert A2L_THIRD_ROW in names, "A2L canonical model does not contain the ledger row"
+tests/test_b103_copy_paste_matrix.py:111: trailing whitespace.
++    mac_names = []
+tests/test_b103_copy_paste_matrix.py:112: trailing whitespace.
++    for line in (examples / "synthetic_update_test1.mac").read_text(
+tests/test_b103_copy_paste_matrix.py:113: trailing whitespace.
++        encoding="utf-8"
+tests/test_b103_copy_paste_matrix.py:114: trailing whitespace.
++    ).splitlines():
+tests/test_b103_copy_paste_matrix.py:115: trailing whitespace.
++        stripped = line.strip()
+tests/test_b103_copy_paste_matrix.py:116: trailing whitespace.
++        if stripped and not stripped.startswith("#") and "=" in stripped:
+tests/test_b103_copy_paste_matrix.py:117: trailing whitespace.
++            mac_names.append(stripped.split("=", 1)[0])
+tests/test_b103_copy_paste_matrix.py:118: trailing whitespace.
++    assert len(mac_names) > 2
+tests/test_b103_copy_paste_matrix.py:119: trailing whitespace.
++    assert mac_names[2] == MAC_THIRD_ROW, "MAC third canonical record changed"
+tests/test_b103_copy_paste_matrix.py:120: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:121: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:122: trailing whitespace.
++async def _settle(pilot, rounds: int = 8) -> None:
+tests/test_b103_copy_paste_matrix.py:123: trailing whitespace.
++    for _ in range(rounds):
+tests/test_b103_copy_paste_matrix.py:124: trailing whitespace.
++        await pilot.pause(0.05)
+tests/test_b103_copy_paste_matrix.py:125: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:126: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:127: trailing whitespace.
++async def _load_census(app, pilot, examples: Path) -> None:
+tests/test_b103_copy_paste_matrix.py:128: trailing whitespace.
++    for name in ("prg.s19", "synthetic_update_test1.mac", "ASAP2_Demo_V171.a2l"):
+tests/test_b103_copy_paste_matrix.py:129: trailing whitespace.
++        destination = Path(app.base_dir) / name
+tests/test_b103_copy_paste_matrix.py:130: trailing whitespace.
++        shutil.copyfile(examples / name, destination)
+tests/test_b103_copy_paste_matrix.py:131: trailing whitespace.
++        if name.endswith(".a2l"):
+tests/test_b103_copy_paste_matrix.py:132: trailing whitespace.
++            app.load_a2l_from_path(destination)
+tests/test_b103_copy_paste_matrix.py:133: trailing whitespace.
++        else:
+tests/test_b103_copy_paste_matrix.py:134: trailing whitespace.
++            app.load_from_path(destination)
+tests/test_b103_copy_paste_matrix.py:135: trailing whitespace.
++        ready = False
+tests/test_b103_copy_paste_matrix.py:136: trailing whitespace.
++        for _ in range(200):
+tests/test_b103_copy_paste_matrix.py:137: trailing whitespace.
++            await pilot.pause(0.05)
+tests/test_b103_copy_paste_matrix.py:138: trailing whitespace.
++            if name.endswith(".s19") and app.current_file is not None:
+tests/test_b103_copy_paste_matrix.py:139: trailing whitespace.
++                ready = True
+tests/test_b103_copy_paste_matrix.py:140: trailing whitespace.
++            elif name.endswith(".a2l") and getattr(app, "current_a2l_data", None):
+tests/test_b103_copy_paste_matrix.py:141: trailing whitespace.
++                ready = True
+tests/test_b103_copy_paste_matrix.py:142: trailing whitespace.
++            elif name.endswith(".mac") and getattr(
+tests/test_b103_copy_paste_matrix.py:143: trailing whitespace.
++                app.current_file, "mac_path", None
+tests/test_b103_copy_paste_matrix.py:144: trailing whitespace.
++            ):
+tests/test_b103_copy_paste_matrix.py:145: trailing whitespace.
++                ready = True
+tests/test_b103_copy_paste_matrix.py:146: trailing whitespace.
++            if ready:
+tests/test_b103_copy_paste_matrix.py:147: trailing whitespace.
++                break
+tests/test_b103_copy_paste_matrix.py:148: trailing whitespace.
++        assert ready, f"census fixture did not load {name}"
+tests/test_b103_copy_paste_matrix.py:149: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:150: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:151: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:152: trailing whitespace.
++async def _drag(pilot, widget, start: tuple[int, int], end: tuple[int, int]) -> None:
+tests/test_b103_copy_paste_matrix.py:153: trailing whitespace.
++    await pilot.mouse_down(widget, offset=start)
+tests/test_b103_copy_paste_matrix.py:154: trailing whitespace.
++    await pilot.hover(widget, offset=end)
+tests/test_b103_copy_paste_matrix.py:155: trailing whitespace.
++    await pilot.mouse_up(widget, offset=end)
+tests/test_b103_copy_paste_matrix.py:156: trailing whitespace.
++    await _settle(pilot, 4)
+tests/test_b103_copy_paste_matrix.py:157: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:158: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:159: trailing whitespace.
++def _rendered_text(widget) -> str:
+tests/test_b103_copy_paste_matrix.py:160: trailing whitespace.
++    try:
+tests/test_b103_copy_paste_matrix.py:161: trailing whitespace.
++        rendered = widget.render()
+tests/test_b103_copy_paste_matrix.py:162: trailing whitespace.
++    except (AttributeError, TypeError):
+tests/test_b103_copy_paste_matrix.py:163: trailing whitespace.
++        return ""
+tests/test_b103_copy_paste_matrix.py:164: trailing whitespace.
++    return rendered.plain if hasattr(rendered, "plain") else str(rendered)
+tests/test_b103_copy_paste_matrix.py:165: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:166: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:167: trailing whitespace.
++def _help_text_widget(screen):
+tests/test_b103_copy_paste_matrix.py:168: trailing whitespace.
++    candidates = []
+tests/test_b103_copy_paste_matrix.py:169: trailing whitespace.
++    for widget in screen.query("*"):
+tests/test_b103_copy_paste_matrix.py:170: trailing whitespace.
++        text = _rendered_text(widget)
+tests/test_b103_copy_paste_matrix.py:171: trailing whitespace.
++        if (
+tests/test_b103_copy_paste_matrix.py:172: trailing whitespace.
++            getattr(widget, "allow_select", False)
+tests/test_b103_copy_paste_matrix.py:173: trailing whitespace.
++            and widget.region.width > 1
+tests/test_b103_copy_paste_matrix.py:174: trailing whitespace.
++            and widget.region.height > 1
+tests/test_b103_copy_paste_matrix.py:175: trailing whitespace.
++            and len(text.splitlines()) >= 2
+tests/test_b103_copy_paste_matrix.py:176: trailing whitespace.
++        ):
+tests/test_b103_copy_paste_matrix.py:177: trailing whitespace.
++            candidates.append((len(text), widget))
+tests/test_b103_copy_paste_matrix.py:178: trailing whitespace.
++    assert candidates, "Workspace help has no selectable multi-line text widget"
+tests/test_b103_copy_paste_matrix.py:179: trailing whitespace.
++    return max(candidates, key=lambda item: item[0])[1]
+tests/test_b103_copy_paste_matrix.py:180: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:181: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:182: trailing whitespace.
++async def _show_patch_json(app, pilot) -> None:
+tests/test_b103_copy_paste_matrix.py:183: trailing whitespace.
++    await pilot.press("6")
+tests/test_b103_copy_paste_matrix.py:184: trailing whitespace.
++    await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:185: trailing whitespace.
++    await pilot.click("#patch_tab_json")
+tests/test_b103_copy_paste_matrix.py:186: trailing whitespace.
++    await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:187: trailing whitespace.
++    view = app.query_one("#patch_json_view")
+tests/test_b103_copy_paste_matrix.py:188: trailing whitespace.
++    assert view.region.width > 0 and view.region.height > 0, (
+tests/test_b103_copy_paste_matrix.py:189: trailing whitespace.
++        type(app.screen).__name__,
+tests/test_b103_copy_paste_matrix.py:190: trailing whitespace.
++        view.region,
+tests/test_b103_copy_paste_matrix.py:191: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:192: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:193: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:194: trailing whitespace.
++async def _arm_source(app, pilot, source: int):
+tests/test_b103_copy_paste_matrix.py:195: trailing whitespace.
++    if source == 1:
+tests/test_b103_copy_paste_matrix.py:196: trailing whitespace.
++        await pilot.press("1")
+tests/test_b103_copy_paste_matrix.py:197: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:198: trailing whitespace.
++        widget = app.query_one("#hex_view")
+tests/test_b103_copy_paste_matrix.py:199: trailing whitespace.
++        await _drag(pilot, widget, (2, 1), (40, 3))
+tests/test_b103_copy_paste_matrix.py:200: trailing whitespace.
++        expected = app.screen.get_selected_text()
+tests/test_b103_copy_paste_matrix.py:201: trailing whitespace.
++        assert expected and expected.count("\n") == 2
+tests/test_b103_copy_paste_matrix.py:202: trailing whitespace.
++        assert len(set(expected.splitlines())) == 3
+tests/test_b103_copy_paste_matrix.py:203: trailing whitespace.
++        return expected, widget, (10, 2)
+tests/test_b103_copy_paste_matrix.py:204: trailing whitespace.
++    if source == 2:
+tests/test_b103_copy_paste_matrix.py:205: trailing whitespace.
++        await pilot.press("1")
+tests/test_b103_copy_paste_matrix.py:206: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:207: trailing whitespace.
++        widget = app.query_one("#ws_stats")
+tests/test_b103_copy_paste_matrix.py:208: trailing whitespace.
++        await _drag(
+tests/test_b103_copy_paste_matrix.py:209: trailing whitespace.
++            pilot,
+tests/test_b103_copy_paste_matrix.py:210: trailing whitespace.
++            widget,
+tests/test_b103_copy_paste_matrix.py:211: trailing whitespace.
++            (0, 0),
+tests/test_b103_copy_paste_matrix.py:212: trailing whitespace.
++            (max(1, widget.region.width - 1), 4),
+tests/test_b103_copy_paste_matrix.py:213: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:214: trailing whitespace.
++        expected = app.screen.get_selected_text()
+tests/test_b103_copy_paste_matrix.py:215: trailing whitespace.
++        assert expected and len(expected.splitlines()) == 5
+tests/test_b103_copy_paste_matrix.py:216: trailing whitespace.
++        return expected, widget, (2, 2)
+tests/test_b103_copy_paste_matrix.py:217: trailing whitespace.
++    if source == 3:
+tests/test_b103_copy_paste_matrix.py:218: trailing whitespace.
++        await pilot.press("1")
+tests/test_b103_copy_paste_matrix.py:219: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:220: trailing whitespace.
++        widget = app.query_one("#a2l_view")
+tests/test_b103_copy_paste_matrix.py:221: trailing whitespace.
++        full_text = _rendered_text(widget)
+tests/test_b103_copy_paste_matrix.py:222: trailing whitespace.
++        await _drag(
+tests/test_b103_copy_paste_matrix.py:223: trailing whitespace.
++            pilot,
+tests/test_b103_copy_paste_matrix.py:224: trailing whitespace.
++            widget,
+tests/test_b103_copy_paste_matrix.py:225: trailing whitespace.
++            (0, 0),
+tests/test_b103_copy_paste_matrix.py:226: trailing whitespace.
++            (max(1, widget.region.width - 1), 1),
+tests/test_b103_copy_paste_matrix.py:227: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:228: trailing whitespace.
++        expected = app.screen.get_selected_text()
+tests/test_b103_copy_paste_matrix.py:229: trailing whitespace.
++        assert expected and len(expected.splitlines()) == 2
+tests/test_b103_copy_paste_matrix.py:230: trailing whitespace.
++        assert expected != full_text, "AT-I1b-3 must copy a selection, not a whole view"
+tests/test_b103_copy_paste_matrix.py:231: trailing whitespace.
++        return expected, widget, (2, 1)
+tests/test_b103_copy_paste_matrix.py:232: trailing whitespace.
++    if source == 4:
+tests/test_b103_copy_paste_matrix.py:233: trailing whitespace.
++        await pilot.press("2")
+tests/test_b103_copy_paste_matrix.py:234: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:235: trailing whitespace.
++        widget = app.query_one("#a2l_tags_list")
+tests/test_b103_copy_paste_matrix.py:236: trailing whitespace.
++        assert widget.row_count > 2
+tests/test_b103_copy_paste_matrix.py:237: trailing whitespace.
++        widget.move_cursor(row=0)
+tests/test_b103_copy_paste_matrix.py:238: trailing whitespace.
++        await _settle(pilot, 2)
+tests/test_b103_copy_paste_matrix.py:239: trailing whitespace.
++        return A2L_THIRD_ROW, widget, (4, widget.header_height + 2)
+tests/test_b103_copy_paste_matrix.py:240: trailing whitespace.
++    if source == 5:
+tests/test_b103_copy_paste_matrix.py:241: trailing whitespace.
++        await pilot.press("3")
+tests/test_b103_copy_paste_matrix.py:242: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:243: trailing whitespace.
++        widget = app.query_one("#mac_records_list")
+tests/test_b103_copy_paste_matrix.py:244: trailing whitespace.
++        assert widget.row_count > 2
+tests/test_b103_copy_paste_matrix.py:245: trailing whitespace.
++        widget.move_cursor(row=0)
+tests/test_b103_copy_paste_matrix.py:246: trailing whitespace.
++        await _settle(pilot, 2)
+tests/test_b103_copy_paste_matrix.py:247: trailing whitespace.
++        return MAC_THIRD_ROW, widget, (4, widget.header_height + 2)
+tests/test_b103_copy_paste_matrix.py:248: trailing whitespace.
++    if source == 6:
+tests/test_b103_copy_paste_matrix.py:249: trailing whitespace.
++        await _show_patch_json(app, pilot)
+tests/test_b103_copy_paste_matrix.py:250: trailing whitespace.
++        widget = app.query_one("#patch_json_view")
+tests/test_b103_copy_paste_matrix.py:251: trailing whitespace.
++        await pilot.click(widget, offset=(0, 1))
+tests/test_b103_copy_paste_matrix.py:252: trailing whitespace.
++        assert app.focused is widget
+tests/test_b103_copy_paste_matrix.py:253: trailing whitespace.
++        await pilot.press("shift+down", "shift+down")
+tests/test_b103_copy_paste_matrix.py:254: trailing whitespace.
++        await _settle(pilot, 4)
+tests/test_b103_copy_paste_matrix.py:255: trailing whitespace.
++        expected = widget.selected_text
+tests/test_b103_copy_paste_matrix.py:256: trailing whitespace.
++        assert expected and len(expected.splitlines()) == 2
+tests/test_b103_copy_paste_matrix.py:257: trailing whitespace.
++        return expected, widget, (1, 1)
+tests/test_b103_copy_paste_matrix.py:258: trailing whitespace.
++    if source == 7:
+tests/test_b103_copy_paste_matrix.py:259: trailing whitespace.
++        await pilot.press("1")
+tests/test_b103_copy_paste_matrix.py:260: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:261: trailing whitespace.
++        await pilot.press("?")
+tests/test_b103_copy_paste_matrix.py:262: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:263: trailing whitespace.
++        widget = _help_text_widget(app.screen)
+tests/test_b103_copy_paste_matrix.py:264: trailing whitespace.
++        expected = None
+tests/test_b103_copy_paste_matrix.py:265: trailing whitespace.
++        for end_y in range(1, widget.region.height):
+tests/test_b103_copy_paste_matrix.py:266: trailing whitespace.
++            app.screen.clear_selection()
+tests/test_b103_copy_paste_matrix.py:267: trailing whitespace.
++            await _drag(
+tests/test_b103_copy_paste_matrix.py:268: trailing whitespace.
++                pilot,
+tests/test_b103_copy_paste_matrix.py:269: trailing whitespace.
++                widget,
+tests/test_b103_copy_paste_matrix.py:270: trailing whitespace.
++                (0, 0),
+tests/test_b103_copy_paste_matrix.py:271: trailing whitespace.
++                (max(1, widget.region.width - 1), end_y),
+tests/test_b103_copy_paste_matrix.py:272: trailing whitespace.
++            )
+tests/test_b103_copy_paste_matrix.py:273: trailing whitespace.
++            candidate = app.screen.get_selected_text()
+tests/test_b103_copy_paste_matrix.py:274: trailing whitespace.
++            if candidate and sum(
+tests/test_b103_copy_paste_matrix.py:275: trailing whitespace.
++                bool(line.strip()) for line in candidate.splitlines()
+tests/test_b103_copy_paste_matrix.py:276: trailing whitespace.
++            ) == 2:
+tests/test_b103_copy_paste_matrix.py:277: trailing whitespace.
++                expected = candidate
+tests/test_b103_copy_paste_matrix.py:278: trailing whitespace.
++                break
+tests/test_b103_copy_paste_matrix.py:279: trailing whitespace.
++        assert expected, (widget.region, app.screen.get_selected_text())
+tests/test_b103_copy_paste_matrix.py:280: trailing whitespace.
++        assert expected != _rendered_text(widget)
+tests/test_b103_copy_paste_matrix.py:281: trailing whitespace.
++        return expected, widget, (2, 1)
+tests/test_b103_copy_paste_matrix.py:282: trailing whitespace.
++    raise AssertionError(f"unknown source {source}")
+tests/test_b103_copy_paste_matrix.py:283: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:284: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:285: trailing whitespace.
++async def _right_click(app, pilot, widget, offset: tuple[int, int]) -> None:
+tests/test_b103_copy_paste_matrix.py:286: trailing whitespace.
++    from textual import events
+tests/test_b103_copy_paste_matrix.py:287: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:288: trailing whitespace.
++    region = widget.region
+tests/test_b103_copy_paste_matrix.py:289: trailing whitespace.
++    x = region.x + offset[0]
+tests/test_b103_copy_paste_matrix.py:290: trailing whitespace.
++    y = region.y + offset[1]
+tests/test_b103_copy_paste_matrix.py:291: trailing whitespace.
++    for event_type in (events.MouseDown, events.MouseUp):
+tests/test_b103_copy_paste_matrix.py:292: trailing whitespace.
++        app.post_message(
+tests/test_b103_copy_paste_matrix.py:293: trailing whitespace.
++            event_type(
+tests/test_b103_copy_paste_matrix.py:294: trailing whitespace.
++                None,
+tests/test_b103_copy_paste_matrix.py:295: trailing whitespace.
++                x,
+tests/test_b103_copy_paste_matrix.py:296: trailing whitespace.
++                y,
+tests/test_b103_copy_paste_matrix.py:297: trailing whitespace.
++                0,
+tests/test_b103_copy_paste_matrix.py:298: trailing whitespace.
++                0,
+tests/test_b103_copy_paste_matrix.py:299: trailing whitespace.
++                3,
+tests/test_b103_copy_paste_matrix.py:300: trailing whitespace.
++                False,
+tests/test_b103_copy_paste_matrix.py:301: trailing whitespace.
++                False,
+tests/test_b103_copy_paste_matrix.py:302: trailing whitespace.
++                False,
+tests/test_b103_copy_paste_matrix.py:303: trailing whitespace.
++                screen_x=x,
+tests/test_b103_copy_paste_matrix.py:304: trailing whitespace.
++                screen_y=y,
+tests/test_b103_copy_paste_matrix.py:305: trailing whitespace.
++            )
+tests/test_b103_copy_paste_matrix.py:306: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:307: trailing whitespace.
++    await pilot.pause()
+tests/test_b103_copy_paste_matrix.py:308: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:309: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:310: trailing whitespace.
++def _copy_notice(expected: str) -> str:
+tests/test_b103_copy_paste_matrix.py:311: trailing whitespace.
++    lines = expected.count("\n") + (0 if expected.endswith("\n") else 1)
+tests/test_b103_copy_paste_matrix.py:312: trailing whitespace.
++    suffix = "line" if lines == 1 else "lines"
+tests/test_b103_copy_paste_matrix.py:313: trailing whitespace.
++    return f"Copied {lines} {suffix} to the clipboard."
+tests/test_b103_copy_paste_matrix.py:314: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:315: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:316: trailing whitespace.
++def _assert_copy_notice(app, before: list, expected: str) -> None:
+tests/test_b103_copy_paste_matrix.py:317: trailing whitespace.
++    previous = {id(notification) for notification in before}
+tests/test_b103_copy_paste_matrix.py:318: trailing whitespace.
++    current = [
+tests/test_b103_copy_paste_matrix.py:319: trailing whitespace.
++        notification
+tests/test_b103_copy_paste_matrix.py:320: trailing whitespace.
++        for notification in list(app._notifications)
+tests/test_b103_copy_paste_matrix.py:321: trailing whitespace.
++        if id(notification) not in previous
+tests/test_b103_copy_paste_matrix.py:322: trailing whitespace.
++    ]
+tests/test_b103_copy_paste_matrix.py:323: trailing whitespace.
++    copies = [
+tests/test_b103_copy_paste_matrix.py:324: trailing whitespace.
++        notification
+tests/test_b103_copy_paste_matrix.py:325: trailing whitespace.
++        for notification in current
+tests/test_b103_copy_paste_matrix.py:326: trailing whitespace.
++        if str(notification.message).startswith("Copied")
+tests/test_b103_copy_paste_matrix.py:327: trailing whitespace.
++    ]
+tests/test_b103_copy_paste_matrix.py:328: trailing whitespace.
++    expected_notice = _copy_notice(expected)
+tests/test_b103_copy_paste_matrix.py:329: trailing whitespace.
++    assert len(copies) == 1, (expected_notice, [str(n.message) for n in current])
+tests/test_b103_copy_paste_matrix.py:330: trailing whitespace.
++    assert str(copies[0].message) == expected_notice
+tests/test_b103_copy_paste_matrix.py:331: trailing whitespace.
++    assert copies[0].severity == "information"
+tests/test_b103_copy_paste_matrix.py:332: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:333: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:334: trailing whitespace.
++async def _prepare_target(app, pilot, target: str):
+tests/test_b103_copy_paste_matrix.py:335: trailing whitespace.
++    if target == "T1":
+tests/test_b103_copy_paste_matrix.py:336: trailing whitespace.
++        await pilot.press("2")
+tests/test_b103_copy_paste_matrix.py:337: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:338: trailing whitespace.
++        await pilot.press("/")
+tests/test_b103_copy_paste_matrix.py:339: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:340: trailing whitespace.
++        widget = app.query_one("#a2l_tags_filter_input")
+tests/test_b103_copy_paste_matrix.py:341: trailing whitespace.
++        widget.focus()
+tests/test_b103_copy_paste_matrix.py:342: trailing whitespace.
++        await _settle(pilot, 2)
+tests/test_b103_copy_paste_matrix.py:343: trailing whitespace.
++        assert widget.value == ""
+tests/test_b103_copy_paste_matrix.py:344: trailing whitespace.
++        assert app.focused is widget
+tests/test_b103_copy_paste_matrix.py:345: trailing whitespace.
++        return widget
+tests/test_b103_copy_paste_matrix.py:346: trailing whitespace.
++    await _show_patch_json(app, pilot)
+tests/test_b103_copy_paste_matrix.py:347: trailing whitespace.
++    widget = app.query_one("#patch_paste_text")
+tests/test_b103_copy_paste_matrix.py:348: trailing whitespace.
++    await pilot.click(widget, offset=(2, 1))
+tests/test_b103_copy_paste_matrix.py:349: trailing whitespace.
++    await pilot.press("f7")
+tests/test_b103_copy_paste_matrix.py:350: trailing whitespace.
++    await _settle(pilot, 4)
+tests/test_b103_copy_paste_matrix.py:351: trailing whitespace.
++    assert app.focused is widget
+tests/test_b103_copy_paste_matrix.py:352: trailing whitespace.
++    assert widget.selected_text
+tests/test_b103_copy_paste_matrix.py:353: trailing whitespace.
++    return widget
+tests/test_b103_copy_paste_matrix.py:354: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:355: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:356: trailing whitespace.
++async def _run_cell(
+tests/test_b103_copy_paste_matrix.py:357: trailing whitespace.
++    tmp_path: Path,
+tests/test_b103_copy_paste_matrix.py:358: trailing whitespace.
++    source: int,
+tests/test_b103_copy_paste_matrix.py:359: trailing whitespace.
++    target: str,
+tests/test_b103_copy_paste_matrix.py:360: trailing whitespace.
++    route: str,
+tests/test_b103_copy_paste_matrix.py:361: trailing whitespace.
++    monkeypatch: pytest.MonkeyPatch,
+tests/test_b103_copy_paste_matrix.py:362: trailing whitespace.
++) -> None:
+tests/test_b103_copy_paste_matrix.py:363: trailing whitespace.
++    from s19_app.tui import app as app_module
+tests/test_b103_copy_paste_matrix.py:364: trailing whitespace.
++    from s19_app.tui import os_clipboard_input as clipboard_module
+tests/test_b103_copy_paste_matrix.py:365: trailing whitespace.
++    from s19_app.tui.app import S19TuiApp
+tests/test_b103_copy_paste_matrix.py:366: trailing whitespace.
++    from textual import events
+tests/test_b103_copy_paste_matrix.py:367: trailing whitespace.
++    from textual.app import App
+tests/test_b103_copy_paste_matrix.py:368: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:369: trailing whitespace.
++    root = Path(__file__).resolve().parents[1]
+tests/test_b103_copy_paste_matrix.py:370: trailing whitespace.
++    examples = root / "examples" / "case_00_public"
+tests/test_b103_copy_paste_matrix.py:371: trailing whitespace.
++    _check_model_oracles(examples)
+tests/test_b103_copy_paste_matrix.py:372: trailing whitespace.
++    if _is_winci():
+tests/test_b103_copy_paste_matrix.py:373: trailing whitespace.
++        _seed_os_clipboard()
+tests/test_b103_copy_paste_matrix.py:374: trailing whitespace.
++    original_tail = clipboard_module._mirror_and_write_os_clipboard
+tests/test_b103_copy_paste_matrix.py:375: trailing whitespace.
++    tail_marker = {"started": False, "ended": False}
+tests/test_b103_copy_paste_matrix.py:376: trailing whitespace.
++    tail_payloads = []
+tests/test_b103_copy_paste_matrix.py:377: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:378: trailing whitespace.
++    async def marked_tail(app, text):
+tests/test_b103_copy_paste_matrix.py:379: trailing whitespace.
++        tail_payloads.append(text)
+tests/test_b103_copy_paste_matrix.py:380: trailing whitespace.
++        tail_marker["started"] = True
+tests/test_b103_copy_paste_matrix.py:381: trailing whitespace.
++        try:
+tests/test_b103_copy_paste_matrix.py:382: trailing whitespace.
++            return await original_tail(app, text)
+tests/test_b103_copy_paste_matrix.py:383: trailing whitespace.
++        finally:
+tests/test_b103_copy_paste_matrix.py:384: trailing whitespace.
++            tail_marker["ended"] = True
+tests/test_b103_copy_paste_matrix.py:385: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:386: trailing whitespace.
++    monkeypatch.setattr(
+tests/test_b103_copy_paste_matrix.py:387: trailing whitespace.
++        clipboard_module, "_mirror_and_write_os_clipboard", marked_tail
+tests/test_b103_copy_paste_matrix.py:388: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:389: trailing whitespace.
++    monkeypatch.setattr(app_module, "_mirror_and_write_os_clipboard", marked_tail)
+tests/test_b103_copy_paste_matrix.py:390: trailing whitespace.
++    app = S19TuiApp(base_dir=tmp_path)
+tests/test_b103_copy_paste_matrix.py:391: trailing whitespace.
++    async with app.run_test(size=SIZE) as pilot:
+tests/test_b103_copy_paste_matrix.py:392: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:393: trailing whitespace.
++        await _load_census(app, pilot, examples)
+tests/test_b103_copy_paste_matrix.py:394: trailing whitespace.
++        App.copy_to_clipboard(app, SEED)
+tests/test_b103_copy_paste_matrix.py:395: trailing whitespace.
++        expected, source_widget, offset = await _arm_source(app, pilot, source)
+tests/test_b103_copy_paste_matrix.py:396: trailing whitespace.
++        before = list(app._notifications)
+tests/test_b103_copy_paste_matrix.py:397: trailing whitespace.
++        await _right_click(app, pilot, source_widget, offset)
+tests/test_b103_copy_paste_matrix.py:398: trailing whitespace.
++        await wait_for_copy_tail(pilot, tail_marker)
+tests/test_b103_copy_paste_matrix.py:399: trailing whitespace.
++        assert tail_payloads == [expected]
+tests/test_b103_copy_paste_matrix.py:400: trailing whitespace.
++        if source == 7:
+tests/test_b103_copy_paste_matrix.py:401: trailing whitespace.
++            await pilot.press("escape")
+tests/test_b103_copy_paste_matrix.py:402: trailing whitespace.
++            await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:403: trailing whitespace.
++        if _is_winci():
+tests/test_b103_copy_paste_matrix.py:404: trailing whitespace.
++            _assert_copy_notice(app, before, expected)
+tests/test_b103_copy_paste_matrix.py:405: trailing whitespace.
++        assert app.clipboard == expected, (
+tests/test_b103_copy_paste_matrix.py:406: trailing whitespace.
++            f"AT-I1b-{source}: right-click copy must replace the app seed with "
+tests/test_b103_copy_paste_matrix.py:407: trailing whitespace.
++            "the independently captured source before paste"
+tests/test_b103_copy_paste_matrix.py:408: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:409: trailing whitespace.
++        os_artifact = _read_os_clipboard() if _is_winci() else None
+tests/test_b103_copy_paste_matrix.py:410: trailing whitespace.
++        if os_artifact is not None:
+tests/test_b103_copy_paste_matrix.py:411: trailing whitespace.
++            assert os_artifact == expected, (
+tests/test_b103_copy_paste_matrix.py:412: trailing whitespace.
++                f"AT-I1b-{source}: separate Get-Clipboard read must equal the "
+tests/test_b103_copy_paste_matrix.py:413: trailing whitespace.
++                "independent source, not the seed or a projected value"
+tests/test_b103_copy_paste_matrix.py:414: trailing whitespace.
++            )
+tests/test_b103_copy_paste_matrix.py:415: trailing whitespace.
++        target_widget = await _prepare_target(app, pilot, target)
+tests/test_b103_copy_paste_matrix.py:416: trailing whitespace.
++        if route == "P1":
+tests/test_b103_copy_paste_matrix.py:417: trailing whitespace.
++            await pilot.press("ctrl+v")
+tests/test_b103_copy_paste_matrix.py:418: trailing whitespace.
++        else:
+tests/test_b103_copy_paste_matrix.py:419: trailing whitespace.
++            assert os_artifact is not None
+tests/test_b103_copy_paste_matrix.py:420: trailing whitespace.
++            app.post_message(events.Paste(os_artifact))
+tests/test_b103_copy_paste_matrix.py:421: trailing whitespace.
++        await _settle(pilot)
+tests/test_b103_copy_paste_matrix.py:422: trailing whitespace.
++        if target == "T1":
+tests/test_b103_copy_paste_matrix.py:423: trailing whitespace.
++            actual = target_widget.value
+tests/test_b103_copy_paste_matrix.py:424: trailing whitespace.
++            wanted = expected.split("\n", 1)[0]
+tests/test_b103_copy_paste_matrix.py:425: trailing whitespace.
++        else:
+tests/test_b103_copy_paste_matrix.py:426: trailing whitespace.
++            actual = target_widget.text
+tests/test_b103_copy_paste_matrix.py:427: trailing whitespace.
++            wanted = expected
+tests/test_b103_copy_paste_matrix.py:428: trailing whitespace.
++        assert actual == wanted, (
+tests/test_b103_copy_paste_matrix.py:429: trailing whitespace.
++            f"AT-I1b-{source} {target}/{route}: expected exactly {wanted!r} once"
+tests/test_b103_copy_paste_matrix.py:430: trailing whitespace.
++        )
+tests/test_b103_copy_paste_matrix.py:431: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:432: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:433: trailing whitespace.
++AT_CELLS = [
+tests/test_b103_copy_paste_matrix.py:434: trailing whitespace.
++    pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:435: trailing whitespace.
++    pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:436: trailing whitespace.
++    pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:437: trailing whitespace.
++    pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:438: trailing whitespace.
++    pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:439: trailing whitespace.
++    pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:440: trailing whitespace.
++    pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:441: trailing whitespace.
++    pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:442: trailing whitespace.
++    pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:443: trailing whitespace.
++    pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:444: trailing whitespace.
++    pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:445: trailing whitespace.
++    pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:446: trailing whitespace.
++    pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:447: trailing whitespace.
++    pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:448: trailing whitespace.
++    pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:449: trailing whitespace.
++    pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:450: trailing whitespace.
++    pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:451: trailing whitespace.
++    pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:452: trailing whitespace.
++    pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:453: trailing whitespace.
++    pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:454: trailing whitespace.
++    pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:455: trailing whitespace.
++    pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:456: trailing whitespace.
++    pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:457: trailing whitespace.
++    pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:458: trailing whitespace.
++    pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+tests/test_b103_copy_paste_matrix.py:459: trailing whitespace.
++    pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+tests/test_b103_copy_paste_matrix.py:460: trailing whitespace.
++    pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+tests/test_b103_copy_paste_matrix.py:461: trailing whitespace.
++    pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+tests/test_b103_copy_paste_matrix.py:462: trailing whitespace.
++]
+tests/test_b103_copy_paste_matrix.py:463: trailing whitespace.
++assert len(AT_CELLS) == 28
+tests/test_b103_copy_paste_matrix.py:464: trailing whitespace.
++assert len({cell.id for cell in AT_CELLS}) == 28
+tests/test_b103_copy_paste_matrix.py:465: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:466: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:467: trailing whitespace.
++@pytest.mark.parametrize(("source", "target", "route"), AT_CELLS)
+tests/test_b103_copy_paste_matrix.py:468: trailing whitespace.
++def test_copy_paste_acceptance_cell(
+tests/test_b103_copy_paste_matrix.py:469: trailing whitespace.
++    tmp_path: Path,
+tests/test_b103_copy_paste_matrix.py:470: trailing whitespace.
++    source: int,
+tests/test_b103_copy_paste_matrix.py:471: trailing whitespace.
++    target: str,
+tests/test_b103_copy_paste_matrix.py:472: trailing whitespace.
++    route: str,
+tests/test_b103_copy_paste_matrix.py:473: trailing whitespace.
++    monkeypatch: pytest.MonkeyPatch,
+tests/test_b103_copy_paste_matrix.py:474: trailing whitespace.
++) -> None:
+tests/test_b103_copy_paste_matrix.py:475: trailing whitespace.
++    _coverage_or_skip(route)
+tests/test_b103_copy_paste_matrix.py:476: trailing whitespace.
++    asyncio.run(_run_cell(tmp_path, source, target, route, monkeypatch))
+tests/test_b103_copy_paste_matrix.py:477: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:478: trailing whitespace.
++
+tests/test_b103_copy_paste_matrix.py:479: trailing whitespace.
++@pytest.mark.skip(
+tests/test_b103_copy_paste_matrix.py:480: trailing whitespace.
++    reason=(
+tests/test_b103_copy_paste_matrix.py:481: trailing whitespace.
++        "AT-I1b-8 manual not_run: only the operator may run the six Windows "
+tests/test_b103_copy_paste_matrix.py:482: trailing whitespace.
++        "Terminal steps and choose to use his own clipboard; no agent access"
+tests/test_b103_copy_paste_matrix.py:483: trailing whitespace.
++    )
+tests/test_b103_copy_paste_matrix.py:484: trailing whitespace.
++)
+tests/test_b103_copy_paste_matrix.py:485: trailing whitespace.
++def test_manual_windows_terminal_operator_acceptance() -> None:
+tests/test_b103_copy_paste_matrix.py:486: trailing whitespace.
++    raise AssertionError("AT-I1b-8 is manual and must never execute in automation")

@@ -1,0 +1,1326 @@
+{
+  "marks": [
+    {
+      "name": "A2LTagTable._highlight_row",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 1485,
+      "def": {
+        "qualname": "A2LTagTable._highlight_row",
+        "line": 1486,
+        "params": [
+          {
+            "name": "row_index",
+            "type": "int",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2LTagTable.on_resize",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 1491,
+      "def": {
+        "qualname": "A2LTagTable.on_resize",
+        "line": 1492,
+        "params": [
+          {
+            "name": "event",
+            "type": "events.Resize",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.compose",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 3535,
+      "def": {
+        "qualname": "S19TuiApp.compose",
+        "line": 3536,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "S19TuiApp._compose_screen_a2l",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 8700,
+      "def": {
+        "qualname": "S19TuiApp._compose_screen_a2l",
+        "line": 8701,
+        "params": [],
+        "returns": "Container"
+      }
+    },
+    {
+      "name": "S19TuiApp._compose_screen_mac",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 8815,
+      "def": {
+        "qualname": "S19TuiApp._compose_screen_mac",
+        "line": 8816,
+        "params": [],
+        "returns": "Container"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_data_table_row_selected",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 17088,
+      "def": {
+        "qualname": "S19TuiApp.on_data_table_row_selected",
+        "line": 17089,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowSelected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_data_table_row_highlighted",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 17133,
+      "def": {
+        "qualname": "S19TuiApp.on_data_table_row_highlighted",
+        "line": 17134,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowHighlighted",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._invalidate_a2l_view_cache",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21091,
+      "def": {
+        "qualname": "S19TuiApp._invalidate_a2l_view_cache",
+        "line": 21092,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.update_a2l_tags_view",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21413,
+      "def": {
+        "qualname": "S19TuiApp.update_a2l_tags_view",
+        "line": 21414,
+        "params": [
+          {
+            "name": "tags",
+            "type": "list[dict]",
+            "default": null
+          },
+          {
+            "name": "empty_message",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._fit_a2l_tag_cells",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21576,
+      "def": {
+        "qualname": "S19TuiApp._fit_a2l_tag_cells",
+        "line": 21577,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_a2l_tag_table_measured",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21632,
+      "def": {
+        "qualname": "S19TuiApp.on_a2l_tag_table_measured",
+        "line": 21633,
+        "params": [
+          {
+            "name": "event",
+            "type": "A2LTagTable.Measured",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._repaint_a2l_tag_cells",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21659,
+      "def": {
+        "qualname": "S19TuiApp._repaint_a2l_tag_cells",
+        "line": 21660,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._build_a2l_table_cells",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 21748,
+      "def": {
+        "qualname": "S19TuiApp._build_a2l_table_cells",
+        "line": 21749,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "name_width",
+            "type": "Optional[int]",
+            "default": "None"
+          }
+        ],
+        "returns": "tuple[Text, ...]"
+      }
+    },
+    {
+      "name": "S19TuiApp.end_busy",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 22851,
+      "def": {
+        "qualname": "S19TuiApp.end_busy",
+        "line": 22852,
+        "params": [
+          {
+            "name": "key",
+            "type": "BusyKey",
+            "default": null
+          },
+          {
+            "name": "gen",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "outcome",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._running_session_action",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 22967,
+      "def": {
+        "qualname": "S19TuiApp._running_session_action",
+        "line": 22968,
+        "params": [],
+        "returns": "Optional[_BusyRun]"
+      }
+    },
+    {
+      "name": "S19TuiApp._refuse_if_busy",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 22992,
+      "def": {
+        "qualname": "S19TuiApp._refuse_if_busy",
+        "line": 22993,
+        "params": [],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_quit",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 23016,
+      "def": {
+        "qualname": "S19TuiApp.action_quit",
+        "line": 23017,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._answer_quit",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 23036,
+      "def": {
+        "qualname": "S19TuiApp._answer_quit",
+        "line": 23037,
+        "params": [
+          {
+            "name": "quit",
+            "type": "Optional[bool]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._exit_if_quit_pending",
+      "reqs": null,
+      "file": "s19_app/tui/app.py",
+      "line": 23041,
+      "def": {
+        "qualname": "S19TuiApp._exit_if_quit_pending",
+        "line": 23042,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CappedTextArea.action_copy",
+      "reqs": null,
+      "file": "s19_app/tui/capped_text_area.py",
+      "line": 241,
+      "def": {
+        "qualname": "CappedTextArea.action_copy",
+        "line": 242,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CappedTextArea.action_cut",
+      "reqs": null,
+      "file": "s19_app/tui/capped_text_area.py",
+      "line": 271,
+      "def": {
+        "qualname": "CappedTextArea.action_cut",
+        "line": 272,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "write_os_clipboard",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 637,
+      "def": {
+        "qualname": "write_os_clipboard",
+        "line": 638,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "strategies",
+            "type": "Optional[tuple[tuple[str, Callable[[str], bool]], ...]]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "_mirror_and_write_os_clipboard",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 697,
+      "def": {
+        "qualname": "_mirror_and_write_os_clipboard",
+        "line": 698,
+        "params": [
+          {
+            "name": "app",
+            "type": "App",
+            "default": null
+          },
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OsClipboardInput.action_copy",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 890,
+      "def": {
+        "qualname": "OsClipboardInput.action_copy",
+        "line": 891,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OsClipboardInput.action_cut",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 917,
+      "def": {
+        "qualname": "OsClipboardInput.action_cut",
+        "line": 918,
+        "params": [],
+        "returns": "None"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "S19TuiApp.compose",
+      "reqs": [],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "result"
+        ],
+        "raw": "ComposeResult result"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline compose) one app composition → containers `screen_a2l` and `screen_mac`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Builds the main screen and calls both rail-screen builders.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LTagTable._highlight_row",
+      "reqs": [
+        "R-COPY.21"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "row_index",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.21 base) row_index `4` with suppression false → toolkit highlight of row `4`; suppression true → refresh of row `4` only"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Refreshes the row without the toolkit highlight while `suppress_row_highlight` is true; otherwise delegates to `DataTable._highlight_row`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2LTagTable.on_resize",
+      "reqs": [
+        "R-TUI-042a.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Resize",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-TUI-042a.5/6 base) a shown table resize to size `(38, 30)` → one `Measured` message"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Re-emits the table resize as one bubbling `A2LTagTable.Measured` message.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._compose_screen_a2l",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.21",
+        "R-COPY.22"
+      ],
+      "in": [],
+      "out": {
+        "type": "Container",
+        "names": [
+          "result"
+        ],
+        "raw": "Container result"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline A2L compose) the A2L rail → `A2LTagTable` `a2l_tags_list` with `cell_padding` `1` and `fixed_columns` `2`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Builds `screen_a2l`; `#a2l_tags_list` is one `A2LTagTable` with row cursor, zebra stripes, cell padding 1 and two fixed columns.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._compose_screen_mac",
+      "reqs": [
+        "R-COPY.4",
+        "R-COPY.21",
+        "R-COPY.22"
+      ],
+      "in": [],
+      "out": {
+        "type": "Container",
+        "names": [
+          "result"
+        ],
+        "raw": "Container result"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline MAC compose) the MAC rail → plain `DataTable` `mac_records_list` with cursor type `row`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Builds `screen_mac`; `#mac_records_list` is currently a plain `DataTable` with a row cursor and zebra stripes.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_data_table_row_selected",
+      "reqs": [
+        "R-COPY.22"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowSelected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.22 base) selected A2L row `a2l:2` whose map holds `ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING` → `_jump_to_tag_by_data` for that tag, so the current hex position can change"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Resolves a MAC row through `_mac_row_key_to_address` or an A2L row through `_a2l_row_key_to_tag`, then calls the corresponding hex jump helper.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_data_table_row_highlighted",
+      "reqs": [
+        "R-COPY.21"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowHighlighted",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.21 base) highlighted A2L row `a2l:4` → detail card `show_tag` with the fifth row's full tag and no selection-event jump"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. For the A2L table only, resolves the highlighted row key and passes its tag, or `None`, to the detail card; it does not call a hex jump helper.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.update_a2l_tags_view",
+      "reqs": [
+        "R-COPY.4",
+        "R-TUI-042a.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[dict]",
+          "name": "tags",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "empty_message",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4 baseline map) one visible tag named `ABCDEFGHIJKLMNO` at absolute index `0`, name width `5` → row key `a2l:0` maps to the original full name while the painted Tag cell is `· AB…NO`",
+        "(baseline empty A2L) `tags=[]`, no custom message → empty row map and summary `No A2L tags.`"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._a2l_row_key_to_tag]",
+        "[Data: A2L Explorer tag table rows]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "baseline. Rebuilds one visible tag page, resets and repopulates the row-key-to-tag map with the original enriched dicts, and paints cells built at the measured name width.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._fit_a2l_tag_cells",
+      "reqs": [
+        "R-TUI-042a.5"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-TUI-042a.5/6 base) row `a2l:0` painted `· ABCDEFGHIJKLMNO` but width `5` requires `· AB…NO` → one page rebuild, then cursor and scroll restoration"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Compares each painted Tag cell with the cell for the measured width; on the first mismatch it rebuilds through `update_a2l_tags_view` and restores cursor and scroll.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_a2l_tag_table_measured",
+      "reqs": [
+        "R-TUI-042a.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "A2LTagTable.Measured",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-TUI-042a.5/6 base) one `Measured` after a resize → stopped event and one `_fit_a2l_tag_cells` call"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Stops the bubbling measurement message and calls `_fit_a2l_tag_cells` directly once.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._repaint_a2l_tag_cells",
+      "reqs": [
+        "R-COPY.4",
+        "R-TUI-042a.5"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.4 baseline repaint) shown row `a2l:0` repainted at width `5` → Tag cell `· AB…NO` and map value still full name `ABCDEFGHIJKLMNO`"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._a2l_row_key_to_tag]",
+        "[Data: A2L Explorer tag table rows]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "baseline. Rewrites changed cells in place after an image write, retains full tag dicts in the row-key map and invalidates the table caches without clearing rows or moving the cursor.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._build_a2l_table_cells",
+      "reqs": [
+        "R-COPY.4",
+        "R-TUI-042a.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "name_width",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Text, ...]",
+        "names": [
+          "cells"
+        ],
+        "raw": "tuple[Text, ...] cells"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-TUI-042a.5 baseline cell) name `ABCDEFGHIJKLMNO`, not in memory, name_width `5` → 16 cells with Tag index `2` equal to `· AB…NO`",
+        "(R-TUI-042a.5 baseline uncapped) name `ABCDEFGHIJKLMNO`, in memory, name_width `None` → Tag cell `✓ ABCDEFGHIJKLMNO`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Produces 16 markup-safe cells; Tag is index 2 and contains the in-image glyph plus the name shortened to the measured cap, not a separate copy-name value.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._invalidate_a2l_view_cache",
+      "reqs": [
+        "R-B102-A2L-005"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-B102-A2L-005 baseline) map containing `a2l:0` before invalidation → map `{}` afterward, so no old payload remains resolvable"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._a2l_row_key_to_tag]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "baseline. Clears the enriched and filtered A2L caches and replaces the row-key-to-tag map with an empty dict.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._running_session_action",
+      "reqs": [
+        "R-COPY.19",
+        "R-QUIT.8"
+      ],
+      "in": [],
+      "out": {
+        "type": "Optional[_BusyRun]",
+        "names": [
+          "run"
+        ],
+        "raw": "_BusyRun? run"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline idle session) no busy runs → `None`",
+        "(R-COPY.19 baseline busy) newest running key `file_load` → that `_BusyRun`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Returns the newest running session action, or `None`, without mutating busy state.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._refuse_if_busy",
+      "reqs": [],
+      "in": [],
+      "out": {
+        "type": "bool",
+        "names": [
+          "refused"
+        ],
+        "raw": "bool refused"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline busy refusal) a running `file_load` → `True` and status `busy: Loading demo.s19 — wait for it to finish.`",
+        "(baseline idle refusal) no session run → `False` and no refusal status"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Returns false when no session action runs; otherwise paints the busy refusal and returns true.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.end_busy",
+      "reqs": [
+        "R-QUIT.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "BusyKey",
+          "name": "key",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "gen",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "outcome",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ended"
+        ],
+        "raw": "bool ended"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-QUIT.8 baseline) matching final `file_load` generation `3` with quit pending → `True` followed by the pending-quit exit check",
+        "(baseline stale busy end) generation `2` when current generation is `3` → `False` and no pending-quit exit check"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Ends the matching busy generation and, after every effective end, calls `_exit_if_quit_pending`; stale generations return false before that call.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_quit",
+      "reqs": [
+        "R-COPY.19",
+        "R-QUIT.8"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(baseline idle quit) no session action → immediate `exit`, no question screen",
+        "(R-COPY.19 baseline busy quit) running `file_load` → title `Quit?`, body `still working: Loading demo.s19 — wait, or quit after it finishes`, buttons `Quit (y)` and `Stay (n)`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Exits immediately when idle; while a session action runs, ignores a repeated quit question or pushes `_QuitQuestionScreen` with `_answer_quit` as callback.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._answer_quit",
+      "reqs": [
+        "R-COPY.17",
+        "R-QUIT.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[bool]",
+          "name": "quit",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-COPY.17 baseline answer) answer `True` while idle → pending `True` and exit",
+        "(baseline stay answer) answer `False` → pending `False` and no quit"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._quit_pending]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "baseline. Converts the answer to a boolean pending flag and immediately runs the pending-quit exit check.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._exit_if_quit_pending",
+      "reqs": [
+        "R-QUIT.8"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(R-QUIT.8 baseline deferred quit) pending `True` and a running `file_load` → no exit; after its effective end and no session run → exit"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Exits only when quit is pending and no session action is running; a busy run keeps the app alive until an effective `end_busy` checks again.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "write_os_clipboard",
+      "reqs": [
+        "R-PASTE.9",
+        "R-PASTE.10",
+        "R-PASTE.12",
+        "R-PASTE.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[tuple[tuple[str, Callable[[str], bool]], ...]]",
+          "name": "strategies",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "written"
+        ],
+        "raw": "bool written"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline write success) text `abc` and one writer returning `True` → writer receives `abc` and result `True`",
+        "(R-PASTE.12 baseline cap) text of `65537` characters → one writer receives exactly `65536` characters",
+        "(R-PASTE.9 baseline failure) every writer returns `False` → result `False` and warning `write_os_clipboard: every strategy failed`"
+      ],
+      "modify": [
+        "[I/O: Windows clipboard]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "baseline. Caps the payload at 65,536 characters, tries the ordered writers and returns true on the first success; exceptions skip only that writer and total failure returns false.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_mirror_and_write_os_clipboard",
+      "reqs": [
+        "R-PASTE.9",
+        "R-PASTE.10",
+        "R-PASTE.12",
+        "R-PASTE.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "App",
+          "name": "app",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline mirror success) selected text `COPYME-1` and write `True` → app clipboard `COPYME-1`, one executor write and no success notice",
+        "(R-PASTE.9/101 baseline failure) write `False` → one warning notice `Clipboard write failed — copied inside the app only.`, severity `warning`, timeout `6.0`",
+        "(R-PASTE.12 baseline mirror cap) text of `65537` characters → toolkit base copy and OS write each receive `65536` characters"
+      ],
+      "modify": [
+        "[Data: App._clipboard]",
+        "[I/O: terminal]",
+        "[I/O: Windows clipboard]"
+      ],
+      "assign": [
+        "replace",
+        "append",
+        "replace"
+      ],
+      "func": "baseline. Caps once, calls toolkit base `App.copy_to_clipboard` directly, awaits `write_os_clipboard` in the executor, returns without a success notice and emits only the existing warning on failure.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput.action_copy",
+      "reqs": [
+        "R-PASTE.2",
+        "R-PASTE.3",
+        "R-PASTE.5",
+        "R-PASTE.15"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-PASTE.3/1 baseline) selection `COPYME-1` → one `_mirror_and_write_os_clipboard` call with `COPYME-1`, value unchanged",
+        "(R-PASTE.5/1 baseline) empty selection and app clipboard `BEFORE` → `SkipAction`, clipboard remains `BEFORE`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Raises `SkipAction` for an empty selection; otherwise awaits the shared mirror/write tail without changing value or selection.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "OsClipboardInput.action_cut",
+      "reqs": [
+        "R-PASTE.5",
+        "R-PASTE.6",
+        "R-PASTE.7",
+        "R-PASTE.15"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-PASTE.7/1 baseline) value `DE AD BE EF`, selected `DE AD` → remaining value ` BE EF` and one tail call with `DE AD`",
+        "(R-PASTE.5/3 baseline) empty selection → `SkipAction`, no local deletion and no tail call"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Raises `SkipAction` for an empty selection; otherwise deletes the selection locally and awaits the shared tail with the removed text.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CappedTextArea.action_copy",
+      "reqs": [
+        "R-PASTE.2",
+        "R-PASTE.3",
+        "R-PASTE.5",
+        "R-PASTE.12",
+        "R-PASTE.15"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/capped_text_area.py",
+      "examples": [
+        "(R-PASTE.3/2 baseline) selected document text `COPYME-2` → one tail call with `COPYME-2`, document unchanged",
+        "(R-PASTE.5/2 baseline) empty selection → `SkipAction`, no tail call"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Raises `SkipAction` for an empty selection; otherwise awaits the shared mirror/write tail without modifying the document.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "CappedTextArea.action_cut",
+      "reqs": [
+        "R-PASTE.6",
+        "R-PASTE.7",
+        "R-PASTE.8",
+        "R-PASTE.15"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/capped_text_area.py",
+      "examples": [
+        "(R-PASTE.7/2 baseline) text `DE AD BE EF`, selected `DE AD` → remaining text ` BE EF` and one tail call with `DE AD`",
+        "(R-PASTE.8/1 baseline) lines `first`, `line_to_cut`, `third`, cursor on the second line and no selection → remaining lines `first`, `third`, tail receives `line_to_cut` with at most one line end",
+        "(baseline read-only cut) read-only document `KEEP` → no deletion and no tail call"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline. Returns for a read-only buffer; otherwise deletes the selection, or the cursor line when there is no selection, and sends the replaced text to the shared tail.",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "CappedTextArea.action_copy",
+      "callee": "_mirror_and_write_os_clipboard",
+      "sites": [
+        "s19_app/tui/capped_text_area.py:270"
+      ]
+    },
+    {
+      "caller": "CappedTextArea.action_cut",
+      "callee": "_mirror_and_write_os_clipboard",
+      "sites": [
+        "s19_app/tui/capped_text_area.py:308"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput.action_copy",
+      "callee": "_mirror_and_write_os_clipboard",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:916"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput.action_cut",
+      "callee": "_mirror_and_write_os_clipboard",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:944"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._answer_quit",
+      "callee": "S19TuiApp._exit_if_quit_pending",
+      "sites": [
+        "s19_app/tui/app.py:23040"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._exit_if_quit_pending",
+      "callee": "S19TuiApp._running_session_action",
+      "sites": [
+        "s19_app/tui/app.py:23044"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._fit_a2l_tag_cells",
+      "callee": "S19TuiApp._build_a2l_table_cells",
+      "sites": [
+        "s19_app/tui/app.py:21619"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._fit_a2l_tag_cells",
+      "callee": "S19TuiApp.update_a2l_tags_view",
+      "sites": [
+        "s19_app/tui/app.py:21623"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._refuse_if_busy",
+      "callee": "S19TuiApp._running_session_action",
+      "sites": [
+        "s19_app/tui/app.py:23010"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._repaint_a2l_tag_cells",
+      "callee": "S19TuiApp._build_a2l_table_cells",
+      "sites": [
+        "s19_app/tui/app.py:21716"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_quit",
+      "callee": "S19TuiApp._running_session_action",
+      "sites": [
+        "s19_app/tui/app.py:23019"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.compose",
+      "callee": "S19TuiApp._compose_screen_a2l",
+      "sites": [
+        "s19_app/tui/app.py:3602"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.compose",
+      "callee": "S19TuiApp._compose_screen_mac",
+      "sites": [
+        "s19_app/tui/app.py:3603"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.end_busy",
+      "callee": "S19TuiApp._exit_if_quit_pending",
+      "sites": [
+        "s19_app/tui/app.py:22907"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_a2l_tag_table_measured",
+      "callee": "S19TuiApp._fit_a2l_tag_cells",
+      "sites": [
+        "s19_app/tui/app.py:21658"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.update_a2l_tags_view",
+      "callee": "S19TuiApp._build_a2l_table_cells",
+      "sites": [
+        "s19_app/tui/app.py:21494"
+      ]
+    },
+    {
+      "caller": "_mirror_and_write_os_clipboard",
+      "callee": "write_os_clipboard",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:741 (ref)"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "A2LTagTable.on_resize": [
+      "s19_app/tui/app.py:1562"
+    ],
+    "S19TuiApp._refuse_if_busy": [
+      "s19_app/tui/app.py:12833",
+      "s19_app/tui/app.py:14724",
+      "s19_app/tui/app.py:16582",
+      "s19_app/tui/app.py:16695",
+      "s19_app/tui/app.py:16793",
+      "s19_app/tui/app.py:16903",
+      "s19_app/tui/app.py:18581",
+      "s19_app/tui/app.py:18609",
+      "s19_app/tui/app.py:5030",
+      "s19_app/tui/app.py:5260",
+      "s19_app/tui/app.py:5551",
+      "s19_app/tui/app.py:5578",
+      "s19_app/tui/app.py:5633",
+      "s19_app/tui/app.py:5668",
+      "s19_app/tui/app.py:5716",
+      "s19_app/tui/app.py:5770",
+      "s19_app/tui/app.py:5838",
+      "s19_app/tui/app.py:5898",
+      "s19_app/tui/app.py:7733",
+      "s19_app/tui/app.py:7868",
+      "s19_app/tui/app.py:7882",
+      "s19_app/tui/app.py:9038",
+      "s19_app/tui/app.py:9106",
+      "s19_app/tui/app.py:9176",
+      "s19_app/tui/app.py:9240",
+      "s19_app/tui/app.py:9788"
+    ],
+    "S19TuiApp._running_session_action": [
+      "s19_app/tui/app.py:6747"
+    ],
+    "S19TuiApp.end_busy": [
+      "s19_app/tui/app.py:13550",
+      "s19_app/tui/app.py:13669",
+      "s19_app/tui/app.py:13673",
+      "s19_app/tui/app.py:15080",
+      "s19_app/tui/app.py:15129",
+      "s19_app/tui/app.py:15164",
+      "s19_app/tui/app.py:15174",
+      "s19_app/tui/app.py:15227",
+      "s19_app/tui/app.py:16614",
+      "s19_app/tui/app.py:17043",
+      "s19_app/tui/app.py:17048",
+      "s19_app/tui/app.py:20022",
+      "s19_app/tui/app.py:20071",
+      "s19_app/tui/app.py:22966",
+      "s19_app/tui/app.py:7097"
+    ],
+    "S19TuiApp.update_a2l_tags_view": [
+      "s19_app/tui/app.py:11643",
+      "s19_app/tui/app.py:11669",
+      "s19_app/tui/app.py:17422",
+      "s19_app/tui/app.py:21278",
+      "s19_app/tui/app.py:21283",
+      "s19_app/tui/app.py:21397",
+      "s19_app/tui/app.py:21981"
+    ],
+    "S19TuiApp._repaint_a2l_tag_cells": [
+      "s19_app/tui/app.py:19336"
+    ],
+    "S19TuiApp._invalidate_a2l_view_cache": [
+      "s19_app/tui/app.py:21157"
+    ],
+    "CappedTextArea.action_copy": [
+      "s19_app/tui/capped_text_area.py:327"
+    ],
+    "OsClipboardInput.action_copy": [
+      "s19_app/tui/os_clipboard_input.py:879"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

@@ -1,0 +1,2326 @@
+REDACTED-EVIDENCE-COPY: true
+APPLICABLE: false
+DO-NOT-APPLY: identities or control canaries were replaced with placeholders.
+HISTORICAL-COPY: retained for review only; no execution verdict changed.
+
+diff --git a/.github/workflows/clipboard-windows.yml b/.github/workflows/clipboard-windows.yml
+index 62f289d1..22277d40 100644
+--- a/.github/workflows/clipboard-windows.yml
++++ b/.github/workflows/clipboard-windows.yml
+@@ -7,29 +7,37 @@ on:
+   workflow_dispatch:
+   push:
+     paths:
+-      - "s19_app/tui/app.py"
+-      - "s19_app/tui/os_clipboard_input.py"
+-      - "s19_app/tui/capped_text_area.py"
+-      - "tests/support/b103_clipboard.py"
++      - "s19_app/**/*.py"
++      - "tests/__init__.py"
++      - "tests/conftest.py"
++      - "tests/support/**"
+       - "tests/test_b103_clipboard_windows.py"
+       - "tests/test_b103_clipboard_matrix.py"
+       - "tests/test_b103_copy_views.py"
+       - "tests/test_b103_clipboard_tail.py"
+       - "tests/test_b103_copy_quit_dialog.py"
+       - "tests/test_b103_copy_paste_matrix.py"
++      - "examples/case_00_public/**"
++      - "requirements.txt"
++      - "pyproject.toml"
++      - "setup.py"
+       - ".github/workflows/clipboard-windows.yml"
+   pull_request:
+     paths:
+-      - "s19_app/tui/app.py"
+-      - "s19_app/tui/os_clipboard_input.py"
+-      - "s19_app/tui/capped_text_area.py"
+-      - "tests/support/b103_clipboard.py"
++      - "s19_app/**/*.py"
++      - "tests/__init__.py"
++      - "tests/conftest.py"
++      - "tests/support/**"
+       - "tests/test_b103_clipboard_windows.py"
+       - "tests/test_b103_clipboard_matrix.py"
+       - "tests/test_b103_copy_views.py"
+       - "tests/test_b103_clipboard_tail.py"
+       - "tests/test_b103_copy_quit_dialog.py"
+       - "tests/test_b103_copy_paste_matrix.py"
++      - "examples/case_00_public/**"
++      - "requirements.txt"
++      - "pyproject.toml"
++      - "setup.py"
+       - ".github/workflows/clipboard-windows.yml"
+ 
+ permissions:
+@@ -54,11 +62,36 @@ jobs:
+         run: |
+           python -m pip install --upgrade pip
+           python -m pip install -r requirements.txt
+-          python -m pip install pytest
+-          python -m pip install -e .
++          python -m pip install pytest "textual==8.2.8"
++          python -m pip install -e . "textual==8.2.8"
+ 
+-      - name: Print the toolkit version the design rests on (E3A-10 a)
+-        run: python -c "import sys, textual; print(sys.version, textual.__version__)"
++      - name: Print and verify the toolkit version the design rests on (E3A-10 a)
++        run: python -c "import sys, textual; print(sys.version, textual.__version__); assert textual.__version__ == '8.2.8', textual.__version__"
+ 
+-      - name: Run the OS clipboard tests (serial, every outcome listed)
+-        run: pytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py tests/test_b103_copy_views.py tests/test_b103_clipboard_tail.py tests/test_b103_copy_quit_dialog.py tests/test_b103_copy_paste_matrix.py
++      - name: Validate exactly 28 acceptance-matrix nodes
++        timeout-minutes: 5
++        run: python -c "import subprocess, sys; result = subprocess.run([sys.executable, '-m', 'pytest', '-p', 'no:cacheprovider', '--collect-only', '-q', 'tests/test_b103_copy_paste_matrix.py'], check=True, capture_output=True, text=True); print(result.stdout, end=''); nodes = [line for line in result.stdout.splitlines() if '::test_copy_paste_acceptance_cell[AT-I1b-' in line]; assert len(nodes) == 28 and len(set(nodes)) == 28, f'expected exactly 28 unique AT nodes, got {len(nodes)}'; print('AT_NODES=28')"
++
++      - name: Run the OS clipboard tests and audit every JUnit outcome
++        timeout-minutes: 45
++        run: |
++          $junit = Join-Path $env:RUNNER_TEMP "b103-winci-junit.xml"
++          $transcript = Join-Path $env:RUNNER_TEMP "b103-winci-pytest.txt"
++          $gateTranscript = Join-Path $env:RUNNER_TEMP "b103-winci-gate.txt"
++          & python -m pytest -v -rs --durations=20 --junitxml="$junit" tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py tests/test_b103_copy_views.py tests/test_b103_clipboard_tail.py tests/test_b103_copy_quit_dialog.py tests/test_b103_copy_paste_matrix.py 2>&1 | Tee-Object -FilePath "$transcript"
++          $pytestExit = $LASTEXITCODE
++          & python tests/support/b103_winci_gate.py --junit-xml "$junit" --pytest-exit $pytestExit 2>&1 | Tee-Object -FilePath "$gateTranscript"
++          $gateExit = $LASTEXITCODE
++          Write-Host "PYTEST_EXIT=$pytestExit GATE_EXIT=$gateExit"
++          exit $gateExit
++
++      - name: Preserve WinCI pytest, JUnit and gate output
++        if: always()
++        uses: actions/upload-artifact@v4
++        with:
++          name: b103-winci-outcomes
++          path: |
++            ${{ runner.temp }}/b103-winci-pytest.txt
++            ${{ runner.temp }}/b103-winci-junit.xml
++            ${{ runner.temp }}/b103-winci-gate.txt
++          if-no-files-found: warn
+diff --git a/tests/support/b103_clipboard.py b/tests/support/b103_clipboard.py
+index c47fb0ca..4fa37f12 100644
+--- a/tests/support/b103_clipboard.py
++++ b/tests/support/b103_clipboard.py
+@@ -42,6 +42,7 @@ from __future__ import annotations
+ import asyncio
+ import base64
+ import logging
++import ntpath
+ import os
+ import re
+ import subprocess
+@@ -197,10 +198,13 @@ def _probe_once() -> tuple:
+     try:
+         read_back = other_program_read()
+     except Exception as exc:  # pragma: no cover - the layers report themselves
+-        return False, f"PowerShell read raised {exc!r}"
++        return False, f"PowerShell read raised {type(exc).__name__}"
+     if read_back == nonce:
+-        return True, f"win32 write ok, PowerShell read {nonce!r}"
+-    return False, f"win32 write ok, PowerShell read {read_back!r}"
++        return True, f"win32 write ok; PowerShell read matched; chars={len(nonce)}"
++    return False, (
++        "win32 write ok; PowerShell read mismatch; "
++        f"expected_chars={len(nonce)}; actual_chars={len(read_back)}"
++    )
+ 
+ 
+ _probe_cache: Optional[tuple] = None
+@@ -502,6 +506,12 @@ async def _poll_until(pilot, predicate: Callable[[], bool], timeout: float = 10.
+     raise AssertionError("poll predicate not satisfied within timeout")
+ 
+ 
++async def wait_for_copy_tail(pilot, marker: dict, timeout: float = 10.0) -> None:
++    """Wait for an instrumented copy tail to start and finish."""
++    await _poll_until(pilot, lambda: bool(marker.get("started")), timeout)
++    await _poll_until(pilot, lambda: bool(marker.get("ended")), timeout)
++
++
+ async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
+     """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
+ 
+@@ -541,58 +551,106 @@ def _require_windows() -> None:
+ 
+ 
+ def _system_powershell_path() -> str:
+-    """The system PowerShell path from the module under test (Windows only)."""
++    """The absolute system PowerShell path from the module under test."""
+     from s19_app.tui import os_clipboard_input as mod
+ 
+     path = mod._system_powershell()
+     if not path:
+-        pytest.skip("system PowerShell not found on this host")
++        pytest.fail("system PowerShell not found on isolated WinCI")
++    if not ntpath.isabs(path):
++        raise AssertionError("system PowerShell path is not absolute")
+     return path
+ 
+ 
+-def other_program_write(text: str) -> None:
+-    """Write the clipboard for the "other program" role via :func:`_own_write`.
+-
+-    Summary:
+-        Run-3 triage C6: the previous PowerShell UTF-16LE stdin pipe decoded
+-        to a one-character payload (an embedded NUL after every char). This
+-        now delegates to :func:`_own_write` (ctypes ``CF_UNICODETEXT``,
+-        UTF-16LE, no PowerShell encoding trick) — the path the probe already
+-        proves round-trips through :func:`other_program_read` and the
+-        product's readers — and then self-checks the round-trip so a future
+-        encoding regression fails here instead of in 21 downstream tests.
++def _run_system_powershell(
++    command: str, *, input_text: Optional[str] = None
++) -> subprocess.CompletedProcess:
++    path = _system_powershell_path()
++    kwargs = {
++        "capture_output": True,
++        "text": True,
++        "encoding": "utf-8",
++        "errors": "strict",
++        "timeout": 10.0,
++        "shell": False,
++        "creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0),
++    }
++    if input_text is None:
++        kwargs["stdin"] = subprocess.DEVNULL
++    else:
++        kwargs["input"] = input_text
++    try:
++        return subprocess.run(
++            [
++                path,
++                "-NoLogo",
++                "-NoProfile",
++                "-NonInteractive",
++                "-Command",
++                command,
++            ],
++            **kwargs,
++        )
++    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
++        raise AssertionError(
++            f"system PowerShell invocation failed: {type(exc).__name__}"
++        ) from exc
+ 
+-    Args:
+-        text (str): The payload to write to the clipboard.
+ 
+-    Raises:
+-        AssertionError: When the Win32 write fails, or the value reads back
+-            different from ``text``.
+-    """
++def other_program_write(text: str) -> None:
++    """Write exact text in an external PowerShell and verify a separate read."""
+     _require_windows()
+-    if not _own_write(text):
+-        raise AssertionError("other_program_write: CF_UNICODETEXT write failed")
+-    read_back = own_read()
++    require_isolated_clipboard("windows")
++    encoded = base64.b64encode(
++        text.encode("utf-16-le", "surrogatepass")
++    ).decode("ascii")
++    command = (
++        "$ErrorActionPreference='Stop'; "
++        "$encoded=[Console]::In.ReadToEnd(); "
++        "$text=[Text.Encoding]::Unicode.GetString("
++        "[Convert]::FromBase64String($encoded)); "
++        "Add-Type -AssemblyName System.Windows.Forms; "
++        "[Windows.Clipboard]::SetText($text)"
++    )
++    result = _run_system_powershell(command, input_text=encoded)
++    if result.returncode:
++        raise AssertionError(
++            "other_program_write: PowerShell exit "
++            f"{result.returncode}; stderr_chars={len(result.stderr or '')}"
++        )
++    read_back = other_program_read()
+     if read_back != text:
+-        shown = read_back[:20] if read_back is not None else None
+         raise AssertionError(
+-            "other_program_write round-trip failed: "
+-            f"wrote {text[:20]!r}, read back {shown!r}"
++            "other_program_write round-trip mismatch: "
++            f"expected_chars={len(text)}; actual_chars={len(read_back)}"
+         )
+ 
+ 
+ def other_program_read() -> str:
+-    """A separate system PowerShell ``Get-Clipboard -Raw`` (UTF-8 output)."""
++    """Read exact clipboard text through a separate system PowerShell."""
+     _require_windows()
+-    path = _system_powershell_path()
+-    result = subprocess.run(
+-        [path, "-NoProfile", "-NonInteractive", "-Command",
+-         "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;Get-Clipboard -Raw"],
+-        capture_output=True, text=True, encoding="utf-8",
+-        errors="replace", timeout=10.0, shell=False,
+-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
++    require_isolated_clipboard("windows")
++    command = (
++        "$ErrorActionPreference='Stop'; "
++        "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); "
++        "$text=[string](Get-Clipboard -Raw); "
++        "[Console]::Out.Write([Convert]::ToBase64String("
++        "[Text.Encoding]::UTF8.GetBytes($text)))"
+     )
+-    return result.stdout.rstrip("\r\n")
++    result = _run_system_powershell(command)
++    if result.returncode:
++        raise AssertionError(
++            "other_program_read: PowerShell exit "
++            f"{result.returncode}; stderr_chars={len(result.stderr or '')}"
++        )
++    try:
++        return base64.b64decode(
++            "".join(result.stdout.split()), validate=True
++        ).decode("utf-8")
++    except (ValueError, UnicodeError) as exc:
++        raise AssertionError(
++            "other_program_read: PowerShell output was not Base64 UTF-8"
++        ) from exc
+ 
+ 
+ def _own_write(text: str) -> bool:
+diff --git a/tests/test_b103_clipboard_tail.py b/tests/test_b103_clipboard_tail.py
+index 6d3f6590..71102ea6 100644
+--- a/tests/test_b103_clipboard_tail.py
++++ b/tests/test_b103_clipboard_tail.py
+@@ -4,8 +4,11 @@ import ast
+ import asyncio
+ import base64
+ import json
++import logging
++import queue
+ import re
+ import shutil
++import subprocess
+ import sys
+ import threading
+ import time
+@@ -25,9 +28,9 @@ from s19_app.tui import os_clipboard_input as clipboard_module
+ from tests.support.b103_clipboard import (
+     arm_tick_lateness,
+     install_log_capture,
+-    other_program_read,
+     other_program_write,
+     remove_log_capture,
++    require_isolated_clipboard,
+ )
+ from tests.support.timing import report_margin, timing_bound
+ 
+@@ -83,6 +86,11 @@ async def _wait(pilot, predicate, timeout: float = 8.0) -> None:
+         await pilot.pause()
+ 
+ 
++async def _wait_copy_tail(pilot, ledger) -> None:
++    await _wait(pilot, lambda: bool(ledger.tail_done))
++    await _settle(pilot, 2)
++
++
+ async def _load_example(app, pilot, tmp_path: Path, name: str) -> None:
+     target = tmp_path / name
+     if not target.exists():
+@@ -128,7 +136,9 @@ def _instrument(app, monkeypatch: pytest.MonkeyPatch, *, writer_result=None, wri
+         base_payloads=[],
+         override_payloads=[],
+         tail_payloads=[],
++        tail_done=[],
+         writer_payloads=[],
++        writer_done=[],
+         writer_threads=[],
+         helper_payloads=[],
+         osc_payloads=[],
+@@ -156,19 +166,25 @@ def _instrument(app, monkeypatch: pytest.MonkeyPatch, *, writer_result=None, wri
+     async def tail_spy(app_self, text: str):
+         ledger.counts["tail"] += 1
+         ledger.tail_payloads.append(text)
+-        return await original_tail(app_self, text)
++        try:
++            return await original_tail(app_self, text)
++        finally:
++            ledger.tail_done.append(text)
+ 
+     def writer_spy(text: str, *args, **kwargs):
+         ledger.counts["writer"] += 1
+         ledger.writer_payloads.append(text)
+         ledger.writer_threads.append(threading.get_ident())
+-        if writer_delay:
+-            time.sleep(writer_delay)
+-        if writer_result is None:
+-            return original_writer(text, *args, **kwargs)
+-        if writer_result:
+-            ledger.os_clipboard = text
+-        return bool(writer_result)
++        try:
++            if writer_delay:
++                time.sleep(writer_delay)
++            if writer_result is None:
++                return original_writer(text, *args, **kwargs)
++            if writer_result:
++                ledger.os_clipboard = text
++            return bool(writer_result)
++        finally:
++            ledger.writer_done.append(text)
+ 
+     def helper_spy(text: str) -> str:
+         ledger.counts["helper"] += 1
+@@ -207,6 +223,46 @@ def _instrument(app, monkeypatch: pytest.MonkeyPatch, *, writer_result=None, wri
+     return ledger
+ 
+ 
++def other_program_read() -> str:
++    """Read the real Windows clipboard as Base64, preserving every CR/LF."""
++    require_isolated_clipboard("windows")
++    program = clipboard_module._system_powershell()
++    if not program:
++        pytest.skip("not_run: isolated WinCI has no system PowerShell")
++    if not Path(program).is_absolute():
++        raise AssertionError("separate clipboard reader requires absolute system PowerShell")
++    result = subprocess.run(
++        [
++            program,
++            "-NoProfile",
++            "-NonInteractive",
++            "-Command",
++            "$ErrorActionPreference='Stop';"
++            "[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false);"
++            "$text=[string](Get-Clipboard -Raw);"
++            "[Console]::Out.Write([Convert]::ToBase64String("
++            "[System.Text.Encoding]::UTF8.GetBytes($text)))",
++        ],
++        stdin=subprocess.DEVNULL,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True,
++        encoding="utf-8",
++        errors="strict",
++        timeout=10.0,
++        shell=False,
++        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
++    )
++    if result.returncode or result.stderr:
++        raise AssertionError(
++            "separate clipboard read failed: "
++            f"exit={result.returncode}, stderr_chars={len(result.stderr)}"
++        )
++    return base64.b64decode(
++        "".join(result.stdout.split()), validate=True
++    ).decode("utf-8")
++
++
+ def _read_os(ledger) -> str:
+     if sys.platform != "win32":
+         return ledger.os_clipboard
+@@ -300,7 +356,10 @@ def _no_secret(records: list, secret: str) -> None:
+     messages = [row[2] for row in records]
+     escaped = secret.encode("unicode_escape").decode("ascii")
+     needles = {secret, secret[:16], escaped, escaped[:16], repr(secret)}
+-    assert not [(needle, message) for needle in needles for message in messages if needle in message], messages
++    leaked = any(
++        needle in message for needle in needles for message in messages
++    )
++    assert not leaked, "copied text or a derived prefix appeared in captured logs"
+ 
+ 
+ def _run_arms(monkeypatch: pytest.MonkeyPatch, arms) -> None:
+@@ -447,9 +506,10 @@ def _view_observation(
+                     await _settle(pilot)
+                 else:
+                     await _right_click(app, pilot, widget, right_offset)
++                await _wait_copy_tail(pilot, ledger)
+             finally:
+                 if held_state is not None:
+-                    held_state["release"].set()
++                    _release_clipboard(held_state)
+             return _observe(app, ledger, expected=expected)
+ 
+     return asyncio.run(drive())
+@@ -469,6 +529,7 @@ def _box_observation(tmp_path: Path, monkeypatch, kind: str, action: str, text:
+             else:
+                 await pilot.press("ctrl+c" if action == "copy" else "ctrl+x")
+                 await _settle(pilot)
++            await _wait_copy_tail(pilot, ledger)
+             after_text = widget.value if kind == "input" else widget.text
+             return _observe(
+                 app,
+@@ -483,7 +544,14 @@ def _box_observation(tmp_path: Path, monkeypatch, kind: str, action: str, text:
+     return asyncio.run(drive())
+ 
+ 
+-def _row_observation(tmp_path: Path, monkeypatch, name: str | None = None, *, writer_result=True) -> dict:
++def _row_observation(
++    tmp_path: Path,
++    monkeypatch,
++    name: str | None = None,
++    *,
++    writer_result=True,
++    held: bool = False,
++) -> dict:
+     async def drive() -> dict:
+         app = S19TuiApp(base_dir=tmp_path)
+         async with app.run_test(size=(118, 54)) as pilot:
+@@ -496,7 +564,13 @@ def _row_observation(tmp_path: Path, monkeypatch, name: str | None = None, *, wr
+                 expected = app._a2l_row_key_to_tag["a2l:0"]["name"]
+                 row = 0
+             ledger = _instrument(app, monkeypatch, writer_result=writer_result)
+-            await _right_click(app, pilot, table, (4, table.header_height + row))
++            held_state = _hold_clipboard() if held and sys.platform == "win32" else None
++            try:
++                await _right_click(app, pilot, table, (4, table.header_height + row))
++                await _wait_copy_tail(pilot, ledger)
++            finally:
++                if held_state is not None:
++                    _release_clipboard(held_state)
+             return _observe(app, ledger, expected=expected)
+ 
+     return asyncio.run(drive())
+@@ -515,7 +589,7 @@ def _injected_hex_key_observation(tmp_path: Path, monkeypatch, text: str) -> dic
+             monkeypatch.setattr(app.screen, "get_selected_text", lambda: text)
+             ledger = _instrument(app, monkeypatch, writer_result=True)
+             await pilot.press("ctrl+c")
+-            await _settle(pilot)
++            await _wait_copy_tail(pilot, ledger)
+             return _observe(app, ledger, expected=text)
+ 
+     return asyncio.run(drive())
+@@ -805,11 +879,15 @@ def test_r_copy_09_2_right_click_cut_notice_original_n(tmp_path, monkeypatch) ->
+ 
+ 
+ def _with_logs(observe):
++    logger = logging.getLogger("s19_app")
++    previous_level = logger.level
++    logger.setLevel(logging.DEBUG)
+     records = install_log_capture()
+     try:
+         obs = observe()
+     finally:
+         remove_log_capture(records)
++        logger.setLevel(previous_level)
+     return obs, records
+ 
+ 
+@@ -925,30 +1003,46 @@ def test_r_paste_10_101_exact_tail_warning_without_payload(tmp_path, monkeypatch
+ 
+ def test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs(tmp_path, monkeypatch) -> None:
+     """R-TUI-043.13/101: key/right/row/failure routes never log copied text."""
+-    if sys.platform == "win32":
+-        pytest.skip("Linux failing-writer arm; successful WinCI arm remains separate")
++    winci = sys.platform == "win32"
++
+     def view(gesture):
+         def check():
+             obs, records = _with_logs(lambda: _view_observation(tmp_path, monkeypatch, "hex", gesture, writer_result=None))
+-            _failure(obs, obs["expected"], view=True)
++            if winci:
++                _success(obs, obs["expected"], "Copied 3 lines to the clipboard.", view=True)
++            else:
++                _failure(obs, obs["expected"], view=True)
+             _no_secret(records, obs["expected"])
+         return check
+-    def row(writer_result):
++
++    def row(writer_result, *, held=False):
+         def check():
+             secret = "<REDACTED_CANARY>"
+-            obs, records = _with_logs(lambda: _row_observation(tmp_path, monkeypatch, secret, writer_result=writer_result))
+-            if writer_result:
+-                _success(obs, secret, "Copied 1 line to the clipboard.", view=True)
+-            else:
++            obs, records = _with_logs(lambda: _row_observation(
++                tmp_path, monkeypatch, secret, writer_result=writer_result, held=held,
++            ))
++            if held or not writer_result:
+                 _failure(obs, secret, view=True)
++            else:
++                _success(obs, secret, "Copied 1 line to the clipboard.", view=True)
+             _no_secret(records, secret)
+         return check
+-    _run_arms(monkeypatch, [
+-        ("view-key", view("key")),
+-        ("view-right-click", view("right")),
+-        ("row-success-recorder", row(True)),
+-        ("row-existing-failing-writer", row(None)),
+-    ])
++
++    if winci:
++        arms = [
++            ("view-key-real-writer", view("key")),
++            ("view-right-click-real-writer", view("right")),
++            ("row-success-real-writer", row(True)),
++            ("row-held-real-writer", row(None, held=True)),
++        ]
++    else:
++        arms = [
++            ("view-key", view("key")),
++            ("view-right-click", view("right")),
++            ("row-success-recorder", row(True)),
++            ("row-existing-failing-writer", row(None)),
++        ]
++    _run_arms(monkeypatch, arms)
+ 
+ 
+ def _hostile_powershell_observation(tmp_path: Path, monkeypatch) -> dict:
+@@ -959,36 +1053,46 @@ def _hostile_powershell_observation(tmp_path: Path, monkeypatch) -> dict:
+             table = await _show_model_row(app, pilot, HOSTILE_NAME)
+             real_writer = clipboard_module.write_os_clipboard
+             ledger = _instrument(app, monkeypatch, writer_result=True)
++            winci = sys.platform == "win32"
++
++            if winci:
++                instrumented_writer = clipboard_module.write_os_clipboard
++
++                def powershell_writer(text: str):
++                    return instrumented_writer(
++                        text,
++                        strategies=(("powershell", clipboard_module._write_via_powershell),),
++                    )
++
++                transport = "winci-real-powershell"
++            else:
++                def fake_run(argv, **kwargs):
++                    ledger.counts["process"] += 1
++                    ledger.processes.append((list(argv), dict(kwargs)))
++                    return SimpleNamespace(returncode=0, stdout="", stderr="")
++
++                def powershell_writer(text: str):
++                    ledger.counts["writer"] += 1
++                    ledger.writer_payloads.append(text)
++                    ledger.writer_threads.append(threading.get_ident())
++                    written = real_writer(
++                        text,
++                        strategies=(("powershell", clipboard_module._write_via_powershell),),
++                    )
++                    if written:
++                        ledger.os_clipboard = text
++                    return written
++
++                transport = "linux-simulated-powershell"
++                monkeypatch.setattr(clipboard_module, "sys", SimpleNamespace(platform="win32"))
++                monkeypatch.setattr(clipboard_module, "_system_powershell", lambda: "/usr/bin/pwsh")
++                monkeypatch.setattr(clipboard_module, "_system_directory", lambda: "/usr/bin")
++                monkeypatch.setattr(clipboard_module.subprocess, "run", fake_run)
+ 
+-            def fake_run(argv, **kwargs):
+-                ledger.counts["process"] += 1
+-                ledger.processes.append((list(argv), dict(kwargs)))
+-                return SimpleNamespace(returncode=0, stdout="", stderr="")
+-
+-            def powershell_writer(text: str):
+-                ledger.counts["writer"] += 1
+-                ledger.writer_payloads.append(text)
+-                ledger.writer_threads.append(threading.get_ident())
+-                written = real_writer(
+-                    text,
+-                    strategies=(("powershell", clipboard_module._write_via_powershell),),
+-                )
+-                if written:
+-                    ledger.os_clipboard = text
+-                return written
+-
+-            monkeypatch.setattr(clipboard_module, "sys", SimpleNamespace(platform="win32"))
+-            monkeypatch.setattr(clipboard_module, "_system_powershell", lambda: "/usr/bin/pwsh")
+-            monkeypatch.setattr(clipboard_module, "_system_directory", lambda: "/usr/bin")
+-            monkeypatch.setattr(clipboard_module.subprocess, "run", fake_run)
+             monkeypatch.setattr(clipboard_module, "write_os_clipboard", powershell_writer)
+             await _right_click(app, pilot, table, (4, table.header_height))
+-            return _observe(
+-                app,
+-                ledger,
+-                expected=HOSTILE_NAME,
+-                transport="linux-simulated-powershell",
+-            )
++            await _wait_copy_tail(pilot, ledger)
++            return _observe(app, ledger, expected=HOSTILE_NAME, transport=transport)
+ 
+     return asyncio.run(drive())
+ 
+@@ -1005,25 +1109,90 @@ def _assert_no_clipboard_app_import() -> None:
+     assert offenders == [], offenders
+ 
+ 
++def test_e5_powershell_preserves_lf_and_emits_bom_free_readers() -> None:
++    """Static E5 oracle: exact LF transport and stdout without a UTF-8 BOM."""
++    failures = []
++    write_command = "".join(clipboard_module._POWERSHELL_WRITE_COMMAND)
++    if "[Console]::In.ReadToEnd()" not in write_command:
++        failures.append("writer must read stdin once with [Console]::In.ReadToEnd()")
++    if "[Windows.Clipboard]::SetText($text)" not in write_command:
++        failures.append("writer must call .NET [Windows.Clipboard]::SetText($text)")
++    if "Set-Clipboard" in write_command:
++        failures.append("writer must not rebuild lines with Set-Clipboard")
++
++    utf8_without_bom = re.compile(
++        r"UTF8Encoding\]?\s*(?:::\s*new\s*)?\(\s*\$false\s*\)"
++    )
++    readers = (
++        (Path(clipboard_module.__file__), "_read_via_powershell"),
++        (Path(__file__), "other_program_read"),
++    )
++    for path, function_name in readers:
++        tree = ast.parse(path.read_text(encoding="utf-8"))
++        function = next(
++            node
++            for node in tree.body
++            if isinstance(node, ast.FunctionDef) and node.name == function_name
++        )
++        literals = "".join(
++            node.value
++            for node in ast.walk(function)
++            if isinstance(node, ast.Constant) and isinstance(node.value, str)
++        )
++        output_encodings = re.findall(
++            r"\[Console\]::OutputEncoding\s*=\s*([^;]+)", literals
++        )
++        if len(output_encodings) != 1 or not all(
++            utf8_without_bom.search(encoding) for encoding in output_encodings
++        ):
++            failures.append(f"{function_name} must use UTF8Encoding($false) for stdout")
++
++    assert not failures, "\n".join(failures)
++
++
+ def test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs(tmp_path, monkeypatch) -> None:
+-    """R-TUI-043.13/102: hostile payload and simulated Linux PowerShell."""
++    """R-TUI-043.13/102: simulated Linux and real forced WinCI PowerShell."""
+     _assert_no_clipboard_app_import()
+-    if sys.platform == "win32":
+-        pytest.skip("partial: simulated PowerShell is Linux-only; WinCI OS read is not implemented")
+     assert HOSTILE_NAME.count("\n") == 1
+-    assert "\x00" not in HOSTILE_NAME
++    if "\x00" in HOSTILE_NAME:
++        raise AssertionError("hostile fixture unexpectedly contains NUL")
+     obs, records = _with_logs(lambda: _hostile_powershell_observation(tmp_path, monkeypatch))
+-    assert obs["transport"] == "linux-simulated-powershell"
+-    _success(obs, HOSTILE_NAME, "Copied 2 lines to the clipboard.", view=True)
+-    assert obs["counts"]["process"] == 1, obs["processes"]
++    winci = sys.platform == "win32"
++    assert obs["transport"] == ("winci-real-powershell" if winci else "linux-simulated-powershell")
++    try:
++        _success(obs, HOSTILE_NAME, "Copied 2 lines to the clipboard.", view=True)
++    except AssertionError:
++        raise AssertionError("hostile exact-payload success oracle failed") from None
++    if obs["counts"]["process"] != 1:
++        raise AssertionError(
++            f"unexpected PowerShell process count: {obs['counts']['process']}"
++        )
+     argv, kwargs = obs["processes"][0]
+-    assert argv == ["/usr/bin/pwsh", "-NonInteractive", *clipboard_module._POWERSHELL_WRITE_COMMAND], argv
+-    assert kwargs.get("shell") is False, kwargs
+-    assert kwargs.get("cwd") == "/usr/bin", kwargs
+-    assert kwargs.get("input") == HOSTILE_NAME, kwargs.keys()
+-    assert all(HOSTILE_NAME not in str(arg) and HOSTILE_NAME[:16] not in str(arg) for arg in argv), argv
+-    assert NUL_REFUSAL not in [row[0] for row in obs["notices"]]
+-    assert NUL_WARNING not in [row[2] for row in records]
++    program = clipboard_module._system_powershell()
++    expected_argv = [
++        program,
++        "-NonInteractive",
++        *clipboard_module._POWERSHELL_WRITE_COMMAND,
++    ]
++    if argv != expected_argv:
++        raise AssertionError("PowerShell argv did not match the static system command")
++    if kwargs.get("shell") is not False:
++        raise AssertionError("PowerShell must run with shell=False")
++    if kwargs.get("cwd") != clipboard_module._system_directory():
++        raise AssertionError("PowerShell cwd was not the system directory")
++    if kwargs.get("input") != HOSTILE_NAME:
++        raise AssertionError("PowerShell stdin payload differed")
++    if winci and not (Path(program).is_absolute() and Path(program).is_file()):
++        raise AssertionError("WinCI PowerShell path was not an absolute existing file")
++    if any(
++        HOSTILE_NAME in str(arg) or HOSTILE_NAME[:16] in str(arg)
++        for arg in argv
++    ):
++        raise AssertionError("copied text or its prefix appeared in PowerShell argv")
++    if NUL_REFUSAL in [row[0] for row in obs["notices"]]:
++        raise AssertionError("hostile payload unexpectedly triggered the NUL refusal")
++    if NUL_WARNING in [row[2] for row in records]:
++        raise AssertionError("hostile payload unexpectedly logged the NUL warning")
+     _no_secret(records, HOSTILE_NAME)
+ 
+ 
+@@ -1037,8 +1206,24 @@ def _winci_ready_or_skip() -> None:
+         pytest.skip(f"runner clipboard unusable: {result}")
+ 
+ 
++def _reap_holder(proc) -> None:
++    try:
++        if proc.poll() is None:
++            proc.kill()
++        proc.wait(timeout=3.0)
++    finally:
++        if proc.stdout is not None:
++            proc.stdout.close()
++
++
++def _release_clipboard(state: dict) -> None:
++    state["release"].set()
++    state["supervisor"].join(timeout=5.0)
++    assert not state["supervisor"].is_alive(), "clipboard holder supervisor did not finish"
++    assert state["proc"].poll() is not None, "clipboard holder process is still running"
++
++
+ def _hold_clipboard(seconds: float = 8.0) -> dict:
+-    import subprocess
+     import textwrap
+     script = textwrap.dedent(
+         """
+@@ -1047,18 +1232,42 @@ def _hold_clipboard(seconds: float = 8.0) -> dict:
+         from ctypes import wintypes
+         user32 = ctypes.windll.user32
+         kernel32 = ctypes.windll.kernel32
+-        hwnd = user32.CreateWindowExW(0, "STATIC", "b103-tail-holder", 0, 0, 0, 0, 0, -3, None, kernel32.GetModuleHandleW(None), None)
+-        if not hwnd:
+-            print("WINDOW-FAILED", flush=True)
+-            sys.exit(1)
++        user32.CreateWindowExW.argtypes = [
++            wintypes.DWORD, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD,
++            ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
++            wintypes.HWND, wintypes.HMENU, wintypes.HINSTANCE, wintypes.LPVOID,
++        ]
++        user32.CreateWindowExW.restype = wintypes.HWND
++        kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
++        kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+         user32.OpenClipboard.argtypes = [wintypes.HWND]
+         user32.OpenClipboard.restype = wintypes.BOOL
+-        if not user32.OpenClipboard(hwnd):
+-            print("OPEN-FAILED", flush=True)
++        user32.CloseClipboard.argtypes = []
++        user32.CloseClipboard.restype = wintypes.BOOL
++        user32.DestroyWindow.argtypes = [wintypes.HWND]
++        user32.DestroyWindow.restype = wintypes.BOOL
++        kernel32.Sleep.argtypes = [wintypes.DWORD]
++        kernel32.Sleep.restype = None
++        hwnd = user32.CreateWindowExW(
++            0, "STATIC", "b103-tail-holder", 0, 0, 0, 0, 0,
++            -3, None, kernel32.GetModuleHandleW(None), None,
++        )
++        if not hwnd:
++            print("WINDOW-FAILED", flush=True)
+             sys.exit(1)
+-        print("HOLDING", flush=True)
+-        while True:
+-            user32.Sleep(20)
++        opened = False
++        try:
++            if not user32.OpenClipboard(hwnd):
++                print("OPEN-FAILED", flush=True)
++                sys.exit(1)
++            opened = True
++            print("HOLDING", flush=True)
++            while True:
++                kernel32.Sleep(20)
++        finally:
++            if opened:
++                user32.CloseClipboard()
++            user32.DestroyWindow(hwnd)
+         """
+     )
+     proc = subprocess.Popen(
+@@ -1066,32 +1275,61 @@ def _hold_clipboard(seconds: float = 8.0) -> dict:
+         stdout=subprocess.PIPE,
+         stderr=subprocess.STDOUT,
+         text=True,
++        encoding="utf-8",
++        errors="replace",
+         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+     )
+-    ready = proc.stdout.readline().strip()
+-    if ready != "HOLDING":
+-        proc.wait()
+-        raise RuntimeError(f"clipboard holder failed: {ready!r}")
+-    import ctypes
+-    from ctypes import wintypes
+-    user32 = ctypes.windll.user32
+-    user32.OpenClipboard.argtypes = [wintypes.HWND]
+-    user32.OpenClipboard.restype = wintypes.BOOL
+-    user32.CloseClipboard.restype = wintypes.BOOL
+-    opened = int(user32.OpenClipboard(None))
+-    if opened:
+-        user32.CloseClipboard()
+-        proc.kill()
+-        proc.wait()
+-        raise RuntimeError("clipboard hold not effective")
+-    state = {"proc": proc, "release": threading.Event()}
+-    def supervise():
+-        state["release"].wait(timeout=seconds)
+-        if proc.poll() is None:
+-            proc.kill()
+-        proc.wait()
+-    threading.Thread(target=supervise, daemon=True).start()
+-    return state
++    ready_lines = queue.Queue(maxsize=1)
++
++    def read_ready():
++        try:
++            ready_lines.put(proc.stdout.readline())
++        except Exception as exc:
++            ready_lines.put(exc)
++
++    reader = threading.Thread(target=read_ready, daemon=True)
++    reader.start()
++    try:
++        try:
++            ready = ready_lines.get(timeout=5.0)
++        except queue.Empty as exc:
++            raise RuntimeError("clipboard holder readiness timed out") from exc
++        reader.join(timeout=1.0)
++        assert not reader.is_alive(), "clipboard holder readiness reader did not finish"
++        if isinstance(ready, Exception):
++            raise RuntimeError("clipboard holder readiness read failed") from ready
++        if ready.strip() != "HOLDING":
++            raise RuntimeError(f"clipboard holder failed: {ready.strip()!r}")
++        if proc.poll() is not None:
++            raise RuntimeError(f"clipboard holder exited after HOLDING: {proc.returncode}")
++
++        import ctypes
++        from ctypes import wintypes
++        user32 = ctypes.windll.user32
++        user32.OpenClipboard.argtypes = [wintypes.HWND]
++        user32.OpenClipboard.restype = wintypes.BOOL
++        user32.CloseClipboard.argtypes = []
++        user32.CloseClipboard.restype = wintypes.BOOL
++        if user32.OpenClipboard(None):
++            user32.CloseClipboard()
++            raise RuntimeError("clipboard hold not effective")
++        if proc.poll() is not None:
++            raise RuntimeError("clipboard holder did not stay alive")
++
++        state = {"proc": proc, "release": threading.Event()}
++
++        def supervise():
++            state["release"].wait(timeout=seconds)
++            _reap_holder(proc)
++
++        supervisor = threading.Thread(target=supervise, daemon=True)
++        state["supervisor"] = supervisor
++        supervisor.start()
++        return state
++    except BaseException:
++        _reap_holder(proc)
++        reader.join(timeout=1.0)
++        raise
+ 
+ 
+ def _allow_real_processes(monkeypatch, ledger, original_run) -> None:
+@@ -1118,10 +1356,15 @@ def test_r_paste_13_101_held_row_copy_warns_within_bound(tmp_path, monkeypatch)
+             try:
+                 started = time.monotonic()
+                 await _right_click(app, pilot, table, (4, table.header_height + 2))
++                await _wait(
++                    pilot,
++                    lambda: bool(ledger.writer_done) and bool(ledger.tail_done),
++                    timeout=10.0,
++                )
+                 elapsed = time.monotonic() - started
+-                return elapsed, _observe(app, ledger, expected=expected)
+             finally:
+-                held["release"].set()
++                _release_clipboard(held)
++            return elapsed, _observe(app, ledger, expected=expected)
+     elapsed, obs = asyncio.run(drive())
+     _failure(obs, obs["expected"], view=True)
+     assert obs["counts"]["writer"] == 1
+@@ -1164,15 +1407,16 @@ def _responsive_copy(tmp_path, monkeypatch, source: str):
+                         await _right_click(app, pilot, widget, (10, 2))
+                     else:
+                         await _right_click(app, pilot, widget, (4, widget.header_height + 2))
+-                    deadline = time.monotonic() + 10.0
+-                    while not marker["ended"] and time.monotonic() < deadline:
+-                        await asyncio.sleep(0.005)
+-                        await pilot.pause()
++                    await _wait(
++                        pilot,
++                        lambda: marker["ended"] and bool(ledger.tail_done),
++                        timeout=10.0,
++                    )
+                     await _settle(pilot)
+                     break
+-                return marker, lateness, _observe(app, ledger, expected=expected)
+             finally:
+-                held["release"].set()
++                _release_clipboard(held)
++            return marker, lateness, _observe(app, ledger, expected=expected)
+     return asyncio.run(drive())
+ 
+ 
+@@ -1219,7 +1463,7 @@ def _line_cut_observation(tmp_path: Path, monkeypatch) -> dict:
+             await _settle(pilot)
+             ledger = _instrument(app, monkeypatch, writer_result=True)
+             await pilot.press("ctrl+x")
+-            await _settle(pilot)
++            await _wait_copy_tail(pilot, ledger)
+             return _observe(app, ledger, after_text=widget.text)
+     return asyncio.run(drive())
+ 
+@@ -1252,6 +1496,7 @@ def _unrelated_view_box_observation(tmp_path: Path, monkeypatch) -> dict:
+             assert box.selection == (0, 3)
+             ledger = _instrument(app, monkeypatch, writer_result=True)
+             await _right_click(app, pilot, box)
++            await _wait_copy_tail(pilot, ledger)
+             return _observe(
+                 app,
+                 ledger,
+diff --git a/tests/test_b103_clipboard_windows.py b/tests/test_b103_clipboard_windows.py
+index c06602e6..d30a9a5d 100644
+--- a/tests/test_b103_clipboard_windows.py
++++ b/tests/test_b103_clipboard_windows.py
+@@ -5,9 +5,9 @@ Summary:
+     (``.github/workflows/clipboard-windows.yml``). Every test requests the
+     ``os_clipboard_ready`` fixture: off Windows it is skipped with the reason
+     ``Windows only``; on a non-isolated Windows host it fails before any open
+-    (R-PASTE.21); on a hosted runner whose probe failed it is skipped with
+-    ``runner clipboard unusable: <probe result>`` (R-PASTE.22). The probe
+-    test itself (``test_runner_clipboard_probe``) FAILS on a failed probe
++    (R-PASTE.21); on a hosted runner whose probe failed it is skipped as
++    ``runner clipboard unusable`` (R-PASTE.22). The probe test itself
++    (``test_runner_clipboard_probe``) FAILS on a failed probe
+     (R-PASTE.23) and is collected from the workflow's run line (R-PASTE.20/1).
+ 
+     Each case's objective, preconditions and expected result are
+@@ -26,6 +26,9 @@ Dependencies:
+ from __future__ import annotations
+ 
+ import asyncio
++import os
++import queue
++import shutil
+ import subprocess
+ import sys
+ import textwrap
+@@ -116,6 +119,46 @@ def _median(samples: list) -> float:
+     return samples[len(samples) // 2]
+ 
+ 
++def _content_shape(value: object) -> str:
++    if value is None:
++        return "none"
++    if isinstance(value, str):
++        return f"chars={len(value)}, line_breaks={value.count(chr(10))}"
++    if isinstance(value, (list, tuple)):
++        lengths = [len(item) if isinstance(item, str) else None for item in value]
++        return f"items={len(value)}, string_item_chars={lengths}"
++    return f"type={type(value).__name__}"
++
++
++def _assert_content_equal(actual: object, expected: object, label: str) -> None:
++    if actual != expected:
++        raise AssertionError(
++            f"{label}: content mismatch; "
++            f"expected {_content_shape(expected)}, actual {_content_shape(actual)}"
++        )
++
++
++def _assert_log_excludes(messages: list, payload: str, label: str) -> None:
++    matches = [index for index, message in enumerate(messages) if payload in message]
++    assert not matches, (
++        f"{label}: clipboard content in {len(matches)} of {len(messages)} "
++        f"captured messages at indexes {matches}"
++    )
++
++
++def _probe_failure_metadata(result: object) -> str:
++    detail = str(result)
++    if detail == "win32 write failed":
++        stage = "win32-write"
++    elif detail.startswith("PowerShell read raised "):
++        stage = "powershell-read-exception"
++    elif detail.startswith("win32 write ok, PowerShell read "):
++        stage = "round-trip-mismatch"
++    else:
++        stage = "unclassified"
++    return f"stage={stage}, result_chars={len(detail)}"
++
++
+ async def _wait_for_box(pilot, widget: object, expected: str, timeout: float = 10.0) -> float:
+     start = time.monotonic()
+     while time.monotonic() - start < timeout:
+@@ -123,7 +166,11 @@ async def _wait_for_box(pilot, widget: object, expected: str, timeout: float = 1
+             return time.monotonic() - start
+         await asyncio.sleep(0.005)
+         await pilot.pause()
+-    raise AssertionError(f"box never held {expected!r}; got {_box(widget)!r}")
++    actual = _box(widget)
++    raise AssertionError(
++        f"box did not reach expected content within {timeout:.1f}s; "
++        f"expected {_content_shape(expected)}, actual {_content_shape(actual)}"
++    )
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -134,15 +181,15 @@ async def _wait_for_box(pilot, widget: object, expected: str, timeout: float = 1
+ def test_runner_clipboard_probe() -> None:
+     """R-PASTE.23/2 + R-PASTE.22/2: the hosted runner's clipboard probe.
+ 
+-    Fails (never skips) with ``runner clipboard unusable: <probe result>``
+-    when the probe cannot round-trip its nonce, so a green job can never
+-    mean "all OS clipboard tests skipped" (orchestrator ruling D-7 B)."""
++    Fails (never skips) with ``runner clipboard unusable`` plus redacted
++    stage/length metadata when the probe cannot round-trip its nonce, so a
++    green job can never mean "all OS clipboard tests skipped" (D-7 B)."""
+     from tests.support.b103_clipboard import clipboard_probe, require_isolated_clipboard
+ 
+     require_isolated_clipboard("windows")
+     usable, result = clipboard_probe()
+     if not usable:
+-        pytest.fail(f"runner clipboard unusable: {result}")
++        pytest.fail(f"runner clipboard unusable: {_probe_failure_metadata(result)}")
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -289,23 +336,34 @@ def test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5(
+     try:
+         elapsed = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     bound = timing_bound(2.5)
+     assert elapsed <= report_margin(f"r_tui_043_10_2_{box_kind}", elapsed, bound), elapsed
+ 
+ 
++def _reap_holder(proc) -> None:
++    try:
++        if proc.poll() is None:
++            proc.kill()
++        proc.wait(timeout=3.0)
++    finally:
++        if proc.stdout is not None:
++            proc.stdout.close()
++
++
++def _release_clipboard(state: dict) -> None:
++    state["release"].set()
++    state["supervisor"].join(timeout=5.0)
++    assert not state["supervisor"].is_alive(), "clipboard holder supervisor did not finish"
++    assert state["proc"].poll() is not None, "clipboard holder process is still running"
++
++
+ def _hold_clipboard(seconds: float) -> dict:
+-    """Hold the clipboard from a separate process (never a thread of the
+-    test process) so a held read/write really fails cross-process.
+-
+-    The child creates a message-only window (``CreateWindowExW`` with parent
+-    ``HWND_MESSAGE``) so the clipboard is owned by a real window, opens the
+-    clipboard with that ``hwnd`` and keeps it open while pumping messages
+-    until killed; ``release.set()`` (or the ``seconds`` fallback) kills the
+-    child, which makes Windows drop the hold. The parent then VERIFIES the
+-    hold with its own ``OpenClipboard(None)``: it must return 0 (the child
+-    holds the clipboard), otherwise the hold is not effective and this raises
+-    ``clipboard hold not effective`` (run-3 triage C4).
++    """Hold the clipboard in a separate, bounded-lifetime process.
++
++    Readiness, process reaping and caller release are bounded. The parent
++    verifies the cross-process hold and the child cleans up its clipboard
++    owner window on every normal exception path.
+     """
+     script = textwrap.dedent(
+         """
+@@ -316,48 +374,43 @@ def _hold_clipboard(seconds: float) -> dict:
+         user32 = ctypes.windll.user32
+         kernel32 = ctypes.windll.kernel32
+ 
+-        kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+-        kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
+-
+         user32.CreateWindowExW.argtypes = [
+             wintypes.DWORD, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD,
+             ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+-            wintypes.HWND, wintypes.HANDLE, wintypes.HMODULE, ctypes.c_void_p,
++            wintypes.HWND, wintypes.HMENU, wintypes.HINSTANCE, wintypes.LPVOID,
+         ]
+         user32.CreateWindowExW.restype = wintypes.HWND
++        kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
++        kernel32.GetModuleHandleW.restype = wintypes.HMODULE
++        user32.OpenClipboard.argtypes = [wintypes.HWND]
++        user32.OpenClipboard.restype = wintypes.BOOL
++        user32.CloseClipboard.argtypes = []
++        user32.CloseClipboard.restype = wintypes.BOOL
++        user32.DestroyWindow.argtypes = [wintypes.HWND]
++        user32.DestroyWindow.restype = wintypes.BOOL
++        kernel32.Sleep.argtypes = [wintypes.DWORD]
++        kernel32.Sleep.restype = None
+ 
+-        hinstance = kernel32.GetModuleHandleW(None)
+         hwnd = user32.CreateWindowExW(
+-            0, "STATIC", "b103-holder", 0,
+-            0, 0, 0, 0, -3, None, hinstance, None,  # HWND_MESSAGE = -3
++            0, "STATIC", "b103-holder", 0, 0, 0, 0, 0,
++            -3, None, kernel32.GetModuleHandleW(None), None,
+         )
+         if not hwnd:
+             print("WINDOW-FAILED", flush=True)
+             sys.exit(1)
+-
+-        user32.OpenClipboard.argtypes = [wintypes.HWND]
+-        user32.OpenClipboard.restype = wintypes.BOOL
+-        if not user32.OpenClipboard(hwnd):
+-            print("OPEN-FAILED", flush=True)
+-            sys.exit(1)
+-        print("HOLDING", flush=True)
+-
+-        user32.PeekMessageW.argtypes = [
+-            ctypes.POINTER(wintypes.MSG), wintypes.HWND, wintypes.UINT,
+-            wintypes.UINT, wintypes.UINT,
+-        ]
+-        user32.PeekMessageW.restype = wintypes.BOOL
+-        user32.TranslateMessage.argtypes = [ctypes.POINTER(wintypes.MSG)]
+-        user32.TranslateMessage.restype = wintypes.BOOL
+-        user32.DispatchMessageW.argtypes = [ctypes.POINTER(wintypes.MSG)]
+-        user32.DispatchMessageW.restype = ctypes.c_ssize_t
+-
+-        msg = wintypes.MSG()
+-        while True:
+-            while user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):
+-                user32.TranslateMessage(ctypes.byref(msg))
+-                user32.DispatchMessageW(ctypes.byref(msg))
+-            user32.Sleep(10)
++        opened = False
++        try:
++            if not user32.OpenClipboard(hwnd):
++                print("OPEN-FAILED", flush=True)
++                sys.exit(1)
++            opened = True
++            print("HOLDING", flush=True)
++            while True:
++                kernel32.Sleep(20)
++        finally:
++            if opened:
++                user32.CloseClipboard()
++            user32.DestroyWindow(hwnd)
+         """
+     )
+     proc = subprocess.Popen(
+@@ -365,34 +418,60 @@ def _hold_clipboard(seconds: float) -> dict:
+         stdout=subprocess.PIPE,
+         stderr=subprocess.STDOUT,
+         text=True,
++        encoding="utf-8",
++        errors="replace",
+         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+     )
+-    ready = proc.stdout.readline().strip()
+-    if ready != "HOLDING":
+-        proc.wait()
+-        raise RuntimeError(f"clipboard hold child failed to hold: {ready!r}")
+-
+-    # Verify the hold cross-process before any test proceeds: this process's
+-    # own OpenClipboard must fail (return 0) because the child holds it. A
+-    # nonzero return means the hold is not effective (run-3 triage C4).
+-    if _open_clipboard_probe() != 0:
+-        proc.kill()
+-        proc.wait()
+-        raise RuntimeError(
+-            "clipboard hold not effective: parent OpenClipboard returned "
+-            "nonzero (expected 0) while the child reports HOLDING"
+-        )
+-
+-    state = {"proc": proc, "release": threading.Event()}
++    ready_lines = queue.Queue(maxsize=1)
+ 
+-    def _supervisor() -> None:
+-        state["release"].wait(timeout=seconds)
+-        if proc.poll() is None:
+-            proc.kill()
+-        proc.wait()
++    def _read_ready() -> None:
++        try:
++            ready_lines.put(proc.stdout.readline())
++        except Exception as exc:
++            ready_lines.put(exc)
+ 
+-    threading.Thread(target=_supervisor, daemon=True).start()
+-    return state
++    reader = threading.Thread(target=_read_ready, daemon=True)
++    reader.start()
++    try:
++        try:
++            ready = ready_lines.get(timeout=5.0)
++        except queue.Empty as exc:
++            raise RuntimeError("clipboard holder readiness timed out") from exc
++        reader.join(timeout=1.0)
++        assert not reader.is_alive(), "clipboard holder readiness reader did not finish"
++        if isinstance(ready, Exception):
++            raise RuntimeError("clipboard holder readiness read failed") from ready
++        if ready.strip() != "HOLDING":
++            raise RuntimeError(
++                "clipboard holder failed readiness: "
++                f"output_chars={len(ready)}, exited={proc.poll() is not None}"
++            )
++        if proc.poll() is not None:
++            raise RuntimeError(f"clipboard holder exited after HOLDING: {proc.returncode}")
++        if _open_clipboard_probe() != 0:
++            raise RuntimeError(
++                "clipboard hold not effective: parent OpenClipboard returned "
++                "nonzero (expected 0) while the child reports HOLDING"
++            )
++        if proc.poll() is not None:
++            raise RuntimeError("clipboard holder did not stay alive")
++
++        state = {"proc": proc, "release": threading.Event()}
++
++        def _supervisor() -> None:
++            state["release"].wait(timeout=seconds)
++            _reap_holder(proc)
++
++        supervisor = threading.Thread(target=_supervisor, daemon=True)
++        state["supervisor"] = supervisor
++        supervisor.start()
++        return state
++    except BaseException:
++        try:
++            _reap_holder(proc)
++        finally:
++            reader.join(timeout=1.0)
++        raise
+ 
+ 
+ def _open_clipboard_probe() -> int:
+@@ -447,8 +526,8 @@ def test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard(
+     try:
+         value = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
+-    assert value == "APP-TEXT", value
++        _release_clipboard(_held)
++    _assert_content_equal(value, "APP-TEXT", "app clipboard fallback")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -485,8 +564,8 @@ def test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell(
+             return _box(widget), [n for n in notices if n[0] == "warning"]
+ 
+     value, warnings = asyncio.run(_drive())
+-    assert value == "APP-TEXT", value
+-    assert not warnings, warnings
++    _assert_content_equal(value, "APP-TEXT", "app clipboard fallback")
++    assert not warnings, f"unexpected clipboard warnings: count={len(warnings)}"
+     assert started == [], started
+ 
+ 
+@@ -542,7 +621,7 @@ def test_r_tui_043_4_1_single_line_inserts_first_line_at_cursor(
+             await pilot.pause()
+             return widget.value
+ 
+-    assert asyncio.run(_drive()) == "aP1 lineb"
++    _assert_content_equal(asyncio.run(_drive()), "aP1 lineb", "R-TUI-043.4/1 paste")
+ 
+ 
+ def test_r_tui_044_3_1_multi_line_inserts_all_at_cursor(
+@@ -561,7 +640,7 @@ def test_r_tui_044_3_1_multi_line_inserts_all_at_cursor(
+             await pilot.pause()
+             return widget.text
+ 
+-    assert asyncio.run(_drive()) == "aP1 line\nsecondb"
++    _assert_content_equal(asyncio.run(_drive()), "aP1 line\nsecondb", "R-TUI-044.3/1 paste")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -587,7 +666,7 @@ def test_r_tui_043_5_1_2_ctrl_v_replaces_selection(
+             await pilot.pause()
+             return _box(widget)
+ 
+-    assert asyncio.run(_drive()) == "ZZ-BBBB"
++    _assert_content_equal(asyncio.run(_drive()), "ZZ-BBBB", "R-TUI-043.5/1-2 selection")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -605,7 +684,7 @@ def test_r_tui_043_11_1_code_page_characters_arrive_unchanged(
+             await pilot.pause()
+             return _box(widget)
+ 
+-    assert asyncio.run(_drive()) == P1
++    _assert_content_equal(asyncio.run(_drive()), P1, "R-TUI-043.11/1 code page")
+ 
+ 
+ def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
+@@ -642,7 +721,7 @@ def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard
+     try:
+         n = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     assert n >= 1
+ 
+ 
+@@ -675,8 +754,8 @@ def test_r_tui_043_13_1_no_clipboard_text_in_log_win(tmp_path: Path, os_clipboar
+             return [m for _, _, m in records]
+ 
+     messages = asyncio.run(_drive())
+-    assert not any("<REDACTED_CANARY>" in m for m in messages), messages
+-    assert not any("<REDACTED_CANARY>" in m for m in messages), messages
++    _assert_log_excludes(messages, "<REDACTED_CANARY>", "R-TUI-043.13/1 paste")
++    _assert_log_excludes(messages, "<REDACTED_CANARY>", "R-TUI-043.13/1 copy")
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -781,8 +860,8 @@ def test_r_paste_34_2_own_write_strips_single_line(tmp_path: Path, os_clipboard_
+             return first, widget.value
+ 
+     first, second = asyncio.run(_drive())
+-    assert first == "A[13DBC", repr(first)
+-    assert second == "L1[2J", repr(second)
++    _assert_content_equal(first, "A[13DBC", "single-line unsafe paste first")
++    _assert_content_equal(second, "L1[2J", "single-line unsafe paste second")
+ 
+ 
+ def test_r_paste_34_4_win_right_click_strips_single_line(
+@@ -807,8 +886,8 @@ def test_r_paste_34_4_win_right_click_strips_single_line(
+             return first, widget.value
+ 
+     first, second = asyncio.run(_drive())
+-    assert first == "A[13DBC", repr(first)
+-    assert second == "L1[2J", repr(second)
++    _assert_content_equal(first, "A[13DBC", "single-line unsafe paste first")
++    _assert_content_equal(second, "L1[2J", "single-line unsafe paste second")
+ 
+ 
+ def test_r_paste_35_2_own_write_strips_multi_line(tmp_path: Path, os_clipboard_ready) -> None:
+@@ -831,8 +910,8 @@ def test_r_paste_35_2_own_write_strips_multi_line(tmp_path: Path, os_clipboard_r
+             return first, _box_lines(widget)
+ 
+     first, second = asyncio.run(_drive())
+-    assert first == ["A[13DBC\tD", "E"], first
+-    assert second == ["L1 Ñ€[2J", "L2 漢"], second
++    _assert_content_equal(first, ["A[13DBC\tD", "E"], "multi-line unsafe paste first")
++    _assert_content_equal(second, ["L1 Ñ€[2J", "L2 漢"], "multi-line unsafe paste second")
+ 
+ 
+ def test_r_paste_35_4_win_right_click_strips_multi_line(
+@@ -850,7 +929,9 @@ def test_r_paste_35_4_win_right_click_strips_multi_line(
+             await pilot.pause()
+             return _box_lines(widget)
+ 
+-    assert asyncio.run(_drive()) == ["A[13DBC\tD", "E"]
++    _assert_content_equal(
++        asyncio.run(_drive()), ["A[13DBC\tD", "E"], "R-PASTE.35/4 right-click paste"
++    )
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -883,7 +964,7 @@ def test_r_paste_2_five_consecutive_copies_reach_other_program(
+ 
+     reads = asyncio.run(_drive())
+     expected = [f"COPY-{k} Ñ€" for k in range(1, 6)] if box_kind == "a" else [f"L1-{k}\nL2-{k}" for k in range(1, 6)]
+-    assert reads == expected, reads
++    _assert_content_equal(reads, expected, "five consecutive clipboard copies")
+ 
+ 
+ def test_r_paste_3_win_copy_puts_selection_on_app_clipboard(
+@@ -901,7 +982,7 @@ def test_r_paste_3_win_copy_puts_selection_on_app_clipboard(
+             await pilot.pause()
+             return app.clipboard
+ 
+-    assert asyncio.run(_drive()) == "COPYME-1"
++    _assert_content_equal(asyncio.run(_drive()), "COPYME-1", "R-PASTE.3 app clipboard")
+ 
+ 
+ def test_r_paste_5_win_no_selection_keeps_os_clipboard(
+@@ -928,8 +1009,8 @@ def test_r_paste_5_win_no_selection_keeps_os_clipboard(
+             return app.clipboard
+ 
+     internal = asyncio.run(_drive())
+-    assert internal == "BEFORE", internal
+-    assert other_program_read() == "OS-BEFORE"
++    _assert_content_equal(internal, "BEFORE", "R-PASTE.5 app clipboard")
++    _assert_content_equal(other_program_read(), "OS-BEFORE", "R-PASTE.5 OS clipboard")
+ 
+ 
+ def test_r_paste_6_win_cut_copies_selection(tmp_path: Path, os_clipboard_ready) -> None:
+@@ -946,8 +1027,8 @@ def test_r_paste_6_win_cut_copies_selection(tmp_path: Path, os_clipboard_ready)
+             return app.clipboard
+ 
+     internal = asyncio.run(_drive())
+-    assert internal == "CUTME-1", internal
+-    assert other_program_read() == "CUTME-1"
++    _assert_content_equal(internal, "CUTME-1", "R-PASTE.6 app clipboard")
++    _assert_content_equal(other_program_read(), "CUTME-1", "R-PASTE.6 OS clipboard")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -975,8 +1056,9 @@ def test_r_paste_9_2_held_clipboard_write_warning(
+     try:
+         warnings = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
+-    assert warnings and warnings[-1][1] == WRITE_FAIL_WARNING, warnings
++        _release_clipboard(_held)
++    assert warnings, "held clipboard write produced no warning"
++    _assert_content_equal(warnings[-1][1], WRITE_FAIL_WARNING, "R-PASTE.9/2 warning")
+ 
+ 
+ @pytest.mark.serial_timing
+@@ -1061,7 +1143,7 @@ def test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5(
+     try:
+         elapsed = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     bound = timing_bound(2.5)
+     assert elapsed <= report_margin(f"r_paste_13_{box_kind}", elapsed, bound), elapsed
+ 
+@@ -1163,7 +1245,7 @@ def test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive(
+             _drive_box1_held_lateness("", mode="read", right_click=False)
+         )
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     _assert_ticks_on_time("r_tui_043_9_1", marker, lateness)
+ 
+ 
+@@ -1178,7 +1260,7 @@ def test_r_paste_14_1_held_write_ctrl_c_stays_responsive(
+             _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=False)
+         )
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     _assert_ticks_on_time("r_paste_14_1", marker, lateness)
+ 
+ 
+@@ -1193,7 +1275,7 @@ def test_r_paste_14_2_held_write_right_click_stays_responsive(
+             _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=True)
+         )
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     _assert_ticks_on_time("r_paste_14_2", marker, lateness)
+ 
+ 
+@@ -1208,7 +1290,7 @@ def test_r_tui_043_9_2_held_read_right_click_stays_responsive(
+             _drive_box1_held_lateness("", mode="read", right_click=True)
+         )
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     _assert_ticks_on_time("r_tui_043_9_2", marker, lateness)
+ 
+ 
+@@ -1237,7 +1319,7 @@ def test_r_paste_24_1_2_five_right_click_copies(tmp_path: Path, os_clipboard_rea
+ 
+     reads = asyncio.run(_drive())
+     expected = [f"RC-{k} Ñ€" for k in range(1, 6)] if box_kind == "a" else [f"RL1-{k}\nRL2-{k}" for k in range(1, 6)]
+-    assert reads == expected, reads
++    _assert_content_equal(reads, expected, "five consecutive clipboard copies")
+ 
+ 
+ def test_r_paste_24_3_unfocused_multi_line_right_click_copies(
+@@ -1262,7 +1344,7 @@ def test_r_paste_24_3_unfocused_multi_line_right_click_copies(
+ 
+     focused = asyncio.run(_drive())
+     assert focused is True
+-    assert other_program_read() == "AAAA"
++    _assert_content_equal(other_program_read(), "AAAA", "R-PASTE.24/3 OS clipboard")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -1285,8 +1367,8 @@ def test_r_paste_25_26_win_right_click_copy_app_clipboard(
+             return app.clipboard, _box(widget), widget.selection
+ 
+     clip, value, selection = asyncio.run(_drive())
+-    assert clip == "AAAA", clip
+-    assert value == "AAAA-BBBB", value
++    _assert_content_equal(clip, "AAAA", "R-PASTE.25/.26 app clipboard")
++    _assert_content_equal(value, "AAAA-BBBB", "R-PASTE.25/.26 source selection")
+     assert tuple(selection) == (0, 4) if box_kind == "a" else ((0, 0), (0, 4)), selection
+ 
+ 
+@@ -1355,7 +1437,7 @@ def test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5(
+     try:
+         elapsed = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     bound = timing_bound(2.5)
+     assert elapsed <= report_margin(f"r_paste_28_{box_kind}", elapsed, bound), elapsed
+ 
+@@ -1388,7 +1470,8 @@ def test_r_paste_29_30_win_right_click_paste_placement(
+             return _box(widget)
+ 
+     value = asyncio.run(_drive())
+-    assert value == ("aP1 lineb" if box_kind == "a" else "aP1 line\nsecondb"), value
++    expected = "aP1 lineb" if box_kind == "a" else "aP1 line\nsecondb"
++    _assert_content_equal(value, expected, "R-PASTE.29/.30 right-click paste")
+ 
+ 
+ @pytest.mark.serial_timing
+@@ -1450,7 +1533,7 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
+                 return _box(widget)
+ 
+         value = asyncio.run(_drive())
+-        assert value == "APP-TEXT", value
++        _assert_content_equal(value, "APP-TEXT", "app clipboard fallback")
+         assert started == [], started
+ 
+ 
+@@ -1485,7 +1568,7 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
+     try:
+         elapsed = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     bound = timing_bound(2.5)
+     assert elapsed <= report_margin(f"r_paste_32_{box_kind}", elapsed, bound), elapsed
+ 
+@@ -1515,7 +1598,7 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
+             await pilot.pause(0.2)
+             return _box(widget)
+ 
+-    assert asyncio.run(_drive()) == "APP-TEXT"
++    _assert_content_equal(asyncio.run(_drive()), "APP-TEXT", "R-TUI-043.6/5 right-click fallback")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -1531,7 +1614,7 @@ def test_r_tui_043_11_2_right_click_keeps_code_page(tmp_path: Path, os_clipboard
+             await pilot.pause()
+             return _box(widget)
+ 
+-    assert asyncio.run(_drive()) == P1
++    _assert_content_equal(asyncio.run(_drive()), P1, "R-TUI-043.11/2 code page")
+ 
+ 
+ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
+@@ -1568,7 +1651,7 @@ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_cli
+     try:
+         n = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     assert n >= 1
+ 
+ 
+@@ -1600,8 +1683,8 @@ def test_r_tui_043_13_2_win_right_click_no_log_leak(tmp_path: Path, os_clipboard
+             return [m for _, _, m in records]
+ 
+     messages = asyncio.run(_drive())
+-    assert not any("<REDACTED_CANARY>" in m for m in messages), messages
+-    assert not any("<REDACTED_CANARY>" in m for m in messages), messages
++    _assert_log_excludes(messages, "<REDACTED_CANARY>", "R-TUI-043.13/2 paste")
++    _assert_log_excludes(messages, "<REDACTED_CANARY>", "R-TUI-043.13/2 copy")
+ 
+ 
+ @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+@@ -1660,7 +1743,7 @@ def test_r_paste_10_2_win_right_click_copy_logs_warning(tmp_path: Path, os_clipb
+     try:
+         n = asyncio.run(_drive())
+     finally:
+-        _held["release"].set()
++        _release_clipboard(_held)
+     assert n >= 1
+ 
+ 
+@@ -1691,8 +1774,11 @@ def test_r_paste_16_1_read_rescue_starts_system_powershell(
+         value = asyncio.run(_drive())
+     finally:
+         mod._STRATEGIES = original
+-    assert value == "PS-READ", value
+-    assert started and started[0].lower() == mod._system_powershell().lower(), started
++    _assert_content_equal(value, "PS-READ", "R-PASTE.16/1 read rescue")
++    system_ps = mod._system_powershell()
++    assert system_ps and started and started[0].lower() == system_ps.lower(), (
++        f"R-PASTE.16/1 expected a system PowerShell start; starts={len(started)}"
++    )
+ 
+ 
+ def test_r_paste_16_2_write_rescue_starts_system_powershell(
+@@ -1714,28 +1800,126 @@ def test_r_paste_16_2_write_rescue_starts_system_powershell(
+             await pilot.pause()
+ 
+     asyncio.run(_drive())
+-    assert other_program_read() == "PS-WRITE"
+-    assert started and started[0].lower() == mod._system_powershell().lower(), started
++    _assert_content_equal(other_program_read(), "PS-WRITE", "R-PASTE.16/2 write rescue")
++    system_ps = mod._system_powershell()
++    assert system_ps and started and started[0].lower() == system_ps.lower(), (
++        f"R-PASTE.16/2 expected a system PowerShell start; starts={len(started)}"
++    )
+ 
+ 
+-def test_r_paste_16_3_decoy_powershell_never_runs(tmp_path: Path, os_clipboard_ready) -> None:
+-    """R-PASTE.16/3 (WinCI): a decoy ``powershell.exe`` in cwd/PATH never runs."""
++def test_r_paste_16_3_decoy_powershell_never_runs(
++    tmp_path: Path, os_clipboard_ready, monkeypatch
++) -> None:
++    """R-PASTE.16/3: forced read/write rescues ignore real cwd/PATH decoys."""
+     from s19_app.tui import os_clipboard_input as mod
+ 
+     other_program_write("PS-READ")
++    system_ps = mod._system_powershell()
++    system_dir = mod._system_directory()
++    assert system_ps and system_dir, "system PowerShell is required for the decoy control"
++
++    decoy_cwd = tmp_path / "decoy-cwd"
++    decoy_path = tmp_path / "decoy-path"
++    decoy_cwd.mkdir()
++    decoy_path.mkdir()
++    decoy_source = tmp_path / "decoy.cs"
++    decoy_source.write_text(
++        "using System; using System.IO; internal static class Decoy { "
++        "private static int Main() { "
++        "var marker = Environment.GetEnvironmentVariable(\"B103_DECOY_MARKER\"); "
++        "if (!String.IsNullOrEmpty(marker)) File.WriteAllText(marker, \"executed\"); "
++        "return 0; } }",
++        encoding="utf-8",
++    )
++    windows_dir = Path(system_dir).parent
++    compiler = next(
++        (
++            candidate
++            for candidate in (
++                windows_dir / "Microsoft.NET" / "Framework64" / "v4.0.30319" / "csc.exe",
++                windows_dir / "Microsoft.NET" / "Framework" / "v4.0.30319" / "csc.exe",
++            )
++            if candidate.is_file()
++        ),
++        None,
++    )
++    assert compiler is not None, "absolute .NET Framework compiler not found for decoy"
++    decoy_in_path = decoy_path / "powershell.exe"
++    compiled = subprocess.run(
++        [str(compiler), "/nologo", "/target:exe", f"/out:{decoy_in_path}", str(decoy_source)],
++        capture_output=True,
++        text=True,
++        encoding="utf-8",
++        errors="replace",
++        timeout=30.0,
++        shell=False,
++        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
++    )
++    assert compiled.returncode == 0, (
++        "decoy compilation failed: "
++        f"exit={compiled.returncode}, stdout_chars={len(compiled.stdout)}, "
++        f"stderr_chars={len(compiled.stderr)}"
++    )
++    shutil.copyfile(decoy_in_path, decoy_cwd / "powershell.exe")
++    marker = tmp_path / "decoy-executed.marker"
++    monkeypatch.setenv("B103_DECOY_MARKER", str(marker))
++    monkeypatch.setenv("PATH", str(decoy_path) + os.pathsep + os.environ.get("PATH", ""))
++    monkeypatch.chdir(decoy_cwd)
++
++    original_run = mod.subprocess.run
++    original_read = mod._STRATEGIES
++    original_write = mod._WRITE_STRATEGIES
+     started = install_process_spy(mod)
++    mod._STRATEGIES = (
++        ("ctypes-win32", lambda: None),
++        ("powershell", mod._read_via_powershell),
++    )
++    mod._WRITE_STRATEGIES = (
++        ("win32", lambda _text: False),
++        ("powershell", mod._write_via_powershell),
++    )
+ 
+     async def _drive() -> str:
+         async for app, pilot, widget in _box_a(tmp_path):
+             widget.focus()
+             await pilot.pause()
+             await pilot.press("ctrl+v")
++            await _wait_for_box(pilot, widget, "PS-READ")
++            read_value = widget.value
++            widget.value = "PS-WRITE"
++            widget.selection = (0, len(widget.value))
+             await pilot.pause()
+-            return widget.value
++            before = clipboard_sequence_number()
++            await pilot.press("ctrl+c")
++            deadline = time.monotonic() + 10.0
++            while time.monotonic() < deadline:
++                await asyncio.sleep(0.005)
++                await pilot.pause()
++                if clipboard_sequence_number() != before:
++                    break
++            return read_value
+ 
+-    value = asyncio.run(_drive())
+-    assert value == "PS-READ", value
+-    assert not any("decoy" in str(p).lower() for p in started), started
++    try:
++        read_value = asyncio.run(_drive())
++    finally:
++        mod._STRATEGIES = original_read
++        mod._WRITE_STRATEGIES = original_write
++        mod.subprocess.run = original_run
++    write_value = other_program_read()
++
++    _assert_content_equal(read_value, "PS-READ", "R-PASTE.16/3 forced read")
++    _assert_content_equal(write_value, "PS-WRITE", "R-PASTE.16/3 forced write")
++    assert started, "forced PowerShell rescues did not start any process"
++    non_system = [
++        index
++        for index, program in enumerate(started)
++        if not isinstance(program, str)
++        or os.path.normcase(program) != os.path.normcase(system_ps)
++    ]
++    assert not non_system, (
++        f"non-system PowerShell argv[0] at indexes {non_system}; starts={len(started)}"
++    )
++    assert not marker.exists(), "decoy PowerShell executed and created its marker"
+ 
+ 
+ @pytest.mark.parametrize("mode", ["read", "write"], ids=["read", "write"])
+@@ -1773,7 +1957,7 @@ def test_r_paste_17_no_powershell_starts_nothing(
+     value = asyncio.run(_drive())
+     assert started == [], started
+     if mode == "read":
+-        assert value == "APP-TEXT", value
++        _assert_content_equal(value, "APP-TEXT", "app clipboard fallback")
+ 
+ 
+ # ---------------------------------------------------------------------------
+diff --git a/tests/test_b103_copy_paste_matrix.py b/tests/test_b103_copy_paste_matrix.py
+index e492cca1..0aca6e01 100644
+--- a/tests/test_b103_copy_paste_matrix.py
++++ b/tests/test_b103_copy_paste_matrix.py
+@@ -1,16 +1,22 @@
+ from __future__ import annotations
+ 
+ import asyncio
+-import base64
+ import os
+ import re
+ import shutil
+-import subprocess
+ import sys
+ from pathlib import Path
+ 
+ import pytest
+ 
++from tests.support.b103_clipboard import (
++    clipboard_isolated,
++    other_program_read,
++    other_program_write,
++    require_isolated_clipboard,
++    wait_for_copy_tail,
++)
++
+ SEED = "SEED-1b"
+ A2L_THIRD_ROW = "ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING"
+ MAC_THIRD_ROW = "Curve_ExternalAxis"
+@@ -18,15 +24,12 @@ SIZE = (118, 54)
+ 
+ 
+ def _is_winci() -> bool:
+-    return (
+-        sys.platform == "win32"
+-        and os.environ.get("GITHUB_ACTIONS") == "true"
+-        and os.environ.get("RUNNER_ENVIRONMENT") == "github-hosted"
+-    )
++    return clipboard_isolated("windows")[0]
+ 
+ 
+ def _coverage_or_skip(route: str) -> str:
+-    if _is_winci():
++    if sys.platform == "win32":
++        require_isolated_clipboard("windows")
+         return "full"
+     if sys.platform.startswith("linux"):
+         if route == "P2":
+@@ -46,66 +49,12 @@ def _coverage_or_skip(route: str) -> str:
+     )
+ 
+ 
+-def _powershell() -> Path:
+-    for name in ("powershell.exe", "powershell"):
+-        found = shutil.which(name)
+-        if found:
+-            path = Path(found).resolve()
+-            if path.is_absolute() and path.is_file():
+-                return path
+-    pytest.skip("not_run: isolated WinCI has no absolute system PowerShell")
+-
+-
+-def _run_powershell(script: str) -> str:
+-    try:
+-        completed = subprocess.run(
+-            [
+-                str(_powershell()),
+-                "-NoLogo",
+-                "-NoProfile",
+-                "-NonInteractive",
+-                "-Command",
+-                script,
+-            ],
+-            stdin=subprocess.DEVNULL,
+-            stdout=subprocess.PIPE,
+-            stderr=subprocess.PIPE,
+-            encoding="utf-8",
+-            errors="strict",
+-            timeout=15,
+-            check=False,
+-        )
+-    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
+-        pytest.skip(f"not_run: isolated WinCI clipboard probe unusable: {exc}")
+-    if completed.returncode:
+-        detail = completed.stderr.strip()[:500]
+-        pytest.skip(
+-            "not_run: isolated WinCI clipboard probe unusable: "
+-            f"PowerShell exit {completed.returncode}: {detail}"
+-        )
+-    return completed.stdout
+-
+-
+ def _seed_os_clipboard() -> None:
+-    encoded = base64.b64encode(SEED.encode("utf-8")).decode("ascii")
+-    _run_powershell(
+-        "$text=[Text.Encoding]::UTF8.GetString("
+-        f"[Convert]::FromBase64String('{encoded}')); "
+-        "Set-Clipboard -Value $text"
+-    )
+-    assert _read_os_clipboard() == SEED, "WinCI seed read-back failed before copy"
++    other_program_write(SEED)
+ 
+ 
+ def _read_os_clipboard() -> str:
+-    output = _run_powershell(
+-        "[Console]::OutputEncoding=[Text.Encoding]::UTF8; "
+-        "$text=[string](Get-Clipboard -Raw); "
+-        "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($text))"
+-    )
+-    try:
+-        return base64.b64decode("".join(output.split()), validate=True).decode("utf-8")
+-    except (ValueError, UnicodeError) as exc:
+-        pytest.skip(f"not_run: isolated WinCI separate read was not decodable: {exc}")
++    return other_program_read()
+ 
+ 
+ def _check_model_oracles(examples: Path) -> None:
+@@ -313,7 +262,7 @@ async def _right_click(app, pilot, widget, offset: tuple[int, int]) -> None:
+                 screen_y=y,
+             )
+         )
+-    await _settle(pilot, 12)
++    await pilot.pause()
+ 
+ 
+ def _copy_notice(expected: str) -> str:
+@@ -362,7 +311,15 @@ async def _prepare_target(app, pilot, target: str):
+     return widget
+ 
+ 
+-async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> None:
++async def _run_cell(
++    tmp_path: Path,
++    source: int,
++    target: str,
++    route: str,
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    from s19_app.tui import app as app_module
++    from s19_app.tui import os_clipboard_input as clipboard_module
+     from s19_app.tui.app import S19TuiApp
+     from textual import events
+     from textual.app import App
+@@ -372,6 +329,22 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+     _check_model_oracles(examples)
+     if _is_winci():
+         _seed_os_clipboard()
++    original_tail = clipboard_module._mirror_and_write_os_clipboard
++    tail_marker = {"started": False, "ended": False}
++    tail_payloads = []
++
++    async def marked_tail(app, text):
++        tail_payloads.append(text)
++        tail_marker["started"] = True
++        try:
++            return await original_tail(app, text)
++        finally:
++            tail_marker["ended"] = True
++
++    monkeypatch.setattr(
++        clipboard_module, "_mirror_and_write_os_clipboard", marked_tail
++    )
++    monkeypatch.setattr(app_module, "_mirror_and_write_os_clipboard", marked_tail)
+     app = S19TuiApp(base_dir=tmp_path)
+     async with app.run_test(size=SIZE) as pilot:
+         await _settle(pilot)
+@@ -380,6 +353,8 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+         expected, source_widget, offset = await _arm_source(app, pilot, source)
+         before = list(app._notifications)
+         await _right_click(app, pilot, source_widget, offset)
++        await wait_for_copy_tail(pilot, tail_marker)
++        assert tail_payloads == [expected]
+         if source == 7:
+             await pilot.press("escape")
+             await _settle(pilot)
+@@ -413,44 +388,50 @@ async def _run_cell(tmp_path: Path, source: int, target: str, route: str) -> Non
+         )
+ 
+ 
+-@pytest.mark.parametrize(
+-    ("source", "target", "route"),
+-    [
+-        pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
+-        pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
+-        pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
+-        pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
+-        pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
+-        pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
+-        pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
+-        pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
+-        pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
+-        pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
+-        pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
+-        pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
+-        pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
+-        pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
+-        pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
+-        pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
+-        pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
+-        pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
+-        pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
+-        pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
+-        pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
+-        pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
+-        pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
+-        pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
+-        pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
+-        pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
+-        pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
+-        pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
+-    ],
+-)
++AT_CELLS = [
++    pytest.param(1, "T1", "P1", id="AT-I1b-1/1-T1-P1"),
++    pytest.param(1, "T1", "P2", id="AT-I1b-1/2-T1-P2"),
++    pytest.param(1, "T2", "P1", id="AT-I1b-1/3-T2-P1"),
++    pytest.param(1, "T2", "P2", id="AT-I1b-1/4-T2-P2"),
++    pytest.param(2, "T1", "P1", id="AT-I1b-2/1-T1-P1"),
++    pytest.param(2, "T1", "P2", id="AT-I1b-2/2-T1-P2"),
++    pytest.param(2, "T2", "P1", id="AT-I1b-2/3-T2-P1"),
++    pytest.param(2, "T2", "P2", id="AT-I1b-2/4-T2-P2"),
++    pytest.param(3, "T1", "P1", id="AT-I1b-3/1-T1-P1"),
++    pytest.param(3, "T1", "P2", id="AT-I1b-3/2-T1-P2"),
++    pytest.param(3, "T2", "P1", id="AT-I1b-3/3-T2-P1"),
++    pytest.param(3, "T2", "P2", id="AT-I1b-3/4-T2-P2"),
++    pytest.param(4, "T1", "P1", id="AT-I1b-4/1-T1-P1"),
++    pytest.param(4, "T1", "P2", id="AT-I1b-4/2-T1-P2"),
++    pytest.param(4, "T2", "P1", id="AT-I1b-4/3-T2-P1"),
++    pytest.param(4, "T2", "P2", id="AT-I1b-4/4-T2-P2"),
++    pytest.param(5, "T1", "P1", id="AT-I1b-5/1-T1-P1"),
++    pytest.param(5, "T1", "P2", id="AT-I1b-5/2-T1-P2"),
++    pytest.param(5, "T2", "P1", id="AT-I1b-5/3-T2-P1"),
++    pytest.param(5, "T2", "P2", id="AT-I1b-5/4-T2-P2"),
++    pytest.param(6, "T1", "P1", id="AT-I1b-6/1-T1-P1"),
++    pytest.param(6, "T1", "P2", id="AT-I1b-6/2-T1-P2"),
++    pytest.param(6, "T2", "P1", id="AT-I1b-6/3-T2-P1"),
++    pytest.param(6, "T2", "P2", id="AT-I1b-6/4-T2-P2"),
++    pytest.param(7, "T1", "P1", id="AT-I1b-7/1-T1-P1"),
++    pytest.param(7, "T1", "P2", id="AT-I1b-7/2-T1-P2"),
++    pytest.param(7, "T2", "P1", id="AT-I1b-7/3-T2-P1"),
++    pytest.param(7, "T2", "P2", id="AT-I1b-7/4-T2-P2"),
++]
++assert len(AT_CELLS) == 28
++assert len({cell.id for cell in AT_CELLS}) == 28
++
++
++@pytest.mark.parametrize(("source", "target", "route"), AT_CELLS)
+ def test_copy_paste_acceptance_cell(
+-    tmp_path: Path, source: int, target: str, route: str
++    tmp_path: Path,
++    source: int,
++    target: str,
++    route: str,
++    monkeypatch: pytest.MonkeyPatch,
+ ) -> None:
+     _coverage_or_skip(route)
+-    asyncio.run(_run_cell(tmp_path, source, target, route))
++    asyncio.run(_run_cell(tmp_path, source, target, route, monkeypatch))
+ 
+ 
+ @pytest.mark.skip(
+diff --git a/tests/test_b103_copy_quit_dialog.py b/tests/test_b103_copy_quit_dialog.py
+index 4daa624b..2cadff03 100644
+--- a/tests/test_b103_copy_quit_dialog.py
++++ b/tests/test_b103_copy_quit_dialog.py
+@@ -1,16 +1,20 @@
+-"""Batch-103 Inc-1b E4: quit dialog, modal guard and deferred quit.
++"""Batch-103 Inc-1b E4/E5: quit dialog, modal guard and deferred quit.
+ 
+ Oracles are the concrete examples in inc-1b/01-requirements.md,
+ 02-test-cases.md, codewire/graph-inc1b.md and E2-interfaces.md. Every new
+-product symbol is resolved lazily. The OS clipboard is a seeded recorder;
+-no test opens a real clipboard.
++product symbol is resolved lazily. Linux uses a seeded in-memory recorder.
++The nine R-COPY.16/.20 partial routes also have an isolated WinCI arm with
++an external seed and separate exact OS reads; Linux passes do not close it.
+ """
+ from __future__ import annotations
+ 
+ import ast
+ import asyncio
++import base64
+ import os
+ import shutil
++import subprocess
++import sys
+ import threading
+ import time
+ from dataclasses import dataclass, field
+@@ -27,6 +31,10 @@ from textual.widgets import Static
+ from s19_app.tui.app import S19TuiApp
+ from tests.b97_probes import is_displayed
+ from tests.support.b100_workers import settle_workers
++from tests.support.b103_clipboard import (
++    clipboard_probe,
++    require_isolated_clipboard,
++)
+ from tests.support.timing import report_margin, timing_bound
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+@@ -41,6 +49,7 @@ QUIT_TEXTS = ("Quit?", BODY_B, "Quit (y)", "Stay (n)")
+ @dataclass
+ class _ClipboardRecorder:
+     os_value: str = SEED
++    os_seeded: bool = False
+     writes: list[str] = field(default_factory=list)
+     reads: list[str] = field(default_factory=list)
+     base_calls: list[str] = field(default_factory=list)
+@@ -71,8 +80,21 @@ def clipboard(monkeypatch: pytest.MonkeyPatch):
+     from s19_app.tui import capped_text_area as capped
+     from s19_app.tui import os_clipboard_input as os_clipboard
+ 
++    if sys.platform == "win32":
++        require_isolated_clipboard("windows")
++        try:
++            usable, _detail = clipboard_probe()
++        except pytest.skip.Exception:
++            raise AssertionError("isolated WinCI clipboard probe failed") from None
++        if not usable:
++            pytest.fail("isolated WinCI clipboard probe failed", pytrace=False)
++
++    real_write = os_clipboard.write_os_clipboard
++
+     def write(text, *args, **kwargs):
+         recorder.writes.append(text)
++        if sys.platform == "win32":
++            return real_write(text, *args, **kwargs)
+         recorder.os_value = text
+         return True
+ 
+@@ -81,10 +103,11 @@ def clipboard(monkeypatch: pytest.MonkeyPatch):
+         return recorder.os_value
+ 
+     monkeypatch.setattr(os_clipboard, "write_os_clipboard", write)
+-    monkeypatch.setattr(os_clipboard, "read_os_clipboard", read)
+-    monkeypatch.setattr(os_clipboard, "_prime_tk_root", lambda: None, raising=False)
+-    monkeypatch.setattr(capped, "write_os_clipboard", write, raising=False)
+-    monkeypatch.setattr(capped, "read_os_clipboard", read, raising=False)
++    if sys.platform != "win32":
++        monkeypatch.setattr(os_clipboard, "read_os_clipboard", read)
++        monkeypatch.setattr(os_clipboard, "_prime_tk_root", lambda: None, raising=False)
++        monkeypatch.setattr(capped, "write_os_clipboard", write, raising=False)
++        monkeypatch.setattr(capped, "read_os_clipboard", read, raising=False)
+ 
+     real_base = App.copy_to_clipboard
+ 
+@@ -96,6 +119,72 @@ def clipboard(monkeypatch: pytest.MonkeyPatch):
+     return recorder
+ 
+ 
++def _winci_powershell_path() -> str:
++    from s19_app.tui import os_clipboard_input as os_clipboard
++
++    path = os_clipboard._system_powershell()
++    if not path:
++        pytest.fail("isolated WinCI system PowerShell not found", pytrace=False)
++    return path
++
++
++def _separate_powershell(script: str) -> str:
++    require_isolated_clipboard("windows")
++    path = _winci_powershell_path()
++    try:
++        completed = subprocess.run(
++            [
++                path,
++                "-NoLogo",
++                "-NoProfile",
++                "-NonInteractive",
++                "-Command",
++                script,
++            ],
++            stdin=subprocess.DEVNULL,
++            stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++            encoding="utf-8",
++            errors="strict",
++            timeout=15,
++            check=False,
++            shell=False,
++            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
++        )
++    except (OSError, UnicodeError, subprocess.TimeoutExpired) as exc:
++        raise AssertionError(f"isolated WinCI PowerShell {type(exc).__name__}") from None
++    if completed.returncode:
++        pytest.fail(
++            f"isolated WinCI PowerShell exit {completed.returncode}", pytrace=False
++        )
++    return completed.stdout
++
++
++def _read_os_clipboard_exact() -> str:
++    output = _separate_powershell(
++        "$ErrorActionPreference='Stop'; "
++        "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); "
++        "$text=[string](Get-Clipboard -Raw); "
++        "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($text))"
++    )
++    try:
++        return base64.b64decode("".join(output.split()), validate=True).decode("utf-8")
++    except (ValueError, UnicodeError):
++        raise AssertionError("isolated WinCI read was not Base64 UTF-8") from None
++
++
++def _seed_os_clipboard() -> None:
++    encoded = base64.b64encode(SEED.encode("utf-8")).decode("ascii")
++    _separate_powershell(
++        "$ErrorActionPreference='Stop'; "
++        "$text=[Text.Encoding]::UTF8.GetString("
++        f"[Convert]::FromBase64String('{encoded}')); "
++        "Set-Clipboard -Value $text"
++    )
++    if _read_os_clipboard_exact() != SEED:
++        pytest.fail("WinCI seed read-back failed before copy", pytrace=False)
++
++
+ def _stack(app) -> list[str]:
+     return [type(screen).__name__ for screen in app.screen_stack]
+ 
+@@ -211,7 +300,14 @@ def _install_recorders(app, recorder: _ClipboardRecorder) -> None:
+     app._driver.write = write
+ 
+ 
+-def _run(base: Path, scenario, recorder: _ClipboardRecorder, *, size=SIZE):
++def _run(
++    base: Path,
++    scenario,
++    recorder: _ClipboardRecorder,
++    *,
++    size=SIZE,
++    winci_seed=False,
++):
+     async def drive():
+         app = S19TuiApp(base_dir=base)
+         async with app.run_test(size=size, notifications=True) as pilot:
+@@ -219,6 +315,10 @@ def _run(base: Path, scenario, recorder: _ClipboardRecorder, *, size=SIZE):
+             await _load_census(app, pilot)
+             app._clipboard = SEED
+             recorder.reset()
++            recorder.os_seeded = False
++            if winci_seed and sys.platform == "win32":
++                _seed_os_clipboard()
++                recorder.os_seeded = True
+             app._notifications.clear()
+             return await scenario(app, pilot)
+ 
+@@ -306,7 +406,11 @@ def _assert_no_copy_effects(app, recorder: _ClipboardRecorder, *, empty_skip=Fal
+             "note": "materialized empty text must raise textual.actions.SkipAction",
+         }
+     assert app.clipboard == SEED, app.clipboard
+-    assert recorder.os_value == SEED, recorder.os_value
++    if recorder.os_seeded:
++        if _read_os_clipboard_exact() != SEED:
++            pytest.fail("WinCI OS clipboard seed changed", pytrace=False)
++    elif sys.platform != "win32":
++        assert recorder.os_value == SEED, recorder.os_value
+     assert recorder.writes == [], recorder.writes
+     assert recorder.base_calls == [], recorder.base_calls
+     assert recorder.workers == [], recorder.workers
+@@ -468,6 +572,7 @@ def test_r_copy_16_1_button_and_materialized_empty_selection(tmp_path: Path, cli
+                     scenario,
+                     clipboard,
+                     size=size,
++                    winci_seed=True,
+                 )
+             except AssertionError as error:
+                 failures.append(f"size={size}, materialized={materialized}: {error}")
+@@ -484,7 +589,7 @@ def test_r_copy_16_2_no_widget_focused(tmp_path: Path, clipboard) -> None:
+         await _open_empty_copy_dialog(app, pilot, clipboard)
+         await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_16_3_highlighted_table_row_is_not_selection(tmp_path: Path, clipboard) -> None:
+@@ -501,7 +606,7 @@ def test_r_copy_16_3_highlighted_table_row_is_not_selection(tmp_path: Path, clip
+         await _open_empty_copy_dialog(app, pilot, clipboard)
+         await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_16_4_empty_single_line_input(tmp_path: Path, clipboard) -> None:
+@@ -519,7 +624,7 @@ def test_r_copy_16_4_empty_single_line_input(tmp_path: Path, clipboard) -> None:
+         await _open_empty_copy_dialog(app, pilot, clipboard)
+         await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_16_5_empty_json_selection(tmp_path: Path, clipboard) -> None:
+@@ -536,7 +641,7 @@ def test_r_copy_16_5_empty_json_selection(tmp_path: Path, clipboard) -> None:
+         await _open_empty_copy_dialog(app, pilot, clipboard)
+         await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_16_6_multiline_text_without_selection(tmp_path: Path, clipboard) -> None:
+@@ -556,7 +661,7 @@ def test_r_copy_16_6_multiline_text_without_selection(tmp_path: Path, clipboard)
+         await _open_empty_copy_dialog(app, pilot, clipboard)
+         await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ # R-COPY.17/.18 — answers, timing and safe emphasis.
+@@ -655,6 +760,7 @@ def test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection(tmp_path:
+                 original.clear_selection()
+             clipboard.reset()
+             app._notifications.clear()
++            _assert_no_copy_effects(app, clipboard)
+             await pilot.press("ctrl+c")
+             await _settle(app, pilot)
+             assert app.screen is original, _stack(app)
+@@ -663,8 +769,9 @@ def test_r_copy_20_1_help_modal_blocks_quit_even_with_empty_selection(tmp_path:
+             _assert_no_copy_effects(app, clipboard, empty_skip=materialized)
+             await pilot.press("escape")
+             await _settle(app, pilot, 3)
++            _assert_no_copy_effects(app, clipboard)
+ 
+-        _run(tmp_path / f"app-{materialized}", scenario, clipboard)
++        _run(tmp_path / f"app-{materialized}", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_20_2_load_dialog_stays_top(tmp_path: Path, clipboard) -> None:
+@@ -678,6 +785,7 @@ def test_r_copy_20_2_load_dialog_stays_top(tmp_path: Path, clipboard) -> None:
+         assert type(original).__name__ == "LoadDialog", _stack(app)
+         clipboard.reset()
+         app._notifications.clear()
++        _assert_no_copy_effects(app, clipboard)
+         await pilot.press("ctrl+c")
+         await _settle(app, pilot)
+         assert app.screen is original, _stack(app)
+@@ -686,8 +794,9 @@ def test_r_copy_20_2_load_dialog_stays_top(tmp_path: Path, clipboard) -> None:
+         _assert_no_copy_effects(app, clipboard)
+         await pilot.press("escape")
+         await _settle(app, pilot, 3)
++        _assert_no_copy_effects(app, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_20_3_existing_copy_quit_stays_single(tmp_path: Path, clipboard) -> None:
+@@ -702,8 +811,9 @@ def test_r_copy_20_3_existing_copy_quit_stays_single(tmp_path: Path, clipboard)
+         assert list(app.screen_stack) == original_stack, _stack(app)
+         assert len(_copy_screens(app)) == 1, _stack(app)
+         _assert_no_copy_effects(app, clipboard)
++        await _close_and_assert_unchanged(app, pilot, clipboard)
+ 
+-    _run(tmp_path / "app", scenario, clipboard)
++    _run(tmp_path / "app", scenario, clipboard, winci_seed=True)
+ 
+ 
+ def test_r_copy_20_4_busy_question_stays_top(tmp_path: Path, clipboard, monkeypatch) -> None:

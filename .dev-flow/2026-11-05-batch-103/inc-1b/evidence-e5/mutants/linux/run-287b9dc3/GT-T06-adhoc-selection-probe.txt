@@ -1,0 +1,11 @@
+Ad hoc probe (not a harness verdict): GT-T06 applied by hand to a copy of the pristine GT tree at 287b9dc3
+(_CopyRowTable -> DataTable for #mac_records_list, one replacement), then the nodes below run in the isolated env.
+Result: the manifest-selected oracle (R-COPY.22/2) and R-COPY.21/2 both still pass; R-COPY.13/9, which is NOT in
+GT-T06's selected tests, fails (kills the mutant).
+
+PASSED tests/test_b103_copy_views.py::test_r_copy_21_valid_right_click_highlights_without_selection[R-COPY.21/2]
+PASSED tests/test_b103_copy_views.py::test_r_copy_22_right_click_does_not_jump_hex[R-COPY.22/2]
+PASSED tests/test_b103_copy_views.py::test_r_copy_12_8_positive_bounds_and_cardinality
+PASSED tests/test_b103_copy_views.py::test_r_copy_14_empty_and_cancelled_gestures_have_no_notice[R-COPY.14/9]
+FAILED tests/test_b103_copy_views.py::test_r_copy_13_empty_and_cancelled_gestures[R-COPY.13/9]
+1 failed, 4 passed in 60.89s (0:01:00)

@@ -37,10 +37,10 @@ Each runner inserts `.` into `sys.path` and prints `s19_app.__file__` before pyt
 
 ### 5. Risks
 - `.021/1-2` are only `partial`: direct handler behavior is proven, but mounted `run_test` acceptance is not. Mounted attempts stalled; no such acceptance is claimed.
-- The complete repository suite is running in eight sequential chunks on the merge clone, launcher PID 596133. Its result is pending and must not be called full-suite PASS; G3 remains open. By operator amendment this does not block integration or main push.
+- The complete-suite attempt ended with `full_suite_exit=1` after `/tmp` filled. Chunk 1 is truncated, `summary.json` is empty, and no complete-suite tally is available. **G3 is FAILED / not PASS.** The redacted evidence and disposition live in `evidence/full-suite/`; this does not block integration or Inc 1b under the operator amendment.
 
 ### 6. Pending items
-- Collect and redact the full-suite logs and summary, rule any findings into the next batch, then resume with Inc 1b. Do not start Inc 1b in this session.
+- A later batch must rerun and diagnose the complete suite with adequate temporary storage. The incomplete chunk's failure/error markers are not individually classified here.
 
 ### 7. Suggested next task
-Inc 1b — Clipboard: copy from every view, using the approved PLAN row and existing clipboard/Windows conventions. Do not begin it in this session; resume from the handoff after Inc 6 closes.
+Inc 1b — Clipboard: copy from every view, using the approved PLAN row and existing clipboard/Windows conventions.

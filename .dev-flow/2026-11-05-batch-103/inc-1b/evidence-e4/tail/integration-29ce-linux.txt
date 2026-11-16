@@ -1,0 +1,49 @@
+s19_app.__file__=<HOME>/work/e4-tail-29ce-green-1794501691-1965/tree/s19_app/__init__.py
+INTEGRATION_HEAD=29ce6448e49cc8a67ecf7a5a7c38a4f31833368c
+OVERLAY_FILES
+ M tests/test_b103_clipboard_tail.py
+30524402b42ccf2dd1deb0a57a2a6898447af2bbbea749ea4ca7eaa46b3a783d  tests/test_b103_clipboard_tail.py
+ENVIRONMENT=Linux headless; stdin=/dev/null; -I -B; cache off; neutral TMPDIR/HOME/XDG/LOCALAPPDATA
+s19_app.__file__=<HOME>/work/e4-tail-29ce-green-1794501691-1965/tree/s19_app/__init__.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/e4-tail-29ce-green-1794501691-1965/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 30 items
+
+tests/test_b103_clipboard_tail.py::test_r_copy_06_1_button_keeps_seeds PASSED [  3%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_2_no_focus_keeps_seeds PASSED [  6%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_3_highlighted_row_is_not_a_selection PASSED [ 10%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_4_empty_input_keeps_seeds PASSED [ 13%]
+tests/test_b103_clipboard_tail.py::test_r_copy_06_5_empty_json_selection_keeps_seeds PASSED [ 16%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_1_row_notice_once PASSED [ 20%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_2_stats_right_click_notice PASSED [ 23%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_3_hex_key_notice PASSED [ 26%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_4_direct_input_copy_notice PASSED [ 30%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_5_direct_textarea_copy_and_final_lf PASSED [ 33%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_6_direct_cut_notices_and_cap PASSED [ 36%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_7_direct_right_click_notice_once PASSED [ 40%]
+tests/test_b103_clipboard_tail.py::test_r_copy_07_8_failed_write_has_no_success_notice PASSED [ 43%]
+tests/test_b103_clipboard_tail.py::test_r_copy_08_1_key_caps_json_and_direct_boxes PASSED [ 46%]
+tests/test_b103_clipboard_tail.py::test_r_copy_08_2_right_click_caps_json_and_direct_boxes PASSED [ 50%]
+tests/test_b103_clipboard_tail.py::test_r_copy_09_1_cut_notice_original_n_and_boundaries PASSED [ 53%]
+tests/test_b103_clipboard_tail.py::test_r_copy_09_2_right_click_cut_notice_original_n PASSED [ 56%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_1_view_and_row_nul_fail_closed PASSED [ 60%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_2_every_direct_box_route_nul_fail_closed PASSED [ 63%]
+tests/test_b103_clipboard_tail.py::test_r_copy_25_3_nul_only_after_cap_is_allowed PASSED [ 66%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_101_view_key_failure_warning PASSED [ 70%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_102_view_right_failure_warning PASSED [ 73%]
+tests/test_b103_clipboard_tail.py::test_r_paste_09_103_row_right_failure_warning PASSED [ 76%]
+tests/test_b103_clipboard_tail.py::test_r_paste_10_101_exact_tail_warning_without_payload PASSED [ 80%]
+tests/test_b103_clipboard_tail.py::test_r_tui_043_13_101_no_copied_text_or_prefix_in_logs PASSED [ 83%]
+tests/test_b103_clipboard_tail.py::test_r_tui_043_13_102_hostile_exact_payload_transport_and_logs PASSED [ 86%]
+tests/test_b103_clipboard_tail.py::test_r_paste_13_101_held_row_copy_warns_within_bound SKIPPEDun on Linux) [ 90%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_101_view_key_write_stays_responsive SKIPPEDun on Linux) [ 93%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_102_view_right_write_stays_responsive SKIPPEDun on Linux) [ 96%]
+tests/test_b103_clipboard_tail.py::test_r_paste_14_103_row_right_write_stays_responsive SKIPPEDun on Linux) [100%]
+
+=========================== short test summary info ============================
+SKIPPED [4] tests/test_b103_clipboard_tail.py:1032: WinCI-only: isolated Windows clipboard, separate OS holder/read; not_run on Linux
+================== 26 passed, 4 skipped in 329.07s (0:05:29) ===================
+TARGETED_30_EXIT_STATUS=0
