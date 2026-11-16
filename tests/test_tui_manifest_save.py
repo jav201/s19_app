@@ -167,7 +167,7 @@ def test_manifest_mismatch_surfaces_loud_notice_naming_drift(
         statuses = _statuses(app)
         notices = _notices(app)
 
-        real_write = app_module.write_project_manifest
+        real_write = app_module.deps.write_project_manifest
 
         def _tampering_write(variant_set, project_root, base_dir, **kwargs):
             written, issues = real_write(
@@ -179,7 +179,7 @@ def test_manifest_mismatch_surfaces_loud_notice_naming_drift(
                 written.write_text(json.dumps(payload, indent=2), encoding="utf-8")
             return written, issues
 
-        app_module.write_project_manifest = _tampering_write
+        app_module.deps.write_project_manifest = _tampering_write
         try:
             async with app.run_test() as pilot:
                 await pilot.pause()
@@ -192,7 +192,7 @@ def test_manifest_mismatch_surfaces_loud_notice_naming_drift(
                 await _flush(pilot)
                 return statuses, notices
         finally:
-            app_module.write_project_manifest = real_write
+            app_module.deps.write_project_manifest = real_write
 
     statuses, notices = asyncio.run(_drive())
     assert any("mismatch" in m.lower() for m in statuses), (
@@ -240,7 +240,7 @@ def test_manifest_write_refusal_surfaces_error_notice_no_crash(
             _manifest_write_containment_issue,
         )
 
-        real_write = app_module.write_project_manifest
+        real_write = app_module.deps.write_project_manifest
 
         def _refusing_write(variant_set, project_root, base_dir, **kwargs):
             return None, [
@@ -250,7 +250,7 @@ def test_manifest_write_refusal_surfaces_error_notice_no_crash(
                 )
             ]
 
-        app_module.write_project_manifest = _refusing_write
+        app_module.deps.write_project_manifest = _refusing_write
         try:
             async with app.run_test() as pilot:
                 await pilot.pause()
@@ -268,7 +268,7 @@ def test_manifest_write_refusal_surfaces_error_notice_no_crash(
                     notices,
                 )
         finally:
-            app_module.write_project_manifest = real_write
+            app_module.deps.write_project_manifest = real_write
 
     manifest_exists, statuses, notices = asyncio.run(_drive())
     assert not manifest_exists, (
@@ -652,8 +652,8 @@ def test_tc302_303_handler_threads_batch_assignments_to_write_and_verify(
 
     write_calls: list[dict] = []
     verify_calls: list[dict] = []
-    real_write = app_module.write_project_manifest
-    real_verify = app_module.verify_written_manifest
+    real_write = app_module.deps.write_project_manifest
+    real_verify = app_module.deps.verify_written_manifest
 
     def _spy_write(variant_set, project_root, base_dir, **kwargs):
         write_calls.append(kwargs)
@@ -663,8 +663,8 @@ def test_tc302_303_handler_threads_batch_assignments_to_write_and_verify(
         verify_calls.append(kwargs)
         return real_verify(project_dir_, variant_set, project_root, **kwargs)
 
-    app_module.write_project_manifest = _spy_write
-    app_module.verify_written_manifest = _spy_verify
+    app_module.deps.write_project_manifest = _spy_write
+    app_module.deps.verify_written_manifest = _spy_verify
     try:
         asyncio.run(
             _save_through_handler(
@@ -675,8 +675,8 @@ def test_tc302_303_handler_threads_batch_assignments_to_write_and_verify(
             )()
         )
     finally:
-        app_module.write_project_manifest = real_write
-        app_module.verify_written_manifest = real_verify
+        app_module.deps.write_project_manifest = real_write
+        app_module.deps.verify_written_manifest = real_verify
 
     assert write_calls, "write_project_manifest must be called"
     assert verify_calls, "verify_written_manifest must be called"

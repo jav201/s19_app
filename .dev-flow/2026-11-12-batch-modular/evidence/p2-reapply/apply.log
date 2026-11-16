@@ -1,0 +1,36 @@
+reset_rc=0
+restore_rc=0
+== MOVE
+MOVE base=4f721985a9676cc9bb142162b3cd49aa2d8dd875 app_files=23 sdb_files=9 units=741 d1_rewrites=220 relimport_rewrites=18 css_rewrites=1
+MOVE imports_fresh=32/32 cycles=0 reexports_missing=0 caps_over=0
+SELF deps-bound 38/38
+SELF deps-bound 1/1
+MOVE OK
+move_rc=0
+== VERIFY
+VERIFY base=4f721985 units_old=626 units_new=626 missing=0 duplicate=0 extra=0 body_diff=0 unlisted_rewrite=0
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=0 pins=12/12 reexports_missing=0 fresh_imports=32/32 cycles=0 caps_over=0 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=0 names=0 tc_shape=0
+VERIFY OK
+verify_rc=0
+== RETARGET
+RETARGET NOTE dynamic-read tests/test_b100_load_question.py:3149
+RETARGET NOTE dynamic-read tests/test_b100_workers.py:1310
+RETARGET files_scanned=309 files_changed=27 T1=133 T2=6 T3=12 T4=64 T5=2 T6=29 refused=0 accepted=1
+RETARGET CHECK remaining=0
+RETARGET OK
+rt_rc=0
+RETARGET files_scanned=309 files_changed=0 T1=0 T2=0 T3=0 T4=0 T5=0 T6=0 refused=0 accepted=1
+RETARGET CHECK remaining=0
+rtc_rc=0
+== DIFF vs b5f5e962dc7f4aec9545b7d73e91107be8b4df4a (expect deps.py + the 4 D1 call-site modules + tests/test_b100_workers.py)
+ s19_app/tui/app/checks_diff.py  |  4 +--
+ s19_app/tui/app/deps.py         |  9 +++++--
+ s19_app/tui/app/project_load.py |  3 +--
+ s19_app/tui/app/projects.py     |  4 +--
+ s19_app/tui/app/save_plan.py    |  3 +--
+ tests/test_b100_workers.py      | 58 ++++++++++++++++++++---------------------
+ 6 files changed, 42 insertions(+), 39 deletions(-)
+./s19_app/__pycache__
+./s19_app/render/__pycache__
+./s19_app/tui/changes/__pycache__
+APPLY_DONE

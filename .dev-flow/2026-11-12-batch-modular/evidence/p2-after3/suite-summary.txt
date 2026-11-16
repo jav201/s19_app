@@ -1,0 +1,5 @@
+summary: 78 failed, 8126 passed, 285 skipped, 4 xfailed in 4829.11s (1:20:29)
+outcome lines: 8493
+collection errors (grep "ERROR collecting|errors during collection"): 0
+rc: 1 (before rc: 1)
+tree: 5b67c844, rtx, -n 12

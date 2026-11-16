@@ -1,0 +1,57 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_tc652_wrapper_absence_and_renderer_surface ________________
+
+    def test_tc652_wrapper_absence_and_renderer_surface() -> None:
+        """AT-289 — black-box node: the 3 wrapper names are not importable from s19_app.tui,
+        absent from tui.__all__, and still live at s19_app.range_index (V-5 re-point, LED-…92.14)."""
+        """TC-652 — wrappers gone from the render module and the tui namespace."""
+        # LLR-002.1: wrappers absent from the moved module.
+        for name in WRAPPER_NAMES:
+            assert not hasattr(render_hexview, name), (
+                f"s19_app.render.hexview must not define {name}"
+            )
+        import inspect
+    
+        source = inspect.getsource(render_hexview)
+        for name in WRAPPER_NAMES:
+            assert f"def {name}" not in source
+    
+        # LLR-002.2: wrappers absent from the tui import surface and __all__.
+        for name in WRAPPER_NAMES:
+            assert not hasattr(tui, name), f"s19_app.tui must not expose {name}"
+            assert name not in tui.__all__, f"{name} must be dropped from tui.__all__"
+    
+        # ...and not importable from s19_app.tui (positive-absence probes).
+        for name in WRAPPER_NAMES:
+            with pytest.raises(ImportError):
+                importlib.import_module(f"s19_app.tui.{name}")
+    
+        # The 12-name renderer surface is re-exported 12/12, sourced from render.
+        for name in RENDERER_SURFACE:
+            assert hasattr(tui, name), f"s19_app.tui lost renderer name {name}"
+            assert name in tui.__all__, f"{name} missing from tui.__all__"
+            assert getattr(tui, name) is getattr(render_hexview, name), (
+                f"tui.{name} must be the identical object from s19_app.render.hexview"
+            )
+    
+        # LLR-002.3: the app package sources the primitives from the engine and
+        # the renderer from render.hexview — no edge to any tui hexview address.
+        edges: Set[str] = set()
+        for _path, mod in ps.package_modules("app"):
+            for node in ast.walk(mod):
+                if isinstance(node, ast.ImportFrom):
+                    edges.add(_resolve_import_from(node, "s19_app.tui.app"))
+                elif isinstance(node, ast.Import):
+                    for alias in node.names:
+                        edges.add(alias.name)
+>       assert "s19_app.range_index" in edges, (
+            "app.py must import the range primitives from the engine"
+        )
+E       AssertionError: app.py must import the range primitives from the engine
+E       assert 's19_app.range_index' in {'__future__', 'argparse', 'bisect', 'collections', 'copy', 'dataclasses', ...}
+
+tests/test_render_hexview.py:311: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_render_hexview.py::test_tc652_wrapper_absence_and_renderer_surface
+1 failed in 0.79s

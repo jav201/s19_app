@@ -1,0 +1,9 @@
+TREE_REV: c3760226ac9e7b99a9eb574321412fcae1c28676
+ARGS: tests/test_zq_nc_diag_seam.py
+LOAD_START: 8.78 6.89 5.30 11/701 181909
+~/work/zq-base2/nc-diag-green/s19_app/__init__.py
+.                                                                        [100%]
+- generated xml file: ~/work/zq-base2/out-nc-diag-green/junit.xml -
+1 passed in 0.15s
+LOAD_END: 8.78 6.89 5.30 11/710 181926
+RUN_DONE rc=0

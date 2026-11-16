@@ -1,0 +1,9 @@
+RETARGET files_scanned=309 files_changed=27 T1=133 T2=6 T3=12 T4=64 T5=2 T6=29 refused=0 accepted=1
+RETARGET CHECK remaining=0
+RETARGET OK
+retarget_rc=0
+UNDO-CHECK files_changed=27 lines_changed=246 lines_outside_spans=0
+TC-MOD-52 PASS 0-lines-outside-spans retarget rc=0 undo-check rc=0
+RETARGET NOTE dynamic-read tests/test_b100_workers.py:1310
+diff-outside-spans tests/test_b100_busy.py
+TC-MOD-52-NC PASS stops with diff-outside-spans rc=1 files_written=0

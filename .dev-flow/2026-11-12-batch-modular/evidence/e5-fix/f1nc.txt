@@ -1,0 +1,8 @@
+# rtx, 2026-11-13, tree bd63404b, f1nc.sh (serial, isolated HOME)
+GREEN fixed tree: 3 passed in 3.14s
+ 2 files changed, 5 insertions(+)
+NC-F1-a fixed staging law on mutant (expect failed): 1 failed in 2.67s
+NC-F1-b fixed strip law on mutant (expect failed): 1 failed in 0.86s
+pre-fix staging law on mutant (gap: passed): 1 passed in 3.04s
+pre-fix strip law on mutant (gap: passed): 1 passed in 0.61s
+F1NC_DONE

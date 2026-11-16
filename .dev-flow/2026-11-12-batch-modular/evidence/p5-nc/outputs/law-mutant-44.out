@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_doc_ref_1_1_named_paths_exist _____________________
+
+    def test_r_doc_ref_1_1_named_paths_exist():
+        """Verifies R-DOC-REF.1 (case /1): every repository path a repository
+        document names exists, unless its line carries a removal mark."""
+        bad: list[str] = []
+        documents = _repository_documents()
+        assert documents, "git ls-files returned no repository document"
+        for rel in documents:
+            text = _read(rel)
+            if text is not None:
+                bad.extend(_unmarked_missing_paths(rel, text))
+>       assert not bad, f"{len(bad)} unmarked repository paths that do not exist:\n" + "\n".join(bad)
+E       AssertionError: 1 unmarked repository paths that do not exist:
+E         CLAUDE.md:87: s19_app/tui/app.py
+E       assert not ['CLAUDE.md:87: s19_app/tui/app.py']
+
+tests/test_b101_doc_hygiene.py:288: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+1 failed in 0.77s

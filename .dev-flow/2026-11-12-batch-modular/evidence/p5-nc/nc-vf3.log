@@ -1,0 +1,61 @@
+VERIFY base=4f721985 units_old=626 units_new=626 missing=0 duplicate=0 extra=0 body_diff=0 unlisted_rewrite=0
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=0 pins=12/12 reexports_missing=0 fresh_imports=32/32 cycles=0 caps_over=0 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=0 names=0 tc_shape=0
+VERIFY OK
+NC-VF-0 PASS baseline VERIFY OK rc=0
+NC-VF-1 PASS V1 V1 rc=1 
+VERIFY FAIL V1: S19TuiApp._land_focus: no unit in the new package (old line 11183)
+NC-VF-2 PASS V2+V10 V10,V2 rc=1 
+VERIFY FAIL V2: S19TuiApp._land_focus: 2 units for 1 old (navigation.py:829, shell.py:585)
+VERIFY FAIL V10: name _land_focus defined in NavigationMixin, ShellMixin
+NC-VF-3 PASS V4 V4 rc=1 
+VERIFY FAIL V4: S19TuiApp._busy_tick (shell.py:342): first diff old='self._busy.frame = (self._busy.frame + 1) % 10' new='self._busy.frame = (self._busy.frame + 1) % 17'
+NC-VF-4 PASS V5 V4,V5 rc=1 
+VERIFY FAIL V5: S19TuiApp._log_a2l_parse_summary (a2l_view.py:630): deps.Path: not a D1 name (line 630)
+NC-VF-5 PASS V6+V7 V6,V7 rc=1 
+VERIFY FAIL V6: file_load.py:200: bare D1 name os
+VERIFY FAIL V7: D1 os: 73 sites in the new package, 74 in the old
+NC-VF-6 PASS V8 V11,V13,V17,V18,V8,V9 rc=1 
+VERIFY FAIL V8: _severity_style: sits in shell.py (line 586), map says shared.py
+NC-VF-7 PASS V9 V8,V9 rc=1 
+VERIFY FAIL V9: S19TuiApp.__dict__ has no on_button_pressed
+NC-VF-8 PASS V11 V11 rc=1 
+VERIFY FAIL V11: app: re-export _TYPED_REFUSAL_TOKENS is missing
+NC-VF-9 PASS V13|V14 V11,V13,V14,V17,V9 rc=1 
+VERIFY FAIL V13: s19_app.tui.app: ImportError: cannot import name 'A2LDetailCard' from partially initialized module 's19_app.tui.app.shared' (most likely due to a circular import) (~/work/zq-mod/p5nc/scratch/vf/nc9/s19_app/tui/a
+VERIFY FAIL V13: s19_app.tui.app.a2l_view: ImportError: cannot import name 'A2LDetailCard' from partially initialized module 's19_app.tui.app.shared' (most likely due to a circular import) (~/work/zq-mod/p5nc/scratch/vf/nc9/s19_
+NC-VF-10 PASS V4+V16 V16,V4 rc=1 
+VERIFY FAIL V4: S19TuiApp.CSS_PATH (core.py:148): CSS_PATH is not the rewritten constant '../styles.tcss'
+VERIFY FAIL V16: CSS resolves to ~/work/zq-mod/p5nc/scratch/vf/nc10/s19_app/tui/app/styles.tcss, expected ~/work/zq-mod/p5nc/scratch/vf/nc10/s19_app/tui/styles.tcss (existing file)
+NC-VF-11 PASS V12 V12 rc=1 
+VERIFY FAIL V12: s19_app/tui/app.py still exists
+NC-VF-12 PASS V17 V17 rc=1 
+VERIFY FAIL V17: s19_app.tui.app.a2l_view.CYAN: bound to a different object than the old module's
+VERIFY FAIL V17: s19_app.tui.app.a2l_view.CYAN: bound to a different object than the old module's
+NC-VF-13 PASS V4|V5 V4 rc=1 
+VERIFY FAIL V4: S19TuiApp._check_items_to_document (checks_diff.py:103): first diff old='from .changes.io import FORMAT_ID, FORMAT_VERSION' new='from ...changes.io import FORMAT_ID, FORMAT_VERSION'
+NC-VF-14 PASS V18 V18 rc=1 TARGET=Label
+VERIFY FAIL V18: app/deps.py binds no Label, but deps.Label is loaded (43 sites, first a2l_view.py:1051)
+NC-VF-15 PASS V18 V18 rc=1 TARGET=safe_text MODULE=a2l_view
+VERIFY FAIL V18: app/a2l_view.py:1058: global name safe_text is used (17 sites) but is not bound at the module's top level
+NC-VF-16 PASS V19 V17,V19 rc=1 TARGET=TYPE_CHECKING
+VERIFY FAIL V19: app/shared.py:4: `if TYPE_CHECKING:` has an else branch
+NC-VF-17 PASS V3 V3 rc=1 
+VERIFY FAIL V3: _helper: no such old unit (shell.py:586)
+NC-VF-18 PASS V10 V10 rc=1 TARGET=ComposeScreensMixin<->FlowMixin
+VERIFY FAIL V10: S19TuiApp bases ['FlowMixin', 'ComposeScreensMixin', 'SaveCommitMixin', 'ReportsMixin', 'PatchMixin', 'ChecksDiffMixin', 'SavePlanMixin', 'ProjectLoadMixin', 'FileLoadMixin', 'LoadedStateMixin', 'WorkspaceViewMixin', 'Proje
+VERIFY FAIL V10: S19TuiApp.__bases__ ['FlowMixin', 'ComposeScreensMixin', 'SaveCommitMixin', 'ReportsMixin', 'PatchMixin', 'ChecksDiffMixin', 'SavePlanMixin', 'ProjectLoadMixin', 'FileLoadMixin', 'LoadedStateMixin', 'WorkspaceViewMixin', 'P
+NC-VF-19 PASS V11 V11 rc=1 TARGET=CHECK_GLYPHS
+VERIFY FAIL V11: screens_directionb: re-export CHECK_GLYPHS is missing
+NC-VF-20 PASS V11 V11,V3,V6 rc=1 TARGET=parse_a2l_cached
+VERIFY FAIL V11: app: re-export parse_a2l_cached (home deps) is not the home module's object
+NC-VF-21 PASS V14 V14 rc=1 TARGET=FlowMixin
+VERIFY FAIL V14: patch.py imports flow: breaks the I-1 direction rule
+NC-VF-22 PASS V15 V15 rc=1 
+VERIFY FAIL V15: app/shell.py has 2983 lines > cap 2200 (largest class 497)
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=0 pins=12/12 reexports_missing=0 fresh_imports=32/32 cycles=0 caps_over=1 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=0 names=0 tc_shape=0
+NC-VF-23 PASS V12|V13 V1,V11,V13,V17,V9 rc=1 
+VERIFY FAIL V13: s19_app.tui.app: ImportError: cannot import name 'AbDiffPanel' from 's19_app.tui.screens_directionb' (unknown location)
+VERIFY FAIL V13: s19_app.tui.app.a2l_view: ImportError: cannot import name 'AbDiffPanel' from 's19_app.tui.screens_directionb' (unknown location)
+NC-VF-24 PASS V8 V11,V8 rc=1 TARGET=_is_link_stat MAP=~/work/zq-mod/p5nc/scratch/vf/nc24-map.json
+VERIFY FAIL V8: _is_link_stat: sits in deps.py (line 192), map says shared.py
+NC-VF-25 FAIL V9 V17,V4 rc=1 TARGET=_is_layout_visible

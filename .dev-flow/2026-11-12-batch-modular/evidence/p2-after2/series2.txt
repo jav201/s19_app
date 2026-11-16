@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# P2 after2: serial 3x per tree (BEFORE then AFTER alternating) for the passed->failed candidates; idle runner.
+set -u
+Z=~/work/zq-mod; PY=$HOME/miniconda3/envs/s19ci/bin/python; S=$Z/ser2; rm -rf $S; mkdir -p $S/zq_iso_user $S/tmp
+N=(
+"tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel"
+"tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1]"
+"tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second"
+"tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time"
+"tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single]"
+)
+E="env -i PATH=/usr/bin:/bin HOME=$S/zq_iso_user TMPDIR=$S/tmp PYTHONDONTWRITEBYTECODE=1 LANG=C.UTF-8 TERM=xterm-256color"
+for n in "${N[@]}"; do
+  line="$n"
+  for i in 1 2 3; do
+    for t in before after2; do
+      r=$(cd $Z/$t/tree && $E $PY -m pytest -q -p no:cacheprovider "$n" < /dev/null 2>&1 | tail -1)
+      case "$r" in *" passed"*) o=P;; *) o=F;; esac
+      line="$line ${t:0:1}$i:$o"
+    done
+  done
+  echo "$line"
+done
+rm -rf $S
+echo SERIES_DONE
+
+# output
+tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1] b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time b1:P a1:P b2:P a2:P b3:P a3:P
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single] b1:P a1:P b2:P a2:P b3:P a3:P
+SERIES_DONE

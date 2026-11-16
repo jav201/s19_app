@@ -26,6 +26,7 @@ from __future__ import annotations
 import ast
 import asyncio
 import inspect
+import textwrap
 from pathlib import Path
 from typing import List, Tuple
 
@@ -144,7 +145,7 @@ def test_at260_a_valueerror_from_the_generator_is_the_tools_failure(
     def boom(*_args, **_kwargs):
         raise ValueError("internal accounting slip, not operator input")
 
-    monkeypatch.setattr(app_module, "generate_project_report", boom)
+    monkeypatch.setattr(app_module.deps, "generate_project_report", boom)
     statuses, _progress, project_dir = asyncio.run(_drive_worker(tmp_path))
 
     assert statuses, "the worker surfaced no status at all"
@@ -198,7 +199,7 @@ def test_at262_pin_neither_path_leaves_a_report_behind(
     def boom(*_args, **_kwargs):
         raise ValueError("injected")
 
-    monkeypatch.setattr(app_module, "generate_project_report", boom)
+    monkeypatch.setattr(app_module.deps, "generate_project_report", boom)
     _s, _p, failed_dir = asyncio.run(_drive_worker(tmp_path / "fail"))
     assert _reports(failed_dir) == [], "the tool-failure path left a report behind"
 
@@ -227,7 +228,7 @@ def test_tc571_the_failure_path_logs_a_failure_not_a_rejection(
     def boom(*_args, **_kwargs):
         raise ValueError("injected")
 
-    monkeypatch.setattr(app_module, "generate_project_report", boom)
+    monkeypatch.setattr(app_module.deps, "generate_project_report", boom)
     asyncio.run(_drive_worker(tmp_path))
 
     assert events, "the failure path logged nothing at all"
@@ -256,7 +257,7 @@ def test_at263_pin_progress_resets_to_zero_on_both_branches(
     def boom(*_args, **_kwargs):
         raise ValueError("injected")
 
-    monkeypatch.setattr(app_module, "generate_project_report", boom)
+    monkeypatch.setattr(app_module.deps, "generate_project_report", boom)
     _statuses, failure_progress, _dir = asyncio.run(_drive_worker(tmp_path))
     assert failure_progress and failure_progress[-1] == 0, (
         f"progress left at {failure_progress[-1] if failure_progress else None} "
@@ -282,7 +283,13 @@ _GUARDED_FUNCTIONS = ("_start_generate_report_worker",)
 
 def _generation_inside_valueerror_span(source: str, function: str) -> List[int]:
     """Line numbers where ``generate_project_report`` is called inside a ``try``
-    that catches ``ValueError``."""
+    that catches ``ValueError``.
+
+    batch-modular: the call moved behind the ``deps`` module alias
+    (``deps.generate_project_report(...)``), so the census matches the direct
+    name AND the module-aliased attribute — otherwise the split would have
+    made the span census silently vacuous.
+    """
     tree = ast.parse(source)
     target = next(
         node
@@ -301,11 +308,15 @@ def _generation_inside_valueerror_span(source: str, function: str) -> List[int]:
         if not catches_value_error:
             continue
         for inner in ast.walk(ast.Module(body=node.body, type_ignores=[])):
-            if (
-                isinstance(inner, ast.Call)
-                and isinstance(inner.func, ast.Name)
-                and inner.func.id == "generate_project_report"
-            ):
+            if not isinstance(inner, ast.Call):
+                continue
+            func = inner.func
+            direct = isinstance(func, ast.Name) and func.id == "generate_project_report"
+            via_module = (
+                isinstance(func, ast.Attribute)
+                and func.attr == "generate_project_report"
+            )
+            if direct or via_module:
                 offenders.append(inner.lineno)
     return offenders
 
@@ -317,7 +328,7 @@ def test_tc570_generation_is_outside_every_valueerror_guarded_span() -> None:
     it, so a future edit that re-nests the call is caught even if the injected
     fixture stops reaching the generator for some unrelated reason.
     """
-    source = inspect.getsource(app_module)
+    source = textwrap.dedent(inspect.getsource(S19TuiApp._start_generate_report_worker))
     for function in _GUARDED_FUNCTIONS:
         offenders = _generation_inside_valueerror_span(source, function)
         assert not offenders, (
@@ -351,9 +362,7 @@ def test_tc572_the_tool_failure_sequence_exists_exactly_once() -> None:
     keeps its progress reset and the other loses it, and nothing notices because
     each branch is exercised by a different test.
     """
-    source = inspect.getsource(app_module)
-    worker = source[source.index("def _start_generate_report_worker") :]
-    worker = worker[: worker.index("\n    def ")]
+    worker = inspect.getsource(S19TuiApp._start_generate_report_worker)
 
     # Extracted rather than inlined: a backslash escape inside an f-string is
     # Python 3.12+ syntax and this repo's ruff targets 3.8.

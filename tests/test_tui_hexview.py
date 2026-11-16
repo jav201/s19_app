@@ -345,22 +345,22 @@ def test_tc_023_hex_width_governs_row_alignment(monkeypatch):
 
 
 def test_tc_023_app_does_not_import_private_hexview_helpers():
-    """LLR-003.2: no caller in app.py reaches into private hexview helpers."""
-    import s19_app.tui.app as app
-
-    # Iterate the AST instead of regex-grepping the source so a multi-line or
-    # aliased import is still caught.
+    """LLR-003.2: no caller in the app package reaches into private hexview helpers."""
     import ast
 
-    source = Path(app.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    from tests.support import package_source as ps
+
+    # Iterate the AST instead of regex-grepping the source so a multi-line or
+    # aliased import is still caught. Every file of the app package is walked
+    # separately (READ-PACKAGE), because the single ``app.py`` is now a package.
     private_imports: list[str] = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module.endswith("tui.hexview") or node.module == "s19_app.tui.hexview":
-                for alias in node.names:
-                    if alias.name.startswith("_"):
-                        private_imports.append(alias.name)
+    for _path, tree in ps.package_modules("app"):
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module:
+                if node.module.endswith("tui.hexview") or node.module == "s19_app.tui.hexview":
+                    for alias in node.names:
+                        if alias.name.startswith("_"):
+                            private_imports.append(alias.name)
     assert private_imports == [], (
-        f"app.py imports private hexview helpers: {private_imports} -- LLR-003.2 violation"
+        f"app package imports private hexview helpers: {private_imports} -- LLR-003.2 violation"
     )

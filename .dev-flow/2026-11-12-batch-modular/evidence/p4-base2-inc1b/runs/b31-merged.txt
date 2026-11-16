@@ -1,0 +1,9 @@
+TREE_REV: c3760226ac9e7b99a9eb574321412fcae1c28676
+ARGS: tests/test_tui_directionb.py -k tc031
+LOAD_START: 7.53 8.15 6.44 6/674 185781
+~/work/zq-base2/merged/s19_app/__init__.py
+...                                                                      [100%]
+-- generated xml file: ~/work/zq-base2/out-b31-merged/junit.xml ---
+3 passed, 181 deselected in 0.48s
+LOAD_END: 7.53 8.15 6.44 6/676 185837
+RUN_DONE rc=0

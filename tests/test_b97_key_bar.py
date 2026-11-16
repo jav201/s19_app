@@ -569,29 +569,33 @@ def test_tc_b97_68_no_hex_literal_in_the_key_bar_code() -> None:
 #: app key's action method contains the guard node's name, directly or
 #: through at most two ``self.<method>(`` hops; an owned key is bound in the
 #: guard's own class ``BINDINGS``.
-APP_PY, SDB_PY, SJ_PY = "s19_app/tui/app.py", "s19_app/tui/screens_directionb.py", "s19_app/tui/segment_split_view.py"
+CORE_PY = "s19_app/tui/app/core.py"
+NAV_PY = "s19_app/tui/app/navigation.py"
+A2L_VIEW_PY = "s19_app/tui/app/a2l_view.py"
+AB_DIFF_PY = "s19_app/tui/screens_directionb/ab_diff.py"
+SJ_PY = "s19_app/tui/segment_split_view.py"
 DERIVED_GUARDS = (
-    ("a2l", "slash", APP_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"a2l": ("alt_search_input", "alt_goto_input"),'),
-    ("a2l", "g", APP_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"a2l": ("alt_search_input", "alt_goto_input"),'),
-    ("a2l", "plus", APP_PY, "S19TuiApp.action_page_next_context", "self.action_a2l_tags_page_next()"),
-    ("a2l", "minus", APP_PY, "S19TuiApp.action_page_prev_context", "self.action_a2l_tags_page_prev()"),
-    ("a2l", "d", APP_PY, "S19TuiApp.action_a2l_describe_tag", 'if self._active_screen_key != "a2l" or not self.current_a2l_data:'),
-    ("a2l", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"a2l": ("A2L",),'),
-    ("mac", "slash", APP_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"mac": ("mac_search_input", "mac_goto_input"),'),
-    ("mac", "g", APP_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"mac": ("mac_search_input", "mac_goto_input"),'),
-    ("mac", "plus", APP_PY, "S19TuiApp.action_page_next_context", "self.action_mac_records_page_next()"),
-    ("mac", "minus", APP_PY, "S19TuiApp.action_page_prev_context", "self.action_mac_records_page_prev()"),
-    ("mac", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"mac": ("MAC",),'),
-    ("map", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"map": (),'),
-    ("issues", "pagedown", APP_PY, "S19TuiApp.action_page_down_context", "self.action_validation_issues_page_next()"),
-    ("issues", "pageup", APP_PY, "S19TuiApp.action_page_up_context", "self.action_validation_issues_page_prev()"),
-    ("issues", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"issues": ("Issues",),'),
-    ("diff", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"diff": ("Hex",),'),
-    ("diff", "f", SDB_PY, "AbDiffPanel.BINDINGS", 'Binding("f", "toggle_run_overlay", "Run list", show=False),'),
-    ("diff", "escape", SDB_PY, "AbDiffPanel.BINDINGS", 'Binding("escape", "close_run_overlay", "Close the run list", show=False),'),
-    ("diff", "right_square_bracket", SDB_PY, "AbDiffPanel.BINDINGS", 'Binding("right_square_bracket", "page_window_down", "Window page +", show=False),'),
-    ("diff", "left_square_bracket", SDB_PY, "AbDiffPanel.BINDINGS", 'Binding("left_square_bracket", "page_window_up", "Window page -", show=False),'),
-    ("checks", "k", APP_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"checks": ("Issues",),'),
+    ("a2l", "slash", CORE_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"a2l": ("alt_search_input", "alt_goto_input"),'),
+    ("a2l", "g", CORE_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"a2l": ("alt_search_input", "alt_goto_input"),'),
+    ("a2l", "plus", NAV_PY, "NavigationMixin.action_page_next_context", "self.action_a2l_tags_page_next()"),
+    ("a2l", "minus", NAV_PY, "NavigationMixin.action_page_prev_context", "self.action_a2l_tags_page_prev()"),
+    ("a2l", "d", A2L_VIEW_PY, "A2lViewMixin.action_a2l_describe_tag", 'if self._active_screen_key != "a2l" or not self.current_a2l_data:'),
+    ("a2l", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"a2l": ("A2L",),'),
+    ("mac", "slash", CORE_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"mac": ("mac_search_input", "mac_goto_input"),'),
+    ("mac", "g", CORE_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"mac": ("mac_search_input", "mac_goto_input"),'),
+    ("mac", "plus", NAV_PY, "NavigationMixin.action_page_next_context", "self.action_mac_records_page_next()"),
+    ("mac", "minus", NAV_PY, "NavigationMixin.action_page_prev_context", "self.action_mac_records_page_prev()"),
+    ("mac", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"mac": ("MAC",),'),
+    ("map", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"map": (),'),
+    ("issues", "pagedown", NAV_PY, "NavigationMixin.action_page_down_context", "self.action_validation_issues_page_next()"),
+    ("issues", "pageup", NAV_PY, "NavigationMixin.action_page_up_context", "self.action_validation_issues_page_prev()"),
+    ("issues", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"issues": ("Issues",),'),
+    ("diff", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"diff": ("Hex",),'),
+    ("diff", "f", AB_DIFF_PY, "AbDiffPanel.BINDINGS", 'Binding("f", "toggle_run_overlay", "Run list", show=False),'),
+    ("diff", "escape", AB_DIFF_PY, "AbDiffPanel.BINDINGS", 'Binding("escape", "close_run_overlay", "Close the run list", show=False),'),
+    ("diff", "right_square_bracket", AB_DIFF_PY, "AbDiffPanel.BINDINGS", 'Binding("right_square_bracket", "page_window_down", "Window page +", show=False),'),
+    ("diff", "left_square_bracket", AB_DIFF_PY, "AbDiffPanel.BINDINGS", 'Binding("left_square_bracket", "page_window_up", "Window page -", show=False),'),
+    ("checks", "k", CORE_PY, "S19TuiApp._SCREEN_LEGEND_SECTIONS", '"checks": ("Issues",),'),
     ("split_join", "space", SJ_PY, "SplitJoinWindow.BINDINGS", 'Binding("space", "toggle_row", "Tick", show=False),'),
     ("split_join", "a", SJ_PY, "SplitJoinWindow.BINDINGS", 'Binding("a", "select_all", "All", show=False),'),
     ("split_join", "n", SJ_PY, "SplitJoinWindow.BINDINGS", 'Binding("n", "select_none", "None", show=False),'),
@@ -606,7 +610,7 @@ DERIVED_GUARDS = (
 )
 #: The derived windows whose row is empty, with the guard that leaves them out
 #: (no find / go-to input; no legend section of their own).
-DERIVED_EMPTY = (("crc_designer", APP_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"crc_designer": None,'),)
+DERIVED_EMPTY = (("crc_designer", CORE_PY, "S19TuiApp._FIND_GOTO_INPUTS", '"crc_designer": None,'),)
 DERIVED = ("a2l", "mac", "map", "issues", "diff", "checks", "crc_designer", "split_join")
 
 
@@ -677,9 +681,10 @@ def test_tc_b97_69_derived_rows_follow_their_guards() -> None:
         else:
             cls_name, attr = qualname.split(".")
             assert attr == "BINDINGS", qualname
+            module = Path(rel).with_suffix("").as_posix().replace("/", ".")
             bound = [
                 b if isinstance(b, Binding) else Binding(*b)
-                for b in __import__("s19_app.tui." + Path(rel).stem, fromlist=[cls_name]).__dict__[cls_name].BINDINGS
+                for b in __import__(module, fromlist=[cls_name]).__dict__[cls_name].BINDINGS
             ]
             assert any(b.key == key for b in bound), (window, key, qualname)
     for window, rel, qualname, snippet in DERIVED_EMPTY:

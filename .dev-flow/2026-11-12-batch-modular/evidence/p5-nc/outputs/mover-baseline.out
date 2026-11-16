@@ -1,0 +1,5 @@
+MOVE base=4f721985a9676cc9bb142162b3cd49aa2d8dd875 app_files=23 sdb_files=9 units=741 d1_rewrites=220 relimport_rewrites=18 css_rewrites=1
+MOVE imports_fresh=32/32 cycles=0 reexports_missing=0 caps_over=0
+SELF deps-bound 38/38
+SELF deps-bound 1/1
+MOVE OK

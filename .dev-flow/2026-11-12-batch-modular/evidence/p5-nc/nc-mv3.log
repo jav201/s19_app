@@ -1,0 +1,61 @@
+MOVE base=4f721985a9676cc9bb142162b3cd49aa2d8dd875 app_files=23 sdb_files=9 units=741 d1_rewrites=220 relimport_rewrites=18 css_rewrites=1
+MOVE imports_fresh=32/32 cycles=0 reexports_missing=0 caps_over=0
+SELF deps-bound 38/38
+SELF deps-bound 1/1
+MOVE OK
+--- git status --porcelain
+ D s19_app/tui/app.py
+ D s19_app/tui/screens_directionb.py
+?? .modularize/
+?? s19_app/tui/app/
+?? s19_app/tui/screens_directionb/
+TC-MOD-40 PASS porcelain=2 deletions + 2 package dirs + .modularize/ only; MOVE OK rc=0
+files_hashed=33 digest=30d0e8973114f7a6
+NC-MV-7 PASS identical-sha256-per-file equal files=33 rc=0,0 digest=30d0e8973114f7a6/30d0e8973114f7a6
+NC-MV-1 PASS E3 E3 rc=1 written_files=0
+MOVE FAIL E3: class unit '_land_focus'@11183 missing from map
+dropped _land_focus 11183
+NC-MV-2 PASS E4 E4 rc=1 written_files=0
+MOVE FAIL E4: class unit '_land_focus'@11183 duplicated in map
+duplicated _land_focus -> shell
+NC-MV-3 PASS E9 E9 rc=1 written_files=0
+MOVE FAIL E9: method 'check_action' has a zero-argument super()
+check_action -> navigation
+NC-MV-4 PASS E11 E11 rc=1 written_files=0
+MOVE FAIL E11: name '_variant_set' bound in multiple classes (projects, shell)
+_variant_set getter projects / setter shell
+NC-MV-5 PASS E1 E1 rc=1 written_files=0
+MOVE FAIL E1: map base 287b9dc3c5e18614ea50a053ef183d80dac59dfc != rev 4f721985a9676cc9bb142162b3cd49aa2d8dd875
+base -> 287b9dc3
+TC-34(../x) PASS E5 E5 rc=1 written_files=0
+MOVE FAIL E5: class unit '_land_focus': unknown module '../x'
+_land_focus -> ../x
+TC-37(on_button_pressed->mixin) FAIL E[0-9]+ none rc=0 written_files=5
+on_button_pressed -> navigation
+NC-MV-6 PASS E12 E12 rc=1 written_files=0
+MOVE FAIL E12: module 'shell': unresolvable name 'NC_MV6_MISSING'
+TC-38(local os) PASS E6 E6 rc=1 written_files=0
+MOVE FAIL E6: D1 name 'os' bound in non-module scope '_flush_logger' at line 3345
+NC-MV-8 PASS MOVE-FAIL(fresh-import|cycle) MOVE FAIL cycle,MOVE FAIL direction,MOVE FAIL fresh import,MOVE FAIL reexports rc=1
+MOVE imports_fresh=0/32 cycles=1 reexports_missing=598 caps_over=0
+MOVE FAIL cycle: core -> navigation -> core
+MOVE FAIL direction: navigation -> core
+NC-MV-9 PASS MOVE-FAIL(deps-bound) MOVE FAIL deps-bound rc=1
+SELF deps-bound 8/38
+SELF deps-bound 1/1
+MOVE FAIL deps-bound: s19_app.tui.app deps.Label used but not bound in deps.py
+MOVE FAIL deps-bound: s19_app.tui.app deps.ListItem used but not bound in deps.py
+NC-MV-10 mover rc=0: MOVE OK
+SELF deps-bound 38/38
+SELF deps-bound 1/1
+baseline-mover rc=0 MOVE OK
+--- diff -rq baseline vs mutated (generated packages)
+Files ~/work/zq-mod/p5nc/scratch/mv/w0b/s19_app/tui/screens_directionb/loaded_artifacts.py and ~/work/zq-mod/p5nc/scratch/mv/w10/s19_app/tui/screens_directionb/loaded_artifacts.py differ
+--- diff (first 20 lines)
+diff -r ~/work/zq-mod/p5nc/scratch/mv/w0b/s19_app/tui/screens_directionb/loaded_artifacts.py ~/work/zq-mod/p5nc/scratch/mv/w10/s19_app/tui/screens_directionb/loaded_artifacts.py
+13,15d12
+< from typing import TYPE_CHECKING
+< if TYPE_CHECKING:
+<     from ..models import LoadedFile
+--- verifier on the mutated output
+VERIFY OK

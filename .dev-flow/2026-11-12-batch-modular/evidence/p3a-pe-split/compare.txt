@@ -1,0 +1,26 @@
+COMPARE before=8502 after=8512 missing=1 new=11 outcome_diff=12 flaky_excused=0
+COMPARE FAIL
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[patch_editor.py] passed -> (absent)
+B1 tests/test_package_source_helper.py::test_mro_class_tree_refuses_a_thin_class (absent) -> passed
+B1 tests/test_package_source_helper.py::test_screens_package_without_patch_editor_trips_the_floor (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[__init__.py6] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[a2l_picker.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[actions.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[checks.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[document.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[entries.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[layout.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[panel.py] (absent) -> passed
+B1 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[shared.py2] (absent) -> passed
+B2 tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0] passed -> failed
+B2 tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1] passed -> failed
+B2 tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] failed -> passed
+B2 tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded failed -> passed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes failed -> passed
+B2 tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged failed -> passed
+B2 tests/test_b100_save_image.py::test_tc_b100_59_pending_patch_in_the_open_project passed -> failed
+B2 tests/test_b100_save_image.py::test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from[carried-True] passed -> failed
+B2 tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[files_list] passed -> failed
+B2 tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[load_dialog] passed -> failed
+B2 tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single] passed -> failed
+B2 tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled passed -> failed

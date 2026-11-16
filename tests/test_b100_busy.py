@@ -46,10 +46,10 @@ from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TE
 from tests.b97_probes import painted_rows
 from tests.conftest import make_large_s19
 from tests.support import b100_projects as projects
+from tests.support.package_source import merged_class, package_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid"
-APP_SOURCE = Path(app_module.__file__)
 SIZE = (118, 54)
 WIN = sys.platform == "win32"
 
@@ -904,9 +904,9 @@ def _stub_diff(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, *, md="written",
 
         return _generator
 
-    monkeypatch.setattr(app_module, "compare_images", lambda *a, **k: fake)
-    monkeypatch.setattr(app_module, "generate_diff_report", _gen("md", md))
-    monkeypatch.setattr(app_module, "generate_diff_report_html", _gen("html", html))
+    monkeypatch.setattr(app_module.deps, "compare_images", lambda *a, **k: fake)
+    monkeypatch.setattr(app_module.deps, "generate_diff_report", _gen("md", md))
+    monkeypatch.setattr(app_module.deps, "generate_diff_report_html", _gen("html", html))
     return paths
 
 
@@ -946,7 +946,7 @@ def _stub_before_after(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Simpl
     result = SimpleNamespace(
         written=True, md_path=tmp_path / "ba.md", html_path=tmp_path / "ba.html", diagnostics=[]
     )
-    monkeypatch.setattr(app_module, "compose_before_after_report", lambda *a, **k: result)
+    monkeypatch.setattr(app_module.deps, "compose_before_after_report", lambda *a, **k: result)
     return result
 
 
@@ -1158,15 +1158,13 @@ def test_tc_b100_50_control_bytes_never_reach_the_status_log(
     assert [x for x in lines + widgets if CONTROL.search(x)] == [], [ascii(x) for x in lines + widgets]
 
 
-def _class_methods(tree: ast.Module, cls: str = "S19TuiApp") -> dict:
-    for node in tree.body:
-        if isinstance(node, ast.ClassDef) and node.name == cls:
-            return {
-                item.name: item
-                for item in node.body
-                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
-            }
-    raise AssertionError(f"class {cls} not found in {APP_SOURCE}")
+def _merged_methods(cls: str = "S19TuiApp") -> dict:
+    """Methods of ``cls`` across the whole app package (MERGED-CLASS)."""
+    return {
+        item.name: item
+        for item in merged_class(cls).body
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
 
 
 def _callee(func) -> Optional[str]:
@@ -1178,14 +1176,14 @@ def _callee(func) -> Optional[str]:
 
 
 def test_tc_b100_50_begin_busy_is_called_only_from_the_one_label_helper() -> None:
-    """LLR-176.1r (S12a-04): in ``app.py``, ``begin_busy(`` is called only
+    """LLR-176.1r (S12a-04): in the app package, ``begin_busy(`` is called only
     inside ``_busy_begin_action`` (1 call site), the one place that formats
     a label and scrubs its name.
 
     Why: a second site that formats its own label skips the name scrub.
     Negative control: a site calling ``begin_busy`` with a formatted label →
     2 sites. RED (base): 0 call sites."""
-    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    methods = _merged_methods()
     sites = []
     for name, node in methods.items():
         for inner in ast.walk(node):
@@ -1345,7 +1343,7 @@ def test_tc_b100_50_kickoff_raise_ends_the_file_load_first(tmp_path: Path, monke
     def _deny(*_a, **_k):
         raise PermissionError("synthetic")
 
-    monkeypatch.setattr(app_module, "copy_into_workarea", _deny)
+    monkeypatch.setattr(app_module.deps, "copy_into_workarea", _deny)
 
     async def scenario(app, pilot, log):
         with pytest.raises(PermissionError):
@@ -1452,7 +1450,7 @@ def test_tc_b100_50_a2l_raise_ends_the_action_first(tmp_path: Path, monkeypatch:
     a worker it must not end the app (P12b-2).
     RED (base): the ``RuntimeError`` leaves ``load_a2l_from_path``."""
     seam = Seam(monkeypatch)
-    monkeypatch.setattr(app_module, "parse_a2l_file", _boom)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _boom)
     line = ("File NOT loaded: 'firmware.a2l' could not be read — check that the file can be "
             "opened, then load again.")
 
@@ -1520,7 +1518,7 @@ def test_tc_b100_50_save_raise_ends_the_action_first(tmp_path: Path, monkeypatch
     from s19_app.tui.screens import SaveProjectPayload
 
     seam = Seam(monkeypatch)
-    monkeypatch.setattr(app_module, "gather_project_artifacts", _boom)
+    monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _boom)
     line = "Project NOT saved: could not save — an unexpected error stopped the save. check the folder."
 
     async def scenario(app, pilot, log):
@@ -1619,14 +1617,14 @@ def _seam_events(node) -> list:
 def test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event() -> None:
     """LLR-176.2 (A12-28): the 24 baseline ``set_progress`` sites in 12
     functions each map to one begin, step or end of the action table; the
-    AST of ``app.py`` holds, per function, at least as many seam calls of
+    AST of the app package holds, per function, at least as many seam calls of
     each (event, key, step) as the baseline sites it replaces (24 in all).
 
     Why: a site left on the raw bar escapes the indicator's rules (stale
     100, no end). Negative control: the report step removed → the census
     names ``_start_generate_report_worker`` step 2.
     RED (base, P12a-1): 24 sites, no seam call."""
-    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    methods = _merged_methods()
     missing = []
     total = 0
     for function, event, key, step, count in CENSUS:
@@ -1647,7 +1645,7 @@ def test_tc_b100_51_only_the_seam_sets_the_bar() -> None:
 
     Why: one writer of the bar is what makes "cleared at the last end"
     true for every action. RED (base, P12a-1): 24 references outside."""
-    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    methods = _merged_methods()
     allowed = {"begin_busy", "step_busy", "end_busy", "set_progress"}
     outside = []
     queries = []
@@ -1672,7 +1670,7 @@ def test_tc_b100_51_workers_take_the_run_generation() -> None:
     """Interfaces S-m, ruling Q-1 (A12-69): the 4 workers take ``gen`` as a
     required keyword-only parameter, ``_handle_load_error`` and
     ``_finish_generate_report`` take it as their last parameter, and every
-    call of the 4 workers in ``app.py`` passes ``gen=``.
+    call of the 4 workers in the app package passes ``gen=``.
 
     The example says a call without ``gen`` raises ``TypeError``; a
     ``@work`` method raises inside its worker, so the signature is read
@@ -1691,7 +1689,7 @@ def test_tc_b100_51_workers_take_the_run_generation() -> None:
         assert params["gen"].default is inspect.Parameter.empty, (name, params["gen"])
     for name in ("_handle_load_error", "_finish_generate_report"):
         assert list(inspect.signature(getattr(S19TuiApp, name)).parameters)[-1] == "gen", name
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
+    tree = package_tree("app")
     calls = [
         node for node in ast.walk(tree)
         if isinstance(node, ast.Call) and _callee(node.func) in workers
@@ -1792,7 +1790,7 @@ def test_tc_b100_51_file_load_ends_once_on_a_containment_refusal(tmp_path: Path,
     def _refuse(*_a, **_k):
         raise WorkareaContainmentError("synthetic containment refusal")
 
-    monkeypatch.setattr(app_module, "copy_into_workarea", _refuse)
+    monkeypatch.setattr(app_module.deps, "copy_into_workarea", _refuse)
 
     async def scenario(app, pilot, log):
         mark = len(log.messages)
@@ -1860,7 +1858,7 @@ def test_tc_b100_51_a2l_load_ends_once_on_a_containment_refusal(tmp_path: Path, 
     def _refuse(*_a, **_k):
         raise WorkareaContainmentError("synthetic containment refusal")
 
-    monkeypatch.setattr(app_module, "copy_into_workarea", _refuse)
+    monkeypatch.setattr(app_module.deps, "copy_into_workarea", _refuse)
 
     async def scenario(app, pilot, log):
         mark = len(log.messages)
@@ -1967,7 +1965,7 @@ def test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin(
         with monkeypatch.context() as patch:
             # Inc 12b re-pin (E3 DF-7): ``_load_a2l_data_with_cache`` is
             # retired; the worker reaches the parse through the app module.
-            patch.setattr(app_module, "parse_a2l_file", _bad_a2l)
+            patch.setattr(app_module.deps, "parse_a2l_file", _bad_a2l)
             mark = len(log.messages)
             app._handle_load_project("A2LONLY")
             await _drain(app, pilot)
@@ -1978,7 +1976,7 @@ def test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin(
         app._handle_load_project("Q")
         await _settle(pilot, 4)
         with monkeypatch.context() as patch:
-            patch.setattr(app_module.os, "lstat", _lstat)
+            patch.setattr(app_module.deps.os, "lstat", _lstat)
             app._handle_load_project("P")
         await _settle(pilot, 4)
         return failed, len(seam.begins) - begins, list(seam.bar), log.since(mark)
@@ -2059,7 +2057,7 @@ def test_tc_b100_51_save_project_mismatch_tail_ends_with_the_mismatch(tmp_path: 
 
     seam = Seam(monkeypatch)
     monkeypatch.setattr(
-        app_module,
+        app_module.deps,
         "verify_written_manifest",
         lambda *a, **k: ManifestVerifyResult(status=MANIFEST_MISMATCH, drift=["active_variant"]),
     )
@@ -2106,7 +2104,7 @@ def test_tc_b100_51_save_project_ends_once_on_a_placement_failure(tmp_path: Path
     def _no_space(*_a, **_k):
         raise OSError(28, "synthetic no space")
 
-    monkeypatch.setattr(app_module, "place_into_workarea", _no_space)
+    monkeypatch.setattr(app_module.deps, "place_into_workarea", _no_space)
 
     async def scenario(app, pilot, log):
         await _load_case01_image(app, pilot)
@@ -2173,7 +2171,7 @@ def test_tc_b100_51_report_ends_once_on_a_failure(tmp_path: Path, monkeypatch: p
         def _fail(*_a, **_k):
             raise RuntimeError("synthetic report failure")
 
-        monkeypatch.setattr(app_module, "generate_project_report", _fail)
+        monkeypatch.setattr(app_module.deps, "generate_project_report", _fail)
 
     async def scenario(app, pilot, log):
         await _load_report_project(app, pilot)
@@ -2614,7 +2612,7 @@ TWELVE_B_SITES = [
 
 def test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers() -> None:
     """LLR-176.2, LLR-176.2c, LLR-176.2d re-derived (X-13, X12b-14,
-    C12b-51): an AST walk of ``app.py`` finds each 12b seam call where the
+    C12b-51): an AST walk of the app package finds each 12b seam call where the
     design puts it — the three begins in the kickoffs; the project load's
     steps 2 and 3 posted from the worker step and step 4 in
     ``_on_project_loaded``; the Save's steps 2, 3, 4 posted from
@@ -2626,7 +2624,7 @@ def test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers() -> Non
     forever after that failure. Negative control: the end removed from
     ``_on_a2l_attach_failed`` → the census names it → RED; base: none of
     these functions exist → RED."""
-    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    methods = _merged_methods()
     missing = []
     for function, event, key, step in TWELVE_B_SITES:
         node = methods.get(function)
@@ -2832,7 +2830,7 @@ def test_tc_b100_51_every_save_abort_return_ends_its_run_first() -> None:
     # ``_save_failure_outcome``: "11 abort exits"); each returns its own text
     # as the outcome, and the main-thread handler ``_on_project_saved`` ends
     # the run with that outcome before its failure arm returns.
-    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    methods = _merged_methods()
     worker = methods["_save_project_files"]
     mkdir_line = min(
         n.lineno for n in ast.walk(worker)
@@ -2886,7 +2884,7 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
     from s19_app.tui.screens import SaveProjectPayload
 
     seam = Seam(monkeypatch)
-    real_validate = app_module.validate_project_files
+    real_validate = app_module.deps.validate_project_files
 
     def _validate(folder, *args, **kwargs):
         # E4 integration re-pin (MERGE-12b-2): the check runs in the Save
@@ -2895,7 +2893,7 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
             return [], [], "synthetic validation error"
         return real_validate(folder, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    monkeypatch.setattr(app_module.deps, "validate_project_files", _validate)
 
     async def scenario(app, pilot, log):
         await _load_case01_image(app, pilot)
@@ -2923,8 +2921,7 @@ def test_tc_b100_51_file_load_reads_the_copy_size_before_the_worker() -> None:
     failure arm while the kickoff still owns the run; after the dispatch
     the worker owns it and the run would end twice or not at all.
     Negative control (M-82, the ``stat`` after the dispatch): RED."""
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
-    function = _class_methods(tree)["load_from_path"]
+    function = _merged_methods()["load_from_path"]
     stats = [
         node.lineno
         for node in ast.walk(function)
@@ -3012,7 +3009,7 @@ def test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app(
     def _raise(path, base_dir):
         raise exc
 
-    monkeypatch.setattr(app_module, "resolve_input_path", _raise)
+    monkeypatch.setattr(app_module.deps, "resolve_input_path", _raise)
     seam = Seam(monkeypatch)
 
     async def scenario(app, pilot, log):
@@ -3057,7 +3054,7 @@ def test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app(
     src.mkdir()
     target = src / "fw.s19"
     shutil.copyfile(CASE01 / "firmware.s19", target)
-    real = app_module.resolve_input_path
+    real = app_module.deps.resolve_input_path
     armed: list = []
 
     def _resolve(path, base_dir):
@@ -3065,7 +3062,7 @@ def test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app(
             raise PermissionError(13, "injected: access denied", str(path))
         return real(path, base_dir)
 
-    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+    monkeypatch.setattr(app_module.deps, "resolve_input_path", _resolve)
 
     async def scenario(app, pilot, log):
         await _load_case01_image(app, pilot)
@@ -3192,7 +3189,7 @@ def test_tc_b100_50_project_deferred_install_raise_ends_the_run(
     left → RED."""
     seam = Seam(monkeypatch)
     _trio_project(tmp_path / "app")
-    monkeypatch.setattr(app_module, "compose_load_announcement", _boom)
+    monkeypatch.setattr(app_module.deps, "compose_load_announcement", _boom)
     in_frame: list = []
 
     async def start(app, pilot):
@@ -3226,7 +3223,7 @@ def test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome(
     from s19_app.tui.screens import SaveProjectPayload
 
     seam = Seam(monkeypatch)
-    real_validate = app_module.validate_project_files
+    real_validate = app_module.deps.validate_project_files
     real_abort = S19TuiApp._abort_save
 
     def _validate(folder, *args, **kwargs):
@@ -3237,7 +3234,7 @@ def test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome(
     def _abort(app, *args, **kwargs):
         return [*real_abort(app, *args, **kwargs), "synthetic rollback note"]
 
-    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    monkeypatch.setattr(app_module.deps, "validate_project_files", _validate)
     monkeypatch.setattr(S19TuiApp, "_abort_save", _abort)
 
     async def scenario(app, pilot, log):
@@ -3278,7 +3275,7 @@ def test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once(
     base = tmp_path / "app"
     _trio_project(base)
     seam = Seam(monkeypatch)
-    real_place = app_module.place_into_workarea
+    real_place = app_module.deps.place_into_workarea
 
     blocked: list = []
 
@@ -3298,7 +3295,7 @@ def test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once(
         app._change_service.add_entry(f"0x{address:08X}", "", f"{(cur.mem_map[address] + 1) & 0xFF:02X}")
         app._change_service.apply(cur.mem_map, cur.ranges, cur.mac_records, None)
         await _settle(pilot, 4)
-        monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+        monkeypatch.setattr(app_module.deps, "place_into_workarea", _patches_full)
         monkeypatch.setattr(S19TuiApp, "update_project_labels", _boom)
         captured["log"] = log
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
@@ -3347,7 +3344,7 @@ def test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app(
     src.mkdir()
     target = src / "fw.s19"
     shutil.copyfile(CASE01 / "firmware.s19", target)
-    real = app_module.resolve_input_path
+    real = app_module.deps.resolve_input_path
     refused: list = []
 
     def _resolve(path, base_dir):
@@ -3356,7 +3353,7 @@ def test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app(
             raise PermissionError(13, "injected: access denied", str(path))
         return real(path, base_dir)
 
-    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+    monkeypatch.setattr(app_module.deps, "resolve_input_path", _resolve)
 
     async def scenario(app, pilot, log):
         raised = None

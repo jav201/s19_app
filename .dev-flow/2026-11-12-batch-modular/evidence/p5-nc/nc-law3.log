@@ -1,0 +1,52 @@
+7L-1 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 1.62s | mutant: 1 failed in 1.50s
+    node: test_b100_a2l_progress.py::test_tc_b100_73_one_argument_callers_outside_the_app_are_unchanged
+    E       AssertionError: ['s19_app/tui/services/flow_execution_service.py:2333']
+    E       assert ['s19_app/tui...vice.py:2333'] == []
+7L-10 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 2.76s | mutant: 1 failed in 2.90s
+    node: test_b100_reuse.py::test_tc_b100_57_export_holds_no_byte_identity_rule
+    E       AssertionError: byte-identity census drifted: unexpected {('s19_app/tui/app/navigation.py', '_nc_byte_identity')}, declared-but-missing set()
+    E       assert {('s19_app/tu...to_workarea')} == {('s19_app/tu...to_workarea')}
+7L-15 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 2.05s | mutant: 1 failed in 2.19s
+    node: test_b100_session_reset.py::test_tc_b100_08_call_site_census
+    E       AssertionError: ['tui/app/a2l_view.py', 'tui/app/project_load.py']
+    E       assert ['tui/app/a2l...ject_load.py'] == ['tui/app/project_load.py']
+7L-20 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 2.53s | mutant: 1 failed in 2.33s
+    node: test_b100_load_question.py::test_tc_b100_44_no_private_dirty_read_outside_the_panel
+    E       AssertionError: private _dirty reads outside the panel: ['color_policy.py:23']
+    E       assert ['color_policy.py:23'] == []
+7L-32 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 3.47s | mutant: 1 failed in 3.26s
+    node: test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+    E       AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/color_policy.py:23 unlink outside the pinned placement allow-list (in '_nc_unlink')"]
+    E       assert ["s19_app/tui..._nc_unlink')"] == []
+7L-33 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 5.13s | mutant: 1 failed in 4.71s
+    node: test_b103_copy_quit_dialog.py::test_r_dlg_14_101_copy_quit_has_reachable_shared_opener
+    E       AssertionError: ['_CopyQuitScreen']
+    E       assert ['_CopyQuitScreen'] == []
+7L-39 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 102 passed in 2.18s | mutant: 1 failed, 101 passed in 2.61s
+    node: test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input
+    E       AssertionError: shell.py constructs stock Input() at [587] — Ctrl+V will silently do nothing there. Use OsClipboardInput. Offending lines: ['return Input(placeholder="x")']
+    E       assert [(587, 'retur...holder="x")')] == []
+7L-43 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 1.37s | mutant: 1 failed in 1.44s
+    node: test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+    E       AssertionError: expected one palette entry for open_split_join_export, read ['Split / Join / Export', 'Split / Join / Export']
+    E       assert 2 == 1
+7L-44 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 0.74s | mutant: 1 failed in 0.77s
+    node: test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+    E       AssertionError: 1 unmarked repository paths that do not exist:
+    E       assert not ['CLAUDE.md:87: s19_app/tui/app.py']
+7L-69 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 0.79s | mutant: 1 failed in 1.06s
+    node: test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff
+    E       AssertionError: this batch must add no UNSANCTIONED App-level Binding — a shared-chrome binding drifts every screen's snapshot (C-28), so any addition must be paired with a snapshot drift-mark. Net Binding( changes:
+    E       assert not ['+1 _NC_BINDING = Binding("x", "y")']
+7L-74 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 14.65s | mutant: 1 failed in 2.27s
+    node: test_import_census.py::test_tc653_safe_text_import_census
+    E       AssertionError: safe_text must be defined only at s19_app.utils, found: {'s19_app.tui.screens_directionb.ab_diff': [1212], 's19_app.utils': [44]}
+    E       assert ['s19_app.tui...19_app.utils'] == ['s19_app.utils']
+7L-75 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 10.46s | mutant: 1 failed in 2.16s
+    node: test_render_hexview.py::test_tc651_import_census_all_consumers_read_render_hexview
+    E       AssertionError: hexview importer set drifted from the measured set: extra=['s19_app.tui.app.flow'] missing=[]
+    E       assert {'s19_app.tui...ex_view', ...} == {'s19_app.tui...screens', ...}
+7L-76 PASS GREEN-on-tree+RED-under-mutant tree_rc=0 mutant_rc=1 | tree: 1 passed in 0.72s | mutant: 1 failed in 0.79s
+    node: test_render_hexview.py::test_tc652_wrapper_absence_and_renderer_surface
+    E       AssertionError: app.py must import the range primitives from the engine
+    E       assert 's19_app.range_index' in {'__future__', 'argparse', 'bisect', 'collections', 'copy', 'dataclasses', ...}

@@ -1,0 +1,7 @@
+VERIFY base=4f721985 units_old=626 units_new=626 missing=0 duplicate=0 extra=2 body_diff=0 unlisted_rewrite=0
+VERIFY d1_sites=226/226 relimports=18 css=1 bare_d1=1 pins=12/12 reexports_missing=1 fresh_imports=32/32 cycles=0 caps_over=0 old_files=0 placement=0 header=0 css_fail=0 imports_equiv=0 names=0 tc_shape=0
+VERIFY FAIL V3: _nc16_orig (__init__.py:440): only re-exports are allowed in __init__
+VERIFY FAIL V3: parse_a2l_cached (__init__.py:443): only re-exports are allowed in __init__
+VERIFY FAIL V6: __init__.py:440: bare D1 name parse_a2l_cached
+VERIFY FAIL V11: app: re-export parse_a2l_cached (home deps) is not the home module's object
+VERIFY FAIL

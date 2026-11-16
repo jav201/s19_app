@@ -1,0 +1,32 @@
+== baseline (after3 as is)
+COMPARE before=8455 after=8493 missing=0 new=8 outcome_diff=17 flaky_excused=3
+COMPARE FAIL
+B2 tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge] passed -> failed
+rc=1
+== NC-CMP-1 (dropped tests/test_a2l_alignment_sizing.py::test_at113_multi_class_alignment_curve_length_16)
+COMPARE before=8455 after=8492 missing=1 new=8 outcome_diff=17 flaky_excused=3
+COMPARE FAIL
+B1 tests/test_a2l_alignment_sizing.py::test_at113_multi_class_alignment_curve_length_16 passed -> (absent)
+B2 tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge] passed -> failed
+rc=1
+== NC-CMP-2 (flipped tests/test_a2l_alignment_sizing.py::test_at113_multi_class_alignment_curve_length_16)
+COMPARE before=8455 after=8493 missing=0 new=8 outcome_diff=18 flaky_excused=3
+COMPARE FAIL
+B2 tests/test_a2l_alignment_sizing.py::test_at113_multi_class_alignment_curve_length_16 passed -> failed
+B2 tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge] passed -> failed
+rc=1
+== TC-62-B4 (dropped tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[__init__.py0])
+COMPARE before=8455 after=8492 missing=0 new=8 outcome_diff=17 flaky_excused=3
+COMPARE FAIL
+B2 tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date passed -> failed
+B2 tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge] passed -> failed
+B4 tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[*: after-family has 101 ids, expected 72 - 2 + 32 = 102
+rc=1
+NCMP_DONE

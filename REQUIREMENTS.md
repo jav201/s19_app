@@ -2763,6 +2763,15 @@ What each session action does, refuses on its own and reports on failure stays i
 | R-QUIT.11 | When | When the operator answers the quit question with Quit after the session action has ended, the system shall quit. |
 | R-QUIT.12 | When | When the system quits on a confirmed quit, the system shall leave no partly written project folder in the work area. |
 
+#### S6.9 · TUI package structure: the `deps` test seam (from batch-modular R-MOD.6.1, R-MOD.6.3)
+
+The TUI app `s19_app.tui.app` and the Direction B screens `s19_app.tui.screens_directionb` are packages. Each package has a `deps` module. A seam name of a package is a name that a module of the package reads as `deps.<name>`; the set is derived from the code by `tests/test_deps_seam_law.py`, never listed by hand.
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-MOD.6.1 | U | The system shall read each seam name in a package module other than `deps` and `__init__` as an attribute of the package's `deps` module. |
+| R-MOD.6.3 | U | The system shall direct every test rebinding of a seam name to the `deps` module of its package. |
+
 
 
 <a id="s7"></a>

@@ -69,6 +69,7 @@ from tests.support import b100_links
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support.b100_workers import settle_workers
+from tests.support.package_source import package_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -603,13 +604,13 @@ def test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy(
     temp = _temp(base)
     (temp / "x.s19").write_bytes(_s19())
     calls: list = []
-    real = app_module.copy_into_workarea
+    real = app_module.deps.copy_into_workarea
 
     def spy(*args, **kwargs):
         calls.append(args)
         return real(*args, **kwargs)
 
-    monkeypatch.setattr(app_module, "copy_into_workarea", spy)
+    monkeypatch.setattr(app_module.deps, "copy_into_workarea", spy)
     before = _temp_files(temp)
 
     async def scenario(app, pilot, log):
@@ -730,10 +731,9 @@ def test_tc_b100_40_path_choice_takes_the_typed_route(tmp_path: Path) -> None:
     assert project == "ab", (project, messages)
 
 
-def _load_dialog_push_sites(source: str) -> list:
+def _load_dialog_push_sites(tree: ast.Module) -> list:
     """(enclosing function, callback text) for every ``push_screen`` call
     whose first argument constructs ``LoadDialog``."""
-    tree = ast.parse(source)
     sites = []
     for function in ast.walk(tree):
         if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -753,9 +753,9 @@ def _load_dialog_push_sites(source: str) -> list:
 
 
 def test_tc_b100_40_one_router_receives_every_dialog_result() -> None:
-    """LLR-173.1e (B02, an AST census of ``app.py``): every ``push_screen``
-    whose first argument constructs ``LoadDialog`` passes
-    ``self._handle_load_dialog`` as its callback → 2 sites
+    """LLR-173.1e (B02, an AST census of the ``s19_app/tui/app/`` package):
+    every ``push_screen`` whose first argument constructs ``LoadDialog``
+    passes ``self._handle_load_dialog`` as its callback → 2 sites
     (``action_load_file``, ``action_load_project``), 0 other callbacks.
 
     Why: one router is the one seam where Inc 10 inserts the load question;
@@ -763,8 +763,8 @@ def test_tc_b100_40_one_router_receives_every_dialog_result() -> None:
     RED (base): ``action_load_project`` pushes ``LoadProjectScreen`` with
     ``_route_load_project`` → 0 ``LoadDialog`` sites. Negative control: a
     mutation giving ``action_load_project`` its own callback → RED."""
-    source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
-    sites = _load_dialog_push_sites(source)
+    tree = package_tree("app")
+    sites = _load_dialog_push_sites(tree)
     assert sorted(sites) == [
         ("action_load_file", "self._handle_load_dialog"),
         ("action_load_project", "self._handle_load_dialog"),
@@ -2053,10 +2053,10 @@ def test_tc_b100_43_a_reparse_project_json_alone_is_not_a_project(
         folder = _wa(base) / name
         folder.mkdir(parents=True)
         (folder / "project.json").write_text('{"schema_version": 1}', encoding="utf-8")
-    real = app_module._is_reparse_point
+    real = app_module.deps._is_reparse_point
     f1_manifest = os.path.normcase(str(_wa(base) / "f1" / "project.json"))
     monkeypatch.setattr(
-        app_module,
+        app_module.deps,
         "_is_reparse_point",
         lambda path: os.path.normcase(os.fspath(path)) == f1_manifest or real(path),
     )
@@ -2689,7 +2689,7 @@ def test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained(
 
     def patch():
         if arm == "walk lstat":
-            monkeypatch.setattr(app_module.os, "lstat", lstat)
+            monkeypatch.setattr(app_module.deps.os, "lstat", lstat)
         elif arm == "list_projects":
             monkeypatch.setattr(app_module.S19TuiApp, "list_projects", boom)
         else:
@@ -2873,7 +2873,7 @@ def test_tc_b100_63_resolve_error_is_refused_not_raised(
         raise exc_type("injected: stat: path too long for Windows")
 
     async def scenario(app, pilot, log):
-        monkeypatch.setattr(app_module, "resolve_input_path", boom)
+        monkeypatch.setattr(app_module.deps, "resolve_input_path", boom)
         await _open(pilot, app, "l")
         await ld.type_into_path(pilot, app, text)
         mark = len(log.messages)
@@ -3225,7 +3225,7 @@ def test_tc_b100_64_project_preview_read_error_says_so(
         def manifest(*args, **kwargs):
             raise PermissionError(13, "injected: access denied", "project.json")
 
-        monkeypatch.setattr(app_module, "read_project_manifest", manifest)
+        monkeypatch.setattr(app_module.deps, "read_project_manifest", manifest)
 
     async def scenario(app, pilot, log):
         lines = await _preview_of_project(pilot, app, "E")
@@ -3521,13 +3521,13 @@ def _reparse_names(monkeypatch: pytest.MonkeyPatch, *names: str) -> None:
     """Make ``_is_reparse_point`` report True for files called ``names``
     (a stand-in for a reparse point that ``lstat`` reports as a regular
     file, such as a cloud placeholder, which a test host cannot create)."""
-    real = app_module._is_reparse_point
+    real = app_module.deps._is_reparse_point
     folded = {name.casefold() for name in names}
 
     def fake(path) -> bool:
         return Path(path).name.casefold() in folded or real(path)
 
-    monkeypatch.setattr(app_module, "_is_reparse_point", fake)
+    monkeypatch.setattr(app_module.deps, "_is_reparse_point", fake)
 
 
 def test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused(

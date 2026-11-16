@@ -1,0 +1,14 @@
+# python -I -B hunkmap.py <repo> dc44b364 541a3d50 aba3b947 a95d0ea9 HEAD (AST only, no product import)
+# member names: S19TuiApp methods (bare) and module-level classes/functions (<module>.X); package side = every class/function in s19_app/tui/app/*.py
+# the 15 inherited mismatches are function-local relative imports that gained one dot (module moved one level deeper: '..validation' -> '...validation'), identical on both pairings
+hunks=18 rows=23 unplaced=7
+members tip=434 twin=434 pkg_modular=441 pkg_merged=441
+late delta (twin->tip app.py): ['_schedule_a2l_filter_refresh']
+port delta (a95d0ea9->merged package): ['_schedule_a2l_filter_refresh']
+equal_delta=True
+AST mismatches tip vs merged (15): ['_apply_changeset_json_edit', '_check_items_to_document', '_flow_issue', '_flow_no_project_error', '_prefill_flow_execution_sets', '_variant_set', 'on_flow_builder_panel_edit_requested', 'on_flow_builder_panel_load_requested', 'on_flow_builder_panel_run_requested', 'on_flow_builder_panel_save_requested', 'on_flow_execution_panel_external_step_confirmed', 'on_flow_execution_panel_import_requested', 'on_flow_execution_panel_load_set_requested', 'on_flow_execution_panel_run_requested', 'on_flow_execution_panel_save_requested']
+AST mismatches twin vs a95d0ea9 (15): ['_apply_changeset_json_edit', '_check_items_to_document', '_flow_issue', '_flow_no_project_error', '_prefill_flow_execution_sets', '_variant_set', 'on_flow_builder_panel_edit_requested', 'on_flow_builder_panel_load_requested', 'on_flow_builder_panel_run_requested', 'on_flow_builder_panel_save_requested', 'on_flow_execution_panel_external_step_confirmed', 'on_flow_execution_panel_import_requested', 'on_flow_execution_panel_load_set_requested', 'on_flow_execution_panel_run_requested', 'on_flow_execution_panel_save_requested']
+same_mismatch_set=True
+missing tip->merged (0): []
+missing twin->a95 (0): []
+same_missing_set=True

@@ -440,6 +440,13 @@ What each session action does, refuses on its own and reports on failure stays i
 | R-QUIT.11 | When | When the operator answers the quit question with Quit after the session action has ended, the system shall quit. | Yes; tested (`test_tc_b100_53_quit_boundaries`). |
 | R-QUIT.12 | When | When the system quits on a confirmed quit, the system shall leave no partly written project folder in the work area. | Yes; tested (`test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder`, `test_tc_b100_53_confirmed_quit_waits_for_the_end`). |
 
+#### S6.9 · TUI package structure: the `deps` test seam (from batch-modular R-MOD.6.1, R-MOD.6.3)
+
+| Id | Form | Requirement | Code today |
+|---|---|---|---|
+| R-MOD.6.1 | U | The system shall read each seam name in a package module other than `deps` and `__init__` as an attribute of the package's `deps` module. | Yes; tested (`test_product_modules_reach_seam_names_only_through_deps`, control `test_control_bare_seam_call_is_flagged`) (D6-47). |
+| R-MOD.6.3 | U | The system shall direct every test rebinding of a seam name to the `deps` module of its package. | Yes; tested (`test_tests_never_patch_seam_names_on_a_package_root`, control `test_control_patching_the_package_root_is_flagged`) (D6-47). |
+
 ---
 
 ## 5. Decisions: recommendation applied
@@ -546,14 +553,19 @@ What each session action does, refuses on its own and reports on failure stays i
 - **Not verified**: nothing was run; the held-step paint gap (D6-46) is read from the code only.
 - **Consolidation (items from S5, S11)**: CTX-BUSY "outcome" cites S5 R-TUI-012L.12 (the file load's `Loaded <name>`). Already here: the file-load label and steps (CTX-BUSY), R-BUSY-REFUSE.1, .6 (cited by S5), the focus after a cancelled load question (R-SHELL-FOCUS.4, `test_tc_b100_12_cancelled_question_rehomes_the_focus`) and after the Load-result panel closes (R-FOCUS-LOAD.1), the quit question's `Stay (n)` emphasis (CTX-BUSY; aligning the load question is S5 D5-52's prototype round). Three TC-B100-51 Save project nodes that S6 had passed uncited are now cited in R-PROGRESS-END.4 (the chapter's own line wins over `<label> failed`).
 
+**Reconciled with batch-modular (2026-11-13)**
+
+- **D6-47**: of the 42 batch-modular rows (`.dev-flow/2026-11-12-batch-modular/01-requirements.md`), only R-MOD.6.1 and R-MOD.6.3 enter the canon now (S6.9): they state structure that must stay true and a permanent law guards them (`tests/test_deps_seam_law.py`). "D1 name" of the batch record becomes "seam name", derived from the code. R-MOD.1.x (re-exports), R-MOD.5.2, 5.3 (no cycles, import direction), R-MOD.8.x (core-pinned members, base order, `@on` in core) and R-MOD.9.x enter in P3 together with their law tests: a row without a guard is not added. R-MOD.2.x, 3.x, 4.x, 6.2, 6.4, 6.5, 7.x and 10.x describe the one-shot migration tools and stay in the batch record; P3's size limits (300 lines per module, 40 per function) replace R-MOD.4.1. Operator verdict 2026-11-13.
+- **Rows added (2)**: R-MOD.6.1, R-MOD.6.3 (S6.9).
+
 ## 6. Counts
 
 | | Old S6 | Strict |
 |---|---:|---:|
-| Requirement statements | 13 rows (1 superseded) | 125 rows (78 before the batch-100 reconciliation, + 47) |
+| Requirement statements | 13 rows (1 superseded) | 127 rows (78 before the batch-100 reconciliation, + 47; + 2 batch-modular) |
 | Statements the code contradicts, that cannot be verified, or that are not product behaviour | 12 (021 items and keys, 022 bar, 033 bar and functions, 036 and 016 surface, 031 key list, 023 mixed scopes, 024 history and light theme, 065 design, 030 panel on every window, 035 no baseline, DISCOVER-001 button, 003 superseded) | 0 |
-| Rows by form: U / When / While / If / Where | — | 30 / 58 / 16 / 21 / 0 (before: 23 / 38 / 7 / 10 / 0) |
+| Rows by form: U / When / While / If / Where | — | 32 / 58 / 16 / 21 / 0 (before: 23 / 38 / 7 / 10 / 0; batch-modular + 2 U) |
 | Rows that could not be written in EARS | — | 0 |
-| Decisions | — | 39 (24 follow the code or move, 3 remove, 10 correct a defect, 2 prototype first; numbers not contiguous; before: 24) |
+| Decisions | — | 40 (D6-47 batch-modular; 24 follow the code or move, 3 remove, 10 correct a defect, 2 prototype first; numbers not contiguous; before: 24) |
 
 Checked by script (`ears_lint.py`): one `shall` per row, correct opening words per form, `If … then`, no "unless" / "only if", no repeated id.

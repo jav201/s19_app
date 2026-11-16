@@ -1,0 +1,9 @@
+TREE_REV: a95d0ea93340d26d8fe55025e9e7c21bef2d4f79
+ARGS: tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+LOAD_START: 4.93 6.33 6.19 5/673 190042
+~/work/zq-base2/base/s19_app/__init__.py
+.                                                                        [100%]
+- generated xml file: ~/work/zq-base2/out-l070-base-<iso-home>/junit.xml -
+1 passed in 10.21s
+LOAD_END: 4.79 6.25 6.17 3/664 190132
+RUN_DONE rc=0

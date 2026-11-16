@@ -300,7 +300,7 @@ def _b78_drive_compare(tmp_path: Path, size, result, *, after):
             return await after(app, pilot)
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: result)
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: result)
     try:
         return asyncio.run(_drive())
     finally:
@@ -384,7 +384,7 @@ def test_tc021_compare_routes_through_service(tmp_path: Path) -> None:
             return len(calls), range_text
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", _spy)
+    monkey.setattr(app_mod.deps, "compare_images", _spy)
     try:
         n_calls, range_text = asyncio.run(_drive())
     finally:
@@ -455,7 +455,7 @@ def test_tc023_refused_compare_surfaces_diagnostic(tmp_path: Path) -> None:
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: refused)
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: refused)
     try:
         status = asyncio.run(_drive())
     finally:
@@ -510,9 +510,9 @@ def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: fake)
-    monkey.setattr(app_mod, "generate_diff_report", _gen_md)
-    monkey.setattr(app_mod, "generate_diff_report_html", _gen_html)
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+    monkey.setattr(app_mod.deps, "generate_diff_report", _gen_md)
+    monkey.setattr(app_mod.deps, "generate_diff_report_html", _gen_html)
     try:
         status = asyncio.run(_drive())
     finally:
@@ -558,8 +558,8 @@ def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: fake)
-    monkey.setattr(app_mod, "generate_diff_report", _gen_refuse)
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+    monkey.setattr(app_mod.deps, "generate_diff_report", _gen_refuse)
     try:
         status = asyncio.run(_drive())
     finally:
@@ -1667,7 +1667,7 @@ def test_tc_b78_49_a_second_compare_rebuilds_the_list(tmp_path: Path) -> None:
             return first_entries, entries, selected, marked, walk
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: pending.pop(0))
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: pending.pop(0))
     try:
         first_entries, entries, selected, marked, walk = asyncio.run(_drive())
     finally:
@@ -2598,7 +2598,7 @@ def test_tc_b78_27_stale_high_selection_after_a_shorter_compare(tmp_path: Path) 
             return high, _b78_run_index(listing.highlighted_child), _b78_window_geometry(app)
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(app_mod, "compare_images", lambda *a, **k: injected["result"])
+    monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: injected["result"])
     try:
         high, highlighted, measured = asyncio.run(_drive())
     finally:

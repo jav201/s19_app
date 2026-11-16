@@ -206,7 +206,7 @@ def _instrument(app, monkeypatch: pytest.MonkeyPatch, *, writer_result=None, wri
     monkeypatch.setattr(App, "copy_to_clipboard", base_spy)
     monkeypatch.setattr(app, "copy_to_clipboard", override_spy)
     monkeypatch.setattr(clipboard_module, "_mirror_and_write_os_clipboard", tail_spy)
-    monkeypatch.setattr(app_module, "_mirror_and_write_os_clipboard", tail_spy, raising=False)
+    monkeypatch.setattr(app_module.deps, "_mirror_and_write_os_clipboard", tail_spy, raising=False)
     monkeypatch.setattr(capped_module, "_mirror_and_write_os_clipboard", tail_spy, raising=False)
     monkeypatch.setattr(clipboard_module, "write_os_clipboard", writer_spy)
     if original_helper is not None:
@@ -2179,7 +2179,7 @@ def _r13_diag_install(app, ledger, monkeypatch) -> dict:
         finally:
             mark("tail_end")
 
-    for module in (clipboard_module, app_module, capped_module):
+    for module in (clipboard_module, app_module.deps, capped_module):
         monkeypatch.setattr(module, "_mirror_and_write_os_clipboard", tail_mark, raising=False)
 
     inner_writer = clipboard_module.write_os_clipboard

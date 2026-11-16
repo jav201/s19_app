@@ -35,6 +35,8 @@ import s19_app
 import s19_app.render.hexview as render_hexview
 import s19_app.tui as tui
 
+from tests.support import package_source as ps
+
 PRODUCT_ROOT = Path(s19_app.__file__).resolve().parent
 TESTS_ROOT = Path(__file__).resolve().parent
 
@@ -42,11 +44,17 @@ HEXVIEW_MODULE = "s19_app.render.hexview"
 RETIRED_MODULE = "s19_app.tui.hexview"
 
 #: Declared measured consumer set (LLR-001.4; module-map §5 F-2 — authoritative).
+#: batch-modular: ``s19_app/tui/app.py`` became a package, so the app importer
+#: is its ``__init__`` plus the importing submodules; the single
+#: ``s19_app/tui/screens_directionb`` module is now the ``ab_diff`` submodule.
 MEASURED_CONSUMERS = {
     "s19_app.tui.app",
     "s19_app.tui",  # tui/__init__.py
+    "s19_app.tui.app.deps",
+    "s19_app.tui.app.file_load",
+    "s19_app.tui.app.hex_view",
     "s19_app.tui.screens",
-    "s19_app.tui.screens_directionb",
+    "s19_app.tui.screens_directionb.ab_diff",
     "s19_app.tui.services.load_service",
     "s19_app.tui.services.report_service",
     "s19_app.tui.services.diff_report_service",
@@ -290,17 +298,16 @@ def test_tc652_wrapper_absence_and_renderer_surface() -> None:
             f"tui.{name} must be the identical object from s19_app.render.hexview"
         )
 
-    # LLR-002.3: app.py sources the primitives from the engine and the
-    # renderer from render.hexview — no edge to any tui hexview address.
-    app_path = PRODUCT_ROOT / "tui" / "app.py"
-    tree = ast.parse(app_path.read_text(encoding="utf-8"), filename=str(app_path))
+    # LLR-002.3: the app package sources the primitives from the engine and
+    # the renderer from render.hexview — no edge to any tui hexview address.
     edges: Set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom):
-            edges.add(_resolve_import_from(node, "s19_app.tui"))
-        elif isinstance(node, ast.Import):
-            for alias in node.names:
-                edges.add(alias.name)
+    for _path, mod in ps.package_modules("app"):
+        for node in ast.walk(mod):
+            if isinstance(node, ast.ImportFrom):
+                edges.add(_resolve_import_from(node, "s19_app.tui.app"))
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    edges.add(alias.name)
     assert "s19_app.range_index" in edges, (
         "app.py must import the range primitives from the engine"
     )

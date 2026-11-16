@@ -249,14 +249,14 @@ def test_tc_b100_31_save_as_copies_the_top_level_files_but_not_the_backups(
     project_dir = projects.build_save_as_project(base, sub_files={}, top_files=top)
     source_a = project_dir / "a.json"
     calls: list = []
-    original = app_module.place_into_workarea
+    original = app_module.deps.place_into_workarea
 
     def _spy(source, *args, **kwargs):
         if os.path.normcase(str(source)) == os.path.normcase(str(source_a)):
             calls.append(source)
         return original(source, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "place_into_workarea", _spy)
+    monkeypatch.setattr(app_module.deps, "place_into_workarea", _spy)
 
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
@@ -628,13 +628,13 @@ def test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments(
     for name, payload in payloads.items():
         (common / name).write_bytes(payload)
     names_seen: list = []
-    original = app_module.gather_project_artifacts
+    original = app_module.deps.gather_project_artifacts
 
     def _spy(*args, **kwargs):
         names_seen.append(tuple(kwargs.get("composition_names", args[1] if len(args) > 1 else ())))
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(app_module, "gather_project_artifacts", _spy)
+    monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _spy)
 
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
@@ -838,7 +838,7 @@ def test_tc_b100_31_failed_copy_rolls_back_in_user_terms(
     base = tmp_path / "app"
     project_dir = projects.build_save_as_project(base)
     before = projects.tree_digests(project_dir)
-    original = app_module.place_into_workarea
+    original = app_module.deps.place_into_workarea
     seen: list = []
 
     def _failing(source, *args, **kwargs):
@@ -849,7 +849,7 @@ def test_tc_b100_31_failed_copy_rolls_back_in_user_terms(
                 raise PermissionError(13, "[WinError 5] Access is denied", str(source_path))
         return original(source, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "place_into_workarea", _failing)
+    monkeypatch.setattr(app_module.deps, "place_into_workarea", _failing)
 
     messages, current = _save_as_from_p(base)
 
@@ -1143,9 +1143,9 @@ def test_tc_b100_32_a2l_admission_refuses_any_reparse_point(
     a2l = project_dir / "firmware.a2l"
     shutil.copyfile(projects.CASE01_DIR / "firmware.a2l", a2l)
     if kind == "reparse point":
-        real = app_module._is_reparse_point
+        real = app_module.deps._is_reparse_point
         monkeypatch.setattr(
-            app_module,
+            app_module.deps,
             "_is_reparse_point",
             lambda path: Path(path).name == "firmware.a2l" or real(path),
         )
@@ -1750,9 +1750,9 @@ def test_e4_r2_r11_call_order_of_a_save_as(tmp_path: Path, monkeypatch: pytest.M
     # Inc 12b re-pin (E3 S12b-05, P1-82): ``_write_editor_document`` is
     # retired; the Save worker's document row calls the unchanged
     # ``write_change_document`` through the app module's name.
-    original_write = app_module.write_change_document
-    original_gather = app_module.gather_project_artifacts
-    original_manifest = app_module.write_project_manifest
+    original_write = app_module.deps.write_change_document
+    original_gather = app_module.deps.gather_project_artifacts
+    original_manifest = app_module.deps.write_project_manifest
 
     def _copy(self, source_dir, project_dir, copies, *args, **kwargs):
         part = "top" if all("/" not in c.relative for c in copies) else "sub"
@@ -1772,9 +1772,9 @@ def test_e4_r2_r11_call_order_of_a_save_as(tmp_path: Path, monkeypatch: pytest.M
         return original_manifest(*args, **kwargs)
 
     monkeypatch.setattr(cls, "_copy_project_subfolders", _copy)
-    monkeypatch.setattr(app_module, "write_change_document", _write)
-    monkeypatch.setattr(app_module, "gather_project_artifacts", _gather)
-    monkeypatch.setattr(app_module, "write_project_manifest", _manifest)
+    monkeypatch.setattr(app_module.deps, "write_change_document", _write)
+    monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _gather)
+    monkeypatch.setattr(app_module.deps, "write_project_manifest", _manifest)
 
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
@@ -1962,14 +1962,14 @@ def test_e4_llr_171_5_unrecorded_gathered_rows_are_named(
     projects.save_case01_project(base, "P", files=("firmware.s19",))
     stems = ["con", "prn", "aux", "nul"] + [f"com{i}" for i in range(1, 9)]
     rows = tuple(f"patches/{stem}.json" for stem in stems[:count])
-    original = app_module.gather_project_artifacts
+    original = app_module.deps.gather_project_artifacts
 
     def _gather(*args, **kwargs):
         outcome = original(*args, **kwargs)
         outcome.unrecorded = rows
         return outcome
 
-    monkeypatch.setattr(app_module, "gather_project_artifacts", _gather)
+    monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _gather)
 
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
@@ -2019,8 +2019,8 @@ def test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed(
     # is retired; the project worker reads the A2L through the module-level
     # ``parse_a2l_cached``, so the cache spy sits there (a spy on a name no
     # code calls would pass vacuously).
-    original_cache = app_module.parse_a2l_cached
-    original_parse = app_module.parse_a2l_file
+    original_cache = app_module.deps.parse_a2l_cached
+    original_parse = app_module.deps.parse_a2l_file
 
     def _cache(path, *args, **kwargs):
         if path is not None and Path(path).name == "firmware.a2l":
@@ -2032,8 +2032,8 @@ def test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed(
             parsed.append(("parse", str(path)))
         return original_parse(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "parse_a2l_cached", _cache)
-    monkeypatch.setattr(app_module, "parse_a2l_file", _parse)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_cached", _cache)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse)
 
     async def _scenario(app, pilot, log):
         parsed.clear()
@@ -2386,14 +2386,14 @@ def test_tc_b100_31_unrecorded_name_reason_is_not_too_long(
     exists)."""
     base = tmp_path / "app"
     projects.save_case01_project(base, "P", files=("firmware.s19",))
-    original = app_module.gather_project_artifacts
+    original = app_module.deps.gather_project_artifacts
 
     def _gather(*args, **kwargs):
         outcome = original(*args, **kwargs)
         outcome.unrecorded = ("templates/trailing .json",)
         return outcome
 
-    monkeypatch.setattr(app_module, "gather_project_artifacts", _gather)
+    monkeypatch.setattr(app_module.deps, "gather_project_artifacts", _gather)
 
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
@@ -2504,7 +2504,7 @@ def test_tc_b100_62_folder_check_permission_error_has_its_own_text(
         if side == "save target":
             await projects.load_image(pilot, app, projects.CASE01_DIR / "firmware.s19")
         mark = len(log.messages)
-        monkeypatch.setattr(app_module.os, "lstat", _lstat)
+        monkeypatch.setattr(app_module.deps.os, "lstat", _lstat)
         try:
             if side == "load":
                 app._handle_load_project("P")
@@ -2513,7 +2513,7 @@ def test_tc_b100_62_folder_check_permission_error_has_its_own_text(
                     SaveProjectPayload(parent_folder=str(app.workarea), project_name="P")
                 )
         finally:
-            monkeypatch.setattr(app_module.os, "lstat", original)
+            monkeypatch.setattr(app_module.deps.os, "lstat", original)
         for _ in range(6):
             await pilot.pause()
         return log.since(mark), app.current_project
@@ -2542,7 +2542,7 @@ def _rollback_swap_scenario(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, swa
     for n in names:
         (other / n).write_bytes(b"R_USER_FILE")
     before = projects.tree_digests(other)
-    original = app_module.place_into_workarea
+    original = app_module.deps.place_into_workarea
     state: dict = {}
 
     def _swap(source, destination, *args, **kwargs):
@@ -2564,7 +2564,7 @@ def _rollback_swap_scenario(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, swa
             raise PermissionError(13, "injected failure after the swap")
         return placed
 
-    monkeypatch.setattr(app_module, "place_into_workarea", _swap)
+    monkeypatch.setattr(app_module.deps, "place_into_workarea", _swap)
     try:
         messages, _current = _save_as_from_p(base)
     finally:

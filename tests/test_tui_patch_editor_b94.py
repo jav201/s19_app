@@ -531,12 +531,11 @@ def test_at_b94_08_variant_machinery_retired(tmp_path: Path) -> None:
             rows_after = app.query_one(
                 "#patch_doc_entries_table", DataTable
             ).row_count
-            source = Path(panel.__module__ and __import__(
-                "s19_app.tui.screens_directionb"
-            ).__file__).read_text(encoding="utf-8")
             import ast as _ast
 
-            tree = _ast.parse(source)
+            from tests.support import package_source as ps
+
+            tree = ps.package_tree("screens_directionb")
             patch_variant_ids = [
                 node.value
                 for node in _ast.walk(tree)
@@ -549,7 +548,7 @@ def test_at_b94_08_variant_machinery_retired(tmp_path: Path) -> None:
     variant_widgets, before, after, ids = asyncio.run(_drive())
     assert variant_widgets == [], f"0 variant widgets, got {variant_widgets}"
     assert before == after == 0, "the stale message is a no-op"
-    assert ids == [], f"0 patch_variant ids in the module source, got {ids}"
+    assert ids == [], f"0 patch_variant ids in the package source, got {ids}"
 
 
 # ---------------------------------------------------------------------------

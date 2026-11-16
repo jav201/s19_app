@@ -1,0 +1,5 @@
+NC-CMP-3 mutant: `return` atop ShellMixin.set_status on 5b67c844 (branch nc-cmp-3 = 4d12cdd9), full suite -n 8 on the laptop (before ran on rtx).
+COMPARE FAIL outcome_diff=274; passed->failed vs before: 238; of those, passed in after3 (rtx, unmutated tree): 233 -> host/timing cannot explain them; 50 ids name status/log/announce/busy/notice/message, e.g.
+  tests/test_b100_busy.py::test_tc_b100_50_end_writes_the_outcome_to_the_status_log
+  tests/test_b100_announce.py::test_tc_b100_56_one_summary_line_and_the_final_status_text
+Suite: 309 failed, 7866 passed, 314 skipped, 4 xfailed in 8456.50s (2:20:56)

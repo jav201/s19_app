@@ -1,0 +1,21 @@
+1	base	load=3.15 3.42 5.81	rc=0	57.0%  0.430 s / 1.000 s cap painted ;80.8%  0.192 s / 1.000 s cap load ;	
+1	after	load=3.06 3.40 5.79	rc=0	56.4%  0.436 s / 1.000 s cap painted ;77.6%  0.224 s / 1.000 s cap load ;	
+2	base	load=3.05 3.39 5.78	rc=0	56.9%  0.431 s / 1.000 s cap painted ;77.8%  0.222 s / 1.000 s cap load ;	
+2	after	load=3.13 3.40 5.77	rc=0	56.2%  0.438 s / 1.000 s cap painted ;79.9%  0.201 s / 1.000 s cap load ;	
+3	base	load=3.12 3.39 5.75	rc=1	            "TC-B100-61 cap load", timing[0], timing_bound(1.0);            "TC-B100-61 cap painted", painted, timing_bound(1.0);55.8%  0.442 s / 1.000 s cap painted ;77.4%  0.226 s / 1.000 s cap load ;	E       AssertionError: [] E       assert ([]) 
+3	after	load=3.19 3.41 5.74	rc=0	58.2%  0.418 s / 1.000 s cap painted ;79.1%  0.209 s / 1.000 s cap load ;	
+4	base	load=3.26 3.42 5.73	rc=0	56.0%  0.440 s / 1.000 s cap painted ;70.2%  0.298 s / 1.000 s cap load ;	
+4	after	load=3.29 3.42 5.71	rc=0	55.1%  0.449 s / 1.000 s cap painted ;70.7%  0.293 s / 1.000 s cap load ;	
+5	base	load=3.35 3.43 5.70	rc=0	57.6%  0.424 s / 1.000 s cap painted ;80.4%  0.196 s / 1.000 s cap load ;	
+5	after	load=3.32 3.42 5.68	rc=0	57.3%  0.427 s / 1.000 s cap painted ;77.7%  0.223 s / 1.000 s cap load ;	
+6	base	load=3.37 3.43 5.67	rc=0	57.1%  0.429 s / 1.000 s cap painted ;79.2%  0.208 s / 1.000 s cap load ;	
+6	after	load=3.34 3.42 5.66	rc=0	56.4%  0.436 s / 1.000 s cap painted ;80.2%  0.198 s / 1.000 s cap load ;	
+7	base	load=3.24 3.40 5.64	rc=0	55.7%  0.443 s / 1.000 s cap painted ;79.1%  0.209 s / 1.000 s cap load ;	
+7	after	load=3.30 3.41 5.63	rc=0	57.6%  0.424 s / 1.000 s cap painted ;78.1%  0.219 s / 1.000 s cap load ;	
+8	base	load=3.35 3.42 5.62	rc=0	55.1%  0.449 s / 1.000 s cap painted ;80.3%  0.197 s / 1.000 s cap load ;	
+8	after	load=3.41 3.43 5.61	rc=0	56.0%  0.440 s / 1.000 s cap painted ;69.6%  0.304 s / 1.000 s cap load ;	
+9	base	load=3.37 3.42 5.60	rc=0	55.3%  0.447 s / 1.000 s cap painted ;78.9%  0.211 s / 1.000 s cap load ;	
+9	after	load=3.42 3.43 5.59	rc=0	55.4%  0.446 s / 1.000 s cap painted ;74.9%  0.251 s / 1.000 s cap load ;	
+10	base	load=3.47 3.44 5.58	rc=1	            "TC-B100-61 cap load", timing[0], timing_bound(1.0);            "TC-B100-61 cap painted", painted, timing_bound(1.0);48.5%  0.515 s / 1.000 s cap painted ;75.6%  0.244 s / 1.000 s cap load ;	E       AssertionError: [] E       assert ([]) 
+10	after	load=3.48 3.44 5.56	rc=1	            "TC-B100-61 cap load", timing[0], timing_bound(1.0);            "TC-B100-61 cap painted", painted, timing_bound(1.0);56.3%  0.437 s / 1.000 s cap painted ;77.7%  0.223 s / 1.000 s cap load ;	E       AssertionError: [] E       assert ([]) 
+REP_DONE

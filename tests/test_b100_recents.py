@@ -65,6 +65,7 @@ from tests.support import b100_links
 from tests.support import b100_projects as projects
 from tests.support.b100_projects import LOAD_RESULT_CLOSE
 from tests.support.b100_workers import settle_workers
+from tests.support import package_source as ps
 
 AT_SIZES = [(118, 54), (220, 60)]
 WIN = sys.platform == "win32"
@@ -2589,7 +2590,7 @@ def test_tc_b100_38_project_list_leaves_a_trailing_dot_name_out_off_windows(
         async def _scenario(app, pilot, log):
             native = app.list_projects()
             with monkeypatch.context() as patch:
-                patch.setattr(app_module, "os", _OsAsPosix())
+                patch.setattr(app_module.deps, "os", _OsAsPosix())
                 off_windows = app.list_projects()
             return native, off_windows
 
@@ -2692,7 +2693,7 @@ def test_tc_b100_38_unreadable_folder_paints_could_not_be_read(
         mark = len(log.messages)
         with monkeypatch.context() as patch:
             if arm == "route: walk lstat":
-                patch.setattr(app_module.os, "lstat", _lstat)
+                patch.setattr(app_module.deps.os, "lstat", _lstat)
             elif arm == "route: _list_project_files":
                 patch.setattr(app_module.S19TuiApp, "_list_project_files", _raise_permission)
             else:
@@ -3232,20 +3233,16 @@ def test_tc_b100_37_widened_census_and_one_enumeration_at_dialog_open(
 # LLR-172.6c. Oracles: inc-12a codewire/proto-12a-sweep.md (B12-NN).
 # ===========================================================================
 
-_APP_SOURCE = Path(app_module.__file__)
 NOT_REGULAR = "File NOT loaded: '{name}' is not a regular file — pick another file."
 TOO_LARGE_LINE = "File NOT loaded: '{name}' is too large to open — load a smaller file."
 
 
 def _sweep_methods() -> dict:
-    tree = ast.parse(_APP_SOURCE.read_text(encoding="utf-8"))
-    for node in tree.body:
-        if isinstance(node, ast.ClassDef) and node.name == "S19TuiApp":
-            return {
-                item.name: item for item in node.body
-                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
-            }
-    raise AssertionError("S19TuiApp not found")
+    cls = ps.merged_class("S19TuiApp")
+    return {
+        item.name: item for item in cls.body
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
 
 
 def _calls_named(node, name: str) -> int:
@@ -3306,7 +3303,7 @@ def test_tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform(
         async def _scenario(app, pilot, log):
             native = app.list_projects()
             with monkeypatch.context() as patch:
-                patch.setattr(app_module, "os", _OsAsPosix())
+                patch.setattr(app_module.deps, "os", _OsAsPosix())
                 posix = app.list_projects()
             return native, posix
 
@@ -3367,10 +3364,11 @@ def test_tc_b100_37_files_list_shows_loadable_suffixes_only(
 
 
 def test_tc_b100_37_files_list_shows_loadable_suffixes_only_through_one_predicate() -> None:
-    """LLR-172.4f (B12-13, interfaces S-h): an AST read of ``app.py`` finds
-    a ``recent_kind(...)`` call in ``refresh_files`` and in
-    ``_load_dialog_rows`` (2 of 2), and ``refresh_files`` compares nothing
-    against a literal collection (no second suffix set).
+    """LLR-172.4f (B12-13, interfaces S-h): an AST read of the
+    ``s19_app/tui/app/`` package finds a ``recent_kind(...)`` call in
+    ``refresh_files`` and in ``_load_dialog_rows`` (2 of 2), and
+    ``refresh_files`` compares nothing against a literal collection (no
+    second suffix set).
 
     Why: two suffix rules drift; the row count alone passes a mutant that
     copies the suffix set into ``refresh_files``.
@@ -3495,9 +3493,10 @@ def test_tc_b100_38_nul_in_typed_path_is_refused(
 
 
 def test_tc_b100_38_one_project_match() -> None:
-    """LLR-172.5j (B12-20): exactly one function in ``app.py`` compares a
-    name against the project list — every method that calls both
-    ``list_projects`` and ``os.path.normcase`` is ``_listed_project_name``.
+    """LLR-172.5j (B12-20): exactly one function in the ``s19_app/tui/app/``
+    package compares a name against the project list — every method that
+    calls both ``list_projects`` and ``os.path.normcase`` is
+    ``_listed_project_name``.
 
     Why: two copies of the match drift (CR9-7).
     RED (base, P12a-4): ``_handle_load_project`` and ``_typed_load_route``."""
@@ -3635,7 +3634,7 @@ def test_tc_b100_38_one_wording_table() -> None:
     """LLR-172.5k, A12a-01, ruling Q-7 (B12-37): in ``_handle_load_project``,
     ``_load_path_from_user_input`` and ``_typed_load_route``, 0 literal
     texts hold ``Project NOT loaded`` together with ``not a project`` or
-    ``could not be read``; the module defines each of the two token pairs
+    ``could not be read``; the package defines each of the two token pairs
     once; and the two painting functions read both pairs from
     ``_TYPED_REFUSAL_TOKENS``. No exact site count is asserted (A12a-01).
 
@@ -3648,7 +3647,7 @@ def test_tc_b100_38_one_wording_table() -> None:
             if "Project NOT loaded" in text and ("not a project" in text or "could not be read" in text):
                 literal.append((name, text))
     assert literal == [], literal
-    tree = ast.parse(_APP_SOURCE.read_text(encoding="utf-8"))
+    tree = ps.package_tree("app")
     pairs = {
         ("not a project", "pick a project in the list"): 0,
         ("could not be read", "check that the folder can be opened, then load again"): 0,
@@ -3850,7 +3849,7 @@ def test_tc_b100_39_pick_rechecks_the_entry_and_fails_closed(
             app._load_from_item(rows[0])
         else:
             with monkeypatch.context() as patch:
-                patch.setattr(app_module.os, "lstat", _lstat)
+                patch.setattr(app_module.deps.os, "lstat", _lstat)
                 try:
                     app._load_from_item(rows[0])
                 except Exception as exc:  # noqa: BLE001 — the threshold counts raises
@@ -4006,7 +4005,7 @@ def test_tc_b100_39_pick_survives_an_error_at_the_first_look(
         rows = list(app.query_one("#files_list", ListView).children)
         mark = len(log.messages)
         with monkeypatch.context() as patch:
-            patch.setattr(app_module.os, "lstat", _lstat)
+            patch.setattr(app_module.deps.os, "lstat", _lstat)
             app._load_from_item(rows[0])
             for _ in range(40):
                 if app.current_file is not None:
@@ -4042,14 +4041,14 @@ def test_tc_b100_39_pick_of_a_reparse_point_file_is_refused(
     (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
     parses = _parse_spy(monkeypatch)
     key = os.path.normcase(str(temp / "x.s19"))
-    real_reparse = app_module._is_reparse_point
+    real_reparse = app_module.deps._is_reparse_point
 
     def _reparse(path, *args, **kwargs):
         if os.path.normcase(os.fspath(path)) == key:
             return True
         return real_reparse(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "_is_reparse_point", _reparse)
+    monkeypatch.setattr(app_module.deps, "_is_reparse_point", _reparse)
 
     async def _scenario(app, pilot, log):
         app.refresh_files()

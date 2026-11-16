@@ -92,7 +92,7 @@ def test_tc1801_identical_paths_are_refused(tmp_path: Path, monkeypatch: pytest.
         calls.append(1)
         raise AssertionError("compare_images must not run when both sides are the same file")
 
-    monkeypatch.setattr(app_mod, "compare_images", _spy)
+    monkeypatch.setattr(app_mod.deps, "compare_images", _spy)
 
     async def _drive() -> tuple[bool, bool, str]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -140,7 +140,7 @@ def test_tc1801_same_file_different_spelling_is_refused(
 
     calls: list[int] = []
     monkeypatch.setattr(
-        app_mod, "compare_images", lambda *a, **k: calls.append(1)
+        app_mod.deps, "compare_images", lambda *a, **k: calls.append(1)
     )
 
     async def _drive() -> tuple[bool, str]:

@@ -41,6 +41,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
 
 from tests.support import b100_projects as projects
+from tests.support import package_source
 from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -198,9 +199,9 @@ def test_tc_b100_73_a_failed_read_reports_no_final_total(tmp_path: Path, monkeyp
 
 def test_tc_b100_73_one_argument_callers_outside_the_app_are_unchanged() -> None:
     """LLR-176.4 (D12b-08), interfaces S-f: every ``parse_a2l_file(`` call
-    in ``s19_app/`` outside ``app.py`` passes exactly 1 positional argument
-    and no keyword, and the entry point's second parameter defaults to
-    ``None`` (an optional callback).
+    in ``s19_app/`` outside the ``s19_app/tui/app/`` package passes exactly
+    1 positional argument and no keyword, and the entry point's second
+    parameter defaults to ``None`` (an optional callback).
 
     Why: four services call it with one argument; a required second
     parameter would break them. Negative control: a signature
@@ -210,9 +211,11 @@ def test_tc_b100_73_one_argument_callers_outside_the_app_are_unchanged() -> None
 
     params = list(inspect.signature(a2l_module.parse_a2l_file).parameters.values())
     assert len(params) >= 2 and params[1].name == "progress" and params[1].default is None, params
+    app_dir = package_source.tui_dir() / "app"
+    assert app_dir.is_dir(), f"the app package is missing: {app_dir}"
     bad = []
     for source in (ROOT / "s19_app").rglob("*.py"):
-        if source.name == "app.py" or source.name == "a2l.py":
+        if source.name == "a2l.py" or source.is_relative_to(app_dir):
             continue
         tree = ast.parse(source.read_text(encoding="utf-8"))
         for node in ast.walk(tree):

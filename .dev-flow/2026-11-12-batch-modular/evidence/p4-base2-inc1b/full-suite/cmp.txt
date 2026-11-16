@@ -1,0 +1,22 @@
+COMPARE before=8512 after=8521 missing=0 new=9 outcome_diff=11 flaky_excused=0
+COMPARE FAIL
+B1 tests/test_b103_a2l_filter_teardown.py::test_r_copy_26_1_filter_refresh_due_after_teardown_is_dropped (absent) -> passed
+B1 tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[key] (absent) -> skipped
+B1 tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[right] (absent) -> skipped
+B1 tests/test_b103_clipboard_tail.py::test_r_paste_14_c1_no_write_control_full_app[row] (absent) -> skipped
+B1 tests/test_b103_clipboard_tail.py::test_r_paste_14_c2_sleep_poll_control_full_app (absent) -> skipped
+B1 tests/test_b103_winci_gate.py::test_artifact_scanner_allows_only_the_hosted_runner_account (absent) -> passed
+B1 tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_credentials_and_personal_paths[forward-slash-windows-path] (absent) -> passed
+B1 tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_credentials_and_personal_paths[runner-prefix-account-forward-slash] (absent) -> passed
+B1 tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_credentials_and_personal_paths[runner-prefix-account] (absent) -> passed
+B2 tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest passed -> failed
+B2 tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0] failed -> passed
+B2 tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1] failed -> passed
+B2 tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap] passed -> failed
+B2 tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded passed -> failed
+B2 tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies failed -> passed
+B2 tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags passed -> failed
+B2 tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time passed -> failed
+B2 tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi] passed -> failed
+B2 tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single] failed -> passed
+B2 tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6 passed -> failed

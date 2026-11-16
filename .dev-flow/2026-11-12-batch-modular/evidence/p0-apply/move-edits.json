@@ -1,0 +1,1689 @@
+{
+ "s19_app/tui/app/a2l_view.py": [
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 21609,
+   "unit": "s19_app.tui.app:S19TuiApp.update_a2l_tags_view"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 21845,
+   "unit": "s19_app.tui.app:S19TuiApp._repaint_a2l_tag_cells"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 22141,
+   "unit": "s19_app.tui.app:S19TuiApp._update_a2l_filter_menu"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22141,
+   "unit": "s19_app.tui.app:S19TuiApp._update_a2l_filter_menu"
+  }
+ ],
+ "s19_app/tui/app/checks_diff.py": [
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 8092,
+   "unit": "s19_app.tui.app:S19TuiApp._check_items_to_document"
+  },
+  {
+   "after": "deps.write_change_document",
+   "before": "write_change_document",
+   "kind": "d1",
+   "line": 8176,
+   "unit": "s19_app.tui.app:S19TuiApp.on_check_editor_panel_action_requested"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 8390,
+   "unit": "s19_app.tui.app:S19TuiApp._diff_sources_identical"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 8391,
+   "unit": "s19_app.tui.app:S19TuiApp._diff_sources_identical"
+  },
+  {
+   "after": "deps.compare_images",
+   "before": "compare_images",
+   "kind": "d1",
+   "line": 8469,
+   "unit": "s19_app.tui.app:S19TuiApp._apply_compare_request"
+  },
+  {
+   "after": "deps.IntelHexFile",
+   "before": "IntelHexFile",
+   "kind": "d1",
+   "line": 8556,
+   "unit": "s19_app.tui.app:S19TuiApp._diff_load_maps"
+  }
+ ],
+ "s19_app/tui/app/compose_screens.py": [
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3845,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_workspace"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3847,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_workspace"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3853,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_workspace"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3869,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_workspace"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3871,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_workspace"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3973,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_issues"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3977,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_issues"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 7264,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_diff"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 8877,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_a2l"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 8904,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_a2l"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 8916,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_a2l"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 8982,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_mac"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 8996,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_mac"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 9003,
+   "unit": "s19_app.tui.app:S19TuiApp._compose_screen_mac"
+  }
+ ],
+ "s19_app/tui/app/core.py": [
+  {
+   "after": "\"../styles.tcss\"",
+   "before": "\"styles.tcss\"",
+   "kind": "css",
+   "line": 3007,
+   "unit": "s19_app.tui.app:S19TuiApp.CSS_PATH"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3770,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3773,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3786,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3787,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3788,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 3789,
+   "unit": "s19_app.tui.app:S19TuiApp.compose"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4822,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_external_step_confirmed"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4827,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_external_step_confirmed"
+  },
+  {
+   "after": "deps._mirror_and_write_os_clipboard",
+   "before": "_mirror_and_write_os_clipboard",
+   "kind": "d1",
+   "line": 23200,
+   "unit": "s19_app.tui.app:S19TuiApp.copy_to_clipboard"
+  }
+ ],
+ "s19_app/tui/app/file_load.py": [
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 9163,
+   "unit": "s19_app.tui.app:S19TuiApp.refresh_files"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 9163,
+   "unit": "s19_app.tui.app:S19TuiApp.refresh_files"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 16443,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16452,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16461,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16462,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16463,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16464,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16465,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16471,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16471,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16481,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16491,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16493,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 16498,
+   "unit": "s19_app.tui.app:S19TuiApp._typed_load_route"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 16603,
+   "unit": "s19_app.tui.app:S19TuiApp._load_path_from_user_input"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 16733,
+   "unit": "s19_app.tui.app:S19TuiApp.load_from_path"
+  },
+  {
+   "after": "deps.copy_into_workarea",
+   "before": "copy_into_workarea",
+   "kind": "d1",
+   "line": 16753,
+   "unit": "s19_app.tui.app:S19TuiApp.load_from_path"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 16842,
+   "unit": "s19_app.tui.app:S19TuiApp.load_a2l_from_path"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 16857,
+   "unit": "s19_app.tui.app:S19TuiApp.load_a2l_from_path"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16946,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16947,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16948,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16948,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 16952,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16970,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16971,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16972,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 16972,
+   "unit": "s19_app.tui.app:S19TuiApp._confirm_project_a2l_replacement"
+  },
+  {
+   "after": "deps.copy_into_workarea",
+   "before": "copy_into_workarea",
+   "kind": "d1",
+   "line": 17075,
+   "unit": "s19_app.tui.app:S19TuiApp._a2l_attach_worker"
+  },
+  {
+   "after": "deps.parse_a2l_cached",
+   "before": "parse_a2l_cached",
+   "kind": "d1",
+   "line": 17087,
+   "unit": "s19_app.tui.app:S19TuiApp._a2l_attach_worker"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 17388,
+   "unit": "s19_app.tui.app:S19TuiApp._load_workarea_file"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 17401,
+   "unit": "s19_app.tui.app:S19TuiApp._load_workarea_file"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 17409,
+   "unit": "s19_app.tui.app:S19TuiApp._load_workarea_file"
+  },
+  {
+   "after": "deps.parse_a2l_cached",
+   "before": "parse_a2l_cached",
+   "kind": "d1",
+   "line": 19205,
+   "unit": "s19_app.tui.app:S19TuiApp._parse_loaded_file"
+  }
+ ],
+ "s19_app/tui/app/flow.py": [
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4303,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_builder_panel_run_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4304,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_builder_panel_run_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4330,
+   "unit": "s19_app.tui.app:S19TuiApp._flow_no_project_error"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4357,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_builder_panel_save_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4402,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_builder_panel_load_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4457,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_builder_panel_edit_requested"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 4529,
+   "unit": "s19_app.tui.app:S19TuiApp._flow_project_file_names"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 4532,
+   "unit": "s19_app.tui.app:S19TuiApp._flow_project_file_names"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4669,
+   "unit": "s19_app.tui.app:S19TuiApp._prefill_flow_execution_sets"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4696,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_import_requested"
+  },
+  {
+   "after": "...",
+   "before": "..",
+   "kind": "relimport",
+   "line": 4725,
+   "unit": "s19_app.tui.app:S19TuiApp._flow_issue"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4756,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_run_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4757,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_run_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4914,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_save_requested"
+  },
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 4972,
+   "unit": "s19_app.tui.app:S19TuiApp.on_flow_execution_panel_load_set_requested"
+  }
+ ],
+ "s19_app/tui/app/hex_view.py": [
+  {
+   "after": "deps.render_hex_view_text",
+   "before": "render_hex_view_text",
+   "kind": "d1",
+   "line": 20824,
+   "unit": "s19_app.tui.app:S19TuiApp.update_hex_view"
+  },
+  {
+   "after": "deps.render_hex_view_text",
+   "before": "render_hex_view_text",
+   "kind": "d1",
+   "line": 20942,
+   "unit": "s19_app.tui.app:S19TuiApp.update_alt_hex_view"
+  },
+  {
+   "after": "deps.find_string_in_mem",
+   "before": "find_string_in_mem",
+   "kind": "d1",
+   "line": 22609,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_search"
+  },
+  {
+   "after": "deps.find_string_in_mem",
+   "before": "find_string_in_mem",
+   "kind": "d1",
+   "line": 22707,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_search_alt"
+  }
+ ],
+ "s19_app/tui/app/issues_checks.py": [
+  {
+   "after": "deps.render_hex_view_text",
+   "before": "render_hex_view_text",
+   "kind": "d1",
+   "line": 17745,
+   "unit": "s19_app.tui.app:S19TuiApp._update_issues_hex_pane"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 17918,
+   "unit": "s19_app.tui.app:S19TuiApp.update_validation_issues_view"
+  },
+  {
+   "after": "deps.render_hex_view_text",
+   "before": "render_hex_view_text",
+   "kind": "d1",
+   "line": 18146,
+   "unit": "s19_app.tui.app:S19TuiApp._update_checks_hex_pane"
+  }
+ ],
+ "s19_app/tui/app/mac_view.py": [
+  {
+   "after": "deps.render_hex_view_text",
+   "before": "render_hex_view_text",
+   "kind": "d1",
+   "line": 20996,
+   "unit": "s19_app.tui.app:S19TuiApp.update_mac_hex_view"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 21049,
+   "unit": "s19_app.tui.app:S19TuiApp.update_mac_view"
+  },
+  {
+   "after": "deps.find_string_in_mem",
+   "before": "find_string_in_mem",
+   "kind": "d1",
+   "line": 22758,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_search_mac"
+  }
+ ],
+ "s19_app/tui/app/navigation.py": [
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 22099,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22099,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 22100,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22100,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 22110,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22110,
+   "unit": "s19_app.tui.app:S19TuiApp._update_settings_menu"
+  }
+ ],
+ "s19_app/tui/app/patch.py": [
+  {
+   "after": "..",
+   "before": ".",
+   "kind": "relimport",
+   "line": 5911,
+   "unit": "s19_app.tui.app:S19TuiApp._apply_changeset_json_edit"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 6498,
+   "unit": "s19_app.tui.app:S19TuiApp._trigger_execute_scope"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 19441,
+   "unit": "s19_app.tui.app:S19TuiApp._refresh_a2l_values_after_write"
+  }
+ ],
+ "s19_app/tui/app/project_load.py": [
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 9736,
+   "unit": "s19_app.tui.app:S19TuiApp._load_dialog_preview"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 9743,
+   "unit": "s19_app.tui.app:S19TuiApp._load_dialog_preview"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 9752,
+   "unit": "s19_app.tui.app:S19TuiApp._load_dialog_preview"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14989,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_load_project"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15012,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_load_project"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15026,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_load_project"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 15082,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_load"
+  },
+  {
+   "after": "deps.parse_a2l_cached",
+   "before": "parse_a2l_cached",
+   "kind": "d1",
+   "line": 15101,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_load"
+  },
+  {
+   "after": "deps.recorded_document_state",
+   "before": "recorded_document_state",
+   "kind": "d1",
+   "line": 15144,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_load"
+  },
+  {
+   "after": "deps.compose_load_announcement",
+   "before": "compose_load_announcement",
+   "kind": "d1",
+   "line": 15324,
+   "unit": "s19_app.tui.app:S19TuiApp._install_prepared_project"
+  }
+ ],
+ "s19_app/tui/app/projects.py": [
+  {
+   "after": "deps.IntelHexFile",
+   "before": "IntelHexFile",
+   "kind": "d1",
+   "line": 15413,
+   "unit": "s19_app.tui.app:S19TuiApp._parse_data_file"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15580,
+   "unit": "s19_app.tui.app:S19TuiApp._listed_project_name"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15580,
+   "unit": "s19_app.tui.app:S19TuiApp._listed_project_name"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15591,
+   "unit": "s19_app.tui.app:S19TuiApp._manifest_is_link"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15596,
+   "unit": "s19_app.tui.app:S19TuiApp._manifest_is_link"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15648,
+   "unit": "s19_app.tui.app:S19TuiApp._project_folder_refusal"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15653,
+   "unit": "s19_app.tui.app:S19TuiApp._project_folder_refusal"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15693,
+   "unit": "s19_app.tui.app:S19TuiApp._folder_holds_project"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15699,
+   "unit": "s19_app.tui.app:S19TuiApp._folder_holds_project"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15756,
+   "unit": "s19_app.tui.app:S19TuiApp._list_project_files"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15762,
+   "unit": "s19_app.tui.app:S19TuiApp._list_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15808,
+   "unit": "s19_app.tui.app:S19TuiApp._a2l_admission"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 15811,
+   "unit": "s19_app.tui.app:S19TuiApp._a2l_admission"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 15914,
+   "unit": "s19_app.tui.app:S19TuiApp._copy_project_subfolders"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15951,
+   "unit": "s19_app.tui.app:S19TuiApp._copy_project_subfolders"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15952,
+   "unit": "s19_app.tui.app:S19TuiApp._copy_project_subfolders"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15961,
+   "unit": "s19_app.tui.app:S19TuiApp._copy_project_subfolders"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15961,
+   "unit": "s19_app.tui.app:S19TuiApp._copy_project_subfolders"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 16087,
+   "unit": "s19_app.tui.app:S19TuiApp._rewrite_project_manifest"
+  },
+  {
+   "after": "deps._image_map",
+   "before": "_image_map",
+   "kind": "d1",
+   "line": 16140,
+   "unit": "s19_app.tui.app:S19TuiApp._derived_record"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 16182,
+   "unit": "s19_app.tui.app:S19TuiApp._activate_project_file"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 16246,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_file_to_project"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 16292,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_file_to_project"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 16331,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_file_to_project"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 16342,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_file_to_project"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 16368,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_a2l_to_project"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 16390,
+   "unit": "s19_app.tui.app:S19TuiApp._sync_loaded_a2l_to_project"
+  }
+ ],
+ "s19_app/tui/app/reports.py": [
+  {
+   "after": "deps.compose_before_after_report",
+   "before": "compose_before_after_report",
+   "kind": "d1",
+   "line": 6338,
+   "unit": "s19_app.tui.app:S19TuiApp._start_before_after_worker"
+  },
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 6805,
+   "unit": "s19_app.tui.app:S19TuiApp.on_report_viewer_screen_filter_path_typed"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 6974,
+   "unit": "s19_app.tui.app:S19TuiApp._trigger_generate_report"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 7090,
+   "unit": "s19_app.tui.app:S19TuiApp._start_generate_report_worker"
+  },
+  {
+   "after": "deps.generate_project_report",
+   "before": "generate_project_report",
+   "kind": "d1",
+   "line": 7144,
+   "unit": "s19_app.tui.app:S19TuiApp._start_generate_report_worker"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 7649,
+   "unit": "s19_app.tui.app:S19TuiApp._resolve_listed_file"
+  },
+  {
+   "after": "deps.generate_diff_report",
+   "before": "generate_diff_report",
+   "kind": "d1",
+   "line": 8790,
+   "unit": "s19_app.tui.app:S19TuiApp._start_diff_report_worker"
+  },
+  {
+   "after": "deps.generate_diff_report_html",
+   "before": "generate_diff_report_html",
+   "kind": "d1",
+   "line": 8803,
+   "unit": "s19_app.tui.app:S19TuiApp._start_diff_report_worker"
+  }
+ ],
+ "s19_app/tui/app/save_commit.py": [
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 2628,
+   "unit": "s19_app.tui.app:_PlacedFiles"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 11945,
+   "unit": "s19_app.tui.app:S19TuiApp._abort_save"
+  },
+  {
+   "after": "deps._private_stage_dir",
+   "before": "_private_stage_dir",
+   "kind": "d1",
+   "line": 12033,
+   "unit": "s19_app.tui.app:S19TuiApp._restore_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12040,
+   "unit": "s19_app.tui.app:S19TuiApp._restore_manifest"
+  },
+  {
+   "after": "deps.datetime",
+   "before": "datetime",
+   "kind": "d1",
+   "line": 12118,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12123,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12123,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12123,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12123,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12127,
+   "unit": "s19_app.tui.app:S19TuiApp._keep_previous_manifest"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 13107,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 13157,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 13162,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.write_change_document",
+   "before": "write_change_document",
+   "kind": "d1",
+   "line": 13182,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.save_patched_image",
+   "before": "save_patched_image",
+   "kind": "d1",
+   "line": 13217,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.verify_written_image",
+   "before": "verify_written_image",
+   "kind": "d1",
+   "line": 13229,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.place_into_workarea",
+   "before": "place_into_workarea",
+   "kind": "d1",
+   "line": 13259,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 13314,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.gather_project_artifacts",
+   "before": "gather_project_artifacts",
+   "kind": "d1",
+   "line": 13356,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps._plan_without_document_key",
+   "before": "_plan_without_document_key",
+   "kind": "d1",
+   "line": 13408,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 13637,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 13637,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 13638,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 13638,
+   "unit": "s19_app.tui.app:S19TuiApp._save_project_files"
+  },
+  {
+   "after": "deps.write_project_manifest",
+   "before": "write_project_manifest",
+   "kind": "d1",
+   "line": 13838,
+   "unit": "s19_app.tui.app:S19TuiApp._write_manifest_for_save"
+  },
+  {
+   "after": "deps.verify_written_manifest",
+   "before": "verify_written_manifest",
+   "kind": "d1",
+   "line": 13863,
+   "unit": "s19_app.tui.app:S19TuiApp._write_manifest_for_save"
+  }
+ ],
+ "s19_app/tui/app/save_plan.py": [
+  {
+   "after": "deps.resolve_input_path",
+   "before": "resolve_input_path",
+   "kind": "d1",
+   "line": 12183,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_save_dialog"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12191,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_save_dialog"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12191,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_save_dialog"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12191,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_save_dialog"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12192,
+   "unit": "s19_app.tui.app:S19TuiApp._handle_save_dialog"
+  },
+  {
+   "after": "deps._SAVE_FULL_PATH_LIMIT",
+   "before": "_SAVE_FULL_PATH_LIMIT",
+   "kind": "d1",
+   "line": 12342,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 12378,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12396,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 12470,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 12492,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.read_project_manifest",
+   "before": "read_project_manifest",
+   "kind": "d1",
+   "line": 12503,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.recorded_document_state",
+   "before": "recorded_document_state",
+   "kind": "d1",
+   "line": 12527,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.inventory_project_tree",
+   "before": "inventory_project_tree",
+   "kind": "d1",
+   "line": 12563,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 12580,
+   "unit": "s19_app.tui.app:S19TuiApp._prepare_project_save"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 12701,
+   "unit": "s19_app.tui.app:S19TuiApp._save_session_inputs"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 12703,
+   "unit": "s19_app.tui.app:S19TuiApp._save_session_inputs"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 12705,
+   "unit": "s19_app.tui.app:S19TuiApp._save_session_inputs"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14097,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14103,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.inventory_project_tree",
+   "before": "inventory_project_tree",
+   "kind": "d1",
+   "line": 14137,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14153,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 14163,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 14233,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.validate_project_files",
+   "before": "validate_project_files",
+   "kind": "d1",
+   "line": 14256,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14269,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps._is_reparse_point",
+   "before": "_is_reparse_point",
+   "kind": "d1",
+   "line": 14272,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14274,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14274,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14274,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14275,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14280,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14280,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps._file_digest",
+   "before": "_file_digest",
+   "kind": "d1",
+   "line": 14285,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.plan_project_save",
+   "before": "plan_project_save",
+   "kind": "d1",
+   "line": 14290,
+   "unit": "s19_app.tui.app:S19TuiApp._plan_project_save"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14348,
+   "unit": "s19_app.tui.app:S19TuiApp._unrecorded_document_lines"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14350,
+   "unit": "s19_app.tui.app:S19TuiApp._unrecorded_document_lines"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14353,
+   "unit": "s19_app.tui.app:S19TuiApp._unrecorded_document_lines"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 14354,
+   "unit": "s19_app.tui.app:S19TuiApp._unrecorded_document_lines"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15605,
+   "unit": "s19_app.tui.app:S19TuiApp._save_as_source_for"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 15606,
+   "unit": "s19_app.tui.app:S19TuiApp._save_as_source_for"
+  }
+ ],
+ "s19_app/tui/app/shared_io.py": [
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 2652,
+   "unit": "s19_app.tui.app:_plan_row_mismatch"
+  },
+  {
+   "after": "deps.os",
+   "before": "os",
+   "kind": "d1",
+   "line": 2652,
+   "unit": "s19_app.tui.app:_plan_row_mismatch"
+  }
+ ],
+ "s19_app/tui/app/shell.py": [
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22878,
+   "unit": "s19_app.tui.app:S19TuiApp._render_log_lines"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22879,
+   "unit": "s19_app.tui.app:S19TuiApp._render_log_lines"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22880,
+   "unit": "s19_app.tui.app:S19TuiApp._render_log_lines"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22881,
+   "unit": "s19_app.tui.app:S19TuiApp._render_log_lines"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22908,
+   "unit": "s19_app.tui.app:S19TuiApp._paint_status_text"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22941,
+   "unit": "s19_app.tui.app:S19TuiApp.begin_busy"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 23045,
+   "unit": "s19_app.tui.app:S19TuiApp.end_busy"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 23061,
+   "unit": "s19_app.tui.app:S19TuiApp._busy_tick"
+  }
+ ],
+ "s19_app/tui/app/workspace_view.py": [
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 20416,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 20419,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 20424,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 20428,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 20439,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 20441,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 20445,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.ListItem",
+   "before": "ListItem",
+   "kind": "d1",
+   "line": 20449,
+   "unit": "s19_app.tui.app:S19TuiApp.update_sections"
+  },
+  {
+   "after": "deps.Label",
+   "before": "Label",
+   "kind": "d1",
+   "line": 22274,
+   "unit": "s19_app.tui.app:S19TuiApp.update_project_labels"
+  }
+ ],
+ "s19_app/tui/screens_directionb/ab_diff.py": [
+  {
+   "after": "...",
+   "before": "..",
+   "kind": "relimport",
+   "line": 9234,
+   "unit": "s19_app.tui.screens_directionb:AbDiffPanel"
+  }
+ ],
+ "s19_app/tui/screens_directionb/patch_editor.py": [
+  {
+   "after": "deps._json_clock",
+   "before": "_json_clock",
+   "kind": "d1",
+   "line": 5802,
+   "unit": "s19_app.tui.screens_directionb:PatchEditorPanel"
+  }
+ ]
+}

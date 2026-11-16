@@ -505,9 +505,18 @@ def test_tc078_1_strip_mounted(tmp_path: Path) -> None:
     # reads the class's OWN namespace, so an inherited attribute of the same
     # name cannot satisfy it.
     new_members = {"_check_strip_text", "_CHECK_STRIP_BAR_CELLS"}
-    assert new_members <= set(vars(PatchEditorPanel)), (
+    # P3a: the panel's own namespace is now the union of its in-package zone
+    # mixins (the thin class plus six); Textual bases still cannot satisfy it.
+    own_members = set().union(
+        *(
+            vars(klass)
+            for klass in PatchEditorPanel.__mro__
+            if klass.__module__.startswith("s19_app.tui.screens_directionb.patch_editor")
+        )
+    )
+    assert new_members <= own_members, (
         f"the strip's members must exist on PatchEditorPanel itself; missing "
-        f"{new_members - set(vars(PatchEditorPanel))!r}"
+        f"{new_members - own_members!r}"
     )
     assert not (new_members & set(dir(Widget))), (
         f"new members collide with Textual Widget internals: "
@@ -555,7 +564,13 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
     # C-7 purity probe over the panel's own AST — 0 `self.app`, 0 service
     # imports. Scoped by inspect, not pinned line numbers (which drift: this
     # batch's spec coordinates were ~160 lines stale).
-    panel_tree = ast.parse(inspect.getsource(PatchEditorPanel))
+    from tests.support import package_source as ps
+
+    panel_tree = ps.mro_class_tree(
+        PatchEditorPanel,
+        "s19_app.tui.screens_directionb.patch_editor",
+        ps.MIN_PATCH_EDITOR_CLASSES,
+    )
     self_app = [
         node
         for node in ast.walk(panel_tree)
@@ -617,7 +632,7 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
 
 
 def test_tc078_3_both_sites(tmp_path: Path) -> None:
-    """Both app.py call sites pass the aggregates (the writer census).
+    """Both app-package call sites pass the aggregates (the writer census).
 
     Intent (LLR-078.3): the post-run site and the history-refresh site are
     the aggregate-passing writers. If either omits the counts the strip and
@@ -634,9 +649,9 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
     calls — it was matching my own explanatory COMMENT. A prose-matching oracle
     is not a census; it fails on documentation and passes on a renamed call.
     """
-    from s19_app.tui import app as app_module
+    from tests.support import package_source as ps
 
-    tree = ast.parse(inspect.getsource(app_module))
+    tree = ps.package_tree("app")
     calls = [
         node
         for node in ast.walk(tree)
@@ -647,7 +662,8 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
 
     # batch-97 Inc-3: the Check Editor's refused Write paints its line through
     # ``CheckEditorPanel.show_status_line`` (it wraps ``refresh_check_results``
-    # inside the panel), so app.py gains no fourth site and the census stays 3.
+    # inside the panel), so the app package gains no fourth site and the census
+    # stays 3.
     assert len(calls) == 3, (
         f"the writer census pins THREE refresh_check_results call sites; found "
         f"{len(calls)}. A new site must pass the aggregates and be recorded here."

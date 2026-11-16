@@ -57,12 +57,14 @@ from pathlib import Path
 import pytest
 from textual import events
 
+import s19_app
 import s19_app.tui.app as app_module
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TEMP
 
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_save_dialog as sd
 from tests.support import b100_projects as projects
+from tests.support import package_source as ps
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid"
@@ -790,13 +792,15 @@ def test_tc_b100_44_patch_editor_reader_follows_its_writers(tmp_path: Path) -> N
 
 
 def _private_dirty_reads() -> list:
-    """Every ``<x>._dirty`` load in ``s19_app/`` outside
-    ``screens_directionb.py`` whose ``<x>`` is not ``self`` (a panel's
-    flag read from outside its own class)."""
-    package = Path(app_module.__file__).resolve().parents[1]
+    """Every ``<x>._dirty`` load in ``s19_app/`` outside the
+    ``screens_directionb/`` package whose ``<x>`` is not ``self`` (a
+    panel's flag read from outside its own class)."""
+    package = Path(s19_app.__file__).resolve().parent
+    files = sorted(package.rglob("*.py"))
+    assert len(files) >= 60, f"package walk narrowed: {len(files)} files"
     hits = []
-    for path in sorted(package.rglob("*.py")):
-        if path.name == "screens_directionb.py":
+    for path in files:
+        if "screens_directionb" in path.relative_to(package).parts:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
@@ -812,7 +816,7 @@ def _private_dirty_reads() -> list:
 
 def test_tc_b100_44_no_private_dirty_read_outside_the_panel() -> None:
     """LLR-174.1c census (C52, P1-5): 0 reads of another object's ``_dirty``
-    in ``s19_app/`` outside ``screens_directionb.py``, and the reader the
+    in ``s19_app/`` outside ``screens_directionb/``, and the reader the
     app uses instead exists.
 
     Why: a private read bypasses the one reader whose behaviour TC-B100-44
@@ -1345,13 +1349,13 @@ def test_tc_b100_45_refusal_lines_paint_names_literally(tmp_path: Path) -> None:
         # ``parse_a2l_file``. The load now ends on a worker, so wait for it.
         from tests.support.b100_workers import settle_workers
 
-        real_parse = app_module.parse_a2l_file
-        app_module.parse_a2l_file = unreadable
+        real_parse = app_module.deps.parse_a2l_file
+        app_module.deps.parse_a2l_file = unreadable
         try:
             app._handle_load_project(hostile_project)
             await settle_workers(pilot)
         finally:
-            app_module.parse_a2l_file = real_parse
+            app_module.deps.parse_a2l_file = real_parse
         await _settle(pilot, 4)
         out["no supported files"] = painted()
         return out
@@ -1807,7 +1811,9 @@ def test_tc_b100_45_modal_imports_nothing_from_the_app() -> None:
     only its parameters, so the scrub and the wording stay in one place.
     Negative control: ``painted_names`` called inside the screen → census 1
     → RED. RED (base): the class does not exist."""
-    screens_path = Path(app_module.__file__).resolve().parent / "screens.py"
+    import s19_app.tui.screens as screens_module
+
+    screens_path = Path(screens_module.__file__)
     tree = ast.parse(screens_path.read_text(encoding="utf-8"))
     banned = set()
     for node in tree.body:
@@ -1962,7 +1968,7 @@ def test_tc_b100_46_project_load_handler_asks_nothing(tmp_path: Path) -> None:
     direct, route = _run(scene.base, scenario)
     assert direct == (0, "P"), direct
     assert route == 1, route
-    tree = ast.parse(Path(app_module.__file__).read_text(encoding="utf-8"))
+    tree = ps.package_tree("app")
     handler = next(
         n for n in ast.walk(tree)
         if isinstance(n, ast.FunctionDef) and n.name == "_handle_load_project"
@@ -2357,14 +2363,13 @@ def test_tc_b100_72_replace_runs_the_load_on_every_route(tmp_path: Path, route: 
 
 def _seam_bypasses() -> list:
     """LLR-174.4 census (E2 P-2 / A10-08): every call of the three loaders
-    and ``_handle_load_project`` in ``app.py`` must be inside a function
-    passed as ``go`` to ``_confirm_then_load``, inside
+    and ``_handle_load_project`` in the ``s19_app/tui/app/`` package must be
+    inside a function passed as ``go`` to ``_confirm_then_load``, inside
     ``_handle_load_project``, or inside ``load_from_path`` (its worker
     start). ``_route_load_project`` is the project seam: its callers are
     exempt."""
     loaders = {"load_selected_file", "load_from_path", "load_a2l_from_path", "_handle_load_project"}
-    tree = ast.parse(Path(app_module.__file__).read_text(encoding="utf-8"))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "S19TuiApp")
+    cls = ps.merged_class("S19TuiApp")
     bypasses = []
 
     def go_nodes(func: ast.AST) -> set:
@@ -2416,8 +2421,9 @@ def _seam_bypasses() -> list:
 
 
 def test_tc_b100_72_every_load_call_passes_the_seam() -> None:
-    """LLR-174.4 (C05, C01): AST census of ``app.py`` → 0 bypasses; each of
-    the four leaves (``_route_load_project``, ``_load_path_from_user_input``,
+    """LLR-174.4 (C05, C01): AST census of the ``s19_app/tui/app/``
+    package → 0 bypasses; each of the four leaves
+    (``_route_load_project``, ``_load_path_from_user_input``,
     ``_load_workarea_file``, ``_handle_select_variant``) calls the seam, and
     the 9b router ``_handle_load_dialog`` does not (S-d: the seam sits in
     the leaves, so one request meets it once).
@@ -2429,8 +2435,11 @@ def test_tc_b100_72_every_load_call_passes_the_seam() -> None:
     ``_load_workarea_file`` x2) → RED."""
     bypasses = _seam_bypasses()
     assert bypasses == [], bypasses
-    tree = ast.parse(Path(app_module.__file__).read_text(encoding="utf-8"))
-    funcs = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+    funcs = {
+        n.name: n
+        for n in ps.merged_class("S19TuiApp").body
+        if isinstance(n, ast.FunctionDef)
+    }
 
     def seam_calls(name: str) -> int:
         return sum(
@@ -3073,7 +3082,7 @@ def test_tc_b100_72_the_load_guard_refuses_while_busy_before_it_asks(
     entered = threading.Event()
     go = threading.Event()
     on_main: list = []
-    real_parse = app_module.parse_a2l_file
+    real_parse = app_module.deps.parse_a2l_file
 
     def _held(path, *args, **kwargs):
         if threading.get_ident() == main:
@@ -3083,7 +3092,7 @@ def test_tc_b100_72_the_load_guard_refuses_while_busy_before_it_asks(
             go.wait(120)
         return real_parse(path, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "parse_a2l_file", _held)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _held)
 
     async def scenario(app, pilot, log):
         app._handle_load_project("PV")

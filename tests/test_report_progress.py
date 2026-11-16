@@ -94,7 +94,7 @@ def test_failed_report_resets_progress_bar_to_zero(
         raise RuntimeError("synthetic report failure")
 
     # Patch the symbol the worker calls so generation crashes in-worker.
-    monkeypatch.setattr("s19_app.tui.app.generate_project_report", _boom)
+    monkeypatch.setattr("s19_app.tui.app.deps.generate_project_report", _boom)
 
     async def _drive() -> tuple[float, bool]:
         app = S19TuiApp(base_dir=tmp_path)

@@ -1,0 +1,29 @@
+TREE_REV: c3760226ac9e7b99a9eb574321412fcae1c28676
+ARGS: tests/test_zq_nc_diag_seam.py
+LOAD_START: 8.78 6.89 5.30 10/710 181932
+~/work/zq-base2/nc-diag-red/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_zq_diag_tail_mark_reaches_the_seam_the_product_calls ___________
+
+tmp_path = PosixPath('~/work/zq-base2/out-nc-diag-red/state/tmp/pytest-of-<user>/pytest-0/test_zq_diag_tail_mark_reaches0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa26cc5ec50>
+
+    def test_zq_diag_tail_mark_reaches_the_seam_the_product_calls(tmp_path, monkeypatch) -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        _r13_diag_install(app, None, monkeypatch)
+        patched = app_module.deps._mirror_and_write_os_clipboard
+>       assert getattr(patched, "__name__", "") == "tail_mark", patched
+E       AssertionError: <function _mirror_and_write_os_clipboard at 0x7fa26d2731a0>
+E       assert '_mirror_and_..._os_clipboard' == 'tail_mark'
+E         
+E         - tail_mark
+E         + _mirror_and_write_os_clipboard
+
+tests/test_zq_nc_diag_seam.py:12: AssertionError
+-- generated xml file: ~/work/zq-base2/out-nc-diag-red/junit.xml --
+=========================== short test summary info ============================
+FAILED tests/test_zq_nc_diag_seam.py::test_zq_diag_tail_mark_reaches_the_seam_the_product_calls
+1 failed in 0.16s
+LOAD_END: 8.78 6.89 5.30 8/707 181989
+RUN_DONE rc=1

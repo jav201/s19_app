@@ -1,0 +1,8 @@
+tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel	load: failed only under -n 12 in after2; serial 3x passed 3/3 on both before and after2 (rtx, idle)
+tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1]	load: failed only under -n 12 in after2; serial 3x passed 3/3 on both before and after2 (rtx, idle)
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second	timing (1.10 s vs 1.0 s budget under -n 12); serial 3x passed 3/3 on both before and after2 (rtx, idle)
+tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time	serial_timing budget under -n 12; serial 3x passed 3/3 on both before and after2 (rtx, idle)
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single]	async paste timing: failed only under -n 12 in after2; serial 3x passed 3/3 on both before and after2 (rtx, idle)
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]	load: failed only under -n 12 in after3 (1.36 s vs 1.0 s bound); serial 3x passed on before and after3
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge]	load: Save project ab did not land under -n 12 in after3; serial 3x passed on before and after3
+tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date	load: Save project ab did not land under -n 12 in after3; serial 3x passed on before and after3

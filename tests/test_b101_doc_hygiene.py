@@ -32,6 +32,8 @@ import tomllib
 from pathlib import Path
 from urllib.parse import unquote
 
+from tests.support import package_source as ps
+
 ROOT = Path(__file__).resolve().parents[1]
 THIS_FILE_REL = "tests/test_b101_doc_hygiene.py"
 
@@ -762,15 +764,18 @@ def test_r_doc_dev_10_1_docs_index_states_no_project_state():
 def _rail_labels() -> set[str]:
     rx = re.compile(r'RailEntry\(\s*"[^"]*",\s*"[^"]*",\s*"[^"]*",\s*"([^"]+)"')
     labels: set[str] = set()
-    for rel in ("s19_app/tui/rail.py", "s19_app/tui/app.py"):
-        labels.update(rx.findall(_need(rel)))
+    labels.update(rx.findall(_need("s19_app/tui/rail.py")))
+    labels.update(rx.findall(ps.package_text("app")))
     return labels
 
 
 def _split_join_label() -> str:
     """The palette label of the Split / Join / Export window, read from the
     EXTRA_PALETTE_ENTRIES pair whose action opens it."""
-    found = re.findall(r'\(\s*"([^"]+)",\s*"open_split_join_export"\s*\)', _need("s19_app/tui/app.py"))
+    found = re.findall(
+        r'\(\s*"([^"]+)",\s*"open_split_join_export"\s*\)',
+        ps.package_text("app"),
+    )
     assert len(found) == 1, f"expected one palette entry for open_split_join_export, read {found}"
     return found[0]
 

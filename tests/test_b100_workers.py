@@ -63,11 +63,11 @@ from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.package_source import merged_class, package_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid"
 CASE06 = ROOT / "examples" / "case_06_large_nested_a2l"
-APP_SOURCE = Path(app_module.__file__)
 SIZE = (118, 54)
 WIN = sys.platform == "win32"
 
@@ -399,7 +399,7 @@ def held_save_scene(tmp_path: Path, monkeypatch, *, patch: bool = False, name: s
     the Save worker's first placement (``app_module.place_into_workarea``)."""
     base = tmp_path / "app"
     trio(W(base) / "P2")
-    hold = Hold(monkeypatch, app_module, "place_into_workarea", **hold_kw)
+    hold = Hold(monkeypatch, app_module.deps, "place_into_workarea", **hold_kw)
     return base, hold
 
 
@@ -412,22 +412,20 @@ async def start_held_save(app, pilot, hold: Hold, *, patch: bool = False, name: 
 
 
 def source_census() -> set:
-    """Every ``self.<name> =`` target in ``S19TuiApp`` (LLR-165.2's domain)."""
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
+    """Every ``self.<name> =`` target in ``S19TuiApp`` (LLR-165.2's domain),
+    read from the merged app-package class (MERGED-CLASS)."""
     names = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef) and node.name == "S19TuiApp":
-            for inner in ast.walk(node):
-                targets = []
-                if isinstance(inner, ast.Assign):
-                    targets = inner.targets
-                elif isinstance(inner, (ast.AnnAssign, ast.AugAssign)):
-                    targets = [inner.target]
-                for target in targets:
-                    for t in ast.walk(target):
-                        if (isinstance(t, ast.Attribute) and isinstance(t.value, ast.Name)
-                                and t.value.id == "self"):
-                            names.add(t.attr)
+    for inner in ast.walk(merged_class("S19TuiApp")):
+        targets = []
+        if isinstance(inner, ast.Assign):
+            targets = inner.targets
+        elif isinstance(inner, (ast.AnnAssign, ast.AugAssign)):
+            targets = [inner.target]
+        for target in targets:
+            for t in ast.walk(target):
+                if (isinstance(t, ast.Attribute) and isinstance(t.value, ast.Name)
+                        and t.value.id == "self"):
+                    names.add(t.attr)
     return names
 
 
@@ -535,7 +533,7 @@ def test_tc_b100_53_project_load_reads_every_file_on_a_worker(
         W(base), "P2", data_files=("firmware.s19", "firmware.mac", "firmware.a2l")
     )
     spies = {
-        name: Spy(monkeypatch, app_module, name)
+        name: Spy(monkeypatch, app_module.deps, name)
         for name in ("check_project_files", "read_project_manifest", "parse_a2l_file",
                      "build_loaded_s19", "recorded_document_state")
     }
@@ -589,9 +587,9 @@ def test_tc_b100_53_save_refuses_before_any_worker_then_writes_on_one(
     target = W(base) / "Q"
     worker = Spy(monkeypatch, S19TuiApp, "_save_project_worker")
     begins = Spy(monkeypatch, S19TuiApp, "begin_busy")
-    places = Spy(monkeypatch, app_module, "place_into_workarea")
-    emits = Spy(monkeypatch, app_module, "save_patched_image")
-    manifests = Spy(monkeypatch, app_module, "write_project_manifest")
+    places = Spy(monkeypatch, app_module.deps, "place_into_workarea")
+    emits = Spy(monkeypatch, app_module.deps, "save_patched_image")
+    manifests = Spy(monkeypatch, app_module.deps, "write_project_manifest")
     mkdirs: list = []
     real_mkdir = pathlib.Path.mkdir
 
@@ -657,8 +655,8 @@ def test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker(
     temp = W(base) / WORKAREA_TEMP
     temp.mkdir(parents=True)
     shutil.copyfile(CASE01 / "firmware.a2l", temp / "c.a2l")
-    parses = Spy(monkeypatch, app_module, "parse_a2l_file")
-    copies = Spy(monkeypatch, app_module, "copy_into_workarea")
+    parses = Spy(monkeypatch, app_module.deps, "parse_a2l_file")
+    copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
 
     def by_name(spy, name):
         return [c.thread for c in spy.calls if c.args and Path(c.args[0]).name == name]
@@ -728,7 +726,7 @@ def test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker(
     temp = W(base) / WORKAREA_TEMP
     temp.mkdir(parents=True)
     _big8(temp / "big8.s19")
-    copies = Spy(monkeypatch, app_module, "copy_into_workarea")
+    copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
     window = {}
     holder = {}
 
@@ -1173,8 +1171,8 @@ def test_tc_b100_53_session_is_written_only_on_the_main_thread(
     record: list = []
     names = source_census()
     service = {m: Spy(monkeypatch, ChangeService, m) for m in ("record_save_entries", "adopt_rederived", "mark_saved")}
-    real_manifest = app_module.read_project_manifest
-    real_parse = app_module.parse_a2l_file
+    real_manifest = app_module.deps.read_project_manifest
+    real_parse = app_module.deps.parse_a2l_file
     has_verify = hasattr(app_module, "verify_written_image")
 
     def _manifest(project_dir, *a, **k):
@@ -1187,8 +1185,8 @@ def test_tc_b100_53_session_is_written_only_on_the_main_thread(
             raise ValueError("synthetic parse")
         return real_parse(path, *a, **k)
 
-    monkeypatch.setattr(app_module, "read_project_manifest", _manifest)
-    monkeypatch.setattr(app_module, "parse_a2l_file", _parse)
+    monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse)
 
     async def scenario(app, pilot, log):
         main = _main_ident()
@@ -1206,7 +1204,7 @@ def test_tc_b100_53_session_is_written_only_on_the_main_thread(
             def _boom(*_a, **_k):
                 raise ValueError("forced defect")
 
-            monkeypatch.setattr(app_module, "verify_written_image", _boom)
+            monkeypatch.setattr(app_module.deps, "verify_written_image", _boom)
         await patch_one_byte(app, pilot, PATCH_ADDRESS - 1)
         try:
             save(app, "Q2")
@@ -1237,14 +1235,13 @@ def test_tc_b100_53_session_is_written_only_on_the_main_thread(
     assert all(t == main for _n, t in cache_writes), cache_writes
 
 
-def _class_methods(tree: ast.Module, cls: str = "S19TuiApp") -> dict:
-    for node in tree.body:
-        if isinstance(node, ast.ClassDef) and node.name == cls:
-            return {
-                item.name: item for item in node.body
-                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
-            }
-    return {}
+def _merged_methods(cls: str = "S19TuiApp") -> dict:
+    """Methods of ``cls`` across the whole app package (MERGED-CLASS)."""
+    return {
+        item.name: item
+        for item in merged_class(cls).body
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
 
 
 def _self_calls(func) -> set:
@@ -1269,10 +1266,10 @@ def _session_reads(func) -> list:
 
 def test_tc_b100_53_workers_read_only_their_frozen_request() -> None:
     """LLR-177.1e (P1-04, P1-08, P1-25, P1-66, C12b-36, C12b-54): an AST
-    census of ``app.py`` — the three workers exist, each takes one
+    census of the app package — the three workers exist, each takes one
     parameter after ``self`` annotated with its request class, each request
     class is a frozen dataclass, and the body of each worker and of every
-    ``app.py`` method it reaches by calls holds 0 reads of the session
+    app-package method it reaches by calls holds 0 reads of the session
     names (``current_file``, ``current_project``, ``current_project_dir``,
     ``current_a2l_*``, ``_variant_set``, ``_change_service``, the A2L
     cache, the declared regions, the template, the paste text,
@@ -1284,10 +1281,9 @@ def test_tc_b100_53_workers_read_only_their_frozen_request() -> None:
     Negative control (code read, base): no worker exists; the base body of
     ``_parse_loaded_file`` reads ``current_file`` / ``current_a2l_*`` →
     RED."""
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
-    methods = _class_methods(tree)
+    methods = _merged_methods()
     missing = [w for w in WORKERS if w not in methods]
-    assert missing == [], f"worker functions not found in app.py: {missing}"
+    assert missing == [], f"worker functions not found in the app package: {missing}"
     hits: dict = {}
     for worker in WORKERS:
         node = methods[worker]
@@ -1310,7 +1306,7 @@ def test_tc_b100_53_workers_read_only_their_frozen_request() -> None:
         cls = getattr(app_module, cls_name, None)
         assert cls is not None and dataclasses.is_dataclass(cls), cls_name
         assert cls.__dataclass_params__.frozen, f"{cls_name} is not frozen"
-    cached = next((n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "parse_a2l_cached"), None)
+    cached = next((n for n in package_tree("app").body if isinstance(n, ast.FunctionDef) and n.name == "parse_a2l_cached"), None)
     assert cached is not None, "parse_a2l_cached (module level) not found"
     assert not [n for n in ast.walk(cached) if isinstance(n, ast.Name) and n.id == "self"]
 
@@ -1396,14 +1392,14 @@ def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
     Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
     Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
     Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
-    real_manifest = app_module.read_project_manifest
+    real_manifest = app_module.deps.read_project_manifest
 
     def _manifest(project_dir, *a, **k):
         if Path(project_dir).name == "PF":
             raise PermissionError("synthetic")
         return real_manifest(project_dir, *a, **k)
 
-    monkeypatch.setattr(app_module, "read_project_manifest", _manifest)
+    monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
 
     async def scenario(app, pilot, log):
         await open_trio_project(app, pilot, "P2")
@@ -1439,7 +1435,7 @@ def test_tc_b100_53_load_result_panel_opens_after_the_install(
     thread)."""
     base = tmp_path / "app"
     trio(W(base) / "P2")
-    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
 
     async def scenario(app, pilot, log):
         try:
@@ -1495,7 +1491,7 @@ def test_tc_b100_53_save_rederives_on_main_before_the_worker(
         return lambda *_a, **_k: order.append((name, threading.get_ident() == main_box[0]))
 
     Spy(monkeypatch, ChangeService, "rederive_for_save", before=mark("rederive"))
-    Spy(monkeypatch, app_module, "render_patched_image", before=mark("render"))
+    Spy(monkeypatch, app_module.deps, "render_patched_image", before=mark("render"))
     Spy(monkeypatch, S19TuiApp, "_save_project_worker", before=mark("worker"))
 
     async def scenario(app, pilot, log):
@@ -1665,7 +1661,7 @@ def test_tc_b100_53_load_requests_are_refused_during_a_project_load(
     pushes the dialog unconditionally → RED."""
     base = tmp_path / "app"
     trio(W(base) / "P2")
-    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
     label = "Loading project P2"
 
     async def scenario(app, pilot, log):
@@ -1725,7 +1721,7 @@ def test_tc_b100_53_variant_unload_and_save_are_refused_while_busy(
     from s19_app.tui.screens_directionb import LoadedArtifactsPanel
 
     base, hold = held_save_scene(tmp_path, monkeypatch)
-    hold2 = Hold(monkeypatch, app_module, "read_project_manifest",
+    hold2 = Hold(monkeypatch, app_module.deps, "read_project_manifest",
                  match=lambda project_dir, *a, **k: Path(project_dir).name == "P2")
 
     async def scenario(app, pilot, log):
@@ -1761,7 +1757,7 @@ def test_tc_b100_53_variant_unload_and_save_are_refused_while_busy(
 
     base2 = tmp_path / "app2"
     trio(W(base2) / "P2")
-    hold3 = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold3 = Hold(monkeypatch, app_module.deps, "read_project_manifest")
 
     async def during_load(app, pilot, log):
         label = "Loading project P2"
@@ -1987,7 +1983,7 @@ def test_tc_b100_53_busy_line_paints_a_hostile_name_literally(
         trio(W(base) / folder)
     except OSError as exc:  # pragma: no cover - platform refuses the name
         pytest.skip(f"the folder name cannot be created here: {exc}")
-    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
 
     async def scenario(app, pilot, log):
         try:
@@ -2030,8 +2026,8 @@ def test_tc_b100_53_refusals_stop_after_each_project_load_exit(
     trio(wa / "P2")
     trio(wa / "A2LONLY", names=("firmware.a2l",))
     trio(wa / "PF")
-    real_manifest = app_module.read_project_manifest
-    real_parse = app_module.parse_a2l_file
+    real_manifest = app_module.deps.read_project_manifest
+    real_parse = app_module.deps.parse_a2l_file
 
     def _manifest(project_dir, *a, **k):
         if Path(project_dir).name == "PF":
@@ -2043,8 +2039,8 @@ def test_tc_b100_53_refusals_stop_after_each_project_load_exit(
             raise ValueError("synthetic")
         return real_parse(path, *a, **k)
 
-    monkeypatch.setattr(app_module, "read_project_manifest", _manifest)
-    monkeypatch.setattr(app_module, "parse_a2l_file", _parse)
+    monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse)
 
     async def scenario(app, pilot, log):
         out = []
@@ -2097,8 +2093,8 @@ def test_tc_b100_53_action_starts_refuse_while_another_session_action_runs(
     base = tmp_path / "app"
     trio(W(base) / "P")
     shutil.copyfile(CASE01 / "firmware.a2l", tmp_path / "other.a2l")
-    hold = Hold(monkeypatch, app_module, "parse_a2l_file")
-    resolves = Spy(monkeypatch, app_module, "resolve_input_path")
+    hold = Hold(monkeypatch, app_module.deps, "parse_a2l_file")
+    resolves = Spy(monkeypatch, app_module.deps, "resolve_input_path")
     label = "Loading firmware.a2l"
 
     async def scenario(app, pilot, log):
@@ -2193,9 +2189,9 @@ def test_tc_b100_53_paste_box_is_read_only_during_a_project_load(
     base = tmp_path / "app"
     trio(W(base) / "P2")
     trio(W(base) / "PF")
-    hold = Hold(monkeypatch, app_module, "read_project_manifest",
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest",
                 match=lambda project_dir, *a, **k: Path(project_dir).name == "P2")
-    hold_f = Hold(monkeypatch, app_module, "read_project_manifest",
+    hold_f = Hold(monkeypatch, app_module.deps, "read_project_manifest",
                   match=lambda project_dir, *a, **k: Path(project_dir).name == "PF",
                   raise_on_release=PermissionError("synthetic"))
 
@@ -2499,7 +2495,7 @@ def test_tc_b100_53_idle_quit_under_the_load_question_keeps_the_key(
     temp = W(base) / WORKAREA_TEMP
     temp.mkdir(parents=True)
     shutil.copyfile(CASE01 / "firmware.s19", temp / "x.s19")
-    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
 
     async def scenario(app, pilot, log):
         await projects.load_image(pilot, app, CASE01 / "firmware.s19")
@@ -2610,12 +2606,12 @@ def test_tc_b100_53_confirmed_quit_waits_for_the_end(
     # the 10 s toast has expired from ``_notifications`` by then.
     toasts = Spy(monkeypatch, S19TuiApp, "notify")
     if arm in ("save", "save_fails"):
-        hold = Hold(monkeypatch, app_module, "place_into_workarea",
+        hold = Hold(monkeypatch, app_module.deps, "place_into_workarea",
                     raise_on_release=OSError(28, "synthetic no space") if arm == "save_fails" else None)
     elif arm == "project":
-        hold = Hold(monkeypatch, app_module, "read_project_manifest")
+        hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
     else:
-        hold = Hold(monkeypatch, app_module, "parse_a2l_file")
+        hold = Hold(monkeypatch, app_module.deps, "parse_a2l_file")
 
     async def scenario(app, pilot, log):
         if arm in ("save", "save_fails"):
@@ -2783,7 +2779,7 @@ def test_tc_b100_54_project_worker_failure_keeps_the_session(
         await projects.load_image(pilot, app, tmp_path / "fw.s19")
         await patch_one_byte(app, pilot)
         before = digest(app)
-        monkeypatch.setattr(app_module, "read_project_manifest", _raise)
+        monkeypatch.setattr(app_module.deps, "read_project_manifest", _raise)
         raised = None
         try:
             app._handle_load_project("P2")
@@ -2829,7 +2825,7 @@ def test_tc_b100_54_save_worker_non_os_error_rolls_back_and_reports(
         await patch_one_byte(app, pilot)
         before = (digest(app), sd.tree_digests(app.workarea), app.current_project,
                   getattr(app._variant_set, "active_id", None))
-        monkeypatch.setattr(app_module, "verify_written_image", _boom, raising=False)
+        monkeypatch.setattr(app_module.deps, "verify_written_image", _boom, raising=False)
         raised = None
         try:
             save(app, "Q")
@@ -2893,11 +2889,11 @@ def test_tc_b100_54_a2l_worker_failure_keeps_the_session(
         await wait(pilot, lambda: app.current_a2l_path is not None, "the attach of p0.a2l")
         path, data = app.current_a2l_path, app.current_a2l_data
         if stage == "parse":
-            monkeypatch.setattr(app_module, "parse_a2l_file", _parse_fail)
+            monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse_fail)
         elif stage == "copy":
-            monkeypatch.setattr(app_module, "copy_into_workarea", _copy_fail)
+            monkeypatch.setattr(app_module.deps, "copy_into_workarea", _copy_fail)
         else:
-            monkeypatch.setattr(app_module, "copy_into_workarea", _contain)
+            monkeypatch.setattr(app_module.deps, "copy_into_workarea", _contain)
         raised = None
         try:
             app.load_a2l_from_path(CASE01 / "firmware.a2l")
@@ -3081,7 +3077,7 @@ def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_
     async def scenario(app, pilot, log):
         await ld.open_project_through_dialog(pilot, app, "S", confirm="enter")
         await projects.dismiss_load_result_panel(pilot, app)
-        hold = Hold(monkeypatch, app_module, "place_into_workarea")
+        hold = Hold(monkeypatch, app_module.deps, "place_into_workarea")
         try:
             await sd.save_through_dialog(pilot, app, "S9")
             await reached(pilot, hold, "Save project S9")
@@ -3338,14 +3334,14 @@ def test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable(
     a2l = tmp_path / "src" / "firmware.a2l"
     a2l.parent.mkdir(parents=True)
     shutil.copyfile(CASE01 / "firmware.a2l", a2l)
-    real_validate = app_module.validate_project_files
+    real_validate = app_module.deps.validate_project_files
 
     def _validate(project_dir):
         if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_project":
             raise PermissionError(13, "synthetic: the folder cannot be read")
         return real_validate(project_dir)
 
-    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    monkeypatch.setattr(app_module.deps, "validate_project_files", _validate)
 
     async def scenario(app, pilot, log):
         await open_trio_project(app, pilot, "P2")
@@ -3423,7 +3419,7 @@ def test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_sav
     committed arm keeps the pending quit -> the app exits -> RED."""
     base = tmp_path / "app"
     trio(W(base) / "P2")
-    real_place = app_module.place_into_workarea
+    real_place = app_module.deps.place_into_workarea
 
     def _patches_full(source, destination, *args, **kwargs):
         if Path(destination).name == "patches":
@@ -3433,7 +3429,7 @@ def test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_sav
     async def scenario(app, pilot, log):
         await open_trio_project(app, pilot, "P2")
         await patch_one_byte(app, pilot)
-        monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+        monkeypatch.setattr(app_module.deps, "place_into_workarea", _patches_full)
         hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
         save(app, "P1")
         try:
@@ -3591,14 +3587,14 @@ def test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails(
         key, expected = "file_load", "Load failed"
     elif arm == "project_fails":
         trio(W(base) / "P2")
-        hold = Hold(monkeypatch, app_module, "read_project_manifest",
+        hold = Hold(monkeypatch, app_module.deps, "read_project_manifest",
                     raise_on_release=PermissionError(13, "synthetic denied"))
         key = "project_load"
         expected = ("Project NOT loaded: 'P2' could not be read — check that the folder can be "
                     "opened, then load again.")
     else:
         trio(W(base) / "PA", names=("firmware.a2l",))
-        hold = Hold(monkeypatch, app_module, "parse_a2l_file",
+        hold = Hold(monkeypatch, app_module.deps, "parse_a2l_file",
                     raise_on_release=ValueError("synthetic A2L parse failure"))
         key, expected = "project_load", "No supported files in project: PA"
 
@@ -3643,7 +3639,7 @@ def test_tc_b100_53_a_project_reload_reuses_the_a2l_parse(
     parses → RED."""
     base = tmp_path / "app"
     trio(W(base) / "P2")
-    parses = Spy(monkeypatch, app_module, "parse_a2l_file")
+    parses = Spy(monkeypatch, app_module.deps, "parse_a2l_file")
 
     async def load(app, pilot) -> None:
         app._handle_load_project("P2")
@@ -3749,8 +3745,8 @@ def test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step(
     temp = W(base) / WORKAREA_TEMP
     temp.mkdir(parents=True)
     shutil.copyfile(CASE01 / "firmware.a2l", temp / "firmware.a2l")
-    hold = Hold(monkeypatch, app_module, "parse_a2l_file")
-    copies = Spy(monkeypatch, app_module, "copy_into_workarea")
+    hold = Hold(monkeypatch, app_module.deps, "parse_a2l_file")
+    copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
 
     async def scenario(app, pilot, log):
         try:
@@ -3802,7 +3798,7 @@ def test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly(
         return real_exit(self, *args, **kwargs)
 
     monkeypatch.setattr(S19TuiApp, "exit", _exit)
-    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    hold = Hold(monkeypatch, app_module.deps, "read_project_manifest")
 
     async def scenario(app, pilot, log):
         app._handle_load_project("P2", routed=True)
@@ -3855,7 +3851,7 @@ def test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor(
         for _ in range(3):
             await pilot.pause()
         before = (names, files.index, getattr(files.highlighted_child, "data", None))
-        monkeypatch.setattr(app_module, "parse_a2l_file", _parse_fail)
+        monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse_fail)
         app._load_workarea_file("firmware.a2l")
         await settle_workers(pilot)
         await wait(pilot, lambda: "a2l_load" not in app._busy.runs, "the failed attach to end")
@@ -3977,7 +3973,7 @@ def _a2l_attach_with_the_folder_deleted_mid_attach(
     shutil.copyfile(CASE01 / "firmware.a2l", a2l)
     main_thread: list = []
     deleted: list = []
-    real_copy = app_module.copy_into_workarea
+    real_copy = app_module.deps.copy_into_workarea
 
     def _copy(*args, **kwargs):
         result = real_copy(*args, **kwargs)
@@ -3986,7 +3982,7 @@ def _a2l_attach_with_the_folder_deleted_mid_attach(
             shutil.rmtree(W(base) / "P2")
         return result
 
-    monkeypatch.setattr(app_module, "copy_into_workarea", _copy)
+    monkeypatch.setattr(app_module.deps, "copy_into_workarea", _copy)
 
     async def scenario(app, pilot, log):
         main_thread.append(threading.get_ident())

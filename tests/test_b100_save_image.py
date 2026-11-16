@@ -753,7 +753,7 @@ def test_tc_b100_17_emit_refusal_writes_no_manifest(
         ]
 
     # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
-    monkeypatch.setattr(app_module, "save_patched_image", _refuse)
+    monkeypatch.setattr(app_module.deps, "save_patched_image", _refuse)
 
     async def scenario(app, pilot) -> None:
         _add(app, PATCH_ADDRESS, PATCH_BYTES)
@@ -780,7 +780,7 @@ def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
         raise PermissionError(13, "re-read refused", str(path))
 
     # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
-    monkeypatch.setattr(app_module, "verify_written_image", _refuse_reread)
+    monkeypatch.setattr(app_module.deps, "verify_written_image", _refuse_reread)
     before: dict = {}
 
     async def scenario(app, pilot) -> None:
@@ -810,7 +810,7 @@ def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
     def _defect(path, image, kind):
         raise ValueError("forced defect after the emit")
 
-    monkeypatch.setattr(app_module, "verify_written_image", _defect)
+    monkeypatch.setattr(app_module.deps, "verify_written_image", _defect)
     src = _copy_case01(tmp_path) / "firmware.s19"
 
     async def _drive() -> tuple:
@@ -939,7 +939,7 @@ def test_f2_unreadable_source_refuses_and_the_app_keeps_running(
                     return _UnreadableHandle(handle)
                 return handle
 
-            monkeypatch.setattr(app_module, "open", _open, raising=False)
+            monkeypatch.setattr(app_module.deps, "open", _open, raising=False)
             await _save_as_callback(pilot, app, "P1")
             monkeypatch.undo()
             status = _status_text(app)
@@ -1132,14 +1132,14 @@ def test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved(
 
 def _capture_plans(monkeypatch: pytest.MonkeyPatch) -> list:
     plans: list = []
-    original = app_module.plan_project_save
+    original = app_module.deps.plan_project_save
 
     def _spy(*args, **kwargs):
         plan = original(*args, **kwargs)
         plans.append(plan)
         return plan
 
-    monkeypatch.setattr(app_module, "plan_project_save", _spy)
+    monkeypatch.setattr(app_module.deps, "plan_project_save", _spy)
     return plans
 
 
@@ -1314,7 +1314,7 @@ def test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from(
             def _unreadable(path):
                 raise OSError(13, "Permission denied", str(path))
 
-            monkeypatch.setattr(app_module, "_image_map", _unreadable)
+            monkeypatch.setattr(app_module.deps, "_image_map", _unreadable)
 
         async def scenario(app, pilot) -> None:
             _add(app, PATCH_ADDRESS, PATCH_BYTES)
@@ -1436,7 +1436,7 @@ def test_tc_b100_59_landing_that_differs_from_its_row_rolls_back(
     byte-identical. A silent mismatch would leave a project whose files
     are not the ones the plan showed."""
     foreign = b"S0030000FC\r\nS9030000FC\r\n"
-    original = app_module.plan_project_save
+    original = app_module.deps.plan_project_save
 
     def _plan_then_race(target, **kwargs):
         plan = original(target, **kwargs)
@@ -1444,7 +1444,7 @@ def test_tc_b100_59_landing_that_differs_from_its_row_rolls_back(
         (Path(target) / "firmware.s19").write_bytes(foreign)
         return plan
 
-    monkeypatch.setattr(app_module, "plan_project_save", _plan_then_race)
+    monkeypatch.setattr(app_module.deps, "plan_project_save", _plan_then_race)
     # The painted line is capped at the terminal width; the full message is
     # read where the app sets it.
     statuses: list = []
@@ -1947,7 +1947,7 @@ def test_tc_b100_70_failed_document_write_keeps_the_flag(
                                       severity=ValidationSeverity.ERROR, artifact="change")]
 
     monkeypatch.setattr(changes_io, "write_change_document", _refuse)
-    monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+    monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
     src = _copy_case01(tmp_path) / "firmware.s19"
 
     async def _drive() -> tuple:
@@ -2688,13 +2688,13 @@ def test_tc_b100_17_emit_that_reports_no_placement_is_refused(
     Negative control: the check reads only ``path is None`` → the missing
     placement record reaches ``landed[0]`` → the generic unexpected-error
     line → RED."""
-    real_emit = app_module.save_patched_image
+    real_emit = app_module.deps.save_patched_image
 
     def _emit_unreported(*args, **kwargs):
         kwargs.pop("on_placed", None)
         return real_emit(*args, **kwargs)
 
-    monkeypatch.setattr(app_module, "save_patched_image", _emit_unreported)
+    monkeypatch.setattr(app_module.deps, "save_patched_image", _emit_unreported)
 
     async def scenario(app, pilot) -> None:
         _add(app, PATCH_ADDRESS, PATCH_BYTES)

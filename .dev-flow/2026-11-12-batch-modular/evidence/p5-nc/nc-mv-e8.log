@@ -1,0 +1,3 @@
+variant=none rc=1 got=E8 written_files=0
+MOVE FAIL E8: method '_land_focus' has a Textual @on decorator
+TC-MOD-28(mover E8) PASS E8 E8 rc=1 written_files=0 (none)

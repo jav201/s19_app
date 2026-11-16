@@ -25,6 +25,7 @@ from textual.widgets import Button, DataTable, Input, Select, TextArea
 from s19_app.tui import screens_directionb as sdb
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import DUMMY_CHANGESET_TEXT, serialize_change_document
+from tests.support import package_source as ps
 from tests.b97_fixtures import (
     CALIB_ADDRESSES,
     CALIB_ENTRIES,
@@ -276,8 +277,8 @@ def test_tc_b97_02_tab_chips_nine_activations(tmp_path: Path) -> None:
 def test_tc_b97_03_columns_once_and_no_geometry_pass(tmp_path: Path) -> None:
     """TC-B97-03 (LLR-144.3): after two shows and a resize the ledger has its
     five columns once, is not a forced 3-row band, the file select and path
-    input widths follow the panel (118x54 vs 220x60), and ``app.py`` holds no
-    show-time geometry call.
+    input widths follow the panel (118x54 vs 220x60), and the app package
+    (``s19_app/tui/app/``) holds no show-time geometry call.
 
     RED on main: ``table.styles.height = 3`` → a 3-row table at both sizes;
     select / path 30 / 28 at both; ``app.py:6995`` calls the geometry pass.
@@ -308,7 +309,7 @@ def test_tc_b97_03_columns_once_and_no_geometry_pass(tmp_path: Path) -> None:
     assert small[0] == large[0] == 5, (small, large)
     assert small[1] > 3 and large[1] > 3, (small, large)
     assert small[2] != large[2] and small[3] != large[3], (small, large)
-    app_source = (Path(sdb.__file__).parent / "app.py").read_text(encoding="utf-8")
+    app_source = ps.package_text("app")
     assert "_apply_window_geometry" not in app_source
 
 
@@ -316,7 +317,7 @@ def test_tc_b97_03_columns_once_and_no_geometry_pass(tmp_path: Path) -> None:
 # TC-B97-04 — LLR-144.4 (+ the D23 scope guard, Inc-3 F9)
 # --------------------------------------------------------------------------- #
 
-STYLES = Path(sdb.__file__).parent / "styles.tcss"
+STYLES = Path(sdb.__file__).parent.parent / "styles.tcss"
 
 #: The unscoped rule the Check Editor's rows inherit, verbatim at ``98f3c84``
 #: (``styles.tcss:1149-1154``). Inc-4 keeps it byte-equal (D23 guard).
@@ -577,7 +578,7 @@ def _clock(monkeypatch):
     ticks = iter(range(1, 10_000))
     # raising=False: on the base tree the seam is absent, and the arm must fail
     # at its own clause (PC-11), not at the monkeypatch.
-    monkeypatch.setattr(sdb, "_json_clock", lambda: f"00:00:{next(ticks):02d}"[-8:], raising=False)
+    monkeypatch.setattr(sdb.deps, "_json_clock", lambda: f"00:00:{next(ticks):02d}"[-8:], raising=False)
 
 
 def _arm(app, panel) -> dict:

@@ -248,7 +248,7 @@ def test_tc_b100_23_digest_changed_between_write_and_verify(
     from s19_app.tui import app as app_module
 
     project_dir = projects.build_p04_case(tmp_path / "app", "clean")
-    real_verify = app_module.verify_written_manifest
+    real_verify = app_module.deps.verify_written_manifest
     seen: list = []
 
     def _tamper_then_verify(project, *args, **kwargs):
@@ -261,7 +261,7 @@ def test_tc_b100_23_digest_changed_between_write_and_verify(
             (project / "project.json").write_text(json.dumps(manifest), encoding="utf-8")
         return real_verify(project, *args, **kwargs)
 
-    monkeypatch.setattr(app_module, "verify_written_manifest", _tamper_then_verify)
+    monkeypatch.setattr(app_module.deps, "verify_written_manifest", _tamper_then_verify)
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path / "app")
@@ -716,7 +716,7 @@ def test_tc_b100_61_unreadable_a2l_is_its_own_problem_and_the_image_opens(
     def _denied(path, *args, **kwargs):  # Inc 12b census C7: progress= may be passed
         raise PermissionError(13, "Permission denied", str(path))
 
-    monkeypatch.setattr(app_module, "parse_a2l_file", _denied)
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _denied)
     app = _load_directly(base)
     assert _problems(app) == [("not readable", "firmware.a2l")]
     assert app._last_load_announcement.unreadable == ()

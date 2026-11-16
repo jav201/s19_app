@@ -1,0 +1,68 @@
+p5-nc: negative controls re-run on the FINAL tree (batch-modular-apply @ 5b67c844), Linux host, 2026-11-13.
+Tools under test = the tools in that tree (tools/modularize/*). Product/tests/tools were not edited; every mutation ran in a
+hard-linked scratch copy with the touched files replaced by new inodes. Mover runs start from base 4f721985 (clean checkout).
+Isolation: env -i PATH=/usr/bin:/bin HOME=<state>/zq_iso_user TMPDIR=<state>/tmp PYTHONDONTWRITEBYTECODE=1 LANG=C.UTF-8, stdin /dev/null.
+Format: <id> PASS|FAIL <expected> <got> then the key tool line.  Raw logs: nc-vf3.log nc-mv3.log nc-mv-e8.log nc-mv37.log nc-rt3.log nc-law3.log nc-pkg.log; outputs/ has per-control tool output.
+
+== Verifier (nc_vf3.sh; mutations nc_mut2.py = p0-fix unchanged for 1..16, nc_mut3.py new for 17..25)
+NC-VF-0  PASS VERIFY OK rc=0                      VERIFY ... units_old=626 units_new=626 missing=0 ... names=0 tc_shape=0 / VERIFY OK
+NC-VF-1  PASS V1        V1                        V1: S19TuiApp._land_focus: no unit in the new package (old line 11183)            [TC-02]
+NC-VF-2  PASS V2+V10    V10,V2                    V2: ... 2 units for 1 old (navigation.py:829, shell.py:585); V10: name _land_focus defined in NavigationMixin, ShellMixin   [TC-03, TC-12]
+NC-VF-3  PASS V4        V4                        V4: S19TuiApp._busy_tick (shell.py:342): first diff ... % 10' new='... % 17'    [TC-05]
+NC-VF-4  PASS V5        V4,V5                     V5: S19TuiApp._log_a2l_parse_summary (a2l_view.py:630): deps.Path: not a D1 name   [TC-06]
+NC-VF-5  PASS V6+V7     V6,V7                     [TC-09]
+NC-VF-6  PASS V8        V11,V13,V17,V18,V8,V9     [TC-08]
+NC-VF-7  PASS V9        V8,V9                     [TC-11]
+NC-VF-8  PASS V11       V11                       V11: app: re-export _TYPED_REFUSAL_TOKENS is missing; reexports_missing=1       [TC-14]
+NC-VF-9  PASS V13|V14   V11,V13,V14,V17,V9        V14: shared.py imports navigation: breaks the I-1 direction rule; V14: cycle: deps -> shared -> navigation -> deps; V13: ImportError ... circular import   [TC-17, TC-18]
+NC-VF-10 PASS V4+V16    V16,V4                    [TC-23]
+NC-VF-11 PASS V12       V12                       [TC-24]
+NC-VF-12 PASS V17       V17                       [TC-20]
+NC-VF-13 PASS V4|V5     V4                        [TC-07]
+NC-VF-14 PASS V18       V18                       TARGET=Label
+NC-VF-15 PASS V18       V18                       TARGET=safe_text MODULE=a2l_view
+NC-VF-16 PASS V19       V17,V19                   TARGET=TYPE_CHECKING
+NC-VF-17 PASS V3        V3                        def _helper(): pass appended to shell.py           [TC-04]
+NC-VF-18 PASS V10       V10                       ComposeScreensMixin<->FlowMixin swapped in the core header   [TC-13]
+NC-VF-19 PASS V11       V11                       V11: screens_directionb: re-export CHECK_GLYPHS is missing; reexports_missing=1   [TC-15]
+NC-VF-20 PASS V11       V11,V3,V6                 V11: app: re-export parse_a2l_cached (home deps) is not the home module's object (identity)   [TC-16]
+NC-VF-21 PASS V14       V14                       V14: patch.py imports flow: breaks the I-1 direction rule     [TC-19]
+NC-VF-22 PASS V15       V15                       caps_over=1; V15: app/shell.py has 2983 lines > cap 2200 (largest class 497)   [TC-21; padded module instead of editing the tool constant]
+NC-VF-23 PASS V12|V13   V1,V11,V13,V17,V9         screens_directionb/__init__.py deleted (verifier side of TC-25)
+NC-VF-24 PASS V8        V11,V8                    V8: _is_link_stat: sits in deps.py (line 192), map says shared.py   [TC-27 scratch half]
+NC-VF-25 FAIL V9        V17,V4                    @on(Button.Pressed) on a NavigationMixin method: V4 (body differs) and V17 fire, V9 does not   [TC-28 verifier half]
+   Note: V9 as specified (spec-verify) checks core pins only; nothing in verify*.py inspects an `@on` decorator on a mixin method. The mutant is caught (rc=1) under other codes.
+
+== Mover (nc_mv3.sh, nc_mv_e8.sh, nc_mv37.sh; mover = final tree tools/modularize/move.py)
+MV-baseline  PASS MOVE OK rc=0   MOVE base=4f721985... app_files=23 sdb_files=9 units=741 d1_rewrites=220 relimport_rewrites=18 css_rewrites=1 / MOVE imports_fresh=32/32 cycles=0 reexports_missing=0 caps_over=0 / SELF deps-bound 38/38 / SELF deps-bound 1/1 / MOVE OK
+TC-MOD-40    PASS porcelain = " D s19_app/tui/app.py", " D s19_app/tui/screens_directionb.py", "?? .modularize/", "?? s19_app/tui/app/", "?? s19_app/tui/screens_directionb/" only   (33 files written: 23 + 9 modules + move-edits.json)
+NC-MV-7      PASS identical sha256 per file, two runs   files=33 digest=30d0e8973114f7a6/30d0e8973114f7a6          [TC-30]
+NC-MV-5      PASS E1       E1     rc=1 written_files=0   MOVE FAIL E1: map base 287b9dc3... != rev 4f721985...     [TC-31]
+NC-MV-1      PASS E3       E3     rc=1 written_files=0   (entry _land_focus dropped)                                [TC-32]
+NC-MV-2      PASS E4       E4     rc=1 written_files=0   (_land_focus duplicated into shell)                        [TC-33]
+TC-34        PASS E5       E5     rc=1 written_files=0   MOVE FAIL E5: class unit '_land_focus': unknown module '../x'
+NC-MV-3      PASS E9       E9     rc=1 written_files=0   (check_action -> navigation)                               [TC-35]
+NC-MV-4      PASS E11      E11    rc=1 written_files=0   (_variant_set setter -> shell)                             [TC-36]
+TC-37 mover  FAIL refused  MOVE OK rc=0 written_files=5  on_button_pressed -> navigation is NOT refused by the mover (no E-code covers a moved core-pinned handler that has no @on and no zero-arg super())
+TC-37 verify PASS V9       V9     rc=1   V9: S19TuiApp.__dict__ has no on_button_pressed     (run on the mover's output with the same map)
+TC-38        PASS E6       E6     rc=1 written_files=0   MOVE FAIL E6: D1 name 'os' bound in non-module scope '_flush_logger' at line 3345
+NC-MV-6      PASS E12      E12    rc=1 written_files=0   MOVE FAIL E12: module 'shell': unresolvable name 'NC_MV6_MISSING'   [TC-39]
+NC-MV-8      PASS MOVE FAIL(fresh import|cycle)  cycle,direction,fresh import,reexports  rc=1   MOVE imports_fresh=0/32 cycles=1 reexports_missing=598; MOVE FAIL cycle: core -> navigation -> core; MOVE FAIL direction: navigation -> core
+NC-MV-9      PASS MOVE FAIL deps-bound  rc=1   SELF deps-bound 8/38; MOVE FAIL deps-bound: s19_app.tui.app deps.Label used but not bound in deps.py
+NC-MV-10     NO TOOL GATE   (emitter with str_ann=set())   mover rc=0 MOVE OK, SELF deps-bound 38/38; the generated screens_directionb/loaded_artifacts.py loses 3 lines (`from typing import TYPE_CHECKING` / `if TYPE_CHECKING:` / `from ..models import LoadedFile`) versus the unmutated output; verify.py on the mutated output prints VERIFY OK.
+   Only an output diff against the unmutated mover run detects NC-MV-10 (V18 excludes annotations by design). Finding; no TC row depends on it.
+TC-28 mover  PASS E8       E8     rc=1 written_files=0   MOVE FAIL E8: method '_land_focus' has a Textual @on decorator   (scratch base commit with @on(Button.Pressed) above the def; map unchanged but for base)
+
+== Retargeter (nc_rt3.sh; independent undo check rt_undo_check.py)
+TC-MOD-52    PASS retarget rc=0   RETARGET files_scanned=309 files_changed=27 T1=133 T2=6 T3=12 T4=64 T5=2 T6=29 refused=0 accepted=1 / RETARGET CHECK remaining=0 / RETARGET OK
+             UNDO-CHECK files_changed=27 lines_changed=246 lines_outside_spans=0   (pre-retarget tests 62b6e712 over the final product; byte comparison, only inserted `.deps` tokens differ)
+TC-MOD-52-NC PASS diff-outside-spans rc=1 files_written=0   (apply_edits mutated to append one stray space: `diff-outside-spans tests/test_b100_busy.py`, nothing written)
+
+== H-13 laws (nc_law3.sh; mutants nc_law_mut.py): each law node GREEN on the tree, RED under the law's own mutant
+7L-1  PASS tree_rc=0 mutant_rc=1  AssertionError: ['s19_app/tui/services/flow_execution_service.py:2333']
+7L-10 PASS tree_rc=0 mutant_rc=1  byte-identity census drifted: unexpected {('s19_app/tui/app/navigation.py', '_nc_byte_identity')}
+7L-15 PASS tree_rc=0 mutant_rc=1  AssertionError: ['tui/app/a2l_view.py', 'tui/app/project_load.py']
+7L-20 PASS  7L-32 PASS  7L-33 PASS  7L-39 PASS  7L-43 PASS  7L-44 PASS  7L-69 PASS  7L-74 PASS  7L-75 PASS  7L-76 PASS   (assertion lines per row in nc-law3.log)
+
+== Package discovery (nc_pkg.sh)
+TC-MOD-25    PASS FOUND 2/2 s19_app.tui.app,s19_app.tui.screens_directionb  then, without screens_directionb/__init__.py, FOUND 1/2 s19_app.tui.app
