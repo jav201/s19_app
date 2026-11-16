@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- C:\hostedtoolcache\windows\Python\3.11.9\x64\python.exe
+rootdir: [CI_GITHUB_WORKSPACE]
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5
+collecting ... collected 1 item
+
+tests/test_b103_clipboard_windows.py::test_runner_clipboard_probe PASSED [100%]
+
+----- generated xml file: [CI_RUNNER_TEMP]\e5-paste-winci\GW-W03\pre-probe.xml ------
+============================== 1 passed in 3.23s ==============================

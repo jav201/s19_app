@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.430" timestamp="2026-11-16T16:56:39.817877+00:00" hostname="runnervmm7ud1"><testcase classname="tests.test_b103_clipboard_windows" name="test_runner_clipboard_probe" time="0.257" /></testsuite></testsuites>
