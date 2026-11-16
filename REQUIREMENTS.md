@@ -638,6 +638,57 @@ painted tag name  Characters outside U+0021 … U+007E become U+FFFD before the
                 to R-TUI-103a and R-TUI-103.1. The detail card keeps the full name.
 ```
 
+#### CTX-A2L-LIST · List of labels (S2.5; batch-103 Inc 7)
+
+```text
+label-list parser  The bulk parser: new line, carriage return, comma and semicolon become
+                   spaces, then the text splits on whitespace; order kept, repeats kept,
+                   no empty name.
+pasted names       Of a text: the names the label-list parser gives for it, in order;
+                   position 1 is the first.
+list text          A text whose pasted names number 2 or more.
+list mode          The viewer while an A2L is loaded, the filter text is a list text and
+                   the filter field is `name` or `all`.
+text mode          The viewer at any other time.
+tag name           The `name` of an enriched tag of the current A2L.
+entry status       Of a pasted name: found, missing, duplicate or hidden (R-A2L-LIST.002–.005).
+glyph              found `●` · missing `✗` · duplicate `=` · hidden `◐`.
+status word        found `found` · missing `not in A2L` · duplicate `dup of #<p>` ·
+                   hidden `hidden: <mode label>`; mode labels: `All`, `Invalid`, `In-memory`.
+found count        The pasted names with the status found or hidden.
+counts line        `<n> pasted  ·  ● <f> found  ·  ✗ <m> missing  ·  = <d> duplicate<s>`,
+                   <s> = `s` unless <d> is 1; followed by `  ·  ◐ <h> hidden by mode` when
+                   <h> ≥ 1.
+ribbon             One glyph per pasted name in pasted order, each followed by a space when
+                   2 × <n> fits in the cell budget; at most <budget> glyphs, then ` +<k>`
+                   for the rest. Budget: 80 in the viewer, 50 in the paste window.
+missing line       `Missing <m> ` + (`▸ #<p> <name>` joined by ` · `, when <m> ≥ 1) + 4 spaces
+                   + `Duplicates <d> ` + (`▸ #<p> <name> (= #<q>)` joined by ` · `, when
+                   <d> ≥ 1).
+display text       Of a name or a text: it with each character U+0000–U+001F, U+007F–U+009F,
+                   U+061C, U+200B–U+200F, U+202A–U+202E, U+2060, U+2066–U+2069 and U+FEFF
+                   replaced by U+FFFD, one for one, painted with markup off.
+short text         Of a name or a text: its display text when that is 64 characters or
+                   fewer, else the first 63 characters of its display text and `…`.
+body regimes       Of the A2L Explorer body, the region of `#a2l_panes`:
+                     wide body     180 columns wide or more;
+                     stacked body  less than 180 and at least 110 columns wide, and at
+                                   least 32 rows high;
+                     short body    every other body: less than 180 columns wide, and
+                                   less than 110 columns wide or less than 32 rows high.
+more line          `  +<k> more names (the counts above cover all <n>)`.
+dropdown           The suggestion box under the filter box (its accept key is tab) or under
+                   the paste window's add line (its accept key is enter).
+ranked names       Of a text: rank(text, prepared name list, 20) of CTX-A2L-MATCH.
+prepared name list The CTX-A2L-MATCH index of the distinct tag names of one A2L load generation.
+choice             The highlighted row of an open dropdown; the first row when it opens.
+rule tag           `<rule>` (exact, prefix, substring, token, subsequence) or
+                   `fuzzy · <k> edit` (k = 1) / `fuzzy · <k> edits`.
+paste routes       The terminal's paste, Ctrl+V and a right-click with no selection.
+A2L transition     Attach, image load with an A2L, project install or unload; it ends in the
+                   common refresh (R-A2L-REFRESH.001–.005).
+```
+
 #### CTX-A2L-MATCH · Label similarity (S2.8)
 
 ```text
@@ -951,10 +1002,11 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TUI-037.1 | While | While the A2L Explorer is shown, the system shall give the tag table 4/7 of the screen width. |
-| R-TUI-037.2 | While | While the A2L Explorer is shown, the system shall give the hex pane 3/7 of the screen width. |
+| R-TUI-037.1 | While | While the A2L Explorer body is a short body, the system shall give the tag table 4/7 of the A2L Explorer body width. |
+| R-TUI-037.2 | While | While the A2L Explorer body is a short body, the system shall give the hex pane 3/7 of the A2L Explorer body width. |
 | R-TUI-042a.1 | While | While the operator scrolls the tag table, the system shall keep its column header visible. |
-| R-TUI-042a.2 | U | The system shall show the tag table with no padding between cells. |
+| R-TUI-042a.2 | U | The system shall show at least one blank column between adjacent cells of the tag table. |
+| R-TUI-042a.3 | While | While the name width of the tag table is 34 cells or more, the system shall show a tag name longer than 34 characters in the Tag cell as its *painted tag name*: its first 16 characters, `…` and its last 17 characters. |
 | R-A2L-006.1 | When | When the system shows the tag table, the system shall show the columns CTX-A2L-SCREEN lists, in that order. |
 | R-A2L-006.2 | When | When the system shows a tag in the tag table, the system shall start its Tag cell with its in-image glyph. |
 | R-A2L-006.3 | If | If a tag has no name, then the system shall show `UNKNOWN` in its Tag cell. |
@@ -990,14 +1042,14 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-007.1 | When | When the operator stops typing in the filter box for 0.15 s, the system shall show only the tags whose filter field contains the filter text, ignoring case. |
-| R-A2L-007.2 | If | If the filter field is `all`, then the system shall match the filter text against every filter field. |
+| R-A2L-007.1 | When | When the operator stops typing in the filter box for 0.15 s while the viewer is in text mode, the system shall show only the tags whose filter field contains the filter text, ignoring case. |
+| R-A2L-007.2 | If | If the filter field is `all` while the viewer is in text mode, then the system shall match the filter text against every filter field. |
 | R-A2L-007.3 | When | When the operator presses the `Field: <field>` button, the system shall open the list of filter fields with the current one marked `(*)`. |
 | R-A2L-007.4 | When | When the operator picks a filter field, the system shall show `Field: <field>` on the button. |
 | R-A2L-007.5 | When | When the system matches the filter text against the address field, the system shall compare it with the address as the table shows it. |
-| R-A2L-007.6 | When | When the operator presses `All`, the system shall show the tags the filter text selects, whatever their status. |
-| R-A2L-007.7 | When | When the operator presses `Invalid`, the system shall show only the tags whose row is red. |
-| R-A2L-007.8 | When | When the operator presses `In-Memory`, the system shall show only the tags that are in image. |
+| R-A2L-007.6 | When | When the operator presses `All` while the viewer is in text mode, the system shall show the tags the filter text selects, whatever their status. |
+| R-A2L-007.7 | When | When the operator presses `Invalid` while the viewer is in text mode, the system shall show only the tags whose row is red. |
+| R-A2L-007.8 | When | When the operator presses `In-Memory` while the viewer is in text mode, the system shall show only the tags that are in image. |
 | R-A2L-007.9 | When | When the operator picks a filter mode, the system shall mark its button as active. |
 | R-A2L-007.10 | When | When the filter changes, the system shall show the first page of the table. |
 
@@ -1041,8 +1093,8 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 | R-TUI-069.3 | When | When the system shows a tag in the detail card, the system shall show on its first line the in-image glyph, the tag's display identifier or name, and its address. |
 | R-TUI-069.4 | When | When the system shows a tag in the detail card, the system shall show the lines `desc <description>`, `unit <unit> · conv <conversion method>`, `layout <record layout>`, `byteorder <byte order>` and `limits <lower>..<upper>`. |
 | R-TUI-069.5 | If | If a detail-card field has no value, then the system shall leave out its line. |
-| R-TUI-069.6 | U | The system shall show the detail card at most 5 lines high, above the hex view. |
-| R-TUI-069.7 | If | If the detail card's content is longer than 5 lines, then the system shall let the operator scroll it. |
+| R-TUI-069.6 | While | While the A2L Explorer body is 180 columns wide or more, the system shall show the detail card at most 8 lines high, above the hex view. |
+| R-TUI-069.7 | If | If the detail card's content is longer than the detail card's height, then the system shall let the operator scroll it. |
 
 **Selecting a row**
 
@@ -1404,6 +1456,94 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-REFRESH.026 | When | When A2L copy, parse or precompute work runs on a worker, the system shall confine that worker to data preparation and perform every common-refresh view mutation on the UI thread. |
 | R-A2L-REFRESH.027 | When | When a direct A2L attach or A2L-only project install completes without installing a primary image, the system shall publish a new A2L view generation while keeping the current image generation unchanged. |
 | R-A2L-REFRESH.028 | If | If a worker-prepared A2L enrichment snapshot's expected post-install A2L or image generation differs from its recorded generation, then the system shall discard the whole prepared load before installing any file, A2L, enrichment, MAC or Issues state. |
+
+##### List of labels (CTX-A2L-LIST; batch-103 Inc 7)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-A2L-LIST.001 | U | The system shall take as the pasted names of a text the names the label-list parser gives for it. |
+| R-A2L-LIST.002 | When | When the system resolves the pasted names against the current A2L, the system shall give the status found to each first occurrence of a name that equals a tag name, case kept. |
+| R-A2L-LIST.003 | If | If a pasted name equals an earlier pasted name, then the system shall give it the status duplicate of the earlier name's position. |
+| R-A2L-LIST.004 | If | If a first occurrence of a pasted name equals no tag name, then the system shall give it the status missing. |
+| R-A2L-LIST.005 | While | While the viewer's filter mode is not `All`, the system shall give the status hidden to a found name whose tag that mode leaves out of the text-mode table. |
+| R-A2L-LIST.006 | While | While the viewer is in list mode, the system shall show one table row per pasted name, in pasted order. |
+| R-A2L-LIST.007 | While | While the viewer is in list mode, the system shall show `LIST` in the mode tag before the filter box. |
+| R-A2L-LIST.008 | While | While the viewer is in text mode, the system shall show `FILTER` in the mode tag before the filter box. |
+| R-A2L-LIST.009 | While | While the viewer is in list mode, the system shall show the table columns `#`, `Tag`, `Status`, `Kind`, `Address`, `Len`, `Physical`, `Unit` and `Limits`, in that order. |
+| R-A2L-LIST.010 | While | While the viewer is in list mode, the system shall keep the `#` and `Tag` columns in place under a horizontal scroll. |
+| R-A2L-LIST.011 | When | When the system shows a pasted name in a list-mode row, the system shall show in its `Tag` cell the glyph of its status, a space and the display text of the name. |
+| R-A2L-LIST.012 | When | When the system shows a pasted name in a list-mode row, the system shall show its status word in its `Status` cell. |
+| R-A2L-LIST.013 | When | When the system shows a found, duplicate or hidden name in a list-mode row, the system shall show in its `Kind` cell the tag's characteristic type, `MEASURE` for a measurement, and the tag's section otherwise. |
+| R-A2L-LIST.014 | When | When the system shows a found, duplicate or hidden name in a list-mode row, the system shall show in its `Address`, `Len`, `Physical`, `Unit` and `Limits` cells the text the text-mode table shows for that tag in its `Address`, `Length`, `Physical`, `Unit` and `Limits` cells. |
+| R-A2L-LIST.015 | If | If a list-mode row shows a missing name, then the system shall leave its cells after `Status` blank. |
+| R-A2L-LIST.016 | While | While the viewer is in list mode, the system shall show under the table the summary `LIST  rows <a>-<b> / <n> in pasted order`. |
+| R-A2L-LIST.017 | While | While the viewer is in list mode, the system shall show above the table ` LIST ` and two spaces followed by the counts line. |
+| R-A2L-LIST.018 | While | While the viewer is in list mode, the system shall show under the counts line `order ` followed by the ribbon and `   field ignored in LIST mode · esc back to text filter · alt+p edit the list`. |
+| R-A2L-LIST.019 | While | While the viewer is in text mode, the system shall show above the table ` TEXT `, two spaces, `'<short text of the filter text>' in <field>` or `no text filter`, `  ·  showing <n> of <T>` and `   paste several names, or alt+p, to filter by a LIST`. |
+| R-A2L-LIST.020 | While | While the filter mode is `All`, the system shall show under the filter summary `mode All · no tag hidden by mode (<T> tags)`. |
+| R-A2L-LIST.021 | While | While the filter mode is not `All`, the system shall show under the filter summary `mode <mode label> · hides <h> of <T> tags  alt+a All`, where <h> counts the tags the mode leaves out with no filter text. |
+| R-A2L-LIST.022 | While | While the viewer is in list mode, the system shall show the missing line under the mode line. |
+| R-A2L-LIST.023 | While | While the viewer is in text mode, the system shall show no missing line. |
+| R-A2L-LIST.024 | If | If more than 20 pasted names are missing, or more than 20 are duplicates, then the system shall list the first 20 of that kind in the missing line, followed by ` +<k>` for the rest. |
+| R-A2L-LIST.025 | If | If the filter text matches no tag in text mode with a filter mode other than `All` and matches at least one tag with mode `All`, then the system shall show the summary `No tag matches '<short text of the filter text>' with mode <mode label> — <n> match with mode All alt+a`. |
+| R-A2L-LIST.026 | When | When the operator presses alt+a on the A2L Explorer, the system shall set the filter mode to `All`. |
+| R-A2L-LIST.027 | When | When a list-mode row of a missing name becomes the highlighted row, the system shall show in the detail card the lines `✗ <display text>  not in this A2L` and `pasted #<p>`. |
+| R-A2L-LIST.028 | When | When the system has ranked the closest names of the highlighted missing name, the system shall add to the detail card the line `closest <names joined by ' · '>`, or `closest —` when there is none. |
+| R-A2L-LIST.029 | When | When a list-mode row of a duplicate name becomes the highlighted row, the system shall show the tag's detail card followed by the line `duplicate of pasted #<p>`. |
+| R-A2L-LIST.030 | When | When a list-mode row of a hidden name becomes the highlighted row, the system shall show the tag's detail card followed by the line `hidden by the active filter mode`. |
+| R-A2L-LIST.031 | When | When the operator selects a list-mode row of a found, duplicate or hidden name, the system shall show the tag in the hex pane as R-A2L-100, R-A2L-101 and R-A2L-103 say. |
+| R-A2L-LIST.032 | When | When the operator presses Esc in the filter box while it shows no dropdown and the viewer is in list mode, the system shall clear the filter text. |
+| R-A2L-LIST.033 | When | When a paste route delivers a text whose pasted names number 2 or more to the filter box with its filter field `name` or `all`, the system shall replace the box text with those names joined by `, ` and put the cursor at its start. |
+| R-A2L-LIST.034 | If | If a text a paste route delivers to the filter box holds unsafe paste characters and 2 or more pasted names, then the system shall remove them before taking its pasted names. |
+| R-A2L-LIST.035 | When | When the filter box holds a list text of 65,536 characters over an A2L of 13,990 tags, the system shall show the list-mode table, its counts line and its missing line within 1.0 s of the debounce. |
+| R-A2L-LIST.036 | When | When the system refits or repaints the tag table while the viewer is in list mode, the system shall keep the list-mode columns and rows. |
+| R-A2L-LIST.040 | When | When the operator presses alt+p on the A2L Explorer, or its `Paste list…  alt+p` button, the system shall open the paste window titled `Paste a list of labels`. |
+| R-A2L-LIST.041 | When | When the paste window opens while the viewer is in list mode, the system shall fill its text area with the viewer's pasted names, one per line. |
+| R-A2L-LIST.042 | When | When the paste window opens, the system shall put the focus in its text area. |
+| R-A2L-LIST.043 | U | The system shall show in the paste window the add line labelled `add` with the placeholder `part of a name — start, middle, end, a typo`, and above the text area the label `or paste names — new line , ; space`. |
+| R-A2L-LIST.044 | U | The system shall show in the paste window the note `The list filters the viewer (LIST mode, pasted order); nothing is saved. Missing names stay listed so you can fix them.` |
+| R-A2L-LIST.045 | U | The system shall show in the paste window the buttons `Filter viewer by list  alt+f` and `Cancel  esc`. |
+| R-A2L-LIST.046 | When | When the text area's text has not changed for 0.15 s, the system shall show in the paste window the counts line and, under it, `order ` followed by the ribbon. |
+| R-A2L-LIST.047 | When | When the text area's text has not changed for 0.15 s, the system shall show in the paste window's preview one row per pasted name with the cells `#`, `Name`, `Status`, `Kind` and `Address`, and also `Value` and `Unit` when the A2L Explorer body was 180 columns wide or more as the window opened. |
+| R-A2L-LIST.048 | When | When the text area's text has not changed for 0.15 s, the system shall show the missing line under the preview. |
+| R-A2L-LIST.049 | When | When the system has ranked the closest names of one of the first 10 missing names in pasted order, the system shall show under the missing line `  similar to #<p> <short text of the name>: ` followed by those names joined by ` · `. |
+| R-A2L-LIST.050 | If | If a missing name has no ranked name, then the system shall end its similar line with `none (digits must match exactly)`. |
+| R-A2L-LIST.051 | If | If more than 10 pasted names are missing, then the system shall show after the similar lines `  similar names are shown for the first 10 missing names`. |
+| R-A2L-LIST.052 | If | If the text area's text changes while the closest names of an earlier text are being ranked, then the system shall discard those closest names. |
+| R-A2L-LIST.053 | When | When the operator presses alt+f in the paste window or its `Filter viewer by list` button, the system shall close the window and set the viewer's filter text to the window's pasted names joined by `, `. |
+| R-A2L-LIST.054 | If | If the text area holds no name when the operator presses alt+f, then the system shall close the paste window and keep the viewer's filter text. |
+| R-A2L-LIST.055 | When | When the operator presses Esc in the paste window while it shows no dropdown, or its `Cancel` button, the system shall close the window and keep the viewer's filter text. |
+| R-A2L-LIST.056 | When | When an A2L transition completes while the paste window is open, the system shall resolve the window's pasted names against the current A2L. |
+| R-A2L-LIST.057 | When | When the operator presses enter on the add line while its dropdown has a choice, the system shall append the chosen name and a new line to the text area, empty the add line and close the dropdown. |
+| R-A2L-LIST.058 | If | If the operator presses enter on the add line while it shows no dropdown, then the system shall leave the text area and the add line unchanged. |
+| R-A2L-LIST.059 | When | When the system shows the closest names of a missing name, the system shall leave the text area unchanged. |
+| R-A2L-LIST.060 | When | When the filter box's text has not changed for 0.15 s and, stripped, is not empty and not a list text, the system shall open the filter box's dropdown with the ranked names of that text. |
+| R-A2L-LIST.061 | When | When the add line's text has not changed for 0.15 s and, stripped, is not empty, the system shall open the add line's dropdown with the ranked names of that text. |
+| R-A2L-LIST.062 | If | If the filter box's stripped text is empty or a list text, then the system shall close its dropdown. |
+| R-A2L-LIST.063 | When | When the system shows ranked names in a dropdown, the system shall show at most the first 8 of them, one per row, each as `▸ ` for the choice or two spaces otherwise, the display text of the name, and its rule tag. |
+| R-A2L-LIST.064 | When | When the system shows a ranked name in a dropdown, the system shall highlight the characters of its match spans. |
+| R-A2L-LIST.065 | When | When the system shows ranked names in a dropdown, the system shall title it `<k> of <n> similar names`, where <n> is the number of ranked names, written `20+` when it is 20. |
+| R-A2L-LIST.066 | If | If a text has no ranked name, then the system shall title its dropdown `no similar name` and show `nothing matches '<short text of the text>'` and `digits must match exactly; a word may have 1–2 typos`. |
+| R-A2L-LIST.067 | U | The system shall end a dropdown with the key line `↑↓ choose  tab complete  esc close` under the filter box or `↑↓ choose  enter add to the list  esc close` under the add line, and the line `rank: exact › prefix › substring › token › fuzzy › subsequence`. |
+| R-A2L-LIST.068 | When | When the operator presses ↓ or ↑ while a dropdown is open, the system shall move the choice one row down or up, staying within the shown rows. |
+| R-A2L-LIST.069 | When | When the operator presses tab in the filter box while its dropdown has a choice, the system shall replace the box text with the chosen name, put the cursor at its end and close the dropdown. |
+| R-A2L-LIST.070 | When | When the operator presses Esc while a dropdown is open, the system shall close it and keep the box text. |
+| R-A2L-LIST.071 | If | If the box text or the A2L load generation has changed since a ranking started, then the system shall discard its ranked names. |
+| R-A2L-LIST.072 | When | When an A2L transition completes, the system shall prepare the name list of the current A2L's tags off the UI thread. |
+| R-A2L-LIST.073 | When | When the system ranks a text for a dropdown or for closest names, the system shall rank it off the UI thread. |
+| R-A2L-LIST.074 | When | When the prepared name list becomes ready while the filter box has the focus and holds a text that would open its dropdown, the system shall open the dropdown for that text. |
+| R-A2L-LIST.075 | When | When the text a ranking serves changes while that ranking runs, the system shall start one further ranking, for the latest text, only after the running one ends. |
+| R-A2L-LIST.076 | When | When the system paints a pasted name or a ranked name in the table, the detail card, the counts and missing lines, the paste window or a dropdown, the system shall paint its display text. |
+| R-A2L-LIST.077 | If | If a name is longer than 64 characters, then the system shall show its short text in the missing line, in a similar line, in a dropdown row and in the detail card's `✗` line. |
+| R-A2L-LIST.078 | If | If more than 200 names are pasted in the paste window, then the system shall show the first 200 preview rows followed by the more line. |
+| R-A2L-LIST.080 | While | While the A2L Explorer body is a stacked body, the system shall show the hex pane 14 rows high under the tags pane, with the detail card left of an 86-column hex box. |
+| R-A2L-LIST.081 | While | While the A2L Explorer body is 180 columns wide or more, the system shall show the tags pane left of a 90-column hex pane. |
+| R-A2L-LIST.082 | While | While the A2L Explorer body is a short body, the system shall show the detail card at most 5 lines high, above the hex view. |
+| R-A2L-LIST.083 | While | While the A2L Explorer body is 15 rows high or more, the system shall show at least one tag table row. |
+| R-A2L-LIST.084 | If | If the name-list preparation raises an error or ends after the app has stopped running, then the system shall drop the prepared list and every request held for it without an error. |
+| R-A2L-LIST.085 | If | If a ranking raises an error, or ends after the app has stopped running or after the box, window or detail card that asked for it has left the screen, then the system shall drop its ranked names without an error. |
+| R-A2L-LIST.086 | If | If the paste window's preview comes due after the window has closed or the app has stopped running, then the system shall drop it without an error. |
+| R-A2L-LIST.087 | If | If the name-list preparation of the current A2L raised an error, then the system shall start it once more at the next ranking request. |
 
 <a id="s3"></a>
 
@@ -2408,6 +2548,8 @@ load cancelled  The operator closes the Load dialog without a choice, or answers
                 load question with Cancel (S5, S7).
 frame widget    A widget of the frame outside the windows: a rail item, the palette
                 filter.
+shown widget    A widget that is displayed, together with every widget that holds it, up to
+                its window.
 text box        A single-line or multi-line box the operator types in.
 status bar      Three parts:
   status line   Left: the status text. Right: the context line.
@@ -2960,13 +3102,112 @@ single-line box  A one-line text box. Every one-line box of the app: the Load
 multi-line box   A text box of several lines that the operator edits: the two JSON
                  editors, the Patch Editor paste buffer, the CRC config, the declared
                  regions of Reports, the manual ranges of Split / Join / Export.
-OS clipboard     The operating system's clipboard (text copied in another program).
+OS clipboard     The Windows clipboard: text copied in another Windows program. On other
+                 operating systems there is no OS clipboard in the sense of these rows.
 app clipboard    Text copied inside the app.
-terminal paste   A paste the terminal sends itself (Ctrl+Shift+V in Windows Terminal).
+terminal paste   A paste the terminal sends itself: Ctrl+Shift+V in Windows Terminal, Ctrl+V
+                 where the terminal binds Ctrl+V to its own paste, and a Shift+right-click in
+                 Windows Terminal when the terminal holds no selection of its own.
+right-click     A press and release of the right mouse button over a text box, as the terminal
+                 reports it to the system. A Shift+right-click in Windows Terminal is the
+                 terminal's own and is not a right-click of the system.
+selection at the press  The selection a text box shows just before the right button goes down
+                 over it. A single-line box without the focus shows none; a multi-line box shows
+                 its selection with or without the focus. The whole-text selection a single-line
+                 box makes when the press itself gives it the focus is not part of it.
+cursor at the press  The cursor position a text box holds just before the right button goes down
+                 over it; a box without the focus keeps the position it had when it lost the focus,
+                 or the one its text was set with.
+text box        A single-line box or a multi-line box constructed by the system's windows and
+                 dialogs, not Textual's own command palette input.
+selection       The text the operator marked in a text box: with shift and the arrow, Home or End
+                 keys, with a mouse drag, with ctrl+shift+a (single-line box) or f7 (multi-line box).
+unsafe paste character  In a pasted text: a control character of CTX-TEXT (U+0000–U+001F,
+                 U+007F–U+009F) other than NUL (U+0000), a lone surrogate (U+D800–U+DFFF) or a
+                 bidi control (U+202A–U+202E, U+2066–U+2069), except the box's keep-set: TAB in a
+                 single-line box; TAB, LF and CR in a multi-line box.
+typed-key time  The median, over 10 presses, of the time from the press of the key `a` in a text
+                 box to the first 5 ms poll of the box's value that holds `a`, measured in the same
+                 running app and the same box as the action it is compared with.
+end of a paste  The moment the box shows the pasted text, or the paste failure warning shows.
+end of a copy   The moment the OS clipboard holds the copied text, or the write failure warning shows.
+responsive      A screen is responsive when every timer of the screen fires at most 100 ms after
+                 its due time.
+write failure warning  The warning notice "Clipboard write failed — copied inside the app only.",
+                 shown for 6 seconds.
+OSC 52 clipboard request  The terminal sequence
+                 `ESC ] 5 2 ; c ; <base64 of the UTF-8 bytes of the text> BEL`.
+system PowerShell  The program `<system folder>\WindowsPowerShell\v1.0\powershell.exe`, where
+                 `<system folder>` is the folder Windows reports as its system directory.
+isolated clipboard  An OS clipboard that belongs to no person: the Windows clipboard of a
+                 GitHub-hosted runner (environment `GITHUB_ACTIONS` = `true`, `RUNNER_ENVIRONMENT`
+                 = `github-hosted`, and the logged-on account `<user>`), or the X clipboard of a
+                 private Xvfb display that the test session started itself.
+clipboard probe  One nonce written to the OS clipboard by the test process, then read back by a
+                 separate system PowerShell `Get-Clipboard -Raw` process; the clipboard is usable
+                 when the read equals the nonce.
+OS clipboard tests  The test cases of the clipboard increments whose preconditions name WinCI.
 paste limit      65,536 characters. (The Load dialog's path box has its own limit of
                  4,096 characters: R-LOADDLG.19.)
 paste failure    The warning notice "Clipboard read failed — try Ctrl+Shift+V or type
 warning          the path manually.", shown for 6 seconds.
+```
+
+#### CTX-COPY · Copy out of a view (S7.3; batch-103 Inc 1b)
+
+```text
+copy key        Ctrl+C.
+view            Any part of a window or dialog outside a text box that shows text: a pane,
+                a line, a label, a card, a list, a table.
+view selection  Text the operator marks in a view: by a mouse drag, or in the JSON view also
+                by Shift+arrows or F7.
+right-click     A press and a release of the right mouse button at the same screen_offset,
+                on the same screen and widget, with no intervening MouseMove whose
+                screen_offset differs from the press, that reach the app. A Shift+right-click
+                and a Shift+drag stay the terminal's own.
+right-drag      A right-button press followed before release by a MouseMove whose
+                screen_offset differs from the press. Leaving and returning to the press
+                cell is still a right-drag, not a right-click.
+table row       A row of the A2L tag table or of the MAC table, not its header; its cell
+                metadata has out_of_bounds=False. A valid row index with out_of_bounds=True
+                is empty space, not a table row.
+empty right-click  A right-click outside a text box, neither on a view that holds part of
+                a view selection nor on a table row; out_of_bounds=True padding is empty
+                space even when its row index is valid.
+nothing selected  No non-empty view selection on the top screen (in the JSON view: none
+                while it has the focus) and no selection in the focused text box. A
+                materialized screen selection whose extracted text is "" counts as nothing
+                selected.
+quit dialog     Title "Quit?". Text "Quit the app? Nothing is selected to copy."
+                Buttons "Quit (y)" and "Stay (n)"; "Stay (n)" is the emphasised button.
+  Quit          y, or Enter or a click on "Quit (y)".
+  Stay          n, Escape, or Enter or a click on "Stay (n)".
+table           The A2L tag table (S2 CTX-A2L-SCREEN) and the MAC table (S2 CTX-MAC).
+highlighted row As CTX-A2L-SCREEN: the row under the table cursor.
+shown           Displayed, with every widget that holds it, up to its window.
+row name        The full tag name associated with a table row, without its leading glyph,
+                a tab or an internal row key; never a shortened painted cell that follows it:
+                the tag name (A2L tag table), the record name (MAC table). Markup and
+                representable C0 characters (including ESC, BEL and LF) are kept verbatim;
+                U+0000 is governed by R-COPY.25, not replaced or sanitized.
+copied text     The text a copy takes: a view selection, a row name, or a text box's selection.
+both clipboards The OS clipboard and the app clipboard.
+copy limit      65,536 characters (the paste limit of CTX-PASTE).
+capped payload  The copied text's first 65,536 characters, or all of it when shorter.
+                The original length is retained for the cut notice.
+copy notice     "Copied 1 line to the clipboard." when the copied text has one line, else
+                "Copied <n> lines to the clipboard.", <n> its number of lines: the line
+                feeds it holds plus one, a line feed at its very end not counted; an
+                information notice. One for every copy, text boxes included.
+cut notice      "Copied the first 65,536 characters to the clipboard (<N> in all).", <N> the
+                copied text's length in characters, written with a comma every three digits;
+                an information notice.
+NUL refusal warning  "Clipboard copy refused — NUL cannot be represented in the Windows text
+                clipboard."; one warning notice, 6 s. Its fixed WARNING log line is
+                "OS clipboard copy refused; payload contains NUL", without payload or a
+                payload prefix.
+terminal copy   A copy the terminal makes from its own selection (Shift+drag in Windows
+                Terminal); it never reaches the app.
 ```
 
 #### CTX-HELP · Window help (S7.4)
@@ -3182,7 +3423,7 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TUI-043.4 | When | When the operator presses Ctrl+V in a single-line box, the system shall insert the first line of the OS clipboard text at the cursor. |
+| R-TUI-043.4 | When | When the operator presses Ctrl+V in a single-line box, the system shall insert the first line of the OS clipboard text at the cursor, except in the A2L Explorer filter box, while its filter field is `name` or `all`, when the text's pasted names number 2 or more (a single line with a space counts). |
 | R-TUI-043.5 | When | When the system pastes into a text box that holds a selection, the system shall replace the selection with the pasted text. |
 | R-TUI-043.6 | If | If the system reads no text from the OS clipboard, then the system shall paste the app clipboard. |
 | R-TUI-043.7 | If | If neither clipboard holds text, then the system shall show the paste failure warning. |
@@ -3197,7 +3438,7 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 | R-TUI-044.3 | When | When the operator presses Ctrl+V in a multi-line box, the system shall insert the OS clipboard text at the cursor. |
 | R-TUI-044.4 | When | When the terminal sends a paste into a multi-line box, the system shall insert every line of it. |
 | R-TUI-044.5 | U | The system shall show pasted text as plain text, never as markup. |
-| R-PASTE.1 | When | When the terminal sends a paste into a single-line box, the system shall insert the first line of it at the cursor. |
+| R-PASTE.1 | When | When the terminal sends a paste into a single-line box, the system shall insert the first line of it at the cursor, except a paste of a text whose pasted names number 2 or more (a single line with a space counts) into the A2L Explorer filter box while its filter field is `name` or `all`. |
 | R-PASTE.2 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall put the selected text on the OS clipboard. |
 | R-PASTE.3 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall put the selected text on the app clipboard. |
 | R-PASTE.4 | When | When the operator presses Ctrl+C in a text box that holds a selection, the system shall leave the text of the box unchanged. |
@@ -3225,7 +3466,7 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 | R-PASTE.26 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall leave the text and the selection of the box unchanged. |
 | R-PASTE.27 | When | When the operator right-clicks a text box that shows a selection at the press, the system shall end the copy within the typed-key time plus 100 ms. |
 | R-PASTE.28 | If | If another program holds the OS clipboard when the operator right-clicks a text box that shows a selection at the press, then the system shall end the copy within 2.5 seconds. |
-| R-PASTE.29 | When | When the operator right-clicks a single-line box that shows no selection at the press, the system shall insert the first line of the OS clipboard text at the cursor at the press. |
+| R-PASTE.29 | When | When the operator right-clicks a single-line box that shows no selection at the press, the system shall insert the first line of the OS clipboard text at the cursor at the press, except in the A2L Explorer filter box, while its filter field is `name` or `all`, when the text's pasted names number 2 or more (a single line with a space counts). |
 | R-PASTE.30 | When | When the operator right-clicks a multi-line box that shows no selection at the press, the system shall insert the OS clipboard text at the cursor at the press. |
 | R-PASTE.31 | When | When the operator right-clicks a text box that shows no selection at the press, the system shall end the paste within the typed-key time plus 100 ms. |
 | R-PASTE.32 | If | If another program holds the OS clipboard when the operator right-clicks a text box that shows no selection at the press, then the system shall end the paste within 2.5 seconds. |
@@ -3235,6 +3476,35 @@ R-LOADDLG.66 (a project row whose name the list no longer holds: `… is not a p
 | R-PASTE.36 | If | If a committed text file of the batch-101 or the batch-103 records folder holds a leak form of the redaction gate, then the system shall fail the redaction gate test. |
 | R-TUI-043.10.1 | When | When the operator presses Ctrl+V in a text box, the system shall end the paste within the typed-key time plus 100 ms. |
 | R-TUI-043.10.2 | If | If another program holds the OS clipboard when the operator presses Ctrl+V, then the system shall end the paste within 2.5 seconds. |
+
+##### Copy out of a view (CTX-COPY; batch-103 Inc 1b)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-COPY.1 | When | When the operator presses the copy key while a view selection exists, the system shall write the selected text to the OS clipboard. |
+| R-COPY.2 | When | When the system copies text outside a text box, the system shall put the copied text in the app clipboard. |
+| R-COPY.4 | When | When the operator completes a right-click on a table row, the system shall write the row name captured at the press to the OS clipboard. |
+| R-COPY.6 | If | If the operator presses the copy key while nothing is selected, then the system shall leave both clipboards unchanged. |
+| R-COPY.7 | When | When the system has written the whole copied text to the OS clipboard after a copy, the system shall show the copy notice. |
+| R-COPY.8 | If | If the copied text is longer than the copy limit, then the system shall copy its first 65,536 characters in its place. |
+| R-COPY.9 | If | If the system has written only the first 65,536 characters of the copied text, then the system shall show the cut notice. |
+| R-COPY.10 | When | When the system copies text outside a text box, the system shall send the copied text to the terminal as an OSC 52 clipboard request. |
+| R-COPY.11 | When | When the operator selects text in a view, including with a right-drag, or moves a table's highlighted row, the system shall leave the OS clipboard unchanged. |
+| R-COPY.12 | When | When the operator completes a right-click on a view that held part of a view selection at the press, the system shall write the whole selection captured at that press to the OS clipboard. |
+| R-COPY.13 | If | If the operator makes an empty right-click or a right-drag/cancelled right-button gesture, then the system shall leave both clipboards unchanged. |
+| R-COPY.14 | If | If the operator makes an empty right-click or a right-drag/cancelled right-button gesture, then the system shall show no notice. |
+| R-COPY.15 | When | When the system has copied a view selection on a right-click, the system shall clear the view selection. |
+| R-COPY.16 | When | When the operator presses the copy key while nothing is selected, no dialog is open and no session action runs, the system shall show the quit dialog. |
+| R-COPY.17 | When | When the operator answers the quit dialog with Quit, the system shall quit. |
+| R-COPY.18 | U | The system shall draw `Stay (n)` as the emphasised button of the quit dialog. |
+| R-COPY.19 | When | When the operator presses the copy key while nothing is selected and a session action runs, the system shall show the quit question of CTX-BUSY. |
+| R-COPY.20 | If | If the operator presses the copy key while nothing is selected and a dialog is open, then the system shall open no quit dialog. |
+| R-COPY.21 | When | When the operator completes a right-click on a table row, the system shall highlight that row. |
+| R-COPY.22 | When | When the operator completes a right-click on a table row, the system shall keep every hex view on the rows it shows. |
+| R-COPY.23 | When | When the operator presses `q` while no session action runs, the system shall show one instance of the quit dialog, whether a selection is present or absent. |
+| R-COPY.24 | When | When the operator presses Ctrl+Q or chooses Quit in the command palette while no session action runs, the system shall quit immediately without the quit dialog. |
+| R-COPY.25 | If | If the capped payload of a copy contains U+0000 (NUL), then the system shall refuse the copy, leave both clipboards unchanged and show the NUL refusal warning. |
+| R-COPY.26 | If | If a pending A2L filter refresh comes due after the app has stopped running, then the system shall drop that refresh without an error. |
 
 #### S7.4 · Window help (CTX-HELP)
 
@@ -3418,14 +3688,19 @@ change summary    Per entry, in document order: span, bytes before (applied entr
 
 ```text
 save-back         Writing the Patch Editor's image to a new file after an apply.
-save-back prompt  The row "Save patched image as:" with a name box and the controls
-                  "Width: <w> bytes/line", "Write file" and "Don't save" (layout: S10).
+output format     The file format a save-back writes: S19 or Intel HEX.
+format control    The control of the save-back prompt that shows the output format and changes it.
+format suffix     `.s19` when the output format is S19; `.hex` when it is Intel HEX.
+save-back prompt  The row "Save patched image as:" with a name box, the apply line, the Format
+                  control, the Width control `Width: <w> bytes/line`, `Write file` and `Don't save`
+                  (layout: S10, R-PE-EXPORT.1).
+apply line        The line of the save-back prompt that states the result of the apply that showed
+                  it (text: R-PE-EXPORT.4).
 width             Data bytes per S19 record: 32 or 16.
-suggested name    <stem of the loaded file>-patched.s19, or …-patched.hex for an
-                  Intel HEX image.
+suggested name    `<stem of the loaded file>-patched` followed by the format suffix of the output
+                  format.
 save name         The confirmed name reduced to its last path part (either separator;
                   a drive removed), without the spaces around it.
-kind suffix       .s19 for an S19 image, .hex for an Intel HEX image.
 reserved device name  A name whose part before the first dot, without trailing dots and
                   spaces, compared case-folded with ¹ ² ³ read as 1 2 3, is CON, PRN,
                   AUX, NUL, CONIN$, CONOUT$, COM0 … COM9 or LPT0 … LPT9 (the shared
@@ -3603,7 +3878,7 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-CHG-003.1 | When | When an apply ends with at least one applied entry on an S19 or Intel HEX image, the system shall show the save-back prompt. |
+| R-CHG-003.1 | When | When an apply ends with at least one applied entry on an S19 or Intel HEX image, the system shall show the save-back prompt as a shown widget whichever inspector tab was shown when the operator pressed Apply. |
 | R-HEX-VERIFY-002.3 | When | When the system shows the save-back prompt, the system shall fill the name box with the suggested name. |
 | R-S19-WIDTH-001.1 | When | When the system shows the save-back prompt, the system shall set the width to 32. |
 | R-S19-WIDTH-001.2 | When | When the operator presses the Width control, the system shall switch the width between 32 and 16. |
@@ -3614,11 +3889,11 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 | R-CHG-003.6 | If | If no image is loaded when the operator presses `Write file`, then the system shall write no file. |
 | R-CHG-003.7 | If | If no image is loaded when the operator presses `Write file`, then the system shall show the status `Patch Editor: no image loaded - nothing saved`. |
 | R-CHG-003.8 | When | When the operator presses `Write file`, the system shall write the saved image to a new file in the destination. |
-| R-HEX-SAVE-001.1 | When | When the system writes a save-back, the system shall write the file in the kind of the loaded image, S19 or Intel HEX. |
+| R-HEX-SAVE-001.1 | When | When the system writes a save-back, the system shall write the file in the output format. |
 | R-CHG-003.9 | If | If the open change document is a blocked document when the operator presses `Write file`, then the system shall write no file. |
 | R-CHG-003.10 | If | If the open change document is a blocked document when the operator presses `Write file`, then the system shall show the status `Patched image not saved - <n> entries blocked - see issues`. |
 | R-CHG-003.11 | When | When the system writes a save-back, the system shall use the save name as the file name. |
-| R-HEX-SAVE-001.2 | If | If the save name does not end with the kind suffix in any letter case, then the system shall add the kind suffix. |
+| R-HEX-SAVE-001.2 | If | If the save name does not end with the format suffix in any letter case, then the system shall add the format suffix. |
 | R-CHG-003.12 | If | If the save name is empty or ends with a dot, then the system shall refuse the save-back with the warning finding `MF-WRITE-CONTAINMENT` and the message `the requested save-back filename is empty or ends with a dot or space after sanitization — the patched image was not written: <typed name>`. |
 | R-CHG-003.13 | If | If the save name is a reserved device name, then the system shall refuse the save-back with the warning finding `MF-WRITE-CONTAINMENT` and the message `the requested save-back filename is a Windows reserved device name — the patched image was not written: <typed name>`. |
 | R-CHG-003.14 | If | If the destination is not inside the work area, then the system shall refuse the save-back with the warning finding `MF-WRITE-CONTAINMENT` and the message `the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: <reason>`. |
@@ -3631,11 +3906,11 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 | R-CHG-003.21 | When | When the system has written a save-back, the system shall show the status `Patched image saved as <name><save suffix>`. |
 | R-CHG-003.22 | If | If the saved image holds an invalid range, then the system shall show the status `Warning: <n> invalid source ranges written with new checksums, first at 0x<A8>`. |
 | R-CHG-003.23 | If | If an entry of the open document is not inside when the system writes a save-back, then the system shall leave its address out of the save suffix. |
-| R-S19-SAVE-REUSE-001.1 | When | When the system writes a save-back of an Intel HEX image, the system shall put at most 16 data bytes in each record whatever the width. |
-| R-S19-S0HEADER-001.1 | When | When the system writes a save-back of an S19 image whose source has an S0 record with data, the system shall use that data as header data. |
-| R-S19-S0HEADER-001.2 | When | When the system writes at width 32 a save-back of an S19 image whose source has no S0 record with data, the system shall use as header data the written file name without its non-ASCII characters, cut to 252 bytes. |
-| R-S19-S0HEADER-001.3 | When | When the system writes at width 16 a save-back of an S19 image whose source has no S0 record with data, the system shall write empty header data. |
-| R-S19-EMIT.11 | When | When the system writes a save-back of an S19 image whose source has a terminator, the system shall write the address of the source's terminator in the terminator. |
+| R-S19-SAVE-REUSE-001.1 | When | When the system writes a save-back as Intel HEX, the system shall put at most 16 data bytes in each record whatever the width. |
+| R-S19-S0HEADER-001.1 | When | When the system writes as S19 a save-back whose source has an S0 record with data, the system shall use that data as header data. |
+| R-S19-S0HEADER-001.2 | When | When the system writes at width 32 as S19 a save-back whose source has no S0 record with data, the system shall use as header data the written file name without its non-ASCII characters, cut to 252 bytes. |
+| R-S19-S0HEADER-001.3 | When | When the system writes at width 16 as S19 a save-back whose source has no S0 record with data, the system shall write empty header data. |
+| R-S19-EMIT.11 | When | When the system writes as S19 a save-back whose source has a terminator, the system shall write the address of the source's terminator in the terminator. |
 
 #### S8.7 · Writing an image file (CTX-WRITE; HLR-153 statement 2)
 
@@ -3665,12 +3940,13 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 | R-HEX-EMIT-001.8 | When | When the system writes an image as Intel HEX, the system shall write no other type-01 record. |
 | R-HEX-EMIT-001.9 | When | When the system writes an empty image as Intel HEX, the system shall write only the line `:00000001FF`. |
 | R-HEX-EMIT-001.10 | When | When the system writes an image as Intel HEX, the system shall write the records in uppercase hexadecimal. |
+| R-HEX-EMIT-001.11 | When | When the system writes an image as Intel HEX, the system shall end each type-00 record at or before the 64 KiB address boundary that follows the record's first address. |
 
 #### S8.8 · Verify on save (CTX-VERIFY)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-HEX-VERIFY-001.1 | When | When the system has written a save-back file, the system shall read the file back with the S1 reader of its kind. |
+| R-HEX-VERIFY-001.1 | When | When the system has written a save-back file, the system shall read the file back with the S1 reader of the output format. |
 | R-HEX-VERIFY-001.2 | When | When the system has read a save-back file back, the system shall compare its image with the saved image. |
 | R-HEX-VERIFY-001.3 | When | When the image read back equals the saved image, the system shall mark the save `verified`. |
 | R-HEX-VERIFY-001.4 | If | If the image read back differs from the saved image, then the system shall mark the save `mismatch`. |
@@ -3939,7 +4215,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-PICKER-CORRECT.008 | If | If a declared length exceeds `MAX_A2L_DECODE_BYTES`, then the system shall skip byte iteration and paint the existing over-cap status; at exactly the cap it shall attempt the full read. |
 | R-PICKER-CORRECT.009 | When | When a Check spec entry names a loaded parameter, the system shall match it only when both the entry address and entry byte count equal the picker's declared address and full length. |
 | R-PICKER-CORRECT.010 | When | When a changed A2L generation repopulates Check, the system shall apply the existing spec demotion rule using the new full declared length. |
-| R-PICKER-CORRECT.011 | When | When the Patch A2L tab is shown, the system shall present the shared pick-mode selector with include and `Add list` controls and no duplicate Check ids. |
+| R-PICKER-CORRECT.011 | When | When the Patch Editor is shown, the system shall present the shared pick-mode selector with include and `Add list` controls and no duplicate Check ids. |
 | R-PICKER-CORRECT.012 | When | When the operator activates Patch `Add list`, the system shall open the shared bulk modal with its multiline area, exact instruction, include action and close action. |
 | R-PICKER-CORRECT.013 | When | When the operator confirms a Patch bulk list, the system shall include each exact case-sensitive source match once in list order while preserving earlier picks and unique-name counts. |
 | R-PICKER-CORRECT.014 | When | When a Patch bulk list completes, the system shall paint the shared exact summary, including the first-missing and no-match alternatives. |
@@ -3948,7 +4224,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-PICKER-CORRECT.017 | When | When the picker paints an A2L/I-2 string on a picker-owned surface, the system shall render it literally with markup off, C0/C1 controls replaced by U+FFFD and long content clipped with an ellipsis. |
 | R-PICKER-CORRECT.018 | When | When A2L population is requested, the system shall preserve the unchanged-signature no-op and describe each changed generation once per picker before painting current lengths/formats. |
 | R-PICKER-CORRECT.019 | When | When a 13,990-object A2L populates a picker, the system shall finish its single batch describe within 2.0 seconds and perform no describes during filter/page rebuilds. |
-| R-PICKER-CORRECT.020 | When | When the Patch A2L tab uses its pick controls, the system shall keep its filter, ledger, status, page, include, bulk and Use surfaces contained at supported widths. |
+| R-PICKER-CORRECT.020 | When | When the Patch Editor uses its pick controls, the system shall keep its filter row, Use parameter row and use-status line contained at supported widths. |
 | R-PICKER-CORRECT.021 | If | If any included Check parameter has no declared length, then the system shall refuse Validate and Write with `Check Editor: parameter has no length — validate/write refused.` before posting an action or reading image bytes. |
 
 <a id="s10"></a>
@@ -3962,31 +4238,31 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 ```text
 Patch Editor    Rail screen. Header "Patch Editor" with the ? chip and the
                 📂 Open patches/ chip (S5, S7). Top to bottom: the identity ribbon;
-                the ledger (border title PATCH SCRIPT) beside the inspector; the
-                file row; the document row; the legend.
+                the filter row; the staging sheet; the landing pane; the file row;
+                the document row; the save-back prompt while it is shown; the legend.
 identity ribbon <file name> · <kind> for a file-backed document;
                 draft · <kind> for a draft.
-inspector       Tab chips Inspector, JSON, Checks and A2L over one pane. Border title:
-                INSPECTOR, JSON, CHECKS or A2L, after the shown tab.
-  A2L           The shared pick-mode parameter selector: filter, ledger, status,
-                paging, Include parameter, Add list and Use parameter.
+filter row      CTX-PE-DEF. The shared parameter picker rides this row.
+staging sheet   CTX-PE-DEF.
+landing pane    CTX-PE-DEF. Tab chips Patch script, Inspector, JSON and Checks over one pane.
+  Patch script  The ledger (CTX-PE-LEDGER) with no border of its own.
   Inspector     The before → after strip (border title BEFORE → AFTER); the entry
                 form (Address, String, Bytes); Add, Edit, Remove, Edit JSON (per
-                entry); the tally.
+                entry); the tally; the Use parameter row and its status line.
   JSON          LOADED DOCUMENT · read-only, the JSON stamp, the read-only JSON view;
                 the paste heading and the paste gauge, the paste buffer, Parse
                 pasted, Edit JSON; the history strip, Undo, Redo; Execute over
-                variants (scope button, Execute scope, scope line); the save-back
-                prompt and the before/after control (hidden until revealed).
+                variants (scope button, Execute scope, scope line).
   Checks        The findings list, the check status, the patch strip and the result
                 rows (S9.2), Run checks and its help.
 file row        File: the dropdown (prompt "Change files in patches/"), the path
                 input, Load, Refresh.
 document row    Validate, Apply loaded changes, Save.
 legend          ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
-save-back prompt  S8 CTX-SAVEBACK. It sits in the JSON tab, hidden until an apply
-                reveals it.
+save-back prompt  S8 CTX-SAVEBACK. Hidden until an apply reveals it; it sits under the
+                document row (R-PE-EXPORT.1).
 before/after control  "Before/after report available:" and Write before/after report.
+                It sits with the save-back prompt.
 scope labels    active variant · all variants · per assignment (cycle order).
 ```
 
@@ -4075,6 +4351,352 @@ JSON hues       Keys, strings, numbers and true / false / null each in its own h
                 none of them an outcome colour (S9).
 ```
 
+#### CTX-PE-DEF · Edit by definition (S10.10; batch-103 Inc 8/8b)
+
+```text
+filter row       One terminal row above the sheet: the shared picker's filter input, its status
+                 `<n> of <m> shown`, Prev, `Page <p>/<q>`, Next, Include parameter, Add list. The
+                 compact filter row paints Prev, Next and Include parameter `<`, `>` and `▽ Pick`.
+staging sheet    The window with border title `STAGING SHEET` and border subtitle
+                 `enter edit · ↑↓ row · arrays open the bench`. Top to bottom: the grid scroller
+                 (the header line, the header rule, the sheet rows of the row window, the expanded
+                 object under the selected row, and the horizontal scrollbar while the grid is
+                 wider than the view), then the formula bar on its last line, outside the scroller.
+view width       V = the visible content width of the grid scroller, in cells.
+grid             The header line, the header rule and the sheet rows, each G = 143 cells wide:
+                 the 2-cell mark column, then each column followed by its gutter `│`.
+grid widths      Parameter 26, Kind 10, Current 20, New 16, Unit 8, Limits 34, Δ 20, at every
+                 view width; a gutter is 1 cell; G = 2 + Σ(width + 1) = 143. Column starts:
+                 Parameter 2, Kind 29, Current 40, New 61, Unit 78, Limits 87, Δ 122; gutters at
+                 28, 39, 60, 77, 86, 121, 142. Widths and lengths are counted in terminal cells
+                 (a wide character such as `温` is 2 cells): a cell wider than its column shows
+                 the longest start that fits in the column's width − 1 cells, then one `…`, then
+                 spaces to the width.
+header line      `  ` then each column's label, left-aligned and padded to its width, then `│`.
+header rule      `━━` then, per column, `━` × its width and `┿`.
+row window       The sheet rows painted. The grid body fills the grid scroller's height less its
+                 scrollbar row. visible = the grid body's height − 2 (the header line and the
+                 header rule); room = visible − 1 (the expanded object is cut to `room` lines, so
+                 the selected row is always painted); need = 1 + its lines after the cut. The first
+                 painted row `top` starts at row 0; when the selected row or the page changes, `top`
+                 becomes the selected row if that row is above `top`, becomes selected + need −
+                 visible if the selected row's last detail line would fall below the body, and else
+                 stays. Rows top … top + visible − need are painted.
+scroll range     The grid scroller's horizontal position x, 0 … max(0, G − V). First view position:
+                 x = 0. Last view position: x = max(0, G − V).
+landing pane     The window with border title `LANDS IN`: tab chips Patch script, Inspector, JSON,
+                 Checks over one pane.
+  Patch script   The ledger (CTX-PE-LEDGER) with no border of its own.
+  Inspector      The Inspector pane (strip, entry form, Add/Edit/Remove/Edit JSON, tally) plus the
+                 `Use parameter` row and its status line, moved from the retired A2L tab.
+row kind         number (a definition of kind "number" with no bit mask), bit mask (kind "number"
+                 with a bit mask), enum, text; `none` for a refused definition. Any other kind
+                 ("array", "curve", "map", "") is its definition-model kind word.
+kind operations  What a row's kind decides: its formula label, whether it has an editor, its
+                 current and staged value, its staged state, its preview, its detail lines, its
+                 stage request, and optionally its cells and its formula bar. Number, bit mask,
+                 enum and text have their own operations; array, curve and map have the bench
+                 operations. Every other row kind takes the fallback operations.
+editor           A row has an editor when its kind operations give one: number, bit mask and enum
+                 rows always; a text row while its span is at most 4,096 bytes; rows with the
+                 fallback operations never.
+kind word        The object's type word: the definition's char type (VALUE, ASCII, …);
+                 `MEASUREMENT` for a measurement; `?` when the definition gives neither.
+image            The source view of the loaded S19/HEX image: its memory map with, at every
+                 address an Apply journaled, the byte held before that Apply — the map the
+                 before/after strip reads. The sheet and the stage read this one map.
+page A2L         The A2L parse payload the picker last described its definitions from, kept with
+                 them; every decode and preview the sheet makes uses it, never the app's loaded A2L
+                 read at paint time. None while no A2L is loaded.
+staged overlay   The image with the bytes of every document entry written over it, in document order.
+current value    Definition-model decode of the definition over the image.
+staged value     Definition-model decode of the definition over the staged overlay.
+staged row       A number, bit-mask, enum or text row whose staged value text differs from its
+                 current value text; a row with the fallback operations, or a text row whose span
+                 is longer than 4,096 bytes, where a byte of a document entry inside the span
+                 differs from the image's byte at that address.
+formula text     The text in the formula input; it belongs to the selected row and stays with that
+                 row when the selection moves. base text: a text row's current text; empty for any
+                 other row. A row is pending while its formula text differs from its base text.
+row fill         The text the formula input takes when a row becomes selected: the row's formula
+                 text while it is pending, else its base text.
+preview          Definition-model encode of the pending formula text over the staged overlay (an
+                 `Encoded` or a `Refusal`) and, for an `Encoded`, a decode over the overlay with
+                 its bytes.
+stage            A write of one row's edit into the change document: a formula-bar stage (Enter
+                 in the formula input) or a bench's record stage.
+value text       number: the decoded `text`. enum: `<stored> <entry text>` when an entry matched,
+                 else the decoded `text`. bit mask: `<field> (0x<field>)`, the field in upper-case
+                 hex with at least 2 digits. text: `"<text>"`. Span not held by the image: `--`.
+                 Refused definition: `refused`. Fallback operations: `<n> values`, n the
+                 definition's element count, or `--` when it gives none. A text row whose span is
+                 longer than 4,096 bytes: `<n> B`, n the span's length, with no decode.
+Δ text           number, staged: `<signed Δ> staged`; number, pending: `<signed Δ> (<signed p>%)`,
+                 p = 100·Δ/(upper − lower) with one decimal while upper > lower, or `<signed Δ>`
+                 without both limits; Δ = new physical − current physical, written with the
+                 definition's display rule. enum: `<old stored> → <new stored>`. bit mask:
+                 `<signed field Δ>`. text: `<n> chars`, n = the span positions whose byte changes.
+short number     |x| < 1000: x rounded to one decimal, a trailing `.0` dropped; else 3 significant
+                 digits and `k`, `M` or `G`.
+limits cell      Exactly the Limits width, 34 cells: `<lower slot> <track> <upper slot>`.
+                 slot: 7 cells — the slot text's number right-aligned in the first 6 cells, its
+                 unit letter (`k`, `M` or `G` of the short number) in the 7th, else a space there.
+                 slot text: the short number of the limit when it is at most 6 cells, else its
+                 exponent form: one significant digit, `<d>e<exponent>`.
+                 track: 18 cells at offsets 8 … 25 of the cell: `├`, `─` × 16, `┤`; `●` at the
+                 current value, `◆` at the preview or staged value; a value below lower is `◀` on
+                 the left end, above upper `▶` on the right end; a value v in range sits on cell
+                 1 + round(pos × 15), kept within 1 … 16, pos = (v − lower)/(upper − lower),
+                 computed on halves (v/2 − lower/2)/(upper/2 − lower/2) only when upper − lower
+                 overflows, so a finite span always has a finite pos; a second mark on a taken cell
+                 moves one cell right, or one cell left from cell 16.
+                 enum: the stored values; bit mask: the field values.
+                 no-position form: both slots and the track `├`, `─` × 7, `?`, `─` × 8, `┤` with
+                 no `●`, `◆`, `◀` or `▶` (`?` at offset 16 of the limits cell) — while the current
+                 or the new value is not a finite number, or the pos of a value in range is not.
+                 It takes precedence over `◀` and `▶`.
+                 range form: both slots, the track's 18 cells blank but for `…` at its cell 8
+                 (offset 16 of the limits cell) — while upper is not greater than lower, while a
+                 limit is not finite, and on bench rows.
+                 no-limits form: 34 cells blank but for `-` at offset 16 — no lower or no upper
+                 limit (text rows, refused rows, an array without limits).
+mark             Cell 1: `▶` on the selected row, else space. Cell 2: `●` staged, else `◆` pending,
+                 else space.
+definition line  `└ <conversion> <formula> · <datatype> <format> <order>[ · <record layout>] · 0x<address> · <n> B`;
+                 ` · <record layout>` only when the definition names one. conversion: the method's
+                 type word, or NO_COMPU_METHOD. formula: IDENTICAL or NO_COMPU_METHOD `phys = raw`;
+                 LINEAR `phys = <a>*raw + <b>` (`<a>*` left out when a = 1, ` + <b>` when b = 0);
+                 TAB_VERB `<n> pairs`; any other type: none. Under a bit mask `raw` is written
+                 `(word & <mask>) >> <shift>`. format: the element format label (`u16`, `s16`,
+                 `f32`, `text`). order: `big-endian` or `little-endian`. address: 8 upper-case hex
+                 digits. n: the span's byte length. A text row's definition line is
+                 `└ text · 0x<address> · <n> B`.
+expanded object  The lines under the selected row: its detail lines (the definition line, then
+                 its card). Each line is `  ┊ ` (the bar) then its content, on the expanded ground
+                 across max(G, V) cells. The kind's detail is laid out for V − 4 cells and every
+                 line is cut at max(G, V) − 4 cells with one `…`.
+card             A framed block in the expanded object, after the definition line, for an enum, a
+                 bit-mask or a text row: `╭─ <title> ─…─╮`, one `│ <card row padded> │` per card
+                 row, `╰─…─╯`; inner width = the widest card row + 2 (at least the title + 4),
+                 at most the cap − 2; cap = max(G, V) − 4. Every card width is counted in terminal
+                 cells. title: `<name> · choose one` (enum), `<name> · bit editor · other bits kept`
+                 (bit mask), `<name> · text editor · 16 B per row` (text). The title and every card
+                 row are plain text; the title is cut with one `…` to the inner width − 4 cells, a
+                 card row wider than the inner width − 2 cells with one `…`. A number row has no card.
+enum options     The card rows of an enum: `( ) <stored> <text>` per table entry in table order,
+                 `(●)` on the chosen one, 3 spaces between entries, then `default "<default text>"`
+                 when the table has one; a second line `↔ choose · enter stage`.
+bit table        The card rows of a bit mask, one block per 16 bits of the word (a word of 8 bits:
+                 one block of 8), high bits first. A block is 4 lines:
+                   `bit    ` then per bit its number right-aligned in 3 cells,
+                   `before ` then per bit its value in the image's word, right-aligned in 3,
+                   `mask   ` then per bit `  ■` under the mask, else `  ·`,
+                   `after  ` then per bit its value in the word after the preview (else the
+                            staged word, else the image's), right-aligned in 3;
+                 after every bit whose number is a multiple of 4, the nibble guide ` │`. On the
+                 first block only, each line then ends with ` hex`, ` <before bytes>`,
+                 ` <mask as 2 hex digits per byte>`, ` <after bytes>` (bytes `XX XX` in span
+                 order). A bit that is not held by the image: `?`.
+hex grid         The card rows of a text row: the head
+                 `off │ +0 +1 … +7 │ +8 … +F │ ASCII`, then one row per 16 of the span's first
+                 64 bytes: `+<offset, 2 upper hex> │` then ` XX` per byte (the bytes after the
+                 preview) with ` │` after the 8th, three spaces per missing byte of a short last
+                 row, then ` │ ` and one ASCII character per byte: the byte's character for
+                 U+0020 … U+007E, else `·`. Then `… <n> more B` when the span is longer than 64 bytes.
+formula bar      `<name> <label> <input> <tail>`. label: number and enum `new =`, bit mask
+                 `field =`, text `text =`. input: 18 cells wide, at most 4,096 characters.
+formula tail     number, enum, bit mask with an `Encoded` preview: `<unit>  (<lower> … <upper>)  raw
+                 <current stored>→<preview stored> · <before bytes> → <after bytes>  <verdict>`;
+                 `(<lower> … <upper>)` only while the bar is at least 110 cells wide; bytes: the
+                 first 8 of the span as `XX XX …`, then `…` when longer; verdict `✓ in limits`, or
+                 `▲ <notice>` when the encode gave a notice. With a `Refusal`: `✗ <message>`. Text:
+                 `<n>/<span> chars · NUL-padded`. Then the key hint `enter stage ↓`. The whole tail
+                 is cut at the bar's right edge with one `…`.
+plain text       Painted with markup off; every U+0000 … U+001F, U+007F, U+0080 … U+009F replaced
+                 by U+FFFD.
+name echo        A name or file word in a status message: at most its first 256 characters, each
+                 control character as U+FFFD, then `…` when longer.
+verdict hues     Inside `#patch_editor_panel`, GREEN #54efae, YELLOW #f6ff8f and RED #fd8383 are
+                 state hues and ride their glyph: GREEN with `✓` (a check or an encode passed) or
+                 `●` (staged), YELLOW with `▲` (a notice, a partial check), RED with `✗` (failed,
+                 refused). A hue is painted there only on a line that carries its glyph; a cue
+                 that is not a state never takes them.
+pending style    Bold PURPLE #b565f3; on a byte of the hex grid or a bit of the bit table's after
+                 row that differs from the image, also underlined.
+sheet styles     The style of each element the sheet paints; the table under this block.
+```
+
+| Element | Marks | Style | Colour-free cue |
+|---|---|---|---|
+| text | names, current values, card values | VALUE #e9e9e9 (the selected row's name bold) | — |
+| dim | kind word, unit, `·` of a row with no edit, the Limits text and track, the definition line after `└`, card labels (`bit`, `before`, `mask`, `after`, `off`, `+0`…), bits and bytes outside the mask or unchanged, the summary strip | DGRAY #969aad | — |
+| header | header labels | bold DGRAY | the header rule under them |
+| rule | header rule `━` `┿`, gutters `│`, nibble and hex-grid guides `│`, card frame, the bar `┊`, `└` | HILITE #91abec | the glyphs |
+| selected | the selected row's ground; `▶` | ground #1c2547; `▶` bold HILITE | `▶` and the bold name |
+| zebra | the ground of every second painted row (odd page position) | DEPTH_ODD_ROW #131a2c | none needed (decoration) |
+| staged | New and Δ of a staged row that is not pending; the mark's `●`; the track's `◆` | bold GREEN #54efae | `●` in the mark; Δ ends `staged` |
+| pending | New and Δ of a pending row (an encode with a notice included); the mark's `◆`; the track's `◆` | the pending style | `◆` in the mark |
+| refused | New and Δ of a pending row whose preview is a refusal | bold RED #fd8383 | `✗ refused` in Δ |
+| current marker | the track's `●` | bold VALUE | `●` |
+| in limits / notice / refused tail | `✓ in limits`, `▲ <notice>`, `✗ <message>` of the formula tail | GREEN / YELLOW / RED | `✓` / `▲` / `✗` |
+| after bytes | the after bytes of the formula tail's `<before> → <after>` | the pending style without underline | `→` |
+| key hint | `enter stage ↓` of the formula tail | bold DEPTH_BG #0a0e1b on HILITE | the words |
+| mask mark | `■` of the bit table | bold HILITE | `■` against `·` |
+| expanded ground | every expanded-object line | ground DEPTH_BORDER #1b233a | the `┊` bar |
+| card ground | inside the card frame | ground DEPTH_PANEL #0f1525 | the frame |
+| verdict hue | inside `#patch_editor_panel`: GREEN = `✓` passed or `●` staged; YELLOW = `▲` notice or partial; RED = `✗` failed or refused | GREEN #54efae, YELLOW #f6ff8f, RED #fd8383, only on a line that carries the glyph | `✓` / `●` / `▲` / `✗` |
+
+#### CTX-PE-BENCH · CURVE / MAP / VAL_BLK benches (S10.11; batch-103 Inc 8b/9/9b)
+
+```text
+bench kind      Definition-model kind "curve", "map" or "array" (a VAL_BLK, or a MEASUREMENT
+                array) of a definition with no refusal. A bench row is a sheet row of a bench kind.
+bench           The detail of the selected bench row, top to bottom: the definition line, the canvas,
+                the legend line, the tool row, the bytes line. The formula bar of a bench row is the
+                op line.
+grid            The cells of a map, an array of two dimensions or an array of one, three or more:
+                map and 2-D array: shape (nx, ny), nx columns × ny rows, cell (c, r) = element (c, r).
+                1-D array and an array of three or more dimensions: 16 columns; cell (c, r) = the
+                element at element-order index 16·r + c (definition-model element order, the first
+                index fastest); the last row may be short.
+chart           The canvas of a curve: one column per point, point k = element (k,).
+values          current: decode_values over the image; staged: over the staged overlay; pending:
+                the result held by the bench edit. The shown value of a cell: pending, else staged,
+                else current. A cell whose element decode is a refusal has no value.
+value text      A cell's shown value written as the definition model writes the element's text
+                (Decoded.text) or, for a pending cell, its result text; a cell with no value: `--`.
+axis labels     map: columns by the X axis point texts, rows by the Y axis point texts; curve: chart
+                ticks by the X axis point texts; array: columns `+<c>` (1-D, ≥ 3-D) or `<c>` (2-D),
+                rows by the index of the row's first element (1-D, ≥ 3-D) or `<r>` (2-D). An axis
+                whose points are None, or a point that is a refusal: its index, `x<c>` / `y<r>`.
+cursor, anchor  Two cells (chart: two points). The selection is the rectangle of cells they span.
+                A bench row's first selection opens it with cursor = anchor = cell (0, 0) and the tool
+                Set; later selections keep them (bench state lifetime).
+bench state     A bench row's bench edit, undo stack, cursor, anchor and tool, kept by row name from
+lifetime        the row's first selection until a record stage of the row writes the document
+                (R-PE-BENCH.79) or a shown page's definitions no longer hold the row; a new selection
+                of the row already selected keeps them. The values, staged values and axes of a row of
+                more than 4,096 elements are kept only while the row is selected.
+window          The grid rows (chart points) and columns shown: from the window origin, as many as
+                fit, at least one row and one column; the window moves the least that keeps the cursor
+                inside it.
+grid geometry   W = the sheet's content width. Columns shown nc = max(1, min(nx, ⌊(W − 6) / 6⌋));
+                cell width cw = max(5, min(20, ⌊(W − 6) / nc⌋ − 1)); a 6-cell row-label column on the
+                left; one space between cells. Grid rows shown: ⌊room / 2⌋ (two terminal rows per grid
+                row: the value row and a bar row) when that shows every grid row, else room (one
+                terminal row per grid row), at least 1. room = the rows the sheet leaves for the canvas.
+bench minimum   12 columns of content width: the least W at which one cell of 5 columns fits beside
+width           the row-label column.
+finite values   The shown values of the object that are numbers and finite. lo / hi = the least and
+                greatest finite value; with no finite value, lo = hi = 0. A value that is not finite
+                (a definition-model `nan`, `inf`, `-inf`, R-A2L-DEF.39) is never compared, scaled or rounded.
+cell look       Background: a 12-step one-hue ramp, step round(t × 11), t = (v − lo)/(hi − lo) over
+                the finite values, t = 0 when lo = hi (no division); a cell whose value is not finite
+                has no ramp step and shows its value text plainly; value text centred, bold and with a
+                trailing `*` (when cw ≥ 6) on a pending or staged cell; `▸` before the cursor cell's
+                text while the bench holds the focus; the bar row `▀` in the accent colour under a
+                selected cell (with one terminal row per grid row: a selected cell is underlined).
+chart look      Height h = max(1, min(16, room − 4)) rows; column width max(1, min(6, ⌊(W − 10) / n⌋))
+                for n points shown, at least 1; eighth blocks `▁▂▃▄▅▆▇█` from a base 10 % of the span
+                under lo to hi (lo = hi: every bar at half height, no division); a point whose value
+                is not finite: no bar, `?` on the chart's bottom row; a pending or staged point in the edit
+                colour with its value text above the chart, its current level drawn `─` (`━` inside
+                the bar); left labels: hi on the top row, lo on the bottom row, right-aligned in 8 cells,
+                then one space; ticks every 4 points under the chart, labelled by the axis labels, then ` pt`.
+legend line     grid: `shade <ramp> <lo> … <hi> <unit>   sel <where without brackets>   * / bold = edited`;
+                chart: `scale <base> … <hi> <unit>   █ edited  ─ old level`, base = lo − (hi − lo)/10.
+                lo, hi, base: short numbers (CTX-PE-DEF) of the finite values; `<unit>` and its space
+                left out when empty.
+tool row        ` s  Set   d  +Δ   p  ×%   i  Interpolate   m  Smooth   u  Undo    shift+arrows select`,
+                the current tool's key and label in the selected style.
+window line     `rows <a>..<b> of <n> · cols <c>..<d> of <m> · pgup/pgdn page` while the window does not
+                show every grid row and column (chart: `points <a>..<b> of <n> · pgup/pgdn page`); else
+                no line. It sits between the canvas and the legend.
+bytes line      no bench edit: `no edit yet · bytes appear here`; a preview running: `encoding …`;
+                a refused preview: `✗ refused: <message>`; else `<k> of <n> B differ  ` and, per run of
+                changed bytes in record order, `+0x<offset, 2+ upper hex> <old bytes> → <new bytes>  `,
+                bytes as `XX XX …`; the line is cut at the sheet edge with one `…`.
+operand         The op input text. Set: the text itself. +Δ and ×%: a number text = optional spaces,
+                optional sign, digits with an optional point and digits (or a point and digits), an
+                optional exponent `e`/`E` with optional sign and digits, optional spaces; its number
+                is the text's value as a binary double, a number operand only while that is finite.
+result          For each cell of the selection, with v its current value as a number (Decoded.value,
+                never the pending value: an apply replaces the edit, R-PE-BENCH.51; finite,
+                R-PE-BENCH.64) and a the operand's number (finite, R-PE-BENCH.62):
+                Set → the operand text; +Δ → v + a; ×% → v × (1 + a / 100);
+                Interpolate → per grid row of the selection, column c gets
+                  v(c0) + (v(c1) − v(c0)) × (c − c0) / (c1 − c0), c0 / c1 the selection's first / last
+                  column (the end cells keep their values);
+                Smooth → per grid row of the selection, a column c that is neither c0 nor c1 gets
+                  (v(c − 1) + v(c) + v(c + 1)) / 3, each v taken before the tool.
+                A chart is one grid row; a point is a column.
+result text     A finite number result written with 15 significant digits, then rounded half away from
+                zero to d decimals: d = 0 for an integer datatype with no conversion or IDENTICAL, else
+                the definition's decimals; no decimals: the 15-significant-digit text. A result that is
+                not finite has no result text (R-PE-BENCH.67).
+page A2L        The A2L payload the sheet stored with the shown page; every bench decode and encode
+                uses it, never the app's loaded A2L.
+bench job       A decode or encode of a bench row run off the UI thread: the selected row's decode or
+                preview, a record stage's encode, a page row's summary or staged decode.
+bench edit      position → text, for each cell whose result differs from its current value; a cell
+                whose result equals its current value (as a number; Set: as text) leaves the edit.
+undo stack      The bench edits as they were before each apply, newest last, at most 32.
+where           curve `[a]` or `[a..b]`; map and 2-D array `[x<a>,y<b>]` or `[x<a>..<b>,y<c>..<d>]`;
+                1-D and ≥ 3-D array `[<i>]` or `[<i0>..<i1>]` (the first and last selected element in
+                element order).
+op line         `<name><where> op = <input> <unit>  <tool label> on <k> <pts | cells><verdict>   enter
+                apply  alt+s stage record`; pts for a chart, cells for a grid; k the selected cells;
+                verdict after a preview: ` ✓` with no notice, ` ▲ <n> notices` with n notices,
+                ` ✗ <message>` for a refusal; cut at the bar's right edge with one `…`.
+array row cells Kind: map `<kind word> <nx>x<ny>`, else the kind word.
+                Current: the summary strip, then ` <element count>`; strip width = the Current
+                width (20) − 1 − the count's width − 1. chart: one block per sampled point
+                (every k-th, k = ⌈n / strip width⌉) at level 1 + round(t × 6) of `▁▂▃▄▅▆▇`
+                (t = (v − lo)/(hi − lo) over the finite values, 0 when lo = hi; a point that is
+                not finite: a space); grid: one block per sampled grid column at the level of
+                the mean of its finite values (none: a space). The strip is painted in the dim
+                style with no ground. A row not yet summarised: `… <count>`; more than 4,096
+                elements not decoded: `<count> values`.
+                New: `<k> pts` / `<k> cells`, k = the cells whose shown value text differs from the
+                current one; `·` when k = 0. Δ: `max |Δ| <short number>` over those cells whose current
+                and shown values are finite (none: `max |Δ| -`), then ` staged` when no bench edit
+                is pending; `✗ refused` after a refused preview.
+                Limits: the range form of CTX-PE-DEF; the no-limits form without both limits.
+summary limit   4,096 elements.
+status echo     A name, an element name or an operand in a status message: at most its first 256
+                characters, each control character of CTX-PE-DEF plain text as U+FFFD, then `…` when
+                longer (CTX-PE-DEF name echo).
+busy job        A record stage, from the alt+s that asks for it until its document write and its view
+                refresh end (asked, queued, encoding, writing or refreshing); else a decode or a preview
+                of the selected bench row while the row's bench state names that job (asked, queued or
+                running). At most one busy job is shown: a record stage when one exists, else the
+                selected row's job. Job word: `stage` (record stage), `decode`, `preview`.
+                A page row's summary decode and another row's staged decode are not busy jobs.
+pending time    The seconds since the busy job was asked: the handling of the key (or the selection)
+                that asked for it, kept while the same job word and name stay the busy job.
+cue tick        A UI-thread timer of 0.1 s that runs while a busy job exists. The spinner advances one
+                frame at each tick that runs.
+busy colour     #f5c26b, the colour of the bench's edit style.
+busy border     The staging sheet window's border drawn `round` in the busy colour.
+busy pill       `` <f> BUSY · <job word> <name> · <s> s · keys still work `` — one space before <f> and one
+                after `work` — in bold, the app background colour (#0a0e1b) on the busy colour;
+                <f> the spinner frame; <s> the pending time, one decimal (`0.3`, `12.0`);
+                <name> the busy name.
+spinner frames  `◐` `◓` `◑` `◒`, in that order, then again.
+busy title      The window's border title while the cue shows: `STAGING SHEET`, two spaces, the busy pill.
+busy name       The status echo of the job's row name, cut so the busy title fits the window's top
+                border: at most max(1, B − F) characters, the last of them `…` when cut;
+                B = the characters the top border shows for its title, F = the busy title's length
+                without the name. A title still wider than B is cropped at its right end by the border.
+busy cue        The busy border and the busy title together.
+idle look       The window's border and title with no busy cue: the border of the stylesheet (`round`,
+                the rule colour; the accent while the focus is within) and the title `STAGING SHEET`.
+grace           0.2 s of pending time: a busy job shows its cue only once its pending time reaches it.
+write and       The UI-thread part of a record stage after its encode: the guarded write
+refresh         (R-PE-BENCH.70 … .83) and the refresh of the ledger, the JSON view, the staging sheet
+                and the checks.
+```
+
 ---
 
 ### Requirements
@@ -4084,13 +4706,11 @@ JSON hues       Keys, strings, numbers and true / false / null each in its own h
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TUI-063.1 | U | The system shall show the Patch Editor as the identity ribbon, the ledger beside the inspector, the file row, the document row and the legend, top to bottom. |
-| R-TUI-063.2 | U | The system shall keep the ledger beside the inspector at every terminal width. |
-| R-TUI-063.3 | U | The system shall give the inspector the tab chips Inspector, JSON, Checks and A2L. |
-| R-TUI-063.4 | When | When the Patch Editor is first shown, the system shall show the Inspector tab. |
+| R-TUI-063.1 | U | The system shall show the Patch Editor as the identity ribbon, the filter row, the staging sheet, the landing pane, the file row, the document row, the save-back prompt while it is shown, and the legend, top to bottom. |
+| R-TUI-063.3 | U | The system shall give the landing pane the tab chips Patch script, Inspector, JSON and Checks. |
+| R-TUI-063.4 | When | When the Patch Editor is first shown, the system shall show the Patch script tab. |
 | R-TUI-063.5 | When | When the operator activates a tab chip by click, Enter or space, the system shall show that tab's pane. |
-| R-TUI-063.6 | When | When the shown tab changes, the system shall set the inspector border title to INSPECTOR, JSON, CHECKS or A2L after the tab. |
-| R-TUI-063.7 | U | The system shall give the ledger the border title `PATCH SCRIPT`. |
+| R-TUI-063.6 | U | The system shall give the landing pane the border title `LANDS IN`. |
 | R-TUI-063.8 | While | While the JSON tab is shown, the system shall show the inspector subtitle `v2 schema`. |
 | R-TUI-064.1 | While | While the Patch Editor is shown at 118 × 54 or more, the system shall show Validate, Apply loaded changes and Save without scrolling. |
 | R-TUI-064.2 | While | While the Patch Editor is shown at 118 × 54 or more, the system shall paint no row wider than the screen. |
@@ -4147,8 +4767,8 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | R-PE-031 | If | If a Bytes token is not 1–2 hex digits with an optional `0x`, then the system shall refuse the action with the status `Patch Editor: invalid byte token '<token>' - every token is 1-2 hex digits with an optional 0x prefix; decimals are not accepted`. |
 | R-PE-032 | If | If the String and Bytes fields are both empty, then the system shall refuse the Add or Edit with the status `Patch Editor: enter a string value or a run of new bytes`. |
 | R-PE-033 | If | If the String text does not encode in the document's encoding, then the system shall refuse the Add or Edit with the status `Patch Editor: string value does not encode under '<encoding>': <reason>`. |
-| R-PE-034 | When | When the document changes through Add, Edit, Remove, Parse pasted, undo, redo or a per-entry JSON edit, the system shall set the dirty flag. |
-| R-PE-035 | If | If an Add, Edit or Remove is refused, then the system shall keep the dirty flag as it was. |
+| R-PE-034 | When | When the document changes through Add, Edit, Remove, Parse pasted, a stage, undo, redo or a per-entry JSON edit, the system shall set the dirty flag. |
+| R-PE-035 | If | If an Add, Edit, Remove or stage is refused, then the system shall keep the dirty flag as it was. |
 | R-PE-036 | When | When the operator types in the paste buffer, the system shall set the dirty flag. |
 | R-PE-037 | When | When a Save or a load succeeds, the system shall clear the dirty flag. |
 
@@ -4168,7 +4788,7 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 |---|---|---|
 | R-CHG-004.1 | U | The system shall edit one change document at a time in the Patch Editor. |
 | R-PE-040 | U | The system shall show one ledger row per entry, in document order. |
-| R-PE-041 | U | The system shall show the ledger subtitle of CTX-PE-LEDGER. |
+| R-PE-041 | While | While the Patch script or Inspector tab is shown, the system shall show the ledger subtitle of CTX-PE-LEDGER as the landing pane's border subtitle. |
 | R-PE-042 | U | The system shall show every ledger address in full. |
 | R-PE-043 | If | If a Value / bytes, Status or Linkage cell is wider than its column, then the system shall show its start and one `…`. |
 | R-PE-044 | If | If the document has no entry and no finding, then the system shall show the ledger line `No entries yet: Add one, paste a change-set or Load a file.` |
@@ -4256,7 +4876,7 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 | R-PE-080 | U | The system shall label the apply button `Apply loaded changes`. |
 | R-PE-081 | When | When the operator presses Apply loaded changes, the system shall apply the document to the loaded image (S8). |
 | R-PE-093 | When | When a Save succeeds, the system shall make the written file the document's source. |
-| R-TUI-049.1 | When | When a save-back succeeds, the system shall show the before/after control. |
+| R-TUI-049.1 | When | When a save-back succeeds, the system shall show the before/after control as a shown widget whichever inspector tab is shown. |
 | R-TUI-049.2 | When | When the operator presses Write before/after report, the system shall write the before/after report as the `b` key does (S14 R-BEFORE-AFTER-REPORT-001.2). |
 | R-TUI-049.3 | When | When the document is replaced by a load, a paste, undo or redo, the system shall hide the before/after control and the save-back prompt. |
 
@@ -4264,7 +4884,7 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. |
+| R-PE-110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, a stage, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. |
 | R-PE-111 | While | While a project load runs, the system shall make the paste buffer read-only. |
 
 #### S10.9 · Checks and the execution scope (CTX-PE)
@@ -4280,6 +4900,241 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-102 | When | When the operator presses Execute scope, the system shall run the document over the variants of the shown scope (S11.13). |
 
 
+
+#### S10.10 · Edit by definition (CTX-PE-DEF; batch-103 Inc 8/8b)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-PE-DEF.1.1 | While | While no bench is shown, the system shall give the landing pane 9 rows and the staging sheet every row that the other shown regions leave. |
+| R-PE-DEF.1.2 | While | While a bench is shown, the system shall give the landing pane 6 rows. |
+| R-PE-DEF.2 | U | The system shall show the picker's filter, status, Prev, page label, Next, Include parameter and Add list in the filter row. |
+| R-PE-DEF.3 | U | The system shall show the `Use parameter` row and its status line in the Inspector tab, under the entry form. |
+| R-PE-DEF.4 | While | While the staging sheet holds the focus, the system shall paint its border in the accent colour. |
+| R-PE-DEF.5 | U | The system shall show the staging sheet's header line of CTX-PE-DEF. |
+| R-PE-DEF.10 | When | When the picker's shown page changes, the system shall show one sheet row per parameter of that page, in page order. |
+| R-PE-DEF.11 | When | When the picker's shown page changes, the system shall build the page's rows from the definitions and the page A2L that the picker last populated from. |
+| R-PE-DEF.12 | When | When the picker's shown page changes, the system shall paint the sheet within 0.5 s for a page of 200 parameters. |
+| R-PE-DEF.13 | If | If the shown page has no parameter, then the system shall show the sheet line `No parameters on this page: type a filter above.` |
+| R-PE-DEF.14 | If | If no A2L is loaded, then the system shall show the sheet line `Load an A2L file to edit parameters by definition.` |
+| R-PE-DEF.15 | U | The system shall show each row's name, clipped to the Parameter column, as plain text. |
+| R-PE-DEF.16 | U | The system shall show each row's kind word in the Kind column. |
+| R-PE-DEF.17 | U | The system shall show each row's current value text in the Current column. |
+| R-PE-DEF.18 | If | If the image does not hold every byte of a row's span, then the system shall show `--` in its Current column. |
+| R-PE-DEF.19 | If | If a row's definition carries a refusal, then the system shall show `refused` in its Current column. |
+| R-PE-DEF.20 | U | The system shall show each row's unit in the Unit column as plain text. |
+| R-PE-DEF.21 | U | The system shall show each row's limits cell of CTX-PE-DEF in the Limits column. |
+| R-PE-DEF.22 | U | The system shall show `▶` in the mark column of the selected row. |
+| R-PE-DEF.23 | While | While a row is staged, the system shall show `●` in its mark column and its staged value text in its New column. |
+| R-PE-DEF.24 | While | While a row is pending with an encodable preview, the system shall show `◆` in its mark column and the preview's value text in its New column. |
+| R-PE-DEF.25 | If | If a pending row's preview is a refusal, then the system shall show its formula text, clipped to the New column, in its New column. |
+| R-PE-DEF.26 | U | The system shall show each staged or pending row's Δ text of CTX-PE-DEF in its Δ column. |
+| R-PE-DEF.27 | If | If a pending row's preview is a refusal, then the system shall show `✗ refused` in its Δ column. |
+| R-PE-DEF.28 | While | While a row is neither staged nor pending, the system shall show `·` in its New column and an empty Δ column. |
+| R-PE-DEF.30 | While | While a row is selected, the system shall show its detail lines under it and no detail line under any other row. |
+| R-PE-DEF.31 | U | The system shall start the selected row's detail with its definition line of CTX-PE-DEF. |
+| R-PE-DEF.32 | If | If the selected row's definition carries a refusal, then the system shall show its refusal message as the detail line `└ <message>`. |
+| R-PE-DEF.33 | While | While an enum row is selected, the system shall show its enum options of CTX-PE-DEF in its card. |
+| R-PE-DEF.34 | While | While a bit-mask row is selected, the system shall show its bit table of CTX-PE-DEF in its card. |
+| R-PE-DEF.35 | While | While a text row is selected, the system shall show its hex grid of CTX-PE-DEF in its card. |
+| R-PE-DEF.36 | While | While the selected row has no editor, the system shall show the formula tail `edit <kind word> objects in the Inspector tab` and keep the formula input disabled. |
+| R-PE-DEF.37 | U | The system shall show the formula bar of CTX-PE-DEF for the selected row on the staging sheet's last line. |
+| R-PE-DEF.38 | When | When a text row becomes selected, the system shall fill the formula input with its row fill. |
+| R-PE-DEF.39 | When | When a row other than a text row becomes selected, the system shall fill the formula input with that row's pending formula text. |
+| R-PE-DEF.40 | When | When the formula text changes, the system shall show the selected row's formula tail of CTX-PE-DEF for its preview. |
+| R-PE-DEF.41 | If | If the formula tail is wider than the formula bar, then the system shall cut it at the bar's right edge with one `…`. |
+| R-PE-DEF.42 | If | If a typed or pasted text would make the formula text longer than 4,096 characters, then the system shall leave the formula text unchanged. |
+| R-PE-DEF.45 | When | When the operator presses up or down while the staging sheet holds the focus, the system shall select the row above or below. |
+| R-PE-DEF.46 | When | When the operator presses Enter while the staging sheet holds the focus, the system shall move the focus to the formula input. |
+| R-PE-DEF.47 | When | When the operator presses left or right while an enum row is selected and the staging sheet holds the focus, the system shall choose the previous or next table entry and set the formula text to its text. |
+| R-PE-DEF.48 | When | When the operator presses Escape in the formula input, the system shall clear the selected row's pending formula text and move the focus to the staging sheet. |
+| R-PE-DEF.49 | When | When the selected row changes, the system shall make the picker's highlighted parameter the selected row's parameter. |
+| R-PE-DEF.50 | When | When the operator presses Enter in the formula input and its preview is an encode, the system shall write the encoded span into the change document. |
+| R-PE-DEF.51 | U | The system shall encode a staged edit over the staged overlay. |
+| R-PE-DEF.52 | When | When a staged edit's span equals the span of an entry in the document, the system shall replace that entry with a bytes entry of the encoded span. |
+| R-PE-DEF.53 | When | When a staged edit's span intersects no entry of the document, the system shall append a bytes entry whose symbol is the row's name. |
+| R-PE-DEF.54 | When | When a staged edit replaces an entry, the system shall keep that entry's symbol. |
+| R-PE-DEF.55 | If | If a staged edit's span intersects an entry of the document without equalling its span, then the system shall refuse the stage with the status `Patch Editor: <name> overlaps the entry at 0x<X> — remove that entry first.` |
+| R-PE-DEF.56 | If | If the preview is a refusal when the operator presses Enter in the formula input, then the system shall leave the document unchanged. |
+| R-PE-DEF.57 | If | If the preview is a refusal when the operator presses Enter in the formula input, then the system shall show the status `Patch Editor: <message>`. |
+| R-PE-DEF.58 | When | When a stage writes the document, the system shall show the status `Patch Editor: <name> staged as <text> (<n> B at 0x<X>).` |
+| R-PE-DEF.59 | When | When a stage writes the document and its encode gave a notice, the system shall show the status `Patch Editor: <notice>`. |
+| R-PE-DEF.60 | When | When a formula-bar stage writes the document, the system shall select the row after the staged row. |
+| R-PE-DEF.61 | When | When a stage writes the document, the system shall add one undo step. |
+| R-PE-DEF.62 | When | When the document changes, the system shall repaint every row's staged state from the staged overlay. |
+| R-PE-DEF.63 | If | If no A2L is loaded when a stage acts, then the system shall refuse the stage with the status `Patch Editor: no A2L is loaded — nothing staged.` |
+| R-PE-DEF.64 | When | When a stage acts, the system shall describe the row's parameter again with the A2L loaded at that moment. |
+| R-PE-DEF.70 | U | The system shall paint every name, unit, value text, enum text, default text, notice, refusal message and formula text in the staging sheet as plain text. |
+| R-PE-DEF.71 | U | The system shall replace every control character of CTX-PE-DEF plain text by U+FFFD in every text the staging sheet paints. |
+| R-PE-DEF.72 | U | The system shall write a name in an Inc 8 status message as its name echo of CTX-PE-DEF. |
+| R-PE-DEF.73 | U | The system shall show every status message of the Patch Editor's stage as plain text. |
+| R-PE-DEF.74 | U | The system shall give the staging sheet window at least 12 rows. |
+| R-PE-DEF.75 | U | The system shall show `<n> values`, n the definition's element count, in the Current column of each row with the fallback operations. |
+| R-PE-DEF.76 | If | If a row's upper limit is not greater than its lower limit, then the system shall show its limits cell in the range form of CTX-PE-DEF. |
+| R-PE-DEF.77 | If | If a row's upper limit is not greater than its lower limit, then the system shall show its pending Δ text without the percent. |
+| R-PE-DEF.78 | While | While the selected row has no editor, the system shall keep the formula input empty. |
+| R-PE-DEF.79 | If | If a text row's span is longer than 64 bytes, then the system shall show the line `… <n> more B` after its fourth text row, n = the span's length − 64. |
+| R-PE-DEF.80 | If | If a text that the system writes into the formula input is longer than 4,096 characters, then the system shall write its first 4,096 characters. |
+| R-PE-DEF.81 | When | When the selected row or the shown page changes, the system shall paint the sheet rows of the row window of CTX-PE-DEF. |
+| R-PE-DEF.82 | When | When a formula-bar stage writes the document, the system shall clear the staged row's pending formula text. |
+| R-PE-DEF.83 | U | The system shall describe the Patch Editor in its help section's first step as the filter row, the STAGING SHEET and LANDS IN with the Patch script, Inspector, JSON and Checks tabs. |
+| R-PE-DEF.84 | U | The system shall give the Patch Editor's help section a `Patch script — <effect>` line that names the ledger of the document's entries. |
+| R-PE-DEF.85 | U | The system shall state in the Patch Editor's help section that in the staging sheet ↑ and ↓ select a row, Enter moves to the formula input, ← and → choose an enum entry, Home and End scroll the grid to its first and last columns, and Escape returns from the formula input to the sheet. |
+| R-PE-DEF.86 | U | The system shall give the Patch Editor's help section one `label — effect` line for each formula label `new =`, `field =` and `text =`. |
+| R-PE-DEF.87 | U | The system shall state in the Patch Editor's help section that Use parameter, on the Inspector tab, uses the staging sheet's selected row. |
+| R-PE-DEF.88 | If | If a text row's span is longer than 4,096 bytes, then the system shall show `<n> B`, n the span's length, in its Current column. |
+| R-PE-DEF.89 | U | The system shall give the sheet's columns the grid widths of CTX-PE-DEF at every view width. |
+| R-PE-DEF.90 | U | The system shall paint a `│` gutter after each column of every sheet row. |
+| R-PE-DEF.91 | U | The system shall show the header rule of CTX-PE-DEF on the line under the header line. |
+| R-PE-DEF.92 | While | While the grid is wider than the view width, the system shall show a horizontal scrollbar under the sheet rows. |
+| R-PE-DEF.93 | While | While the grid is not wider than the view width, the system shall show no horizontal scrollbar. |
+| R-PE-DEF.94 | When | When the operator presses Home or End while the staging sheet's body holds the focus, the system shall scroll the grid to its first or last view position of CTX-PE-DEF. |
+| R-PE-DEF.95 | U | The system shall paint the formula bar no wider than the staging sheet. |
+| R-PE-DEF.96 | If | If a sheet cell's text is wider than its column, then the system shall show the longest start of it that fits in the column's width − 1 cells, then `…`. |
+| R-PE-DEF.97 | U | The system shall paint each element of the staging sheet that the sheet styles of CTX-PE-DEF name in its style. |
+| R-PE-DEF.98 | While | While a row is staged and not pending, the system shall paint its New and Δ cells, its mark's `●` and its track's `◆` in the staged style. |
+| R-PE-DEF.99 | While | While a row is pending, the system shall paint its New and Δ cells, its mark's `◆` and its track's `◆` in the pending style. |
+| R-PE-DEF.100 | If | If a pending row's preview is a refusal, then the system shall paint its New and Δ cells in the refused style. |
+| R-PE-DEF.101 | U | The system shall paint the verdict hues of CTX-PE-DEF in the staging sheet only on a line that carries their glyph. |
+| R-PE-DEF.102 | U | The system shall underline each byte of the hex grid and each bit of the bit table's after row that differs from the image. |
+| R-PE-DEF.103 | Where | Where the terminal shows no colour, the system shall show every glyph and text of the staging sheet that it shows with colour. |
+| R-PE-DEF.104 | U | The system shall place every limits cell's track, range mark, no-limits mark and slots at the fixed offsets of CTX-PE-DEF in the Limits column. |
+| R-PE-DEF.105 | If | If a limit's short number is wider than 6 cells, then the system shall write the limit in its exponent form of CTX-PE-DEF in its slot. |
+| R-PE-DEF.106 | If | If a row's lower or upper limit is not finite, then the system shall show its limits cell in the range form of CTX-PE-DEF. |
+| R-PE-DEF.107 | U | The system shall paint every line of the expanded object of CTX-PE-DEF after the `┊` bar, on the expanded ground, cut at max(G, V) − 4 cells. |
+| R-PE-DEF.108 | While | While an enum, bit-mask or text row is selected, the system shall show its card of CTX-PE-DEF after its definition line. |
+| R-PE-DEF.109 | If | If a bit-mask word is wider than 16 bits, then the system shall show one bit-table block per 16 bits, high bits first. |
+| R-PE-DEF.110 | If | If the shown bytes of a text row end inside a hex-grid row, then the system shall keep that row's ASCII guide at the column of a full row. |
+| R-PE-DEF.111 | If | If a byte of the hex grid is outside U+0020 … U+007E, then the system shall show `·` for it in the ASCII column. |
+| R-PE-DEF.112 | If | If a card line is wider than the card's cap of CTX-PE-DEF, then the system shall cut it at the cap with one `…`. |
+| R-PE-DEF.113 | U | The system shall paint the Include parameter control of the filter row as `▽ Pick`. |
+| R-PE-DEF.114 | If | If a row's current or new value, or the position of a value in range on its track, is not a finite number, then the system shall show its limits cell in the no-position form of CTX-PE-DEF. |
+| R-PE-DEF.115 | If | If a card's title or a card row holds a control character or a markup tag, then the system shall show that text in the card as CTX-PE-DEF plain text. |
+| R-PE-DEF.116 | If | If a card's title or a card row holds a wide character, then the system shall paint every line of that card at the card's width in terminal cells, each wide character counting 2 cells. |
+| R-PE-DEF.117 | If | If a row's limit is beyond the float range, or the span between its finite limits is, then the system shall show its limits cell of CTX-PE-DEF with each value in range at its proportion of the span. |
+
+#### S10.11 · CURVE / MAP / VAL_BLK benches (CTX-PE-BENCH; batch-103 Inc 8b/9/9b)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-PE-BENCH.1 | U | The system shall give the staging sheet the border subtitle `enter edit · ↑↓ row · arrays open the bench`. |
+| R-PE-BENCH.3 | While | While a bench row is selected, the system shall show its bench under it, as its detail. |
+| R-PE-BENCH.4 | U | The system shall write a bench row's definition line as CTX-PE-DEF's definition line with ` · <record layout>` after the byte order. |
+| R-PE-BENCH.5 | U | The system shall paint no bench line wider than the view width of CTX-PE-DEF once its trailing ground is removed, no op line wider than the staging sheet, and no more bench lines than the rows the sheet leaves for the detail. |
+| R-PE-BENCH.6 | When | When a record stage writes the document, the system shall keep the selected row. |
+| R-PE-BENCH.7 | If | If the sheet's content width is under the bench minimum width of CTX-PE-BENCH, then the system shall show only the bench's definition line, cut at the sheet's edge with one `…`. |
+| R-PE-BENCH.9 | U | The system shall keep each bench row's bench state for its bench state lifetime of CTX-PE-BENCH. |
+| R-PE-BENCH.10 | U | The system shall show a bench row's Kind cell of CTX-PE-BENCH array row cells. |
+| R-PE-BENCH.11 | U | The system shall show a summarised bench row's Current cell as its summary strip and its element count. |
+| R-PE-BENCH.12 | If | If a bench row has more than 4,096 elements and its values are not decoded, then the system shall show `<count> values` in its Current cell. |
+| R-PE-BENCH.13 | While | While a bench row's summary decode runs, the system shall show `… <count>` in its Current cell. |
+| R-PE-BENCH.14 | If | If the decode of a bench row's values is a refusal, then the system shall show `--` in its Current cell. |
+| R-PE-BENCH.15 | U | The system shall show a bench row's New cell of CTX-PE-BENCH array row cells. |
+| R-PE-BENCH.16 | U | The system shall show a bench row's Δ cell of CTX-PE-BENCH array row cells. |
+| R-PE-BENCH.17 | U | The system shall show a bench row's Limits cell in the range form of CTX-PE-DEF, or in its no-limits form without both limits. |
+| R-PE-BENCH.18 | U | The system shall show `◆` in a bench row's mark column while it has a bench edit, else `●` while a byte of its span differs between the staged overlay and the image. |
+| R-PE-BENCH.19 | If | If a shown value of a bench row is not finite, then the system shall paint it as its value text with no ramp shade (a chart point: `?` on the chart's bottom row) and take lo and hi over the finite values of CTX-PE-BENCH. |
+| R-PE-BENCH.20 | When | When a bench row becomes selected, the system shall decode its current and staged values off the UI thread. |
+| R-PE-BENCH.21 | While | While the selected row's decode runs, the system shall show the bench line `decoding <count> values …` in place of the canvas. |
+| R-PE-BENCH.22 | If | If the selection changes before a decode of the selected row ends, then the system shall discard that decode's result. |
+| R-PE-BENCH.23 | When | When the shown page changes, the system shall decode off the UI thread, in page order, the values of each bench row of at most 4,096 elements. |
+| R-PE-BENCH.24 | If | If the shown page changes before its summary decodes end, then the system shall discard their results. |
+| R-PE-BENCH.25 | When | When the change document changes, the system shall recompute off the UI thread the staged values of every bench row whose span holds an entry's byte. |
+| R-PE-BENCH.26 | U | The system shall keep at most 64 MiB for the decoded values of the shown page and the selected row. |
+| R-PE-BENCH.27 | If | If the operator applies a tool or stages while the selected row's values are decoding, then the system shall show the status `Patch Editor: <name> is still decoding — try again when its values show.` |
+| R-PE-BENCH.28 | U | The system shall run at most one bench job at a time. |
+| R-PE-BENCH.29 | When | When the operator moves the cursor on the bench of an object of more than 4,096 elements that holds a previewed bench edit, the system shall handle the key within 0.5 s, or within 1.0 s while a preview or a record-stage encode of that object is running. |
+| R-PE-BENCH.30 | While | While a curve row is selected, the system shall paint its chart of CTX-PE-BENCH chart look. |
+| R-PE-BENCH.31 | While | While a map or array row is selected, the system shall paint its grid of CTX-PE-BENCH grid geometry and cell look. |
+| R-PE-BENCH.32 | U | The system shall label the canvas by the axis labels of CTX-PE-BENCH. |
+| R-PE-BENCH.33 | If | If an axis has no points or one of its points is a refusal, then the system shall label that axis's place by its index. |
+| R-PE-BENCH.34 | U | The system shall show the legend line of CTX-PE-BENCH under the canvas. |
+| R-PE-BENCH.35 | U | The system shall show the tool row of CTX-PE-BENCH under the legend line, with the current tool selected. |
+| R-PE-BENCH.36 | When | When the cursor moves outside the window, the system shall move the window the least that shows the cursor. |
+| R-PE-BENCH.37 | While | While the window does not show every grid row and column, the system shall show the window line of CTX-PE-BENCH. |
+| R-PE-BENCH.38 | U | The system shall show the bytes line of CTX-PE-BENCH as the bench's last line. |
+| R-PE-BENCH.39 | If | If the bytes line is wider than the sheet, then the system shall cut it at the sheet's edge with one `…`. |
+| R-PE-BENCH.40 | When | When the operator presses Enter while the staging sheet holds the focus and a bench row is selected, the system shall give the bench the focus. |
+| R-PE-BENCH.41 | When | When the operator presses an arrow key while the bench holds the focus, the system shall move the cursor one cell that way within the grid and set the anchor to the cursor. |
+| R-PE-BENCH.42 | When | When the operator presses shift with an arrow key while the bench holds the focus, the system shall move the cursor one cell that way and keep the anchor. |
+| R-PE-BENCH.43 | When | When the operator presses page up or page down while the bench holds the focus, the system shall move the cursor by the window's grid rows and set the anchor to the cursor. |
+| R-PE-BENCH.44 | When | When the operator presses `s`, `d`, `p`, `i` or `m` while the bench holds the focus, the system shall make Set, +Δ, ×%, Interpolate or Smooth the current tool. |
+| R-PE-BENCH.45 | When | When the operator presses Enter while the bench holds the focus, the system shall move the focus to the op input. |
+| R-PE-BENCH.46 | When | When the operator presses Escape while the bench holds the focus, the system shall move the focus to the staging sheet's rows. |
+| R-PE-BENCH.47 | When | When the operator presses Escape in the op input while a bench row is selected, the system shall move the focus to the bench. |
+| R-PE-BENCH.48 | When | When the operator presses alt+s while the bench or the op input holds the focus, the system shall ask for a record stage of the selected row with its bench edit. |
+| R-PE-BENCH.49 | While | While the bench does not hold the focus, the system shall give the keys `s`, `d`, `p`, `i`, `m`, `u`, page up, page down, shift with an arrow key, Escape and alt+s the meaning they have without a bench. |
+| R-PE-BENCH.50 | While | While a bench row is selected, the system shall show the op line of CTX-PE-BENCH as the formula bar. |
+| R-PE-BENCH.51 | When | When the operator presses Enter in the op input while a bench row is selected, the system shall set the bench edit to the current tool's results over the selection. |
+| R-PE-BENCH.52 | U | The system shall give each selected cell the Set result of CTX-PE-BENCH: the operand text. |
+| R-PE-BENCH.53 | U | The system shall give each selected cell the +Δ result of CTX-PE-BENCH. |
+| R-PE-BENCH.54 | U | The system shall give each selected cell the ×% result of CTX-PE-BENCH. |
+| R-PE-BENCH.55 | U | The system shall give each selected cell the Interpolate result of CTX-PE-BENCH. |
+| R-PE-BENCH.56 | U | The system shall give each selected cell the Smooth result of CTX-PE-BENCH. |
+| R-PE-BENCH.57 | U | The system shall write each number result as its result text of CTX-PE-BENCH. |
+| R-PE-BENCH.58 | U | The system shall leave out of the bench edit every cell whose result equals its current value. |
+| R-PE-BENCH.59 | When | When the operator presses `u` while the bench holds the focus, the system shall restore the bench edit held before the last apply. |
+| R-PE-BENCH.61 | If | If the undo stack is empty when the operator presses `u` on the bench, then the system shall show the status `Patch Editor: nothing to undo on the bench.` |
+| R-PE-BENCH.62 | If | If the operand of +Δ or ×% is not a number text or its number is not finite, then the system shall show the status `Patch Editor: '<operand echo>' is not a number.` and keep the bench edit. |
+| R-PE-BENCH.63 | If | If a tool other than Set acts on an object whose values are texts, then the system shall show the status `Patch Editor: <tool label> needs numbers — <name> holds texts.` and keep the bench edit. |
+| R-PE-BENCH.64 | If | If a tool other than Set acts on a selection that holds a cell with no value or a value that is not finite, then the system shall show the status `Patch Editor: <element name> has no value to change.` and keep the bench edit. |
+| R-PE-BENCH.65 | If | If Interpolate acts on a selection of one column or Smooth on fewer than three, then the system shall show the status `Patch Editor: <tool label> needs at least <n> columns in the selection.` and keep the bench edit. |
+| R-PE-BENCH.66 | When | When the bench edit changes, the system shall encode its preview off the UI thread and show the verdict of CTX-PE-BENCH in the op line. |
+| R-PE-BENCH.67 | If | If a tool's result for a cell is not finite, then the system shall show the status `Patch Editor: <tool label> gives a value that is not finite for <element name echo>.` and keep the bench edit. |
+| R-PE-BENCH.70 | When | When a record stage is asked for a bench edit that is not empty, the system shall write the object's encoded record into the change document. |
+| R-PE-BENCH.71 | U | The system shall encode a record stage over the staged overlay. |
+| R-PE-BENCH.72 | When | When a record stage writes the document, the system shall show the status `Patch Editor: <name> staged as <k> <value word> (<n> B at 0x<X>).`, the value word `value` when k = 1, else `values`. |
+| R-PE-BENCH.73 | When | When a record stage writes the document and its encode gave notices, the system shall show the status `Patch Editor: <first notice>`, then ` (+<m> more)` when m more notices follow. |
+| R-PE-BENCH.74 | If | If the encode of a record stage is a refusal, then the system shall show the status `Patch Editor: <message>` and leave the document and the bench edit unchanged. |
+| R-PE-BENCH.75 | If | If a record stage is asked with an empty bench edit, then the system shall show the status `Patch Editor: <name> has no bench edit to stage.` |
+| R-PE-BENCH.76 | If | If no A2L is loaded when a record stage acts, then the system shall show the status `Patch Editor: no A2L is loaded — nothing staged.` |
+| R-PE-BENCH.77 | If | If the object's definition described again from the loaded A2L when a record stage writes is not equal to the bench's definition (from the page A2L), then the system shall show the status `Patch Editor: <name> changed in the A2L — select it again to reload its values.` |
+| R-PE-BENCH.78 | If | If the change document or the image changes while a record stage's encode runs, then the system shall show the status `Patch Editor: the change document or the image changed while <name> was encoding — stage it again.` and leave the document unchanged. |
+| R-PE-BENCH.79 | When | When a record stage writes the document while the row's bench edit is still the edit it staged, the system shall clear the row's bench edit and its undo stack. |
+| R-PE-BENCH.80 | When | When a record stage writes the document, the system shall add one undo step and set the dirty flag. |
+| R-PE-BENCH.81 | If | If the record's span intersects an entry of the document without equalling its span, then the system shall refuse the record stage with Inc 8's status `Patch Editor: <name> overlaps the entry at 0x<X> — remove that entry first.` |
+| R-PE-BENCH.82 | When | When a record stage acts, the system shall run its encode off the UI thread. |
+| R-PE-BENCH.83 | If | If a session action is running when a record stage's encode ends, then the system shall refuse the stage with the busy line of R-PE-110 and leave the document and the bench edit unchanged. |
+| R-PE-BENCH.90 | U | The system shall paint every element text, axis label, name, unit, refusal message and notice of the bench and the op line as plain text. |
+| R-PE-BENCH.91 | U | The system shall replace every control character of CTX-PE-DEF plain text by U+FFFD in every text the bench and the op line paint. |
+| R-PE-BENCH.92 | U | The system shall write a name, an element name or an operand in an Inc 9 status message as its status echo of CTX-PE-BENCH. |
+| R-PE-BENCH.93 | If | If the op line is wider than the formula bar, then the system shall cut it at the bar's right edge with one `…`. |
+| R-PE-BENCH.94 | When | When a busy job's pending time reaches the grace of CTX-PE-BENCH, the system shall show the busy cue. |
+| R-PE-BENCH.95 | While | While no busy job has reached the grace, the system shall keep the staging sheet window in its idle look. |
+| R-PE-BENCH.96 | U | The system shall write the busy title of CTX-PE-BENCH, with the busy pill in its style. |
+| R-PE-BENCH.97 | While | While the busy cue shows, the system shall advance its spinner and its pending time at every cue tick. |
+| R-PE-BENCH.98 | While | While a record stage's write and refresh run, the system shall keep advancing the busy cue at least every 0.5 s. |
+| R-PE-BENCH.99 | While | While a record stage's write and refresh run, the system shall handle a key press within 1.0 s. |
+| R-PE-BENCH.100 | When | When a busy job ends with its result, the system shall return the staging sheet window to its idle look within 0.3 s. |
+| R-PE-BENCH.101 | If | If a busy job ends with a refusal or an error, then the system shall return the staging sheet window to its idle look within 0.3 s. |
+| R-PE-BENCH.102 | If | If the selection leaves a bench row, or the shown page changes, while that row's decode or preview is the busy job, then the system shall stop showing that job in the busy cue within 0.3 s. |
+| R-PE-BENCH.103 | U | The system shall paint the busy title as plain text. |
+| R-PE-BENCH.104 | If | If the busy name holds a control character of CTX-PE-DEF plain text, then the system shall paint it as U+FFFD in the busy title. |
+| R-PE-BENCH.105 | If | If the busy title with the whole name is wider than the window's top border allows, then the system shall cut the busy name of CTX-PE-BENCH so the title fits, ending it with one `…`. |
+| R-PE-BENCH.106 | If | If the change document or the image changes while a record stage's write and refresh run, then the system shall show that latest document in the ledger, the JSON view and the staging sheet when the refresh ends. |
+| R-PE-BENCH.107 | U | The system shall draw each cell of a summary strip with a block no taller than seven eighths of the cell. |
+| R-PE-BENCH.108 | U | The system shall paint each summary strip in the dim style of CTX-PE-DEF with no ground of its own. |
+
+#### S10.12 · Apply visibly and export (CTX-SAVEBACK; batch-103 Inc 10)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-PE-EXPORT.1 | U | The system shall show the save-back prompt between the document row and the legend, across the width of the document row. |
+| R-PE-EXPORT.2 | While | While the save-back prompt is shown on a terminal of 118 × 54 or more, the system shall show every control of the prompt without scrolling. |
+| R-PE-EXPORT.3 | When | When an apply ends with no applied entry, the system shall hide the save-back prompt. |
+| R-PE-EXPORT.4 | When | When the system shows the save-back prompt, the system shall show in the prompt the apply line `Apply: <a> applied, <s> skipped, <b> blocked · changed in memory only — Write file saves it` with the counts of the apply that showed it. |
+| R-PE-EXPORT.5 | If | If an apply ends with no applied entry, then the system shall show a warning notice titled `Nothing applied` with the text `Apply: 0 applied, <s> skipped, <b> blocked`. |
+| R-PE-EXPORT.6 | When | When an apply ends with at least one applied entry, the system shall show no notice. |
+| R-PE-EXPORT.7 | When | When the system shows the save-back prompt, the system shall set the output format to the format of the loaded image. |
+| R-PE-EXPORT.8 | When | When the operator presses the Format control, the system shall change the output format to the other of S19 and Intel HEX. |
+| R-PE-EXPORT.9 | While | While the save-back prompt is shown, the system shall show the name of the output format, `S19` or `Intel HEX`, on the Format control. |
+| R-PE-EXPORT.10 | While | While the output format is Intel HEX, the system shall show no Width control. |
+| R-PE-EXPORT.11 | While | While the save-back prompt is shown and the output format is S19, the system shall show the Width control `Width: <w> bytes/line`. |
+| R-PE-EXPORT.12 | When | When the output format changes, the system shall keep `Write file` and `Don't save` at the same places on the screen. |
+| R-PE-EXPORT.13 | When | When the output format changes, the system shall keep the width. |
+| R-PE-EXPORT.14 | When | When the output format changes, the system shall replace a final `.s19` or `.hex` of the name box text, in any letter case and together with any whitespace after it, with the format suffix of the new output format. |
+| R-PE-EXPORT.15 | If | If the name box text, without its trailing whitespace, does not end with `.s19` or `.hex` in any letter case when the output format changes, then the system shall keep the name box text. |
+| R-PE-EXPORT.16 | When | When the system writes a save-back as Intel HEX, the system shall write only records of types 00, 01 and 04. |
+| R-PE-EXPORT.17 | When | When the operator adds, edits or removes an entry, the system shall hide the save-back prompt. |
 
 <a id="s11"></a>
 

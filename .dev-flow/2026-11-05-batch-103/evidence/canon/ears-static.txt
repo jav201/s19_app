@@ -1,0 +1,1 @@
+static EARS check of folded/changed rows: 363 rows; errors=['3504 R-COPY.23: shall count', '5045 R-PE-BENCH.29: shall count']
