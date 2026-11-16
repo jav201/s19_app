@@ -1,6 +1,7 @@
 """s19_app.tui.app.a2l_view — S19TuiApp mixin: a2l_view (moved verbatim from s19_app/tui/app.py at 4f721985)."""
 from __future__ import annotations
 
+import functools
 import json
 from pathlib import Path
 import time
@@ -15,6 +16,8 @@ from ..a2l_describe import CurveDescriptionScreen
 from ..a2l import describe_curve_tag
 from ..segment_split_view import SplitJoinWindow
 from ..workspace import WORKAREA_TEMP
+from ..a2l_parameter_picker import parse_parameter_list
+from s19_app.tui import a2l_label_list as label_list
 from . import deps
 from .shared import (
     _A2L_ISSUE_SEVERITY_RANK,
@@ -22,6 +25,29 @@ from .shared import (
     _severity_style,
     A2LTagTable,
     A2LDetailCard,
+    _a2l_detail_card_text,
+)
+
+#: The shipped 16 A2L tag-table columns (text mode), in ``_build_a2l_table_cells``
+#: order. List mode swaps these for ``label_list.LIST_COLUMNS`` and back
+#: (R-A2L-LIST.009, R-TUI-042a.4).
+_A2L_TEXT_COLUMNS = (
+    "Address",
+    "Length",
+    "Tag",
+    "Source",
+    "Raw",
+    "Physical",
+    "InMem",
+    "Region",
+    "Limits",
+    "Unit",
+    "Bits",
+    "Endian",
+    "Virt",
+    "Func",
+    "Access",
+    "Dtype",
 )
 
 
@@ -827,33 +853,39 @@ class A2lViewMixin:
     def _refresh_a2l_filtered_tags(self, preserve_anchor: bool) -> None:
         """
         Summary:
-            Rebuild filtered A2L tag source list and render a buffered window.
+            Rebuild the filtered A2L tag source list (list mode or text mode)
+            and render the buffered window plus the filter chips.
 
         Args:
-            preserve_anchor (bool): Keep current buffered start when possible; otherwise reset to top.
+            preserve_anchor (bool): Keep the current buffered start when
+                possible; otherwise reset to top.
 
         Returns:
             None
 
         Data Flow:
-            - Apply active filter mode/text to cached enriched tags.
-            - Optionally reset buffered start index on filter model changes.
-            - When a non-empty filter matches nothing, pass the
-              filter-specific empty message ``No A2L tags match
-              '<filter>'.`` so the operator reads a successful load
-              whose filter excluded every row as exactly that, not as a
-              missing load (F-B102-A2L-2); ``update_a2l_tags_view``
-              remains the one writer of the summary text.
-            - Render only current buffered window to list view.
+            - List mode with ``preserve_anchor=True`` (the in-place write
+              route's fallback, ``patch.py:1847``): repaint the shown page in
+              place and refresh the chips, no ``clear()`` (R-A2L-LIST.036).
+            - Otherwise filter via ``_filter_a2l_tags``, reset or clamp the
+              anchor, and render the window through ``update_a2l_tags_view``.
+            - A non-empty text with no row passes the short-text summary, the
+              mode-hint variant when the text matches under ``All``
+              (R-A2L-LIST.025); then paint the filter chips.
 
         Dependencies:
             Uses:
-                - ``_filter_a2l_tags``
+                - ``_a2l_list_names`` / ``_filter_a2l_tags`` / ``_a2l_empty_message``
+                - ``_repaint_a2l_tag_cells`` / ``_paint_a2l_filter_chips``
                 - ``update_a2l_tags_view``
             Used by:
                 - ``update_a2l_view``
                 - filter and debounce handlers
         """
+        if preserve_anchor and self._a2l_list_names() is not None:
+            self._repaint_a2l_tag_cells()
+            self._paint_a2l_filter_chips()
+            return
         self._a2l_filtered_tags = self._filter_a2l_tags(self._a2l_enriched_tags)
         if not preserve_anchor:
             self._a2l_window_start = 0
@@ -863,10 +895,298 @@ class A2lViewMixin:
         if not self._a2l_filtered_tags and filter_text:
             self.update_a2l_tags_view(
                 self._a2l_filtered_tags,
-                empty_message=f"No A2L tags match '{filter_text}'.",
+                empty_message=self._a2l_empty_message(filter_text),
             )
+            self._paint_a2l_filter_chips()
             return
         self.update_a2l_tags_view(self._a2l_filtered_tags)
+        self._paint_a2l_filter_chips()
+
+    def _a2l_empty_message(self, text: str) -> str:
+        """
+        Summary:
+            Build the no-match summary for an empty text-mode result, switching
+            to the mode hint when the text would match under ``All``.
+
+        Args:
+            text (str): The stripped, non-empty filter text.
+
+        Returns:
+            str: ``No A2L tags match '<short>'.``, or ``No tag matches
+                '<short>' with mode <label> — <n> match with mode All alt+a``
+                when the text matches at least one tag under ``All`` and the
+                active mode is not ``all``. ``<short>`` is the short text of
+                ``text`` (``display_text(text, 64)``).
+
+        Data Flow:
+            - Shorten the text once (E3S-02).
+            - With mode ``all``, or when the text matches nothing under
+              ``all``, keep the R-B102-A2L-003 summary with the short text.
+            - Otherwise count the tags the text matches under ``all`` and
+              build the mode-hint summary (R-A2L-LIST.025).
+
+        Dependencies:
+            Uses:
+                - ``_tag_matches_filter``
+                - ``display_text`` / ``MODE_LABEL`` (a2l_label_list)
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        short = label_list.display_text(text, 64)
+        mode = self.a2l_tags_filter_mode
+        if mode == "all":
+            return f"No A2L tags match '{short}'."
+        lower = text.lower()
+        matches = sum(
+            1 for tag in self._a2l_enriched_tags if self._tag_matches_filter(tag, lower)
+        )
+        if not matches:
+            return f"No A2L tags match '{short}'."
+        label = label_list.MODE_LABEL.get(mode, mode)
+        return (
+            f"No tag matches '{short}' with mode {label} "
+            f"— {matches} match with mode All alt+a"
+        )
+
+    def _paint_a2l_filter_chips(self) -> None:
+        """
+        Summary:
+            Paint the list-mode / text-mode filter chips, mode tag and missing
+            line above the A2L tag table (R-A2L-LIST.007-.008, .017-.024).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Decide list mode via ``_a2l_list_names`` and mark the active
+              mode's button with the ``-on`` class.
+            - Paint the mode tag (``LIST`` / ``FILTER``) and the chips line(s).
+            - Show ``#a2l_list_missing`` with the missing line in list mode and
+              hide it in text mode. Every widget is queried defensively so an
+              uncomposed surface is a no-op; an app that is not running has
+              no screen to query, so nothing is painted.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_list_names`` / ``_mark_a2l_filter_mode``
+                - ``_a2l_list_chips`` / ``_a2l_text_chips``
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        if not self.is_running:
+            return
+        names = self._a2l_list_names()
+        self._mark_a2l_filter_mode()
+        mode_tag = self.query("#a2l_filter_mode_tag")
+        if mode_tag:
+            mode_tag.first(deps.Label).update("LIST" if names is not None else "FILTER")
+        if names is not None:
+            chips, missing = self._a2l_list_chips()
+        else:
+            chips, missing = self._a2l_text_chips(), None
+        chips_widget = self.query("#a2l_list_chips")
+        if chips_widget:
+            chips_widget.first(Static).update(chips)
+        missing_widget = self.query("#a2l_list_missing")
+        if not missing_widget:
+            return
+        missing_static = missing_widget.first(Static)
+        if missing is None:
+            missing_static.add_class("hidden")
+        else:
+            missing_static.remove_class("hidden")
+            missing_static.update(missing)
+
+    def _mark_a2l_filter_mode(self) -> None:
+        """Mark the active filter mode's button with the ``-on`` class (R-A2L-007.9)."""
+        active = {
+            "all": "a2l_filter_all",
+            "invalid": "a2l_filter_invalid",
+            "inmem": "a2l_filter_inmem",
+        }.get(self.a2l_tags_filter_mode)
+        for button_id in ("a2l_filter_all", "a2l_filter_invalid", "a2l_filter_inmem"):
+            buttons = self.query(f"#{button_id}")
+            if not buttons:
+                continue
+            button = buttons.first(Button)
+            if button_id == active:
+                button.add_class("-on")
+            else:
+                button.remove_class("-on")
+
+    def _a2l_list_names(self) -> Optional[list[str]]:
+        """
+        Summary:
+            Return the pasted names when the viewer is in list mode, else ``None``.
+
+        Args:
+            None
+
+        Returns:
+            Optional[list[str]]: The pasted names in order when an A2L is
+                loaded, the filter field is ``name`` or ``all`` and the filter
+                text is a list text (two or more names); else ``None`` (text
+                mode).
+
+        Data Flow:
+            - An unloaded A2L, a non-``name``/``all`` field, or fewer than two
+              parsed names each fall through to ``None`` (R-A2L-LIST.008, E3A-08).
+
+        Dependencies:
+            Uses:
+                - ``parse_parameter_list`` (I-5)
+            Used by:
+                - ``_filter_a2l_tags``
+                - ``_refresh_a2l_filtered_tags``
+                - ``_paint_a2l_filter_chips``
+        """
+        if not self.current_a2l_data:
+            return None
+        if self.a2l_tags_filter_field not in ("name", "all"):
+            return None
+        names = parse_parameter_list(self.a2l_tags_filter_text)
+        if len(names) < 2:
+            return None
+        return names
+
+    def _a2l_mode_keeps(self, tag: dict, mode: str) -> bool:
+        """Return True when ``mode`` keeps ``tag`` with no filter text.
+
+        Summary:
+            The shipped mode test, factored so the list-mode hidden predicate
+            and the mode line's ``<h>`` count read one definition
+            (R-A2L-LIST.005, .021). ``all`` keeps every tag; ``invalid`` keeps
+            a schema-invalid or checked-not-in-image tag; ``inmem`` keeps an
+            in-image tag.
+
+        Args:
+            tag (dict): Enriched A2L tag.
+            mode (str): The filter mode (``all`` / ``invalid`` / ``inmem``).
+
+        Returns:
+            bool: True when the tag would stay in the text-mode table under
+                ``mode`` with an empty filter text.
+        """
+        if mode == "invalid":
+            return (not tag.get("schema_ok", True)) or (
+                tag.get("memory_checked") and tag.get("in_memory") is False
+            )
+        if mode == "inmem":
+            return tag.get("in_memory") is True
+        return True
+
+    def _a2l_mode_line(self) -> Text:
+        """Build the mode line (R-A2L-LIST.020, .021)."""
+        mode = self.a2l_tags_filter_mode
+        total = len(self._a2l_enriched_tags)
+        label = label_list.MODE_LABEL.get(mode, mode)
+        if mode == "all":
+            return Text(f"mode {label} · no tag hidden by mode ({total} tags)")
+        kept = sum(
+            1 for tag in self._a2l_enriched_tags if self._a2l_mode_keeps(tag, mode)
+        )
+        return Text(f"mode {label} · hides {total - kept} of {total} tags  alt+a All")
+
+    def _a2l_text_chips(self) -> Text:
+        """Build the text-mode chips line (R-A2L-LIST.019)."""
+        text = self.a2l_tags_filter_text
+        if text:
+            part = (
+                f"'{label_list.display_text(text, 64)}' in {self.a2l_tags_filter_field}"
+            )
+        else:
+            part = "no text filter"
+        line = Text()
+        line.append(" TEXT ")
+        line.append("  ")
+        line.append(part)
+        line.append(
+            f"  ·  showing {len(self._a2l_filtered_tags)} of {len(self._a2l_enriched_tags)}"
+        )
+        line.append("   paste several names, or alt+p, to filter by a LIST")
+        line.append("\n")
+        line.append(self._a2l_mode_line())
+        return line
+
+    def _a2l_list_chips(self) -> tuple[Text, Text]:
+        """Build the list-mode chips and missing line (R-A2L-LIST.017-.018, .022)."""
+        resolution = getattr(self, "_a2l_list_resolution", None)
+        if resolution is None:
+            return Text(), Text()
+        counts, ribbon, missing = label_list.list_summary_texts(
+            resolution, label_list.VIEWER_RIBBON
+        )
+        chips = Text()
+        chips.append(" LIST ")
+        chips.append("  ")
+        chips.append(counts)
+        chips.append("\n")
+        chips.append("order ")
+        chips.append(ribbon)
+        chips.append(
+            "   field ignored in LIST mode · esc back to text filter · alt+p edit the list"
+        )
+        chips.append("\n")
+        chips.append(self._a2l_mode_line())
+        return chips, missing
+
+    def a2l_open_label_list(self) -> None:
+        """
+        Summary:
+            Open the paste window, seeded with the viewer's pasted names when
+            the viewer is in list mode, and apply its result to the filter box
+            (R-A2L-LIST.040, .041, .053, .054).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Seed the window with the current enriched tags, the shared
+              label ranker, the viewer's pasted names (empty in text mode)
+              and the ``#a2l_panes`` width regime.
+            - On dismiss with a non-empty name list, replace the filter box
+              value with the names joined by ``, `` (cursor 0, so the box's
+              Changed event runs the debounced refresh) and close the
+              dropdown; ``None`` leaves the filter untouched.
+
+        Dependencies:
+            Uses:
+                - ``LabelListPasteModal`` / ``LabelRanker``
+                - ``_a2l_list_names``
+            Used by:
+                - ``A2LExplorerBody.action_paste_list`` (alt+p)
+        """
+        names = self._a2l_list_names() or []
+        ranker = getattr(self, "_a2l_label_ranker", None)
+        if ranker is None:
+            ranker = label_list.LabelRanker(self)
+            self._a2l_label_ranker = ranker
+        try:
+            wide = self.query_one("#a2l_panes").size.width >= label_list.WIDE_AT
+        except Exception:
+            wide = False
+        modal = label_list.LabelListPasteModal(
+            tags=self._a2l_enriched_tags,
+            ranker=ranker,
+            names=names,
+            wide=wide,
+        )
+
+        def apply_result(result: Optional[list[str]]) -> None:
+            if not result:
+                return
+            box = self.query_one("#a2l_tags_filter_input", Input)
+            box.value = ", ".join(result)
+            box.cursor_position = 0
+            self.query_one("#a2l_filter_suggest", label_list.LabelSuggestBox).close()
+
+        self.push_screen(modal, apply_result)
 
     def _refresh_a2l_dependent_views(self) -> None:
         """
@@ -882,6 +1202,8 @@ class A2lViewMixin:
 
         Data Flow:
             - Reset only the filter mode, then render fresh A2L/MAC/Issues data.
+            - Re-resolve the open paste window's names against the new tags
+              (R-A2L-LIST.056).
             - Invalidate the old hex span, description and detail selection;
               register the final detail clear behind queued row highlights.
             - Refresh both pickers, Memory Map, Split / Join and Loaded through
@@ -891,6 +1213,7 @@ class A2lViewMixin:
             Uses:
                 - ``update_a2l_view`` / ``_prefill_check_editor`` /
                   ``_prefill_patch_editor`` / ``update_memory_map``
+                - ``LabelListPasteModal.refresh_tags``
                 - ``SplitJoinWindow.invalidate_a2l_selection`` /
                   ``watch_current_file`` / ``_refresh_loaded_panel``
             Used by:
@@ -916,6 +1239,8 @@ class A2lViewMixin:
             screen = None
         if isinstance(screen, CurveDescriptionScreen):
             screen.dismiss(None)
+        if isinstance(screen, label_list.LabelListPasteModal):
+            screen.refresh_tags(self._a2l_enriched_tags)
         try:
             card = self.query_one("#a2l_detail_card", A2LDetailCard)
         except Exception:
@@ -971,6 +1296,10 @@ class A2lViewMixin:
                 - ``_refresh_a2l_dependent_views``
                 - A2L filter handlers
         """
+        ranker = getattr(self, "_a2l_label_ranker", None)
+        if ranker is None:
+            ranker = label_list.LabelRanker(self)
+            self._a2l_label_ranker = ranker
         if not self.current_a2l_data:
             self._a2l_enriched_tags = []
             self._a2l_filtered_tags = []
@@ -979,8 +1308,12 @@ class A2lViewMixin:
             self._a2l_tag_hex_highlight = None
             self._a2l_tag_find_query = ""
             self._a2l_tag_find_last_index = -1
+            ranker.prepare([], self._a2l_view_generation)
+            self._a2l_list_resolution = None
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
+            # Text mode again: repaint the mode tag and chips (R-A2L-LIST.008/3, E3A-08).
+            self._paint_a2l_filter_chips()
             self.update_mac_view()
             if not self.current_file:
                 self._validation_report = None
@@ -988,6 +1321,7 @@ class A2lViewMixin:
                 self.update_validation_issues_view()
             return
         self._compute_a2l_enriched_tags()
+        ranker.prepare(self._a2l_distinct_tag_names(), self._a2l_view_generation)
         # LLR-037.3: install the validation issue list after enrichment (the
         # MAC-view cache consumes _a2l_enriched_tags) and before the tag rows
         # render, so the first frame reads a fresh issue-severity map.
@@ -1052,6 +1386,11 @@ class A2lViewMixin:
         self._a2l_row_key_to_tag = {}
         a2l_table.suppress_row_highlight = True
         try:
+            resolution = getattr(self, "_a2l_list_resolution", None)
+            if resolution is not None:
+                self._update_a2l_list_page(a2l_table, summary_label, resolution)
+                return
+            self._set_a2l_table_columns(a2l_table, _A2L_TEXT_COLUMNS)
             a2l_table.clear(columns=False)
             if not tags:
                 self._a2l_window_start = 0
@@ -1192,6 +1531,8 @@ class A2lViewMixin:
                 - ``update_a2l_tags_view`` (after each non-empty page build)
                 - ``on_a2l_tag_table_measured``
         """
+        if getattr(self, "_a2l_list_resolution", None) is not None:
+            return
         a2l_table = self.query_one("#a2l_tags_list", DataTable)
         name_width = self._a2l_tag_name_width(a2l_table)
         if name_width is None:
@@ -1285,6 +1626,10 @@ class A2lViewMixin:
         """
         table = self.query_one("#a2l_tags_list", DataTable)
         summary_label = self.query_one("#a2l_tags_summary", deps.Label)
+        names = self._a2l_list_names()
+        if names is not None:
+            self._repaint_a2l_list_cells(table, summary_label, names)
+            return
         tags = self._a2l_filtered_tags
         total_tags = len(tags)
         if not total_tags:
@@ -1331,6 +1676,109 @@ class A2lViewMixin:
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
         table.notify_style_update()
+
+    def _a2l_table_column_labels(self, a2l_table: DataTable) -> tuple[str, ...]:
+        """Return ``a2l_table``'s current column labels in order."""
+        return tuple(column.label.plain for column in a2l_table.ordered_columns)
+
+    def _set_a2l_table_columns(
+        self, a2l_table: DataTable, labels: tuple[str, ...]
+    ) -> None:
+        """Set ``a2l_table``'s columns to ``labels`` only when they differ."""
+        if self._a2l_table_column_labels(a2l_table) == labels:
+            return
+        a2l_table.clear(columns=True)
+        a2l_table.add_columns(*labels)
+
+    def _a2l_list_text_cells(self, tag: dict) -> Mapping[str, Text]:
+        """Map the shipped text-mode labels to ``tag``'s 16 built cells."""
+        cells = self._build_a2l_table_cells(tag)
+        return dict(zip(_A2L_TEXT_COLUMNS, cells))
+
+    def _update_a2l_list_page(
+        self,
+        a2l_table: DataTable,
+        summary_label: deps.Label,
+        resolution: label_list.LabelListResolution,
+    ) -> None:
+        """Render one list-mode page of ``resolution`` into ``a2l_table``."""
+        self._set_a2l_table_columns(a2l_table, label_list.LIST_COLUMNS)
+        a2l_table.clear(columns=False)
+        total = len(resolution.entries)
+        self._a2l_window_start = self._a2l_clamp_page_start(total)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(total, self._a2l_window_start, page_size)
+        self._a2l_window_start = start
+        mode = self.a2l_tags_filter_mode
+        for index in range(start, end):
+            entry = resolution.entries[index]
+            text_cells = (
+                self._a2l_list_text_cells(entry.tag)
+                if entry.tag is not None
+                else None
+            )
+            cells = label_list.list_row_cells(entry, text_cells, mode)
+            row_key = f"a2l:{index}"
+            self._a2l_row_key_to_tag[row_key] = resolution.rows[index]
+            a2l_table.add_row(*cells, key=row_key)
+        summary_label.update(Text(f"LIST  rows {start + 1}-{end} / {total} in pasted order"))
+
+    def _repaint_a2l_list_cells(
+        self,
+        table: DataTable,
+        summary_label: deps.Label,
+        names: list[str],
+    ) -> None:
+        """Re-resolve and write the shown list-mode page in place (R-A2L-LIST.036)."""
+        mode = self.a2l_tags_filter_mode
+        resolution = label_list.resolve_label_list(
+            names,
+            self._a2l_enriched_tags,
+            hidden=lambda tag: not self._a2l_mode_keeps(tag, mode),
+        )
+        self._a2l_list_resolution = resolution
+        self._a2l_filtered_tags = list(resolution.rows)
+        total = len(resolution.entries)
+        if not total:
+            return
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(total, self._a2l_window_start, page_size)
+        from textual.coordinate import Coordinate
+
+        for i in range(end - start):
+            index = start + i
+            entry = resolution.entries[index]
+            text_cells = (
+                self._a2l_list_text_cells(entry.tag)
+                if entry.tag is not None
+                else None
+            )
+            cells = label_list.list_row_cells(entry, text_cells, mode)
+            for column, cell in enumerate(cells):
+                existing = table.get_cell_at(Coordinate(i, column))
+                if isinstance(existing, Text):
+                    text_changed = existing.plain != cell.plain
+                    style_changed = existing.style != cell.style
+                else:
+                    text_changed = str(existing) != cell.plain
+                    style_changed = True
+                if text_changed or style_changed:
+                    table.update_cell_at(Coordinate(i, column), cell, update_width=True)
+            self._a2l_row_key_to_tag[f"a2l:{index}"] = resolution.rows[index]
+        summary_label.update(Text(f"LIST  rows {start + 1}-{end} / {total} in pasted order"))
+        table.notify_style_update()
+
+    def _a2l_distinct_tag_names(self) -> list[str]:
+        """Return the distinct non-empty tag names of the current A2L in order."""
+        seen: set[str] = set()
+        names: list[str] = []
+        for tag in self._a2l_enriched_tags:
+            name = str(tag.get("name") or "")
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            names.append(name)
+        return names
 
     def _build_a2l_table_cells(
         self, tag: dict, name_width: Optional[int] = None
@@ -1435,17 +1883,53 @@ class A2lViewMixin:
         )
 
     def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
+        """
+        Summary:
+            Resolve list mode into one row per pasted name, else run the
+            shipped mode-then-substring text filter.
+
+        Args:
+            tags (list[dict]): Enriched A2L tags.
+
+        Returns:
+            list[dict]: In list mode, the resolution rows in pasted order
+                (each row is the tag object itself for a found / duplicate /
+                hidden name, or ``{"name": ..., "_list_pos": ...}`` for a
+                missing name); in text mode, the tags the active mode and the
+                filter text keep.
+
+        Data Flow:
+            - List mode: resolve the pasted names over ``tags`` with the
+              active mode's hidden test, keep the resolution in
+              ``_a2l_list_resolution`` and return its rows (R-A2L-LIST.006).
+            - Text mode: clear the resolution and run the unchanged shipped
+              mode-then-substring filter.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_list_names`` / ``_a2l_mode_keeps``
+                - ``resolve_label_list`` (a2l_label_list)
+                - ``_tag_matches_filter``
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        names = self._a2l_list_names()
+        if names is not None:
+            mode = self.a2l_tags_filter_mode
+            resolution = label_list.resolve_label_list(
+                names,
+                tags,
+                hidden=lambda tag: not self._a2l_mode_keeps(tag, mode),
+            )
+            self._a2l_list_resolution = resolution
+            return list(resolution.rows)
+        self._a2l_list_resolution = None
         mode = self.a2l_tags_filter_mode
         text = (self.a2l_tags_filter_text or "").lower()
         filtered = []
         for tag in tags:
-            if mode == "invalid":
-                show = (not tag.get("schema_ok", True)) or (
-                    tag.get("memory_checked") and tag.get("in_memory") is False
-                )
-                if not show:
-                    continue
-            if mode == "inmem" and tag.get("in_memory") is not True:
+            # One source of truth for the mode test (P-087 b): list mode reads it too.
+            if not self._a2l_mode_keeps(tag, mode):
                 continue
             if text:
                 if not self._tag_matches_filter(tag, text):
@@ -1548,7 +2032,8 @@ class A2lViewMixin:
     def _schedule_a2l_filter_refresh(self) -> None:
         """
         Summary:
-            Debounce rapid filter-input events and refresh only buffered A2L tags window.
+            Debounce rapid filter-input events, refresh the buffered A2L tags
+            window and drive the filter box's suggestion dropdown.
 
         Args:
             None
@@ -1563,16 +2048,22 @@ class A2lViewMixin:
             - Drop the refresh when it comes due after the app stopped
               running: shutdown has already removed the A2L tag table
               (Inc 1b E5, R-COPY.26).
+            - After the refresh, open the dropdown with the ranked names of
+              the stripped text; an empty or list text closes it
+              (R-A2L-LIST.060, .062).
 
         Dependencies:
             Uses:
                 - ``set_timer``
                 - ``_refresh_a2l_filtered_tags``
+                - ``LabelRanker.request`` / ``LabelSuggestBox``
             Used by:
                 - ``on_input_changed`` for A2L filter input
         """
         self._a2l_filter_debounce_token += 1
         expected_token = self._a2l_filter_debounce_token
+        box = self.query_one("#a2l_tags_filter_input", Input)
+        suggest = self.query_one("#a2l_filter_suggest", label_list.LabelSuggestBox)
 
         def _apply_filter() -> None:
             if expected_token != self._a2l_filter_debounce_token:
@@ -1580,5 +2071,145 @@ class A2lViewMixin:
             if not self.is_running:
                 return
             self._refresh_a2l_filtered_tags(preserve_anchor=False)
+            text = box.value.strip()
+            if not text or label_list.is_list_text(text):
+                suggest.close()
+                return
+            ranker = getattr(self, "_a2l_label_ranker", None)
+            if ranker is not None:
+                ranker.request(
+                    "filter",
+                    text,
+                    label_list.RANK_LIMIT,
+                    functools.partial(suggest.show_ranked, text),
+                    current=lambda: box.is_attached and box.value.strip() == text,
+                )
 
         self.set_timer(0.15, _apply_filter)
+
+
+class ListAwareDetailCard(A2LDetailCard):
+    """The A2L Explorer detail card, aware of list mode (R-A2L-LIST.027-.030).
+
+    A subclass of :class:`A2LDetailCard` (``shared.py``) so the type queries
+    ``a2l_view.py`` and ``navigation.py:1418`` still match. In list mode it
+    finds the highlighted pasted name's entry and paints the missing /
+    duplicate / hidden card lines; in text mode it shows the shipped card
+    unchanged. It lives in G-V because :mod:`a2l_label_list` may not import
+    the app package.
+    """
+
+    def show_tag(self, tag: Optional[dict]) -> None:
+        """
+        Summary:
+            Update the card for the highlighted A2L row, switching on list mode.
+
+        Args:
+            tag (Optional[dict]): The highlighted row's dict — the enriched
+                tag object for a found / duplicate / hidden name, the
+                ``{"name": ..., "_list_pos": ...}`` dict for a missing name,
+                or ``None``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - No list resolution (text mode) or ``None`` → the shipped card.
+            - A missing row → its ``✗`` / ``pasted #`` lines, then a ``card``
+              ranking for the closest names.
+            - A duplicate or hidden row → the shipped card + its addendum.
+            - A found row → the shipped card.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_detail_card_text`` / ``label_list.list_card_text``
+                - ``label_list.LabelRanker.request``
+            Used by:
+                - ``on_data_table_row_highlighted``
+        """
+        self._shown_entry = None
+        if tag is None:
+            super().show_tag(tag)
+            return
+        resolution = getattr(self.app, "_a2l_list_resolution", None)
+        if resolution is None:
+            super().show_tag(tag)
+            return
+        entry = self._resolve_entry(tag, resolution)
+        if entry is None or entry.status == label_list.FOUND:
+            super().show_tag(tag)
+            return
+        if entry.status == label_list.MISSING:
+            self._paint_missing(entry)
+            return
+        self._paint_addendum(tag, entry)
+
+    def _resolve_entry(
+        self, tag: dict, resolution: label_list.LabelListResolution
+    ) -> Optional[label_list.LabelListEntry]:
+        """Resolve ``tag`` to its list-mode entry, or ``None`` for the shipped card."""
+        if "_list_pos" in tag:
+            return resolution.entries[tag["_list_pos"] - 1]
+        entry = self._cursor_entry(resolution)
+        if entry is not None and entry.tag is tag:
+            return entry
+        return None
+
+    def _cursor_entry(
+        self, resolution: label_list.LabelListResolution
+    ) -> Optional[label_list.LabelListEntry]:
+        """Return the tag table's cursor-row entry, or ``None``."""
+        try:
+            a2l_table = self.app.query_one("#a2l_tags_list", DataTable)
+            row_index = a2l_table.cursor_row
+            if row_index is None:
+                return None
+            row_key, _ = a2l_table.coordinate_to_cell_key((row_index, 0))
+        except Exception:
+            return None
+        key = getattr(row_key, "value", row_key)
+        if not isinstance(key, str) or not key.startswith("a2l:"):
+            return None
+        try:
+            index = int(key[len("a2l:"):])
+        except ValueError:
+            return None
+        if 0 <= index < len(resolution.entries):
+            return resolution.entries[index]
+        return None
+
+    def _paint_missing(self, entry: label_list.LabelListEntry) -> None:
+        """Paint the missing card and request its closest names off the UI thread."""
+        self._set_card_text(label_list.list_card_text(entry, None))
+        ranker = getattr(self.app, "_a2l_label_ranker", None)
+        if ranker is None:
+            return
+        self._shown_entry = entry
+
+        def deliver(matches: list) -> None:
+            self._set_card_text(
+                label_list.list_card_text(entry, [match.name for match in matches])
+            )
+
+        def current() -> bool:
+            return self.is_attached and self._shown_entry is entry
+
+        ranker.request(
+            "card",
+            entry.name,
+            label_list.CLOSEST_LIMIT,
+            deliver,
+            current,
+        )
+
+    def _paint_addendum(self, tag: dict, entry: label_list.LabelListEntry) -> None:
+        """Paint the shipped card followed by the duplicate / hidden addendum."""
+        text = _a2l_detail_card_text(tag)
+        text.append("\n")
+        text.append(label_list.list_card_text(entry, None))
+        self._set_card_text(text)
+
+    def _set_card_text(self, text: Text) -> None:
+        """Write ``text`` as the card's content (markup off, re-wrapped)."""
+        self._card_text = text
+        self._rewrite_card_text()

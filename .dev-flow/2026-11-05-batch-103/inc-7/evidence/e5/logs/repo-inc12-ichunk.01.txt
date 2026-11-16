@@ -1,0 +1,8 @@
+label=inc12-ichunk.01 start=2026-11-14T10:27:16-06:00 load=2.11 2.24 2.12 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......................................                                   [100%]
+38 passed in 134.39s (0:02:14)
+RC=0 end=2026-11-14T10:29:31-06:00 load=2.58 2.34 2.17

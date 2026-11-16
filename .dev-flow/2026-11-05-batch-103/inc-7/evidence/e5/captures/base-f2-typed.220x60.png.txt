@@ -1,0 +1,87 @@
+scenario=f2-typed
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tag_find_input
+body=196x45 classes=[]
+region #a2l_tags_pane: Region(x=23, y=4, width=112, height=45) visible=Region(x=23, y=4, width=112, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=135, y=4, width=84, height=45) visible=Region(x=135, y=4, width=84, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=137, y=6, width=80, height=2) visible=Region(x=137, y=6, width=80, height=2) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=108, height=4) visible=Region(x=25, y=7, width=108, height=4) display=True hit_at_centre=a2l_filter_inmem
+region #a2l_tags_filter_input: Region(x=25, y=7, width=6, height=3) visible=Region(x=25, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=10
+region #a2l_tag_find_input: Region(x=95, y=7, width=6, height=3) visible=Region(x=95, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=3
+region #a2l_tags_list: Region(x=25, y=11, width=108, height=36) visible=Region(x=25, y=11, width=108, height=36) display=True hit_at_centre=a2l_tags_list rows=1 body_rows=35
+region #alt_hex_scroll: Region(x=137, y=14, width=80, height=41) visible=Region(x=137, y=14, width=80, height=33) display=True hit_at_centre=alt_hex_view
+text #a2l_tags_summary[0]: 'Page 1/1 | tags 1-1 / 1 (page size 200; +/- to change page)  ·  1 in image'
+text #a2l_detail_card[0]: 'Highlight a tag to inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=78
+table_columns=['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['0x00000014', '2', '✓ VALUE_0002', 'formula', '48800', '488000.0']
+screen_begin
+| 
+|   ⭘                                                                                                   Hex Edit Tool
+|                       │                                                                                          A2L Explorer                                                                                            ?
+|  ▏ ◫  Workspace       │
+|  ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏ ◉  MAC View        │▊                                                   A2L Tags                                                   ▎▊                                                                                  ▎
+|  ▏ ▤  Memory Map      │▊                                                                                                              ▎▊  Highlight a tag to inspect its fields.                                          ▎
+|  ▏ !  Issues Report   │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊ ──────────────────────────────────────────────────────────────────────────────── ▎
+|  ▏ ✎  Patch Editor    │▊ ▊    ▎  Field: name         All           Invalid        In-Memory    ▊    ▎   Find next       Page Prev     ▎▊                                    Hex Viewer                                    ▎
+|  ▏ ✔  Check Editor    │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊                                                                                  ▎
+|  ▏ ⏚  A2B Diff        │▊                                                                                                              ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|  ▏ ✦  Flow Builder    │▊  Address     Length  Tag                 Source   Raw                 Physical            InMem  Region  Lim ▎▊ ▊  Search ASCII text   ▎   Find Next    ▊  Goto 0xADDR         ▎      Goto       ▎
+|  ▏ ▶  Flow Execution  │▊  0x00000014  2       ✓ VALUE_0002        formula  48800               488000.0            yes    flash   0.. ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|  ▏ ☑  Checks          │▊                                                                                                              ▎▊                                                                                  ▎
+|  ▏ ⊕  CRC Designer    │▊                                                                                                              ▎▊ ... window limited to 200 rows ...                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT     ▎
+|                       │▊                                                                                                              ▎▊ v1.|                                                                             ▎
+|                       │▊                                                                                                              ▎▊   0x00000010  30 00 00 00 A0 BE 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |0...............|                                                            ▆▆ ▎
+|                       │▊                                                                                                              ▎▊   0x00000020  00 00 00 00 00 00 00 00 5E 26 03 B4 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |........^&......|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000030  00 00 00 00 00 00 00 00 00 00 00 00 FE 01 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000050  00 C8 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000060  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000070  00 00 00 00 00 00 00 00 EA 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000080  00 00 00 00 00 00 00 00 00 00 00 00 78 57 27 2A                    ▎
+|                       │▊                                                                                                              ▎▊ |............xW'*|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x00000090  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000A0  B0 46 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |.F..............|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000B0  00 00 00 00 2B 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |....+...........|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000C0  00 00 00 00 00 00 00 00 01 90 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000D0  00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                                                                              ▎▊ |................|                                                               ▎
+|                       │▊                                                                                                              ▎▊   0x000000F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                    ▎
+|                       │▊                                                              ▊                                               ▎▊ |................|                                                               ▎
+|                       │▊  Page 1/1 | tags 1-1 / 1 (page size 200; +/- to change page)  ·  1 in image                                  ▎▊                                                                                  ▎
+|                       │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                                                                                                                                   (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

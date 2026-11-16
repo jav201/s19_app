@@ -314,7 +314,7 @@ async def _prepare_target(app, pilot, target: str):
         await _settle(pilot)
         await pilot.press("/")
         await _settle(pilot)
-        widget = app.query_one("#a2l_tags_filter_input")
+        widget = app.query_one("#a2l_tag_find_input")
         widget.focus()
         await _settle(pilot, 2)
         assert widget.value == ""

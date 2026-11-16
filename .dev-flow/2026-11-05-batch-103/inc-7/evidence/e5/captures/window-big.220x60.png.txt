@@ -1,0 +1,115 @@
+scenario=window-big
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=LabelListPasteModal
+focused=a2l_list_text
+body=196x45 classes=['-wide']
+region #a2l_tags_pane: Region(x=23, y=4, width=106, height=45) visible=Region(x=23, y=4, width=106, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=129, y=4, width=90, height=45) visible=Region(x=129, y=4, width=90, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=131, y=6, width=86, height=2) visible=Region(x=131, y=6, width=86, height=2) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=102, height=4) visible=Region(x=25, y=7, width=102, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=31, y=7, width=6, height=3) visible=Region(x=31, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=0
+region #a2l_tag_find_input: Region(x=121, y=7, width=6, height=3) visible=Region(x=121, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=37, y=7, width=20, height=3) visible=Region(x=37, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=25, y=11, width=102, height=2) visible=Region(x=25, y=11, width=102, height=2) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=37, y=50, width=146, height=1) visible=Region(x=37, y=50, width=146, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=25, y=13, width=102, height=34) visible=Region(x=25, y=13, width=102, height=34) display=True hit_at_centre=a2l_tags_list rows=200 body_rows=33
+region #alt_hex_scroll: Region(x=131, y=14, width=86, height=39) visible=Region(x=131, y=14, width=86, height=33) display=True hit_at_centre=alt_hex_view
+region #a2l_list_add_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_add: Region(x=40, y=5, width=73, height=3) visible=Region(x=40, y=5, width=70, height=3) display=True hit_at_centre=a2l_list_add content_width=67 value_len=0
+text #a2l_filter_mode_tag[0]: 'FILTER'
+text #a2l_list_chips[0]: ' TEXT   no text filter  ·  showing 462 of 462   paste several names, or alt+p, to filter by a LIST'
+text #a2l_list_chips[1]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 0     Duplicates 4444 ▸ #463 VALUE_0001 (= #1) · #464 VALUE_0002 (= #2) · #465 VALUE_0003 (= #3) · #466 VALUE_0004 (= #4) · #467 MEASUREMENT_0001 (= #5) · #468 MEASUREMENT_0002 (= #6) · #469 MEASUREMENT_0003 (= #7) · #470 MEASUREMENT_0004 (= #8) · #471 MEASUREMENT_0005 (= #9) · #472 MEASUREM'
+text #a2l_tags_summary[0]: 'Page 1/3 | tags 1-200 / 462 (page size 200; +/- to change page)  ·  402 in image'
+text #a2l_list_counts[0]: '4906 pasted  ·  ● 462 found  ·  ✗ 0 missing  ·  = 4444 duplicates'
+text #a2l_list_ribbon[0]: 'order ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●● +4856'
+text #a2l_list_more[0]: '  +4706 more names (the counts above cover all 4906)'
+text #a2l_list_missing[0]: 'Missing 0     Duplicates 4444 ▸ #463 VALUE_0001 (= #1) · #464 VALUE_0002 (= #2) · #465 VALUE_0003 (= #3) · #466 VALUE_0004 (= #4) · #467 MEASUREMENT_0001 (= #5) · #468 MEASUREMENT_0002 (= #6) · #469 MEASUREMENT_0003 (= #7) · #470 MEASUREMENT_0004 (= #8) · #471 MEASUREMENT_0005 (= #9) · #472 MEASUREM'
+text #a2l_detail_card[0]: 'Highlight a tag to inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['0x00000000', '1', '✓ VALUE_0001', 'formula', '108', '108']
+table_row[1]: ['0x00000014', '2', '✓ VALUE_0002', 'formula', '48800', '488000.0']
+table_row[2]: ['0x00000028', '4', '✓ VALUE_0003', 'formula', '1579549620', '1579549720.0']
+table_row[3]: ['0x0000003C', '4', '✓ VALUE_0004', 'formula', '510', '970.0']
+table_row[4]: ['0x00000050', '2', '✓ MEASUREMENT_0001', 'formula', '200', '20.0']
+table_row[5]: ['0x00000064', '2', '✓ MEASUREMENT_0002', 'formula', '0', '0.0']
+table_row[6]: ['0x00000078', '1', '✓ MEASUREMENT_0003', 'formula', '234', '234']
+table_row[7]: ['0x0000008C', '4', '✓ MEASUREMENT_0004', 'formula', '707221368', '7072213680.0']
+table_row[8]: ['0x000000A0', '2', '✓ MEASUREMENT_0005', 'formula', '-20410', '-20310.0']
+table_row[9]: ['0x000000B4', '4', '✓ MEASUREMENT_0006', 'formula', '43', '36.0']
+table_row[10]: ['0x000000C8', '2', '✓ MEASUREMENT_0007', 'formula', '400', '40.0']
+table_row[11]: ['0x000000DC', '2', '✓ MEASUREMENT_0008', 'formula', '1', '5.0']
+table_row[12]: ['0x00040000', '1', '✓ VALUE_0005', 'formula', '131', '131']
+table_row[13]: ['0x00040014', '2', '✓ VALUE_0006', 'formula', '-27427', '-274270.0']
+text_area_lines=4906 first='VALUE_0001'
+screen_begin
+| 
+|                                   ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+|    ⭘                              │                                                                                                                                                      │
+|                        │          │   Paste a list of labels                                                                                                                             │                                ?
+|   ▏ ◫  Workspace       │          │                                                                                                                                                      │
+|   ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔│  add╭─────────────────────────────────────────────────────────────────────4906 pasted  ·  ● 462 found  ·  ✗ 0 missing  ·  = 4444 duplicates          │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|   ▏ ◉  MAC View        │▊         │     │  part of a name — start, middle, end, a typo                        order ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●● +4856             │
+|   ▏ ▤  Memory Map      │▊         │     ╰───────────────────────────────────────────────────────────────────── #    Name                Status  Kind     Address     Value               │
+|   ▏ !  Issues Report   │▊ FILTER▊▔│                                                                            1    ● VALUE_0001        found   VALUE    0x00000000  108                 │────────────────────────────────
+|   ▏ ✎  Patch Editor    │▊       ▊ │                                                                            2    ● VALUE_0002        found   VALUE    0x00000014  488000.0            │
+|   ▏ ✔  Check Editor    │▊       ▊▁│                                                                            3    ● VALUE_0003        found   VALUE    0x00000028  1579549720.0        │
+|   ▏ ⏚  A2B Diff        │▊         │                                                                            4    ● VALUE_0004        found   VALUE    0x0000003C  970.0               │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|   ▏ ✦  Flow Builder    │▊  TEXT   │                                                                            5    ● MEASUREMENT_0001  found   MEASURE  0x00000050  20.0                │DDR            ▎      Goto
+|   ▏ ▶  Flow Execution  │▊ mode All│                                                                            6    ● MEASUREMENT_0002  found   MEASURE  0x00000064  0.0                 │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|   ▏ ☑  Checks          │▊  Address│                                                                            7    ● MEASUREMENT_0003  found   MEASURE  0x00000078  234                 │
+|   ▏ ⊕  CRC Designer    │▊  0x00000│                                                                            8    ● MEASUREMENT_0004  found   MEASURE  0x0000008C  7072213680.0        │
+|                        │▊  0x00000│                                                                            9    ● MEASUREMENT_0005  found   MEASURE  0x000000A0  -20310.0        ▂▂  │6 31 2E  |l19TOOL BOOT v1.|
+|                        │▊  0x00000│                                                                            10   ● MEASUREMENT_0006  found   MEASURE  0x000000B4  36.0                │0 00 00  |0...............|
+|                        │▊  0x00000│                                                                            11   ● MEASUREMENT_0007  found   MEASURE  0x000000C8  40.0                │0 00 00  |........^&......|
+|                        │▊  0x00000│                                                                            12   ● MEASUREMENT_0008  found   MEASURE  0x000000DC  5.0                 │1 00 00  |................|
+|                        │▊  0x00000│                                                                            13   ● VALUE_0005        found   VALUE    0x00040000  131                 │0 00 00  |................|
+|                        │▊  0x00000│                                                                            14   ● VALUE_0006        found   VALUE    0x00040014  -274270.0           │0 00 00  |................|
+|                        │▊  0x00000│                                                                            15   ● VALUE_0007        found   VALUE    0x00040028  185.658958435058    │0 00 00  |................|   ▃▃
+|                        │▊  0x00000│                                                                            16   ● VALUE_0008        found   VALUE    0x0004003C  1608.0              │0 00 00  |................|
+|                        │▊  0x00000│                                                                            17   ● VALUE_0009        found   VALUE    0x00040050  0.0                 │7 27 2A  |............xW'*|
+|                        │▊  0x00000│                                                                            18   ● VALUE_0010        found   VALUE    0x00040064  20.0                │0 00 00  |................|
+|                        │▊  0x00000│                                                                            19   ● VALUE_0011        found   VALUE    0x00040078  22                  │0 00 00  |.F..............|
+|                        │▊  0x00040│  or paste names — new line , ; space                                       20   ● VALUE_0012        found   VALUE    0x0004008C  286.195907592773    │0 00 00  |....+...........|
+|                        │▊  0x00040│  ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 21   ● VALUE_0013        found   VALUE    0x000400A0  125.0               │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0023                                                          ▎ 22   ● VALUE_0014        found   VALUE    0x000400B4  954.0               │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0024                                                          ▎ 23   ● VALUE_0015        found   VALUE    0x000400C8  0.0                 │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0025                                                          ▎ 24   ● VALUE_0016        found   VALUE    0x000400DC  10.0                │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0026                                                          ▎ 25   ● VALUE_0017        found   VALUE    0x000400F0  241                 │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0027                                                          ▎ 26   ● VALUE_0018        found   VALUE    0x00040104  1700.0              │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0028                                                          ▎ 27   ● VALUE_0019        found   VALUE    0x00040118  12930.0             │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0029                                                          ▎ 28   ● VALUE_0020        found   VALUE    0x0004012C  1640.0              │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0030                                                          ▎ 29   ● VALUE_0021        found   VALUE    0x00040140  20.0                │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0031                                                          ▎ 30   ● VALUE_0022        found   VALUE    0x00040154  15.0                │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0032                                                          ▎ 31   ● VALUE_0023        found   VALUE    0x00040168  100                 │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0033                                                          ▎ 32   ● VALUE_0024        found   VALUE    0x0004017C  449410.0            │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0034                                                          ▎ 33   ● VALUE_0025        found   VALUE    0x00040190  1937037856.0        │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0035                                                          ▎ 34   ● VALUE_0026        found   VALUE    0x000401A4  1542.0              │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0036                                                          ▎ 35   ● VALUE_0027        found   VALUE    0x000401B8  40.0                │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0037                                                          ▎ 36   ● VALUE_0028        found   VALUE    0x000401CC  20.0                │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0038                                                          ▎ 37   ● VALUE_0029        found   VALUE    0x000401E0  57                  │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0039                                                          ▎ 38   ● VALUE_0030        found   VALUE    0x000401F4  19496757010.0       │0 00 00  |................|
+|                        │▊  0x00040│  ▊ VAL_BLK_0040                                                          ▎ 39   ● VALUE_0031        found   VALUE    0x00040208  -28005.0            │0 00 00  |................|
+|                        │▊         │  ▊ VAL_BLK_0041                                                          ▎ 40   ● VALUE_0032        found   VALUE    0x0004021C  1094.0              │0 00 00  |................|
+|                        │▊  Page 1/│  ▊ VAL_BLK_0042                                                          ▎ 41   ● VALUE_0033        found   VALUE    0x00040230  30.0                │
+|                        │▊▁▁▁▁▁▁▁▁▁│  ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 42   ● VALUE_0034        found   VALUE    0x00040244  0.0                 │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|   ────────────────────────────────│  Missing 0     Duplicates 4444 ▸ #463 VALUE_0001 (= #1) · #464 VALUE_0002 (= #2) · #465 VALUE_0003 (= #3) · #466 VALUE_0004 (= #4) · #467 MEASUREM…  │─────────────────────────────────
+|    Loaded firmware.s19 (S19 only) │                                                                                                                                                      │          (none)  |  firmware.a2l
+|                                   │  The list filters the viewer (LIST mode, pasted order); nothing is saved. Missing names stay listed so you can fix them.                             │
+|    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│                                                                                                                                                      │
+|                                   │                                                                                                    ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  │
+|                                   │                                                                                                     Filter viewer by list  alt+f     Cancel  esc     │
+|    Loaded firmware.s19 (S19 only) │                                                                                                    ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  │
+|    A2L loaded: firmware.a2l       │                                                                                                                                                      │
+|    ^k Palette  ^d Density  ^l Load╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+| 
+screen_end
+stub_os_writes=0
+surface=ready

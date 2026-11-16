@@ -1,0 +1,24 @@
+== A2LDetailCard.show_tag
+   s19_app/tui/app/a2l_view.py:924 (marked copy :926)  in A2lViewMixin._refresh_a2l_dependent_views
+   s19_app/tui/app/navigation.py:1421 (marked copy :1421)  in NavigationMixin.on_data_table_row_highlighted
+   s19_app/tui/app/shared.py:580 (marked copy :580)  in A2LDetailCard.on_mount
+== A2lViewMixin._filter_a2l_tags
+   s19_app/tui/app/a2l_view.py:857 (marked copy :859)  in A2lViewMixin._refresh_a2l_filtered_tags
+== A2lViewMixin._jump_to_tag_by_data
+   s19_app/tui/app/a2l_view.py:441 (marked copy :441)  in A2lViewMixin._jump_to_tag
+== A2lViewMixin._refresh_a2l_filtered_tags
+   s19_app/tui/app/a2l_view.py:997 (marked copy :1000)  in A2lViewMixin.update_a2l_view
+   s19_app/tui/app/a2l_view.py:1546 (marked copy :1552)  in A2lViewMixin._set_a2l_filter_field
+   s19_app/tui/app/a2l_view.py:1577 (marked copy :1584)  in A2lViewMixin._schedule_a2l_filter_refresh._apply_filter
+== A2lViewMixin.update_a2l_tags_view
+   s19_app/tui/app/a2l_view.py:366 (marked copy :366)  in A2lViewMixin.action_a2l_tags_page_next
+   s19_app/tui/app/a2l_view.py:392 (marked copy :392)  in A2lViewMixin.action_a2l_tags_page_prev
+   s19_app/tui/app/a2l_view.py:506 (marked copy :507)  in A2lViewMixin._focus_a2l_tag_absolute_index
+   s19_app/tui/app/a2l_view.py:864 (marked copy :866)  in A2lViewMixin._refresh_a2l_filtered_tags
+   s19_app/tui/app/a2l_view.py:869 (marked copy :871)  in A2lViewMixin._refresh_a2l_filtered_tags
+   s19_app/tui/app/a2l_view.py:983 (marked copy :986)  in A2lViewMixin.update_a2l_view
+   s19_app/tui/app/a2l_view.py:1209 (marked copy :1213)  in A2lViewMixin._fit_a2l_tag_cells
+== A2lViewMixin.update_a2l_view
+   s19_app/tui/app/a2l_view.py:910 (marked copy :912)  in A2lViewMixin._refresh_a2l_dependent_views
+== OsClipboardInput.action_paste
+   s19_app/tui/os_clipboard_input.py:975 (marked copy :976)  in OsClipboardInput._on_mouse_down

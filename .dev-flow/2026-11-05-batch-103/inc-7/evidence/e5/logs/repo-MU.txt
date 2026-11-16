@@ -1,0 +1,8 @@
+label=MU start=2026-11-14T10:14:58-06:00 load=2.57 2.38 2.03 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 78.66s (0:01:18)
+RC=0 end=2026-11-14T10:16:18-06:00 load=2.12 2.28 2.02

@@ -1,0 +1,2593 @@
+{
+  "marks": [
+    {
+      "name": "parse_parameter_list",
+      "reqs": null,
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 69,
+      "def": {
+        "qualname": "parse_parameter_list",
+        "line": 70,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "list"
+      }
+    },
+    {
+      "name": "A2lViewMixin._jump_to_tag_by_data",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 443,
+      "def": {
+        "qualname": "A2lViewMixin._jump_to_tag_by_data",
+        "line": 444,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 828,
+      "def": {
+        "qualname": "A2lViewMixin._refresh_a2l_filtered_tags",
+        "line": 829,
+        "params": [
+          {
+            "name": "preserve_anchor",
+            "type": "bool",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_dependent_views",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 873,
+      "def": {
+        "qualname": "A2lViewMixin._refresh_a2l_dependent_views",
+        "line": 874,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_view",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 941,
+      "def": {
+        "qualname": "A2lViewMixin.update_a2l_view",
+        "line": 942,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_tags_view",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1004,
+      "def": {
+        "qualname": "A2lViewMixin.update_a2l_tags_view",
+        "line": 1005,
+        "params": [
+          {
+            "name": "tags",
+            "type": "list[dict]",
+            "default": null
+          },
+          {
+            "name": "empty_message",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lViewMixin._build_a2l_table_cells",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1340,
+      "def": {
+        "qualname": "A2lViewMixin._build_a2l_table_cells",
+        "line": 1341,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "name_width",
+            "type": "Optional[int]",
+            "default": "None"
+          }
+        ],
+        "returns": "tuple[Text, ...]"
+      }
+    },
+    {
+      "name": "A2lViewMixin._filter_a2l_tags",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1443,
+      "def": {
+        "qualname": "A2lViewMixin._filter_a2l_tags",
+        "line": 1444,
+        "params": [
+          {
+            "name": "tags",
+            "type": "list[dict]",
+            "default": null
+          }
+        ],
+        "returns": "list[dict]"
+      }
+    },
+    {
+      "name": "A2lViewMixin._tag_matches_filter",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1463,
+      "def": {
+        "qualname": "A2lViewMixin._tag_matches_filter",
+        "line": 1464,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "reqs": null,
+      "file": "s19_app/tui/app/a2l_view.py",
+      "line": 1556,
+      "def": {
+        "qualname": "A2lViewMixin._schedule_a2l_filter_refresh",
+        "line": 1557,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ComposeScreensMixin._compose_screen_a2l",
+      "reqs": null,
+      "file": "s19_app/tui/app/compose_screens.py",
+      "line": 629,
+      "def": {
+        "qualname": "ComposeScreensMixin._compose_screen_a2l",
+        "line": 630,
+        "params": [],
+        "returns": "Container"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_selected",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1332,
+      "def": {
+        "qualname": "NavigationMixin.on_data_table_row_selected",
+        "line": 1333,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowSelected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_highlighted",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1378,
+      "def": {
+        "qualname": "NavigationMixin.on_data_table_row_highlighted",
+        "line": 1379,
+        "params": [
+          {
+            "name": "event",
+            "type": "DataTable.RowHighlighted",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "NavigationMixin.on_input_changed",
+      "reqs": null,
+      "file": "s19_app/tui/app/navigation.py",
+      "line": 1496,
+      "def": {
+        "qualname": "NavigationMixin.on_input_changed",
+        "line": 1497,
+        "params": [
+          {
+            "name": "event",
+            "type": "Input.Changed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "_a2l_detail_card_text",
+      "reqs": null,
+      "file": "s19_app/tui/app/shared.py",
+      "line": 320,
+      "def": {
+        "qualname": "_a2l_detail_card_text",
+        "line": 321,
+        "params": [
+          {
+            "name": "tag",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "Text"
+      }
+    },
+    {
+      "name": "A2LDetailCard.show_tag",
+      "reqs": null,
+      "file": "s19_app/tui/app/shared.py",
+      "line": 602,
+      "def": {
+        "qualname": "A2LDetailCard.show_tag",
+        "line": 603,
+        "params": [
+          {
+            "name": "tag",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "_strip_paste_controls",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 505,
+      "def": {
+        "qualname": "_strip_paste_controls",
+        "line": 506,
+        "params": [
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "multiline",
+            "type": "bool",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "OsClipboardInput._on_paste",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 927,
+      "def": {
+        "qualname": "OsClipboardInput._on_paste",
+        "line": 928,
+        "params": [
+          {
+            "name": "event",
+            "type": "events.Paste",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OsClipboardInput.action_paste",
+      "reqs": null,
+      "file": "s19_app/tui/os_clipboard_input.py",
+      "line": 1040,
+      "def": {
+        "qualname": "OsClipboardInput.action_paste",
+        "line": 1041,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "build_label_index",
+      "reqs": null,
+      "file": "s19_app/tui/services/label_match.py",
+      "line": 123,
+      "def": {
+        "qualname": "build_label_index",
+        "line": 124,
+        "params": [
+          {
+            "name": "names",
+            "type": "Iterable[str]",
+            "default": null
+          }
+        ],
+        "returns": "LabelIndex"
+      }
+    },
+    {
+      "name": "rank",
+      "reqs": null,
+      "file": "s19_app/tui/services/label_match.py",
+      "line": 250,
+      "def": {
+        "qualname": "rank",
+        "line": 251,
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "index",
+            "type": "LabelIndex",
+            "default": null
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": null
+          }
+        ],
+        "returns": "list[LabelMatch]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "parse_parameter_list",
+      "reqs": [
+        "R-A2L-LIST.001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list",
+        "names": [
+          "result"
+        ],
+        "raw": "list result"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/a2l_parameter_picker.py:70 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "parse_parameter_list"
+    },
+    {
+      "name": "_strip_paste_controls",
+      "reqs": [
+        "R-A2L-LIST.034"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "multiline",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "result"
+        ],
+        "raw": "str result"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/os_clipboard_input.py:506 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "_strip_paste_controls"
+    },
+    {
+      "name": "OsClipboardInput._on_paste",
+      "reqs": [
+        "R-PASTE.1",
+        "R-A2L-LIST.033"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Paste",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-A2L-LIST.033/1) the terminal paste of G2L into `#a2l_tags_filter_input` → value = G2L joined by `, ` (no stock insert after it)",
+        "(R-PASTE.1/1) the same paste into the Load box → its first line `VALUE_0002`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. After the 65,536-character cap and before the first-line cut: `if self._take_paste(event.text)`: `prevent_default()`, `stop()`, return. The rest unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "OsClipboardInput._on_paste"
+    },
+    {
+      "name": "OsClipboardInput.action_paste",
+      "reqs": [
+        "R-TUI-043.4",
+        "R-PASTE.29",
+        "R-A2L-LIST.033"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-A2L-LIST.033/2) Ctrl+V with the clipboard seam (`deps`/module patch, never the real clipboard) returning G2L → value = G2L joined",
+        "(R-A2L-LIST.033/3) right-click with no selection, same seam → the same value",
+        "(R-TUI-043.4/1) Ctrl+V of G2L in the Load box → `VALUE_0002`",
+        "(R-PASTE.29/1) right-click with no selection in the Load box, the seam returning G2L → `VALUE_0002` inserted at the press"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. After the read cascade and the cap, before the first-line cut: `if self._take_paste(text)`: return. The rest unchanged; the right-click route (`:975`) calls this, so it follows.",
+      "volatile": [],
+      "oracle": [],
+      "key": "OsClipboardInput.action_paste"
+    },
+    {
+      "name": "A2lViewMixin._jump_to_tag_by_data",
+      "reqs": [
+        "R-A2L-LIST.031"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:444 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._jump_to_tag_by_data"
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "reqs": [
+        "R-A2L-LIST.025",
+        "R-A2L-LIST.019",
+        "R-A2L-LIST.006"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "preserve_anchor",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.025/1) A2L only, mode `inmem`, `VALUE_0002` → summary `No tag matches 'VALUE_0002' with mode In-memory — 1 match with mode All alt+a`",
+        "(R-A2L-LIST.025/2) the same with `VALUE` → `… — 208 match with mode All alt+a` (derived: C08 has 208 VALUE names, P1 §1)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. As today (filter, anchor, `update_a2l_tags_view`), then `_paint_a2l_filter_chips()`. In text mode with no row, a non-empty text and a mode other than `all`: when the text matches at least one tag under `all`, pass the empty message `No tag matches '<text>' with mode <mode label> — <n> match with mode All alt+a` (else today's `No A2L tags match '<text>'.`).",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._refresh_a2l_filtered_tags"
+    },
+    {
+      "name": "A2lViewMixin._refresh_a2l_dependent_views",
+      "reqs": [
+        "R-A2L-LIST.056"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md",
+        "(R-A2L-LIST.056/1) window open with G2L; attach an A2L that also holds `MAP_0024` → `refresh_tags` called once; counts `10 found`, `1 missing`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:874 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._refresh_a2l_dependent_views"
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_view",
+      "reqs": [
+        "R-A2L-LIST.072"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md",
+        "(R-A2L-LIST.072/1) attach C08 (generation `1`, P2 §1) → `prepare(462 names, 1)`",
+        "(R-A2L-LIST.072/2) unload → `prepare([], <new generation>)`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:942 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin.update_a2l_view"
+    },
+    {
+      "name": "A2lViewMixin.update_a2l_tags_view",
+      "reqs": [
+        "R-A2L-LIST.009",
+        "R-A2L-LIST.014",
+        "R-A2L-LIST.016",
+        "R-A2L-LIST.031",
+        "R-TUI-042a.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list",
+          "name": "tags",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "empty_message",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.009/1) G2L at 118×54 → column labels `#`, `Tag`, `Status`, `Kind`, `Address`, `Len`, `Physical`, `Unit`, `Limits`",
+        "(R-A2L-LIST.016/1) G2L → summary `LIST  rows 1-12 / 12 in pasted order`; (R-A2L-LIST.016/2) 250 names, page 2 → `LIST  rows 201-250 / 250 in pasted order`",
+        "(R-A2L-LIST.014/1) row 1 cells 5–9 = the text-mode `Address`, `Length`, `Physical`, `Unit`, `Limits` of `VALUE_0002` (P2 §1: `0x00000014`, `2`, `347190.0`, …, `0..655350`)",
+        "(R-A2L-LIST.031/1) row key `a2l:2` → the `MAP_0003` tag; enter → status `Tag at 0x00804FD0` (G2 scene av-list; P2 §1 address)",
+        "(R-TUI-042a.4/1) back to text mode → the 16 shipped columns, `Address`, `Length` first and fixed (Inc 12's cases)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. List mode (a resolution is kept): set the table's columns to `LIST_COLUMNS` when they differ (clear with columns, add, `fixed_columns` stays 2); paint the page of entries with `list_row_cells(entry, text cells of _build_a2l_table_cells(tag) by label, mode)`; map `a2l:<i>` → the entry's `row`; summary `LIST  rows <a>-<b> / <n> in pasted order`; no fit is scheduled. Text mode: set the shipped 16 columns back when they differ; then today's body unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin.update_a2l_tags_view"
+    },
+    {
+      "name": "A2lViewMixin._build_a2l_table_cells",
+      "reqs": [
+        "R-A2L-LIST.014"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "name_width",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Text, ...]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[Text, ...] result"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1341 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._build_a2l_table_cells"
+    },
+    {
+      "name": "A2lViewMixin._filter_a2l_tags",
+      "reqs": [
+        "R-A2L-LIST.005",
+        "R-A2L-LIST.006",
+        "R-A2L-007.1",
+        "R-A2L-007.6",
+        "R-A2L-007.7",
+        "R-A2L-007.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list",
+          "name": "tags",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list",
+        "names": [
+          "rows"
+        ],
+        "raw": "list rows"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.006/1) G2L over C08 → 12 rows; rows[0] `is` the `VALUE_0002` tag; rows[6] `{\"name\": \"MAP_0024\", \"_list_entry\": …}`",
+        "(R-A2L-LIST.005/2) A2L only (no image), mode `inmem`, G2L → the 9 found names HIDDEN; 12 rows still",
+        "(R-A2L-007.1/2) `cuvre_00` (text mode) → `[]` (G2 scene hoy.av-typo)",
+        "(R-A2L-007.7/1) text mode, `Invalid` over C08 → `[]` (P2 §2: 0 invalid)",
+        "(R-A2L-007.6/1) text mode, `All`, `''` over C08 → `462` rows (P2 §2)",
+        "(R-A2L-007.8/1) text mode, `In-Memory`, `''` over C08 → `402` rows (P2 §2)"
+      ],
+      "modify": [
+        "[Data: A2lViewMixin._a2l_list_resolution]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "changed. List mode (`_a2l_list_names()` not `None`): resolve those names over `tags` with `hidden` = \"the active mode's own test leaves the tag out\" (the shipped mode test, the text ignored); keep the resolution; return the entries' `row` dicts in pasted order. Text mode: resolution `None`; the shipped mode-then-substring filter, unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._filter_a2l_tags"
+    },
+    {
+      "name": "A2lViewMixin._tag_matches_filter",
+      "reqs": [
+        "R-A2L-007.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "result"
+        ],
+        "raw": "bool result"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/a2l_view.py:1464 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._tag_matches_filter"
+    },
+    {
+      "name": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "reqs": [
+        "R-A2L-LIST.060",
+        "R-A2L-LIST.062",
+        "R-A2L-LIST.074"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.060/1) `0017` → after 0.15 s and the worker, `#a2l_filter_suggest` open with 5 rows, `MAP_0017` first",
+        "(R-A2L-LIST.060/3) `map_002` → row 1 `MAP_0020 … prefix` (P1 §2)",
+        "(R-A2L-LIST.062/1) `0017` then `''` → dropdown closed",
+        "(R-A2L-LIST.074/1) build held; `0017` typed and debounced (request held); build released → dropdown with 5 rows, no new keystroke"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. Inside the debounced callback, after the refresh: the stripped text empty or a list text → close `#a2l_filter_suggest`; else `ranker.request(\"filter\", text, 20, box.show_ranked bound to the text, current = \"the box's stripped value is still the text\")`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._schedule_a2l_filter_refresh"
+    },
+    {
+      "name": "ComposeScreensMixin._compose_screen_a2l",
+      "reqs": [
+        "R-A2L-LIST.007",
+        "R-A2L-LIST.008",
+        "R-A2L-LIST.010",
+        "R-A2L-LIST.040",
+        "R-A2L-LIST.080",
+        "R-A2L-LIST.081"
+      ],
+      "in": [],
+      "out": {
+        "type": "Container",
+        "names": [
+          "section"
+        ],
+        "raw": "Container section"
+      },
+      "module": "s19_app/tui/app/compose_screens.py",
+      "examples": [
+        "(R-A2L-LIST.008/1) mounted, empty filter → `#a2l_filter_mode_tag` plain `FILTER`",
+        "(R-A2L-LIST.040/2) `#a2l_paste_list_button` label `Paste list…  alt+p`; a click → the paste window",
+        "(R-A2L-LIST.010/1) list mode at 80×54 scrolled fully right → the `#` and `Tag` cells at their unscrolled x (fixed columns 2 of `LIST_COLUMNS`)",
+        "(derived) every id the shipped tests query (`#a2l_tags_filter_input`, `#a2l_filter_all`, `#a2l_tags_list`, `#a2l_tags_summary`, `#a2l_detail_card`, `#alt_hex_view`, `#alt_search_input`, `#alt_goto_input`) is present once"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. The scene's composition, every shipped id kept: the filter row = mode tag `Label` (`#a2l_filter_mode_tag`), `ListAwareFilterInput` (`#a2l_tags_filter_input`, placeholder `type part of a name — or paste a list (new line , ; space)`), `Button(\"Paste list…  alt+p\", id=\"a2l_paste_list_button\")`, `Field: name`, `All`, `Invalid`, `In-Memory`; `LabelSuggestBox(accept=\"tab complete\", id=\"a2l_filter_suggest\")`; the find row (find box, `Find next`, `Page Prev`, `Page Next` — shipped ids and labels); `#a2l_filter_menu`; `Static` `#a2l_list_chips`; `Static` `#a2l_list_missing` (hidden); the `A2LTagTable` (`fixed_columns=2`, unchanged); the summary. Hex pane: `ListAwareDetailCard` (`#a2l_detail_card`) and a `Container` `#a2l_hexbox` holding the hex controls and `#alt_hex_scroll`. Body: `A2LExplorerBody(tags_pane, hex_pane, id=\"a2l_panes\")`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "ComposeScreensMixin._compose_screen_a2l"
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_selected",
+      "reqs": [
+        "R-A2L-LIST.031"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowSelected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1333 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_data_table_row_selected"
+    },
+    {
+      "name": "NavigationMixin.on_data_table_row_highlighted",
+      "reqs": [
+        "R-A2L-LIST.027"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "DataTable.RowHighlighted",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1379 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_data_table_row_highlighted"
+    },
+    {
+      "name": "NavigationMixin.on_input_changed",
+      "reqs": [
+        "R-A2L-LIST.060"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Input.Changed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/navigation.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/navigation.py:1497 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "NavigationMixin.on_input_changed"
+    },
+    {
+      "name": "_a2l_detail_card_text",
+      "reqs": [
+        "R-A2L-LIST.029"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Text",
+        "names": [
+          "result"
+        ],
+        "raw": "Text result"
+      },
+      "module": "s19_app/tui/app/shared.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/shared.py:321 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "_a2l_detail_card_text"
+    },
+    {
+      "name": "A2LDetailCard.show_tag",
+      "reqs": [
+        "R-A2L-LIST.027"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/shared.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/app/shared.py:603 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LDetailCard.show_tag"
+    },
+    {
+      "name": "build_label_index",
+      "reqs": [
+        "R-A2L-LIST.072"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LabelIndex",
+        "names": [
+          "result"
+        ],
+        "raw": "LabelIndex result"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/services/label_match.py:124 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "build_label_index"
+    },
+    {
+      "name": "rank",
+      "reqs": [
+        "R-A2L-LIST.060"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "LabelIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[LabelMatch]",
+        "names": [
+          "result"
+        ],
+        "raw": "list[LabelMatch] result"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(baseline) see graph-inc7.md"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "baseline (unchanged at s19_app/tui/services/label_match.py:251 in 2dbd7d5a)",
+      "volatile": [],
+      "oracle": [],
+      "key": "rank"
+    },
+    {
+      "name": "is_list_text",
+      "reqs": [
+        "R-A2L-LIST.001",
+        "R-A2L-LIST.006",
+        "R-A2L-LIST.062"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "is_list"
+        ],
+        "raw": "bool is_list"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.001/1) G2L → `True` (12 names, P1 §3)",
+        "(R-A2L-LIST.062/2) `0042 val` → `True` (2 names; the G2 page's effect (2))",
+        "(R-A2L-LIST.062/1) `0017` → `False`; ` ,;\\n ` → `False` (R-A2L-LIST.001/3: 0 names)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. `len(parse_parameter_list(text)) >= 2` (I-5; the definition *list text*).",
+      "volatile": [],
+      "oracle": [],
+      "key": "is_list_text"
+    },
+    {
+      "name": "display_text",
+      "reqs": [
+        "R-A2L-LIST.076",
+        "R-A2L-LIST.077"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "cap",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "shown"
+        ],
+        "raw": "str shown"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.076/1) `A[red]` + U+001B + `B` + U+0000 + U+0085 → `A[red]\\ufffdB\\ufffd\\ufffd` (length 10 kept)",
+        "(R-A2L-LIST.077/1) a 300-character name, cap `64` → its first 63 characters + `…` (64 characters)",
+        "(R-A2L-LIST.077/2) a 64-character name, cap `64` → the name, whole"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. Replace each character U+0000–U+001F and U+007F–U+009F with U+FFFD, one for one (offsets kept, so match spans still index it); then, when `cap` is given and the result is longer than `cap` characters, keep its first `cap - 1` characters and `…`. Callers paint the result as `Text(shown)` — never markup.",
+      "volatile": [],
+      "oracle": [],
+      "key": "display_text"
+    },
+    {
+      "name": "resolve_label_list",
+      "reqs": [
+        "R-A2L-LIST.001",
+        "R-A2L-LIST.002",
+        "R-A2L-LIST.003",
+        "R-A2L-LIST.004",
+        "R-A2L-LIST.005",
+        "R-A2L-LIST.035"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "tags",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[dict], Optional[bool]]",
+          "name": "hidden",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "LabelListResolution",
+        "names": [
+          "res"
+        ],
+        "raw": "LabelListResolution res"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.002/1) names of G2L over C08 → FOUND at 1–6, 8, 9, 12; MISSING at 7 `MAP_0024`, 11 `CURVE_0071`; DUPLICATE at 10 (first_pos `1`) (P1 §3)",
+        "(R-A2L-LIST.002/2) [`value_0002`] over C08 → MISSING (case kept)",
+        "(R-A2L-LIST.003/2) [`X`, `X`, `X`] over C08 → MISSING, DUPLICATE first_pos `1`, DUPLICATE first_pos `1`",
+        "(R-A2L-LIST.004/3) G2L names over `[]` (no A2L) → 11 MISSING, 1 DUPLICATE",
+        "(R-A2L-LIST.005/1) G2L over C08 with `hidden` = \"mode Invalid leaves the tag out\" (C08 has 0 invalid tags, P2 §2) → the 9 found names HIDDEN",
+        "(I-7) a FOUND entry's `row` is the very tag object of `tags` (`is`), so `_jump_to_tag_by_data` reads the real tag",
+        "(R-A2L-LIST.035/1) the P1 §5 `software_a` paste (65,522 characters → 2,048 names) over SWA → 2,048 entries, `683` MISSING, `0` DUPLICATE; parse + resolve median 1.2 ms (P1 §5); the whole list-mode refresh (one page of ≤ 200 rows, counts and missing lines) median of 3 ≤ 1.0 s (E4 measures)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. One map `name → first tag with that name` built once (`str(tag.get(\"name\") or \"\")`), then one pass over `names` in order: a name seen before → DUPLICATE of its first position; else absent from the map → MISSING; else `hidden(tag)` true → HIDDEN; else FOUND. Case kept: no fold. Builds each entry's `row` (I-7). Cost: one map build plus one lookup per name (R-A2L-LIST.035's control is the scan per name).",
+      "volatile": [],
+      "oracle": [],
+      "key": "resolve_label_list"
+    },
+    {
+      "name": "list_summary_texts",
+      "reqs": [
+        "R-A2L-LIST.017",
+        "R-A2L-LIST.018",
+        "R-A2L-LIST.022",
+        "R-A2L-LIST.024",
+        "R-A2L-LIST.046",
+        "R-A2L-LIST.048",
+        "R-A2L-LIST.077"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LabelListResolution",
+          "name": "res",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "budget",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple(Text counts, Text ribbon, Text missing)",
+        "names": [
+          "lines"
+        ],
+        "raw": "tuple(Text counts, Text ribbon, Text missing) lines"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.017/1) G2L over C08 → counts plain `12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate`",
+        "(R-A2L-LIST.017/2) G2L with 9 HIDDEN → counts plain ends `= 1 duplicate  ·  ◐ 9 hidden by mode`",
+        "(R-A2L-LIST.018/1) G2L, budget `80` → ribbon plain `● ● ● ● ● ● ✗ ● ● = ✗ ● ` (12 glyphs, spaced)",
+        "(R-A2L-LIST.018/2) 100 found names, budget `80` → ribbon plain = 80 × `●` + ` +20`",
+        "(R-A2L-LIST.046/2) 60 found names, budget `50` → 50 × `●` + ` +10`",
+        "(R-A2L-LIST.022/1) G2L → missing plain `Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)`",
+        "(R-A2L-LIST.022/2) 3 found names → missing plain `Missing 0     Duplicates 0 `",
+        "(R-A2L-LIST.024/1) 25 missing names → 20 listed + ` +5`",
+        "(R-A2L-LIST.024/2) the P1 §5 case-08 paste (4,906 names: 1,636 missing, 2,962 duplicates) → `… +1616` and `… +2942`",
+        "(R-A2L-LIST.077/1) a 300-character missing name → in the missing line as 63 characters + `…`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The three lines of the definitions: the *counts line*; the *ribbon* of at most `budget` glyphs (spaced when `2 × n ≤ budget`, then ` +<k>`); the *missing line* with at most 20 names of each kind then ` +<k>` [D-9], each name as `display_text(name, 64)`. Styles as the scene (`_av_common.py`): found accent, missing red, duplicate and hidden yellow, the rest muted.",
+      "volatile": [],
+      "oracle": [],
+      "key": "list_summary_texts"
+    },
+    {
+      "name": "list_row_cells",
+      "reqs": [
+        "R-A2L-LIST.011",
+        "R-A2L-LIST.012",
+        "R-A2L-LIST.013",
+        "R-A2L-LIST.014",
+        "R-A2L-LIST.015",
+        "R-A2L-LIST.076"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LabelListEntry",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Text]]",
+          "name": "text_cells",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "mode",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple",
+        "names": [
+          "cells"
+        ],
+        "raw": "tuple cells"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.011/1) FOUND `VALUE_0002` → Tag `● VALUE_0002`",
+        "(R-A2L-LIST.011/2) MISSING `MAP_0024` → Tag `✗ MAP_0024`",
+        "(R-A2L-LIST.015/1) MISSING `MAP_0024` → cells 4–9 `''`",
+        "(R-A2L-LIST.012/3) DUPLICATE #10 → Status `dup of #1`; (R-A2L-LIST.012/4) HIDDEN, mode `inmem` → `hidden: In-memory`",
+        "(R-A2L-LIST.013/3) `MEASUREMENT_0005` (char_type `None`, section `MEASUREMENT`, P2 §1) → Kind `MEASURE`; (R-A2L-LIST.013/1) `VALUE_0002` → `VALUE`",
+        "(R-A2L-LIST.014/1) `VALUE_0002` with its text cells (P2 §1) → Address `0x00000014`, Len `2`, Physical `347190.0`, Limits `0..655350`",
+        "(R-A2L-LIST.076/1) HOST name FOUND → Tag plain `● A[red]\\ufffdB\\ufffd\\ufffd`, `spans == []`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The nine cells of `LIST_COLUMNS` [D-4]: `#` = the position; `Tag` = glyph + space + `display_text(name)`; `Status` = the status word (hidden: `hidden: ` + `MODE_LABEL[mode]`); `Kind` = `char_type`, else `MEASURE` for section `MEASUREMENT`, else the section; `Address`, `Len`, `Physical`, `Unit`, `Limits` = the given text-mode cells `Address`, `Length`, `Physical`, `Unit`, `Limits` (G-V passes `_build_a2l_table_cells(tag)` keyed by column label); MISSING: those five and `Kind` blank. Every cell a `Text` built from plain strings.",
+      "volatile": [],
+      "oracle": [],
+      "key": "list_row_cells"
+    },
+    {
+      "name": "list_card_text",
+      "reqs": [
+        "R-A2L-LIST.027",
+        "R-A2L-LIST.028",
+        "R-A2L-LIST.029",
+        "R-A2L-LIST.030",
+        "R-A2L-LIST.076"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LabelListEntry",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[str]]",
+          "name": "closest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Text",
+        "names": [
+          "lines"
+        ],
+        "raw": "Text lines"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.027/1) MISSING #7 `MAP_0024`, closest `None` → plain `✗ MAP_0024  not in this A2L\\npasted #7`",
+        "(R-A2L-LIST.028/2) the same, closest `[]` → adds `closest —` (P1 §4: no ranked name)",
+        "(R-A2L-LIST.028/1) MISSING `VALUE_002`, closest [`VALUE_0020`, `VALUE_0021`, `VALUE_0022`] (P1 §4) → adds `closest VALUE_0020 · VALUE_0021 · VALUE_0022`",
+        "(R-A2L-LIST.029/1) DUPLICATE #10 → `duplicate of pasted #1`; (R-A2L-LIST.030/1) HIDDEN → `hidden by the active filter mode`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. MISSING: `✗ <display text>  not in this A2L`, `pasted #<p>`, and — when `closest` is not `None` — `closest ` + the names joined by ` · `, or `closest —` for `[]` [D-12]. DUPLICATE: `duplicate of pasted #<first_pos>`. HIDDEN: `hidden by the active filter mode`. FOUND: empty `Text`. (G-V appends this to the shipped card text for DUPLICATE and HIDDEN.)",
+      "volatile": [],
+      "oracle": [],
+      "key": "list_card_text"
+    },
+    {
+      "name": "LabelRanker.prepare",
+      "reqs": [
+        "R-A2L-LIST.072",
+        "R-A2L-LIST.074"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "generation",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.072/1) C08 names, generation `1` → a worker on a thread ≠ the UI thread builds an index of `462`; `ready` `True` after `_install`",
+        "(R-A2L-LIST.072/2) `[]` (unload), generation `2` → an index of `0`; any request then delivers `[]`",
+        "(derived) the same names and generation twice → one build only"
+      ],
+      "modify": [
+        "[Data: LabelRanker]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new [D-13]. If `generation` equals the generation already prepared or being prepared, return. Else record it, drop the old index (`ready` becomes `False`) and start one thread worker (`app.run_worker(..., thread=True, group=\"a2l_label_index\")`) that calls `build_label_index(names)` and hands the index to `_install` through `app.call_from_thread`. `names` is copied to a tuple on the UI thread before the worker starts.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelRanker.prepare"
+    },
+    {
+      "name": "LabelRanker._install",
+      "reqs": [
+        "R-A2L-LIST.072",
+        "R-A2L-LIST.074"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "generation",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "LabelIndex",
+          "name": "index",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.074/1) build held; `0017` requested for \"filter\" (held); build released → the held request runs and delivers 5 matches (P1 §2)",
+        "(derived) generation 1 built after generation 2 was requested → index of 1 dropped, `ready` stays `False`"
+      ],
+      "modify": [
+        "[Data: LabelRanker]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. UI thread. If `generation` is not the latest prepared generation, drop the index (a newer A2L won). Else keep it, set `ready`, and re-issue each request held while not ready whose token is still that consumer's latest (R-A2L-LIST.074).",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelRanker._install"
+    },
+    {
+      "name": "LabelRanker.request",
+      "reqs": [
+        "R-A2L-LIST.071",
+        "R-A2L-LIST.073"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "consumer",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[list], None]",
+          "name": "deliver",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[], bool]",
+          "name": "current",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.073/1) \"filter\", `cuvre_00`, 20 → `rank` called on a worker thread (thread id ≠ UI thread); `deliver` receives 20 matches, first `CURVE_0001` fuzzy `e1` (P1 §2)",
+        "(R-A2L-LIST.073/2) \"similar\", `MAP_0024`, 3 → `rank` on a worker thread; `deliver` receives `[]` (P1 §4)",
+        "(I-3 obligation 6) limit `100` → `rank` called with `20`"
+      ],
+      "modify": [
+        "[Data: LabelRanker]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. UI thread. Give the consumer a new token (the latest token per consumer wins). Not ready → hold `(token, query, limit, deliver, current)` for `_install`. Ready → one thread worker runs `rank(query, index, min(limit, 20))` and hands the result to `_deliver` with the token and the generation through `app.call_from_thread`. `rank` never runs on the UI thread.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelRanker.request"
+    },
+    {
+      "name": "LabelRanker._deliver",
+      "reqs": [
+        "R-A2L-LIST.052",
+        "R-A2L-LIST.071",
+        "R-A2L-LIST.073"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "consumer",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "token",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "generation",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list",
+          "name": "matches",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[list], None]",
+          "name": "deliver",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[], bool]",
+          "name": "current",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.071/1) \"filter\": `cu` requested, then `cuvre_00` requested before `cu`'s result → `cu`'s result dropped; only `cuvre_00`'s 20 matches delivered",
+        "(R-A2L-LIST.071/2) a result whose generation `1` arrives after an A2L transition prepared generation `2` → dropped",
+        "(R-A2L-LIST.052/1) \"similar\" result for a text the operator has edited since (`current()` `False`) → dropped, no similar line painted"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. UI thread. Call `deliver(matches)` only when `token` is still the consumer's latest, `generation` is still the prepared generation and `current()` is true (the box or text area still holds the query); otherwise drop the result.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelRanker._deliver"
+    },
+    {
+      "name": "LabelSuggestBox.show_ranked",
+      "reqs": [
+        "R-A2L-LIST.060",
+        "R-A2L-LIST.061",
+        "R-A2L-LIST.063",
+        "R-A2L-LIST.064",
+        "R-A2L-LIST.065",
+        "R-A2L-LIST.066",
+        "R-A2L-LIST.067",
+        "R-A2L-LIST.076"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[LabelMatch]",
+          "name": "matches",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.063/1) `cuvre_00`, the 20 matches of P1 §2 → 8 rows; row 1 plain starts `▸ CURVE_0001` and ends `fuzzy · 1 edit`",
+        "(R-A2L-LIST.065/2) `cuvre_00`, 20 matches → title `8 of 20+ similar names`",
+        "(R-A2L-LIST.063/2) `0017`, 5 matches → 5 rows, row 1 `▸ MAP_0017 … substring`",
+        "(R-A2L-LIST.065/1) `0017`, 5 matches → title `5 of 5 similar names`",
+        "(R-A2L-LIST.064/1) row `CURVE_0001` → characters (0,5) and (6,10) in the highlight style, (5,6) not",
+        "(R-A2L-LIST.064/2) row `MAP_0017` for `0017` → (4,8) highlighted",
+        "(R-A2L-LIST.066/1) `zzzz`, `[]` → title `no similar name`; lines `nothing matches 'zzzz'` and `digits must match exactly; a word may have 1–2 typos`",
+        "(R-A2L-LIST.067/1) accept `tab complete` → key line `↑↓ choose  tab complete  esc close`; (R-A2L-LIST.067/2) accept `enter add to the list` → `↑↓ choose  enter add to the list  esc close`",
+        "(R-A2L-LIST.061/1) add line `0042 val` → rows `VALUE_0042 … token`, `VAL_BLK_0042 … token` (P1 §2)",
+        "(R-A2L-LIST.076/1) HOST name as a match → its row shows `A[red]\\ufffdB\\ufffd\\ufffd`, no markup span"
+      ],
+      "modify": [
+        "[Data: LabelSuggestBox.rows]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. Keep the first 8 matches, set the choice to row 1, open (class `-open`) and paint: title `<k> of <n> similar names` with <n> = `len(matches)`, written `20+` when it is 20 [D-6]; each row `▸ ` (choice) or two spaces, `display_text(name)` with its spans' characters in the highlight style, a space pad, the rule tag (`fuzzy · 1 edit`, `fuzzy · <k> edits`, else the rule word); then the key line of its `accept` and `rank: exact › prefix › substring › token › fuzzy › subsequence`. No match: title `no similar name`, lines `nothing matches '<query>'` and `digits must match exactly; a word may have 1–2 typos`, the choice `None`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelSuggestBox.show_ranked"
+    },
+    {
+      "name": "LabelSuggestBox.move",
+      "reqs": [
+        "R-A2L-LIST.068"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "step",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.068/1) `cuvre_00` open, `+1` → choice `CURVE_0002`; (R-A2L-LIST.068/2) `+1` × 9 → `CURVE_0008`; (R-A2L-LIST.068/3) `-1` at row 1 → `CURVE_0001`"
+      ],
+      "modify": [
+        "[Data: LabelSuggestBox.rows]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. Move the choice by `step`, clamped to the shown rows; repaint. No-op while closed.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelSuggestBox.move"
+    },
+    {
+      "name": "ListAwareFilterInput._take_paste",
+      "reqs": [
+        "R-A2L-LIST.033",
+        "R-A2L-LIST.034",
+        "R-PASTE.1",
+        "R-TUI-043.4",
+        "R-PASTE.29"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "taken"
+        ],
+        "raw": "bool taken"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.033/1) G2L → `True`; value `VALUE_0002, CURVE_0001, MAP_0003, MEASUREMENT_0005, VALUE_0042, CURVE_0017, MAP_0024, MAP_0001, MEASUREMENT_0012, VALUE_0002, CURVE_0071, VALUE_0118` (P1 §3); cursor `0`",
+        "(R-A2L-LIST.034/1) `VALUE_0002\\x1b[31m\\nMAP_0003` → value `VALUE_0002[31m, MAP_0003`",
+        "(R-A2L-LIST.034/2) `A\\u202eB\\nC` → value `AB, C`",
+        "(R-PASTE.1/2) `VALUE_0002` (one name) → `False`; the stock route inserts `VALUE_0002`"
+      ],
+      "modify": [
+        "[Data: Input.value]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new, overrides L26 [D-5]. Strip the unsafe paste characters of the whole text (I-1's multi-line rule), take its pasted names; 2 or more → `value` = the names joined by `, `, cursor `0`, return `True`; else return `False` (the box's first-line paste runs as today).",
+      "volatile": [],
+      "oracle": [],
+      "key": "ListAwareFilterInput._take_paste"
+    },
+    {
+      "name": "ListAwareFilterInput.action_esc",
+      "reqs": [
+        "R-A2L-LIST.032",
+        "R-A2L-LIST.070"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.070/1) `cuvre_00` with the dropdown open → closed; value `cuvre_00`",
+        "(R-A2L-LIST.032/1) value = G2L joined, no dropdown → value `''`; after the debounce 462 rows"
+      ],
+      "modify": [
+        "[Data: Input.value]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new (binding `escape`). Dropdown open → close it, text kept. Else the value is a list text → value `''` (text mode). Else nothing.",
+      "volatile": [],
+      "oracle": [],
+      "key": "ListAwareFilterInput.action_esc"
+    },
+    {
+      "name": "ListAwareFilterInput.action_complete",
+      "reqs": [
+        "R-A2L-LIST.069"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.069/1) `cuvre_00`, choice row 1 → value `CURVE_0001`, cursor `10`, dropdown closed",
+        "(R-A2L-LIST.069/2) ↓ then tab → value `CURVE_0002`",
+        "(R-A2L-LIST.069, control) a name holding U+0007 chosen → value holds U+0007, not U+FFFD",
+        "(derived) tab with no dropdown → the focus moves to the next widget"
+      ],
+      "modify": [
+        "[Data: Input.value]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new (binding `tab`; P1 §7: a box-level tab binding runs before the app's focus move). Dropdown open with a choice → value = the chosen `LabelMatch.name` (never its display text, I-3 obligation 3), cursor at the end, dropdown closed. Else move the focus on (`screen.focus_next()`), as tab does today.",
+      "volatile": [],
+      "oracle": [],
+      "key": "ListAwareFilterInput.action_complete"
+    },
+    {
+      "name": "LabelListPasteModal.compose",
+      "reqs": [
+        "R-A2L-LIST.043",
+        "R-A2L-LIST.044",
+        "R-A2L-LIST.045",
+        "R-A2L-LIST.047"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.043/1) mounted at 118×54 → `#a2l_list_add` placeholder `part of a name — start, middle, end, a typo`; a label reads `or paste names — new line , ; space`",
+        "(R-A2L-LIST.044/1) `#a2l_list_note` plain = the note text above",
+        "(R-A2L-LIST.045/1) button labels `Filter viewer by list  alt+f`, `Cancel  esc`",
+        "(R-A2L-LIST.047/1) `wide` `False` → preview columns `#`, `Name`, `Status`, `Kind`, `Address`; (R-A2L-LIST.047/2) `True` → plus `Value`, `Unit`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The scene's dialog: title `Paste a list of labels`; left: `add` + an `AddNameInput` (`#a2l_list_add`, placeholder `part of a name — start, middle, end, a typo`), its `LabelSuggestBox` (accept `enter add to the list`), the label `or paste names — new line , ; space`, a `CappedTextArea` (`#a2l_list_text`, I-1 cap); right: the counts `Static` and the preview `DataTable` (columns `#`, `Name`, `Status`, `Kind`, `Address`, plus `Value`, `Unit` when `wide`); under: missing, similar, note (`The list filters the viewer (LIST mode, pasted order); nothing is saved. Missing names stay listed so you can fix them.`), buttons `Filter viewer by list  alt+f` and `Cancel  esc`. Every label is a plain string (no markup).",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.compose"
+    },
+    {
+      "name": "LabelListPasteModal.on_mount",
+      "reqs": [
+        "R-A2L-LIST.041",
+        "R-A2L-LIST.042"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.041/1) names = G2L's 12 → text area holds 12 lines, `VALUE_0002` first, `VALUE_0118` last",
+        "(R-A2L-LIST.041/2) names `[]` (text mode) → text `''`",
+        "(R-A2L-LIST.042/1) focus = `#a2l_list_text`"
+      ],
+      "modify": [
+        "[Data: TextArea.text]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. Load the given `names` into the text area, one per line, each followed by a new line [D-7]; focus the text area; run the first preview.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.on_mount"
+    },
+    {
+      "name": "LabelListPasteModal._preview",
+      "reqs": [
+        "R-A2L-LIST.046",
+        "R-A2L-LIST.047",
+        "R-A2L-LIST.048",
+        "R-A2L-LIST.051",
+        "R-A2L-LIST.056",
+        "R-A2L-LIST.059",
+        "R-A2L-LIST.076"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.046/1) G2L pasted → counts plain `12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate`; ribbon `● ● ● ● ● ● ✗ ● ● = ✗ ● `",
+        "(R-A2L-LIST.047/1) G2L at 118×54 → 12 preview rows; row 7 `✗ MAP_0024`, `not in A2L`",
+        "(R-A2L-LIST.048/1) G2L → missing plain as `list_summary_texts` R-A2L-LIST.022/1",
+        "(R-A2L-LIST.051/1) 11 missing → 10 \"similar\" requests and the line `  similar names are shown for the first 10 missing names`; (R-A2L-LIST.051/2) 10 missing → 10 requests, no line",
+        "(R-A2L-LIST.059/1) G2L + `VALUE_002` → text area text identical before and after the similar lines paint",
+        "(R-A2L-LIST.076/4) HOST name pasted → its preview row plain `● A[red]\\ufffdB\\ufffd\\ufffd`"
+      ],
+      "modify": [
+        "[Data: LabelListPasteModal.res]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. Runs 0.15 s after the last text-area change (a token-checked timer, as `_schedule_a2l_filter_refresh`). Resolve the text's pasted names over the window's tags (no mode: never HIDDEN); paint counts + ribbon (budget 50), the preview rows (as `list_row_cells`, `Name` = glyph + display text; `Value` = the Physical text), the missing line; clear the similar lines and request \"similar\" for each of the first 10 MISSING names in pasted order (limit 3, `current` = the text unchanged) [D-8]; with more than 10 missing add `  similar names are shown for the first 10 missing names`. Never writes the text area.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal._preview"
+    },
+    {
+      "name": "LabelListPasteModal._on_similar",
+      "reqs": [
+        "R-A2L-LIST.049",
+        "R-A2L-LIST.050",
+        "R-A2L-LIST.052",
+        "R-A2L-LIST.077"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LabelListEntry",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list",
+          "name": "matches",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.050/1) #7 `MAP_0024`, `[]` → `  similar to #7 MAP_0024: none (digits must match exactly)` (P1 §4)",
+        "(R-A2L-LIST.049/1) #3 `VALUE_002`, [`VALUE_0020`, `VALUE_0021`, `VALUE_0022`] → `  similar to #3 VALUE_002: VALUE_0020 · VALUE_0021 · VALUE_0022` (P1 §4)",
+        "(R-A2L-LIST.049/2) `value_0002` → `…: VALUE_0002` (P1 §4: exact, case folded by I-3)",
+        "(R-A2L-LIST.077/1) a 300-character missing name → its similar line shows 63 characters + `…`, then `: none (digits must match exactly)` (R-A2L-MATCH.38: more than 256 characters → `[]`)"
+      ],
+      "modify": [
+        "[Data: LabelListPasteModal.similar]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new (the \"similar\" `deliver`, called only through `_deliver`). Set the entry's line `  similar to #<p> <display_text(name, 64)>: ` + the names joined by ` · `, or `none (digits must match exactly)` for `[]` [D-10]; repaint the similar lines in pasted order.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal._on_similar"
+    },
+    {
+      "name": "LabelListPasteModal.on_input_submitted",
+      "reqs": [
+        "R-A2L-LIST.057",
+        "R-A2L-LIST.058"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Input.Submitted",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.057/1) text = G2L (ends in a new line), add `0042 val`, choice `VALUE_0042` → text = G2L + `VALUE_0042\\n`; add line `''`",
+        "(R-A2L-LIST.057/2) text `MAP_0003` (no final new line), choice `VALUE_0042` → `MAP_0003\\nVALUE_0042\\n`",
+        "(R-A2L-LIST.058/1) add `zzzz` (no ranked name, no choice) → text and add line unchanged"
+      ],
+      "modify": [
+        "[Data: TextArea.text]",
+        "[Data: Input.value]"
+      ],
+      "assign": [
+        "append",
+        "clear"
+      ],
+      "func": "new. Only for `#a2l_list_add`. Dropdown open with a choice → append (a new line first when the text is not empty and does not end in one) the chosen `LabelMatch.name` and a new line; add line `''`; dropdown closed. Else nothing.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.on_input_submitted"
+    },
+    {
+      "name": "LabelListPasteModal.action_apply",
+      "reqs": [
+        "R-A2L-LIST.053",
+        "R-A2L-LIST.054"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.053/1) G2L → dismissed with the 12 names; (R-A2L-LIST.054/1) text `''` → dismissed with `None`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (binding `alt+f`, priority; the apply button) [D-11]. `dismiss(names)` with the text's pasted names, or `dismiss(None)` when there is none.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.action_apply"
+    },
+    {
+      "name": "LabelListPasteModal.action_cancel",
+      "reqs": [
+        "R-A2L-LIST.055",
+        "R-A2L-LIST.070"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.070/2) add `0042 val` with its dropdown open, Esc → dropdown closed, window still open",
+        "(R-A2L-LIST.055/1) Esc with no dropdown → dismissed with `None`; (R-A2L-LIST.055/2) Cancel → `None`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (binding `escape`; the cancel button). The add line's dropdown open → close it only. Else `dismiss(None)`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.action_cancel"
+    },
+    {
+      "name": "LabelListPasteModal.refresh_tags",
+      "reqs": [
+        "R-A2L-LIST.056"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "tags",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.056/1) G2L open over C08; tags of an A2L that also holds `MAP_0024` → counts `… ● 10 found  ·  ✗ 1 missing …`"
+      ],
+      "modify": [
+        "[Data: LabelListPasteModal.res]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "new. Keep the new tags and run `_preview` at once (the text is unchanged).",
+      "volatile": [],
+      "oracle": [],
+      "key": "LabelListPasteModal.refresh_tags"
+    },
+    {
+      "name": "A2LExplorerBody.on_resize",
+      "reqs": [
+        "R-A2L-LIST.047",
+        "R-A2L-LIST.080",
+        "R-A2L-LIST.081",
+        "R-TUI-069.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Resize",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.080/1) body width at 118×54 (P2 §3: 112) → no `-wide`; (R-A2L-LIST.081/1) at 220×60 (196) → `-wide`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new [D-2]. Set the class `-wide` exactly when its width ≥ 180 (the stylesheet does the layout, `[Config: styles.tcss A2L panes]`).",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LExplorerBody.on_resize"
+    },
+    {
+      "name": "A2LExplorerBody.action_paste_list",
+      "reqs": [
+        "R-A2L-LIST.040"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.040/1) focus in `#a2l_tags_list`, alt+p → the screen stack's top is a `LabelListPasteModal` titled `Paste a list of labels`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (binding `alt+p`, priority, on the body; and the `#a2l_paste_list_button` press, stopped here). Call `app.a2l_open_label_list()` (V11).",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LExplorerBody.action_paste_list"
+    },
+    {
+      "name": "A2LExplorerBody.action_mode_all",
+      "reqs": [
+        "R-A2L-LIST.026"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/a2l_label_list.py",
+      "examples": [
+        "(R-A2L-LIST.026/1) mode `invalid`, focus in the filter box, alt+a → `a2l_tags_filter_mode` `all`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (binding `alt+a`, priority). Press `#a2l_filter_all` (the shipped handler `core.py:1108` sets the mode and refreshes).",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LExplorerBody.action_mode_all"
+    },
+    {
+      "name": "OsClipboardInput._take_paste",
+      "reqs": [
+        "R-PASTE.1",
+        "R-TUI-043.4",
+        "R-PASTE.29"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "taken"
+        ],
+        "raw": "bool taken"
+      },
+      "module": "s19_app/tui/os_clipboard_input.py",
+      "examples": [
+        "(R-PASTE.1/1) a stock `OsClipboardInput` (the Load box) → `False`, so a two-line paste inserts its first line as today"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (I-1 hook) [D-5]. Return `False`. Called by L27 and L28 with the capped text before the first-line cut; a subclass that takes the paste returns `True`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "OsClipboardInput._take_paste"
+    },
+    {
+      "name": "A2lViewMixin._a2l_list_names",
+      "reqs": [
+        "R-A2L-LIST.006",
+        "R-A2L-007.2"
+      ],
+      "in": [],
+      "out": {
+        "type": "Optional[list]",
+        "names": [
+          "names"
+        ],
+        "raw": "list? names"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.006/1) text = G2L joined, field `name` → the 12 names",
+        "(R-A2L-LIST.006/3) the same, field `all` → the 12 names [D-3]",
+        "(R-A2L-007.2/1) `synthetic`, field `all` → `None` (one name: text mode)",
+        "(derived) G2L joined, field `address` → `None`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new [D-3]. The filter field is `name` or `all` and `a2l_tags_filter_text` is a list text → its pasted names; else `None` (text mode).",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._a2l_list_names"
+    },
+    {
+      "name": "A2lViewMixin._paint_a2l_filter_chips",
+      "reqs": [
+        "R-A2L-LIST.007",
+        "R-A2L-LIST.008",
+        "R-A2L-LIST.017",
+        "R-A2L-LIST.018",
+        "R-A2L-LIST.019",
+        "R-A2L-LIST.020",
+        "R-A2L-LIST.021",
+        "R-A2L-LIST.022",
+        "R-A2L-LIST.023",
+        "R-A2L-LIST.024"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.017/1) G2L over C08 → chips line 1 plain ` LIST   12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate`",
+        "(R-A2L-LIST.018/1) chips line 2 plain `order ● ● ● ● ● ● ✗ ● ● = ✗ ●    field ignored in LIST mode · esc back to text filter · alt+p edit the list`",
+        "(R-A2L-LIST.019/1) `VALUE` in `name` → ` TEXT   'VALUE' in name  ·  showing 208 of 462   paste several names, or alt+p, to filter by a LIST`; (R-A2L-LIST.019/2) `''` → ` TEXT   no text filter  ·  showing 462 of 462   …`",
+        "(R-A2L-LIST.020/1) mode `all` → `mode All · no tag hidden by mode (462 tags)`",
+        "(R-A2L-LIST.021/1) mode `invalid` → `mode Invalid · hides 462 of 462 tags  alt+a All`; (R-A2L-LIST.021/2) `inmem`, image + A2L → `mode In-memory · hides 60 of 462 tags  alt+a All` (P2 §2: 402 kept); (R-A2L-LIST.021/3) `inmem`, A2L only → `… hides 462 of 462 …`",
+        "(R-A2L-LIST.007/1) G2L → mode tag `LIST`",
+        "(R-A2L-LIST.023/1) text mode → `#a2l_list_missing` hidden",
+        "(R-A2L-LIST.022/1) G2L → `#a2l_list_missing` plain = R-A2L-LIST.022/1's line"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. Mark the active mode's button (class `-on`; R-A2L-007.9). List mode: mode tag `LIST`; chips = ` LIST ` + 2 spaces + counts, a new line, `order ` + ribbon (budget 80) + `   field ignored in LIST mode · esc back to text filter · alt+p edit the list`, a new line, the mode line; `#a2l_list_missing` shown with the missing line. Text mode: mode tag `FILTER`; chips = ` TEXT ` + 2 spaces + (`'<text>' in <field>` or `no text filter`) + `  ·  showing <n> of <T>` + `   paste several names, or alt+p, to filter by a LIST`, a new line, the mode line; `#a2l_list_missing` hidden. Mode line: `mode All · no tag hidden by mode (<T> tags)`, or `mode <label> · hides <h> of <T> tags  alt+a All` with <h> = T − the tags the mode keeps with no text. Every text built from plain strings; the filter text through `display_text`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._paint_a2l_filter_chips"
+    },
+    {
+      "name": "A2lViewMixin._fit_a2l_tag_cells",
+      "reqs": [
+        "R-A2L-LIST.036"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.036/1) G2L shown, resize 118 → 80 → 118 → column labels still `LIST_COLUMNS`; row 1 cell 1 `1`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. List mode → return (the list page has no width-dependent cell). Text mode unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._fit_a2l_tag_cells"
+    },
+    {
+      "name": "A2lViewMixin._repaint_a2l_tag_cells",
+      "reqs": [
+        "R-A2L-LIST.036"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.036/3) G2L shown, Inc 12's Save project commit route (R-A2L-048/2) → columns `LIST_COLUMNS`, 12 rows, the written tag's Physical cell updated",
+        "(R-A2L-LIST.036/2) 250 names, page change → `LIST  rows 201-250 / 250 in pasted order`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed. List mode → `update_a2l_tags_view(self._a2l_filtered_tags)` keeping the cursor row and scroll (the list rows re-read their tags' cells); text mode unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin._repaint_a2l_tag_cells"
+    },
+    {
+      "name": "A2lViewMixin.a2l_open_label_list",
+      "reqs": [
+        "R-A2L-LIST.040",
+        "R-A2L-LIST.041",
+        "R-A2L-LIST.053",
+        "R-A2L-LIST.054"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.041/1) viewer in list mode with G2L → the window opens with 12 lines",
+        "(R-A2L-LIST.053/1) callback with G2L's 12 names → filter value `VALUE_0002, CURVE_0001, …, VALUE_0118`; after the debounce 12 list rows",
+        "(R-A2L-LIST.053/2) callback [`MAP_0003`] → filter `MAP_0003`, text mode, 1 row",
+        "(R-A2L-LIST.054/1) filter `VALUE`, callback `None` → filter `VALUE`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (I-7, called by L24). Push `LabelListPasteModal(tags=self._a2l_enriched_tags, ranker=…, names=<_a2l_list_names() or []>, wide=<#a2l_panes width ≥ 180>)` with a callback: a non-empty name list → the filter box value = the names joined by `, ` (cursor 0; the box's Changed event runs the debounced refresh) and the dropdown closed; `None` → nothing.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lViewMixin.a2l_open_label_list"
+    },
+    {
+      "name": "ListAwareDetailCard.show_tag",
+      "reqs": [
+        "R-A2L-LIST.027",
+        "R-A2L-LIST.028",
+        "R-A2L-LIST.029",
+        "R-A2L-LIST.030"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "tag",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(R-A2L-LIST.027/1) highlight row 7 → `✗ MAP_0024  not in this A2L` / `pasted #7`; after the worker `closest —` (R-A2L-LIST.028/2)",
+        "(R-A2L-LIST.028/1) a list with `VALUE_002` → after the worker `closest VALUE_0020 · VALUE_0021 · VALUE_0022`",
+        "(R-A2L-LIST.029/1) row 10 → the card of `VALUE_0002` + `duplicate of pasted #1`",
+        "(R-A2L-LIST.030/1) mode `invalid`, row 1 → card + `hidden by the active filter mode`",
+        "(derived) a text-mode row → the shipped card, unchanged"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (subclass of `A2LDetailCard`, `shared.py:540`, so the type queries `a2l_view.py:919` and `navigation.py:1418` still match; defined in G-V because `a2l_label_list.py` may not import the app package). No `_list_entry` → `super().show_tag(tag)`. MISSING → `list_card_text(entry, None)`, then `ranker.request(\"card\", name, 3, …, current = \"this entry is still shown\")`, whose `deliver` repaints with `list_card_text(entry, matches)` [D-12]. DUPLICATE, HIDDEN → the shipped card text of the tag + a new line + `list_card_text(entry, None)`.",
+      "volatile": [],
+      "oracle": [],
+      "key": "ListAwareDetailCard.show_tag"
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2LDetailCard.show_tag",
+      "callee": "_a2l_detail_card_text",
+      "sites": [
+        "s19_app/tui/app/shared.py:625"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._filter_a2l_tags",
+      "callee": "A2lViewMixin._tag_matches_filter",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1458"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_dependent_views",
+      "callee": "A2LDetailCard.show_tag",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:927"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_dependent_views",
+      "callee": "A2lViewMixin.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:913"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "callee": "A2lViewMixin._filter_a2l_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:859"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "callee": "A2lViewMixin.update_a2l_tags_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:866",
+        "s19_app/tui/app/a2l_view.py:871"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin._schedule_a2l_filter_refresh",
+      "callee": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1586"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_tags_view",
+      "callee": "A2lViewMixin._build_a2l_table_cells",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1085"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_view",
+      "callee": "A2lViewMixin._refresh_a2l_filtered_tags",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:1001"
+      ]
+    },
+    {
+      "caller": "A2lViewMixin.update_a2l_view",
+      "callee": "A2lViewMixin.update_a2l_tags_view",
+      "sites": [
+        "s19_app/tui/app/a2l_view.py:987"
+      ]
+    },
+    {
+      "caller": "NavigationMixin.on_data_table_row_highlighted",
+      "callee": "A2LDetailCard.show_tag",
+      "sites": [
+        "s19_app/tui/app/navigation.py:1423"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput._on_paste",
+      "callee": "_strip_paste_controls",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:947",
+        "s19_app/tui/os_clipboard_input.py:953"
+      ]
+    },
+    {
+      "caller": "OsClipboardInput.action_paste",
+      "callee": "_strip_paste_controls",
+      "sites": [
+        "s19_app/tui/os_clipboard_input.py:1104",
+        "s19_app/tui/os_clipboard_input.py:1108"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "A2lViewMixin.update_a2l_tags_view": [
+      "s19_app/tui/app/a2l_view.py:1214",
+      "s19_app/tui/app/a2l_view.py:366",
+      "s19_app/tui/app/a2l_view.py:392",
+      "s19_app/tui/app/a2l_view.py:507"
+    ],
+    "A2lViewMixin._jump_to_tag_by_data": [
+      "s19_app/tui/app/a2l_view.py:441"
+    ],
+    "A2lViewMixin._build_a2l_table_cells": [
+      "s19_app/tui/app/a2l_view.py:1210",
+      "s19_app/tui/app/a2l_view.py:1307"
+    ],
+    "A2lViewMixin._refresh_a2l_filtered_tags": [
+      "s19_app/tui/app/a2l_view.py:1554"
+    ],
+    "A2LDetailCard.show_tag": [
+      "s19_app/tui/app/shared.py:581"
+    ],
+    "_a2l_detail_card_text": [
+      "s19_app/tui/app/shared.py:600"
+    ],
+    "_strip_paste_controls": [
+      "s19_app/tui/capped_text_area.py:169",
+      "s19_app/tui/capped_text_area.py:238"
+    ],
+    "OsClipboardInput.action_paste": [
+      "s19_app/tui/os_clipboard_input.py:977"
+    ],
+    "parse_parameter_list": [
+      "s19_app/tui/screens.py:1019"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "info_nodes_replaced",
+      "where": "graphs",
+      "msg": "7 replaced by a later graph: `OsClipboardInput._on_paste`, `OsClipboardInput.action_paste`, `ComposeScreensMixin._compose_screen_a2l`, `A2lViewMixin._filter_a2l_tags`, `A2lViewMixin._refresh_a2l_filtered_tags`, `A2lViewMixin.update_a2l_tags_view`, `A2lViewMixin._schedule_a2l_filter_refresh`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/app/a2l_view.py:1004",
+      "msg": "`tags`: graph `list` vs code `list[dict]`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/app/a2l_view.py:1443",
+      "msg": "`tags`: graph `list` vs code `list[dict]`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/app/a2l_view.py:1443",
+      "msg": "output: graph `list` vs code `list[dict]`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`is_list_text`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`display_text`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`resolve_label_list`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`list_summary_texts`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`list_row_cells`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`list_card_text`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelRanker.prepare`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelRanker._install`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelRanker.request`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelRanker._deliver`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelSuggestBox.show_ranked`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelSuggestBox.move`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`ListAwareFilterInput._take_paste`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`ListAwareFilterInput.action_esc`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`ListAwareFilterInput.action_complete`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.compose`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.on_mount`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal._preview`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal._on_similar`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.on_input_submitted`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.action_apply`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.action_cancel`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`LabelListPasteModal.refresh_tags`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`A2LExplorerBody.on_resize`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`A2LExplorerBody.action_paste_list`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/a2l_label_list.py",
+      "msg": "`A2LExplorerBody.action_mode_all`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/os_clipboard_input.py",
+      "msg": "`OsClipboardInput._take_paste`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`A2lViewMixin._a2l_list_names`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`A2lViewMixin._paint_a2l_filter_chips`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`A2lViewMixin._fit_a2l_tag_cells`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`A2lViewMixin._repaint_a2l_tag_cells`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`A2lViewMixin.a2l_open_label_list`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/a2l_view.py",
+      "msg": "`ListAwareDetailCard.show_tag`"
+    }
+  ],
+  "parse_failures": []
+}

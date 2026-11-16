@@ -1,0 +1,115 @@
+scenario=add-enter
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=LabelListPasteModal
+focused=a2l_list_add
+body=196x45 classes=['-wide']
+region #a2l_tags_pane: Region(x=23, y=4, width=106, height=45) visible=Region(x=23, y=4, width=106, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=129, y=4, width=90, height=45) visible=Region(x=129, y=4, width=90, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=131, y=6, width=86, height=2) visible=Region(x=131, y=6, width=86, height=2) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=102, height=4) visible=Region(x=25, y=7, width=102, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=29, y=7, width=6, height=3) visible=Region(x=29, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=148
+region #a2l_tag_find_input: Region(x=119, y=7, width=6, height=3) visible=Region(x=119, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=35, y=7, width=20, height=3) visible=Region(x=35, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=25, y=11, width=102, height=3) visible=Region(x=25, y=11, width=102, height=3) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=37, y=49, width=146, height=1) visible=Region(x=37, y=49, width=146, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=25, y=15, width=102, height=32) visible=Region(x=25, y=15, width=102, height=32) display=True hit_at_centre=a2l_tags_list rows=12 body_rows=31
+region #alt_hex_scroll: Region(x=131, y=14, width=86, height=39) visible=Region(x=131, y=14, width=86, height=33) display=True hit_at_centre=alt_hex_view
+region #a2l_list_add_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_add: Region(x=40, y=5, width=73, height=3) visible=Region(x=40, y=5, width=70, height=3) display=True hit_at_centre=a2l_list_add content_width=67 value_len=0
+text #a2l_filter_mode_tag[0]: 'LIST'
+text #a2l_list_chips[0]: ' LIST   12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate'
+text #a2l_list_chips[1]: 'order ● ● ● ● ● ● ✗ ● ● = ✗ ●    field ignored in LIST mode · esc back to text filter · alt+p edit the list'
+text #a2l_list_chips[2]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 2 ▸ #10 VALUE_0002 (= #1) · #13 VALUE_0042 (= #5)'
+text #a2l_tags_summary[0]: 'LIST  rows 1-12 / 12 in pasted order'
+text #a2l_list_counts[0]: '13 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 2 duplicates'
+text #a2l_list_ribbon[0]: 'order ● ● ● ● ● ● ✗ ● ● = ✗ ● = '
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 2 ▸ #10 VALUE_0002 (= #1) · #13 VALUE_0042 (= #5)'
+text #a2l_list_similar[0]: '  similar to #7 MAP_0024: none (digits must match exactly)'
+text #a2l_list_similar[1]: '  similar to #11 CURVE_0071: none (digits must match exactly)'
+text #a2l_detail_card[0]: 'Highlight a tag to inspect its fields.'
+hex_rows=201 longest_row=81 hex_scroll_width=84
+table_columns=['#', 'Tag', 'Status', 'Kind', 'Address', 'Len', 'Physical', 'Unit', 'Limits']
+table_cursor_row=0 scroll_x=0.0
+table_row[0]: ['1', '● VALUE_0002', 'found', 'VALUE', '0x00000014', '2']
+table_row[1]: ['2', '● CURVE_0001', 'found', 'CURVE', '0x00803DE0', '64']
+table_row[2]: ['3', '● MAP_0003', 'found', 'MAP', '0x00804FD0', '128']
+table_row[3]: ['4', '● MEASUREMENT_0005', 'found', 'MEASURE', '0x000000A0', '2']
+table_row[4]: ['5', '● VALUE_0042', 'found', 'VALUE', '0x000402E4', '4']
+table_row[5]: ['6', '● CURVE_0017', 'found', 'CURVE', '0x00804260', '64']
+table_row[6]: ['7', '✗ MAP_0024', 'not in A2L', '', '', '']
+table_row[7]: ['8', '● MAP_0001', 'found', 'MAP', '0x00804EC0', '128']
+table_row[8]: ['9', '● MEASUREMENT_0012', 'found', 'MEASURE', '0x00040E4C', '4']
+table_row[9]: ['10', '= VALUE_0002', 'dup of #1', 'VALUE', '0x00000014', '2']
+table_row[10]: ['11', '✗ CURVE_0071', 'not in A2L', '', '', '']
+table_row[11]: ['12', '● VALUE_0118', 'found', 'VALUE', '0x000408D4', '2']
+text_area_lines=14 first='VALUE_0002'
+screen_begin
+| 
+|                                   ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+|    ⭘                              │                                                                                                                                                      │
+|                        │          │   Paste a list of labels                                                                                                                             │                                ?
+|   ▏ ◫  Workspace       │          │                                                                                                                                                      │
+|   ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔│  add╭─────────────────────────────────────────────────────────────────────13 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 2 duplicates                 │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|   ▏ ◉  MAC View        │▊         │     │  part of a name — start, middle, end, a typo                        order ● ● ● ● ● ● ✗ ● ● = ✗ ● =                                            │
+|   ▏ ▤  Memory Map      │▊         │     ╰───────────────────────────────────────────────────────────────────── #    Name                Status      Kind     Address     Value           │
+|   ▏ !  Issues Report   │▊ LIST▊▔▔▔│                                                                            1    ● VALUE_0002        found       VALUE    0x00000014  488000.0        │────────────────────────────────
+|   ▏ ✎  Patch Editor    │▊     ▊   │                                                                            2    ● CURVE_0001        found       CURVE    0x00803DE0  57199           │
+|   ▏ ✔  Check Editor    │▊     ▊▁▁▁│                                                                            3    ● MAP_0003          found       MAP      0x00804FD0  42244           │
+|   ▏ ⏚  A2B Diff        │▊         │                                                                            4    ● MEASUREMENT_0005  found       MEASURE  0x000000A0  -20310.0        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+|   ▏ ✦  Flow Builder    │▊  LIST   │                                                                            5    ● VALUE_0042        found       VALUE    0x000402E4  566.7663192749  │DDR            ▎      Goto
+|   ▏ ▶  Flow Execution  │▊ order ● │                                                                            6    ● CURVE_0017        found       CURVE    0x00804260  32163           │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|   ▏ ☑  Checks          │▊ mode All│                                                                            7    ✗ MAP_0024          not in A2L                                       │
+|   ▏ ⊕  CRC Designer    │▊ Missing │                                                                            8    ● MAP_0001          found       MAP      0x00804EC0  15412           │
+|                        │▊  #   Tag│                                                                            9    ● MEASUREMENT_0012  found       MEASURE  0x00040E4C  1482.0          │6 31 2E  |l19TOOL BOOT v1.|
+|                        │▊  1   ● V│                                                                            10   = VALUE_0002        dup of #1   VALUE    0x00000014  488000.0        │0 00 00  |0...............|
+|                        │▊  2   ● C│                                                                            11   ✗ CURVE_0071        not in A2L                                       │0 00 00  |........^&......|
+|                        │▊  3   ● M│                                                                            12   ● VALUE_0118        found       VALUE    0x000408D4  0.0             │1 00 00  |................|
+|                        │▊  4   ● M│                                                                            13   = VALUE_0042        dup of #5   VALUE    0x000402E4  566.7663192749  │0 00 00  |................|
+|                        │▊  5   ● V│                                                                                                                                         ▊            │0 00 00  |................|
+|                        │▊  6   ● C│                                                                                                                                                      │0 00 00  |................|   ▃▃
+|                        │▊  7   ✗ M│                                                                                                                                                      │0 00 00  |................|
+|                        │▊  8   ● M│                                                                                                                                                      │7 27 2A  |............xW'*|
+|                        │▊  9   ● M│                                                                                                                                                      │0 00 00  |................|
+|                        │▊  10  = V│  or paste names — new line , ; space                                                                                                                 │0 00 00  |.F..............|
+|                        │▊  11  ✗ C│  ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎                                                                           │0 00 00  |....+...........|
+|                        │▊  12  ● V│  ▊ VALUE_0002                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ CURVE_0001                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ MAP_0003                                                              ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ MEASUREMENT_0005                                                      ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ VALUE_0042                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ CURVE_0017                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ MAP_0024                                                              ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ MAP_0001                                                              ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ MEASUREMENT_0012                                                      ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ VALUE_0002                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ CURVE_0071                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ VALUE_0118                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊ VALUE_0042                                                            ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊         │  ▊                                                                       ▎                                                                           │0 00 00  |................|
+|                        │▊  LIST  r│  ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎                                                                           │
+|                        │▊▁▁▁▁▁▁▁▁▁│  Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 2 ▸ #10 VALUE_0002 (= #1) · #13 VALUE_0042 (= #5)                                            │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+|   ────────────────────────────────│    similar to #7 MAP_0024: none (digits must match exactly)                                                                                          │─────────────────────────────────
+|    Loaded firmware.s19 (S19 only) │    similar to #11 CURVE_0071: none (digits must match exactly)                                                                                       │          (none)  |  firmware.a2l
+|                                   │  The list filters the viewer (LIST mode, pasted order); nothing is saved. Missing names stay listed so you can fix them.                             │
+|    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│                                                                                                                                                      │
+|                                   │                                                                                                    ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  │
+|                                   │                                                                                                     Filter viewer by list  alt+f     Cancel  esc     │
+|    Loaded firmware.s19 (S19 only) │                                                                                                    ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  │
+|    A2L loaded: firmware.a2l       │                                                                                                                                                      │
+|    ^k Palette  ^d Density  ^l Load╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+| 
+screen_end
+stub_os_writes=0
+surface=ready

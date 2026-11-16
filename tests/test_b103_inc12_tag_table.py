@@ -666,7 +666,13 @@ def test_r_tui_042a_5_2_short_name_cut_too_at_80(tmp_path: Path) -> None:
 
 
 def test_r_tui_042a_5_3_64_bit_page(tmp_path: Path) -> None:
-    """R-TUI-042a.5 case /3: PAGE64(48) at 80/95/100/118 (*w* = 9/17/20/31)."""
+    """R-TUI-042a.5 case /3: PAGE64(48) at 80/95/100/118 (*w* = 9/17/20/31).
+
+    The 118-column arm runs at 118×30, a short body (measured *w* = 31; 29 before
+    Inc 7 E5 F-X7-1 hid the short body's horizontal scrollbar): Inc 7 stacks the panes at
+    118×54 (R-A2L-LIST.080), where the tag table takes the full body width and *w*
+    (79) is no longer under 34.
+    """
     heads = {80: 4, 95: 8, 100: 9, 118: 15}
     for width, head in heads.items():
         async def _check(app, pilot, table, width=width, head=head):
@@ -683,14 +689,14 @@ def test_r_tui_042a_5_3_64_bit_page(tmp_path: Path) -> None:
                 assert cell.endswith(name[len(name) - (w - 1 - head):]), (r, cell)
                 _assert_painted_tag_cell(table, geom, r, cell)
 
-        _explore(tmp_path, page64(48), (width, 54), _check)
+        _explore(tmp_path, page64(48), (width, 30 if width == 118 else 54), _check)
 
 
 def test_r_tui_042a_5_4_fixed_cap_at_220(tmp_path: Path) -> None:
     """R-TUI-042a.5 case /4: LONGMAP(48) then PAGE64(48) at 220 — 36-cell form."""
     async def _long(app, pilot, table):
         geom = _geom(table)
-        assert geom.w == 84, geom.w
+        assert geom.w == 78, geom.w  # Inc 7: tags pane left of a 90-column hex pane (R-A2L-LIST.081)
         cell = table.get_row_at(0)[geom.idx["Tag"]].plain
         assert cell == "✓ " + _shorten(longname(48), 34), cell
         assert cell_len(cell) == 36
@@ -698,7 +704,7 @@ def test_r_tui_042a_5_4_fixed_cap_at_220(tmp_path: Path) -> None:
 
     async def _p64(app, pilot, table):
         geom = _geom(table)
-        assert geom.w == 79, geom.w
+        assert geom.w == 73, geom.w  # Inc 7: tags pane left of a 90-column hex pane (R-A2L-LIST.081)
         for r in range(table.row_count):
             tag = _tags_of(app, table)[r]
             glyph = "✓" if tag.get("in_memory") else "·"
@@ -758,7 +764,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
             timeout=30,
         )
         geom = _geom(table)
-        assert geom.w == 84, geom.w
+        assert geom.w == 78, geom.w  # Inc 7: tags pane left of a 90-column hex pane (R-A2L-LIST.081)
         _assert_painted_tag_cell(table, geom, 0, wide)
         await pilot.resize_terminal(80, 54)
         await wait_until(
@@ -778,7 +784,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
             timeout=30,
         )
         geom = _geom(table)
-        assert geom.w == 84, geom.w
+        assert geom.w == 78, geom.w  # Inc 7: tags pane left of a 90-column hex pane (R-A2L-LIST.081)
         _assert_painted_tag_cell(table, geom, 0, wide)
         assert table.cursor_row == 0
 

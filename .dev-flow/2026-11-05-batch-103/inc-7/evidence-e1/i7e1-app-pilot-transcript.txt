@@ -1,0 +1,89 @@
+s19_app.__file__ = ~/work/zq-i7/repo/s19_app/__init__.py
+repo HEAD = 2dbd7d5a
+
+######## size 118x54
+=== 1. columns = ['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+   fixed_columns = 2 enriched tags = 462 a2l_view_generation = 1
+   VALUE_0002: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00000014', '2', '✓ VALUE_0002', 'formula', '34719', '347190.0', 'yes', 'flash', '0..655350']
+   CURVE_0001: char_type='CURVE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00803DE0', '64', '✓ CURVE_0001', 'formula', '42162', '42162', 'yes', 'flash', '0..65535']
+   MAP_0003: char_type='MAP' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804FD0', '128', '✓ MAP_0003', 'formula', '13876', '13876', 'yes', 'flash', '0..65535']
+   MEASUREMENT_0005: char_type=None section='MEASUREMENT' in_memory=True schema_ok=True
+      cells = ['0x000000A0', '2', '✓ MEASUREMENT_0005', 'formula', '29214', '29314.0', 'yes', 'flash', '-32668..32867']
+   VALUE_0042: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x000402E4', '4', '✓ VALUE_0042', 'formula', '24.09669303894043', '240.9669303894043', 'yes', 'flash', '120.483..361.450']
+   CURVE_0017: char_type='CURVE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804260', '64', '✓ CURVE_0017', 'formula', '34893', '34893', 'yes', 'flash', '0..65535']
+   MAP_0001: char_type='MAP' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804EC0', '128', '✓ MAP_0001', 'formula', '41399', '41399', 'yes', 'flash', '0..65535']
+   MEASUREMENT_0012: char_type=None section='MEASUREMENT' in_memory=True schema_ok=True
+      cells = ['0x00040E4C', '4', '✓ MEASUREMENT_0012', 'formula', '458', '866.0', 'yes', 'flash', '0..2000']
+   VALUE_0118: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x000408D4', '2', '✓ VALUE_0118', 'formula', '4', '20.0', 'yes', 'flash', '0..30']
+=== 2. mode counts (no text)
+   all: 462
+   invalid: 0
+   inmem: 402
+=== 3. panes
+   #a2l_panes: region=(5, 4, 112, 39) content=(5, 4, 112, 39)
+   #a2l_tags_pane: region=(5, 4, 64, 39) content=(7, 5, 60, 37)
+   #a2l_hex_pane: region=(69, 4, 48, 39) content=(71, 6, 44, 35)
+   #a2l_detail_card: region=(71, 6, 44, 2) content=(72, 6, 42, 1)
+   #alt_hex_scroll: region=(71, 14, 44, 35) content=(71, 14, 44, 35)
+   #alt_hex_view: region=(71, 14, 42, 402) content=(71, 14, 42, 402)
+   #a2l_tags_filters: region=(7, 7, 60, 4) content=(7, 7, 60, 3)
+   hex view width = 42; painted lines = 404; widest = 40
+   |... showing from 0x00804FC0 (context
+   |preserved) ...
+   |... window limited to 200 rows ...
+   |  0x00804FC0  09 20 14 20 1F 20 2A 20 E1
+   |41 03 3B 69 34 1C 2E  |. . . * .A.;i4..|
+   |  0x00804FD0  36 34 36 3F 36 4A 36 55 36
+=== 4. filter box value after a two-line value is set
+   value = 'VALUE_0002\nCURVE_0001'
+
+######## size 220x60
+=== 1. columns = ['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+   fixed_columns = 2 enriched tags = 462 a2l_view_generation = 1
+   VALUE_0002: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00000014', '2', '✓ VALUE_0002', 'formula', '34719', '347190.0', 'yes', 'flash', '0..655350']
+   CURVE_0001: char_type='CURVE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00803DE0', '64', '✓ CURVE_0001', 'formula', '42162', '42162', 'yes', 'flash', '0..65535']
+   MAP_0003: char_type='MAP' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804FD0', '128', '✓ MAP_0003', 'formula', '13876', '13876', 'yes', 'flash', '0..65535']
+   MEASUREMENT_0005: char_type=None section='MEASUREMENT' in_memory=True schema_ok=True
+      cells = ['0x000000A0', '2', '✓ MEASUREMENT_0005', 'formula', '29214', '29314.0', 'yes', 'flash', '-32668..32867']
+   VALUE_0042: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x000402E4', '4', '✓ VALUE_0042', 'formula', '24.09669303894043', '240.9669303894043', 'yes', 'flash', '120.483..361.450']
+   CURVE_0017: char_type='CURVE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804260', '64', '✓ CURVE_0017', 'formula', '34893', '34893', 'yes', 'flash', '0..65535']
+   MAP_0001: char_type='MAP' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x00804EC0', '128', '✓ MAP_0001', 'formula', '41399', '41399', 'yes', 'flash', '0..65535']
+   MEASUREMENT_0012: char_type=None section='MEASUREMENT' in_memory=True schema_ok=True
+      cells = ['0x00040E4C', '4', '✓ MEASUREMENT_0012', 'formula', '458', '866.0', 'yes', 'flash', '0..2000']
+   VALUE_0118: char_type='VALUE' section='CHARACTERISTIC' in_memory=True schema_ok=True
+      cells = ['0x000408D4', '2', '✓ VALUE_0118', 'formula', '4', '20.0', 'yes', 'flash', '0..30']
+=== 2. mode counts (no text)
+   all: 462
+   invalid: 0
+   inmem: 402
+=== 3. panes
+   #a2l_panes: region=(23, 4, 196, 45) content=(23, 4, 196, 45)
+   #a2l_tags_pane: region=(23, 4, 112, 45) content=(25, 5, 108, 43)
+   #a2l_hex_pane: region=(135, 4, 84, 45) content=(137, 6, 80, 41)
+   #a2l_detail_card: region=(137, 6, 80, 2) content=(138, 6, 78, 1)
+   #alt_hex_scroll: region=(137, 14, 80, 41) content=(137, 14, 80, 41)
+   #alt_hex_view: region=(137, 14, 78, 402) content=(137, 14, 78, 402)
+   #a2l_tags_filters: region=(25, 7, 108, 4) content=(25, 7, 108, 3)
+   hex view width = 78; painted lines = 403; widest = 77
+   |... showing from 0x00804FC0 (context preserved) ...
+   |... window limited to 200 rows ...
+   |  0x00804FC0  09 20 14 20 1F 20 2A 20 E1 41 03 3B 69 34 1C 2E  |. . . *
+   |.A.;i4..|
+   |  0x00804FD0  36 34 36 3F 36 4A 36 55 36 60 36 6B 36 76 36 81
+   ||646?6J6U6`6k6v6.|
+=== 4. filter box value after a two-line value is set
+   value = 'VALUE_0002\nCURVE_0001'
+rc=0

@@ -1,0 +1,154 @@
+# i7-remap-census: old 2dbd7d5a new 9ffe019d; python 3.12.7
+## files: 490 old, 499 new; removed ['s19_app/tui/screens_directionb/patch_editor.py']; added 10 (9 under s19_app/)
+## files that differ (same path, other bytes): 16
+  s19_app/tui/app/a2l_view.py
+  tests/support/b103_artifact_safety.py
+  tests/support/b103_clipboard.py
+  tests/support/b103_winci_gate.py
+  tests/support/b103_winci_manifest.json
+  tests/support/package_source.py
+  tests/test_b103_clipboard_tail.py
+  tests/test_b103_clipboard_windows.py
+  tests/test_b103_copy_paste_matrix.py
+  tests/test_b103_winci_gate.py
+  tests/test_id_registry.py
+  tests/test_import_census.py
+  tests/test_package_source_helper.py
+  tests/test_tui_patch_card.py
+  tests/test_tui_patch_checks_strip.py
+  tests/test_tui_patch_history_strip.py
+## added under s19_app/: s19_app/tui/screens_directionb/patch_editor/__init__.py, s19_app/tui/screens_directionb/patch_editor/a2l_picker.py, s19_app/tui/screens_directionb/patch_editor/actions.py, s19_app/tui/screens_directionb/patch_editor/checks.py, s19_app/tui/screens_directionb/patch_editor/document.py, s19_app/tui/screens_directionb/patch_editor/entries.py, s19_app/tui/screens_directionb/patch_editor/layout.py, s19_app/tui/screens_directionb/patch_editor/panel.py, s19_app/tui/screens_directionb/patch_editor/shared.py
+## added under tests/: tests/test_b103_a2l_filter_teardown.py
+## graph nodes: 44 (Counter({'new': 33, 'changed': 11}))
+## node: module | state | old lines | new lines | AST
+is_list_text                                         a2l_label_list.py            new      module absent at old and new; name absent=True
+display_text                                         a2l_label_list.py            new      module absent at old and new; name absent=True
+resolve_label_list                                   a2l_label_list.py            new      module absent at old and new; name absent=True
+list_summary_texts                                   a2l_label_list.py            new      module absent at old and new; name absent=True
+list_row_cells                                       a2l_label_list.py            new      module absent at old and new; name absent=True
+list_card_text                                       a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelRanker.prepare                                  a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelRanker._install                                 a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelRanker.request                                  a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelRanker._deliver                                 a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelRanker._work                                    a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelSuggestBox.show_ranked                          a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelSuggestBox.move                                 a2l_label_list.py            new      module absent at old and new; name absent=True
+ListAwareFilterInput._take_paste                     a2l_label_list.py            new      module absent at old and new; name absent=True
+ListAwareFilterInput.action_esc                      a2l_label_list.py            new      module absent at old and new; name absent=True
+ListAwareFilterInput.action_complete                 a2l_label_list.py            new      module absent at old and new; name absent=True
+ListAwareFilterInput.action_move_choice              a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.compose                          a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.on_mount                         a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal._preview                         a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal._on_similar                      a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.on_input_submitted               a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.action_apply                     a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.action_cancel                    a2l_label_list.py            new      module absent at old and new; name absent=True
+LabelListPasteModal.refresh_tags                     a2l_label_list.py            new      module absent at old and new; name absent=True
+A2LExplorerBody.on_resize                            a2l_label_list.py            new      module absent at old and new; name absent=True
+A2LExplorerBody.action_paste_list                    a2l_label_list.py            new      module absent at old and new; name absent=True
+A2LExplorerBody.action_mode_all                      a2l_label_list.py            new      module absent at old and new; name absent=True
+OsClipboardInput._take_paste                         os_clipboard_input.py        new      module exists at old and new; name absent=True; class OsClipboardInput at new 849-1112
+OsClipboardInput._on_paste                           os_clipboard_input.py        changed  926-951 -> 926-951 same-ast
+OsClipboardInput.action_paste                        os_clipboard_input.py        changed  1038-1112 -> 1038-1112 same-ast
+ComposeScreensMixin._compose_screen_a2l              app/compose_screens.py       changed  629-742 -> 629-742 same-ast
+A2lViewMixin._a2l_list_names                         app/a2l_view.py              new      module exists at old and new; name absent=True; class A2lViewMixin at new 239-1584
+A2lViewMixin._filter_a2l_tags                        app/a2l_view.py              changed  1437-1454 -> 1437-1454 same-ast
+A2lViewMixin._refresh_a2l_filtered_tags              app/a2l_view.py              changed  827-869 -> 827-869 same-ast
+A2lViewMixin._paint_a2l_filter_chips                 app/a2l_view.py              new      module exists at old and new; name absent=True; class A2lViewMixin at new 239-1584
+A2lViewMixin.update_a2l_tags_view                    app/a2l_view.py              changed  1000-1113 -> 1000-1113 same-ast
+A2lViewMixin._fit_a2l_tag_cells                      app/a2l_view.py              changed  1163-1217 -> 1163-1217 same-ast
+A2lViewMixin._repaint_a2l_tag_cells                  app/a2l_view.py              changed  1246-1333 -> 1246-1333 same-ast
+A2lViewMixin.update_a2l_view                         app/a2l_view.py              changed  938-998 -> 938-998 same-ast
+A2lViewMixin._schedule_a2l_filter_refresh            app/a2l_view.py              changed  1548-1579 -> 1548-1584 DIFF
+A2lViewMixin.a2l_open_label_list                     app/a2l_view.py              new      module exists at old and new; name absent=True; class A2lViewMixin at new 239-1584
+A2lViewMixin._refresh_a2l_dependent_views            app/a2l_view.py              changed  871-936 -> 871-936 same-ast
+ListAwareDetailCard.show_tag                         app/a2l_view.py              new      module exists at old and new; name absent=True
+## changed nodes whose AST differs old -> new: ['A2lViewMixin._schedule_a2l_filter_refresh']
+## citations: 237 file:line citations naming a file under s19_app/ or tests/
+## citation status: differs-file/moved=13, differs-file/same-line=70, same-file=154
+## citations into files that differ, or not resolvable (each: record:line cited -> new)
+  01-requirements.md:121 s19_app/tui/app/a2l_view.py:862-867 -> 862->862 (A2lViewMixin._refresh_a2l_filtered_tags) text= .. 867->867 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  01-requirements.md:132 s19_app/tui/app/a2l_view.py:1163-1215 -> 1163->1163 (A2lViewMixin._fit_a2l_tag_cells) text= .. 1215->1215 (A2lViewMixin._fit_a2l_tag_cells) text=
+  01-requirements.md:132 s19_app/tui/app/a2l_view.py:1246-1335 -> 1246->1246 (A2lViewMixin._repaint_a2l_tag_cells) text= .. 1335->1335 (A2lViewMixin._build_a2l_table_cells) text=
+  01-requirements.md:132 s19_app/tui/app/a2l_view.py:1205 -> 1205->1205 (A2lViewMixin._fit_a2l_tag_cells) text=
+  01-requirements.md:132 s19_app/tui/app/a2l_view.py:1302 -> 1302->1302 (A2lViewMixin._repaint_a2l_tag_cells) text=
+  01-requirements.md:138 s19_app/tui/app/a2l_view.py:1437-1454 -> 1437->1437 (A2lViewMixin._filter_a2l_tags) text= .. 1454->1454 (A2lViewMixin._filter_a2l_tags) text=
+  01-requirements.md:143 tests/support/b103_clipboard.py:291 -> 291->291 (outside every def; unique text match yes)
+  E1-slice.md:51 s19_app/tui/app/a2l_view.py:1437 -> 1437->1437 (A2lViewMixin._filter_a2l_tags) text=
+  E1-slice.md:52 s19_app/tui/app/a2l_view.py:827 -> 827->827 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  E1-slice.md:54 s19_app/tui/app/a2l_view.py:1000 -> 1000->1000 (A2lViewMixin.update_a2l_tags_view) text=
+  E1-slice.md:55 s19_app/tui/app/a2l_view.py:1163 -> 1163->1163 (A2lViewMixin._fit_a2l_tag_cells) text=
+  E1-slice.md:56 s19_app/tui/app/a2l_view.py:1246 -> 1246->1246 (A2lViewMixin._repaint_a2l_tag_cells) text=
+  E1-slice.md:57 s19_app/tui/app/a2l_view.py:938 -> 938->938 (A2lViewMixin.update_a2l_view) text=
+  E1-slice.md:58 s19_app/tui/app/a2l_view.py:1548 -> 1548->1548 (A2lViewMixin._schedule_a2l_filter_refresh) text=
+  E1-slice.md:60 s19_app/tui/app/a2l_view.py:871 -> 871->871 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:77 s19_app/tui/app/a2l_view.py:997 -> 997->997 (A2lViewMixin.update_a2l_view) text=
+  E1-slice.md:77 s19_app/tui/app/a2l_view.py:1546 -> 1546->1546 (A2lViewMixin._set_a2l_filter_field) text=
+  E1-slice.md:77 s19_app/tui/app/a2l_view.py:1577 -> 1577->1582 (A2lViewMixin._schedule_a2l_filter_refresh._apply_filter) text=
+  E1-slice.md:78 s19_app/tui/app/a2l_view.py:857 -> 857->857 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:366 -> 366->366 (A2lViewMixin.action_a2l_tags_page_next) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:392 -> 392->392 (A2lViewMixin.action_a2l_tags_page_prev) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:506 -> 506->506 (A2lViewMixin._focus_a2l_tag_absolute_index) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:864 -> 864->864 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:869 -> 869->869 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:983 -> 983->983 (A2lViewMixin.update_a2l_view) text=
+  E1-slice.md:79 s19_app/tui/app/a2l_view.py:1209 -> 1209->1209 (A2lViewMixin._fit_a2l_tag_cells) text=
+  E1-slice.md:80 s19_app/tui/app/a2l_view.py:1104 -> 1104->1104 (A2lViewMixin.update_a2l_tags_view) text=
+  E1-slice.md:80 s19_app/tui/app/a2l_view.py:1244 -> 1244->1244 (A2lViewMixin.on_a2l_tag_table_measured) text=
+  E1-slice.md:82 s19_app/tui/app/a2l_view.py:910 -> 910->910 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:89 s19_app/tui/app/a2l_view.py:975 -> 975->975 (A2lViewMixin.update_a2l_view) text=
+  E1-slice.md:93 s19_app/tui/app/a2l_view.py:997 -> 997->997 (A2lViewMixin.update_a2l_view) text=
+  E1-slice.md:93 s19_app/tui/app/a2l_view.py:1546 -> 1546->1546 (A2lViewMixin._set_a2l_filter_field) text=
+  E1-slice.md:93 s19_app/tui/app/a2l_view.py:1577 -> 1577->1582 (A2lViewMixin._schedule_a2l_filter_refresh._apply_filter) text=
+  E1-slice.md:95 s19_app/tui/app/a2l_view.py:910 -> 910->910 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:97 s19_app/tui/app/a2l_view.py:924 -> 924->924 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:98 s19_app/tui/app/a2l_view.py:441 -> 441->441 (A2lViewMixin._jump_to_tag) text=
+  E1-slice.md:103 s19_app/tui/app/a2l_view.py:924 -> 924->924 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:103 s19_app/tui/app/a2l_view.py:1080 -> 1080->1080 (A2lViewMixin.update_a2l_tags_view) text=
+  E1-slice.md:103 s19_app/tui/app/a2l_view.py:1205 -> 1205->1205 (A2lViewMixin._fit_a2l_tag_cells) text=
+  E1-slice.md:103 s19_app/tui/app/a2l_view.py:1302 -> 1302->1302 (A2lViewMixin._repaint_a2l_tag_cells) text=
+  E1-slice.md:108 s19_app/tui/app/a2l_view.py:919-925 -> 919->919 (A2lViewMixin._refresh_a2l_dependent_views) text= .. 925->925 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:97 -> 97->97 (_box_a) text=
+  E1-slice.md:117 tests/test_b103_clipboard_tail.py:463 -> 463->472 (_show_box) text=
+  E1-slice.md:117 tests/test_b103_clipboard_tail.py:2303 -> 2303->2702 (_unrelated_view_box_observation.drive) text=
+  E1-slice.md:117 tests/test_b103_copy_paste_matrix.py:298 -> 298->317 (_prepare_target) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:294 -> 294->294 (test_r_tui_043_10_1_5_6_no_text_no_powershell) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:366 -> 366->366 (test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:1055 -> 1055->1055 (test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:1095 -> 1095->1095 (test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:1250 -> 1250->1250 (test_r_tui_043_12_2_held_clipboard_logs_warning._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:1287 -> 1287->1287 (test_r_tui_043_13_1_no_clipboard_text_in_log_win._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:1550 -> 1550->1550 (test_r_paste_5_win_no_selection_keeps_os_clipboard._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2072 -> 2072->2076 (test_r_paste_31_5_6_right_click_no_text_no_powershell) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2105 -> 2105->2109 (test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2138 -> 2138->2142 (test_r_tui_043_6_5_win_right_click_pastes_app_clipboard._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2183 -> 2183->2187 (test_r_tui_043_12_3_win_right_click_held_logs_warning._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2220 -> 2220->2224 (test_r_tui_043_13_2_win_right_click_no_log_leak._drive) text=
+  E1-slice.md:117 tests/test_b103_clipboard_windows.py:2498 -> 2498->2502 (test_r_paste_17_no_powershell_starts_nothing._drive) text=
+  E3-rulings.md:81 tests/test_b103_clipboard_windows.py:97 -> 97->97 (_box_a) text=
+  E3-architect.md:63 tests/support/b103_clipboard.py:287-296 -> 287->287 (outside every def; unique text match yes) .. 296->296 (outside every def; unique text match yes)
+  E3-architect.md:70 s19_app/tui/app/a2l_view.py:974-989 -> 974->974 (A2lViewMixin.update_a2l_view) text= .. 989->989 (A2lViewMixin.update_a2l_view) text=
+  E3-architect.md:70 s19_app/tui/app/a2l_view.py:211 -> 211->211 (_shorten_tag_name) text=
+  E3-architect.md:75 s19_app/tui/app/a2l_view.py:468-470 -> 468->468 (A2lViewMixin._jump_to_tag_by_data) text= .. 470->470 (A2lViewMixin._jump_to_tag_by_data) text=
+  E3-architect.md:79 s19_app/tui/app/a2l_view.py:742 -> 742->742 (A2lViewMixin._replace_current_a2l) text=
+  E3-architect.md:104 s19_app/tui/app/a2l_view.py:827-998 -> 827->827 (A2lViewMixin._refresh_a2l_filtered_tags) text= .. 998->998 (A2lViewMixin.update_a2l_view) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:97 -> 97->97 (_box_a) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:294 -> 294->294 (test_r_tui_043_10_1_5_6_no_text_no_powershell) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:366 -> 366->366 (test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:1055 -> 1055->1055 (test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:1095 -> 1095->1095 (test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:1250 -> 1250->1250 (test_r_tui_043_12_2_held_clipboard_logs_warning._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:1287 -> 1287->1287 (test_r_tui_043_13_1_no_clipboard_text_in_log_win._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:1550 -> 1550->1550 (test_r_paste_5_win_no_selection_keeps_os_clipboard._drive) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:2072 -> 2072->2076 (test_r_paste_31_5_6_right_click_no_text_no_powershell) text=
+  E3-architect.md:152 tests/test_b103_clipboard_windows.py:2105 -> 2105->2109 (test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5._drive) text=
+  E3-security.md:36 s19_app/tui/app/a2l_view.py:1059 -> 1059->1059 (A2lViewMixin.update_a2l_tags_view) text=
+  E3-security.md:74 s19_app/tui/app/a2l_view.py:866 -> 866->866 (A2lViewMixin._refresh_a2l_filtered_tags) text=
+  codewire/graph-inc7.md:32 s19_app/tui/app/a2l_view.py:910 -> 910->910 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  codewire/graph-inc7.md:141 s19_app/tui/app/a2l_view.py:899-908 -> 899->899 (A2lViewMixin._refresh_a2l_dependent_views) text= .. 908->908 (A2lViewMixin._refresh_a2l_dependent_views) text=
+  codewire/graph-inc7.md:335 tests/support/b103_clipboard.py:291 -> 291->291 (outside every def; unique text match yes)
+  codewire/graph-inc7.md:600 s19_app/tui/app/a2l_view.py:468-470 -> 468->468 (A2lViewMixin._jump_to_tag_by_data) text= .. 470->470 (A2lViewMixin._jump_to_tag_by_data) text=
+  codewire/graph-inc7.md:628 s19_app/tui/app/a2l_view.py:983 -> 983->983 (A2lViewMixin.update_a2l_view) text=
+  codewire/graph-inc7.md:669 s19_app/tui/app/a2l_view.py:919 -> 919->919 (A2lViewMixin._refresh_a2l_dependent_views) text=

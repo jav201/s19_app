@@ -247,7 +247,7 @@ def test_r_whelp_12_1_quoted_keys_act_on_the_window() -> None:
 
 _CONTROLS = {
     "a2l": (
-        "Filter tags", "All", "Invalid", "In-Memory", "Find in tag table",
+        "type part of a name — or paste a list", "All", "Invalid", "In-Memory", "Find in tag table",
         "Find next", "Page Prev", "Page Next", "Search ASCII text",
         "Find Next", "Goto 0xADDR", "Goto", "Region",
     ),
@@ -395,7 +395,7 @@ def test_r_whelp_12_2_named_controls_exist(tmp_path: Path) -> None:
     assert not _control_found("Section tree", painted["a2l"])
     # E5 C-1 negative controls: a control painted by another window only is
     # not found in this one, and a longer label does not stand for a control
-    assert not _control_found("Filter tags", painted["checks"])
+    assert not _control_found("type part of a name — or paste a list", painted["checks"])
     assert not _control_found("Goto", {"Goto 0xADDR", "Load path"})
     assert not _control_found("Save", {"Load / Save"})
     assert not _control_found("Run checks", {"No check run yet: press Run checks."})

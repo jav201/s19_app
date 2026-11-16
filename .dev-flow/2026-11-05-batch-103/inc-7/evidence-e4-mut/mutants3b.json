@@ -1,0 +1,63 @@
+[
+ {
+  "id": "GREEN",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "",
+  "new": "",
+  "req": "R-A2L-LIST.059/.049 closest names 3 -> 4",
+  "k": "",
+  "extra": "tests/test_b103_inc7_mu_survivors.py"
+ },
+ {
+  "id": "MU22a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "WIDE_AT = 180",
+  "new": "WIDE_AT = 160",
+  "req": "R-A2L-LIST.082 wide regime from 160",
+  "k": "",
+  "extra": "tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds"
+ },
+ {
+  "id": "MU22b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "STACK_MIN_HEIGHT = 32",
+  "new": "STACK_MIN_HEIGHT = 28",
+  "req": "R-A2L-LIST.083/R-TUI-037 short body below 28",
+  "k": "",
+  "extra": "tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds"
+ },
+ {
+  "id": "MU22c",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "STACK_MIN_WIDTH = 110",
+  "new": "STACK_MIN_WIDTH = 100",
+  "req": "R-A2L-LIST.080/R-TUI-037 short body below 100",
+  "k": "",
+  "extra": "tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds"
+ },
+ {
+  "id": "MU07a",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "LIST_COLUMNS = (\"#\", \"Tag\", \"Status\", \"Kind\", \"Address\", \"Len\", \"Physical\", \"Unit\", \"Limits\")",
+  "new": "LIST_COLUMNS = (\"Address\", \"Len\", \"#\", \"Tag\", \"Status\", \"Kind\", \"Physical\", \"Unit\", \"Limits\")",
+  "req": "R-A2L-LIST.009/.010 D-4 B: Address/Len first again",
+  "k": "009 or 042a_4_1 or 010 or 011 or 036",
+  "extra": ""
+ },
+ {
+  "id": "MU07b",
+  "file": "s19_app/tui/a2l_label_list.py",
+  "old": "LIST_COLUMNS = (\"#\", \"Tag\", \"Status\", \"Kind\", \"Address\", \"Len\", \"Physical\", \"Unit\", \"Limits\")",
+  "new": "LIST_COLUMNS = (\"Address\", \"Len\", \"#\", \"Tag\", \"Status\", \"Kind\", \"Physical\", \"Unit\", \"Limits\")",
+  "req": "R-A2L-LIST.009/.010 D-4 B: Address/Len first again, cells reordered with the header",
+  "k": "009 or 042a_4_1 or 010 or 011 or 036",
+  "extra": "",
+  "also": [
+   [
+    "s19_app/tui/a2l_label_list.py",
+    "    return tuple(cells)\n\n\ndef _status_word",
+    "    return tuple(cells[4:6] + cells[0:4] + cells[6:])\n\n\ndef _status_word"
+   ]
+  ]
+ }
+]

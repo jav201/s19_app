@@ -96,7 +96,7 @@ async def _drive_real_app(tmp_path: Path, screen_key: str):
 
 async def _box_a(tmp_path: Path):
     async for app, pilot in _drive_real_app(tmp_path, "a2l"):
-        yield app, pilot, app.query_one("#a2l_tags_filter_input", Input)
+        yield app, pilot, app.query_one("#a2l_tag_find_input", Input)
 
 
 async def _box_m(tmp_path: Path):
@@ -291,7 +291,7 @@ def test_r_tui_043_10_1_5_6_no_text_no_powershell(
                     app.action_show_screen("a2l")
                     for _ in range(4):
                         await pilot.pause()
-                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget = app.query_one("#a2l_tag_find_input", Input)
                 else:
                     app.action_show_screen("patch")
                     for _ in range(4):
@@ -363,7 +363,7 @@ def test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 app.action_show_screen("patch")
                 for _ in range(4):
@@ -1052,7 +1052,7 @@ def test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 app.action_show_screen("patch")
                 for _ in range(4):
@@ -1092,7 +1092,7 @@ def test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 app.action_show_screen("patch")
                 for _ in range(4):
@@ -1247,7 +1247,7 @@ def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -1284,7 +1284,7 @@ def test_r_tui_043_13_1_no_clipboard_text_in_log_win(tmp_path: Path, os_clipboar
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -1547,7 +1547,7 @@ def test_r_paste_5_win_no_selection_keeps_os_clipboard(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.value = "KEEP"
             box.focus()
             await pilot.pause()
@@ -2073,7 +2073,7 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
                     app.action_show_screen("a2l")
                     for _ in range(4):
                         await pilot.pause()
-                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget = app.query_one("#a2l_tag_find_input", Input)
                 else:
                     await show_patch_paste(app, pilot)
                     widget = app.query_one("#patch_paste_text", TextArea)
@@ -2106,7 +2106,7 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -2139,7 +2139,7 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
                 app.action_show_screen("a2l")
                 for _ in range(4):
                     await pilot.pause()
-                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget = app.query_one("#a2l_tag_find_input", Input)
             else:
                 await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
@@ -2184,7 +2184,7 @@ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_cli
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
@@ -2221,7 +2221,7 @@ def test_r_tui_043_13_2_win_right_click_no_log_leak(tmp_path: Path, os_clipboard
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
@@ -2499,7 +2499,7 @@ def test_r_paste_17_no_powershell_starts_nothing(
             app.action_show_screen("a2l")
             for _ in range(4):
                 await pilot.pause()
-            box = app.query_one("#a2l_tags_filter_input", Input)
+            box = app.query_one("#a2l_tag_find_input", Input)
             box.focus()
             await pilot.pause()
             if mode == "read":

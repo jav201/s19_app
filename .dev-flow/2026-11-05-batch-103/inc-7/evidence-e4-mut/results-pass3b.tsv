@@ -1,0 +1,14 @@
+GREEN	extra	rc=0	load=0.95	92s		3 passed in 91.24s (0:01:31)
+GREEN	RESULT	survived
+MU22a	extra	rc=2	load=1.86	77s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 76.11s (0:01:16)
+MU22a	RESULT	killed
+MU22b	extra	rc=2	load=2.00	75s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 74.26s (0:01:14)
+MU22b	RESULT	killed
+MU22c	extra	rc=2	load=1.87	77s	tests/test_b103_inc7_mu_survivors.py::test_the_body_regime_changes_exactly_at_its_thresholds	1 failed in 76.50s (0:01:16)
+MU22c	RESULT	killed
+MU07a	L	rc=5	load=1.70	2s		no tests ran in 1.28s
+MU07a	V	rc=2	load=1.70	14s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_009_1 - AssertionErr...	1 failed, 2 passed in 14.01s
+MU07a	RESULT	killed
+MU07b	L	rc=5	load=1.98	2s		no tests ran in 1.24s
+MU07b	V	rc=2	load=1.98	14s	tests/test_b103_a2l_list_view.py::test_r_a2l_list_009_1 - AssertionErr...	2 failed in 14.01s
+MU07b	RESULT	killed

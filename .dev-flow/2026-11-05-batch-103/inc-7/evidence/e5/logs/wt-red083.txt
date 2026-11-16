@@ -1,0 +1,53 @@
+fatal: Needed a single revision
+label=red083 start=2026-11-14T09:40:40-06:00 load=1.89 1.56 1.57 head=
+s19_app.__file__=~/work/zq-x7/wt/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________________________ test_r_a2l_list_083_1 _____________________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+case08 = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/i7_v_case080')
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/test_r_a2l_list_083_10')
+
+    def test_r_a2l_list_083_1(case08, tmp_path) -> None:
+        """R-A2L-LIST.083/1 (E3A-10, measured P4): 120x30 list mode -> at least 1 table row."""
+>       assert _table_rows_shown(case08, tmp_path, (120, 30)) >= 1
+E       AssertionError: assert 0 >= 1
+E        +  where 0 = _table_rows_shown(PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/i7_v_case080'), PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/test_r_a2l_list_083_10'), (120, 30))
+
+tests/test_b103_a2l_list_view.py:1122: AssertionError
+____________________________ test_r_a2l_list_083_2 _____________________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+case08 = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw0/i7_v_case080')
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw0/test_r_a2l_list_083_20')
+
+    def test_r_a2l_list_083_2(case08, tmp_path) -> None:
+        """R-A2L-LIST.083/2: 160x40 -> at least 11 rows."""
+>       assert _table_rows_shown(case08, tmp_path, (160, 40)) >= 11
+E       AssertionError: assert 10 >= 11
+E        +  where 10 = _table_rows_shown(PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw0/i7_v_case080'), PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw0/test_r_a2l_list_083_20'), (160, 40))
+
+tests/test_b103_a2l_list_view.py:1127: AssertionError
+____________________________ test_r_a2l_list_083_3 _____________________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+case08 = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/i7_v_case080')
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/test_r_a2l_list_083_30')
+
+    def test_r_a2l_list_083_3(case08, tmp_path) -> None:
+        """R-A2L-LIST.083/3: 118x54 -> at least 11 rows."""
+>       assert _table_rows_shown(case08, tmp_path, (118, 54)) >= 11
+E       AssertionError: assert 10 >= 11
+E        +  where 10 = _table_rows_shown(PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/i7_v_case080'), PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-0/popen-gw1/test_r_a2l_list_083_30'), (118, 54))
+
+tests/test_b103_a2l_list_view.py:1132: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_list_view.py::test_r_a2l_list_083_1 - AssertionErr...
+FAILED tests/test_b103_a2l_list_view.py::test_r_a2l_list_083_2 - AssertionErr...
+FAILED tests/test_b103_a2l_list_view.py::test_r_a2l_list_083_3 - AssertionErr...
+3 failed in 29.94s
+RC=1 end=2026-11-14T09:41:11-06:00 load=2.38 1.71 1.62

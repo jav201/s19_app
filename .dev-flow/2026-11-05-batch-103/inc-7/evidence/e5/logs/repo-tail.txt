@@ -1,0 +1,8 @@
+label=tail start=2026-11-14T10:19:39-06:00 load=2.08 2.21 2.04 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..........................sssssss.s                                      [100%]
+27 passed, 8 skipped in 183.07s (0:03:03)
+RC=0 end=2026-11-14T10:22:43-06:00 load=2.20 2.21 2.07

@@ -1,0 +1,113 @@
+scenario=layout
+fixture=case 08 (tools/synth/make_release_case.py generate, seed 20260001, 1.0 MB)
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=220x60
+a2l_tags=462
+top_screen=Screen
+focused=a2l_tags_list
+body=196x45 classes=['-wide']
+region #a2l_tags_pane: Region(x=23, y=4, width=106, height=45) visible=Region(x=23, y=4, width=106, height=45) display=True hit_at_centre=a2l_tags_list
+region #a2l_hex_pane: Region(x=129, y=4, width=90, height=45) visible=Region(x=129, y=4, width=90, height=45) display=True hit_at_centre=alt_hex_view
+region #a2l_detail_card: Region(x=131, y=6, width=86, height=7) visible=Region(x=131, y=6, width=86, height=7) display=True hit_at_centre=a2l_detail_card
+region #a2l_tags_filters: Region(x=25, y=7, width=102, height=4) visible=Region(x=25, y=7, width=102, height=4) display=True hit_at_centre=a2l_filter_all
+region #a2l_tags_filter_input: Region(x=29, y=7, width=6, height=3) visible=Region(x=29, y=7, width=6, height=3) display=True hit_at_centre=a2l_tags_filter_input content_width=0 value_len=148
+region #a2l_tag_find_input: Region(x=119, y=7, width=6, height=3) visible=Region(x=119, y=7, width=6, height=3) display=True hit_at_centre=a2l_tag_find_input content_width=0 value_len=0
+region #a2l_paste_list_button: Region(x=35, y=7, width=20, height=3) visible=Region(x=35, y=7, width=20, height=3) display=True hit_at_centre=a2l_paste_list_button
+region #a2l_filter_suggest: Region(x=0, y=0, width=0, height=0) visible=None display=False hit_at_centre=NoneType
+region #a2l_list_chips: Region(x=25, y=11, width=102, height=3) visible=Region(x=25, y=11, width=102, height=3) display=True hit_at_centre=a2l_list_chips
+region #a2l_list_missing: Region(x=25, y=14, width=102, height=1) visible=Region(x=25, y=14, width=102, height=1) display=True hit_at_centre=a2l_list_missing
+region #a2l_tags_list: Region(x=25, y=15, width=102, height=32) visible=Region(x=25, y=15, width=102, height=32) display=True hit_at_centre=a2l_tags_list rows=12 body_rows=31
+region #alt_hex_scroll: Region(x=131, y=19, width=86, height=34) visible=Region(x=131, y=19, width=86, height=28) display=True hit_at_centre=alt_hex_view
+text #a2l_filter_mode_tag[0]: 'LIST'
+text #a2l_list_chips[0]: ' LIST   12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate'
+text #a2l_list_chips[1]: 'order ● ● ● ● ● ● ✗ ● ● = ✗ ●    field ignored in LIST mode · esc back to text filter · alt+p edit the list'
+text #a2l_list_chips[2]: 'mode All · no tag hidden by mode (462 tags)'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)'
+text #a2l_tags_summary[0]: 'LIST  rows 1-12 / 12 in pasted order'
+text #a2l_list_missing[0]: 'Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)'
+text #a2l_detail_card[0]: '✓ CURVE_0001  0x00803DE0'
+text #a2l_detail_card[1]: 'desc synthetic demo characteristic'
+text #a2l_detail_card[2]: 'unit — · conv CM_IDENT'
+text #a2l_detail_card[3]: 'layout RL_U16'
+text #a2l_detail_card[4]: 'byteorder big'
+text #a2l_detail_card[5]: 'limits 0..65535'
+hex_rows=202 longest_row=81 hex_scroll_width=84
+table_columns=['#', 'Tag', 'Status', 'Kind', 'Address', 'Len', 'Physical', 'Unit', 'Limits']
+table_cursor_row=1 scroll_x=0.0
+table_row[0]: ['1', '● VALUE_0002', 'found', 'VALUE', '0x00000014', '2']
+table_row[1]: ['2', '● CURVE_0001', 'found', 'CURVE', '0x00803DE0', '64']
+table_row[2]: ['3', '● MAP_0003', 'found', 'MAP', '0x00804FD0', '128']
+table_row[3]: ['4', '● MEASUREMENT_0005', 'found', 'MEASURE', '0x000000A0', '2']
+table_row[4]: ['5', '● VALUE_0042', 'found', 'VALUE', '0x000402E4', '4']
+table_row[5]: ['6', '● CURVE_0017', 'found', 'CURVE', '0x00804260', '64']
+table_row[6]: ['7', '✗ MAP_0024', 'not in A2L', '', '', '']
+table_row[7]: ['8', '● MAP_0001', 'found', 'MAP', '0x00804EC0', '128']
+table_row[8]: ['9', '● MEASUREMENT_0012', 'found', 'MEASURE', '0x00040E4C', '4']
+table_row[9]: ['10', '= VALUE_0002', 'dup of #1', 'VALUE', '0x00000014', '2']
+table_row[10]: ['11', '✗ CURVE_0071', 'not in A2L', '', '', '']
+table_row[11]: ['12', '● VALUE_0118', 'found', 'VALUE', '0x000408D4', '2']
+screen_begin
+| 
+|   ⭘                                                                                                   Hex Edit Tool
+|                       │                                                                                          A2L Explorer                                                                                            ?
+|  ▏ ◫  Workspace       │
+|  ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+|  ▏ ◉  MAC View        │▊                                                A2L Tags                                                ▎▊                                                                                        ▎
+|  ▏ ▤  Memory Map      │▊                                                                                                        ▎▊  ✓ CURVE_0001  0x00803DE0                                                              ▎
+|  ▏ !  Issues Report   │▊ LIST▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔ ▎▊  desc synthetic demo characteristic                                                    ▎
+|  ▏ ✎  Patch Editor    │▊     ▊    ▎ Paste list…  alt+p   Field: name         All           Invalid        In-Memory    ▊    ▎   ▎▊  unit — · conv CM_IDENT                                                                ▎
+|  ▏ ✔  Check Editor    │▊     ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁ ▎▊  layout RL_U16                                                                         ▎
+|  ▏ ⏚  A2B Diff        │▊                                                                                                        ▎▊  byteorder big                                                                         ▎
+|  ▏ ✦  Flow Builder    │▊  LIST   12 pasted  ·  ● 9 found  ·  ✗ 2 missing  ·  = 1 duplicate                                      ▎▊  limits 0..65535                                                                       ▎
+|  ▏ ▶  Flow Execution  │▊ order ● ● ● ● ● ● ✗ ● ● = ✗ ●    field ignored in LIST mode · esc back to text filter · alt+p edit th… ▎▊ ────────────────────────────────────────────────────────────────────────────────────── ▎
+|  ▏ ☑  Checks          │▊ mode All · no tag hidden by mode (462 tags)                                                            ▎▊                                       Hex Viewer                                       ▎
+|  ▏ ⊕  CRC Designer    │▊ Missing 2 ▸ #7 MAP_0024 · #11 CURVE_0071    Duplicates 1 ▸ #10 VALUE_0002 (= #1)                       ▎▊                                                                                        ▎
+|                       │▊  #   Tag                 Status      Kind     Address     Len  Physical           Unit    Limits       ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎
+|                       │▊  1   ● VALUE_0002        found       VALUE    0x00000014  2    488000.0           units   0..655350    ▎▊ ▊  Search ASCII text      ▎   Find Next    ▊  Goto 0xADDR            ▎      Goto       ▎
+|                       │▊  2   ● CURVE_0001        found       CURVE    0x00803DE0  64   57199              counts  0..65535     ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎
+|                       │▊  3   ● MAP_0003          found       MAP      0x00804FD0  128  42244              counts  0..65535     ▎▊                                                                                        ▎
+|                       │▊  4   ● MEASUREMENT_0005  found       MEASURE  0x000000A0  2    -20310.0           units   -32668..3286 ▎▊ ... showing from 0x00803DD0 (context preserved) ...                                    ▎
+|                       │▊  5   ● VALUE_0042        found       VALUE    0x000402E4  4    566.7663192749023  units   283.383..850 ▎▊ ... window limited to 200 rows ...                                                     ▎
+|                       │▊  6   ● CURVE_0017        found       CURVE    0x00804260  64   32163              counts  0..65535     ▎▊   0x00803DD0  1A 64 1F 64 24 64 29 64 2A 00 02 00 5A 00 31 01  |.d.d$d)d*...Z.1.|      ▎
+|                       │▊  7   ✗ MAP_0024          not in A2L                                                                    ▎▊   0x00803DE0  DF 6F DF 76 DF 7D DF 84 DF 8B DF 92 DF 99 DF A0  |.o.v.}..........|      ▎
+|                       │▊  8   ● MAP_0001          found       MAP      0x00804EC0  128  15412              counts  0..65535     ▎▊   0x00803DF0  DF A7 DF AE DF B5 DF BC DF C3 DF CA DF D1 DF D8  |................|      ▎
+|                       │▊  9   ● MEASUREMENT_0012  found       MEASURE  0x00040E4C  4    1482.0             units   0..2000      ▎▊   0x00803E00  DF DF DF E6 DF ED DF F4 DF FB E0 02 E0 09 E0 10  |................|   ▂▂ ▎
+|                       │▊  10  = VALUE_0002        dup of #1   VALUE    0x00000014  2    488000.0           units   0..655350    ▎▊   0x00803E10  E0 17 E0 1E E0 25 E0 2C E0 33 E0 3A E0 41 E0 48  |.....%.,.3.:.A.H|      ▎
+|                       │▊  11  ✗ CURVE_0071        not in A2L                                                                    ▎▊   0x00803E20  DF C1 DD C1 DB C1 D9 C1 62 04 69 04 70 04 77 04  |........b.i.p.w.|      ▎
+|                       │▊  12  ● VALUE_0118        found       VALUE    0x000408D4  2    0.0                units   0..30        ▎▊   0x00803E30  7E 04 85 04 8C 04 93 04 9A 04 A1 04 A8 04 AF 04  |~...............|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E40  B6 04 BD 04 C4 04 CB 04 D2 04 D9 04 E0 04 E7 04  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E50  EE 04 F5 04 FC 04 03 05 0A 05 11 05 18 05 1F 05  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E60  26 05 2D 05 34 05 3B 05 97 C1 95 C1 93 C1 91 C1  |&.-.4.;.........|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E70  5D 51 5D 58 5D 5F 5D 66 5D 6D 5D 74 5D 7B 5D 82  |]Q]X]_]f]m]t]{].|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E80  5D 89 5D 90 5D 97 5D 9E 5D A5 5D AC 5D B3 5D BA  |].].].].].].].].|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803E90  5D C1 5D C8 5D CF 5D D6 5D DD 5D E4 5D EB 5D F2  |].].].].].].].].|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803EA0  5D F9 5E 00 5E 07 5E 0E 5E 15 5E 1C 5E 23 5E 2A  |].^.^.^.^.^.^#^*|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803EB0  4F C1 4D C1 4B C1 49 C1 7B 3C 82 3C 89 3C 90 3C  |O.M.K.I.{<.<.<.<|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803EC0  97 3C 9E 3C A5 3C AC 3C B3 3C BA 3C C1 3C C8 3C  |.<.<.<.<.<.<.<.<|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803ED0  CF 3C D6 3C DD 3C E4 3C EB 3C F2 3C F9 3C 00 3D  |.<.<.<.<.<.<.<.=|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803EE0  07 3D 0E 3D 15 3D 1C 3D 23 3D 2A 3D 31 3D 38 3D  |.=.=.=.=#=*=1=8=|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803EF0  3F 3D 46 3D 4D 3D 54 3D 07 C1 05 C1 03 C1 01 C1  |?=F=M=T=........|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F00  97 09 97 10 97 17 97 1E 97 25 97 2C 97 33 97 3A  |.........%.,.3.:|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F10  97 41 97 48 97 4F 97 56 97 5D 97 64 97 6B 97 72  |.A.H.O.V.].d.k.r|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F20  97 79 97 80 97 87 97 8E 97 95 97 9C 97 A3 97 AA  |.y..............|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F30  97 B1 97 B8 97 BF 97 C6 97 CD 97 D4 97 DB 97 E2  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F40  E0 1F E3 1F E6 1F E9 1F A6 15 AD 15 B4 15 BB 15  |................|      ▎
+|                       │▊                                                                                                        ▎▊   0x00803F50  C2 15 C9 15 D0 15 D7 15 DE 15 E5 15 EC 15 F3 15  |................|      ▎
+|                       │▊                                                                                                  ▎     ▎▊   0x00803F60  FA 15 01 16 08 16 0F 16 16 16 1D 16 24 16 2B 16  |............$.+.|      ▎
+|                       │▊  LIST  rows 1-12 / 12 in pasted order                                                                  ▎▊                                                                                        ▎
+|                       │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+|  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|   Loaded firmware.s19 (S19 only)                                                                                                                                                                   (none)  |  firmware.a2l
+| 
+|   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+| 
+|   Loaded firmware.s19 (S19 only)
+|   A2L loaded: firmware.a2l
+|   Tag at 0x00803DE0
+|   ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+|   A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+| 
+screen_end
+stub_os_writes=0
+surface=ready

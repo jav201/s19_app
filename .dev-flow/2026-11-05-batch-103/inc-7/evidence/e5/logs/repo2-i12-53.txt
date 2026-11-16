@@ -1,0 +1,8 @@
+label=i12-53 start=2026-11-14T10:53:47-06:00 load=2.63 2.32 2.08 head=6aaf4040
+s19_app.__file__=~/work/zq-x7/repo2/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 26.57s
+RC=0 end=2026-11-14T10:54:15-06:00 load=2.59 2.33 2.09

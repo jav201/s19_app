@@ -1,0 +1,12 @@
+uptime:  13:49:59 up 22:38,  3 users,  load average: 7.29, 7.54, 7.81
+code-wire: v3.1.0-8-gb6cd30d
+copy HEAD: 1d47d12f (throwaway clone of the exact clone)
+11 marks written, 0 nodes without code
+marks_rc=0
+ s19_app/tui/app/a2l_view.py        | 7 +++++++
+ s19_app/tui/app/compose_screens.py | 1 +
+ s19_app/tui/app/shared.py          | 1 +
+ s19_app/tui/os_clipboard_input.py  | 2 ++
+ 4 files changed, 11 insertions(+)
+marks=11 graph_nodes=11 calls=5 findings=0 parse_failures=1
+extract_rc=1

@@ -1,0 +1,6 @@
+label=timing start=2026-11-14T09:55:31-06:00 load=0.24 0.93 1.39 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..RC=124 end=2026-11-14T10:00:31-06:00 load=1.82 1.23 1.37

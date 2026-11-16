@@ -2690,12 +2690,27 @@ def _unrelated_view_box_observation(tmp_path: Path, monkeypatch) -> dict:
             await _load_example(app, pilot, tmp_path, "ASAP2_Demo_V171.a2l")
             app.action_show_screen("a2l")
             await _settle(pilot)
-            app.screen.clear_selection()
-            await pilot.mouse_down("#alt_hex_view", offset=(2, 1))
-            await pilot.hover("#alt_hex_view", offset=(40, 5))
-            await pilot.mouse_up("#alt_hex_view", offset=(40, 5))
-            await _settle(pilot)
-            unrelated = app.screen.get_selected_text()
+            # R-COPY.7/7 needs a selection of three hex lines, not given cells (F-I7-3,
+            # DF-04 b): drag inside the rows of the hex view that are on screen (its
+            # region clipped by its container; Inc 7's stacked layout shows 4 at
+            # 118x54) and go down a row at a time until the drag covers three lines
+            # (a narrow hex view wraps one line onto two rows).
+            hex_view = app.query_one("#alt_hex_view")
+            geometry = app.screen.find_widget(hex_view)
+            shown = geometry.region.intersection(geometry.clip)
+            _require(shown.height >= 3, "the hex view shows fewer than three rows")
+            left, top = shown.x - hex_view.region.x, shown.y - hex_view.region.y
+            unrelated = ""
+            for rows in range(2, shown.height):
+                app.screen.clear_selection()
+                end = (left + shown.width // 2, top + rows)
+                await pilot.mouse_down(hex_view, offset=(left + 2, top))
+                await pilot.hover(hex_view, offset=end)
+                await pilot.mouse_up(hex_view, offset=end)
+                await _settle(pilot)
+                unrelated = app.screen.get_selected_text()
+                if unrelated and unrelated.count("\n") >= 2:
+                    break
             _require(bool(unrelated) and unrelated.count("\n") == 2, "unrelated selection did not contain three lines")
             _require(len(set(unrelated.splitlines())) == 3, "unrelated selection lines were not distinct")
             view_selections = dict(app.screen.selections)

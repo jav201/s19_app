@@ -1,0 +1,65 @@
+label=inc12-ichunk.00 start=2026-11-14T10:24:52-06:00 load=2.15 2.17 2.08 head=710a6fc7
+s19_app.__file__=~/work/zq-x7/repo/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+..F...................................                                   [100%]
+=================================== FAILURES ===================================
+_________________ test_r_tui_042a_3_4_card_keeps_the_full_name _________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x7/tmp/pytest-of-<user>/pytest-21/popen-gw1/test_r_tui_042a_3_4_card_keeps0')
+
+    def test_r_tui_042a_3_4_card_keeps_the_full_name(tmp_path: Path) -> None:
+        """R-TUI-042a.3 case /4: LONGMAP(48) at 118×54 — the card's painted lines
+        hold the 48-character name whole and one line holds the address whole."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert longname(48) in joined, (longname(48), joined)
+            assert any(ADDR_STR in ln for ln in lines), lines
+    
+>       _explore(tmp_path, page_long(48), (118, 54), _check)
+
+tests/test_b103_inc12_tag_table.py:552: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:278: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert longname(48) in joined, (longname(48), joined)
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag toinspect its fields.')
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag toinspect its fields.'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+
+tests/test_b103_inc12_tag_table.py:549: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name
+1 failed, 37 passed in 143.09s (0:02:23)
+RC=1 end=2026-11-14T10:27:16-06:00 load=2.11 2.24 2.12

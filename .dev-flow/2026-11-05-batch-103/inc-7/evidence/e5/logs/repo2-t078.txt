@@ -1,0 +1,5 @@
+label=t078 start=2026-11-14T10:48:09-06:00 load=1.62 1.61 1.82 head=6aaf4040
+s19_app.__file__=~/work/zq-x7/repo2/s19_app/__init__.py
+.                                                                        [100%]
+1 passed in 13.14s
+RC=0 end=2026-11-14T10:48:24-06:00 load=1.67 1.63 1.82
