@@ -11,9 +11,14 @@ CANON_TEXT = {
 }
 
 
+INCREMENT_ORDER = (
+    "inc-1a", "inc-1b", "inc-2", "inc-3", "inc-4", "inc-5", "inc-6", "inc-7",
+    "inc-8", "inc-9", "inc-8b", "inc-9b", "inc-10", "inc-11", "inc-12",
+)
+
+
 def increment_key(path):
-    match = re.fullmatch(r"inc-(\d+)([a-z]?)", path.parent.name)
-    return int(match.group(1)), match.group(2)
+    return INCREMENT_ORDER.index(path.parent.name)
 
 
 def cells(line):

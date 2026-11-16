@@ -5019,7 +5019,7 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-BENCH.1 | U | The system shall give the staging sheet the border subtitle `enter edit · ↑↓ row · arrays open the bench`. |
 | R-PE-BENCH.3 | While | While a bench row is selected, the system shall show its bench under it, as its detail. |
 | R-PE-BENCH.4 | U | The system shall write a bench row's definition line as CTX-PE-DEF's definition line with ` · <record layout>` after the byte order. |
-| R-PE-BENCH.5 | U | The system shall paint no bench line and no op line wider than the staging sheet, and no more bench lines than the rows the sheet leaves for the detail. |
+| R-PE-BENCH.5 | U | The system shall paint no bench line wider than the view width of CTX-PE-DEF once its trailing ground is removed, no op line wider than the staging sheet, and no more bench lines than the rows the sheet leaves for the detail. |
 | R-PE-BENCH.6 | When | When a record stage writes the document, the system shall keep the selected row. |
 | R-PE-BENCH.7 | If | If the sheet's content width is under the bench minimum width of CTX-PE-BENCH, then the system shall show only the bench's definition line, cut at the sheet's edge with one `…`. |
 | R-PE-BENCH.9 | U | The system shall keep each bench row's bench state for its bench state lifetime of CTX-PE-BENCH. |
@@ -5030,7 +5030,7 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-BENCH.14 | If | If the decode of a bench row's values is a refusal, then the system shall show `--` in its Current cell. |
 | R-PE-BENCH.15 | U | The system shall show a bench row's New cell of CTX-PE-BENCH array row cells. |
 | R-PE-BENCH.16 | U | The system shall show a bench row's Δ cell of CTX-PE-BENCH array row cells. |
-| R-PE-BENCH.17 | U | The system shall show a bench row's Limits cell as `<short lower> … <short upper>`, or `-` without both limits. |
+| R-PE-BENCH.17 | U | The system shall show a bench row's Limits cell in the range form of CTX-PE-DEF, or in its no-limits form without both limits. |
 | R-PE-BENCH.18 | U | The system shall show `◆` in a bench row's mark column while it has a bench edit, else `●` while a byte of its span differs between the staged overlay and the image. |
 | R-PE-BENCH.19 | If | If a shown value of a bench row is not finite, then the system shall paint it as its value text with no ramp shade (a chart point: `?` on the chart's bottom row) and take lo and hi over the finite values of CTX-PE-BENCH. |
 | R-PE-BENCH.20 | When | When a bench row becomes selected, the system shall decode its current and staged values off the UI thread. |

@@ -24,7 +24,7 @@ Base: `c1741dee6cf2488b7f28f228e6dd66aa2775893c`. Alcance: sólo los `01-require
 | 11 | 81 | 2 movidas a Inc 12 | `02-test-cases.md` |
 | 12 | 8 | 0 | `02-test-cases.md` |
 
-La precedencia es el orden natural `1a, 1b, 2 … 12`: para un ID repetido se toma la última definición de requisito, no una cita ni una tabla de reparto. `fold_canon.py` contiene la transformación; `fold-report.txt` y `fold-run.txt` archivan su ejecución.
+La precedencia es explícita: `1a → 1b → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 8b → 9b → 10 → 11 → 12`. No es orden lexicográfico ni natural por nombre. Inc 8b declara como base `09001bbc` (`b103-inc9` más la enmienda A3) y restatea las filas de Inc 8 e Inc 9 que cambia; por eso sus versiones prevalecen sobre ambos. Para un ID repetido se toma la última definición de requisito en esa secuencia, no una cita ni una tabla de reparto. `fold_canon.py` contiene la transformación; `fold-report.txt` y `fold-run.txt` archivan la ejecución regenerada desde la base.
 
 ## Fold y decisiones
 
@@ -34,8 +34,16 @@ La precedencia es el orden natural `1a, 1b, 2 … 12`: para un ID repetido se to
 - `R-TUI-042a.2` y `.3` están retirados sólo en Inc 11 porque se mueven; la versión activa de Inc 12 es la plegada.
 - Las familias ya plegadas, incluidas `R-A2L-MATCH`, `R-A2L-DEF`, `R-A2L-REFRESH`, `R-PICKER-CORRECT` y `R-A2L-READ`, se deduplicaron por ID. Sus textos activos coincidían con el canon y no recibieron una segunda definición.
 - Las 15 menciones en negrita de Inc 10 bajo “Cited rows with cases here” son referencias de casos, no nuevas frases de requisito; sus requisitos ya existían y no se copió ese texto de prueba.
-- Se consolidaron `CTX-A2L-LIST`, `CTX-COPY`, `CTX-PASTE`, `CTX-PE`, `CTX-PE-DEF`, `CTX-PE-BENCH`, `CTX-SAVEBACK` y el término `shown widget` de `CTX-SHELL`. Las enmiendas de Inc 8b sustituyen los términos correspondientes de Inc 8; las de Inc 9b amplían el bench. No se copiaron columnas de casos, controles negativos, Base ni resoluciones como requisitos.
+- Se consolidaron `CTX-A2L-LIST`, `CTX-COPY`, `CTX-PASTE`, `CTX-PE`, `CTX-PE-DEF`, `CTX-PE-BENCH`, `CTX-SAVEBACK` y el término `shown widget` de `CTX-SHELL`. Las enmiendas de Inc 8b sustituyen los términos correspondientes de Inc 8 e Inc 9; las de Inc 9b amplían el bench. No se copiaron columnas de casos, controles negativos, Base ni resoluciones como requisitos.
 - Dos frases se normalizaron para las reglas EARS existentes sin cambiar IDs ni semántica: `R-COPY.23` exige mostrar una instancia del diálogo con un solo `shall`; `R-PE-BENCH.29` conserva 0.5 s y 1.0 s en sus dos estados con un solo `shall` y deja fuera la resolución histórica. Estas formas están en `CANON_TEXT` del script.
+
+## Corrección de la revisión NO-GO
+
+La salida de `de637bbe` usaba precedencia por nombre y dejaba a Inc 9 después de Inc 8b. El fold, inventario, informes, reconciliaciones y trazas se regeneraron desde `c1741dee`; no se corrigieron sólo las dos filas. `context-fold.patch` contiene únicamente los seis hunks de notas de contexto, sin filas de requisitos, y se aplicó al canon base antes de repetir `fold_canon.py` con la precedencia explícita.
+
+Con la precedencia corregida, `R-PE-BENCH.5` usa el view width de `CTX-PE-DEF` sin trailing ground y `R-PE-BENCH.17` usa range/no-limits de `CTX-PE-DEF`, eliminando la contradicción con el contexto. `R-PE-BENCH.11` y `.36` permanecen idénticas. El diff del canon contra `de637bbe` contiene únicamente `.5` y `.17`.
+
+Las salidas del orden incorrecto están marcadas en `superseded-natural-order/`; no son evidencia del resultado corregido. En particular, su traza de 0 gaps sólo comprobaba presencia de IDs, no precedencia ni texto.
 
 ## Trazas y chequeos
 
