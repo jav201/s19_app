@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 BATCH = ROOT / ".dev-flow" / "2026-11-05-batch-103"
 OUT = Path(__file__).with_name("g3-review.html")
-COMMIT = "bd9a51153390b8e9430c332490bcd40e09eaa7a7"
+COMMIT = "35fabb25c42d752216433c095eb0d29024027294"
 
 INCREMENTS = [
     ("1a", "Clipboard core: instant paste", "PASS-WITH-NOTES", "122 passed / 75 skipped; límites Windows y AT manuales declarados."),
@@ -56,16 +56,18 @@ TEMPLATE = r"""<!doctype html>
 <div class="topbar"><div class="topbar-inner"><a class="brand" href="#resumen">B103 · G3</a><nav class="nav" aria-label="Secciones"><a href="#resumen">Resumen</a><a href="#incrementos">15 incrementos</a><a href="#capturas">8 capturas</a><a href="#at-i1b-8">AT-I1b-8</a><a href="#resultados">Resultados</a><a href="#riesgos">Riesgos</a><a href="#decision">Decisión</a></nav></div></div>
 <div class="wrap">
 <header class="hero" id="resumen">
-<div class="eyebrow">Revisión de integración · evidencia en bd9a5115</div>
+<div class="eyebrow">Revisión de integración · evidencia en 35fabb25</div>
 <h1>Batch 103 · puerta G3</h1>
 <span class="badge blocked" data-gate-status>BLOCKED · no cerrada</span>
-<p class="lead">La trazabilidad final está completa, pero la full-suite y su self-test no se ejecutaron por conectividad SSH. AT-I1b-8 también sigue manual <strong>not_run</strong>. Esta página no declara G3 PASS ni autoriza release.</p>
-<div class="alert" role="status"><strong>Decisión segura ahora:</strong> se puede rechazar o solicitar cambios. «Aprobar G3» está bloqueado mientras falten la full-suite y la aceptación manual.</div>
+<span class="badge ok" data-operator-decision>APROBACIÓN PROVISIONAL · decisiones y página</span>
+<p class="lead"><strong>Operador:</strong> «Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.»</p>
+<p class="lead">La validación de las decisiones continuará durante el uso y las pruebas de usuario. AT-I1b-8 queda <strong>deferred-to-user-validation / not_run</strong>: diferida por el operador, no ejecutada. Esta página no declara G3 PASS ni autoriza release: la full-suite local sigue <strong>RUNNING</strong> en un clon separado del commit exacto 35fabb25, sin full-suite PASS ni cierre de G3.</p>
+<div class="alert" role="status"><strong>Decisión provisional registrada:</strong> la aprobación del operador cubre las decisiones y esta página, no un G3 PASS. «Aprobar G3» permanece bloqueado hasta que la full-suite local sea GREEN; AT-I1b-8 ya no es una ejecución previa exigida para la aprobación provisional.</div>
 <div class="grid" aria-label="Datos de cabecera">
-<div class="card"><span class="label">Commit revisado</span><strong><code>bd9a5115</code></strong><p><code>bd9a51153390b8e9430c332490bcd40e09eaa7a7</code></p></div>
+<div class="card"><span class="label">Commit revisado</span><strong><code>35fabb25</code></strong><p><code>35fabb25c42d752216433c095eb0d29024027294</code></p></div>
 <div class="card"><span class="label">Traza G3 final</span><strong>0 gaps</strong><p>14 US · US/CASE/TEST/SLICE/EVID/CANON · exit 0.</p></div>
 <div class="card"><span class="label">CANON</span><strong>752 activos</strong><p>10 withdrawn; fold y traza sin gaps, no equivale a suite GREEN.</p></div>
-<div class="card"><span class="label">Full-suite distribuida</span><strong>NOT RUN</strong><p>Self-test NOT RUN · conectividad SSH · sin veredicto de suite.</p></div>
+<div class="card"><span class="label">Full-suite local</span><strong>RUNNING</strong><p>Clon separado exacto 35fabb25 · sin veredicto. Self-test distribuido NOT RUN por SSH.</p></div>
 </div>
 <details><summary>Fuentes primarias del estado G3</summary><ul class="source-list">
 <li><a href="../full-suite/RESULT.md">full-suite/RESULT.md</a> — estado BLOCKED y ausencia de veredicto.</li>
@@ -92,9 +94,9 @@ TEMPLATE = r"""<!doctype html>
 </section>
 <section id="at-i1b-8" aria-labelledby="at-title">
 <h2 id="at-title">AT-I1b-8 · aceptación manual del operador</h2>
-<span class="badge pending" data-at-status>not_run · manual · 0/6 registrados</span>
-<p class="section-intro">Texto literal de <a href="../../inc-1b/02-test-cases.md">02-test-cases.md</a>, con el contexto de <a href="../../inc-1b/01-requirements.md">01-requirements.md</a>. Los checkboxes son sólo ayuda local: no cambian el estado <code>not_run</code>, no se guardan y no desbloquean G3.</p>
-<details open><summary>Precondiciones literales</summary><p class="exact">%%AT_PRECONDITIONS%%</p><p>Ningún agente debe ejecutar esta AT ni tocar el clipboard del operador. Pass exige <strong>6/6</strong>; hasta el informe del operador, Result sigue <code>not_run</code>.</p></details>
+<span class="badge pending" data-at-status>deferred-to-user-validation · not_run · 0/6 ejecutados</span>
+<p class="section-intro">El operador difiere la comprobación de AT-I1b-8 al uso y las pruebas de usuario. El texto literal procede de <a href="../../inc-1b/02-test-cases.md">02-test-cases.md</a>, con el contexto de <a href="../../inc-1b/01-requirements.md">01-requirements.md</a>. Los checkboxes son sólo ayuda local: no cambian los estados <code>deferred-to-user-validation</code> y <code>not_run</code>, no se guardan y no desbloquean G3.</p>
+<details open><summary>Precondiciones literales</summary><p class="exact">%%AT_PRECONDITIONS%%</p><p>La ejecución queda diferida a la validación de usuario; ningún agente la marca como realizada ni toca el clipboard del operador. Si se ejecuta después, Pass exige <strong>6/6</strong>; el estado actual sigue <code>not_run</code>.</p></details>
 <ol class="checklist" aria-label="Checklist AT-I1b-8 de seis pasos">
 %%AT_STEPS%%
 </ol>
@@ -121,31 +123,31 @@ TEMPLATE = r"""<!doctype html>
 </div>
 </section>
 <section id="riesgos" aria-labelledby="riesgos-title">
-<h2 id="riesgos-title">Riesgos y pendientes que impiden el cierre</h2>
+<h2 id="riesgos-title">Riesgos y pendientes abiertos</h2>
 <div class="risk-list">
-<div class="risk"><strong>Full-suite + self-test</strong><p><span class="badge blocked">NOT RUN</span> Conectividad SSH a los hosts registrados. Ejecutar self-test y los ocho chunks, recoger resultados y clasificar fallos antes de reconsiderar G3.</p></div>
-<div class="risk"><strong>AT-I1b-8</strong><p><span class="badge pending">not_run</span> El operador debe realizar los seis pasos en Windows Terminal. La aprobación de capturas no sustituye esta aceptación.</p></div>
+<div class="risk"><strong>Full-suite local + self-test distribuido</strong><p><span class="badge blocked">RUNNING · sin veredicto</span> La full-suite local corre en un clon separado exacto 35fabb25; no se la declara PASS ni se cierra G3 mientras siga corriendo. El self-test y la pasada distribuida permanecen NOT RUN por SSH.</p></div>
+<div class="risk"><strong>AT-I1b-8</strong><p><span class="badge pending">deferred-to-user-validation / not_run</span> El operador difiere la comprobación al uso y las pruebas de usuario. No está ejecutada y no bloquea la aprobación provisional ya registrada.</p></div>
 <div class="risk"><strong>74 partial</strong><p>El agregado WinCI 108/108 no tiene mapping por fila en el manifest. No promover esos casos sin esa correspondencia auditable.</p></div>
 <div class="risk"><strong>GC-C14</strong><p>Mutante BAD/bloqueado por diseño. Mantenerlo visible como no ejecutado válidamente; no convertirlo en killed ni en PASS.</p></div>
-<div class="risk"><strong>Release</strong><p><span class="badge blocked">NO autorizado</span> La traza 0 gaps, el canon plegado y las aprobaciones visuales no cierran G3 ni constituyen release.</p></div>
+<div class="risk"><strong>Release</strong><p><span class="badge blocked">NO autorizado</span> La traza 0 gaps, el canon plegado, la aprobación provisional y las aprobaciones visuales no cierran G3 ni constituyen release.</p></div>
 </div>
 </section>
 <section id="decision" aria-labelledby="decision-title">
 <h2 id="decision-title">Decisión de revisión G3</h2>
-<p class="section-intro">La exportación crea un JSON local en este equipo. No envía datos, no usa servicios y no modifica los registros del batch.</p>
+<p class="section-intro">La aprobación provisional del operador ya consta en esta página. La exportación crea un JSON local en este equipo; no envía datos, no usa servicios y no modifica los registros del batch.</p>
 <form id="decision-form">
 <fieldset aria-describedby="approve-reason"><legend>Decisión</legend><div class="choices">
-<div class="choice"><input type="radio" name="decision" value="approve" id="approve" disabled><label for="approve">Aprobar G3 <small>No disponible con full-suite/self-test NOT RUN y AT-I1b-8 not_run.</small></label></div>
+<div class="choice"><input type="radio" name="decision" value="approve" id="approve" disabled><label for="approve">Aprobar G3 <small>No disponible hasta que la full-suite local sea GREEN. AT-I1b-8 está diferida a validación de usuario, no exigida como ejecución previa.</small></label></div>
 <div class="choice"><input type="radio" name="decision" value="reject" id="reject"><label for="reject">Rechazar <small>Registra una decisión negativa para esta revisión.</small></label></div>
 <div class="choice"><input type="radio" name="decision" value="request-changes" id="request-changes"><label for="request-changes">Solicitar cambios <small>Registra trabajo pendiente sin cerrar la puerta.</small></label></div>
-</div><p id="approve-reason" class="note"><strong>Por qué approve está bloqueado:</strong> faltan una ejecución completa de full-suite (incluido el self-test del runner distribuido) y el resultado manual 6/6 de AT-I1b-8. Marcar el checklist visual no cambia ninguna de esas evidencias.</p></fieldset>
+</div><p id="approve-reason" class="note"><strong>Regla de aprobación:</strong> approve permanece bloqueado mientras la full-suite local no sea GREEN. AT-I1b-8 queda <code>deferred-to-user-validation / not_run</code> por decisión del operador: no se exige como ejecución previa para la aprobación provisional, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia.</p></fieldset>
 <label for="notes">Notas de revisión</label><textarea id="notes" name="notes" maxlength="12000" placeholder="Describe evidencia pendiente, cambios solicitados o motivo de rechazo."></textarea>
 <div class="actions"><button class="button" type="submit" id="export-json">Exportar decisión JSON</button><button class="button secondary" type="button" id="print-page">Imprimir / guardar PDF</button></div>
 <p id="form-status" role="status" aria-live="polite"></p>
 </form>
 </section>
 </main>
-<footer class="footer">Página autocontenida generada desde evidencia del commit <code>bd9a5115</code>. CSS, JavaScript y ocho imágenes van inline. Sin red, CDN, almacenamiento ni dependencias de render. Los enlaces Markdown son referencias opcionales al checkout.</footer>
+<footer class="footer">Página autocontenida generada desde evidencia del commit <code>35fabb25</code>. CSS, JavaScript y ocho imágenes van inline. Sin red, CDN, almacenamiento ni dependencias de render. Los enlaces Markdown son referencias opcionales al checkout.</footer>
 </div>
 <script>
 (() => {
@@ -180,25 +182,26 @@ TEMPLATE = r"""<!doctype html>
       return;
     }
     if (selected.value === 'approve') {
-      status.textContent = 'Approve bloqueado: full-suite y AT-I1b-8 siguen pendientes.';
+      status.textContent = 'Approve bloqueado: la full-suite local aún no es GREEN.';
       return;
     }
     const payload = {
       schema: 's19.batch103.g3-review.v1',
-      commit: 'bd9a51153390b8e9430c332490bcd40e09eaa7a7',
+      commit: '35fabb25c42d752216433c095eb0d29024027294',
       gate: 'G3',
       gate_status: 'BLOCKED',
+      operator_decision: 'provisional_approval',
       decision: selected.value,
       notes: document.getElementById('notes').value,
       exported_at: new Date().toISOString(),
-      pending: {full_suite: 'NOT_RUN', distributed_self_test: 'NOT_RUN', 'AT-I1b-8': 'not_run'},
+      pending: {full_suite: 'RUNNING_NO_VERDICT', distributed_self_test: 'NOT_RUN', 'AT-I1b-8': 'deferred-to-user-validation/not_run'},
       release_authorized: false
     };
     const blob = new Blob([JSON.stringify(payload, null, 2) + '\n'], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'g3-decision-bd9a5115.json';
+    link.download = 'g3-decision-35fabb25.json';
     document.body.appendChild(link);
     link.click();
     link.remove();

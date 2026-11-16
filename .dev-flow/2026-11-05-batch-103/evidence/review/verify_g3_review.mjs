@@ -26,8 +26,9 @@ export default async function run(page, ui) {
   check('title', (await page.title()) === 'Batch 103 · Revisión G3 — BLOCKED');
   const bodyChars = await page.locator('body').innerText().then(text => text.length);
   check('body renderizado', bodyChars > 8000, { bodyChars });
-  check('cabecera BLOCKED', await page.locator('[data-gate-status]').innerText() === 'BLOCKED · no cerrada');
-  check('commit completo', await page.locator('body').innerText().then(text => text.includes('bd9a51153390b8e9430c332490bcd40e09eaa7a7')));
+  const headerText = await page.locator('#resumen').innerText();
+  check('cabecera BLOCKED y aprobación provisional', await page.locator('[data-gate-status]').innerText() === 'BLOCKED · no cerrada' && headerText.includes('APROBACIÓN PROVISIONAL') && headerText.includes('Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.'));
+  check('commit completo', await page.locator('body').innerText().then(text => text.includes('35fabb25c42d752216433c095eb0d29024027294')));
   check('sin declaración de release', await page.locator('body').innerText().then(text => text.includes('NO autorizado') && text.includes('no declara G3 PASS')));
 
   const images = page.locator('img[data-capture]');
@@ -68,10 +69,10 @@ export default async function run(page, ui) {
 
   check('checklist de seis pasos', await page.locator('[data-at-step]').count() === 6);
   for (const checkbox of await page.locator('[data-at-step]').all()) await checkbox.check();
-  check('checklist no altera AT', await page.locator('[data-at-status]').innerText() === 'not_run · manual · 0/6 registrados');
+  check('checklist no altera AT', await page.locator('[data-at-status]').innerText() === 'deferred-to-user-validation · not_run · 0/6 ejecutados');
   check('approve deshabilitado', await page.locator('#approve').isDisabled());
   const blockReason = await page.locator('#approve-reason').innerText();
-  check('explicación visible del bloqueo', blockReason.includes('full-suite') && blockReason.includes('AT-I1b-8'), { blockReason });
+  check('bloqueo exige suite GREEN y difiere AT', blockReason.includes('full-suite') && blockReason.includes('GREEN') && blockReason.includes('deferred-to-user-validation / not_run') && blockReason.includes('no se exige como ejecución previa'), { blockReason });
 
   const desktopOverflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
   check('sin overflow horizontal desktop', desktopOverflow.scrollWidth <= desktopOverflow.innerWidth, desktopOverflow);
@@ -81,16 +82,16 @@ export default async function run(page, ui) {
   check('galería móvil en una columna', await page.locator('.capture-grid').first().evaluate(item => getComputedStyle(item).gridTemplateColumns.split(' ').length === 1));
   await page.setViewportSize({ width: 1440, height: 1100 });
 
-  const note = 'Solicito ejecutar la full-suite y registrar AT-I1b-8 antes de reconsiderar G3.';
+  const note = 'Solicito confirmar full-suite GREEN; AT-I1b-8 permanece diferida a validación de usuario.';
   await page.locator('#request-changes').check();
   await page.locator('#notes').fill(note);
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#export-json').click();
   const download = await downloadPromise;
-  check('nombre de descarga JSON', download.suggestedFilename() === 'g3-decision-bd9a5115.json');
+  check('nombre de descarga JSON', download.suggestedFilename() === 'g3-decision-35fabb25.json');
   const exported = JSON.parse(readFileSync(await download.path(), 'utf8'));
   check('exportación request-changes real', exported.decision === 'request-changes' && exported.notes === note, { decision: exported.decision, notes: exported.notes });
-  check('JSON conserva bloqueos', exported.gate_status === 'BLOCKED' && exported.pending.full_suite === 'NOT_RUN' && exported.pending.distributed_self_test === 'NOT_RUN' && exported.pending['AT-I1b-8'] === 'not_run' && exported.release_authorized === false);
+  check('JSON conserva bloqueos y diferimiento', exported.gate_status === 'BLOCKED' && exported.operator_decision === 'provisional_approval' && exported.pending.full_suite === 'RUNNING_NO_VERDICT' && exported.pending.distributed_self_test === 'NOT_RUN' && exported.pending['AT-I1b-8'] === 'deferred-to-user-validation/not_run' && exported.release_authorized === false);
   check('estado de exportación visible', await page.locator('#form-status').innerText().then(text => text.includes('JSON local generado') && text.includes('BLOCKED')));
 
   await page.reload({ waitUntil: 'load' });
@@ -118,7 +119,7 @@ export default async function run(page, ui) {
   const report = {
     schema: 's19.batch103.g3-browser-verification.v1',
     page: 'g3-review.html',
-    commit: 'bd9a51153390b8e9430c332490bcd40e09eaa7a7',
+    commit: '35fabb25c42d752216433c095eb0d29024027294',
     browser: 'headless browser-automation / patchright',
     result: 'PASS',
     checks,

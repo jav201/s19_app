@@ -1,7 +1,7 @@
 {
   "schema": "s19.batch103.g3-browser-verification.v1",
   "page": "g3-review.html",
-  "commit": "bd9a51153390b8e9430c332490bcd40e09eaa7a7",
+  "commit": "35fabb25c42d752216433c095eb0d29024027294",
   "browser": "headless browser-automation / patchright",
   "result": "PASS",
   "checks": [
@@ -19,11 +19,11 @@
       "name": "body renderizado",
       "result": "PASS",
       "detail": {
-        "bodyChars": 9437
+        "bodyChars": 10482
       }
     },
     {
-      "name": "cabecera BLOCKED",
+      "name": "cabecera BLOCKED y aprobación provisional",
       "result": "PASS",
       "detail": null
     },
@@ -182,10 +182,10 @@
       "detail": null
     },
     {
-      "name": "explicación visible del bloqueo",
+      "name": "bloqueo exige suite GREEN y difiere AT",
       "result": "PASS",
       "detail": {
-        "blockReason": "Por qué approve está bloqueado: faltan una ejecución completa de full-suite (incluido el self-test del runner distribuido) y el resultado manual 6/6 de AT-I1b-8. Marcar el checklist visual no cambia ninguna de esas evidencias."
+        "blockReason": "Regla de aprobación: approve permanece bloqueado mientras la full-suite local no sea GREEN. AT-I1b-8 queda deferred-to-user-validation / not_run por decisión del operador: no se exige como ejecución previa para la aprobación provisional, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia."
       }
     },
     {
@@ -219,11 +219,11 @@
       "result": "PASS",
       "detail": {
         "decision": "request-changes",
-        "notes": "Solicito ejecutar la full-suite y registrar AT-I1b-8 antes de reconsiderar G3."
+        "notes": "Solicito confirmar full-suite GREEN; AT-I1b-8 permanece diferida a validación de usuario."
       }
     },
     {
-      "name": "JSON conserva bloqueos",
+      "name": "JSON conserva bloqueos y diferimiento",
       "result": "PASS",
       "detail": null
     },
