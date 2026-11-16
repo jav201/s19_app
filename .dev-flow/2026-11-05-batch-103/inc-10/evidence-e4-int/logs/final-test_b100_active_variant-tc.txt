@@ -1,0 +1,15 @@
+== final-test_b100_active_variant-tc | tree final | 2026-11-14T05:55:49Z | load: 9.71 10.14 9.69
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+................................s.............s................          [100%]
+============================= QC-TM timing margins =============================
+LOW 2.1%  0.979 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+33.6%  0.664 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+49.4%  0.506 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+49.8%  0.502 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+53.6%  0.464 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+QC-TM: 5 bounds, 1 under 20 % margin
+61 passed, 2 skipped in 144.34s (0:02:24)
+rc=0

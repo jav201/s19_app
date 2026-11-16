@@ -81,9 +81,11 @@ from s19_app.tui.services.variant_execution_service import read_project_manifest
 from s19_app.tui.workspace import WORKAREA_DIRNAME
 from s19_app.tui.workspace import WORKAREA_SUBDIR
 
+from tests.support.b103_inc10 import shown as shown_widget  # Inc 10 (R-CHG-003.1)
 from tests.support import b100_links
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
+from tests.support.b103_inc8_p import click_visible
 from tests.support.b100_load_dialog import highlight_row
 from tests.support.b100_workers import settle_workers
 from tests.support.b100_load_dialog import is_load_dialog
@@ -259,7 +261,7 @@ def _apply_patch(app: S19TuiApp) -> None:
 
 async def _save_back(pilot, app: S19TuiApp, filename: str) -> None:
     app.on_patch_editor_panel_save_back_decision(
-        PatchEditorPanel.SaveBackDecision(filename, 32)
+        PatchEditorPanel.SaveBackDecision(filename, 32, output_format="s19")
     )
     await _wait_for(
         pilot,
@@ -717,7 +719,7 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
             if writer == "save-back":
                 _apply_patch(app)
                 app.on_patch_editor_panel_save_back_decision(
-                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32, output_format="s19")
                 )
             elif writer == "variant-append" or writer == "mac-sync":
                 app.load_from_path(src)
@@ -1042,13 +1044,15 @@ async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
         lambda: len(app.query("#patch_entry_add_button")) > 0,
         "the Patch Editor panel",
     )
-    assert await pilot.click("#patch_entry_address_input")
+    # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+    assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+    assert await click_visible(pilot, "#patch_entry_address_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*f"0x{PATCH_ADDRESS:08X}")
-    assert await pilot.click("#patch_entry_bytes_input")
+    assert await click_visible(pilot, "#patch_entry_bytes_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*" ".join(f"{b:02X}" for b in PATCH_BYTES))
-    assert await pilot.click("#patch_entry_add_button")
+    assert await click_visible(pilot, "#patch_entry_add_button")
     await _wait_for(
         pilot,
         lambda: "Patch Editor: entry added." in _status_text(app),
@@ -1061,12 +1065,11 @@ async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
 async def _save_back_through_the_prompt(pilot, app: S19TuiApp, typed) -> None:
     await _wait_for(
         pilot,
-        lambda: not app.query_one("#patch_saveback_row").has_class("hidden"),
-        "the save-back prompt",
+        lambda: shown_widget(app.query_one("#patch_saveback_row")),
+        "the save-back prompt (a shown widget)",
     )
-    # The prompt renders in the editor's JSON pane: pick that tab by its
-    # chip, then wait for the prompt to be painted.
-    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+    # Inc 10 (R-CHG-003.1): the prompt is a shown widget whichever tab is shown, so no
+    # chip is pressed; wait for it to be painted.
     await _wait_for(
         pilot,
         lambda: app.query_one("#patch_saveback_name_input").region.area > 0,
@@ -1358,7 +1361,7 @@ def _script_border(app: S19TuiApp) -> str:
     """The SCRIPT window's bottom border row as the screen paints it (the
     composited strip; a widget's own ``render_line`` excludes its border):
     it carries ``N entries`` and the unsaved marker (LLR-005.1)."""
-    region = app.query_one("#patch_win_script").region
+    region = app.query_one("#patch_inspector").region
     strips = app.screen._compositor.render_strips()
     return strips[region.y + region.height - 1].text[region.x : region.x + region.width]
 

@@ -234,7 +234,12 @@ from tools.id_registry import (
 # tests/support/b103_inc8b_r.py); 344 -> 349.
 # batch-103 Inc 9b E4 correction: +3 (tests/test_b103_inc9b_at.py, _s.py, _w.py); 349 -> 352, measured.
 # Final content merge of Inc 7 and Inc 9b: measured 358 (312 + 5 + 41).
-EXPECTED_SCANNED_TEST_FILES = 358
+# batch-103 Inc 10 E4 integration: +7 (the five tests/test_b103_inc10_{g1_panel,g1_controls,
+# g2_arms,g2_write,g3_engine}.py modules, tests/support/b103_inc10.py and
+# tests/test_b103_inc10_s0_written_name.py); 329 -> 336 on the Inc 10 branch.
+# batch-103 Inc 10 MU10: +1 (tests/test_b103_inc10_mu_survivors.py); 336 -> 337.
+# Final content merge with Inc 10: measured 366 (358 + 8).
+EXPECTED_SCANNED_TEST_FILES = 366
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

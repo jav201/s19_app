@@ -1970,9 +1970,10 @@ def emit_intel_hex_from_mem_map(
 
     Data Flow:
         - Sort ``ranges`` ascending for deterministic output.
-        - Walk each range in 16-byte rows; before each row, if the row's
-          upper-16 address differs from the active upper-16, emit a type-0x04
-          ELA record and update the active upper-16.
+        - Walk each range in rows of at most 16 bytes, each ending at or before
+          the next 64 KiB boundary; before each row, if the row's upper-16
+          address differs from the active upper-16, emit a type-0x04 ELA record
+          and update the active upper-16.
         - Emit a type-0x00 data record per row using the low-16 of the row
           address (the upper-16 is carried by the active ELA).
         - Terminate with one type-0x01 EOF record.
@@ -1994,14 +1995,20 @@ def emit_intel_hex_from_mem_map(
     lines: list[str] = []
     active_upper = None
     for start, end in sorted(ranges):
-        for row_start in range(start, end, HEX_DATA_BYTES_PER_RECORD):
-            row_end = min(row_start + HEX_DATA_BYTES_PER_RECORD, end)
+        row_start = start
+        while row_start < end:
+            row_end = min(
+                row_start + HEX_DATA_BYTES_PER_RECORD,
+                end,
+                (row_start | 0xFFFF) + 1,
+            )
             upper = (row_start >> 16) & 0xFFFF
             if upper != active_upper:
                 lines.append(_intel_hex_record(0x04, 0, [upper >> 8, upper & 0xFF]))
                 active_upper = upper
             data = [mem_map[addr] for addr in range(row_start, row_end)]
             lines.append(_intel_hex_record(0x00, row_start & 0xFFFF, data))
+            row_start = row_end
     lines.append(_intel_hex_record(0x01, 0, []))
     return "\n".join(lines) + "\n"
 

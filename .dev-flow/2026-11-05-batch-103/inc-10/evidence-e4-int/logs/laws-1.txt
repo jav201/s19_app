@@ -1,0 +1,72 @@
+== laws-1 | tree laws | 2026-11-14T05:46:13Z | load: 9.78 10.13 9.20
+s19_app.__file__ = ~/work/zq-e4-10-int/laws/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.......F..............F.........                                         [100%]
+=================================== FAILURES ===================================
+________________ test_canon_rows_hold_the_obligation_word_once _________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_canon_rows_hold_the_obligation_word_once() -> None:
+        """R-DOC-CANON.4 -- each sentence holds ``shall`` exactly once.
+    
+        Why: one ``shall`` is one obligation is one test case. Two make a row that can be
+        half met; none makes a statement that obliges nothing.
+        """
+        rows = _rows()
+        offenders: List[str] = []
+        for r in rows:
+            n = len(re.findall(r"\bshall\b", r.sentence))
+            if n != 1:
+                offenders.append(f"line {r.line} {r.id}: 'shall' appears {n} times")
+>       _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+
+tests/test_requirements_canon.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rule = 'R-DOC-CANON.4 the obligation word is not used exactly once'
+offenders = ["line 1321 R-A2L-DEF.153: 'shall' appears 2 times", "line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times", "line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times"]
+checked = 2990
+
+    def _report(rule: str, offenders: List[str], checked: int) -> None:
+        if not offenders:
+            return
+        shown = "\n  ".join(offenders[:SHOWN])
+        more = f"\n  ... and {len(offenders) - SHOWN} more" if len(offenders) > SHOWN else ""
+>       pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E       Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2990 checked)
+E         line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+E         line 3935 R-PICKER-CORRECT.004: 'shall' appears 2 times
+E         line 3939 R-PICKER-CORRECT.008: 'shall' appears 2 times
+
+tests/test_requirements_canon.py:176: Failed
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7f6bd906b210>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 336 test modules, not the declared 329. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 336 == 329
+
+tests/test_id_registry.py:566: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+2 failed, 30 passed in 66.05s (0:01:06)
+rc=1

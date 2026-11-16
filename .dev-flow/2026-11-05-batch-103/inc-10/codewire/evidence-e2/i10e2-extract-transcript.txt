@@ -1,0 +1,264 @@
+# transcript: i10e2-extract.sh, run 2026-11-13T04:32:08Z
+# code-wire: v3.1.0-8-gb6cd30d b6cd30d; clone at 287b9dc3; worktree HEAD 287b9dc3
+# graph sha256 71d033de75e6fbfacb2b70893c3cb0346794f8eeda3eb6efef8ed0ce511820ea
+# python: Python 3.12.7
+# layered graphs, oldest first: .dev-flow/2026-11-01-batch-101/inc-4/codewire/graph-inc4.md .dev-flow/2026-11-01-batch-101/inc-5/codewire/graph-inc5.md .dev-flow/2026-11-01-batch-101/inc-6/codewire/graph-inc6.md .dev-flow/2026-11-05-batch-103/inc-6/codewire/graph-inc6.md then graph-inc10.md
+
+## baseline subset: 17 nodes
+
+## run 1: marks + extract, baseline subset (expected: drift only on I-10.1 and I-10.2)
+17 marks written, 0 nodes without code
+marks exit=0
+marks=17 graph_nodes=17 calls=14 findings=3 parse_failures=0
+extract exit=1
+# Code-Wire extractor report
+
+- Marks found: 17
+- Graph nodes parsed: 17
+- Real calls between marked nodes: 14
+- Findings: 3 (3 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Input in graph, not a parameter in code | 3 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `ChangeService.emit_and_verify` | `save_patched_image` | s19_app/tui/services/change_service.py:2445 |
+| `ChangeService.emit_and_verify` | `verify_written_image` | s19_app/tui/services/change_service.py:2470 |
+| `ChangeService.save_patched` | `ChangeService.emit_and_verify` | s19_app/tui/services/change_service.py:2626 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5583 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5584 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5199 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.show_save_prompt` | s19_app/tui/app.py:5256 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `S19TuiApp._hide_replaced_document_controls` | s19_app/tui/app.py:5210, s19_app/tui/app.py:7928 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `save_patched_image` | s19_app/tui/services/variant_execution_service.py:2584 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `ChangeService.save_patched` | s19_app/tui/app.py:5415 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5399 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.show_before_after_prompt` | s19_app/tui/app.py:5460 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `_synth_s0_header_from_filename` | s19_app/tui/app.py:5410 |
+| `save_patched_image` | `render_patched_image` | s19_app/tui/changes/apply.py:797 |
+
+Top-level sites (no marked node above them):
+
+- `PatchEditorPanel.__init__`: s19_app/tui/app.py:5065
+- `S19TuiApp._hide_replaced_document_controls`: s19_app/tui/app.py:14718, s19_app/tui/app.py:19663, s19_app/tui/app.py:5781, s19_app/tui/app.py:5816
+- `render_patched_image`: s19_app/tui/app.py:13949
+- `save_patched_image`: s19_app/tui/app.py:13221, s19_app/tui/services/flow_execution_service.py:727
+- `verify_written_image`: s19_app/tui/app.py:13233, s19_app/tui/operations/crc.py:1524, s19_app/tui/services/flow_execution_service.py:746
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/screens_directionb.py:4675` — graph input `output_format` not a parameter of `PatchEditorPanel.SaveBackDecision.__init__`
+- `s19_app/tui/screens_directionb.py:6497` — graph input `output_format` not a parameter of `PatchEditorPanel.show_save_prompt`
+- `s19_app/tui/screens_directionb.py:6497` — graph input `apply_line` not a parameter of `PatchEditorPanel.show_save_prompt`
+
+## run 2: marks + extract, whole graph (expected exit 1: run 1's drift + the NEW node without a mark)
+17 marks written, 1 nodes without code
+  missing: PatchEditorPanel._set_saveback_format (s19_app/tui/screens_directionb.py): no def
+marks exit=0
+marks=17 graph_nodes=18 calls=14 findings=4 parse_failures=0
+extract exit=1
+# Code-Wire extractor report
+
+- Marks found: 17
+- Graph nodes parsed: 18
+- Real calls between marked nodes: 14
+- Findings: 4 (4 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 1 |
+| Input in graph, not a parameter in code | 3 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `ChangeService.emit_and_verify` | `save_patched_image` | s19_app/tui/services/change_service.py:2445 |
+| `ChangeService.emit_and_verify` | `verify_written_image` | s19_app/tui/services/change_service.py:2470 |
+| `ChangeService.save_patched` | `ChangeService.emit_and_verify` | s19_app/tui/services/change_service.py:2626 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5583 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5584 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5199 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.show_save_prompt` | s19_app/tui/app.py:5256 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `S19TuiApp._hide_replaced_document_controls` | s19_app/tui/app.py:5210, s19_app/tui/app.py:7928 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `save_patched_image` | s19_app/tui/services/variant_execution_service.py:2584 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `ChangeService.save_patched` | s19_app/tui/app.py:5415 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5399 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.show_before_after_prompt` | s19_app/tui/app.py:5460 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `_synth_s0_header_from_filename` | s19_app/tui/app.py:5410 |
+| `save_patched_image` | `render_patched_image` | s19_app/tui/changes/apply.py:797 |
+
+Top-level sites (no marked node above them):
+
+- `PatchEditorPanel.__init__`: s19_app/tui/app.py:5065
+- `S19TuiApp._hide_replaced_document_controls`: s19_app/tui/app.py:14718, s19_app/tui/app.py:19663, s19_app/tui/app.py:5781, s19_app/tui/app.py:5816
+- `render_patched_image`: s19_app/tui/app.py:13949
+- `save_patched_image`: s19_app/tui/app.py:13221, s19_app/tui/services/flow_execution_service.py:727
+- `verify_written_image`: s19_app/tui/app.py:13233, s19_app/tui/operations/crc.py:1524, s19_app/tui/services/flow_execution_service.py:746
+
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/screens_directionb.py` — `PatchEditorPanel._set_saveback_format`
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/screens_directionb.py:4675` — graph input `output_format` not a parameter of `PatchEditorPanel.SaveBackDecision.__init__`
+- `s19_app/tui/screens_directionb.py:6497` — graph input `output_format` not a parameter of `PatchEditorPanel.show_save_prompt`
+- `s19_app/tui/screens_directionb.py:6497` — graph input `apply_line` not a parameter of `PatchEditorPanel.show_save_prompt`
+
+## run 3: layered, earlier graphs then this one, the two Python files only (a list to rule on, not a gate)
+53 marks written, 3 nodes without code, 2 nodes replaced by a later graph: PatchEditorPanel.__init__, S19TuiApp.on_patch_editor_panel_action_requested
+  missing: run_checks_for_project (s19_app/tui/services/change_service.py): no def
+  missing: PatchEditorPanel._set_saveback_format (s19_app/tui/screens_directionb.py): no def
+  missing: BulkParameterAddScreen (s19_app/tui/screens.py): no def
+marks exit=0
+marks=28 graph_nodes=56 calls=18 findings=50 parse_failures=0
+extract exit=1
+# Code-Wire extractor report
+
+- Marks found: 28
+- Graph nodes parsed: 56
+- Real calls between marked nodes: 18
+- Findings: 50 (49 drift, 1 info)
+- Ambiguous call resolutions (a name matched several defs): 5
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 28 |
+| Input in graph, not a parameter in code | 11 |
+| Parameter in code, not an input in graph | 5 |
+| Output type mismatch | 5 |
+| Info: nodes replaced by a later graph (`--layered`) | 1 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `PatchEditorPanel.on_button_pressed` | `PatchEditorPanel._use_highlighted_parameter` | s19_app/tui/screens_directionb.py:5980 |
+| `S19TuiApp._apply_changeset_json_edit` | `S19TuiApp._report_change_result` | s19_app/tui/app.py:5918 |
+| `S19TuiApp._apply_entry_json_edit` | `S19TuiApp._report_change_result` | s19_app/tui/app.py:6044 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5583 |
+| `S19TuiApp._hide_replaced_document_controls` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5584 |
+| `S19TuiApp._patch_editor_load` | `S19TuiApp._hide_replaced_document_controls` | s19_app/tui/app.py:7932 |
+| `S19TuiApp._patch_editor_load` | `S19TuiApp._report_change_result` | s19_app/tui/app.py:7935 |
+| `S19TuiApp._prefill_check_editor` | `CheckEditorPanel.set_a2l_parameters` | s19_app/tui/app.py:8056 |
+| `S19TuiApp._prefill_check_editor` | `PatchEditorPanel.set_a2l_parameters` | s19_app/tui/app.py:8056 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.hide_before_after_prompt` | s19_app/tui/app.py:5199 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `PatchEditorPanel.show_save_prompt` | s19_app/tui/app.py:5256 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `S19TuiApp._hide_replaced_document_controls` | s19_app/tui/app.py:5210 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `S19TuiApp._patch_editor_load` | s19_app/tui/app.py:5205 |
+| `S19TuiApp.on_patch_editor_panel_action_requested` | `S19TuiApp._report_change_result` | s19_app/tui/app.py:5212, s19_app/tui/app.py:5233, s19_app/tui/app.py:5269, s19_app/tui/app.py:5281 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.hide_save_prompt` | s19_app/tui/app.py:5399 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `PatchEditorPanel.show_before_after_prompt` | s19_app/tui/app.py:5460 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `S19TuiApp._report_change_result` | s19_app/tui/app.py:5437 |
+| `S19TuiApp.on_patch_editor_panel_save_back_decision` | `_synth_s0_header_from_filename` | s19_app/tui/app.py:5410 |
+
+Top-level sites (no marked node above them):
+
+- `CheckEditorPanel._named_parameter`: s19_app/tui/screens_directionb.py:7404
+- `CheckEditorPanel.set_a2l_parameters`: s19_app/tui/app.py:8077
+- `PatchEditorPanel.__init__`: s19_app/tui/app.py:5065
+- `PatchEditorPanel._apply_a2l_layout`: s19_app/tui/screens_directionb.py:5590, s19_app/tui/screens_directionb.py:5660
+- `PatchEditorPanel.set_a2l_parameters`: s19_app/tui/app.py:8077
+- `S19TuiApp._apply_entry_json_edit`: s19_app/tui/app.py:5990
+- `S19TuiApp._hide_replaced_document_controls`: s19_app/tui/app.py:14725, s19_app/tui/app.py:19670, s19_app/tui/app.py:5781, s19_app/tui/app.py:5816
+- `S19TuiApp._patch_editor_load`: s19_app/tui/app.py:7912, s19_app/tui/app.py:8025
+- `S19TuiApp._prefill_check_editor`: s19_app/tui/app.py:10475, s19_app/tui/app.py:21495, s19_app/tui/app.py:8209
+
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/changes/io.py` — `_symbol_name_index`
+- `s19_app/tui/changes/io.py` — `_resolve_symbol_tag`
+- `s19_app/tui/changes/io.py` — `_parse_entry`
+- `s19_app/tui/changes/io.py` — `_parse_entries`
+- `s19_app/tui/changes/io.py` — `parse_change_document`
+- `s19_app/tui/changes/io.py` — `read_change_document`
+- `s19_app/tui/services/change_service.py` — `ChangeService.edit_entry_json`
+- `s19_app/tui/services/change_service.py` — `ChangeService.load`
+- `s19_app/tui/services/change_service.py` — `ChangeService.load_text`
+- `s19_app/tui/services/change_service.py` — `run_checks_for_project`
+- `s19_app/tui/services/variant_execution_service.py` — `_execute_one_variant`
+- `s19_app/tui/services/variant_execution_service.py` — `execute_variant_plan`
+- `s19_app/tui/services/variant_execution_service.py` — `execute_project_variants`
+- `s19_app/tui/a2l_parameter_picker.py` — `A2LParameterPicker.set_parameters`
+- `s19_app/tui/a2l_parameter_picker.py` — `_format_parameter`
+- `s19_app/tui/a2l_parameter_picker.py` — `_literal_parameter_text`
+- `s19_app/tui/a2l_parameter_picker.py` — `A2LParameterPicker._row_cells`
+- `s19_app/tui/a2l_parameter_picker.py` — `A2LParameterPicker.highlighted_parameter`
+- `s19_app/tui/a2l_definition.py` — `describe_definitions`
+- `s19_app/tui/a2l_parameter_picker.py` — `parse_parameter_list`
+- `s19_app/tui/screens.py` — `BulkParameterAddScreen`
+- `s19_app/utils.py` — `safe_text`
+- `s19_app/tui/screens_directionb.py` — `PatchEditorPanel._set_saveback_format`
+- `s19_app/tui/services/change_service.py` — `ChangeService.save_patched`
+- `s19_app/tui/services/change_service.py` — `ChangeService.emit_and_verify`
+- `s19_app/tui/changes/apply.py` — `save_patched_image`
+- `s19_app/tui/changes/apply.py` — `render_patched_image`
+- `s19_app/tui/changes/verify.py` — `verify_written_image`
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/screens_directionb.py:5498` — graph input `none` not a parameter of `PatchEditorPanel._use_highlighted_parameter`
+- `s19_app/tui/screens_directionb.py:5498` — graph input `inputs` not a parameter of `PatchEditorPanel._use_highlighted_parameter`
+- `s19_app/tui/app.py:8033` — graph input `signature` not a parameter of `S19TuiApp._prefill_check_editor`
+- `s19_app/tui/screens_directionb.py:7442` — graph input `entries` not a parameter of `CheckEditorPanel._named_parameter`
+- `s19_app/tui/screens_directionb.py:7442` — graph input `rows` not a parameter of `CheckEditorPanel._named_parameter`
+- `s19_app/tui/screens_directionb.py:5427` — graph input `regions` not a parameter of `PatchEditorPanel._apply_a2l_layout`
+- `s19_app/tui/screens_directionb.py:5427` — graph input `rows` not a parameter of `PatchEditorPanel._apply_a2l_layout`
+- `s19_app/tui/screens_directionb.py:7939` — graph input `summary` not a parameter of `CheckEditorPanel._on_a2l_parameter_picker_bulk_add_requested`
+- `s19_app/tui/screens_directionb.py:4675` — graph input `output_format` not a parameter of `PatchEditorPanel.SaveBackDecision.__init__`
+- `s19_app/tui/screens_directionb.py:6502` — graph input `output_format` not a parameter of `PatchEditorPanel.show_save_prompt`
+- `s19_app/tui/screens_directionb.py:6502` — graph input `apply_line` not a parameter of `PatchEditorPanel.show_save_prompt`
+
+## Parameter in code, not an input in graph
+
+- `s19_app/tui/screens_directionb.py:7442` — parameter `address: int` not in graph
+- `s19_app/tui/screens_directionb.py:7442` — parameter `size: int` not in graph
+- `s19_app/tui/screens_directionb.py:7442` — parameter `symbol: Optional[str]` not in graph
+- `s19_app/tui/screens_directionb.py:7442` — parameter `by_key: dict` not in graph
+- `s19_app/tui/screens_directionb.py:7442` — parameter `taken: set` not in graph
+
+## Output type mismatch
+
+- `s19_app/tui/screens_directionb.py:5475` — graph `None; one shared modal` vs code `None`
+- `s19_app/tui/screens_directionb.py:7970` — graph `None; refusal status or existing` vs code `None`
+- `s19_app/tui/app.py:8033` — graph `None; calls N7/N8 on` vs code `None`
+- `s19_app/tui/screens_directionb.py:7442` — graph `named inclusions and memory` vs code `Optional[str]`
+- `s19_app/tui/screens_directionb.py:5427` — graph `None; columns/cells` vs code `None`
+
+## Info: nodes replaced by a later graph (`--layered`)
+
+- `graphs` — 2 replaced by a later graph: `PatchEditorPanel.__init__`, `S19TuiApp.on_patch_editor_panel_action_requested`
+
+## lint: whole graph
+not read=0 nodes=18 entities=12 edges=31
+lint exit=0
+
+## clone left as found except marks: 53 added, 0 removed lines

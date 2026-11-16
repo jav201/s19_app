@@ -58,6 +58,8 @@ from s19_app.tui.changes.io import (
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
 from tests.b97_probes import settled
+from tests.support.b103_inc10 import shown as shown_widget  # Inc 10 (R-CHG-003.1)
+from tests.support.timing import wait_until
 
 NEW_WIDGET_IDS = (
     "patch_doc_path_input",
@@ -297,11 +299,14 @@ def test_paste_parse_then_apply_matches_file_loaded(tmp_path: Path) -> None:
             )
 
             panel.request_action("apply_doc")
-            await pilot.pause()
+            for _ in range(6):  # the layout pass that gives the prompt its region
+                await pilot.pause()
 
             prompt = app.query_one("#patch_saveback_row", Container)
             name_input = app.query_one("#patch_saveback_name_input", Input)
-            outcomes["prompt_shown"] = not prompt.has_class("hidden")
+            # Inc 10 (R-CHG-003.1): a shown widget, not the absence of a class (the
+            # class left in place while the row sat inside an undisplayed window).
+            outcomes["prompt_shown"] = shown_widget(prompt)
             outcomes["saveback_name"] = name_input.value
         return outcomes
 
@@ -576,7 +581,13 @@ def test_save_back_prompt(tmp_path: Path) -> None:
 
             # Stage 1 — prompt appears with the pre-filled suggestion.
             await _apply()
-            outcomes["prompt_shown"] = not prompt.has_class("hidden")
+            await wait_until(
+                pilot,
+                lambda: shown_widget(prompt),
+                "the layout pass gave the save-back prompt its region",
+                pause_first=True,
+            )
+            outcomes["prompt_shown"] = shown_widget(prompt)  # Inc 10: a shown widget (R-CHG-003.1)
             outcomes["suggestion"] = name_input.value
 
             # Stage 2 — decline: nothing written, saved_path stays None.

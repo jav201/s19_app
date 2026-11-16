@@ -1,0 +1,105 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  03:05:30 up 1 day, 11:54,  4 users,  load average: 7.91, 8.72, 8.28
++ pytest -p no:cacheprovider -p no:xdist -q -rfE tests/test_b100_save_image.py -k tc_b100_59
+.....FF.............s.......s...                                         [100%]
+=================================== FAILURES ===================================
+____________________ test_tc_b100_59_open_project_unchanged ____________________
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-21/test_tc_b100_59_open_project_u0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7dcf76aa10>
+
+    def test_tc_b100_59_open_project_unchanged(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The open project saved again unchanged → image and MAC ``keep``,
+        ``project.json`` ``new`` (the seeded project had none);
+        nothing else is written."""
+        plans = _capture_plans(monkeypatch)
+>       before, after = _open_project_session(tmp_path, patch=False)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1367: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_image.py:1357: in _open_project_session
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1349: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_session.<locals>._drive.<locals>.<lambda> at 0x7f7dcfb1f420>
+description = 'the save into the open project', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the save into the open project
+
+tests/test_b100_save_image.py:158: AssertionError
+______________ test_tc_b100_59_pending_patch_in_the_open_project _______________
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-21/test_tc_b100_59_pending_patch_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7dcf562dd0>
+
+    def test_tc_b100_59_pending_patch_in_the_open_project(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A pending patch saved into the open project → the image row is
+        ``firmware_1.s19`` ``new`` (a clashing landing name), the MAC ``keep``;
+        the tree equals the rows. Inc 8a re-pin (LLR-167.6 / LLR-170.2, E4
+        integration RP-5): the pending document is pasted (no file), so it is
+        also a ``document`` row ``changes.json`` ``new``."""
+        plans = _capture_plans(monkeypatch)
+>       before, after = _open_project_session(tmp_path, patch=True)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_image.py:1357: in _open_project_session
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1349: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_session.<locals>._drive.<locals>.<lambda> at 0x7f7dd78398a0>
+description = 'the save into the open project', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the save into the open project
+
+tests/test_b100_save_image.py:158: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_pending_patch_in_the_open_project
+2 failed, 28 passed, 2 skipped, 46 deselected in 171.04s (0:02:51)
+RC=1

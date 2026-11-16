@@ -1,0 +1,115 @@
+== green1-test_b103_inc10_g2_write | tree fix | 2026-11-14T05:10:54Z | load: 9.17 7.88 5.95
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F..................FF
+=================================== FAILURES ===================================
+__ test_r_pe_export_8_1_one_press_changes_s19_to_intel_hex_shown_and_written ___
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_r_pe_export_8_1_one_press0')
+
+    def test_r_pe_export_8_1_one_press_changes_s19_to_intel_hex_shown_and_written(tmp_path):
+        """R-PE-EXPORT.8/1: Format, ``Write file`` -> the control shows ``Intel HEX`` and the written file's first
+        line starts with ``:``.  Negative control: a press that changes nothing -> RED."""
+    
+        async def body(app, pilot):
+            await press_format(pilot)
+            label = format_text(app)
+            await t.write_file(pilot, app)
+            return label, t.first_line(t.written(app, "firmware-patched.hex"))
+    
+        label, line = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert "Intel HEX" in label and line.startswith(":"), (label, line)
+E       AssertionError: ('Format: Intel', ':0200000480007A')
+E       assert ('Intel HEX' in 'Format: Intel')
+
+tests/test_b103_inc10_g2_write.py:50: AssertionError
+_______ test_at_i10_1_apply_from_the_inspector_tab_and_export_intel_hex ________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-18/popen-gw0/test_at_i10_1_apply_from_the_i0')
+
+    def test_at_i10_1_apply_from_the_inspector_tab_and_export_intel_hex(tmp_path):
+        """AT-I10-1 (118x54): case01 loaded through the Load dialog; the Inspector chip pressed BEFORE the entry
+        (the entry boxes are in the Inspector pane; the default tab is Patch script since Inc 8, finding F-T10-1);
+        0x8000007C ``DE AD BE EF`` typed and Add; Apply; Format; ``Write file``.  No chip is pressed after Apply.
+        The apply line is shown; after Format the control shows ``Intel HEX``, the name box is
+        ``firmware-patched.hex``, no Width control is painted; the status is ``Saved + verified:
+        firmware-patched.hex - 1 entry applied before this save (0x8000007C)``; the file reads back (independent
+        Intel HEX reader) with ``DE AD BE EF`` at 0x8000007C and case01's bytes elsewhere.  Negative control: a
+        prompt hidden after Apply, no Format control, or the file written as S19 -> RED."""
+    
+        async def scene(app, pilot):
+            t.TYPING["mode"] = "keys"
+            path = t.copy_source(tmp_path, "firmware.s19")
+            await t.load_via_dialog(pilot, app, path)
+            await t.open_patch_editor(pilot, app)
+            await t.click_tab(pilot, "patch_tab_inspector")
+            await t.add_entry(pilot, app)
+            await t.press_apply(pilot, app)
+            seen = {"line": t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))}
+            await press_format(pilot)
+            seen["format"] = format_text(app)
+            seen["name"] = t.name_value(app)
+            seen["width"] = t.painted(app, t.need(app.screen, "#patch_saveback_width_button"))
+            await t.write_file(pilot, app)
+            seen["log"] = t.painted_log(app)
+            seen["path"] = t.written(app, "firmware-patched.hex")
+            return seen
+    
+        try:
+            seen = t.run_scene(tmp_path, t.SIZE, scene)
+        finally:
+            t.TYPING["mode"] = "value"
+        assert seen["line"] == t.APPLY_LINE_1, seen["line"]
+>       assert "Intel HEX" in seen["format"] and seen["name"] == "firmware-patched.hex", seen
+E       AssertionError: {'format': 'Format: Intel', 'line': 'Apply: 1 applied, 0 skipped, 0 blocked · changed in memory only — Write file save...+ verified: firmware-patched.hex — 1 entry applied before this save (0x8000007C)', 'name': 'firmware-patched.hex', ...}
+E       assert ('Intel HEX' in 'Format: Intel')
+
+tests/test_b103_inc10_g2_write.py:277: AssertionError
+____ test_at_i10_2_an_intel_hex_image_exported_as_s19_at_16_bytes_per_line _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_at_i10_2_an_intel_hex_ima0')
+
+    def test_at_i10_2_an_intel_hex_image_exported_as_s19_at_16_bytes_per_line(tmp_path):
+        """AT-I10-2 (220x60): ``firmware.hex`` (case01's twin) loaded through the Load dialog; the entry added from
+        the Inspector pane, then the Checks tab shown; Apply; Format; Width; ``Write file``.  The Format control
+        showed ``Intel HEX`` first, then ``S19``; ``Width: 16 bytes/line``; ``firmware-patched.s19`` written: first
+        line ``S0030000FC``, S3 data records of at most 16 data bytes, terminator ``S7``; status ``Saved +
+        verified: firmware-patched.s19 - ...``.  Negative control: the Width press ignored, the file written as
+        Intel HEX, or a name header at width 16 -> RED."""
+    
+        async def scene(app, pilot):
+            t.TYPING["mode"] = "keys"
+            path = t.copy_source(tmp_path, "firmware.hex")
+            await t.applied_scene(pilot, app, path, "patch_tab_checks", dialog=True)
+            seen = {"first": format_text(app)}
+            await press_format(pilot)
+            seen["second"] = format_text(app)
+            await t.press_button(pilot, "#patch_saveback_width_button")
+            seen["width"] = t.painted(app, t.need(app.screen, "#patch_saveback_width_button"))
+            await t.write_file(pilot, app)
+            seen["log"] = t.painted_log(app)
+            seen["path"] = t.written(app, "firmware-patched.s19")
+            return seen
+    
+        try:
+            seen = t.run_scene(tmp_path, t.WIDE, scene)
+        finally:
+            t.TYPING["mode"] = "value"
+>       assert "Intel HEX" in seen["first"] and "S19" in seen["second"] and "Intel HEX" not in seen["second"], seen
+E       AssertionError: {'first': 'Format: Intel', 'log': 'Patch Editor: entry added.
+E         Apply: 1 applied, 0 skipped, 0 blocked
+E         Patched image s...8/popen-gw1/test_at_i10_2_an_intel_hex_ima0/app/.s19tool/workarea/firmware-patched.s19'), 'second': 'Format: S19', ...}
+E       assert ('Intel HEX' in 'Format: Intel')
+
+tests/test_b103_inc10_g2_write.py:312: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g2_write.py::test_r_pe_export_8_1_one_press_changes_s19_to_intel_hex_shown_and_written
+FAILED tests/test_b103_inc10_g2_write.py::test_at_i10_1_apply_from_the_inspector_tab_and_export_intel_hex
+FAILED tests/test_b103_inc10_g2_write.py::test_at_i10_2_an_intel_hex_image_exported_as_s19_at_16_bytes_per_line
+3 failed, 18 passed in 153.53s (0:02:33)
+rc=1

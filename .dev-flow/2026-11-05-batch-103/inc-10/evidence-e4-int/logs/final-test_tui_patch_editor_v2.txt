@@ -1,0 +1,8 @@
+== final-test_tui_patch_editor_v2 | tree final | 2026-11-14T05:52:36Z | load: 10.09 10.21 9.57
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+....................................................                     [100%]
+52 passed in 134.44s (0:02:14)
+rc=0

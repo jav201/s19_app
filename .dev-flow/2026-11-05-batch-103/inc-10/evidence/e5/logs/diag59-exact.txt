@@ -1,0 +1,6 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: HEAD f256579c (git archive)
+uptime:  03:21:21 up 1 day, 12:10,  3 users,  load average: 5.35, 6.64, 7.42
+RESULT ok
+STATUS Saved project to ~/work/zq-x10/tmp/tmp09b5dkjy/app/.s19tool/workarea/P1 (variant 'firmware')
+RC=0

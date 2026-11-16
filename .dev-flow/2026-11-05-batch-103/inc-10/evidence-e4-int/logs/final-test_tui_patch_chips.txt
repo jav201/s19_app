@@ -1,0 +1,85 @@
+== final-test_tui_patch_chips | tree final | 2026-11-14T05:55:36Z | load: 9.64 10.15 9.68
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_at076a_docked_buttons_are_grouped_chips _________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+    def test_at076a_docked_buttons_are_grouped_chips() -> None:
+        """AT-076a — every docked Button is a chip; >=3 groups resolve distinctly.
+    
+        Intent (HLR-076): the analyst reads the docked buttons as colour-GROUPED
+        chips, so function is legible before the label is. Asserted as a structural
+        invariant enumerated from the live tree — "every docked Button carries a
+        chip class AND >=3 distinct groups are present" — never "the N buttons all
+        render as chips", which would be an unverified all-at-once claim (C-29).
+        """
+    
+        async def _run(size: tuple[int, int]) -> dict[str, object]:
+            app = S19TuiApp(base_dir=Path(_tmp(size)))
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one(f"#{_PANEL_ID}")
+                buttons = list(panel.walk_children(Button))
+                naked = [
+                    b.id
+                    for b in buttons
+                    if _CHIP_CLASS not in b.classes and _TAB_CHIP_CLASS not in b.classes
+                ]
+                # One button from each of the three groups, through the REAL tree.
+                # MEASURED (batch-94): the entry probe rides
+                # ``#patch_entry_remove_button`` — ``#patch_entry_add_button`` /
+                # ``#patch_entry_edit_button`` (the first grid row of
+                # ``#patch_doc_entry_buttons``) paint at ZERO height under the
+                # content-height chain, so their ``region.height`` cannot carry
+                # the 1-row chip-shape assertion; Remove / Edit JSON paint.
+                probes = {
+                    "entry": app.query_one("#patch_entry_remove_button", Button),
+                    "apply": app.query_one("#patch_doc_apply_button", Button),
+                    "checks": app.query_one("#patch_checks_run_button", Button),
+                }
+                heights = {k: b.region.height for k, b in probes.items() if k != "checks"}
+                # batch-97 Inc-4: Run checks lives on the inspector's Checks tab.
+                app.query_one("#patch_tab_checks", Button).press()
+                await pilot.pause()
+                heights["checks"] = probes["checks"].region.height
+                return {
+                    "count": len(buttons),
+                    "naked": naked,
+                    "colours": {
+                        k: b.styles.color.rgb for k, b in probes.items()
+                    },
+                    "heights": heights,
+                }
+    
+        for size in _SIZES:
+            r = asyncio.run(_run(size))
+            assert r["count"] > 0, f"@{size}: no docked Buttons found at all"
+            assert r["naked"] == [], (
+                f"@{size}: {len(r['naked'])} docked Button(s) carry NO chip class "
+                f"— the family must cover every one of them: {r['naked']}"
+            )
+            colours = r["colours"]
+            assert len(set(colours.values())) == 3, (
+                f"@{size}: the three chip groups must resolve to three DISTINCT "
+                f"colours; got {colours}"
+            )
+            # The chip's own shape: one row, not Textual's 3-row default Button.
+            for group, height in r["heights"].items():
+>               assert height == 1, (
+                    f"@{size}: the {group} chip must render as a single row "
+                    f"(Textual's default Button is 3); got height={height}"
+                )
+E               AssertionError: @(80, 24): the entry chip must render as a single row (Textual's default Button is 3); got height=0
+E               assert 0 == 1
+
+tests/test_tui_patch_chips.py:246: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips
+1 failed, 3 passed in 11.78s
+rc=1

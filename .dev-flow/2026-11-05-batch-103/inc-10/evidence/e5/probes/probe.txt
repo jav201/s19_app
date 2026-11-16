@@ -1,0 +1,9 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: HEAD f256579c (git archive)
+P1 code points where the regex whitespace class and str.isspace() disagree: []
+P1 rename 'fw.s19' + U+3000 -> 'fw.hex'
+P2 sanitized name: 'fw\x1bx.s19' issue: None
+P2 S0 header data from it: b'fw\x1bx.s19'
+P3 rounds cap: 3 landing: bar.s19 header data: b'bar.s19' issues: []
+P3 files: ['bar.s19', 'foo.s19', 'temp']
+RC=0

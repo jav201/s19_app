@@ -1,0 +1,48 @@
+== green1-test_b103_inc10_g1_controls | tree fix | 2026-11-14T05:05:45Z | load: 7.53 5.78 4.73
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.FF.....................
+=================================== FAILURES ===================================
+________________ test_r_pe_export_9_2_the_label_follows_a_press ________________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-10/popen-gw0/test_r_pe_export_9_2_the_label0')
+
+    def test_r_pe_export_9_2_the_label_follows_a_press(tmp_path):
+        """R-PE-EXPORT.9/2: after one Format press the painted control holds ``Intel HEX``.  Negative control: the
+        label not refreshed on a press -> RED."""
+    
+        async def body(app, pilot):
+            await format_press(pilot)
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+    
+        text = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert "Intel HEX" in text and "S19" not in text, text
+E       AssertionError: Format: Intel
+E       assert ('Intel HEX' in 'Format: Intel')
+
+tests/test_b103_inc10_g1_controls.py:77: AssertionError
+_ test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-10/popen-gw1/test_r_pe_export_7_2_the_forma0')
+
+    def test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image(tmp_path):
+        """R-PE-EXPORT.7/2: Applied HEX -> ``Intel HEX``.  Negative control: always S19 -> RED."""
+    
+        async def body(app, pilot):
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+    
+        text = applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body)
+>       assert "Intel HEX" in text, text
+E       AssertionError: Format: Intel
+E       assert 'Intel HEX' in 'Format: Intel'
+
+tests/test_b103_inc10_g1_controls.py:50: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_9_2_the_label_follows_a_press
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image
+2 failed, 22 passed in 153.13s (0:02:33)
+rc=1

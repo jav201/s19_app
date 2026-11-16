@@ -1,0 +1,331 @@
+== red-base-s0_written_name | tree base | 2026-11-14T05:07:38Z | load: 8.11 6.59 5.15
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[suffix-added] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-13/popen-gw1/test_r_s19_s0header_001_2_5_th0')
+typed = 'C:\\Users\\<user>\\Desktop\\fw', name = 'fw.s19'
+header = b'fw.s19'
+
+    @pytest.mark.parametrize("typed,name,header", [c[1:] for c in TYPED], ids=[c[0] for c in TYPED])
+    def test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path(tmp_path, typed, name, header):
+        """R-S19-S0HEADER-001.2/5 and BL-I10-E3-8: an Intel HEX source written as S19 at width 32 under a typed
+        name that differs from the written one gets the WRITTEN name as header data.  The account folder of the
+        typed path is in neither the header nor any byte of the file.  Negative control: the header built from the
+        typed text (the code before the P-022 fix) -> RED."""
+    
+        async def body(app, pilot):
+            await t.post_decision(app, pilot, typed, "s19", 32)
+            path = t.written(app, name)
+            return t.s0_data(path), path.read_bytes(), t.work_files(app)
+    
+>       data, raw, files = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_s0_written_name.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_s0_written_name.py:35: in body
+    await t.post_decision(app, pilot, typed, "s19", 32)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+name = 'C:\\Users\\<user>\\Desktop\\fw', fmt = 's19', width = 32
+
+    async def post_decision(app, pilot, name, fmt, width: int = 32) -> list:
+        """The panel's confirm message, as the Write file chip posts it, for handler cases that need no prompt
+        (the app's own ``on_patch_editor_panel_save_back_decision`` runs).  Returns the new status lines."""
+        panel = panel_of(app)
+        seen = len(app.status_history)
+>       panel.post_message(type(panel).SaveBackDecision(name, bytes_per_line=width, output_format=fmt))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PatchEditorPanel.SaveBackDecision.__init__() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:458: TypeError
+_ test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[full-windows-path] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-13/popen-gw0/test_r_s19_s0header_001_2_5_th0')
+typed = 'C:\\Users\\<user>\\Desktop\\fw.s19', name = 'fw.s19'
+header = b'fw.s19'
+
+    @pytest.mark.parametrize("typed,name,header", [c[1:] for c in TYPED], ids=[c[0] for c in TYPED])
+    def test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path(tmp_path, typed, name, header):
+        """R-S19-S0HEADER-001.2/5 and BL-I10-E3-8: an Intel HEX source written as S19 at width 32 under a typed
+        name that differs from the written one gets the WRITTEN name as header data.  The account folder of the
+        typed path is in neither the header nor any byte of the file.  Negative control: the header built from the
+        typed text (the code before the P-022 fix) -> RED."""
+    
+        async def body(app, pilot):
+            await t.post_decision(app, pilot, typed, "s19", 32)
+            path = t.written(app, name)
+            return t.s0_data(path), path.read_bytes(), t.work_files(app)
+    
+>       data, raw, files = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_s0_written_name.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_s0_written_name.py:35: in body
+    await t.post_decision(app, pilot, typed, "s19", 32)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+name = 'C:\\Users\\<user>\\Desktop\\fw.s19', fmt = 's19', width = 32
+
+    async def post_decision(app, pilot, name, fmt, width: int = 32) -> list:
+        """The panel's confirm message, as the Write file chip posts it, for handler cases that need no prompt
+        (the app's own ``on_patch_editor_panel_save_back_decision`` runs).  Returns the new status lines."""
+        panel = panel_of(app)
+        seen = len(app.status_history)
+>       panel.post_message(type(panel).SaveBackDecision(name, bytes_per_line=width, output_format=fmt))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PatchEditorPanel.SaveBackDecision.__init__() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:458: TypeError
+_ test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[non-ascii-dropped] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-13/popen-gw1/test_r_s19_s0header_001_2_5_th1')
+typed = 'C:\\Users\\<user>\\Desktop\\fw_é.s19', name = 'fw_é.s19'
+header = b'fw_.s19'
+
+    @pytest.mark.parametrize("typed,name,header", [c[1:] for c in TYPED], ids=[c[0] for c in TYPED])
+    def test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path(tmp_path, typed, name, header):
+        """R-S19-S0HEADER-001.2/5 and BL-I10-E3-8: an Intel HEX source written as S19 at width 32 under a typed
+        name that differs from the written one gets the WRITTEN name as header data.  The account folder of the
+        typed path is in neither the header nor any byte of the file.  Negative control: the header built from the
+        typed text (the code before the P-022 fix) -> RED."""
+    
+        async def body(app, pilot):
+            await t.post_decision(app, pilot, typed, "s19", 32)
+            path = t.written(app, name)
+            return t.s0_data(path), path.read_bytes(), t.work_files(app)
+    
+>       data, raw, files = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_s0_written_name.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_s0_written_name.py:35: in body
+    await t.post_decision(app, pilot, typed, "s19", 32)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+name = 'C:\\Users\\<user>\\Desktop\\fw_é.s19', fmt = 's19', width = 32
+
+    async def post_decision(app, pilot, name, fmt, width: int = 32) -> list:
+        """The panel's confirm message, as the Write file chip posts it, for handler cases that need no prompt
+        (the app's own ``on_patch_editor_panel_save_back_decision`` runs).  Returns the new status lines."""
+        panel = panel_of(app)
+        seen = len(app.status_history)
+>       panel.post_message(type(panel).SaveBackDecision(name, bytes_per_line=width, output_format=fmt))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PatchEditorPanel.SaveBackDecision.__init__() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:458: TypeError
+_ test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[full-posix-path] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-13/popen-gw0/test_r_s19_s0header_001_2_5_th1')
+typed = '~/fw.s19', name = 'fw.s19', header = b'fw.s19'
+
+    @pytest.mark.parametrize("typed,name,header", [c[1:] for c in TYPED], ids=[c[0] for c in TYPED])
+    def test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path(tmp_path, typed, name, header):
+        """R-S19-S0HEADER-001.2/5 and BL-I10-E3-8: an Intel HEX source written as S19 at width 32 under a typed
+        name that differs from the written one gets the WRITTEN name as header data.  The account folder of the
+        typed path is in neither the header nor any byte of the file.  Negative control: the header built from the
+        typed text (the code before the P-022 fix) -> RED."""
+    
+        async def body(app, pilot):
+            await t.post_decision(app, pilot, typed, "s19", 32)
+            path = t.written(app, name)
+            return t.s0_data(path), path.read_bytes(), t.work_files(app)
+    
+>       data, raw, files = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_s0_written_name.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_s0_written_name.py:35: in body
+    await t.post_decision(app, pilot, typed, "s19", 32)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+name = '~/fw.s19', fmt = 's19', width = 32
+
+    async def post_decision(app, pilot, name, fmt, width: int = 32) -> list:
+        """The panel's confirm message, as the Write file chip posts it, for handler cases that need no prompt
+        (the app's own ``on_patch_editor_panel_save_back_decision`` runs).  Returns the new status lines."""
+        panel = panel_of(app)
+        seen = len(app.status_history)
+>       panel.post_message(type(panel).SaveBackDecision(name, bytes_per_line=width, output_format=fmt))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PatchEditorPanel.SaveBackDecision.__init__() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:458: TypeError
+_ test_r_s19_s0header_001_2_5_a_numbered_written_name_wins_over_the_typed_one __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-13/popen-gw1/test_r_s19_s0header_001_2_5_a_0')
+
+    def test_r_s19_s0header_001_2_5_a_numbered_written_name_wins_over_the_typed_one(tmp_path):
+        """R-S19-S0HEADER-001.2/5 (D8-28): ``firmware-patched.s19`` already in the work area with other content;
+        the save-back under that typed name is written as ``firmware-patched_1.s19`` and its header data is
+        ``firmware-patched_1.s19``.  The file already there is left as it was.  Negative control: the header built
+        from the typed name (``firmware-patched.s19``) -> RED."""
+        other = b"other content\n"
+    
+        async def body(app, pilot):
+            holder = t.workarea(app) / "firmware-patched.s19"
+            holder.parent.mkdir(parents=True, exist_ok=True)
+            holder.write_bytes(other)
+            lines = await t.post_decision(app, pilot, "firmware-patched.s19", "s19", 32)
+            numbered = t.written(app, "firmware-patched_1.s19")
+            return t.s0_data(numbered), holder.read_bytes(), lines
+    
+>       data, held, lines = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_s0_written_name.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_s0_written_name.py:56: in body
+    lines = await t.post_decision(app, pilot, "firmware-patched.s19", "s19", 32)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+name = 'firmware-patched.s19', fmt = 's19', width = 32
+
+    async def post_decision(app, pilot, name, fmt, width: int = 32) -> list:
+        """The panel's confirm message, as the Write file chip posts it, for handler cases that need no prompt
+        (the app's own ``on_patch_editor_panel_save_back_decision`` runs).  Returns the new status lines."""
+        panel = panel_of(app)
+        seen = len(app.status_history)
+>       panel.post_message(type(panel).SaveBackDecision(name, bytes_per_line=width, output_format=fmt))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PatchEditorPanel.SaveBackDecision.__init__() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:458: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_s0_written_name.py::test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[suffix-added]
+FAILED tests/test_b103_inc10_s0_written_name.py::test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[full-windows-path]
+FAILED tests/test_b103_inc10_s0_written_name.py::test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[non-ascii-dropped]
+FAILED tests/test_b103_inc10_s0_written_name.py::test_r_s19_s0header_001_2_5_the_header_is_the_written_name_never_the_typed_path[full-posix-path]
+FAILED tests/test_b103_inc10_s0_written_name.py::test_r_s19_s0header_001_2_5_a_numbered_written_name_wins_over_the_typed_one
+5 failed in 22.09s
+rc=1

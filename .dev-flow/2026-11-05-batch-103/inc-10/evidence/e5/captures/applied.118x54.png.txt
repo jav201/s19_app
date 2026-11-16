@@ -1,0 +1,41 @@
+scenario=applied
+fixture=examples/case_01_basic_valid/firmware.s19 (case01), copied into the scratch base
+entry=0x8000007C DE AD BE EF
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+status_after_add=Patch Editor: entry added.
+status_after_apply=Apply: 1 applied, 0 skipped, 0 blocked
+shown_pane=patch_pane_inspector
+prompt_hidden_class=False
+apply_line=Apply: 1 applied, 0 skipped, 0 blocked · changed in memory only — Write file saves it
+format_label=Format: S19
+width_label=Width: 32 bytes/line visibility=visible
+name_box=firmware-patched.s19
+painted patch_doc_controls: Region(x=5, y=38, width=112, height=1) hit_at_centre=patch_doc_controls
+painted patch_export_dock: Region(x=5, y=39, width=112, height=3) hit_at_centre=patch_saveback_name_input
+painted patch_saveback_row: Region(x=5, y=39, width=112, height=3) hit_at_centre=patch_saveback_name_input
+painted patch_saveback_apply_line: Region(x=6, y=39, width=110, height=1) hit_at_centre=patch_saveback_apply_line
+painted patch_saveback_name_input: Region(x=29, y=40, width=87, height=1) hit_at_centre=patch_saveback_name_input
+painted patch_saveback_format_button: Region(x=6, y=41, width=19, height=1) hit_at_centre=patch_saveback_format_button
+painted patch_saveback_width_button: Region(x=26, y=41, width=22, height=1) hit_at_centre=patch_saveback_width_button
+painted patch_saveback_confirm_button: Region(x=49, y=41, width=12, height=1) hit_at_centre=patch_saveback_confirm_button
+painted patch_saveback_decline_button: Region(x=62, y=41, width=12, height=1) hit_at_centre=patch_saveback_decline_button
+painted patch_before_after_row: None hit_at_centre=None
+painted_rows_from_document_row_begin
+      │  Validate   Apply loaded changes   Save
+      │ Apply: 1 applied, 0 skipped, 0 blocked · changed in memory only — Write file saves it
+      │ Save patched image as: firmware-patched.s19
+      │     Format: S19      Width: 32 bytes/line   Write file   Don't save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded firmware.s19 (S19 only)                                                                   (none)  |  (none)
+  
+painted_rows_from_document_row_end
+focused=patch_doc_apply_button
+notifications=0
+status: Loaded firmware.s19
+status: Patch Editor: entry added.
+status: Apply: 1 applied, 0 skipped, 0 blocked
+stub_os_writes=0
+surface=ready

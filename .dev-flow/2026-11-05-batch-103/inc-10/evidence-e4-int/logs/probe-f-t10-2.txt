@@ -1,0 +1,8 @@
+== probe-f-t10-2 | tree fix | 2026-11-14T05:02:40Z | load: 5.29 4.24 4.10
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+PROBE apply: Apply: 1 applied, 1 skipped, 0 blocked
+PROBE prompt shown after the apply: True
+PROBE save: Saved + verified: firmware-patched.s19 — 1 entry applied before this save (0x8000007C); includes 1 entry not applied before this save (0x00000010)
+.
+1 passed in 11.18s
+rc=0

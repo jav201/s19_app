@@ -1,0 +1,6 @@
+== red-base-shared | tree base | 2026-11-14T05:08:01Z | load: 8.41 6.78 5.25
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+...........................F.F..FF......F......F............rc=124

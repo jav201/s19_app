@@ -507,7 +507,7 @@ def _saved_state_arm(root: Path, arm: str) -> tuple:
         elif arm == "save-back":
             await _patch(pilot, app)
             app.on_patch_editor_panel_save_back_decision(
-                PatchEditorPanel.SaveBackDecision("fw_saved.s19", 32)
+                PatchEditorPanel.SaveBackDecision("fw_saved.s19", 32, output_format="s19")
             )
             await ld.wait_for(
                 pilot,

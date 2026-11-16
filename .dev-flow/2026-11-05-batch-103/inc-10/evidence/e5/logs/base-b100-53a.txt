@@ -1,0 +1,10 @@
+~/work/zq-x10/base/s19_app/__init__.py
+tree: base  base 439860c4 + this test file, its support module and fixtures
+uptime:  03:28:49 up 1 day, 12:17,  3 users,  load average: 6.07, 6.03, 6.79
++ pytest -p no:cacheprovider -p no:xdist -q -rA tests/test_b100_workers.py::test_tc_b100_53_session_writers_are_refused_during_a_save
+.                                                                        [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b100_workers.py::test_tc_b100_53_session_writers_are_refused_during_a_save
+1 passed in 8.35s
+RC=0

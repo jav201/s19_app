@@ -1,0 +1,8 @@
+== final-test_b97_patch_editor | tree final | 2026-11-14T05:47:01Z | load: 10.27 10.23 9.28
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+......................................                                   [100%]
+38 passed in 292.70s (0:04:52)
+rc=0

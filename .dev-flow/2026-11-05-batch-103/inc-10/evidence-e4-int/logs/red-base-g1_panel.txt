@@ -1,0 +1,1111 @@
+== red-base-g1_panel | tree base | 2026-11-14T04:58:35Z | load: 3.17 2.77 3.71
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFF.FFF.FFFFFFFFFFFFFF                                              [100%]
+=================================== FAILURES ===================================
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/4] __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_the_prompt_is0')
+case = 'R-CHG-003.1/4', size = (118, 54), tab = 'script'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/4', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/1] __
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_chg_003_1_the_prompt_is0')
+case = 'R-CHG-003.1/1', size = (118, 54), tab = 'inspector'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/1', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/5] __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_the_prompt_is1')
+case = 'R-CHG-003.1/5', size = (220, 60), tab = 'inspector'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/5', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/2] __
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_chg_003_1_the_prompt_is1')
+case = 'R-CHG-003.1/2', size = (118, 54), tab = 'json'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/2', ['patch_saveback_row: region Region(x=7, y=54, width=106, height=3) leaves the screen Region(x=0, y=...nfirm_button: region Region(x=29, y=55, width=12, height=1) leaves the screen Region(x=0, y=0, width=118, height=54)'])
+E       assert (['patch_saveb..., height=54)'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: region Region(x=7, y=54, width=106, height=3) leaves the screen Region(x=0, y=0, width=118, height=54)'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/6] __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_the_prompt_is2')
+case = 'R-CHG-003.1/6', size = (220, 60), tab = 'json'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/6', ['patch_saveback_row: region Region(x=25, y=60, width=190, height=3) leaves the screen Region(x=0, y...nfirm_button: region Region(x=47, y=61, width=12, height=1) leaves the screen Region(x=0, y=0, width=220, height=60)'])
+E       assert (['patch_saveb..., height=60)'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: region Region(x=25, y=60, width=190, height=3) leaves the screen Region(x=0, y=0, width=220, height=60)'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/3] __
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_chg_003_1_the_prompt_is2')
+case = 'R-CHG-003.1/3', size = (118, 54), tab = 'checks'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/3', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/7] __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_the_prompt_is3')
+case = 'R-CHG-003.1/7', size = (220, 60), tab = 'checks'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/7', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_ test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend[R-PE-EXPORT.1/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_1_the_prompt_0')
+case = 'R-PE-EXPORT.1/2', size = (220, 60)
+
+    @pytest.mark.parametrize("case,size", [("R-PE-EXPORT.1/1", t.SIZE), ("R-PE-EXPORT.1/2", t.WIDE)],
+                             ids=["R-PE-EXPORT.1/1", "R-PE-EXPORT.1/2"])
+    def test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend(tmp_path, case, size):
+        """R-PE-EXPORT.1/1,/2: prompt top row below the document row's row, bottom row above the legend's row,
+        x and width equal the document row's.  Negative control: the prompt inside the inspector (base) -> RED."""
+    
+        async def body(app, pilot):
+            prompt = t.need(app.screen, "#patch_saveback_row").region
+            doc = t.need(app.screen, "#patch_doc_controls").region
+            legend = t.need(app.screen, "#patch_legend").region
+            return prompt, doc, legend
+    
+        prompt, doc, legend = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+>       assert prompt.y > doc.y, (case, "prompt top row is not below the document row", prompt, doc)
+E       AssertionError: ('R-PE-EXPORT.1/2', 'prompt top row is not below the document row', Region(x=0, y=0, width=0, height=0), Region(x=23, y=47, width=196, height=1))
+E       assert 0 > 47
+E        +  where 0 = Region(x=0, y=0, width=0, height=0).y
+E        +  and   47 = Region(x=23, y=47, width=196, height=1).y
+
+tests/test_b103_inc10_g1_panel.py:97: AssertionError
+_ test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/8] __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_the_prompt_is4')
+case = 'R-CHG-003.1/8', size = (220, 60), tab = 'script'
+
+    @pytest.mark.parametrize("case,size,tab", CHG_1, ids=[c[0] for c in CHG_1])
+    def test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown(tmp_path, case, size, tab):
+        """R-CHG-003.1/1..8: after Apply from each tab the prompt and ``Write file`` are shown at their place and
+        the shown tab is still the one shown before Apply (D-1 A).  Negative control: the prompt kept inside the
+        JSON tab (the base) -> 6 of the 8 cases RED."""
+        chip = TAB_BY_NAME[tab]
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")),
+                    t.current_pane(app))
+    
+        dialog = case in ("R-CHG-003.1/1", "R-CHG-003.1/5")  # the Inspector cases load through the Load dialog
+        row, confirm, pane = applied(tmp_path, size, "firmware.s19", chip, body, dialog=dialog)
+>       assert row == [] and confirm == [], (case, row, confirm)
+E       AssertionError: ('R-CHG-003.1/8', ['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:65: AssertionError
+_____ test_r_tui_063_1_the_patch_editor_top_to_bottom_order[R-TUI-063.1/2] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_tui_063_1_the_patch_edi1')
+case = 'R-TUI-063.1/2', size = (118, 54), with_prompt = True
+
+    @pytest.mark.parametrize("case,size,with_prompt", TOP_ROWS, ids=[c[0] for c in TOP_ROWS])
+    def test_r_tui_063_1_the_patch_editor_top_to_bottom_order(tmp_path, case, size, with_prompt):
+        """R-TUI-063.1/1..4: the shown parts' top rows strictly increase: ribbon, filter row, staging sheet,
+        landing pane, file row, document row, [prompt], legend.  Negative control: the prompt docked under the
+        legend -> /2 and /4 RED."""
+        order = ORDER_SHOWN if with_prompt else ORDER_HIDDEN
+    
+        async def body(app, pilot):
+            return t.top_rows(app, order), t.prompt_is_shown(app)
+    
+        if with_prompt:
+            rows, prompt = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+        else:
+            rows, prompt = loaded(tmp_path, size, "firmware.s19", body)
+>       assert prompt is with_prompt, (case, "prompt shown state", prompt)
+E       AssertionError: ('R-TUI-063.1/2', 'prompt shown state', False)
+E       assert False is True
+
+tests/test_b103_inc10_g1_panel.py:120: AssertionError
+_ test_r_chg_003_1_9_the_prompt_is_shown_after_an_apply_on_an_intel_hex_image __
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_chg_003_1_9_the_prompt_0')
+
+    def test_r_chg_003_1_9_the_prompt_is_shown_after_an_apply_on_an_intel_hex_image(tmp_path):
+        """R-CHG-003.1/9: Applied HEX from the Inspector tab at 118x54 -> prompt and ``Write file`` shown at their
+        place.  Negative control: the prompt hidden by ``#patch_win_json`` (base, B) -> RED."""
+    
+        async def body(app, pilot):
+            return (t.at_its_place(app, t.need(app.screen, "#patch_saveback_row")),
+                    t.at_its_place(app, t.need(app.screen, "#patch_saveback_confirm_button")))
+    
+        row, confirm = applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body)
+>       assert row == [] and confirm == [], (row, confirm)
+E       AssertionError: (['patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], ['patch_saveback_confirm_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_row: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_panel.py:78: AssertionError
+_ test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend[R-PE-EXPORT.1/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_1_the_prompt_0')
+case = 'R-PE-EXPORT.1/1', size = (118, 54)
+
+    @pytest.mark.parametrize("case,size", [("R-PE-EXPORT.1/1", t.SIZE), ("R-PE-EXPORT.1/2", t.WIDE)],
+                             ids=["R-PE-EXPORT.1/1", "R-PE-EXPORT.1/2"])
+    def test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend(tmp_path, case, size):
+        """R-PE-EXPORT.1/1,/2: prompt top row below the document row's row, bottom row above the legend's row,
+        x and width equal the document row's.  Negative control: the prompt inside the inspector (base) -> RED."""
+    
+        async def body(app, pilot):
+            prompt = t.need(app.screen, "#patch_saveback_row").region
+            doc = t.need(app.screen, "#patch_doc_controls").region
+            legend = t.need(app.screen, "#patch_legend").region
+            return prompt, doc, legend
+    
+        prompt, doc, legend = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+>       assert prompt.y > doc.y, (case, "prompt top row is not below the document row", prompt, doc)
+E       AssertionError: ('R-PE-EXPORT.1/1', 'prompt top row is not below the document row', Region(x=0, y=0, width=0, height=0), Region(x=5, y=41, width=112, height=1))
+E       assert 0 > 41
+E        +  where 0 = Region(x=0, y=0, width=0, height=0).y
+E        +  and   41 = Region(x=5, y=41, width=112, height=1).y
+
+tests/test_b103_inc10_g1_panel.py:97: AssertionError
+_____ test_r_tui_063_1_the_patch_editor_top_to_bottom_order[R-TUI-063.1/4] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_tui_063_1_the_patch_edi3')
+case = 'R-TUI-063.1/4', size = (220, 60), with_prompt = True
+
+    @pytest.mark.parametrize("case,size,with_prompt", TOP_ROWS, ids=[c[0] for c in TOP_ROWS])
+    def test_r_tui_063_1_the_patch_editor_top_to_bottom_order(tmp_path, case, size, with_prompt):
+        """R-TUI-063.1/1..4: the shown parts' top rows strictly increase: ribbon, filter row, staging sheet,
+        landing pane, file row, document row, [prompt], legend.  Negative control: the prompt docked under the
+        legend -> /2 and /4 RED."""
+        order = ORDER_SHOWN if with_prompt else ORDER_HIDDEN
+    
+        async def body(app, pilot):
+            return t.top_rows(app, order), t.prompt_is_shown(app)
+    
+        if with_prompt:
+            rows, prompt = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+        else:
+            rows, prompt = loaded(tmp_path, size, "firmware.s19", body)
+>       assert prompt is with_prompt, (case, "prompt shown state", prompt)
+E       AssertionError: ('R-TUI-063.1/4', 'prompt shown state', False)
+E       assert False is True
+
+tests/test_b103_inc10_g1_panel.py:120: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_every_promp0')
+case = 'R-PE-EXPORT.2/1', size = (118, 54), tab = 'inspector'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/3] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_every_promp0')
+case = 'R-PE-EXPORT.2/3', size = (118, 54), tab = 'checks'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/2] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_every_promp1')
+case = 'R-PE-EXPORT.2/2', size = (118, 54), tab = 'json'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/4] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_every_promp1')
+case = 'R-PE-EXPORT.2/4', size = (118, 54), tab = 'script'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/5] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_every_promp2')
+case = 'R-PE-EXPORT.2/5', size = (220, 60), tab = 'inspector'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/6] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_every_promp2')
+case = 'R-PE-EXPORT.2/6', size = (220, 60), tab = 'json'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/7] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_every_promp3')
+case = 'R-PE-EXPORT.2/7', size = (220, 60), tab = 'checks'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/8] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_every_promp3')
+case = 'R-PE-EXPORT.2/8', size = (220, 60), tab = 'script'
+source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/9] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_every_promp4')
+case = 'R-PE-EXPORT.2/9', size = (118, 54), tab = 'inspector'
+source = 'firmware.hex'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/10] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_every_promp4')
+case = 'R-PE-EXPORT.2/10', size = (220, 60), tab = 'inspector'
+source = 'firmware.hex'
+
+    @pytest.mark.parametrize("case,size,tab,source", EXPORT_2, ids=[c[0] for c in EXPORT_2])
+    def test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling(tmp_path, case, size, tab, source):
+        """R-PE-EXPORT.2/1..10: name box, Format, Width (S19 only), ``Write file``, ``Don't save`` inside the
+        screen and every scroll offset of the Patch Editor at 0.  Negative control: the prompt mounted after the
+        legend with the panel's height unchanged -> controls past the last row -> RED."""
+        ids = CTRL_S19 if source.endswith(".s19") else CTRL_HEX
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app))
+    
+>       bad, offsets = applied(tmp_path, size, source, TAB_BY_NAME[tab], body)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in body
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:145: in <listcomp>
+    bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+____ test_r_pe_export_2_11_the_largest_dock_fits_and_its_height_is_recorded ____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw1/test_r_pe_export_2_11_the_larg0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f8e0e5bcf50>
+
+    def test_r_pe_export_2_11_the_largest_dock_fits_and_its_height_is_recorded(tmp_path, capsys):
+        """R-PE-EXPORT.2/11 (118x54): prompt and before/after control both shown (``Write file``, then Apply
+        again): every control inside the screen, every scroll offset 0; the dock's height is printed as
+        ``DOCK-HEIGHT`` (expected 4 = Inc 8's stand-in; more than 4 is finding F-R8-1, not a failure here).
+        Negative control: no dock at all (base) -> the ids are missing -> RED."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            await t.press_apply(pilot, app)
+            ids = CTRL_S19 + ("patch_before_after_button",)
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            dock = t.need(app.screen, "#patch_export_dock")
+            return bad, t.scroll_offsets(t.panel_of(app)), dock.region.height
+    
+>       bad, offsets, height = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:160: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+___________ test_r_pe_export_2_11_dock_height_at_220x60_is_recorded ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-1/popen-gw0/test_r_pe_export_2_11_dock_hei0')
+
+    def test_r_pe_export_2_11_dock_height_at_220x60_is_recorded(tmp_path):
+        """R-PE-EXPORT.2/11 (second size, brief: record at 118x54 and 220x60): same scene at 220x60; the height
+        is printed as ``DOCK-HEIGHT`` and the controls are inside the screen.  Negative control as above."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            await t.press_apply(pilot, app)
+            ids = CTRL_S19 + ("patch_before_after_button",)
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.need(app.screen, "#patch_export_dock").region.height
+    
+>       bad, height = applied(tmp_path, t.WIDE, "firmware.s19", "patch_tab_inspector", body)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_panel.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_panel.py:178: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/4]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/1]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/5]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/2]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/6]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/3]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/7]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend[R-PE-EXPORT.1/2]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_the_prompt_is_shown_whichever_tab_was_shown[R-CHG-003.1/8]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_tui_063_1_the_patch_editor_top_to_bottom_order[R-TUI-063.1/2]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_chg_003_1_9_the_prompt_is_shown_after_an_apply_on_an_intel_hex_image
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_1_the_prompt_sits_between_the_document_row_and_the_legend[R-PE-EXPORT.1/1]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_tui_063_1_the_patch_editor_top_to_bottom_order[R-TUI-063.1/4]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/1]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/3]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/2]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/4]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/5]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/6]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/7]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/8]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/9]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_every_prompt_control_is_on_screen_without_scrolling[R-PE-EXPORT.2/10]
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_11_the_largest_dock_fits_and_its_height_is_recorded
+FAILED tests/test_b103_inc10_g1_panel.py::test_r_pe_export_2_11_dock_height_at_220x60_is_recorded
+25 failed, 2 passed in 139.99s (0:02:19)
+rc=1

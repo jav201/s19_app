@@ -1,0 +1,25 @@
+# base 439860c4 product + T10 tests; rtx; env -i ... timeout 300 python -m pytest -p no:cacheprovider -n 2 -q -rfEp
+# first line = s19_app.__file__ (base tree, runner home abbreviated)
+~/work/zq-e4-10-t10/base/s19_app/__init__.py
+E           FileNotFoundError: [Errno 2] No such file or directory: '~/work/zq-e4-10-t10/base/examples/case_00_public/prg.s19'
+E           FileNotFoundError: [Errno 2] No such file or directory: '~/work/zq-e4-10-t10/base/examples/case_00_public/prg.s19'
+E           FileNotFoundError: [Errno 2] No such file or directory: '~/work/zq-e4-10-t10/base/examples/case_00_public/prg.s19'
+E               TypeError: ActionsMixin.show_save_prompt() got an unexpected keyword argument 'output_format'
+E       AssertionError: click missed #patch_entry_address_input
+E       AssertionError: click missed #patch_entry_address_input
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size2]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size1]
+FAILED tests/test_tui_patch_layout.py::test_at064c_revealed_rows_reachable_at_80
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert Fals...
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1]
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_save_back_keeps_editor_image
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_verify_mismatch_status_still_names_entries
+14 failed in 57.68s
+real	0m59.404s

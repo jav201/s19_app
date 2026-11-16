@@ -1,0 +1,7 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  03:21:52 up 1 day, 12:10,  3 users,  load average: 5.57, 6.56, 7.37
++ pytest -p no:cacheprovider -p no:xdist -q -rfE tests/test_b100_save_image.py -k tc_b100_59
+....................s.......s...                                         [100%]
+30 passed, 2 skipped, 46 deselected in 113.86s (0:01:53)
+RC=0

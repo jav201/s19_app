@@ -1,0 +1,224 @@
+~/work/zq-x10/base/s19_app/__init__.py
+tree: base  base 439860c4 + this test file, its support module and fixtures
+uptime:  03:27:44 up 1 day, 12:16,  3 users,  load average: 5.74, 5.98, 6.83
++ pytest -p no:cacheprovider -p no:xdist -q -rA tests/test_b100_save_image.py -k tc_b100_14 or tc_b100_15 or tc_b100_58 or tc_b100_69
+...................F.....s.                                              [100%]
+=================================== FAILURES ===================================
+__________ test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved ___________
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-31/test_tc_b100_58_mac_attach_kee0')
+
+    def test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved(
+        tmp_path: Path,
+    ) -> None:
+        """Review F5 (LLR-167.5): attaching a MAC re-installs the SAME image
+        dict, so it is not a load — an applied, unsaved patch must stay
+        unsaved, or the Inc 10 load question would not ask before replacing
+        it."""
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.mac")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                mem_map = app.current_file.mem_map
+                assert app._change_service.differs_from_last_saved(mem_map)
+                app.load_selected_file(folder / "firmware.mac")
+                await _wait_for(
+                    pilot,
+                    lambda: app.current_file is not None
+                    and app.current_file.mac_path is not None,
+                    "the MAC attach",
+                )
+                return (
+                    app.current_file.mem_map is mem_map,
+                    app._change_service.differs_from_last_saved(
+                        app.current_file.mem_map
+                    ),
+                )
+    
+>       assert asyncio.run(_drive()) == (True, True)
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1104: in _drive
+    async with app.run_test(size=(220, 60)) as pilot:
+../../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+s19_app/tui/app/core.py:1260: in on_event
+    await super().on_event(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4148: in on_event
+    await super().on_event(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:900: in on_callback
+    await invoke(event.callback)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app/loaded_state.py:779: in _step_sections
+    self.update_sections()
+s19_app/tui/app/workspace_view.py:265: in update_sections
+    sections = self.query_one("#sections_list", ListView)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#sections_list'
+expect_type = <class 'textual.widgets._list_view.ListView'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#sections_list' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ ~/work/zq-x10/base/s19_app/tui/app/loaded_state.py:779 in       │
+│ _step_sections                                                               │
+│                                                                              │
+│   776 │   │   │   │   if precomputed_oor is not None:                        │
+│   777 │   │   │   │   │   self.update_sections(precomputed_out_of_range=prec │
+│   778 │   │   │   │   else:                                                  │
+│ ❱ 779 │   │   │   │   │   self.update_sections()                             │
+│   780 │   │   │   finally:                                                   │
+│   781 │   │   │   │   self.logger.info(                                      │
+│   782 │   │   │   │   │   "Load phase boundary: apply_sections_done path=%s" │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-x10/base/s19_app/tui/app/workspace_view.py:265 in     │
+│ update_sections                                                              │
+│                                                                              │
+│   262 │   │   │   Used by:                                                   │
+│   263 │   │   │   │   - ``_apply_prepared_load``                             │
+│   264 │   │   """                                                            │
+│ ❱ 265 │   │   sections = self.query_one("#sections_list", ListView)          │
+│   266 │   │   sections.clear()                                               │
+│   267 │   │   self.update_workspace_stats()                                  │
+│   268 │   │   self.update_memory_strip()                                     │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'focus',                     │          │
+│ │                            │   │   'dark'                       │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#sections_list' on Screen(id='_default')
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_no_entry_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_new_bytes_emit
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_same_bytes_copy
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_check_document_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_applied_then_undone_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_unapplied_entry_emits
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_save_back_then_emit
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_deciding_writes_nothing
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_patched_s19_is_emitted
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_check_document_only_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_unchanged_document_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_entry_removed_after_apply_is_absent
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_patched_hex_is_emitted
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_save_back_then_save_project_keeps_the_patch
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_clashing_name_lands_as_the_next_variant
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_predicate_sequence_unit
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_save_project_records_the_saved_state
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_save_back_records_the_saved_state
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_rederive_writes_nothing_into_the_session_map
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[applied]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[undone]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[added_after_apply]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[blocked]
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_save_project_surfaces_the_emit_verify
+SKIPPED [1] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved
+1 failed, 25 passed, 1 skipped, 51 deselected in 63.02s (0:01:03)
+RC=1

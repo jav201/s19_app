@@ -1,0 +1,8 @@
+== green2-g1_panel-chg | tree fix | 2026-11-14T05:06:55Z | load: 8.10 6.32 5.00
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 64.83s (0:01:04)
+rc=0

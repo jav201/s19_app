@@ -1,0 +1,69 @@
+# base 439860c4 product + T10 tests; rtx; env -i ... timeout 300 python -m pytest -p no:cacheprovider -n 2 -q -rfEp
+# first line = s19_app.__file__ (base tree, runner home abbreviated)
+~/work/zq-e4-10-t10/base/s19_app/__init__.py
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+E       AssertionError: assert ['the prompt ...cuity guard)'] == []
+E         
+E         Left contains one more item: 'the prompt itself is not shown at its place (vacuity guard)'
+E         Use -v to get more diff
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E       AssertionError: the Width control has no place to click before the switch
+E       AssertionError: (['patch_saveback_width_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], '')
+E         
+E         Left contains one more item: 'patch_saveback_width_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E       AssertionError: click missed #patch_saveback_width_button
+E       AssertionError: click missed #patch_saveback_width_button
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+E       AssertionError: ('R-HEX-VERIFY-002.3/1', 'firmware-patched.s19', ['patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E         
+E           firmware-patched.s19 and ['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+E       AssertionError: ('R-HEX-VERIFY-002.3/2', 'firmware-patched.hex', ['patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E         
+E           firmware-patched.hex and ['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+E       AssertionError: the prompt is not a shown widget, so this case would pass vacuously
+E       AssertionError: the prompt is not a shown widget, so this case would pass vacuously
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_1_the_format_control_shows_s19_for_an_s19_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_9_2_the_label_follows_a_press
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_10_1_no_width_control_for_an_intel_hex_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_3_each_new_prompt_starts_from_the_loaded_images_format
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_10_2_no_width_control_after_switching_to_intel_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_11_1_the_width_control_is_shown_for_s19
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_11_2_the_width_control_returns_when_switching_intel_hex_to_s19
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/3]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/4]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_s19_width_001_2_1_width_switches_32_16_in_the_new_placement
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_s19_width_001_1_1_the_width_is_32_on_every_new_prompt
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_1_the_suggested_name_follows_a_switch_to_intel_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_2_an_upper_case_suffix_is_replaced
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_3_a_switch_to_s19_replaces_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_4_1_the_prompts_chips_are_one_row_high
+24 failed in 116.45s (0:01:56)
+real	1m58.343s

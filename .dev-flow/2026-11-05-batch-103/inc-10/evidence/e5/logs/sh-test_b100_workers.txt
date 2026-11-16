@@ -1,0 +1,8 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  02:54:49 up 1 day, 11:43,  5 users,  load average: 8.45, 8.67, 7.71
++ pytest -p no:cacheprovider -n 2 -q -rfE tests/test_b100_workers.py
+bringing up nodes...
+bringing up nodes...
+
+.........F................x.F....RC=124

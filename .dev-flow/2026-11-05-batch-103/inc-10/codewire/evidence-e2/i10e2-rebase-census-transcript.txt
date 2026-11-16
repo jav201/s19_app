@@ -1,0 +1,98 @@
+# i10e2-rebase-census: old e07fb00f new 287b9dc3; python 3.12.7
+## files identical at both commits
+s19_app/tui/screens_directionb.py: differs
+s19_app/tui/app.py: differs
+s19_app/tui/services/change_service.py: identical
+s19_app/tui/changes/apply.py: identical
+s19_app/tui/changes/verify.py: identical
+s19_app/tui/services/flow_execution_service.py: differs
+s19_app/tui/services/variant_execution_service.py: identical
+s19_app/tui/styles.tcss: identical
+## functions (def line - end line; AST equality)
+screens_directionb.py          PatchEditorPanel.SAVEBACK_WIDTHS                     4589-4589    -> 4589-4589    same-ast
+screens_directionb.py          PatchEditorPanel.__init__                            4811-4871    -> 4811-4872    DIFF
+screens_directionb.py          PatchEditorPanel.SaveBackDecision.__init__           4675-4680    -> 4675-4680    same-ast
+screens_directionb.py          PatchEditorPanel.compose                             4930-5284    -> 4931-5287    DIFF
+screens_directionb.py          PatchEditorPanel.on_button_pressed                   5896-6058    -> 5941-6103    same-ast
+screens_directionb.py          PatchEditorPanel.show_save_prompt                    6448-6469    -> 6493-6514    same-ast
+screens_directionb.py          PatchEditorPanel.hide_save_prompt                    6471-6478    -> 6516-6523    same-ast
+screens_directionb.py          PatchEditorPanel.show_before_after_prompt            6480-6495    -> 6525-6540    same-ast
+screens_directionb.py          PatchEditorPanel.hide_before_after_prompt            6497-6511    -> 6542-6556    same-ast
+screens_directionb.py          PatchEditorPanel._show_tab                           5637-5649    -> 5682-5694    same-ast
+app.py                         S19TuiApp.on_patch_editor_panel_action_requested     4734-4956    -> 5112-5334    same-ast
+app.py                         S19TuiApp.on_patch_editor_panel_save_back_decision   4958-5096    -> 5336-5474    same-ast
+app.py                         S19TuiApp._hide_replaced_document_controls           5173-5202    -> 5551-5580    same-ast
+app.py                         _synth_s0_header_from_filename                       662-690      -> 708-736      same-ast
+app.py                         S19TuiApp._compose_screen_patch                      4649-4689    -> 5027-5067    same-ast
+app.py                         S19TuiApp._patch_editor_load                         7529-7552    -> 7907-7930    same-ast
+app.py                         S19TuiApp.action_patch_undo                          5367-5400    -> 5745-5778    same-ast
+app.py                         S19TuiApp.action_patch_redo                          5402-5435    -> 5780-5813    same-ast
+app.py                         S19TuiApp._reset_project_session                     13854-14011  -> 14556-14718  DIFF
+app.py                         S19TuiApp._apply_prepared_load                       18428-18721  -> 19518-19799  DIFF
+app.py                         S19TuiApp._save_project_files                        12369-12993  -> 13050-13674  same-ast
+app.py                         S19TuiApp._decide_project_image                      13194-13300  -> 13875-13981  same-ast
+change_service.py              ChangeService.save_patched                           2481-2634    -> 2481-2634    same-ast
+change_service.py              ChangeService.emit_and_verify                        2375-2479    -> 2375-2479    same-ast
+apply.py                       save_patched_image                                   686-874      -> 686-874      same-ast
+apply.py                       render_patched_image                                 629-683      -> 629-683      same-ast
+verify.py                      verify_written_image                                 119-171      -> 119-171      same-ast
+flow_execution_service.py      run_flow                                             187-1351     -> 187-1351     same-ast
+variant_execution_service.py   _execute_one_variant                                 2478-2606    -> 2478-2606    same-ast
+## call sites (file:line, def lines excluded)
+### old
+app.py:4686: PatchEditorPanel(),
+app.py:4819: panel.hide_before_after_prompt()
+app.py:4830: self._hide_replaced_document_controls(panel)
+app.py:4876: panel.show_save_prompt(f"{variant_id}-patched{suffix}")
+app.py:5018: panel.hide_save_prompt()
+app.py:5029: s0_header = loaded.source_s0_header or _synth_s0_header_from_filename(
+app.py:5034: result = self._change_service.save_patched(
+app.py:5079: panel.show_before_after_prompt()
+app.py:5201: panel.hide_before_after_prompt()
+app.py:5202: panel.hide_save_prompt()
+app.py:5399: self._hide_replaced_document_controls(panel)
+app.py:5434: self._hide_replaced_document_controls(panel)
+app.py:7546: self._hide_replaced_document_controls(panel)
+app.py:12536: path, issues = save_patched_image(
+app.py:13264: payload = render_patched_image(
+app.py:14007: self._hide_replaced_document_controls(panel)
+app.py:18565: self._hide_replaced_document_controls(panel)
+screens_directionb.py:5920: self._show_tab(button_id)
+screens_directionb.py:5945: self.SaveBackDecision(
+screens_directionb.py:5953: self.post_message(self.SaveBackDecision(None))
+screens_directionb.py:7922: self._show_tab(button_id)
+screens_directionb.py:7942: self._show_tab("check_tab_addendum")
+screens_directionb.py:8026: self._show_tab("check_tab_fields")
+change_service.py:2444: path, issues = save_patched_image(
+change_service.py:2624: return self.emit_and_verify(
+apply.py:795: payload = render_patched_image(
+flow_execution_service.py:727: saved_path, save_issues = save_patched_image(
+variant_execution_service.py:2584: saved_path, save_issues = save_patched_image(
+### new
+app.py:5064: PatchEditorPanel(),
+app.py:5197: panel.hide_before_after_prompt()
+app.py:5208: self._hide_replaced_document_controls(panel)
+app.py:5254: panel.show_save_prompt(f"{variant_id}-patched{suffix}")
+app.py:5396: panel.hide_save_prompt()
+app.py:5407: s0_header = loaded.source_s0_header or _synth_s0_header_from_filename(
+app.py:5412: result = self._change_service.save_patched(
+app.py:5457: panel.show_before_after_prompt()
+app.py:5579: panel.hide_before_after_prompt()
+app.py:5580: panel.hide_save_prompt()
+app.py:5777: self._hide_replaced_document_controls(panel)
+app.py:5812: self._hide_replaced_document_controls(panel)
+app.py:7924: self._hide_replaced_document_controls(panel)
+app.py:13217: path, issues = save_patched_image(
+app.py:13945: payload = render_patched_image(
+app.py:14714: self._hide_replaced_document_controls(panel)
+app.py:19659: self._hide_replaced_document_controls(panel)
+screens_directionb.py:5965: self._show_tab(button_id)
+screens_directionb.py:5990: self.SaveBackDecision(
+screens_directionb.py:5998: self.post_message(self.SaveBackDecision(None))
+screens_directionb.py:7964: self._show_tab(button_id)
+screens_directionb.py:8072: self._show_tab("check_tab_fields")
+change_service.py:2444: path, issues = save_patched_image(
+change_service.py:2624: return self.emit_and_verify(
+apply.py:795: payload = render_patched_image(
+flow_execution_service.py:727: saved_path, save_issues = save_patched_image(
+variant_execution_service.py:2584: saved_path, save_issues = save_patched_image(

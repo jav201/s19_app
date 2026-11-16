@@ -1,0 +1,20 @@
+~/work/zq-x10/clone3/s19_app/__init__.py
+tree: clone3  clone of the bundle at 9eadcf22, main = origin/main
+uptime:  03:38:40 up 1 day, 12:27,  4 users,  load average: 7.27, 6.72, 6.77
++ pytest -p no:cacheprovider -n 2 tests/test_suite_hygiene.py tests/test_no_private_tokens.py tests/test_id_registry.py tests/test_filename_markup_safety.py tests/test_docs_canon.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x10/clone3
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [85 items]
+
+........................................................................ [ 84%]
+.............                                                            [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.505 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+======================== 85 passed in 210.74s (0:03:30) ========================
+RC=0

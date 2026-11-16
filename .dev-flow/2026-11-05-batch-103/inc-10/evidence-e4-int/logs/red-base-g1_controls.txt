@@ -1,0 +1,1679 @@
+== red-base-g1_controls | tree base | 2026-11-14T05:00:56Z | load: 5.51 3.79 3.95
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFFFFFFF                                                 [100%]
+=================================== FAILURES ===================================
+______ test_r_pe_export_7_1_the_format_control_shows_s19_for_an_s19_image ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_7_1_the_forma0')
+
+    def test_r_pe_export_7_1_the_format_control_shows_s19_for_an_s19_image(tmp_path):
+        """R-PE-EXPORT.7/1 + R-PE-EXPORT.9/1: Applied case01 -> the painted Format control holds ``S19`` and not
+        ``Intel HEX``.  Negative control: always Intel HEX, or no control (base) -> RED."""
+    
+        async def body(app, pilot):
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+    
+>       text = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:37: in body
+    return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+________________ test_r_pe_export_9_2_the_label_follows_a_press ________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_9_2_the_label0')
+
+    def test_r_pe_export_9_2_the_label_follows_a_press(tmp_path):
+        """R-PE-EXPORT.9/2: after one Format press the painted control holds ``Intel HEX``.  Negative control: the
+        label not refreshed on a press -> RED."""
+    
+        async def body(app, pilot):
+            await format_press(pilot)
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+    
+>       text = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:73: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_7_2_the_forma0')
+
+    def test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image(tmp_path):
+        """R-PE-EXPORT.7/2: Applied HEX -> ``Intel HEX``.  Negative control: always S19 -> RED."""
+    
+        async def body(app, pilot):
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+    
+>       text = applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:47: in body
+    return t.painted(app, t.need(app.screen, "#patch_saveback_format_button"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+________ test_r_pe_export_10_1_no_width_control_for_an_intel_hex_image _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_10_1_no_width0')
+
+    def test_r_pe_export_10_1_no_width_control_for_an_intel_hex_image(tmp_path):
+        """R-PE-EXPORT.10/1: Applied HEX -> Width not painted, never focused by Tab, a click at its place leaves
+        the width and the name box unchanged.  Negative control: Width shown for Intel HEX (base, B) -> RED."""
+    
+        async def body(app, pilot):
+            region = t.need(app.screen, "#patch_saveback_width_button").region
+            return await width_is_inert(app, pilot, region)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body) == []
+E       AssertionError: assert ['the prompt ...cuity guard)'] == []
+E         
+E         Left contains one more item: 'the prompt itself is not shown at its place (vacuity guard)'
+E         Use -v to get more diff
+
+tests/test_b103_inc10_g1_controls.py:114: AssertionError
+__ test_r_pe_export_7_3_each_new_prompt_starts_from_the_loaded_images_format ___
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_7_3_each_new_0')
+
+    def test_r_pe_export_7_3_each_new_prompt_starts_from_the_loaded_images_format(tmp_path):
+        """R-PE-EXPORT.7/3: Format (Intel HEX), ``Don't save``, Apply -> the control shows ``S19``, the name box
+        ``firmware-patched.s19``.  Negative control: the format kept from the last prompt -> RED."""
+    
+        async def body(app, pilot):
+            await format_press(pilot)
+            await t.press_button(pilot, "#patch_saveback_decline_button")
+            await t.press_apply(pilot, app)
+            return t.painted(app, t.need(app.screen, "#patch_saveback_format_button")), t.name_value(app)
+    
+>       text, name = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:58: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_____ test_r_pe_export_10_2_no_width_control_after_switching_to_intel_hex ______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_10_2_no_width0')
+
+    def test_r_pe_export_10_2_no_width_control_after_switching_to_intel_hex(tmp_path):
+        """R-PE-EXPORT.10/2: Applied case01, Format -> as /1, the click at the place the control had.
+        Negative control: Width shown for Intel HEX -> RED."""
+    
+        async def body(app, pilot):
+            region = t.need(app.screen, "#patch_saveback_width_button").region
+            assert region.width > 0, "the Width control has no place to click before the switch"
+            await format_press(pilot)
+            return await width_is_inert(app, pilot, region)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        region = t.need(app.screen, "#patch_saveback_width_button").region
+>       assert region.width > 0, "the Width control has no place to click before the switch"
+E       AssertionError: the Width control has no place to click before the switch
+E       assert 0 > 0
+E        +  where 0 = Region(x=0, y=0, width=0, height=0).width
+
+tests/test_b103_inc10_g1_controls.py:123: AssertionError
+___________ test_r_pe_export_11_1_the_width_control_is_shown_for_s19 ___________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_11_1_the_widt0')
+
+    def test_r_pe_export_11_1_the_width_control_is_shown_for_s19(tmp_path):
+        """R-PE-EXPORT.11/1: Applied case01 -> ``Width: 32 bytes/line`` shown at its place.  Negative control:
+        the control hidden for S19 -> RED (base: shown only in the JSON tab, C)."""
+    
+        async def body(app, pilot):
+            width = t.need(app.screen, "#patch_saveback_width_button")
+            return t.at_its_place(app, width), t.painted(app, width)
+    
+        place, text = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert place == [] and "Width: 32 bytes/line" in text, (place, text)
+E       AssertionError: (['patch_saveback_width_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'], '')
+E       assert (['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_width_button: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_controls.py:139: AssertionError
+_ test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/2] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_12_write_file0')
+case = 'R-PE-EXPORT.12/2', size = (118, 54), source = 'firmware.hex'
+
+    @pytest.mark.parametrize("case,size,source", EXPORT_12, ids=[c[0] for c in EXPORT_12])
+    def test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change(tmp_path, case, size, source):
+        """R-PE-EXPORT.12/1..4: the regions of ``Write file`` and ``Don't save`` equal before and after a Format
+        press (/1, /3 S19 -> Intel HEX; /2, /4 Intel HEX -> S19, the source being HEX).  Negative control: the
+        Width control collapsed for Intel HEX -> ``Write file`` moves left -> RED."""
+        ids = ("patch_saveback_confirm_button", "patch_saveback_decline_button")
+    
+        async def body(app, pilot):
+            before = t.regions(app, ids)
+            await format_press(pilot)
+            return before, t.regions(app, ids)
+    
+>       before, after = applied(tmp_path, size, source, "patch_tab_inspector", body)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:171: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_pe_export_11_2_the_width_control_returns_when_switching_intel_hex_to_s19 _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_11_2_the_widt0')
+
+    def test_r_pe_export_11_2_the_width_control_returns_when_switching_intel_hex_to_s19(tmp_path):
+        """R-PE-EXPORT.11/2: Applied HEX, Format -> ``Width: 32 bytes/line`` shown.  Negative control: the control
+        stays hidden after the switch -> RED."""
+    
+        async def body(app, pilot):
+            await format_press(pilot)
+            width = t.need(app.screen, "#patch_saveback_width_button")
+            return t.at_its_place(app, width), t.painted(app, width)
+    
+>       place, text = applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:147: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/3] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_12_write_file1')
+case = 'R-PE-EXPORT.12/3', size = (220, 60), source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,source", EXPORT_12, ids=[c[0] for c in EXPORT_12])
+    def test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change(tmp_path, case, size, source):
+        """R-PE-EXPORT.12/1..4: the regions of ``Write file`` and ``Don't save`` equal before and after a Format
+        press (/1, /3 S19 -> Intel HEX; /2, /4 Intel HEX -> S19, the source being HEX).  Negative control: the
+        Width control collapsed for Intel HEX -> ``Write file`` moves left -> RED."""
+        ids = ("patch_saveback_confirm_button", "patch_saveback_decline_button")
+    
+        async def body(app, pilot):
+            before = t.regions(app, ids)
+            await format_press(pilot)
+            return before, t.regions(app, ids)
+    
+>       before, after = applied(tmp_path, size, source, "patch_tab_inspector", body)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:171: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/1] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_12_write_file0')
+case = 'R-PE-EXPORT.12/1', size = (118, 54), source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,size,source", EXPORT_12, ids=[c[0] for c in EXPORT_12])
+    def test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change(tmp_path, case, size, source):
+        """R-PE-EXPORT.12/1..4: the regions of ``Write file`` and ``Don't save`` equal before and after a Format
+        press (/1, /3 S19 -> Intel HEX; /2, /4 Intel HEX -> S19, the source being HEX).  Negative control: the
+        Width control collapsed for Intel HEX -> ``Write file`` moves left -> RED."""
+        ids = ("patch_saveback_confirm_button", "patch_saveback_decline_button")
+    
+        async def body(app, pilot):
+            before = t.regions(app, ids)
+            await format_press(pilot)
+            return before, t.regions(app, ids)
+    
+>       before, after = applied(tmp_path, size, source, "patch_tab_inspector", body)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:171: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/4] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_12_write_file2')
+case = 'R-PE-EXPORT.12/4', size = (220, 60), source = 'firmware.hex'
+
+    @pytest.mark.parametrize("case,size,source", EXPORT_12, ids=[c[0] for c in EXPORT_12])
+    def test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change(tmp_path, case, size, source):
+        """R-PE-EXPORT.12/1..4: the regions of ``Write file`` and ``Don't save`` equal before and after a Format
+        press (/1, /3 S19 -> Intel HEX; /2, /4 Intel HEX -> S19, the source being HEX).  Negative control: the
+        Width control collapsed for Intel HEX -> ``Write file`` moves left -> RED."""
+        ids = ("patch_saveback_confirm_button", "patch_saveback_decline_button")
+    
+        async def body(app, pilot):
+            before = t.regions(app, ids)
+            await format_press(pilot)
+            return before, t.regions(app, ids)
+    
+>       before, after = applied(tmp_path, size, source, "patch_tab_inspector", body)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:171: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+______ test_r_s19_width_001_2_1_width_switches_32_16_in_the_new_placement ______
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_s19_width_001_2_1_width0')
+
+    def test_r_s19_width_001_2_1_width_switches_32_16_in_the_new_placement(tmp_path):
+        """R-S19-WIDTH-001.2/1: Width, Width -> ``Width: 16 bytes/line`` then ``Width: 32 bytes/line``, read from
+        the painted control at its new place.  Negative control: the press changes nothing -> RED."""
+    
+        async def body(app, pilot):
+            out = []
+            for _ in range(2):
+                await t.press_button(pilot, "#patch_saveback_width_button")
+                out.append(t.painted(app, t.need(app.screen, "#patch_saveback_width_button")))
+            return out
+    
+>       first, second = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:203: in body
+    await t.press_button(pilot, "#patch_saveback_width_button")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+selector = '#patch_saveback_width_button', rounds = 4
+
+    async def press_button(pilot, selector: str, rounds: int = 4) -> None:
+>       assert await pilot.click(selector), f"click missed {selector}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: click missed #patch_saveback_width_button
+
+tests/support/b103_inc10.py:258: AssertionError
+_________ test_r_s19_width_001_1_1_the_width_is_32_on_every_new_prompt _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_s19_width_001_1_1_the_w0')
+
+    def test_r_s19_width_001_1_1_the_width_is_32_on_every_new_prompt(tmp_path):
+        """R-S19-WIDTH-001.1/1: Width (16), ``Don't save``, Apply -> ``Width: 32 bytes/line``.  Negative control:
+        the width kept across prompts -> RED."""
+    
+        async def body(app, pilot):
+            await t.press_button(pilot, "#patch_saveback_width_button")
+            assert "16" in t.width_label(app), t.width_label(app)
+            await t.press_button(pilot, "#patch_saveback_decline_button")
+            await t.press_apply(pilot, app)
+            return t.width_label(app)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body) == "Width: 32 bytes/line"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:187: in body
+    await t.press_button(pilot, "#patch_saveback_width_button")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+selector = '#patch_saveback_width_button', rounds = 4
+
+    async def press_button(pilot, selector: str, rounds: int = 4) -> None:
+>       assert await pilot.click(selector), f"click missed {selector}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: click missed #patch_saveback_width_button
+
+tests/support/b103_inc10.py:258: AssertionError
+____ test_r_pe_export_14_1_the_suggested_name_follows_a_switch_to_intel_hex ____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_14_1_the_sugg0')
+
+    def test_r_pe_export_14_1_the_suggested_name_follows_a_switch_to_intel_hex(tmp_path):
+        """R-PE-EXPORT.14/1: Format -> name box ``firmware-patched.hex``.  Negative control: the name box left as
+        it was -> RED."""
+    
+        async def body(app, pilot):
+            await format_press(pilot)
+            return t.name_value(app)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body) == "firmware-patched.hex"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:223: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+____________ test_r_pe_export_14_2_an_upper_case_suffix_is_replaced ____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_pe_export_14_2_an_upper0')
+
+    def test_r_pe_export_14_2_an_upper_case_suffix_is_replaced(tmp_path):
+        """R-PE-EXPORT.14/2: name box ``MyImage.S19``, Format -> ``MyImage.hex``.  Negative control: a
+        case-sensitive match -> the name stays ``MyImage.S19`` -> RED."""
+    
+        async def body(app, pilot):
+            await retype_name(pilot, "MyImage.S19")
+            await format_press(pilot)
+            return t.name_value(app)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body) == "MyImage.hex"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:235: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+______________ test_r_pe_export_14_3_a_switch_to_s19_replaces_hex ______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_pe_export_14_3_a_switch0')
+
+    def test_r_pe_export_14_3_a_switch_to_s19_replaces_hex(tmp_path):
+        """R-PE-EXPORT.14/3: Applied HEX, name box ``a.hex``, Format -> ``a.s19``.  Negative control: only
+        ``.s19`` -> ``.hex`` handled -> RED."""
+    
+        async def body(app, pilot):
+            await retype_name(pilot, "a.hex")
+            await format_press(pilot)
+            return t.name_value(app)
+    
+>       assert applied(tmp_path, t.SIZE, "firmware.hex", "patch_tab_inspector", body) == "a.s19"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:247: in body
+    await format_press(pilot)
+tests/test_b103_inc10_g1_controls.py:26: in format_press
+    await t.press_button(pilot, "#patch_saveback_format_button")
+tests/support/b103_inc10.py:258: in press_button
+    assert await pilot.click(selector), f"click missed {selector}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:238: in click
+    return await self._post_mouse_events(
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), selector = '#patch_saveback_format_button'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_saveback_format_button' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+_ test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_hex_verify_002_3_the_su0')
+case = 'R-HEX-VERIFY-002.3/1', source = 'firmware.s19'
+expected = 'firmware-patched.s19'
+
+    @pytest.mark.parametrize("case,source,expected", [
+        ("R-HEX-VERIFY-002.3/1", "firmware.s19", "firmware-patched.s19"),
+        ("R-HEX-VERIFY-002.3/2", "firmware.hex", "firmware-patched.hex")],
+        ids=["R-HEX-VERIFY-002.3/1", "R-HEX-VERIFY-002.3/2"])
+    def test_r_hex_verify_002_3_the_suggested_name_follows_the_image(tmp_path, case, source, expected):
+        """R-HEX-VERIFY-002.3/1,/2: the name box holds ``<stem>-patched<format suffix>`` after Apply.  The prompt
+        must be a shown widget for the operator to see it (base: same text, in a 0x0 box).  Negative control:
+        the suffix taken from the other format -> RED."""
+    
+        async def body(app, pilot):
+            return t.name_value(app), t.at_its_place(app, t.need(app.screen, "#patch_saveback_name_input"))
+    
+        name, place = applied(tmp_path, t.SIZE, source, "patch_tab_inspector", body)
+>       assert name == expected and place == [], (case, name, place)
+E       AssertionError: ('R-HEX-VERIFY-002.3/1', 'firmware-patched.s19', ['patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert ('firmware-patched.s19' == 'firmware-patched.s19'
+E         
+E           firmware-patched.s19 and ['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_controls.py:269: AssertionError
+_ test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_hex_verify_002_3_the_su0')
+case = 'R-HEX-VERIFY-002.3/2', source = 'firmware.hex'
+expected = 'firmware-patched.hex'
+
+    @pytest.mark.parametrize("case,source,expected", [
+        ("R-HEX-VERIFY-002.3/1", "firmware.s19", "firmware-patched.s19"),
+        ("R-HEX-VERIFY-002.3/2", "firmware.hex", "firmware-patched.hex")],
+        ids=["R-HEX-VERIFY-002.3/1", "R-HEX-VERIFY-002.3/2"])
+    def test_r_hex_verify_002_3_the_suggested_name_follows_the_image(tmp_path, case, source, expected):
+        """R-HEX-VERIFY-002.3/1,/2: the name box holds ``<stem>-patched<format suffix>`` after Apply.  The prompt
+        must be a shown widget for the operator to see it (base: same text, in a 0x0 box).  Negative control:
+        the suffix taken from the other format -> RED."""
+    
+        async def body(app, pilot):
+            return t.name_value(app), t.at_its_place(app, t.need(app.screen, "#patch_saveback_name_input"))
+    
+        name, place = applied(tmp_path, t.SIZE, source, "patch_tab_inspector", body)
+>       assert name == expected and place == [], (case, name, place)
+E       AssertionError: ('R-HEX-VERIFY-002.3/2', 'firmware-patched.hex', ['patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'])
+E       assert ('firmware-patched.hex' == 'firmware-patched.hex'
+E         
+E           firmware-patched.hex and ['patch_saveb..., height=0))'] == []
+E         
+E         Left contains one more item: 'patch_saveback_name_input: not a shown widget (region Region(x=0, y=0, width=0, height=0))'
+E         Use -v to get more diff)
+
+tests/test_b103_inc10_g1_controls.py:269: AssertionError
+_ test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_tui_064_1_validate_appl0')
+case = 'R-TUI-064.1/1', source = 'firmware.s19'
+
+    @pytest.mark.parametrize("case,source", [("R-TUI-064.1/1", "firmware.s19"), ("R-TUI-064.1/2", "firmware.hex")],
+                             ids=["R-TUI-064.1/1", "R-TUI-064.1/2"])
+    def test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown(tmp_path, case, source):
+        """R-TUI-064.1/1,/2 (118x54): Validate, Apply loaded changes and Save inside the screen at scroll offset 0
+        with the prompt shown.  The prompt must be shown (a hidden prompt would pass vacuously).  Negative
+        control: the dock pushing the document row off screen -> RED."""
+        ids = ("patch_doc_validate_button", "patch_doc_apply_button", "patch_doc_save_button")
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app)), t.prompt_is_shown(app)
+    
+        bad, offsets, prompt = applied(tmp_path, t.SIZE, source, "patch_tab_inspector", body)
+>       assert prompt, "the prompt is not a shown widget, so this case would pass vacuously"
+E       AssertionError: the prompt is not a shown widget, so this case would pass vacuously
+E       assert False
+
+tests/test_b103_inc10_g1_controls.py:288: AssertionError
+_ test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_tui_064_1_validate_appl0')
+case = 'R-TUI-064.1/2', source = 'firmware.hex'
+
+    @pytest.mark.parametrize("case,source", [("R-TUI-064.1/1", "firmware.s19"), ("R-TUI-064.1/2", "firmware.hex")],
+                             ids=["R-TUI-064.1/1", "R-TUI-064.1/2"])
+    def test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown(tmp_path, case, source):
+        """R-TUI-064.1/1,/2 (118x54): Validate, Apply loaded changes and Save inside the screen at scroll offset 0
+        with the prompt shown.  The prompt must be shown (a hidden prompt would pass vacuously).  Negative
+        control: the dock pushing the document row off screen -> RED."""
+        ids = ("patch_doc_validate_button", "patch_doc_apply_button", "patch_doc_save_button")
+    
+        async def body(app, pilot):
+            bad = [r for i in ids for r in t.at_its_place(app, t.need(app.screen, f"#{i}"))]
+            return bad, t.scroll_offsets(t.panel_of(app)), t.prompt_is_shown(app)
+    
+        bad, offsets, prompt = applied(tmp_path, t.SIZE, source, "patch_tab_inspector", body)
+>       assert prompt, "the prompt is not a shown widget, so this case would pass vacuously"
+E       AssertionError: the prompt is not a shown widget, so this case would pass vacuously
+E       assert False
+
+tests/test_b103_inc10_g1_controls.py:288: AssertionError
+_ test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_tui_064_2_no_painted_pa0')
+case = 'R-TUI-064.2/1', size = (118, 54)
+
+    @pytest.mark.parametrize("case,size", [("R-TUI-064.2/1", t.SIZE), ("R-TUI-064.2/2", t.WIDE)],
+                             ids=["R-TUI-064.2/1", "R-TUI-064.2/2"])
+    def test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown(tmp_path, case, size):
+        """R-TUI-064.2/1,/2: with the prompt shown no displayed part of the Patch Editor leaves the panel on x
+        (``clipped_overflow``) and the apply line is painted whole.  Guard: the population is large and the
+        prompt is shown.  Negative control: the apply line / a chip row wider than the panel -> RED."""
+    
+        async def body(app, pilot):
+            panel = t.panel_of(app)
+            line = t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+            return clipped_overflow(panel), len(displayed_descendants(panel)), line, t.prompt_is_shown(app)
+    
+>       over, population, line, prompt = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:301: in body
+    line = t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_apply_line'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw0/test_r_tui_064_2_no_painted_pa0')
+case = 'R-TUI-064.2/2', size = (220, 60)
+
+    @pytest.mark.parametrize("case,size", [("R-TUI-064.2/1", t.SIZE), ("R-TUI-064.2/2", t.WIDE)],
+                             ids=["R-TUI-064.2/1", "R-TUI-064.2/2"])
+    def test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown(tmp_path, case, size):
+        """R-TUI-064.2/1,/2: with the prompt shown no displayed part of the Patch Editor leaves the panel on x
+        (``clipped_overflow``) and the apply line is painted whole.  Guard: the population is large and the
+        prompt is shown.  Negative control: the apply line / a chip row wider than the panel -> RED."""
+    
+        async def body(app, pilot):
+            panel = t.panel_of(app)
+            line = t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+            return clipped_overflow(panel), len(displayed_descendants(panel)), line, t.prompt_is_shown(app)
+    
+>       over, population, line, prompt = applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:301: in body
+    line = t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_apply_line'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+____________ test_r_tui_064_4_1_the_prompts_chips_are_one_row_high _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-3/popen-gw1/test_r_tui_064_4_1_the_prompts0')
+
+    def test_r_tui_064_4_1_the_prompts_chips_are_one_row_high(tmp_path):
+        """R-TUI-064.4/1: the Format control, Width, ``Write file`` and ``Don't save`` have height 1 (and are
+        shown, so a 0-row hidden chip cannot pass).  Negative control: a two-row chip grid (the base's) -> RED."""
+        ids = ("patch_saveback_format_button", "patch_saveback_width_button",
+               "patch_saveback_confirm_button", "patch_saveback_decline_button")
+    
+        async def body(app, pilot):
+            return {i: (t.shown(t.need(app.screen, f"#{i}")), t.need(app.screen, f"#{i}").region.height) for i in ids}
+    
+>       got = applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g1_controls.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:317: in body
+    return {i: (t.shown(t.need(app.screen, f"#{i}")), t.need(app.screen, f"#{i}").region.height) for i in ids}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g1_controls.py:317: in <dictcomp>
+    return {i: (t.shown(t.need(app.screen, f"#{i}")), t.need(app.screen, f"#{i}").region.height) for i in ids}
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_format_button'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_format_button: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_1_the_format_control_shows_s19_for_an_s19_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_9_2_the_label_follows_a_press
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_2_the_format_control_shows_intel_hex_for_an_intel_hex_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_10_1_no_width_control_for_an_intel_hex_image
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_7_3_each_new_prompt_starts_from_the_loaded_images_format
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_10_2_no_width_control_after_switching_to_intel_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_11_1_the_width_control_is_shown_for_s19
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_11_2_the_width_control_returns_when_switching_intel_hex_to_s19
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/3]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_12_write_file_and_dont_save_stay_put_on_a_format_change[R-PE-EXPORT.12/4]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_s19_width_001_2_1_width_switches_32_16_in_the_new_placement
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_s19_width_001_1_1_the_width_is_32_on_every_new_prompt
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_1_the_suggested_name_follows_a_switch_to_intel_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_2_an_upper_case_suffix_is_replaced
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_pe_export_14_3_a_switch_to_s19_replaces_hex
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_hex_verify_002_3_the_suggested_name_follows_the_image[R-HEX-VERIFY-002.3/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_1_validate_apply_save_stay_on_screen_with_the_prompt_shown[R-TUI-064.1/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/1]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_2_no_painted_part_is_wider_than_the_panel_with_the_prompt_shown[R-TUI-064.2/2]
+FAILED tests/test_b103_inc10_g1_controls.py::test_r_tui_064_4_1_the_prompts_chips_are_one_row_high
+24 failed in 121.24s (0:02:01)
+rc=1

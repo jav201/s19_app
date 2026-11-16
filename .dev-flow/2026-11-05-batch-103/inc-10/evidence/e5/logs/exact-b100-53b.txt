@@ -1,0 +1,10 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  03:27:32 up 1 day, 12:16,  3 users,  load average: 5.57, 5.97, 6.84
++ pytest -p no:cacheprovider -p no:xdist -q -rA tests/test_b100_workers.py::test_tc_b100_53_patch_editor_changes_are_refused_while_busy
+.                                                                        [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b100_workers.py::test_tc_b100_53_patch_editor_changes_are_refused_while_busy
+1 passed in 10.46s
+RC=0

@@ -63,3 +63,6 @@ docs/requirements/history/** -text
 .dev-flow/2026-11-05-batch-103/inc-*/evidence-*/** -text
 .dev-flow/2026-11-05-batch-103/inc-*/evidence-*.txt -text
 .dev-flow/2026-11-05-batch-103/inc-*/steps.log -text
+
+# Inc 10 x64u data (E3-2): expected Intel HEX lines are compared byte for byte, LF-only on every checkout.
+tests/fixtures/b103_inc10/** text eol=lf

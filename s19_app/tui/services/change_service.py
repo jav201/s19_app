@@ -2552,6 +2552,7 @@ class ChangeService:
         summary: Optional[ChangeSummary] = None,
         workarea_root: Optional[Path] = None,
         on_placed: Optional[Callable[[PlacementResult], None]] = None,
+        s0_header_from_name: Optional[Callable[[str], bytes]] = None,
     ) -> ChangeActionResult:
         """
         Summary:
@@ -2577,6 +2578,8 @@ class ChangeService:
                 staging root comes from the destination guard (SEC-4).
             on_placed (Optional[Callable[[PlacementResult], None]]): Told
                 the placement's result the moment it lands (LED .53).
+            s0_header_from_name (Optional[Callable[[str], bytes]]): The
+                written-name S0 rule for ``save_patched_image``.
 
         Returns:
             ChangeActionResult: ``ok`` with the written name and the
@@ -2617,6 +2620,7 @@ class ChangeService:
             s0_header=s0_header,
             workarea_root=workarea_root,
             on_placed=on_placed,
+            s0_header_from_name=s0_header_from_name,
         )
         if stamped is not None:
             stamped.saved_path = path
@@ -2658,6 +2662,7 @@ class ChangeService:
         mac_records: Optional[Sequence[dict]] = None,
         a2l_tags: Optional[Sequence[dict]] = None,
         workarea_root: Optional[Path] = None,
+        s0_header_from_name: Optional[Callable[[str], bytes]] = None,
     ) -> ChangeActionResult:
         """
         Summary:
@@ -2724,6 +2729,9 @@ class ChangeService:
                 destination guard with this root, never from a resolved
                 ``dest_dir``. ``None`` derives it from ``dest_dir``'s own
                 textual path.
+            s0_header_from_name (Optional[Callable[[str], bytes]]): The
+                written-name S0 rule, forwarded to ``save_patched_image``
+                (R-S19-S0HEADER-001.2; S19 branch only).
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
@@ -2797,6 +2805,7 @@ class ChangeService:
             s0_header=s0_header,
             source_image_path=source_image_path,
             workarea_root=workarea_root,
+            s0_header_from_name=s0_header_from_name,
         )
 
     # ------------------------------------------------------------------

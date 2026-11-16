@@ -1,0 +1,15 @@
+~/work/zq-x10/tree/s19_app/__init__.py
+tree: tree  HEAD 190121c0 + uncommitted g3 bound test
+uptime:  02:00:35 up 1 day, 10:49,  3 users,  load average: 2.01, 2.20, 2.66
++ pytest -p no:cacheprovider tests/test_b103_inc10_g3_engine.py -k low_ffff -v
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-x10/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 25 items / 24 deselected / 1 selected
+
+tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_a_row_starting_at_low_ffff_ends_at_the_boundary_and_the_walk_advances PASSED [100%]
+
+======================= 1 passed, 24 deselected in 0.06s =======================
+RC=0

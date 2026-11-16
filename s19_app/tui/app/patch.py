@@ -69,14 +69,18 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
 def _synth_s0_header_from_filename(filename: str) -> bytes:
     """
     Summary:
-        Synthesize a minimal populated S0 header from a save-back destination
-        filename (US-015 / LLR-015.2) — used in 32-byte mode when the loaded
-        image carried no source S0 to preserve. The result is plain ASCII,
-        bounded to ``_SAVEBACK_S0_MAX_BYTES`` so the emitter's one-byte
-        ``byte_count`` field cannot overflow.
+        Synthesize a minimal populated S0 header from the name of the file a
+        save-back writes (US-015 / LLR-015.2, R-S19-S0HEADER-001.2) — used
+        in 32-byte mode when the loaded image carried no source S0 to
+        preserve. The result is plain ASCII, bounded to
+        ``_SAVEBACK_S0_MAX_BYTES`` so the emitter's one-byte ``byte_count``
+        field cannot overflow.
 
     Args:
-        filename (str): The (possibly edited) operator-confirmed target name.
+        filename (str): The bare name the file is written under, as the
+            engine's placement picks it (``save_patched_image`` calls this
+            rule; never the typed text, which may hold a full path:
+            BL-I10-E3-8).
 
     Returns:
         bytes: The ASCII bytes of ``filename`` with any non-ASCII character
@@ -91,7 +95,8 @@ def _synth_s0_header_from_filename(filename: str) -> bytes:
 
     Dependencies:
         Used by:
-            - S19TuiApp.on_patch_editor_panel_save_back_decision
+            - S19TuiApp.on_patch_editor_panel_save_back_decision (passed
+              as ``s0_header_from_name``)
     """
     ascii_bytes = filename.encode("ascii", errors="ignore")
     return ascii_bytes[:_SAVEBACK_S0_MAX_BYTES]
@@ -169,16 +174,19 @@ class PatchMixin:
                 service.add_entry(
                     event.address_text, event.value_text, event.bytes_text
                 )
+                panel.hide_save_prompt()
                 self.set_status("Patch Editor: entry added.")
                 self._refresh_patch_checks_tab(panel)
             elif event.action == "edit_entry":
                 service.edit_entry(
                     event.address_text, event.value_text, event.bytes_text
                 )
+                panel.hide_save_prompt()
                 self.set_status("Patch Editor: entry updated.")
                 self._refresh_patch_checks_tab(panel)
             elif event.action == "remove_entry":
                 service.remove_entry(event.address_text)
+                panel.hide_save_prompt()
                 self.set_status("Patch Editor: entry removed.")
                 self._refresh_patch_checks_tab(panel)
             elif event.action == "load_doc":
@@ -235,18 +243,34 @@ class PatchMixin:
                     + counts["skipped-outside"]
                     + counts["skipped-no-image"]
                 )
-                self.set_status(
+                apply_text = (
                     f"Apply: {counts['applied']} applied, "
                     f"{skipped} skipped, {counts['blocked']} blocked"
                 )
+                self.set_status(apply_text)
                 if counts["applied"] > 0 and loaded is not None:
                     if loaded.file_type in ("s19", "hex"):
                         suffix = ".hex" if loaded.file_type == "hex" else ".s19"
-                        panel.show_save_prompt(f"{variant_id}-patched{suffix}")
+                        panel.show_save_prompt(
+                            f"{variant_id}-patched{suffix}",
+                            output_format=loaded.file_type,
+                            apply_line=(
+                                f"{apply_text} · changed in memory only — "
+                                "Write file saves it"
+                            ),
+                        )
                     else:
                         self.set_status(
                             f"{loaded.file_type} save-back not supported"
                         )
+                else:
+                    panel.hide_save_prompt()
+                    self.notify(
+                        apply_text,
+                        title="Nothing applied",
+                        severity="warning",
+                        markup=False,
+                    )
             elif event.action == "save_doc":
                 # Change 1 (HLR-138): a NEW change-set defaults INTO the
                 # project (``patches/``, or ``checks/`` for a check
@@ -347,8 +371,9 @@ class PatchMixin:
               ``nothing staged`` status; else ``describe_definition`` fresh,
               ``ChangeService.stage_definition`` over ``_strip_source_map``,
               ``_report_change_result`` then one status line per notice;
-              ok → ``PatchEditorPanel.note_staged(name)``; always
-              ``_refresh_patch_history_view``.
+              ok → ``PatchEditorPanel.note_staged(name)`` and
+              ``hide_save_prompt`` (the document changed, R-PE-EXPORT.17);
+              always ``_refresh_patch_history_view``.
             - Nothing of the formula text is logged.
 
         Dependencies:
@@ -378,6 +403,7 @@ class PatchMixin:
         if result.ok:
             panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
             panel.note_staged(event.name)
+            panel.hide_save_prompt()
         self._refresh_patch_history_view()
 
     def on_array_bench_sheet_record_stage_requested(self, event) -> None:
@@ -477,8 +503,11 @@ class PatchMixin:
             - Confirm → resolve the operator's selected record width and the
               matching S0 policy (US-015 / LLR-015.3): at 32 bytes/line
               PRESERVE the loaded image's ``source_s0_header`` when present,
-              else SYNTHESIZE a minimal ASCII S0 from the destination filename
-              (``_synth_s0_header_from_filename``). Note: an EMPTY source S0
+              else SYNTHESIZE a minimal ASCII S0 from the name of the file
+              written: ``_synth_s0_header_from_filename`` rides
+              ``s0_header_from_name`` and the engine applies it to the
+              landing name, never to the typed text (R-S19-S0HEADER-001.2,
+              BL-I10-E3-8, D8-28). Note: an EMPTY source S0
               (zero-length ``bytes``) is falsy and so is treated as absent →
               synthesized, same as ``None`` (the ``source_s0_header or synth``
               semantics). At 16 bytes/line write the
@@ -523,21 +552,27 @@ class PatchMixin:
             self.set_status("Patch Editor: no image loaded - nothing saved")
             return
         dest_dir = self._active_project_dir() or self.workarea
+        kind = (
+            event.output_format
+            if loaded.file_type in ("s19", "hex")
+            else loaded.file_type
+        )
         bytes_per_line = event.bytes_per_line
-        if bytes_per_line == 32:
-            s0_header = loaded.source_s0_header or _synth_s0_header_from_filename(
-                event.filename
-            )
-        else:
-            s0_header = None
+        s0_header = None
+        s0_from_name = None
+        if bytes_per_line == 32 and kind == "s19":
+            s0_header = loaded.source_s0_header or None
+            if s0_header is None:
+                s0_from_name = _synth_s0_header_from_filename
         result = self._change_service.save_patched(
             loaded.mem_map,
             loaded.ranges,
             dest_dir,
             event.filename,
-            source_kind=loaded.file_type,
+            source_kind=kind,
             bytes_per_line=bytes_per_line,
             s0_header=s0_header,
+            s0_header_from_name=s0_from_name,
             source_image_path=loaded.path,
             # batch-99 HLR-157: the save re-derives the image from the whole
             # document; the linkage inputs keep a re-derived summary's
@@ -1195,6 +1230,10 @@ class PatchMixin:
             index, edited, a2l_context=self.current_a2l_data
         )
         self._report_change_result(result)
+        if result.ok:
+            self.query_one(
+                "#patch_editor_panel", PatchEditorPanel
+            ).hide_save_prompt()
         if (
             not result.ok
             and self.current_a2l_data is None

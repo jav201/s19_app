@@ -1,0 +1,45 @@
+== red-base-17_5 | tree base | 2026-11-14T05:13:04Z | load: 9.26 8.50 6.44
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt _____
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-20/test_r_pe_export_17_5_a_stage_0')
+
+    def test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/5 (F-R8-3, ruling P-043): Inc 8's definitions case loaded (A2L and image through the
+        app's loaders), an entry added at 0x800010 and applied (prompt shown), DISPLAY_0001 staged with ``25.5``
+        through the sheet's formula input -> the stage is in the document and the prompt is not a shown widget.
+        Deviation (declared): the DEFC image, not case01 (the staged-able scalar needs Inc 8's fixture).
+        Negative control: the hide dropped from ``on_staging_sheet_stage_requested`` (base) -> RED."""
+        from tests.b103_inc8_a_support import MASK_WORD, build_defc
+        from tests.support.b100_workers import settle_workers
+    
+        defc = build_defc(tmp_path / "defc")
+    
+        async def body(app, pilot):
+            app.load_a2l_from_path(defc["a2l_path"])
+            await settle_workers(pilot)
+            assert app.current_a2l_data is not None, "the A2L did not load"
+            app.load_from_path(defc["s19_path"])
+            await t.wait_for(pilot, lambda: app.current_file is not None, "the image load")
+            await t.open_patch_editor(pilot, app)
+            await t.click_tab(pilot, "patch_tab_inspector")
+            await t.add_entry(pilot, app, f"0x{MASK_WORD:X}", "00 01")
+            await t.press_apply(pilot, app)
+            assert t.prompt_offered(app), "precondition: the prompt is offered after Apply"
+            entries_before = len(app._change_service.document.entries)
+            await stage_through_the_sheet(app, pilot, "DISPLAY_0001", "25.5")
+            return entries_before, len(app._change_service.document.entries), t.prompt_hidden(app)
+    
+        before, after, hidden = t.run_scene(tmp_path, t.SIZE, body)
+        assert after == before + 1, f"the stage did not add an entry ({before} -> {after})"
+>       assert hidden is True, "the prompt is still a shown widget after a stage"
+E       AssertionError: the prompt is still a shown widget after a stage
+E       assert False is True
+
+tests/test_b103_inc10_g2_arms.py:295: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt
+1 failed in 11.27s
+rc=1

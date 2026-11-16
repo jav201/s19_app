@@ -1,0 +1,56 @@
+~/work/zq-x10/base/s19_app/__init__.py
+tree: base  base 439860c4 + this test file, its support module and fixtures
+uptime:  02:01:13 up 1 day, 10:49,  4 users,  load average: 2.48, 2.30, 2.67
++ pytest -p no:cacheprovider tests/test_b103_inc10_g3_engine.py -k low_ffff -v
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- ~/miniconda3/envs/s19ci/bin/python
+rootdir: ~/work/zq-x10/base
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 25 items / 24 deselected / 1 selected
+
+tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_a_row_starting_at_low_ffff_ends_at_the_boundary_and_the_walk_advances FAILED [100%]
+
+=================================== FAILURES ===================================
+_ test_r_hex_emit_001_11_a_row_starting_at_low_ffff_ends_at_the_boundary_and_the_walk_advances _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f97a8140b50>
+
+    def test_r_hex_emit_001_11_a_row_starting_at_low_ffff_ends_at_the_boundary_and_the_walk_advances(monkeypatch):
+        """Bound for R-HEX-EMIT-001.11 (E5, not a case): a row whose first address has low 16 bits 0xFFFF holds one
+        byte and the next row starts at 0x00010000.  The emitter's record writer is counted and stopped after 64
+        records, so a walk that stops advancing fails here in milliseconds instead of hanging the run (mutant MU24c,
+        the boundary ``(row_start | 0xFFFF)`` without ``+ 1``, hung to the 300 s runner timeout).  Expected lines are
+        hand-computed Intel HEX (checksums = two's complement of the byte sum), not read from the emitter.  Negative
+        controls: MU24c -> the 64-record stop -> RED; the base loop (16-byte rows from the range start) -> one record
+        ``:02FFFF00...`` across the boundary -> RED."""
+        from s19_app.tui.changes import io as changes_io
+    
+        real_record = changes_io._intel_hex_record
+        calls = []
+    
+        def bounded_record(*args, **kwargs):
+            calls.append(args)
+            assert len(calls) <= 64, "the HEX row walk stopped advancing (more than 64 records for a 2-byte image)"
+            return real_record(*args, **kwargs)
+    
+        monkeypatch.setattr(changes_io, "_intel_hex_record", bounded_record)
+        text = changes_io.emit_intel_hex_from_mem_map({0xFFFF: 0xAA, 0x10000: 0xBB}, [(0xFFFF, 0x10001)])
+>       assert text.splitlines() == [":020000040000FA", ":01FFFF00AA57", ":020000040001F9", ":01000000BB44",
+                                     ":00000001FF"]
+E       AssertionError: assert [':0200000400...':00000001FF'] == [':0200000400...':00000001FF']
+E         
+E         At index 1 diff: ':02FFFF00AABB9B' != ':01FFFF00AA57'
+E         Right contains 2 more items, first extra item: ':01000000BB44'
+E         
+E         Full diff:
+E           [
+E               ':020000040000FA',...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/test_b103_inc10_g3_engine.py:106: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_a_row_starting_at_low_ffff_ends_at_the_boundary_and_the_walk_advances
+======================= 1 failed, 24 deselected in 0.09s =======================
+RC=1

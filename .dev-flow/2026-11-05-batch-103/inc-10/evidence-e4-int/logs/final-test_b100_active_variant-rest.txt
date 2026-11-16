@@ -1,0 +1,596 @@
+== final-test_b100_active_variant-rest | tree final | 2026-11-14T05:58:15Z | load: 10.52 10.37 9.85
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFF..FsF..                                                              [100%]
+=================================== FAILURES ===================================
+_________ test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A] _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw0/test_at_b100_06_reopen_opens_t0')
+size = (118, 54), case = 'A'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_06_reopen_opens_the_saved_back_variant(
+        tmp_path: Path, size: tuple, case: str
+    ) -> None:
+        """HLR-168's acceptance scene by keys and clicks: Load file
+        ``firmware.s19``, Save project P (``ctrl+s``), add and apply
+        ``0x8000007C DE AD BE EF``, save back (``p02`` A typed ``firmware.s19``
+        -> ``firmware_1.s19``; ``p02`` B the default ``firmware-patched.s19``),
+        then open P in a FRESH app through the Load project dialog (``p``). The
+        painted summary line names the saved-back file, the independent reader
+        finds the patch in it, and ``project.json`` names it as active.
+    
+        RED (executed on 1d677ba, P-3): ``RELOAD -> file=firmware.s19 …
+        image_is_patched=False``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+        landed = projects.landed_name(case)
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, projects.typed_name(case))
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming the reopened project",
+                )
+                return _painted_log(app)
+    
+>       asyncio.run(_save_scene())
+
+tests/test_b100_active_variant.py:1163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1148: in _save_scene
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+        assert await pilot.click("#patch_entry_address_input")
+        await pilot.press("ctrl+a", "delete")
+        await pilot.press(*f"0x{PATCH_ADDRESS:08X}")
+>       assert await pilot.click("#patch_entry_bytes_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1051: AssertionError
+_________ test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A] _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw1/test_at_b100_06_reopen_opens_t0')
+size = (220, 60), case = 'A'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_06_reopen_opens_the_saved_back_variant(
+        tmp_path: Path, size: tuple, case: str
+    ) -> None:
+        """HLR-168's acceptance scene by keys and clicks: Load file
+        ``firmware.s19``, Save project P (``ctrl+s``), add and apply
+        ``0x8000007C DE AD BE EF``, save back (``p02`` A typed ``firmware.s19``
+        -> ``firmware_1.s19``; ``p02`` B the default ``firmware-patched.s19``),
+        then open P in a FRESH app through the Load project dialog (``p``). The
+        painted summary line names the saved-back file, the independent reader
+        finds the patch in it, and ``project.json`` names it as active.
+    
+        RED (executed on 1d677ba, P-3): ``RELOAD -> file=firmware.s19 …
+        image_is_patched=False``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+        landed = projects.landed_name(case)
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, projects.typed_name(case))
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming the reopened project",
+                )
+                return _painted_log(app)
+    
+>       asyncio.run(_save_scene())
+
+tests/test_b100_active_variant.py:1163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1148: in _save_scene
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+        assert await pilot.click("#patch_entry_address_input")
+        await pilot.press("ctrl+a", "delete")
+        await pilot.press(*f"0x{PATCH_ADDRESS:08X}")
+>       assert await pilot.click("#patch_entry_bytes_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1051: AssertionError
+_________ test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B] _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw0/test_at_b100_06_reopen_opens_t1')
+size = (118, 54), case = 'B'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_06_reopen_opens_the_saved_back_variant(
+        tmp_path: Path, size: tuple, case: str
+    ) -> None:
+        """HLR-168's acceptance scene by keys and clicks: Load file
+        ``firmware.s19``, Save project P (``ctrl+s``), add and apply
+        ``0x8000007C DE AD BE EF``, save back (``p02`` A typed ``firmware.s19``
+        -> ``firmware_1.s19``; ``p02`` B the default ``firmware-patched.s19``),
+        then open P in a FRESH app through the Load project dialog (``p``). The
+        painted summary line names the saved-back file, the independent reader
+        finds the patch in it, and ``project.json`` names it as active.
+    
+        RED (executed on 1d677ba, P-3): ``RELOAD -> file=firmware.s19 …
+        image_is_patched=False``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+        landed = projects.landed_name(case)
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, projects.typed_name(case))
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming the reopened project",
+                )
+                return _painted_log(app)
+    
+>       asyncio.run(_save_scene())
+
+tests/test_b100_active_variant.py:1163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1148: in _save_scene
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+        assert await pilot.click("#patch_entry_address_input")
+        await pilot.press("ctrl+a", "delete")
+        await pilot.press(*f"0x{PATCH_ADDRESS:08X}")
+>       assert await pilot.click("#patch_entry_bytes_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1051: AssertionError
+_________ test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B] _________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw1/test_at_b100_06_reopen_opens_t1')
+size = (220, 60), case = 'B'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_06_reopen_opens_the_saved_back_variant(
+        tmp_path: Path, size: tuple, case: str
+    ) -> None:
+        """HLR-168's acceptance scene by keys and clicks: Load file
+        ``firmware.s19``, Save project P (``ctrl+s``), add and apply
+        ``0x8000007C DE AD BE EF``, save back (``p02`` A typed ``firmware.s19``
+        -> ``firmware_1.s19``; ``p02`` B the default ``firmware-patched.s19``),
+        then open P in a FRESH app through the Load project dialog (``p``). The
+        painted summary line names the saved-back file, the independent reader
+        finds the patch in it, and ``project.json`` names it as active.
+    
+        RED (executed on 1d677ba, P-3): ``RELOAD -> file=firmware.s19 …
+        image_is_patched=False``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+        landed = projects.landed_name(case)
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, projects.typed_name(case))
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming the reopened project",
+                )
+                return _painted_log(app)
+    
+>       asyncio.run(_save_scene())
+
+tests/test_b100_active_variant.py:1163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1148: in _save_scene
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+        assert await pilot.click("#patch_entry_address_input")
+        await pilot.press("ctrl+a", "delete")
+        await pilot.press(*f"0x{PATCH_ADDRESS:08X}")
+>       assert await pilot.click("#patch_entry_bytes_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1051: AssertionError
+____ test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1] _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw1/test_at_b100_20_inc8a_every_wr0')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene, Inc 8a arm, by keys and clicks: P records
+        ``batch``, ``assignments``, ``declared_regions``, ``gathered`` and
+        ``active_document`` "patches/boost.json" (one entry at ``0x80000010``).
+        With P open through the Load project dialog, the engineer (1) adds and
+        applies ``0x8000007C DE AD BE EF`` in the Patch Editor and saves back
+        under the default name, then loads through Load (2) a new S19, (3) a
+        MAC and (4) an A2L. After each writer ``project.json`` on disk was
+        rewritten, keeps ``active_document`` and the four other not-owned keys
+        equal (JSON compare) with 0 absolute paths, and the document file's
+        bytes are unchanged. A fresh app opening P through the dialog paints
+        no problem naming the document in the Load-result panel, and the Patch
+        Editor ledger paints the document's entry ``80000010`` with the SCRIPT
+        window at ``1 entry`` and no unsaved marker.
+    
+        RED (base dc3b314): ``active_document`` is an unknown key there, so
+        the in-project writers refuse to rewrite the manifest (SEC6-2) and the
+        first writer's rewrite never comes."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_document_project(_workarea(base), extra=projects.seeded_keys())
+        for relative in (projects.SEEDED_PATCH, projects.SEEDED_CHECK):
+            target = project_dir / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('{"entries": []}', encoding="utf-8")
+        document_bytes = (project_dir / projects.DOCUMENT_TEXT).read_bytes()
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        dirty_marker = "●"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns, manifest_path.read_bytes())
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await projects.dismiss_load_result_panel(pilot, app)
+                # (1) save-back
+                previous = _stamp()
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware-patched.s19").is_file()
+                    and _stamp() != previous,
+                    "firmware-patched.s19 placed and project.json rewritten by the save-back",
+                )
+                snapshots.append(("save-back", json.loads(manifest_path.read_bytes())))
+                # (2) variant append, (3) MAC sync, (4) A2L sync, through Load
+                for writer, src, landed in (
+                    ("variant-append", s19 / "firmware.s19", "firmware_1.s19"),
+                    ("mac-sync", side / "firmware.mac", "firmware.mac"),
+                    ("a2l-sync", side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten by the {writer}",
+                    )
+                    snapshots.append((writer, json.loads(manifest_path.read_bytes())))
+    
+        async def _reopen() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                panel = await _open_and_close_the_panel(pilot, app, "P")
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_doc_entries_table")) > 0
+                    and f"{projects.DOCUMENT_ADDRESS:08X}" in _ledger(app).upper(),
+                    "the reopened document's entry painted in the ledger",
+                )
+                return panel, _ledger(app), _script_border(app)
+    
+>       asyncio.run(_writers())
+
+tests/test_b100_active_variant.py:1455: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1416: in _writers
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1048: AssertionError
+____ test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0] _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-50/popen-gw0/test_at_b100_20_inc8a_every_wr0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene, Inc 8a arm, by keys and clicks: P records
+        ``batch``, ``assignments``, ``declared_regions``, ``gathered`` and
+        ``active_document`` "patches/boost.json" (one entry at ``0x80000010``).
+        With P open through the Load project dialog, the engineer (1) adds and
+        applies ``0x8000007C DE AD BE EF`` in the Patch Editor and saves back
+        under the default name, then loads through Load (2) a new S19, (3) a
+        MAC and (4) an A2L. After each writer ``project.json`` on disk was
+        rewritten, keeps ``active_document`` and the four other not-owned keys
+        equal (JSON compare) with 0 absolute paths, and the document file's
+        bytes are unchanged. A fresh app opening P through the dialog paints
+        no problem naming the document in the Load-result panel, and the Patch
+        Editor ledger paints the document's entry ``80000010`` with the SCRIPT
+        window at ``1 entry`` and no unsaved marker.
+    
+        RED (base dc3b314): ``active_document`` is an unknown key there, so
+        the in-project writers refuse to rewrite the manifest (SEC6-2) and the
+        first writer's rewrite never comes."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_document_project(_workarea(base), extra=projects.seeded_keys())
+        for relative in (projects.SEEDED_PATCH, projects.SEEDED_CHECK):
+            target = project_dir / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('{"entries": []}', encoding="utf-8")
+        document_bytes = (project_dir / projects.DOCUMENT_TEXT).read_bytes()
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        dirty_marker = "●"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns, manifest_path.read_bytes())
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P")
+                await projects.dismiss_load_result_panel(pilot, app)
+                # (1) save-back
+                previous = _stamp()
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware-patched.s19").is_file()
+                    and _stamp() != previous,
+                    "firmware-patched.s19 placed and project.json rewritten by the save-back",
+                )
+                snapshots.append(("save-back", json.loads(manifest_path.read_bytes())))
+                # (2) variant append, (3) MAC sync, (4) A2L sync, through Load
+                for writer, src, landed in (
+                    ("variant-append", s19 / "firmware.s19", "firmware_1.s19"),
+                    ("mac-sync", side / "firmware.mac", "firmware.mac"),
+                    ("a2l-sync", side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten by the {writer}",
+                    )
+                    snapshots.append((writer, json.loads(manifest_path.read_bytes())))
+    
+        async def _reopen() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                panel = await _open_and_close_the_panel(pilot, app, "P")
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_doc_entries_table")) > 0
+                    and f"{projects.DOCUMENT_ADDRESS:08X}" in _ledger(app).upper(),
+                    "the reopened document's entry painted in the ledger",
+                )
+                return panel, _ledger(app), _script_border(app)
+    
+>       asyncio.run(_writers())
+
+tests/test_b100_active_variant.py:1455: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:1416: in _writers
+    await _add_and_apply_through_the_panel(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def _add_and_apply_through_the_panel(pilot, app: S19TuiApp) -> None:
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+        # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+        assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_active_variant.py:1048: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B]
+FAILED tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0]
+6 failed, 4 passed, 1 skipped in 98.78s (0:01:38)
+rc=1

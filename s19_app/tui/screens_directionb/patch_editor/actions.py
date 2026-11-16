@@ -1,6 +1,7 @@
 """s19_app.tui.screens_directionb.patch_editor.actions - ActionsMixin (methods moved verbatim from patch_editor.py at 2dbd7d5a)."""
 from __future__ import annotations
 
+import re
 from typing import Mapping, Optional
 from rich.text import Text
 from textual.app import ComposeResult
@@ -8,6 +9,12 @@ from textual.containers import Container, Horizontal
 from textual.widgets import Button, DataTable, Input, Label, Static, TextArea
 from ...insight_style import DGRAY, LABEL, VALUE
 from ...os_clipboard_input import OsClipboardInput
+
+# The rename rule (R-PE-EXPORT.14/.15): a final ``.s19`` or ``.hex`` in any
+# letter case, together with any trailing whitespace, is replaced by the new
+# format's suffix; any other text stays as typed. ``\s`` on a str is what
+# ``str.strip()`` removes, so the box agrees with the engine's suffix rule.
+_SUFFIX_RE = re.compile(r"\.(s19|hex)\s*\Z", re.IGNORECASE)
 
 
 class ActionsMixin:
@@ -93,6 +100,15 @@ class ActionsMixin:
             event.stop()
             self._use_highlighted_parameter()
             return
+        if button_id == "patch_saveback_format_button":
+            # Selector state only — switch to the other output format and
+            # relabel (and re-suffix the name box); no message is posted, the
+            # same idiom as the Width selector (R-PE-EXPORT.8).
+            event.stop()
+            self._set_saveback_format(
+                "hex" if self._saveback_format == "s19" else "s19", rename=True
+            )
+            return
         if button_id == "patch_saveback_width_button":
             # Selector state only — cycle the save-back record width and
             # relabel; no message is posted, so this adds no routed action
@@ -113,6 +129,7 @@ class ActionsMixin:
                 self.SaveBackDecision(
                     self.query_one("#patch_saveback_name_input", Input).value,
                     bytes_per_line=self._saveback_width,
+                    output_format=self._saveback_format,
                 )
             )
             return
@@ -277,17 +294,27 @@ class ActionsMixin:
         # writers all end here, so the stamp follows the flag at once.
         self._refresh_json_stamp()
 
-    def show_save_prompt(self, suggestion: str) -> None:
+    def show_save_prompt(
+        self, suggestion: str, *, output_format: str, apply_line: str
+    ) -> None:
         """Show the post-apply save-back prompt (LLR-002.7 UI half).
 
         Summary:
-            Un-hide the save-back row and pre-fill the filename ``Input``
-            with the editable ``<variant_id>-patched.s19`` suggestion.
+            Un-hide the save-back row, pre-fill the filename ``Input`` with
+            the editable suggestion, reset the width to its 32-byte default,
+            set the output format to the loaded image's format and paint the
+            apply line.
 
         Args:
             suggestion (str): The pre-filled target filename suggestion.
+            output_format (str): ``"s19"`` or ``"hex"`` — the loaded image's
+                format (I-10.5).
+            apply_line (str): The apply-count line, painted as a literal
+                ``Text`` (no markup).
 
         Dependencies:
+            Uses:
+                - :meth:`_set_saveback_format`
             Used by:
                 - ``S19TuiApp`` apply-action handling
         """
@@ -298,7 +325,35 @@ class ActionsMixin:
         self.query_one("#patch_saveback_width_button", Button).label = (
             f"Width: {self._saveback_width} bytes/line"
         )
+        # Each prompt starts from the loaded image's format whatever the last
+        # prompt showed (R-PE-EXPORT.7); the suggestion already ends with its
+        # suffix, so no rename.
+        self._set_saveback_format(output_format, rename=False)
+        self.query_one("#patch_saveback_apply_line", Static).update(
+            Text(apply_line)
+        )
         self.query_one("#patch_saveback_row", Container).remove_class("hidden")
+
+    def _set_saveback_format(self, output_format: str, rename: bool) -> None:
+        """Set the output format, its label, the Width visibility and (optionally)
+        the name box suffix (R-PE-EXPORT.7-.15)."""
+        self._saveback_format = output_format
+        name = suffix = None
+        for kind, fmt_name, fmt_suffix in self.SAVEBACK_FORMATS:
+            if kind == output_format:
+                name, suffix = fmt_name, fmt_suffix
+                break
+        self.query_one("#patch_saveback_format_button", Button).label = (
+            f"Format: {name}"
+        )
+        # Hide the Width control for Intel HEX but keep its place (never
+        # ``display``), so no neighbour moves (R-PE-EXPORT.12).
+        self.query_one("#patch_saveback_width_button", Button).styles.visibility = (
+            "visible" if output_format == "s19" else "hidden"
+        )
+        if rename:
+            name_input = self.query_one("#patch_saveback_name_input", Input)
+            name_input.value = _SUFFIX_RE.sub(suffix, name_input.value)
 
     def hide_save_prompt(self) -> None:
         """Hide the save-back prompt after a confirm / decline.
@@ -475,7 +530,7 @@ class ActionsMixin:
         )
 
     def _compose_action_bar(self) -> ComposeResult:
-        """Compose helper: the history strip, undo/redo, execute scope, save-back and before/after rows."""
+        """Compose helper: the history strip, undo/redo and execute scope rows."""
         # batch-48 (LLR-081.2): the history strip beside the
         # Undo/Redo row it describes; derived integers and
         # author-fixed key hints only (C-17).
@@ -514,54 +569,9 @@ class ActionsMixin:
                 markup=False,
                 classes="patch-stat-line",
             )
-        # The save-back prompt (LLR-002.7), hidden until an
-        # apply writes >= 1 entry; its label shares its input's
-        # row (design §3).
-        with Container(
-            id="patch_saveback_row", classes="hidden patch-docked-group"
-        ):
-            with Horizontal(classes="pe-row"):
-                yield Label("Save patched image as:", classes="pe-label")
-                yield OsClipboardInput(
-                    id="patch_saveback_name_input", compact=True
-                )
-            with Horizontal(
-                id="patch_saveback_buttons", classes="patch-chip-apply"
-            ):
-                yield Button(
-                    f"Width: {self._saveback_width} bytes/line",
-                    id="patch_saveback_width_button",
-                    classes="patch-chip",
-                )
-                yield Button(
-                    "Write file",
-                    id="patch_saveback_confirm_button",
-                    classes="patch-chip",
-                )
-                yield Button(
-                    "Don't save",
-                    id="patch_saveback_decline_button",
-                    classes="patch-chip",
-                )
-        # US-061: the persistent before/after-report control.
-        with Container(
-            id="patch_before_after_row", classes="hidden patch-docked-group"
-        ):
-            yield Label(
-                "Before/after report available:",
-                classes="patch-field-label",
-            )
-            with Horizontal(
-                id="patch_before_after_buttons", classes="patch-chip-apply"
-            ):
-                yield Button(
-                    "Write before/after report",
-                    id="patch_before_after_button",
-                    classes="patch-chip",
-                )
 
     def _compose_doc_controls(self) -> ComposeResult:
-        """Compose helper: the Validate / Apply / Save row."""
+        """Compose helper: the Validate / Apply / Save row, then the export dock."""
         with Horizontal(
             id="patch_doc_controls", classes="patch-docked-row patch-chip-apply"
         ):
@@ -573,3 +583,20 @@ class ActionsMixin:
             yield Button(
                 "Save", id="patch_doc_save_button", classes="patch-chip fill-accent"
             )
+        # Inc 10's export dock (I-10.4): the save-back prompt and the before/after
+        # control, moved out of the JSON tab so they show whichever tab was shown.
+        with Container(id="patch_export_dock"):
+            with Container(id="patch_saveback_row", classes="hidden patch-docked-group"):
+                yield Static("", id="patch_saveback_apply_line", markup=False)
+                with Horizontal(classes="pe-row"):
+                    yield Label("Save patched image as:", classes="pe-label")
+                    yield OsClipboardInput(id="patch_saveback_name_input", compact=True)
+                with Horizontal(id="patch_saveback_buttons", classes="patch-chip-apply"):
+                    yield Button("Format: S19", id="patch_saveback_format_button", classes="patch-chip")
+                    yield Button(f"Width: {self._saveback_width} bytes/line", id="patch_saveback_width_button", classes="patch-chip")
+                    yield Button("Write file", id="patch_saveback_confirm_button", classes="patch-chip")
+                    yield Button("Don't save", id="patch_saveback_decline_button", classes="patch-chip")
+            with Container(id="patch_before_after_row", classes="hidden patch-docked-group"):
+                yield Label("Before/after report available:", classes="patch-field-label")
+                with Horizontal(id="patch_before_after_buttons", classes="patch-chip-apply"):
+                    yield Button("Write before/after report", id="patch_before_after_button", classes="patch-chip")

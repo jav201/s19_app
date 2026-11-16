@@ -119,3 +119,78 @@ Under D-1 A no requirement depends on a new key: the prompt's controls are butto
 ## Orchestrator rulings (2026-11-06T19:43:15-06:00, Opus 5.5)
 
 D-1 (placement) and D-2 (default format) **→ operator at G2** (page question 7); the E1 recommendation (docked bar A; same format as the loaded file) is on record. D-3 **A** (Width hidden for HEX, its space kept). D-4 **A** (the apply line in the prompt; a warning notice only when nothing was applied; the line's text waits for G2). D-5 **A** (the before/after control moves with the prompt). D-6 **A** (D8-27/28/29 stay open; the unreachable D8-17 branch is left as is — not in scope). D-7 **A** (folder rule unchanged). New row R-PE-EXPORT.3 (stale prompt after a no-op apply) accepted. **E2 waits for the G2 verdict** (the graph depends on D-1); it is written on base lines and integrated at E4 after batch-101 Inc 12 merges. Backlog: the canon has no A2L tab row though the code has four tabs.
+
+## G2 verdict applied (2026-11-12T22:22:33-06:00, E2 author, Opus 5.5)
+
+Source: the operator's export `../evidence/G2/veredicto-b103-r2.json` (round `b103_ux_r2`, exported 2026-11-12T11:43:28Z): `q7_export = "A"`, `q7_default = "same_as_source"`, no note on question 7, empty general note. The page is `prototypes/b103_ux/round2/b103_ux_r2.html` in the main checkout (read only; its question 7 text quoted below in English). Question 7 asked two things: "Export the changed image: which variant? A docked bar · B card in Inspector · C dialog" and "Format selected by default: the same as the source · always ask (none selected)".
+
+| Decision | Ruling | Rows settled | What changes in the records |
+|---|---|---|---|
+| D-1 placement | **A — docked bar** (operator, G2 `q7_export`) | R-PE-EXPORT.1, R-TUI-063.1 (changed), CTX-PE *save-back prompt* | "PROPOSED — awaits G2" dropped in `01-requirements.md`; case R-CHG-003.1/1 no longer names the D-1 B outcome; the D-1 B / C rows of §3 and the slice's §4 deltas are not chosen (kept for the record) |
+| D-2 default format | **A — the loaded file's format** (operator, G2 `q7_default = same_as_source`) | R-PE-EXPORT.7 | "PROPOSED — awaits G2" dropped; R-PE-EXPORT.17 / .18 (the D-2 B rows) stay unused, not reserved |
+| D-3 Width for Intel HEX | already **A** (orchestrator, 2026-11-06); the G2 answer A shows Width gone for Intel HEX (Fig. 7.7), which agrees with R-PE-EXPORT.10 | R-PE-EXPORT.10, .12 | "PROPOSED D-3" replaced by "ruled D-3 A". D8-40 / D10-43 (§4) **closed** by R-PE-EXPORT.10: no Width control on an Intel HEX save-back. The place kept (R-PE-EXPORT.12) is the orchestrator's D-3 A; the prototype collapses it (open item O-2 below) |
+| D-4 notice | already **A** (orchestrator) | R-PE-EXPORT.5, .6 | "PROPOSED D-4" replaced by "ruled D-4 A" |
+| D-4 apply-line text | **no G2 answer covers it.** The page did not ask about the text: its "with the proposal" row showed the prototype's line `✓ APPLIED 7 entries written into firmware.s19 in memory · not on disk yet` as part of every variant, so the A answer does not choose between A′ and B′. **A′ is kept** (E1 recommendation, orchestrator brief): `Apply: <a> applied, <s> skipped, <b> blocked · changed in memory only — Write file saves it` | R-PE-EXPORT.4 | status reads "text: E1 A′, kept — not asked at G2; open operator item O-1". One more reason for A′, found at E2 (R): the prototype paints `✓ APPLIED` on GREEN, and `styles.tcss:1124-1140` reserves green and the check glyphs for verdicts inside this panel ("the chip family is non-verdict by construction") |
+| D-5 before/after control | already **A** (orchestrator) | R-TUI-049.1 | "D-5" stays as the reason |
+
+Open operator items (the prototype px_A draws them; no G2 answer covers them; the E1 rows stand until the operator says otherwise — `E2-rulings.md` lists them with their cost):
+- **O-1** the apply-line text (A′ kept; B′ is what Fig. 7.5 / 7.6 show).
+- **O-2** the Width control for Intel HEX: hidden with its place kept (D-3 A, R-PE-EXPORT.12) versus removed from the row (px_A, Fig. 7.7: `Write file` moves left).
+- **O-3** the Format control: a one-row chip `Format: S19` / `Format: Intel HEX` that a click switches (R-PE-EXPORT.8, .9) versus px_A's line `Format (●) S19 ( ) Intel HEX  alt+f switch`.
+- **O-4** keys: px_A's `alt+f` / `alt+b` / `alt+w` / `alt+n` (the page called them "a proposal of the prototype"); no row depends on a key (§8); a key needs the Windows Terminal check of §8 before a row names it.
+- **O-5** the bar's frame: px_A draws a round border titled `EXPORT THE CHANGED IMAGE` (2 more rows); no row asks for a frame or a title.
+- **O-6** the name on a format change: px_A replaces any final extension; R-PE-EXPORT.14 / .15 replace only a final `.s19` / `.hex` and keep any other text.
+
+Text fixed in place by this addendum: `01-requirements.md` (the status of R-PE-EXPORT.1, .4, .5, .7, .10, R-TUI-063.1, R-TUI-049.1; the CTX-PE line; the Counts paragraph), `02-test-cases.md` (the header's PROPOSED sentence; case R-CHG-003.1/1's expected result; the D-6 sentence: D-6 is ruled A, so the four `conflict` cases stay `conflict`, owed by D8-27 / D8-28 / D8-29), `E1-slice.md` (§5, the rebase to `287b9dc3`). No requirement sentence, threshold or id changed.
+
+## Re-map to a95d0ea9 (relevo-8) — 2026-11-13T15:35:27-06:00, re-map author claude-opus-5-5
+
+Source: PENDING P-020 (re-map E1–E3 onto batch-modular + the split) and Inc 8's pinned I-8.3 (`b103-inc8` `d5d48685`: Inc 8 `E1-slice.md` §5, `E1-rulings.md` D-8 and §7, `codewire/graph-inc8.md` §Interfaces, `E3-rulings.md` E3A-05). Records only; no product or test code; no test run. The rulings above (§1–§8, the orchestrator's rulings, "G2 verdict applied") are not rewritten (PP-06): their `e07fb00` / `287b9dc3` file:line citations map to `a95d0ea9` through `E1-slice.md` §7.1 (and `evidence-remap/i10-remap-map.py`, which maps any line inside a moved function by its offset and checks its text). The same holds for `E2-rulings.md` and `E3-rulings.md`.
+
+### Changed rows (each in place in `01-requirements.md`, Status says `re-map`; no sentence, id or new row)
+
+| Row | Change | Reason |
+|---|---|---|
+| R-CHG-003.1 | The negative control names "the three tabs other than JSON" (Inspector, Checks, A2L at `a95d0ea9`; Patch script, Inspector, Checks with Inc 8); threshold count unchanged (9/9). | Inc 8 changes R-TUI-063.3 (the A2L chip leaves, Patch script enters); I-8.3 (d) says Inc 10's tab list follows R-TUI-063.3 as merged. Four tabs in either base, so the count holds. |
+| *inspector tabs* (CTX-PE, Definitions) | The four tab chips of R-TUI-063.3 on the base E4 builds on. | As R-CHG-003.1: the term was a fact about `e07fb00`; either merge order is allowed (I-8.3 (e)), so the term names the rule, not a list. |
+| R-TUI-063.1 | Status gives the merged form used when Inc 8 is in the E4 base: Inc 8's text (ribbon, filter row, staging sheet, landing pane, file row, document row, legend) with Inc 10's insertion "the save-back prompt while it is shown" before the legend; same 4/4 threshold. Cases R-TUI-063.1/1, /2 name the regions of both bases. | Both increments change this one canon row (Inc 8 R-1, Inc 10 R-2); I-8.3 point 2 says the two edits compose and the canon fold takes Inc 8's text with Inc 10's insertion. |
+| R-PE-EXPORT.2 | + 1/1 at 118×54 with the before/after control also shown (case /11): every control inside the screen, and the dock's height recorded. | I-8.3 fit: Inc 8's R-PE-DEF.1.1/3 and R-PE-DEF.74/2 assume a 4-row dock. Inc 10's largest dock is 4 rows (prompt 3 + before/after 1, after `Write file` and a new Apply), a state no Inc 10 case exercised (`E1-slice.md` §7.3). |
+| R-PE-EXPORT.17 | With Inc 8 in the E4 base, 5/5: + (/5) a value staged from the staging sheet. | Finding F-R8-3: a stage appends or replaces an entry (Inc 8 I-8.2 `_stage_encoded`), which the row's sentence covers; Inc 8's stage handler (slice A3) does not hide the prompt. |
+| R-TUI-064.1 (cited) | The parenthesis "the prompt takes rows from the ledger and the inspector" adds "once Inc 8 is in the base, from the staging sheet window (I-8.3 (b))". | The region that yields rows changes with Inc 8; no case changes. |
+
+Citations only (Base column, no change of meaning): R-PE-EXPORT.1, R-TUI-049.1, R-PE-EXPORT.7, R-PE-EXPORT.17, R-HEX-SAVE-001.1, R-HEX-VERIFY-001.1, and the *inspector tabs* line.
+
+### Decisions of the re-map (decided and recorded, DF-02; none is visible to the operator)
+
+| Id | Decision | Reason |
+|---|---|---|
+| R8-1 | The two prompt blocks move verbatim from `_compose_action_bar` into `_compose_doc_controls`, inside `Container(id="patch_export_dock")` after `#patch_doc_controls`; no new compose helper. | I-8.3 (a) names `_compose_doc_controls` as the yield point; the blocks keep their AST; a helper used once would add a node for no requirement (simplicity). |
+| R8-2 | Graph nodes take the defining class's name (`ActionsMixin.*`, `PatchMixin.*`, `LayoutMixin.compose`); interfaces keep the public form (`PatchEditorPanel.show_save_prompt`, defined in `ActionsMixin`). | The extractor marks a def by its module and qualname; callers still call the panel's or the app's method through the mixin bases. |
+| R8-3 | Everything that depends on Inc 8 (the tab names, R-TUI-063.1's merged text, R-PE-EXPORT.17/5) is written as "when Inc 8 is in the E4 base", not as new rows. | Either merge order is allowed (I-8.3 (e)); one requirement set must hold on both bases. |
+| R8-4 | `LayoutMixin.compose` is a context node and `layout.py` is not in the slice. | I-8.3 / DF-10: Inc 8 is `layout.py`'s one writer; its docstring's id-type sentence stays true after the move. |
+
+### Findings for both increments (for the orchestrator; Inc 8's records are not edited here)
+
+F-R8-1 (fit: fits, max 4 = stand-in), F-R8-2 (the stand-in's "inside the document controls" wording; MINOR, Inc 8), F-R8-3 (Inc 8's stage path must hide the prompt; open, whichever merges second), F-R8-4 (shared files, disjoint hunks), F-R8-5 (the extractor does not see cross-mixin `self.` calls; method note, open): `E1-slice.md` §7.3–§7.4. Whether Inc 10 E4 can start right after Inc 8 merges: yes, after a rebase, a re-run of the census and the extractor, and the "Inc 8 in the base" forms (`E1-slice.md` §7.5).
+
+### Open operator items O-1 … O-6 (PENDING P-021) and BL-I10-E3-8 (PENDING P-022): all still open
+
+- O-1 (apply-line text): open; with Inc 8, B′ also risks the dock's height — it paints the loaded file's name, so a long name wraps the line and the dock exceeds Inc 8's 4-row stand-in.
+- O-2 (Width hidden with its place kept vs removed): open; unchanged by the re-map (no height change).
+- O-3 (Format chip vs px_A's format line): open; px_A's line adds a row, so the dock would be 5 rows, over Inc 8's stand-in.
+- O-4 (keys): open; unchanged by the re-map.
+- O-5 (frame and title): open; a frame adds 2 rows, so the dock would be 6 rows, over Inc 8's stand-in (R-PE-DEF.1.1/3, .74/2 would need it).
+- O-6 (which extension the rename replaces): open; unchanged by the re-map.
+- BL-I10-E3-8 (HIGH, the S0 header from the typed full path): open; unchanged in substance — the call moved verbatim to `app/patch.py:389` (`_synth_s0_header_from_filename(event.filename)`, function at `app/patch.py:61-89`, same AST).
+
+## Prep onto Inc 8 final (relevo-10, 2026-11-14)
+
+Base `7ac47dc5` (`b103-inc8` tip, E5 PASS-WITH-NOTES). Records only; no product file changed.
+
+| Id | Decision | Reason |
+|---|---|---|
+| R10-1 | The forms of R8-3 are applied in place and the "when Inc 8 is in the E4 base" qualifiers are dropped: tab names (Patch script, Inspector, JSON, Checks; the cases that named the A2L tab use Patch script: R-CHG-003.1/4, /8, R-PE-EXPORT.2/4, /8, R-TUI-049.1/4), R-TUI-063.1's sentence (Inc 8's regions plus the prompt), R-PE-EXPORT.17 at 5/5. | Inc 8 is in the base; one requirement set, no alternates (R8-3). |
+| R10-2 | F-R8-3 (orchestrator ruling P-043): Inc 8 did not add the hide, so Inc 10 E4 wires `panel.hide_save_prompt()` on an ok stage in `PatchMixin.on_staging_sheet_stage_requested` (`app/patch.py:322-376`, group G2) with test R-PE-EXPORT.17/5. The function is node 23 of the graph (changed). | `git grep hide_save_prompt` at `7ac47dc5` finds no call in that handler; R-PE-EXPORT.17 covers a stage (an entry change). |
+| R10-3 | I-8.3 fit holds against Inc 8's final tests: R-PE-DEF.1.1/3 and R-PE-DEF.74/2 (`tests/test_b103_inc8_p_layout.py:130`, `:165`) use `STANDIN_DOCK_ROWS = 4` (`tests/support/b103_inc8_p.py:43`) yielded by wrapping `ActionsMixin._compose_doc_controls` after the document row, so a sibling before the legend, as Inc 10's dock. Inc 10's largest dock is 4 rows. | `E1-slice.md` §7.3, §8. |
+| R10-4 | O-1 … O-6 (P-021) and BL-I10-E3-8 (P-022) stay open; their effect on the dock height (§7.3) is unchanged. | Operator-visible (DF-09). |
+

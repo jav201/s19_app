@@ -1,0 +1,39 @@
+scenario=idle
+fixture=examples/case_01_basic_valid/firmware.s19 (case01), copied into the scratch base
+entry=0x8000007C DE AD BE EF
+os_clipboard=stubbed (never touched)
+osc52=stubbed
+app_size=118x54
+status_after_add=Patch Editor: entry added.
+shown_pane=patch_pane_inspector
+prompt_hidden_class=True
+apply_line=
+format_label=Format: S19
+width_label=Width: 32 bytes/line visibility=visible
+name_box=
+painted patch_doc_controls: Region(x=5, y=41, width=112, height=1) hit_at_centre=patch_doc_controls
+painted patch_export_dock: Region(x=5, y=42, width=112, height=0) hit_at_centre=None
+painted patch_saveback_row: None hit_at_centre=None
+painted patch_saveback_apply_line: None hit_at_centre=None
+painted patch_saveback_name_input: None hit_at_centre=None
+painted patch_saveback_format_button: None hit_at_centre=None
+painted patch_saveback_width_button: None hit_at_centre=None
+painted patch_saveback_confirm_button: None hit_at_centre=None
+painted patch_saveback_decline_button: None hit_at_centre=None
+painted patch_before_after_row: None hit_at_centre=None
+painted_rows_from_document_row_begin
+      │  Validate   Apply loaded changes   Save
+      │ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image
+   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Loaded firmware.s19 (S19 only)                                                                   (none)  |  (none)
+  
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%
+  
+    Loaded firmware.s19 (S19 only)
+painted_rows_from_document_row_end
+focused=patch_entry_add_button
+notifications=0
+status: Loaded firmware.s19
+status: Patch Editor: entry added.
+stub_os_writes=0
+surface=ready

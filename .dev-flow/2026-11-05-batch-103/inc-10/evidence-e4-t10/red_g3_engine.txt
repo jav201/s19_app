@@ -1,0 +1,37 @@
+# base 439860c4 product + T10 tests; rtx; env -i ... timeout 300 python -m pytest -p no:cacheprovider -n 2 -q -rfEp
+# first line = s19_app.__file__ (base tree, runner home abbreviated)
+~/work/zq-e4-10-t10/base/s19_app/__init__.py
+E       AssertionError: ('R-HEX-EMIT-001.11/1', [':10FFF800000102030405060708090A0B0C0D0E0F81'])
+E         
+E         Left contains one more item: ':10FFF800000102030405060708090A0B0C0D0E0F81'
+E         Use -v to get more diff
+E       AssertionError: ('R-HEX-EMIT-001.11/2', [':10FFF800000102030405060708090A0B0C0D0E0F81'])
+E         
+E         Left contains one more item: ':10FFF800000102030405060708090A0B0C0D0E0F81'
+E         Use -v to get more diff
+FAILED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_no_type_00_record_crosses_a_64_kib_boundary[R-HEX-EMIT-001.11/1]
+FAILED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_no_type_00_record_crosses_a_64_kib_boundary[R-HEX-EMIT-001.11/2]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_save_001_2_the_format_suffix_is_added_when_missing[R-HEX-SAVE-001.2/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_save_001_2_the_format_suffix_is_added_when_missing[R-HEX-SAVE-001.2/2]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_save_001_2_the_format_suffix_is_added_when_missing[R-HEX-SAVE-001.2/3]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_save_001_2_the_format_suffix_is_added_when_missing[R-HEX-SAVE-001.2/4]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/2]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/3]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/4]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/5]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/6]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/7]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_pe_export_16_a_hex_save_back_holds_only_record_types_00_01_04[R-PE-EXPORT.16/8]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_11_the_data_files_are_what_the_base_emitter_would_cross
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_2_1_a_type_04_record_precedes_the_first_data_record
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_3_a_type_04_record_when_the_upper_16_bits_change[R-HEX-EMIT-001.3/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_s19_emit_the_record_size_follows_the_highest_address[R-S19-EMIT.4/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_emit_001_3_a_type_04_record_when_the_upper_16_bits_change[R-HEX-EMIT-001.3/2]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_s19_emit_the_record_size_follows_the_highest_address[R-S19-EMIT.4/2]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_s19_emit_the_record_size_follows_the_highest_address[R-S19-EMIT.3/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_s19_emit_the_record_size_follows_the_highest_address[R-S19-EMIT.5/1]
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_img_write_2_1_every_conversion_reads_back_to_the_same_image
+PASSED tests/test_b103_inc10_g3_engine.py::test_r_hex_verify_001_1_5_the_conversion_matrix_verifies_and_the_wrong_reader_does_not
+2 failed, 22 passed in 1.33s
+real	0m3.327s

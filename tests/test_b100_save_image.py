@@ -210,7 +210,7 @@ def _add(app: S19TuiApp, address: int, run) -> None:
 async def _save_back(pilot, app: S19TuiApp, filename: str) -> None:
     """The app's own save-back handler (the panel's decision message)."""
     app.on_patch_editor_panel_save_back_decision(
-        PatchEditorPanel.SaveBackDecision(filename, 32)
+        PatchEditorPanel.SaveBackDecision(filename, 32, output_format="s19")
     )
     await _wait_for(
         pilot,

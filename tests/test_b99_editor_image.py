@@ -45,6 +45,7 @@ from s19_app.tui.changes import (
 )
 from s19_app.tui.services.before_after_service import compose_before_after_report
 from s19_app.tui.services.change_service import ChangeService
+from tests.support.b103_inc8_p import click_visible
 from tests.support.independent_reader import read_s19
 
 #: The source bytes the fixture image declares at 0xEB10..0xEB13 (" App").
@@ -565,7 +566,7 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
             await pilot.pause()
 
             async def _type(input_id: str, text: str) -> None:
-                assert await pilot.click(f"#{input_id}"), (
+                assert await click_visible(pilot, f"#{input_id}"), (
                     f"click missed #{input_id}"
                 )
                 await pilot.press("ctrl+shift+a")
@@ -578,10 +579,12 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
+            # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+            assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
             await _type("patch_entry_address_input", "0xEB10")
             await _type("patch_entry_bytes_input", "DE AD BE EF")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
@@ -608,8 +611,8 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
             )
             await _type("patch_entry_address_input", "0xEB40")
             await _type("patch_entry_bytes_input", "01 02")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
@@ -630,8 +633,8 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
             # the save, with the "1 entry" count (review finding F3).
             await _type("patch_entry_address_input", "0xEB60")
             await _type("patch_entry_bytes_input", "05 06")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
@@ -639,9 +642,15 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
                 "third add status line",
             )
 
-            # 3. Save-back: the prompt renders in the editor's JSON pane.
-            assert await pilot.click("#patch_tab_json"), (
-                "click missed #patch_tab_json"
+            # 3. Save-back. Inc 10 R-PE-EXPORT.17: the add above hid the prompt, so
+            # ``Write file`` is not reachable with an unapplied entry; the F3 naming
+            # (the not-applied entry in the status) is reached by showing the prompt
+            # through I-10.1 (``show_save_prompt``) -- the same route R-PE-EXPORT.3's
+            # cases use -- and the prompt is a shown widget in whichever tab.
+            app.query_one("#patch_editor_panel").show_save_prompt(
+                "editor_image-patched.s19",
+                output_format="s19",
+                apply_line="Apply: 1 applied, 0 skipped, 0 blocked",
             )
             await _wait_for(
                 pilot,
@@ -753,7 +762,7 @@ def test_tc_b99_22_verify_mismatch_status_still_names_entries(
             await pilot.pause()
 
             async def _type(input_id: str, text: str) -> None:
-                assert await pilot.click(f"#{input_id}"), (
+                assert await click_visible(pilot, f"#{input_id}"), (
                     f"click missed #{input_id}"
                 )
                 await pilot.press("ctrl+shift+a")
@@ -763,10 +772,12 @@ def test_tc_b99_22_verify_mismatch_status_still_names_entries(
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
+            # Inc 8 R-TUI-063.3: the pane lands on Patch script; the entry boxes live in Inspector.
+            assert await pilot.click("#patch_tab_inspector"), "click missed #patch_tab_inspector"
             await _type("patch_entry_address_input", "0xEB10")
             await _type("patch_entry_bytes_input", "DE AD BE EF")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
@@ -785,8 +796,8 @@ def test_tc_b99_22_verify_mismatch_status_still_names_entries(
             # name the mismatch arm must still carry.
             await _type("patch_entry_address_input", "0xEB40")
             await _type("patch_entry_bytes_input", "01 02")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
@@ -794,8 +805,12 @@ def test_tc_b99_22_verify_mismatch_status_still_names_entries(
                 "second add status line",
             )
 
-            assert await pilot.click("#patch_tab_json"), (
-                "click missed #patch_tab_json"
+            # Inc 10 R-PE-EXPORT.17: the add hid the prompt; show it through I-10.1
+            # (the not-applied name is what this case reads, not the route to it).
+            app.query_one("#patch_editor_panel").show_save_prompt(
+                "editor_image-patched.s19",
+                output_format="s19",
+                apply_line="Apply: 1 applied, 0 skipped, 0 blocked",
             )
             await _wait_for(
                 pilot,

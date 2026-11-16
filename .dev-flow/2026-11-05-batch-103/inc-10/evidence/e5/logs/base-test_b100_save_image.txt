@@ -1,0 +1,894 @@
+~/work/zq-x10/base/s19_app/__init__.py
+tree: base  base 439860c4 + this test file, its support module and fixtures
+uptime:  02:51:59 up 1 day, 11:40,  5 users,  load average: 9.41, 8.71, 7.51
++ pytest -p no:cacheprovider -n 2 -q -rfE tests/test_b100_save_image.py
+bringing up nodes...
+bringing up nodes...
+
+................F.......s......F.................s.F.FF...F.F.sF...F...s [ 92%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+_________________ test_tc_b100_15_mac_and_a2l_stay_byte_copies _________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_15_mac_and_a2l_st0')
+
+    def test_tc_b100_15_mac_and_a2l_stay_byte_copies(tmp_path: Path) -> None:
+        """A project holding S19 + MAC + A2L, patched and saved as another
+        project → the image emitted, the MAC and the A2L byte-identical."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=base)
+            p1 = app.workarea / "P1"
+            p1.mkdir(parents=True)
+            for name in ("firmware.s19", "firmware.mac", "firmware.a2l"):
+                shutil.copy2(CASE01_DIR / name, p1 / name)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_project(pilot, app, "P1")
+                assert app.current_file.mac_path is not None
+                assert app.current_a2l_path is not None
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                await _save(pilot, app, "P2")
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the P2 save",
+                )
+            return app.workarea / "P2"
+    
+>       p2 = asyncio.run(_drive())
+             ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:603: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:596: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_tc_b100_15_mac_and_a2l_stay_byte_copies.<locals>._drive.<locals>.<lambda> at 0x7f09fa023ba0>
+description = 'the P2 save', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the P2 save
+
+tests/test_b100_save_image.py:158: AssertionError
+__________ test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved ___________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw0/test_tc_b100_58_mac_attach_kee0')
+
+    def test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved(
+        tmp_path: Path,
+    ) -> None:
+        """Review F5 (LLR-167.5): attaching a MAC re-installs the SAME image
+        dict, so it is not a load — an applied, unsaved patch must stay
+        unsaved, or the Inc 10 load question would not ask before replacing
+        it."""
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.mac")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                mem_map = app.current_file.mem_map
+                assert app._change_service.differs_from_last_saved(mem_map)
+                app.load_selected_file(folder / "firmware.mac")
+                await _wait_for(
+                    pilot,
+                    lambda: app.current_file is not None
+                    and app.current_file.mac_path is not None,
+                    "the MAC attach",
+                )
+                return (
+                    app.current_file.mem_map is mem_map,
+                    app._change_service.differs_from_last_saved(
+                        app.current_file.mem_map
+                    ),
+                )
+    
+>       assert asyncio.run(_drive()) == (True, True)
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1104: in _drive
+    async with app.run_test(size=(220, 60)) as pilot:
+../../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+s19_app/tui/app/core.py:1260: in on_event
+    await super().on_event(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4148: in on_event
+    await super().on_event(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:900: in on_callback
+    await invoke(event.callback)
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app/loaded_state.py:779: in _step_sections
+    self.update_sections()
+s19_app/tui/app/workspace_view.py:265: in update_sections
+    sections = self.query_one("#sections_list", ListView)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+selector = '#sections_list'
+expect_type = <class 'textual.widgets._list_view.ListView'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#sections_list' on Screen(id='_default')
+
+../../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ ~/work/zq-x10/base/s19_app/tui/app/loaded_state.py:779 in       │
+│ _step_sections                                                               │
+│                                                                              │
+│   776 │   │   │   │   if precomputed_oor is not None:                        │
+│   777 │   │   │   │   │   self.update_sections(precomputed_out_of_range=prec │
+│   778 │   │   │   │   else:                                                  │
+│ ❱ 779 │   │   │   │   │   self.update_sections()                             │
+│   780 │   │   │   finally:                                                   │
+│   781 │   │   │   │   self.logger.info(                                      │
+│   782 │   │   │   │   │   "Load phase boundary: apply_sections_done path=%s" │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ ~/work/zq-x10/base/s19_app/tui/app/workspace_view.py:265 in     │
+│ update_sections                                                              │
+│                                                                              │
+│   262 │   │   │   Used by:                                                   │
+│   263 │   │   │   │   - ``_apply_prepared_load``                             │
+│   264 │   │   """                                                            │
+│ ❱ 265 │   │   sections = self.query_one("#sections_list", ListView)          │
+│   266 │   │   sections.clear()                                               │
+│   267 │   │   self.update_workspace_stats()                                  │
+│   268 │   │   self.update_memory_strip()                                     │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'dark',                      │          │
+│ │                            │   │   'focus'                      │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#sections_list' on Screen(id='_default')
+_________________ test_tc_b100_70_refused_save_keeps_the_flag __________________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_70_refused_save_k0')
+
+    def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -> None:
+        """A refused Save project (a blocked document) → the flag is still set
+        (1 assertion after the vacuity guard)."""
+>       dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1887: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_image.py:1881: in _dirty_after_save
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1861: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+_______________ test_tc_b100_70_written_document_clears_the_flag _______________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_70_written_docume0')
+
+    def test_tc_b100_70_written_document_clears_the_flag(tmp_path: Path) -> None:
+        """LLR-167.8 positive arm (Inc 8a re-pin of Inc 5's
+        ``test_tc_b100_70_unwritten_document_keeps_the_flag``, C5): the typed
+        document is now written into the project by Save project (LLR-170.2),
+        so a file holds every entry -> the flag is cleared, and a following
+        Patch Editor Load raises 0 ``LoadGuardScreen``. The skip-``mark_saved``
+        mutant leaves the flag set and the Load asks -> RED."""
+        from textual.widgets import Button, Input
+    
+        from s19_app.tui.screens_directionb import LoadGuardScreen
+    
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        other = tmp_path / "other.json"
+        other.write_bytes(b100_projects.change_document_bytes())
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+                )
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                dirty_before = panel._dirty
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                dirty_after = panel._dirty
+                panel.query_one("#patch_doc_path_input", Input).value = str(other)
+                panel.query_one("#patch_doc_load_button", Button).press()
+                asked = False
+                for _ in range(12):
+                    await pilot.pause()
+                    asked = asked or isinstance(app.screen, LoadGuardScreen)
+                return dirty_before, dirty_after, messages, asked, app.workarea / "P1"
+    
+>       dirty_before, dirty_after, messages, asked, project = asyncio.run(_drive())
+                                                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1929: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1914: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+_____________ test_tc_b100_70_failed_document_write_keeps_the_flag _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_70_failed_documen0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f09fbfb3e90>
+
+    def test_tc_b100_70_failed_document_write_keeps_the_flag(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A forced document-write failure -> the project is saved, 1 line names
+        the unsaved document, the flag stays set (no file holds the edits)."""
+        from s19_app.tui.changes import io as changes_io
+        from s19_app.validation.model import ValidationIssue, ValidationSeverity
+    
+        def _refuse(*args, **kwargs):
+            return None, [ValidationIssue(code="MF-WRITE-CONTAINMENT", message="forced",
+                                          severity=ValidationSeverity.ERROR, artifact="change")]
+    
+        monkeypatch.setattr(changes_io, "write_change_document", _refuse)
+        monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return messages, panel._dirty
+    
+>       messages, dirty = asyncio.run(_drive())
+                          ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1966: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1959: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+_______ test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag _______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_70_file_backed_do0')
+
+    def test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag(tmp_path: Path) -> None:
+        """A file-backed ``boost.json`` loaded from the common folder, 1 entry
+        added through the panel, Save project -> the copy holds the file's
+        bytes, not the edit -> the flag stays set (the copy landed and was
+        recorded: vacuity guard). The call-``mark_saved``-after-every-save
+        mutant -> False -> RED."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        body = b100_projects.change_document_bytes()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                common = app.workarea / "patches"
+                common.mkdir(parents=True, exist_ok=True)
+                (common / "boost.json").write_bytes(body)
+                assert app._change_service.load(str(common / "boost.json"), app.base_dir).ok
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return messages, panel._dirty, app.workarea / "P1"
+    
+>       messages, dirty, project = asyncio.run(_drive())
+                                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:1998: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:1991: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+__________ test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw1/test_tc_b100_70_natural_path_l0')
+
+    def test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag(tmp_path: Path) -> None:
+        """E3 R1 natural path: Load ``P`` (the reopen binds
+        ``P/patches/boost.json``, 1 entry), add 1 entry, Save project into
+        ``P`` -> the flag stays set, the file's bytes unchanged, still
+        recorded, 1 status line naming the Patch Editor save."""
+        base = tmp_path / "app"
+        project = b100_projects.seed_document_project(_workarea(base))
+        before = (project / "patches" / "boost.json").read_bytes()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await b100_projects.load_project(pilot, app, "P")
+                reopened = len(app._change_service.document.entries)
+                if reopened != 1:
+                    return reopened, [], None
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return reopened, messages, panel._dirty
+    
+>       reopened, messages, dirty = asyncio.run(_drive())
+                                    ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:2032: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:2025: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size0] __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw0/test_at_b100_05_save_project_s0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+                # name, type it, and wait for its painted summary before Save.
+                await sd.type_and_await_summary(pilot, app, "P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+>       painted = asyncio.run(_save_scene())
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:2218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:2152: in _save_scene
+    await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size1] __________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-18/popen-gw0/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+                # name, type it, and wait for its painted summary before Save.
+                await sd.type_and_await_summary(pilot, app, "P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+>       painted = asyncio.run(_save_scene())
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_image.py:2218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_save_image.py:2152: in _save_scene
+    await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -> None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) > 0,
+            "the Patch Editor panel",
+        )
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_save_image.py:1835: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_written_document_clears_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+9 failed, 65 passed, 4 skipped in 167.97s (0:02:47)
+RC=1

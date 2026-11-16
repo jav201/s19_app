@@ -1,0 +1,68 @@
+screens_directionb.py:4589         -> s19_app/tui/screens_directionb/patch_editor/panel.py:238 (PatchEditorPanel) TEXT-DIFFERS
+screens_directionb.py:4811-4872    -> s19_app/tui/screens_directionb/patch_editor/panel.py:468 (PatchEditorPanel.__init__) text= .. s19_app/tui/screens_directionb/patch_editor/panel.py:529 (PatchEditorPanel.__init__) text=
+screens_directionb.py:4839-4842    -> s19_app/tui/screens_directionb/patch_editor/panel.py:496 (PatchEditorPanel.__init__) text= .. s19_app/tui/screens_directionb/patch_editor/panel.py:499 (PatchEditorPanel.__init__) text=
+screens_directionb.py:4652-4680    -> s19_app/tui/screens_directionb/patch_editor/panel.py:309 (PatchEditorPanel.SaveBackDecision) text= .. s19_app/tui/screens_directionb/patch_editor/panel.py:337 (PatchEditorPanel.SaveBackDecision.__init__) text=
+screens_directionb.py:4675-4680    -> s19_app/tui/screens_directionb/patch_editor/panel.py:332 (PatchEditorPanel.SaveBackDecision.__init__) text= .. s19_app/tui/screens_directionb/patch_editor/panel.py:337 (PatchEditorPanel.SaveBackDecision.__init__) text=
+screens_directionb.py:4931-5287    -> s19_app/tui/screens_directionb/patch_editor/layout.py:17 (LayoutMixin.compose; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:487 (ActionsMixin._compose_action_bar; compose split) text=
+screens_directionb.py:4940-4943    -> s19_app/tui/screens_directionb/patch_editor/layout.py:26 (LayoutMixin.compose; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/layout.py:29 (LayoutMixin.compose; compose split) text=
+screens_directionb.py:5115-5143    -> s19_app/tui/screens_directionb/patch_editor/actions.py:517 (ActionsMixin._compose_action_bar; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:487 (ActionsMixin._compose_action_bar; compose split) text=
+screens_directionb.py:5144-5159    -> s19_app/tui/screens_directionb/patch_editor/actions.py:546 (ActionsMixin._compose_action_bar; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:487 (ActionsMixin._compose_action_bar; compose split) text=
+screens_directionb.py:5271-5281    -> s19_app/tui/screens_directionb/patch_editor/actions.py:488 (ActionsMixin._compose_action_bar; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:487 (ActionsMixin._compose_action_bar; compose split) text=
+screens_directionb.py:5282-5287    -> s19_app/tui/screens_directionb/patch_editor/actions.py:482 (ActionsMixin._compose_action_bar; compose split) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:487 (ActionsMixin._compose_action_bar; compose split) text=
+screens_directionb.py:5235-5236    -> compose:5235 -> no helper holds the text 'use_status.styles.height = 3' .. compose:5236 -> no helper holds the text 'use_status.styles.text_wrap = "wrap"'
+screens_directionb.py:5941-6103    -> s19_app/tui/screens_directionb/patch_editor/actions.py:64 (ActionsMixin.on_button_pressed) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:226 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5965         -> s19_app/tui/screens_directionb/patch_editor/actions.py:88 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5973-5986    -> s19_app/tui/screens_directionb/patch_editor/actions.py:96 (ActionsMixin.on_button_pressed) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:109 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5987-5995    -> s19_app/tui/screens_directionb/patch_editor/actions.py:110 (ActionsMixin.on_button_pressed) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:118 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5996-5999    -> s19_app/tui/screens_directionb/patch_editor/actions.py:119 (ActionsMixin.on_button_pressed) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:122 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5989-5994    -> s19_app/tui/screens_directionb/patch_editor/actions.py:112 (ActionsMixin.on_button_pressed) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:117 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5990         -> s19_app/tui/screens_directionb/patch_editor/actions.py:113 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:5998         -> s19_app/tui/screens_directionb/patch_editor/actions.py:121 (ActionsMixin.on_button_pressed) text=
+screens_directionb.py:6493-6514    -> s19_app/tui/screens_directionb/patch_editor/actions.py:280 (ActionsMixin.show_save_prompt) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:301 (ActionsMixin.show_save_prompt) text=
+screens_directionb.py:6516-6523    -> s19_app/tui/screens_directionb/patch_editor/actions.py:303 (ActionsMixin.hide_save_prompt) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:310 (ActionsMixin.hide_save_prompt) text=
+screens_directionb.py:6525-6540    -> s19_app/tui/screens_directionb/patch_editor/actions.py:312 (ActionsMixin.show_before_after_prompt) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:327 (ActionsMixin.show_before_after_prompt) text=
+screens_directionb.py:6542-6556    -> s19_app/tui/screens_directionb/patch_editor/actions.py:329 (ActionsMixin.hide_before_after_prompt) text= .. s19_app/tui/screens_directionb/patch_editor/actions.py:343 (ActionsMixin.hide_before_after_prompt) text=
+screens_directionb.py:5682-5694    -> s19_app/tui/screens_directionb/patch_editor/panel.py:711 (PatchEditorPanel._show_tab) text= .. s19_app/tui/screens_directionb/patch_editor/panel.py:723 (PatchEditorPanel._show_tab) text=
+screens_directionb.py:5485         -> s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:120 (A2lPickerMixin._on_bulk_add_closed) text=
+app.py:708-736                     -> s19_app/tui/app/patch.py:61 (_synth_s0_header_from_filename) text= .. s19_app/tui/app/patch.py:89 (_synth_s0_header_from_filename) text=
+app.py:5064                        -> s19_app/tui/app/compose_screens.py:540 (ComposeScreensMixin._compose_screen_patch) text=
+app.py:5112-5334                   -> s19_app/tui/app/patch.py:94 (PatchMixin.on_patch_editor_panel_action_requested) text= .. s19_app/tui/app/patch.py:316 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5177-5192                   -> s19_app/tui/app/patch.py:159 (PatchMixin.on_patch_editor_panel_action_requested) text= .. s19_app/tui/app/patch.py:174 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5178                        -> s19_app/tui/app/patch.py:160 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5184                        -> s19_app/tui/app/patch.py:166 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5190                        -> s19_app/tui/app/patch.py:172 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5197                        -> s19_app/tui/app/patch.py:179 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5208                        -> s19_app/tui/app/patch.py:190 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5232-5258                   -> s19_app/tui/app/patch.py:214 (PatchMixin.on_patch_editor_panel_action_requested) text= .. s19_app/tui/app/patch.py:240 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5254                        -> s19_app/tui/app/patch.py:236 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5255-5258                   -> s19_app/tui/app/patch.py:237 (PatchMixin.on_patch_editor_panel_action_requested) text= .. s19_app/tui/app/patch.py:240 (PatchMixin.on_patch_editor_panel_action_requested) text=
+app.py:5336-5474                   -> s19_app/tui/app/patch.py:318 (PatchMixin.on_patch_editor_panel_save_back_decision) text= .. s19_app/tui/app/patch.py:456 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5396                        -> s19_app/tui/app/patch.py:378 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5404-5419                   -> s19_app/tui/app/patch.py:386 (PatchMixin.on_patch_editor_panel_save_back_decision) text= .. s19_app/tui/app/patch.py:401 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5407                        -> s19_app/tui/app/patch.py:389 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5412                        -> s19_app/tui/app/patch.py:394 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5417                        -> s19_app/tui/app/patch.py:399 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5457                        -> s19_app/tui/app/patch.py:439 (PatchMixin.on_patch_editor_panel_save_back_decision) text=
+app.py:5551-5580                   -> s19_app/tui/app/patch.py:498 (PatchMixin._hide_replaced_document_controls) text= .. s19_app/tui/app/patch.py:527 (PatchMixin._hide_replaced_document_controls) text=
+app.py:5579                        -> s19_app/tui/app/patch.py:526 (PatchMixin._hide_replaced_document_controls) text=
+app.py:5777                        -> s19_app/tui/app/patch.py:724 (PatchMixin.action_patch_undo) text=
+app.py:5812                        -> s19_app/tui/app/patch.py:759 (PatchMixin.action_patch_redo) text=
+app.py:5983-5987                   -> s19_app/tui/app/patch.py:930 (PatchMixin.on_patch_editor_panel_entry_edit_json_requested) text= .. s19_app/tui/app/patch.py:934 (PatchMixin.on_patch_editor_panel_entry_edit_json_requested) text=
+app.py:5990-6052                   -> s19_app/tui/app/patch.py:937 (PatchMixin._apply_entry_json_edit) text= .. s19_app/tui/app/patch.py:999 (PatchMixin._apply_entry_json_edit) text=
+app.py:6117                        -> s19_app/tui/app/patch.py:1064 (PatchMixin._surface_verify_result) text=
+app.py:7907                        -> s19_app/tui/app/patch.py:1476 (PatchMixin._patch_editor_load) text=
+app.py:7924                        -> s19_app/tui/app/patch.py:1493 (PatchMixin._patch_editor_load) text=
+app.py:13217                       -> s19_app/tui/app/save_commit.py:805 (SaveCommitMixin._save_project_files) TEXT-DIFFERS
+app.py:13229                       -> s19_app/tui/app/save_commit.py:817 (SaveCommitMixin._save_project_files) TEXT-DIFFERS
+app.py:13945                       -> s19_app/tui/app/save_plan.py:1145 (SavePlanMixin._decide_project_image) TEXT-DIFFERS
+app.py:14714                       -> s19_app/tui/app/project_load.py:1045 (ProjectLoadMixin._reset_project_session) text=
+app.py:16149                       -> s19_app/tui/app/projects.py:1068 (ProjectsMixin._activate_project_file) text=
+app.py:19658-19659                 -> s19_app/tui/app/loaded_state.py:688 (LoadedStateMixin._apply_prepared_load) text= .. s19_app/tui/app/loaded_state.py:689 (LoadedStateMixin._apply_prepared_load) text=
+# ruled (re-map author, by reading i10-remap-census-transcript.txt): the mapper's offset rule does not apply to
+# - a class attribute (screens_directionb.py:4589 SAVEBACK_WIDTHS -> panel.py:246, the census's class-level row);
+# - the end line of a split-compose block: it matches the first equal text line of the helper. The census's block
+#   table holds the real ranges: #patch_saveback_row 5118-5143 -> actions.py:520-545 (its comment 5115-5117 ->
+#   517-519), #patch_before_after_row 5145-5159 -> actions.py:547-561 (comment 5144 -> 546), #patch_doc_controls
+#   5271-5281 -> actions.py:565-575, #patch_legend 5282-5287 -> layout.py:78-83; compose 4931-5287 -> layout.py:17-83;
+# - screens_directionb.py:5235-5236 (Inc 6's Use status) -> a2l_picker.py:239-240 (A2lPickerMixin._compose_a2l_tab, by git grep);
+# - TEXT-DIFFERS at app.py:13217, 13229, 13945: the new line adds batch-modular's `deps.` prefix only (same call).

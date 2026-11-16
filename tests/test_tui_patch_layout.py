@@ -113,6 +113,9 @@ _BUTTON_HOMES = (
     # Inc 8 R-TUI-063.3: "patch_win_a2l" leaves (the A2L tab is retired, D-1 A)
     "patch_doc_file_row",
     "patch_doc_controls",
+    # Inc 10 (I-10.4, R-PE-EXPORT.1): the save-back prompt and the before/after control ride the
+    # export dock, a sibling of the document row; never a tab pane, never a scroll body.
+    "patch_export_dock",
 )
 # batch-97: the tab chip that shows each tab-resident home.
 # batch-102 Inc 5 (E3 ruling 8): the A2L tab's pane joins the map — on the
@@ -599,7 +602,11 @@ def _drive_button_reachability(
                 panel = app.query_one(
                     "#patch_editor_panel", PatchEditorPanel
                 )
-                panel.show_save_prompt("out.s19")
+                panel.show_save_prompt(
+                    "out.s19",
+                    output_format="s19",
+                    apply_line="Apply: 1 applied, 0 skipped, 0 blocked",
+                )  # Inc 10 I-10.1: both new arguments are required
                 panel.show_before_after_prompt()
                 await pilot.pause()
 
@@ -738,7 +745,8 @@ def test_at064c_revealed_rows_reachable_at_80(tmp_path: Path) -> None:
     Intent: HLR-064 / FOLD-5 — after the save-back and before/after rows are
     REVEALED (driven through the panel's ``show_save_prompt`` /
     ``show_before_after_prompt`` reveal path), their docked buttons are still
-    siblings of the JSON window body and reachable-under-scroll — a regression
+    in the export dock (Inc 10 I-10.4: a sibling of the document row, never
+    inside a scroll body) and reachable-under-scroll — a regression
     trapping a revealed row below a fold is the exact B2 class this catches.
     """
     revealed = (

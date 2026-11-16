@@ -1,0 +1,5 @@
+~/work/zq-x10/base/s19_app/__init__.py
+tree: base  base 439860c4 + this test file, its support module and fixtures
+uptime:  03:15:34 up 1 day, 12:04,  4 users,  load average: 7.43, 7.62, 7.91
++ pytest -p no:cacheprovider -p no:xdist -q -rfE tests/test_b100_workers.py -k tc_b100_53
+.....RC=124

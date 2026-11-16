@@ -1,0 +1,89 @@
+# i10-remap-census: old 287b9dc3 new a95d0ea9; python 3.12.7
+## files read by the slice, not moved: byte identity old -> new
+s19_app/tui/changes/io.py: identical
+s19_app/tui/changes/apply.py: identical
+s19_app/tui/changes/verify.py: identical
+s19_app/tui/services/change_service.py: identical
+s19_app/tui/services/flow_execution_service.py: identical
+s19_app/tui/services/variant_execution_service.py: identical
+s19_app/segment_ops.py: identical
+s19_app/hexfile.py: identical
+s19_app/tui/styles.tcss: identical
+## functions: old file:lines -> new file:qualname:lines (AST equality, docstring included)
+PatchEditorPanel.SAVEBACK_WIDTHS                           screens_directionb.py:4589-4589  -> screens_directionb/patch_editor/panel.py:PatchEditorPanel.SAVEBACK_WIDTHS:246-246 same-ast
+PatchEditorPanel.__init__                                  screens_directionb.py:4811-4872  -> screens_directionb/patch_editor/panel.py:PatchEditorPanel.__init__:468-529 same-ast
+PatchEditorPanel.SaveBackDecision                          screens_directionb.py:4652-4680  -> screens_directionb/patch_editor/panel.py:PatchEditorPanel.SaveBackDecision:309-337 same-ast
+PatchEditorPanel.SaveBackDecision.__init__                 screens_directionb.py:4675-4680  -> screens_directionb/patch_editor/panel.py:PatchEditorPanel.SaveBackDecision.__init__:332-337 same-ast
+PatchEditorPanel.compose                                   screens_directionb.py:4931-5287  -> screens_directionb/patch_editor/layout.py:LayoutMixin.compose:17-83 DIFF
+PatchEditorPanel.on_button_pressed                         screens_directionb.py:5941-6103  -> screens_directionb/patch_editor/actions.py:ActionsMixin.on_button_pressed:64-226 same-ast
+PatchEditorPanel.show_save_prompt                          screens_directionb.py:6493-6514  -> screens_directionb/patch_editor/actions.py:ActionsMixin.show_save_prompt:280-301 same-ast
+PatchEditorPanel.hide_save_prompt                          screens_directionb.py:6516-6523  -> screens_directionb/patch_editor/actions.py:ActionsMixin.hide_save_prompt:303-310 same-ast
+PatchEditorPanel.show_before_after_prompt                  screens_directionb.py:6525-6540  -> screens_directionb/patch_editor/actions.py:ActionsMixin.show_before_after_prompt:312-327 same-ast
+PatchEditorPanel.hide_before_after_prompt                  screens_directionb.py:6542-6556  -> screens_directionb/patch_editor/actions.py:ActionsMixin.hide_before_after_prompt:329-343 same-ast
+PatchEditorPanel._show_tab                                 screens_directionb.py:5682-5694  -> screens_directionb/patch_editor/panel.py:PatchEditorPanel._show_tab:711-723 same-ast
+_synth_s0_header_from_filename                             app.py:708-736                   -> app/patch.py:_synth_s0_header_from_filename:61-89 same-ast
+S19TuiApp.on_patch_editor_panel_action_requested           app.py:5112-5334                 -> app/patch.py:PatchMixin.on_patch_editor_panel_action_requested:94-316 same-ast
+S19TuiApp.on_patch_editor_panel_save_back_decision         app.py:5336-5474                 -> app/patch.py:PatchMixin.on_patch_editor_panel_save_back_decision:318-456 same-ast
+S19TuiApp._hide_replaced_document_controls                 app.py:5551-5580                 -> app/patch.py:PatchMixin._hide_replaced_document_controls:498-527 same-ast
+S19TuiApp._apply_entry_json_edit                           app.py:5990-6052                 -> app/patch.py:PatchMixin._apply_entry_json_edit:937-999 same-ast
+S19TuiApp.on_patch_editor_panel_entry_edit_json_requested  app.py:5933-5988                 -> app/patch.py:PatchMixin.on_patch_editor_panel_entry_edit_json_requested:880-935 same-ast
+S19TuiApp._compose_screen_patch                            app.py:5027-5067                 -> app/compose_screens.py:ComposeScreensMixin._compose_screen_patch:503-543 same-ast
+S19TuiApp._patch_editor_load                               app.py:7907-7930                 -> app/patch.py:PatchMixin._patch_editor_load:1476-1499 same-ast
+S19TuiApp.action_patch_undo                                app.py:5745-5778                 -> app/patch.py:PatchMixin.action_patch_undo:692-725 same-ast
+S19TuiApp.action_patch_redo                                app.py:5780-5813                 -> app/patch.py:PatchMixin.action_patch_redo:727-760 same-ast
+S19TuiApp._reset_project_session                           app.py:14556-14718               -> app/project_load.py:ProjectLoadMixin._reset_project_session:887-1049 same-ast
+S19TuiApp._apply_prepared_load                             app.py:19518-19799               -> app/loaded_state.py:LoadedStateMixin._apply_prepared_load:548-829 same-ast
+S19TuiApp._save_project_files                              app.py:13050-13674               -> app/save_commit.py:SaveCommitMixin._save_project_files:638-1262 DIFF
+S19TuiApp._decide_project_image                            app.py:13875-13981               -> app/save_plan.py:SavePlanMixin._decide_project_image:1075-1181 DIFF
+S19TuiApp._activate_project_file                           app.py:16149-16202               -> app/projects.py:ProjectsMixin._activate_project_file:1068-1121 DIFF
+ChangeService.save_patched                                 change_service.py:2481-2634      -> services/change_service.py:ChangeService.save_patched:2481-2634 same-ast
+ChangeService.emit_and_verify                              change_service.py:2375-2479      -> services/change_service.py:ChangeService.emit_and_verify:2375-2479 same-ast
+save_patched_image                                         apply.py:686-874                 -> changes/apply.py:save_patched_image:686-874 same-ast
+render_patched_image                                       apply.py:629-683                 -> changes/apply.py:render_patched_image:629-683 same-ast
+verify_written_image                                       verify.py:119-171                -> changes/verify.py:verify_written_image:119-171 same-ast
+emit_intel_hex_from_mem_map                                io.py:1934-2006                  -> changes/io.py:emit_intel_hex_from_mem_map:1934-2006 same-ast
+## the prompt's blocks: old PatchEditorPanel.compose vs the new compose helpers
+#patch_saveback_row       old compose:5118-5143 -> actions.py:ActionsMixin._compose_action_bar:520-545 same-ast
+#patch_before_after_row   old compose:5145-5159 -> actions.py:ActionsMixin._compose_action_bar:547-561 same-ast
+#patch_doc_controls       old compose:5271-5281 -> actions.py:ActionsMixin._compose_doc_controls:565-575 same-ast
+## call sites at the new commit (file:line enclosing-def: text; def/class/comment lines excluded)
+segment_ops.py:32 <module>: from .tui.changes.io import emit_intel_hex_from_mem_map, emit_s19_from_mem_map
+segment_ops.py:507 emit_image: return emit_intel_hex_from_mem_map(mem_map, ranges)
+tui/app/compose_screens.py:540 ComposeScreensMixin._compose_screen_patch: PatchEditorPanel(),
+tui/app/loaded_state.py:689 LoadedStateMixin._apply_prepared_load: self._hide_replaced_document_controls(panel)
+tui/app/patch.py:179 PatchMixin.on_patch_editor_panel_action_requested: panel.hide_before_after_prompt()
+tui/app/patch.py:190 PatchMixin.on_patch_editor_panel_action_requested: self._hide_replaced_document_controls(panel)
+tui/app/patch.py:236 PatchMixin.on_patch_editor_panel_action_requested: panel.show_save_prompt(f"{variant_id}-patched{suffix}")
+tui/app/patch.py:378 PatchMixin.on_patch_editor_panel_save_back_decision: panel.hide_save_prompt()
+tui/app/patch.py:389 PatchMixin.on_patch_editor_panel_save_back_decision: s0_header = loaded.source_s0_header or _synth_s0_header_from_filename(
+tui/app/patch.py:394 PatchMixin.on_patch_editor_panel_save_back_decision: result = self._change_service.save_patched(
+tui/app/patch.py:439 PatchMixin.on_patch_editor_panel_save_back_decision: panel.show_before_after_prompt()
+tui/app/patch.py:526 PatchMixin._hide_replaced_document_controls: panel.hide_before_after_prompt()
+tui/app/patch.py:527 PatchMixin._hide_replaced_document_controls: panel.hide_save_prompt()
+tui/app/patch.py:724 PatchMixin.action_patch_undo: self._hide_replaced_document_controls(panel)
+tui/app/patch.py:759 PatchMixin.action_patch_redo: self._hide_replaced_document_controls(panel)
+tui/app/patch.py:895 PatchMixin.on_patch_editor_panel_entry_edit_json_requested: by :meth:`_apply_entry_json_edit` for the same index.
+tui/app/patch.py:909 PatchMixin.on_patch_editor_panel_entry_edit_json_requested: callback binds the index for :meth:`_apply_entry_json_edit`.
+tui/app/patch.py:932 PatchMixin.on_patch_editor_panel_entry_edit_json_requested: lambda edited, index=event.index: self._apply_entry_json_edit(
+tui/app/patch.py:1493 PatchMixin._patch_editor_load: self._hide_replaced_document_controls(panel)
+tui/app/project_load.py:1045 ProjectLoadMixin._reset_project_session: self._hide_replaced_document_controls(panel)
+tui/app/save_commit.py:805 SaveCommitMixin._save_project_files: path, issues = deps.save_patched_image(
+tui/app/save_plan.py:1145 SavePlanMixin._decide_project_image: payload = deps.render_patched_image(
+tui/changes/__init__.py:45 <module>: emit_intel_hex_from_mem_map,
+tui/changes/__init__.py:112 <module>: "emit_intel_hex_from_mem_map",
+tui/changes/apply.py:25 <module>: source or ``emit_intel_hex_from_mem_map`` for a HEX source, and place it
+tui/changes/apply.py:66 <module>: emit_intel_hex_from_mem_map,
+tui/changes/apply.py:105 <module>: "hex": (emit_intel_hex_from_mem_map, ".hex"),
+tui/changes/apply.py:795 save_patched_image: payload = render_patched_image(
+tui/changes/io.py:118 <module>: "emit_intel_hex_from_mem_map",
+tui/screens_directionb/check_editor.py:835 CheckEditorPanel.on_button_pressed: self._show_tab(button_id)
+tui/screens_directionb/check_editor.py:943 CheckEditorPanel.refresh_check_results: self._show_tab("check_tab_fields")
+tui/screens_directionb/patch_editor/actions.py:88 ActionsMixin.on_button_pressed: self._show_tab(button_id)
+tui/screens_directionb/patch_editor/actions.py:113 ActionsMixin.on_button_pressed: self.SaveBackDecision(
+tui/screens_directionb/patch_editor/actions.py:121 ActionsMixin.on_button_pressed: self.post_message(self.SaveBackDecision(None))
+tui/screens_directionb/patch_editor/layout.py:67 LayoutMixin.compose: yield from self._compose_action_bar()
+tui/screens_directionb/patch_editor/layout.py:77 LayoutMixin.compose: yield from self._compose_doc_controls()
+tui/services/change_service.py:2444 ChangeService.emit_and_verify: path, issues = save_patched_image(
+tui/services/change_service.py:2624 ChangeService.save_patched: return self.emit_and_verify(
+tui/services/flow_execution_service.py:727 run_flow: saved_path, save_issues = save_patched_image(
+tui/services/variant_execution_service.py:2584 _execute_one_variant: saved_path, save_issues = save_patched_image(

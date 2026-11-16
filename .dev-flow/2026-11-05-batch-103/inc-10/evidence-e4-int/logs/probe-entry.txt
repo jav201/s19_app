@@ -1,0 +1,17 @@
+== probe-entry | tree final | 2026-11-14T05:32:31Z | load: 10.17 9.57 7.81
+s19_app.__file__ = ~/work/zq-e4-10-int/final/s19_app/__init__.py
+PROBE (160, 54) ('patch_entry_address_input', 'Region(x=33, y=36, width=123, height=1)', True, 'patch_entry_address_input')
+PROBE (160, 54) ('patch_entry_bytes_input', 'Region(x=33, y=40, width=123, height=1)', True, 'patch_doc_path_input')
+PROBE (160, 54) ('patch_entry_add_button', 'Region(x=25, y=41, width=5, height=1)', True, 'patch_doc_validate_button')
+PROBE (160, 54) ('screen', 'Region(x=0, y=0, width=160, height=54)')
+.PROBE (118, 54) ('patch_entry_address_input', 'Region(x=15, y=36, width=99, height=1)', True, 'patch_entry_address_input')
+PROBE (118, 54) ('patch_entry_bytes_input', 'Region(x=15, y=40, width=99, height=1)', True, 'patch_doc_path_input')
+PROBE (118, 54) ('patch_entry_add_button', 'Region(x=7, y=41, width=5, height=1)', True, 'patch_doc_validate_button')
+PROBE (118, 54) ('screen', 'Region(x=0, y=0, width=118, height=54)')
+.PROBE (220, 60) ('patch_entry_address_input', 'Region(x=33, y=42, width=183, height=1)', True, 'patch_entry_address_input')
+PROBE (220, 60) ('patch_entry_bytes_input', 'Region(x=33, y=46, width=183, height=1)', True, 'patch_doc_path_input')
+PROBE (220, 60) ('patch_entry_add_button', 'Region(x=25, y=47, width=5, height=1)', True, 'patch_doc_validate_button')
+PROBE (220, 60) ('screen', 'Region(x=0, y=0, width=220, height=60)')
+.
+3 passed in 22.92s
+rc=0

@@ -1,0 +1,7 @@
+== green-dock-height | tree fix | 2026-11-14T05:08:02Z | load: 8.41 6.78 5.25
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+DOCK-HEIGHT 118x54 = 4 rows (expected 4; F-R8-1 if more)
+.DOCK-HEIGHT 220x60 = 4 rows (expected 4; F-R8-1 if more)
+.
+2 passed, 25 deselected in 27.31s
+rc=0

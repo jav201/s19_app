@@ -1499,9 +1499,10 @@ async def _check_homes(app, pilot, panel, tab, homes, problems, seen_c, seen_r) 
 def test_tc_b97_60_every_control_displayed_in_its_home(tmp_path: Path, size) -> None:
     """TC-B97-60 (LLR-144.12): per tab state every control and read-out of the
     table is displayed inside its home when its condition holds and every
-    displayed control is in the focus chain (29 controls, 11 read-outs over
+    displayed control is in the focus chain (Inc 10: 30 controls, 12 read-outs over
     the states: a refused load, a pasted document on each tab, the save-back
-    offer and the before/after report offered); every control-typed shipped id
+    offer and the before/after report offered; Inc 10: 30 controls and 12
+    read-outs, the Format control and the apply line having joined them); every control-typed shipped id
     lies in the controls column; the paste buffer stays editable and Parse
     reads it.
 
@@ -1541,16 +1542,20 @@ def test_tc_b97_60_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
         await show_tab(panel, pilot, "patch_tab_json")
         panel.query_one("#patch_doc_apply_button", Button).press()
         await settle(pilot, 6)
-        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_win_json": (SAVEBACK, (), None)}, problems, seen_c, seen_r)
+        # Inc 10 (I-10.4, R-PE-EXPORT.1): the prompt's home is the export dock under the document
+        # row, shown whichever tab is shown (was: inside the JSON window); it gains the Format
+        # control and the apply line (read-out).
+        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_export_dock": (SAVEBACK + ("patch_saveback_format_button",), ("patch_saveback_apply_line",), None)}, problems, seen_c, seen_r)
         # state D: the before/after report offered (Write file)
         panel.query_one("#patch_saveback_confirm_button", Button).press()
         await settle(pilot, 8)
-        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_win_json": (("patch_before_after_button",), (), None)}, problems, seen_c, seen_r)
+        await _check_homes(app, pilot, panel, "patch_tab_json", {"patch_export_dock": (("patch_before_after_button",), (), None)}, problems, seen_c, seen_r)
         return typed, seen_c, seen_r, problems, read_only, parsed
 
     typed, controls, readouts, problems, read_only, parsed = run(tmp_path, size, body)
     assert problems == [], problems[:6]
-    assert len(controls) == 29 and len(readouts) == 11, (len(controls), len(readouts))
+    # Inc 10: + the Format control (a control) and the apply line (a read-out).
+    assert len(controls) == 30 and len(readouts) == 12, (len(controls), len(readouts))
     column = {c for home in HOMES.values() for c in home[0]} | set(SAVEBACK) | {"patch_before_after_button"}
     assert len(typed) == 28 and typed <= column, sorted(typed - column)
     assert read_only is False and parsed == 6

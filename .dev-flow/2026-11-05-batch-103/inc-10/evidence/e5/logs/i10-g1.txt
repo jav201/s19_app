@@ -1,0 +1,15 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  02:07:49 up 1 day, 10:56,  4 users,  load average: 2.68, 2.42, 2.60
++ pytest -p no:cacheprovider -n 2 tests/test_b103_inc10_g1_controls.py tests/test_b103_inc10_g1_panel.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: ~/work/zq-x10/exact
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 2/2 workers
+2 workers [51 items]
+
+...................................................                      [100%]
+======================== 51 passed in 253.65s (0:04:13) ========================
+RC=0

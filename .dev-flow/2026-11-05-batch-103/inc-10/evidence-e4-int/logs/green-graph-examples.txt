@@ -1,0 +1,8 @@
+== green-graph-examples | tree fix | 2026-11-14T05:03:37Z | load: 6.29 4.69 4.27
+s19_app.__file__ = ~/work/zq-e4-10-int/fix/s19_app/__init__.py
+EX1 x64u line for line: True
+EX2 x64 two type-04, rows 16/16/4: True [(4, 0, 2), (0, 65520, 16), (4, 65536, 2), (0, 65536, 16), (0, 65552, 4), (1, 65536, 0)]
+EX3 no record crosses 0x10000: True
+EX4 docstring example: True (tries=1, failures=0)
+ALL HELD
+rc=0

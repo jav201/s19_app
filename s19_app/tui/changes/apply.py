@@ -59,6 +59,7 @@ from ..workspace import (
     _guarded_destination,
     _private_stage_dir,
     place_into_workarea,
+    predict_placement,
 )
 from .io import (
     MF_WRITE_CONTAINMENT,
@@ -683,6 +684,67 @@ def render_patched_image(
     return text.replace("\n", os.linesep).encode("ascii")
 
 
+_S0_NAME_ROUNDS = 3
+
+
+def _render_named_by_landing(
+    mem_map: Dict[int, int],
+    ranges: Sequence[Tuple[int, int]],
+    dest_dir: Path,
+    safe_name: str,
+    *,
+    bytes_per_line: int,
+    s0_header_from_name: Callable[[str], bytes],
+) -> bytes:
+    """
+    Summary:
+        Render the S19 payload whose S0 header data is the name the file
+        will be written under (R-S19-S0HEADER-001.2; D8-28): the header
+        changes the bytes, the bytes decide the landing name (byte-identical
+        reuse or the next free ``_<N>``), so the render repeats until the
+        predicted landing name is the one in the header.
+
+    Args:
+        mem_map (Dict[int, int]): The image to serialize (read only).
+        ranges (Sequence[Tuple[int, int]]): The image's ranges.
+        dest_dir (Path): The placement's destination, as passed to it.
+        safe_name (str): The sanitized requested name (bare, suffixed).
+        bytes_per_line (int): S19 record width, ``{16, 32}``.
+        s0_header_from_name (Callable[[str], bytes]): Name -> header data.
+
+    Returns:
+        bytes: The payload to stage. A fixed point is reached in the second
+        round at most for a fresh or numbered landing; the round cap only
+        bounds a work area edited by hand between rounds.
+
+    Data Flow:
+        - Header from the current name; render; predict the landing with
+          :func:`predict_placement` (the placement's own rule); stop when
+          the landing name equals the header's name, else take it.
+
+    Dependencies:
+        Uses:
+            - render_patched_image / predict_placement
+        Used by:
+            - save_patched_image
+    """
+    name = safe_name
+    for _ in range(_S0_NAME_ROUNDS):
+        header_name = name
+        payload = render_patched_image(
+            mem_map,
+            ranges,
+            source_kind="s19",
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header_from_name(header_name),
+        )
+        assert payload is not None
+        name = predict_placement(payload, len(payload), dest_dir, safe_name).path.name
+        if name == header_name:
+            break
+    return payload
+
+
 def save_patched_image(
     mem_map: Dict[int, int],
     ranges: Sequence[Tuple[int, int]],
@@ -694,6 +756,7 @@ def save_patched_image(
     s0_header: bytes | None = None,
     workarea_root: Optional[Path] = None,
     on_placed: Optional[Callable[[PlacementResult], None]] = None,
+    s0_header_from_name: Optional[Callable[[str], bytes]] = None,
 ) -> Tuple[Optional[Path], List[ValidationIssue]]:
     """
     Summary:
@@ -747,6 +810,12 @@ def save_patched_image(
         on_placed (Optional[Callable[[PlacementResult], None]]): Told the
             placement's result the moment it lands, so a caller's rollback
             knows whether this call created the file (LED .53).
+        s0_header_from_name (Optional[Callable[[str], bytes]]): For an
+            ``"s19"`` source only, used in place of ``s0_header``: the rule
+            that turns the WRITTEN file name into the S0 header data
+            (R-S19-S0HEADER-001.2; D8-28, BL-I10-E3-8). The name is the
+            placement's landing name (bare, suffix forced, numbered on a
+            collision), never the typed text. ``None`` keeps ``s0_header``.
 
     Returns:
         Tuple[Optional[Path], List[ValidationIssue]]: The absolute path of
@@ -772,10 +841,13 @@ def save_patched_image(
           ``workspace._private_stage_dir``; place with
           ``place_into_workarea``; remove only the owned staging directory
           either way (LLR-155.1/.7).
+        - With ``s0_header_from_name`` (S19), after the guard: re-render
+          with the header of the name the placement would land on
+          (:func:`_render_named_by_landing`) before staging.
 
     Dependencies:
         Uses:
-            - render_patched_image
+            - render_patched_image / _render_named_by_landing
             - _guarded_destination / place_into_workarea
             - _sanitize_s19_filename
             - _issue
@@ -837,6 +909,16 @@ def save_patched_image(
             )
         )
         return None, issues
+
+    if s0_header_from_name is not None and source_kind == "s19":
+        payload = _render_named_by_landing(
+            mem_map,
+            ranges,
+            dest_dir,
+            safe_name,
+            bytes_per_line=bytes_per_line,
+            s0_header_from_name=s0_header_from_name,
+        )
 
     # Private staging (LLR-155.1): the emitted bytes are written into a
     # mkdtemp directory under the shared, reparse-checked

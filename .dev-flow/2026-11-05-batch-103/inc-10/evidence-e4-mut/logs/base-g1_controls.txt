@@ -1,0 +1,8 @@
+# 2026-11-14T06:14:45Z load: 10.65 10.25 9.88
+~/work/zq-mu10/tree/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................                                                 [100%]
+24 passed in 185.30s (0:03:05)
+# rc=0 2026-11-14T06:17:52Z

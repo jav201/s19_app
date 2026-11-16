@@ -1,0 +1,961 @@
+== red-base-g2_arms | tree base | 2026-11-14T05:02:59Z | load: 5.46 4.35 4.14
+s19_app.__file__ = ~/work/zq-e4-10-int/base/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFF.F.FFFFFFFFFFFF                                                  [100%]
+=================================== FAILURES ===================================
+_____ test_r_pe_export_3_3_an_apply_of_a_blocked_document_hides_the_prompt _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_3_3_an_apply_0')
+
+    def test_r_pe_export_3_3_an_apply_of_a_blocked_document_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.3/3: the entry 0x8000007D ``00`` added (a collision), the prompt shown again through I-10.1,
+        Apply -> ``0 applied, 2 blocked`` and the prompt is not a shown widget.  Negative control: as /1 -> RED."""
+    
+        async def body(app, pilot):
+            await t.add_entry(pilot, app, "0x8000007D", "00")
+            await t.show_prompt_again(app, pilot)
+            status = await t.press_apply(pilot, app)
+            return status, t.prompt_hidden(app)
+    
+>       status, hidden = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:49: in body
+    await t.show_prompt_again(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def show_prompt_again(app, pilot, *, fmt: str = "s19", name: str = "firmware-patched.s19") -> None:
+        """Re-show the prompt through I-10.1 (the shown-prompt precondition of R-PE-EXPORT.3's cases)."""
+>       panel_of(app).show_save_prompt(name, output_format=fmt, apply_line=APPLY_LINE_1)
+E       TypeError: ActionsMixin.show_save_prompt() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:448: TypeError
+_ test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt[R-PE-EXPORT.3/1] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_3_an_apply_th0')
+case = 'R-PE-EXPORT.3/1', size = (118, 54)
+
+    @pytest.mark.parametrize("case,size", [("R-PE-EXPORT.3/1", t.SIZE), ("R-PE-EXPORT.3/2", t.WIDE)],
+                             ids=["R-PE-EXPORT.3/1", "R-PE-EXPORT.3/2"])
+    def test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt(tmp_path, case, size):
+        """R-PE-EXPORT.3/1,/2: after an apply of 1 entry the entry is removed and 0x00000010 ``AA`` added (outside
+        the image), the prompt is shown again through I-10.1, Apply -> status ``Apply: 0 applied, 1 skipped, 0
+        blocked`` and the prompt is not a shown widget.  Negative control: the zero-apply path leaves the prompt
+        (the base) -> RED."""
+    
+        async def body(app, pilot):
+            await t.press_entry(pilot, app, "remove", "Patch Editor: entry removed.", t.PATCH_ADDRESS)
+            await t.add_entry(pilot, app, "0x00000010", "AA")
+            await t.show_prompt_again(app, pilot)
+            status = await t.press_apply(pilot, app)
+            return status, t.prompt_hidden(app)
+    
+>       status, hidden = t.run_applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:34: in body
+    await t.show_prompt_again(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def show_prompt_again(app, pilot, *, fmt: str = "s19", name: str = "firmware-patched.s19") -> None:
+        """Re-show the prompt through I-10.1 (the shown-prompt precondition of R-PE-EXPORT.3's cases)."""
+>       panel_of(app).show_save_prompt(name, output_format=fmt, apply_line=APPLY_LINE_1)
+E       TypeError: ActionsMixin.show_save_prompt() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:448: TypeError
+_________ test_r_pe_export_4_1_the_apply_line_after_one_applied_entry __________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_4_1_the_apply0')
+
+    def test_r_pe_export_4_1_the_apply_line_after_one_applied_entry(tmp_path):
+        """R-PE-EXPORT.4/1: the painted apply line reads exactly the text of the requirement.  Negative control:
+        no line (the base) / the counts swapped -> RED."""
+    
+        async def body(app, pilot):
+            return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+    
+>       assert t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body) == t.APPLY_LINE_1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:66: in body
+    return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_apply_line'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt[R-PE-EXPORT.3/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_3_an_apply_th1')
+case = 'R-PE-EXPORT.3/2', size = (220, 60)
+
+    @pytest.mark.parametrize("case,size", [("R-PE-EXPORT.3/1", t.SIZE), ("R-PE-EXPORT.3/2", t.WIDE)],
+                             ids=["R-PE-EXPORT.3/1", "R-PE-EXPORT.3/2"])
+    def test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt(tmp_path, case, size):
+        """R-PE-EXPORT.3/1,/2: after an apply of 1 entry the entry is removed and 0x00000010 ``AA`` added (outside
+        the image), the prompt is shown again through I-10.1, Apply -> status ``Apply: 0 applied, 1 skipped, 0
+        blocked`` and the prompt is not a shown widget.  Negative control: the zero-apply path leaves the prompt
+        (the base) -> RED."""
+    
+        async def body(app, pilot):
+            await t.press_entry(pilot, app, "remove", "Patch Editor: entry removed.", t.PATCH_ADDRESS)
+            await t.add_entry(pilot, app, "0x00000010", "AA")
+            await t.show_prompt_again(app, pilot)
+            status = await t.press_apply(pilot, app)
+            return status, t.prompt_hidden(app)
+    
+>       status, hidden = t.run_applied(tmp_path, size, "firmware.s19", "patch_tab_inspector", body)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:34: in body
+    await t.show_prompt_again(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def show_prompt_again(app, pilot, *, fmt: str = "s19", name: str = "firmware-patched.s19") -> None:
+        """Re-show the prompt through I-10.1 (the shown-prompt precondition of R-PE-EXPORT.3's cases)."""
+>       panel_of(app).show_save_prompt(name, output_format=fmt, apply_line=APPLY_LINE_1)
+E       TypeError: ActionsMixin.show_save_prompt() got an unexpected keyword argument 'output_format'
+
+tests/support/b103_inc10.py:448: TypeError
+_ test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/2] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_5_an_apply_th0')
+case = 'R-PE-EXPORT.5/2', source = 'firmware.s19'
+entries = [('0x00000010', 'AA')]
+text = 'Apply: 0 applied, 1 skipped, 0 blocked'
+
+    @pytest.mark.parametrize("case,source,entries,text", NOTHING, ids=[c[0] for c in NOTHING])
+    def test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice(tmp_path, case, source, entries, text):
+        """R-PE-EXPORT.5/1..3: exactly one new notice, severity warning, title ``Nothing applied``, text
+        ``Apply: 0 applied, <s> skipped, <b> blocked``.  Negative control: no notice (the base), or severity
+        information -> RED."""
+    
+        async def body(app, pilot):
+            for address, run in entries:
+                await t.add_entry(pilot, app, address, run)
+            await t.press_apply(pilot, app)
+            return t.notices(app)[app.notices_at_apply:]
+    
+        new = t.run_loaded(tmp_path, t.SIZE, source, body, notifications=True)
+>       assert new == [("Nothing applied", text, "warning")], (case, new)
+E       AssertionError: ('R-PE-EXPORT.5/2', [])
+E       assert [] == [('Nothing ap...', 'warning')]
+E         
+E         Right contains one more item: ('Nothing applied', 'Apply: 0 applied, 1 skipped, 0 blocked', 'warning')
+E         Use -v to get more diff
+
+tests/test_b103_inc10_g2_arms.py:124: AssertionError
+________ test_r_pe_export_4_2_the_apply_line_counts_applied_and_skipped ________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_4_2_the_apply0')
+
+    def test_r_pe_export_4_2_the_apply_line_counts_applied_and_skipped(tmp_path):
+        """R-PE-EXPORT.4/2: entries 0x8000007C ``DE AD``, 0x80000040 ``11``, 0x00000010 ``AA`` -> ``2 applied, 1
+        skipped, 0 blocked``.  Negative control: <a> and <s> swapped -> RED."""
+    
+        async def body(app, pilot):
+            await t.add_entry(pilot, app, "0x8000007C", "DE AD")
+            await t.add_entry(pilot, app, "0x80000040", "11")
+            await t.add_entry(pilot, app, "0x00000010", "AA")
+            await t.click_tab(pilot, "patch_tab_inspector")
+            await t.press_apply(pilot, app)
+            return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+    
+>       line = t.run_loaded(tmp_path, t.SIZE, "firmware.s19", body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:443: in run_loaded
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:441: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:81: in body
+    return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_apply_line'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/3] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_5_an_apply_th1')
+case = 'R-PE-EXPORT.5/3', source = 'firmware.s19'
+entries = [('0x8000007C', 'DE AD BE EF'), ('0x8000007D', '00')]
+text = 'Apply: 0 applied, 0 skipped, 2 blocked'
+
+    @pytest.mark.parametrize("case,source,entries,text", NOTHING, ids=[c[0] for c in NOTHING])
+    def test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice(tmp_path, case, source, entries, text):
+        """R-PE-EXPORT.5/1..3: exactly one new notice, severity warning, title ``Nothing applied``, text
+        ``Apply: 0 applied, <s> skipped, <b> blocked``.  Negative control: no notice (the base), or severity
+        information -> RED."""
+    
+        async def body(app, pilot):
+            for address, run in entries:
+                await t.add_entry(pilot, app, address, run)
+            await t.press_apply(pilot, app)
+            return t.notices(app)[app.notices_at_apply:]
+    
+        new = t.run_loaded(tmp_path, t.SIZE, source, body, notifications=True)
+>       assert new == [("Nothing applied", text, "warning")], (case, new)
+E       AssertionError: ('R-PE-EXPORT.5/3', [])
+E       assert [] == [('Nothing ap...', 'warning')]
+E         
+E         Right contains one more item: ('Nothing applied', 'Apply: 0 applied, 0 skipped, 2 blocked', 'warning')
+E         Use -v to get more diff
+
+tests/test_b103_inc10_g2_arms.py:124: AssertionError
+__________ test_r_pe_export_4_3_a_new_apply_refreshes_the_apply_line ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_4_3_a_new_app0')
+
+    def test_r_pe_export_4_3_a_new_apply_refreshes_the_apply_line(tmp_path):
+        """R-PE-EXPORT.4/3: after /1, the entry 0x80000040 ``11`` added and Apply pressed again -> ``2 applied, 0
+        skipped, 0 blocked``.  Negative control: the line keeps the first apply's counts -> RED."""
+    
+        async def body(app, pilot):
+            await t.add_entry(pilot, app, "0x80000040", "11")
+            await t.press_apply(pilot, app)
+            return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+    
+>       line = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:94: in body
+    return t.painted(app, t.need(app.screen, "#patch_saveback_apply_line"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = Screen(id='_default'), selector = '#patch_saveback_apply_line'
+
+    def need(root, selector: str):
+        found = list(root.query(selector))
+>       assert len(found) == 1, f"{selector}: expected exactly 1 widget, found {len(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: #patch_saveback_apply_line: expected exactly 1 widget, found 0
+
+tests/support/b103_inc10.py:151: AssertionError
+_ test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_5_an_apply_th0')
+case = 'R-PE-EXPORT.5/1', source = None, entries = [('0x100', 'AA')]
+text = 'Apply: 0 applied, 1 skipped, 0 blocked'
+
+    @pytest.mark.parametrize("case,source,entries,text", NOTHING, ids=[c[0] for c in NOTHING])
+    def test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice(tmp_path, case, source, entries, text):
+        """R-PE-EXPORT.5/1..3: exactly one new notice, severity warning, title ``Nothing applied``, text
+        ``Apply: 0 applied, <s> skipped, <b> blocked``.  Negative control: no notice (the base), or severity
+        information -> RED."""
+    
+        async def body(app, pilot):
+            for address, run in entries:
+                await t.add_entry(pilot, app, address, run)
+            await t.press_apply(pilot, app)
+            return t.notices(app)[app.notices_at_apply:]
+    
+        new = t.run_loaded(tmp_path, t.SIZE, source, body, notifications=True)
+>       assert new == [("Nothing applied", text, "warning")], (case, new)
+E       AssertionError: ('R-PE-EXPORT.5/1', [])
+E       assert [] == [('Nothing ap...', 'warning')]
+E         
+E         Right contains one more item: ('Nothing applied', 'Apply: 0 applied, 1 skipped, 0 blocked', 'warning')
+E         Use -v to get more diff
+
+tests/test_b103_inc10_g2_arms.py:124: AssertionError
+___________ test_r_pe_export_17_2_editing_an_entry_hides_the_prompt ____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_17_2_editing_0')
+
+    def test_r_pe_export_17_2_editing_an_entry_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/2: the bytes of 0x8000007C typed as ``CA FE BA BE``, Edit -> ``Patch Editor: entry
+        updated.`` and the prompt hidden.  Negative control: the hide dropped from the edit arm -> RED."""
+    
+        async def body(app, pilot):
+            assert t.prompt_offered(app), "precondition: the prompt is offered after Apply"
+            await t.press_entry(pilot, app, "edit", "Patch Editor: entry updated.", t.PATCH_ADDRESS, "CA FE BA BE")
+            return t.prompt_hidden(app), t.status_text(app)
+    
+        hidden, status = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert status == "Patch Editor: entry updated." and hidden is True, (hidden, status)
+E       AssertionError: (False, 'Patch Editor: entry updated.')
+E       assert ('Patch Editor: entry updated.' == 'Patch Editor: entry updated.'
+E         
+E           Patch Editor: entry updated. and False is True)
+
+tests/test_b103_inc10_g2_arms.py:172: AssertionError
+____________ test_r_pe_export_17_1_adding_an_entry_hides_the_prompt ____________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_17_1_adding_a0')
+
+    def test_r_pe_export_17_1_adding_an_entry_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/1: Applied case01 (prompt shown), 0x80000040 ``11`` added -> ``Patch Editor: entry
+        added.`` and the prompt is not a shown widget.  Negative control: the hide dropped from the add arm (the
+        base) -> RED."""
+    
+        async def body(app, pilot):
+            assert t.prompt_offered(app), "precondition: the prompt is offered after Apply"
+            await t.add_entry(pilot, app, "0x80000040", "11")
+            return t.prompt_hidden(app), t.status_text(app)
+    
+        hidden, status = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert status == "Patch Editor: entry added." and hidden is True, (hidden, status)
+E       AssertionError: (False, 'Patch Editor: entry added.')
+E       assert ('Patch Editor: entry added.' == 'Patch Editor: entry added.'
+E         
+E           Patch Editor: entry added. and False is True)
+
+tests/test_b103_inc10_g2_arms.py:159: AssertionError
+___________ test_r_pe_export_17_3_removing_an_entry_hides_the_prompt ___________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_17_3_removing0')
+
+    def test_r_pe_export_17_3_removing_an_entry_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/3: 0x8000007C typed, Remove -> ``Patch Editor: entry removed.`` and the prompt hidden
+        (else ``Write file`` would write a copy of the source, E3-1).  Negative control: the hide dropped from the
+        remove arm -> RED."""
+    
+        async def body(app, pilot):
+            assert t.prompt_offered(app), "precondition: the prompt is offered after Apply"
+            await t.press_entry(pilot, app, "remove", "Patch Editor: entry removed.", t.PATCH_ADDRESS)
+            return t.prompt_hidden(app), t.status_text(app)
+    
+        hidden, status = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+>       assert status == "Patch Editor: entry removed." and hidden is True, (hidden, status)
+E       AssertionError: (False, 'Patch Editor: entry removed.')
+E       assert ('Patch Editor: entry removed.' == 'Patch Editor: entry removed.'
+E         
+E           Patch Editor: entry removed. and False is True)
+
+tests/test_b103_inc10_g2_arms.py:186: AssertionError
+____ test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt _____
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_17_5_a_stage_0')
+
+    def test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/5 (F-R8-3, ruling P-043): Inc 8's definitions case loaded (A2L and image through the
+        app's loaders), an entry added at 0x800010 and applied (prompt shown), DISPLAY_0001 staged with ``25.5``
+        through the sheet's formula input -> the stage is in the document and the prompt is not a shown widget.
+        Deviation (declared): the DEFC image, not case01 (the staged-able scalar needs Inc 8's fixture).
+        Negative control: the hide dropped from ``on_staging_sheet_stage_requested`` (base) -> RED."""
+        from tests.b103_inc8_a_support import MASK_WORD, build_defc
+        from tests.support.b100_workers import settle_workers
+    
+>       defc = build_defc(tmp_path / "defc")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:276: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_pe_export_17_5_a_stage_0/defc')
+
+    def build_defc(folder: Path) -> dict:
+        """The definitions case through the shipped CLI, parsed through the app's own loaders."""
+        from s19_app.core import S19File
+        from s19_app.tui.a2l_definition import describe_definitions
+        from s19_app.tui.a2l_parse import parse_a2l_file
+    
+        result = subprocess.run(
+            [sys.executable, "-B", str(REPO_ROOT / "tools" / "synth" / "make_release_case.py"),
+             "--out", str(folder), "--seed", str(SEED), "--case", "definitions"],
+            capture_output=True, text=True, timeout=600,
+        )
+>       assert result.returncode == 0, result.stderr
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ~/miniconda3/envs/s19ci/bin/python: can't open file '~/work/zq-e4-10-int/base/tools/synth/make_release_case.py': [Errno 2] No such file or directory
+
+tests/b103_inc8_a_support.py:37: AssertionError
+______ test_r_chg_003_5_1_write_file_hides_the_prompt_from_the_checks_tab ______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_chg_003_5_1_write_file_0')
+
+    def test_r_chg_003_5_1_write_file_hides_the_prompt_from_the_checks_tab(tmp_path):
+        """R-CHG-003.5/1: Applied case01 (Checks tab), ``Write file`` -> prompt not a shown widget and one new file
+        in the work area.  Negative control: the prompt left shown -> RED."""
+    
+        async def body(app, pilot):
+            assert t.prompt_offered(app), "precondition: the prompt is offered (Checks tab)"
+            before = t.work_files(app)
+            await t.write_file(pilot, app)
+            return t.prompt_hidden(app), before, t.work_files(app)
+    
+>       hidden, before, after = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_checks", body)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:322: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+_________ test_r_pe_export_17_4_a_per_entry_json_edit_hides_the_prompt _________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_pe_export_17_4_a_per_en0')
+
+    def test_r_pe_export_17_4_a_per_entry_json_edit_hides_the_prompt(tmp_path):
+        """R-PE-EXPORT.17/4: case01 loaded, a one-entry change-set pasted and parsed, Apply (prompt shown), the
+        per-entry Edit JSON of entry 0 with its bytes changed to ``CA FE BA BE``, Confirm -> the document holds
+        the new bytes (the edit reported ok) and the prompt is not a shown widget.  Negative control: the hide
+        dropped from ``_apply_entry_json_edit`` (the base) -> RED."""
+        import json
+    
+        from tests.support import b100_projects
+    
+        text = b100_projects.change_document_bytes([b100_projects.address_entry(0x8000007C, t.PATCH_RUN)]).decode()
+        edited = json.dumps({"type": "bytes", "address": "0x8000007C", "bytes": "CA FE BA BE"})
+    
+        async def body(app, pilot):
+            await paste_and_parse(app, pilot, text)
+            await t.press_apply(pilot, app)
+            assert t.prompt_offered(app), "precondition: the prompt is offered after Apply"
+            await per_entry_json_edit(app, pilot, edited)
+            entry = app._change_service.document.entries[0]
+            return tuple(entry.encoded_bytes), t.prompt_hidden(app)
+    
+        got, hidden = t.run_loaded(tmp_path, t.SIZE, "firmware.s19", body)
+        assert got == (0xCA, 0xFE, 0xBA, 0xBE), f"the per-entry edit did not land: {got}"
+>       assert hidden is True, "the prompt is still a shown widget after the per-entry JSON edit"
+E       AssertionError: the prompt is still a shown widget after the per-entry JSON edit
+E       assert False is True
+
+tests/test_b103_inc10_g2_arms.py:245: AssertionError
+_ test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/1] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_tui_049_1_the_before_af0')
+case = 'R-TUI-049.1/1', tab = 'patch_tab_inspector'
+
+    @pytest.mark.parametrize("case,tab", TUI_49, ids=[c[0] for c in TUI_49])
+    def test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back(tmp_path, case, tab):
+        """R-TUI-049.1/1..4 (118x54): ``Write file`` from each tab -> the painted status of R-HEX-VERIFY-002.1 and
+        ``Write before/after report`` shown at its place.  Negative control: the control left inside the JSON tab
+        while the prompt moves -> 3 of 4 RED."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            control = t.need(app.screen, "#patch_before_after_button")
+            return t.at_its_place(app, control), t.painted_log(app)
+    
+>       place, log = t.run_applied(tmp_path, t.SIZE, "firmware.s19", tab, body)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:342: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+_____ test_r_chg_003_2_1_dont_save_hides_the_prompt_from_the_inspector_tab _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_chg_003_2_1_dont_save_h0')
+
+    def test_r_chg_003_2_1_dont_save_hides_the_prompt_from_the_inspector_tab(tmp_path):
+        """R-CHG-003.2/1: ``Don't save`` -> prompt not a shown widget, status ``Patch Editor: save-back
+        declined``, no new file in the work area.  Negative control: the prompt left shown -> RED."""
+    
+        async def body(app, pilot):
+            before = t.work_files(app)
+            await t.press_button(pilot, "#patch_saveback_decline_button", 8)
+            return t.prompt_hidden(app), t.status_text(app), before, t.work_files(app)
+    
+>       hidden, status, before, after = t.run_applied(tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:307: in body
+    await t.press_button(pilot, "#patch_saveback_decline_button", 8)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+selector = '#patch_saveback_decline_button', rounds = 8
+
+    async def press_button(pilot, selector: str, rounds: int = 4) -> None:
+>       assert await pilot.click(selector), f"click missed {selector}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: click missed #patch_saveback_decline_button
+
+tests/support/b103_inc10.py:258: AssertionError
+_ test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/2] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_tui_049_1_the_before_af1')
+case = 'R-TUI-049.1/2', tab = 'patch_tab_json'
+
+    @pytest.mark.parametrize("case,tab", TUI_49, ids=[c[0] for c in TUI_49])
+    def test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back(tmp_path, case, tab):
+        """R-TUI-049.1/1..4 (118x54): ``Write file`` from each tab -> the painted status of R-HEX-VERIFY-002.1 and
+        ``Write before/after report`` shown at its place.  Negative control: the control left inside the JSON tab
+        while the prompt moves -> 3 of 4 RED."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            control = t.need(app.screen, "#patch_before_after_button")
+            return t.at_its_place(app, control), t.painted_log(app)
+    
+>       place, log = t.run_applied(tmp_path, t.SIZE, "firmware.s19", tab, body)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:342: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+_ test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/3] _
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_r_tui_049_1_the_before_af0')
+case = 'R-TUI-049.1/3', tab = 'patch_tab_checks'
+
+    @pytest.mark.parametrize("case,tab", TUI_49, ids=[c[0] for c in TUI_49])
+    def test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back(tmp_path, case, tab):
+        """R-TUI-049.1/1..4 (118x54): ``Write file`` from each tab -> the painted status of R-HEX-VERIFY-002.1 and
+        ``Write before/after report`` shown at its place.  Negative control: the control left inside the JSON tab
+        while the prompt moves -> 3 of 4 RED."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            control = t.need(app.screen, "#patch_before_after_button")
+            return t.at_its_place(app, control), t.painted_log(app)
+    
+>       place, log = t.run_applied(tmp_path, t.SIZE, "firmware.s19", tab, body)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:342: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+_ test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/4] _
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw1/test_r_tui_049_1_the_before_af2')
+case = 'R-TUI-049.1/4', tab = 'patch_tab_script'
+
+    @pytest.mark.parametrize("case,tab", TUI_49, ids=[c[0] for c in TUI_49])
+    def test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back(tmp_path, case, tab):
+        """R-TUI-049.1/1..4 (118x54): ``Write file`` from each tab -> the painted status of R-HEX-VERIFY-002.1 and
+        ``Write before/after report`` shown at its place.  Negative control: the control left inside the JSON tab
+        while the prompt moves -> 3 of 4 RED."""
+    
+        async def body(app, pilot):
+            await t.write_file(pilot, app)
+            control = t.need(app.screen, "#patch_before_after_button")
+            return t.at_its_place(app, control), t.painted_log(app)
+    
+>       place, log = t.run_applied(tmp_path, t.SIZE, "firmware.s19", tab, body)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_inc10_g2_arms.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b103_inc10.py:429: in run_applied
+    return run_scene(tmp_path, size, scene, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:119: in run_scene
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:117: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b103_inc10.py:427: in scene
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc10_g2_arms.py:342: in body
+    await t.write_file(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def write_file(pilot, app) -> str:
+        """Click ``Write file``; wait for the save status; return it."""
+        seen = len(app.status_history)
+>       assert not at_its_place(app, need(app.screen, "#patch_saveback_confirm_button")), "Write file is not at its place"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write file is not at its place
+
+tests/support/b103_inc10.py:265: AssertionError
+_____________ test_at_i10_3_an_apply_that_applies_nothing_is_seen ______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-e4-10-int/tmp/pytest-of-<user>/pytest-7/popen-gw0/test_at_i10_3_an_apply_that_ap0')
+
+    def test_at_i10_3_an_apply_that_applies_nothing_is_seen(tmp_path):
+        """AT-I10-3 (118x54): case01 loaded, applied once (prompt shown); Remove the entry (prompt hidden,
+        R-PE-EXPORT.17); add 0x00000010 ``AA``; Apply -> a warning notice ``Nothing applied`` / ``Apply: 0 applied,
+        1 skipped, 0 blocked``, the prompt still hidden, and the byte at 0x8000007C back to its source value.
+        Negative control: a prompt left after Remove, or no notice, or the patched byte left in the image -> RED."""
+        original = read_s19(t.CASE01).data[0x8000007C]
+    
+        async def body(app, pilot):
+            assert t.prompt_offered(app), "precondition: the prompt is offered after the first Apply"
+            await t.press_entry(pilot, app, "remove", "Patch Editor: entry removed.", t.PATCH_ADDRESS)
+            after_remove = t.prompt_hidden(app)
+            await t.add_entry(pilot, app, "0x00000010", "AA")
+            status = await t.press_apply(pilot, app)
+            return (after_remove, status, t.notices(app)[app.notices_at_apply:], t.prompt_hidden(app),
+                    app.current_file.mem_map[0x8000007C])
+    
+        after_remove, status, new, hidden, byte = t.run_applied(
+            tmp_path, t.SIZE, "firmware.s19", "patch_tab_inspector", body, notifications=True)
+>       assert after_remove is True, "the prompt survived Remove"
+E       AssertionError: the prompt survived Remove
+E       assert False is True
+
+tests/test_b103_inc10_g2_arms.py:372: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_3_3_an_apply_of_a_blocked_document_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt[R-PE-EXPORT.3/1]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_4_1_the_apply_line_after_one_applied_entry
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_3_an_apply_that_applies_nothing_hides_the_prompt[R-PE-EXPORT.3/2]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/2]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_4_2_the_apply_line_counts_applied_and_skipped
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/3]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_4_3_a_new_apply_refreshes_the_apply_line
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_5_an_apply_that_applies_nothing_raises_one_warning_notice[R-PE-EXPORT.5/1]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_2_editing_an_entry_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_1_adding_an_entry_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_3_removing_an_entry_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_5_a_stage_from_the_staging_sheet_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_chg_003_5_1_write_file_hides_the_prompt_from_the_checks_tab
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_pe_export_17_4_a_per_entry_json_edit_hides_the_prompt
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/1]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_chg_003_2_1_dont_save_hides_the_prompt_from_the_inspector_tab
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/2]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/3]
+FAILED tests/test_b103_inc10_g2_arms.py::test_r_tui_049_1_the_before_after_control_is_shown_after_a_save_back[R-TUI-049.1/4]
+FAILED tests/test_b103_inc10_g2_arms.py::test_at_i10_3_an_apply_that_applies_nothing_is_seen
+21 failed, 2 passed in 136.89s (0:02:16)
+rc=1

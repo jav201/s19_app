@@ -247,6 +247,11 @@ class PatchEditorPanel(
     #: imports nothing from the engine or service layer.
     SAVEBACK_WIDTHS = (32, 16)
 
+    #: The save-back output formats in press order (I-10.5): (kind, name,
+    #: suffix) — the engine's kind strings spelled locally so this view widget
+    #: imports nothing from the engine or service layer, as SAVEBACK_WIDTHS.
+    SAVEBACK_FORMATS = (("s19", "S19", ".s19"), ("hex", "Intel HEX", ".hex"))
+
     #: The DOCUMENT tally's bar width (pe_A, design §3).
     _TALLY_BAR_CELLS = 12
 
@@ -325,6 +330,10 @@ class PatchEditorPanel(
                 operator selected (``{16, 32}``, default 32) — carried only on
                 a confirm so ``app.py`` can thread it (and the matching S0
                 policy) into ``ChangeService.save_patched`` (US-015 / LLR-015.3).
+            output_format (Optional[str]): The output format a confirm carries
+                (``"s19"`` or ``"hex"``, I-10.5); ``None`` on a decline (never
+                read) and on a confirm built without it, which the engine
+                refuses rather than silently writing S19 (E3-5).
 
         Dependencies:
             Used by:
@@ -332,11 +341,15 @@ class PatchEditorPanel(
         """
 
         def __init__(
-            self, filename: Optional[str], bytes_per_line: int = 32
+            self,
+            filename: Optional[str],
+            bytes_per_line: int = 32,
+            output_format: Optional[str] = None,
         ) -> None:
             super().__init__()
             self.filename = filename
             self.bytes_per_line = bytes_per_line
+            self.output_format = output_format
 
     class BeforeAfterReportRequested(Message):
         """The operator activated the persistent before/after control (US-061).
@@ -502,6 +515,10 @@ class PatchEditorPanel(
         #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
         #: carried on the ``SaveBackDecision``. Defaults to 32.
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
+        #: The save-back output format the prompt shows and a confirm carries
+        #: (I-10.5) — "s19" or "hex", a placeholder until ``show_save_prompt``
+        #: sets the loaded image's format. Defaults to "s19".
+        self._saveback_format: str = self.SAVEBACK_FORMATS[0][0]
         #: The dirty flag (batch-94, LLR-005.1). Set while unsaved edits exist
         #: in EITHER editor region (the entries or the paste buffer); cleared
         #: by a successful save or load. Readers in this module: the Load guard,

@@ -1,0 +1,136 @@
+# transcript: i10-remap-extract.sh, run 2026-11-14T03:59:38Z
+# code-wire: v3.1.0-8-gb6cd30d b6cd30d; clone at 7ac47dc5; worktree HEAD 92f28fcc
+# graph sha256 12937af0df45de40fa4f822c48dd27903fd59b860940e8b3bce95fda08e6b851
+# python: Python 3.12.7
+
+## baseline subset: 22 nodes
+
+## run 1: marks + extract, baseline subset (expected: drift only on I-10.1 and I-10.2)
+22 marks written, 0 nodes without code
+marks exit=0
+marks=22 graph_nodes=22 calls=14 findings=3 parse_failures=0
+extract exit=1
+# Code-Wire extractor report
+
+- Marks found: 22
+- Graph nodes parsed: 22
+- Real calls between marked nodes: 14
+- Findings: 3 (3 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 39
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Input in graph, not a parameter in code | 3 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `ChangeService.emit_and_verify` | `save_patched_image` | s19_app/tui/services/change_service.py:2576 |
+| `ChangeService.emit_and_verify` | `verify_written_image` | s19_app/tui/services/change_service.py:2601 |
+| `ChangeService.save_patched` | `ChangeService.emit_and_verify` | s19_app/tui/services/change_service.py:2757 |
+| `PatchMixin._hide_replaced_document_controls` | `ActionsMixin.hide_before_after_prompt` | s19_app/tui/app/patch.py:591 |
+| `PatchMixin._hide_replaced_document_controls` | `ActionsMixin.hide_save_prompt` | s19_app/tui/app/patch.py:592 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `ActionsMixin.hide_before_after_prompt` | s19_app/tui/app/patch.py:185 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `ActionsMixin.show_save_prompt` | s19_app/tui/app/patch.py:242 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `PatchMixin._hide_replaced_document_controls` | s19_app/tui/app/patch.py:1559, s19_app/tui/app/patch.py:196 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `save_patched_image` | s19_app/tui/services/variant_execution_service.py:2584 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ActionsMixin.hide_save_prompt` | s19_app/tui/app/patch.py:442 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ActionsMixin.show_before_after_prompt` | s19_app/tui/app/patch.py:503 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ChangeService.save_patched` | s19_app/tui/app/patch.py:458 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `_synth_s0_header_from_filename` | s19_app/tui/app/patch.py:453 |
+| `save_patched_image` | `render_patched_image` | s19_app/tui/changes/apply.py:797 |
+
+Top-level sites (no marked node above them):
+
+- `PatchEditorPanel.__init__`: s19_app/tui/app/compose_screens.py:540
+- `PatchMixin._apply_entry_json_edit`: s19_app/tui/app/patch.py:997
+- `PatchMixin._hide_replaced_document_controls`: s19_app/tui/app/patch.py:789, s19_app/tui/app/patch.py:824
+- `emit_intel_hex_from_mem_map`: s19_app/segment_ops.py:507
+- `render_patched_image`: s19_app/tui/app/save_plan.py:1145
+- `save_patched_image`: s19_app/tui/app/save_commit.py:805, s19_app/tui/services/flow_execution_service.py:727
+- `verify_written_image`: s19_app/tui/app/save_commit.py:817, s19_app/tui/operations/crc.py:1524, s19_app/tui/services/flow_execution_service.py:746
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/screens_directionb/patch_editor/panel.py:334` — graph input `output_format` not a parameter of `PatchEditorPanel.SaveBackDecision.__init__`
+- `s19_app/tui/screens_directionb/patch_editor/actions.py:281` — graph input `output_format` not a parameter of `ActionsMixin.show_save_prompt`
+- `s19_app/tui/screens_directionb/patch_editor/actions.py:281` — graph input `apply_line` not a parameter of `ActionsMixin.show_save_prompt`
+
+## run 2: marks + extract, whole graph (expected exit 1: run 1's drift + the NEW node without a mark)
+22 marks written, 1 nodes without code
+  missing: ActionsMixin._set_saveback_format (s19_app/tui/screens_directionb/patch_editor/actions.py): no def
+marks exit=0
+marks=22 graph_nodes=23 calls=14 findings=4 parse_failures=0
+extract exit=1
+# Code-Wire extractor report
+
+- Marks found: 22
+- Graph nodes parsed: 23
+- Real calls between marked nodes: 14
+- Findings: 4 (4 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 39
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 1 |
+| Input in graph, not a parameter in code | 3 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `ChangeService.emit_and_verify` | `save_patched_image` | s19_app/tui/services/change_service.py:2576 |
+| `ChangeService.emit_and_verify` | `verify_written_image` | s19_app/tui/services/change_service.py:2601 |
+| `ChangeService.save_patched` | `ChangeService.emit_and_verify` | s19_app/tui/services/change_service.py:2757 |
+| `PatchMixin._hide_replaced_document_controls` | `ActionsMixin.hide_before_after_prompt` | s19_app/tui/app/patch.py:591 |
+| `PatchMixin._hide_replaced_document_controls` | `ActionsMixin.hide_save_prompt` | s19_app/tui/app/patch.py:592 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `ActionsMixin.hide_before_after_prompt` | s19_app/tui/app/patch.py:185 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `ActionsMixin.show_save_prompt` | s19_app/tui/app/patch.py:242 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `PatchMixin._hide_replaced_document_controls` | s19_app/tui/app/patch.py:1559, s19_app/tui/app/patch.py:196 |
+| `PatchMixin.on_patch_editor_panel_action_requested` | `save_patched_image` | s19_app/tui/services/variant_execution_service.py:2584 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ActionsMixin.hide_save_prompt` | s19_app/tui/app/patch.py:442 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ActionsMixin.show_before_after_prompt` | s19_app/tui/app/patch.py:503 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `ChangeService.save_patched` | s19_app/tui/app/patch.py:458 |
+| `PatchMixin.on_patch_editor_panel_save_back_decision` | `_synth_s0_header_from_filename` | s19_app/tui/app/patch.py:453 |
+| `save_patched_image` | `render_patched_image` | s19_app/tui/changes/apply.py:797 |
+
+Top-level sites (no marked node above them):
+
+- `PatchEditorPanel.__init__`: s19_app/tui/app/compose_screens.py:540
+- `PatchMixin._apply_entry_json_edit`: s19_app/tui/app/patch.py:997
+- `PatchMixin._hide_replaced_document_controls`: s19_app/tui/app/patch.py:789, s19_app/tui/app/patch.py:824
+- `emit_intel_hex_from_mem_map`: s19_app/segment_ops.py:507
+- `render_patched_image`: s19_app/tui/app/save_plan.py:1145
+- `save_patched_image`: s19_app/tui/app/save_commit.py:805, s19_app/tui/services/flow_execution_service.py:727
+- `verify_written_image`: s19_app/tui/app/save_commit.py:817, s19_app/tui/operations/crc.py:1524, s19_app/tui/services/flow_execution_service.py:746
+
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/screens_directionb/patch_editor/actions.py` — `ActionsMixin._set_saveback_format`
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/screens_directionb/patch_editor/panel.py:334` — graph input `output_format` not a parameter of `PatchEditorPanel.SaveBackDecision.__init__`
+- `s19_app/tui/screens_directionb/patch_editor/actions.py:281` — graph input `output_format` not a parameter of `ActionsMixin.show_save_prompt`
+- `s19_app/tui/screens_directionb/patch_editor/actions.py:281` — graph input `apply_line` not a parameter of `ActionsMixin.show_save_prompt`
+
+## lint: whole graph
+not read=0 nodes=23 entities=13 edges=40
+lint exit=0
+
+## clone left as found except marks: 22 added, 0 removed lines

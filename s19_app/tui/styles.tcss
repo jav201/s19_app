@@ -3240,8 +3240,6 @@ ModalScreen {
 
 #patch_editor_panel #patch_history_strip,
 #patch_editor_panel #patch_execute_row,
-#patch_editor_panel #patch_saveback_row,
-#patch_editor_panel #patch_before_after_row,
 #patch_editor_panel #patch_checks_controls {
     height: auto;
     padding: 0;
@@ -3253,14 +3251,43 @@ ModalScreen {
     padding: 0;
 }
 
-/* Three save-back buttons need 48 cells against the pane's 41 at 118
- * columns: two rows, the Width selector first (design §3). */
-#patch_editor_panel #patch_saveback_buttons {
-    layout: grid;
-    grid-size: 2;
-    grid-columns: auto 1fr;
+/* The save-back prompt dock (I-10.4): no padding of its own, so its rows'
+ * region equals #patch_doc_controls' (R-PE-EXPORT.1, E2-5). */
+#patch_editor_panel #patch_export_dock {
+    width: 100%;
     height: auto;
     padding: 0;
+}
+
+/* The two prompt rows carry their own inset so their text starts in the
+ * column of the document row's first chip (E2-5). */
+#patch_editor_panel #patch_saveback_row,
+#patch_editor_panel #patch_before_after_row {
+    height: auto;
+    padding: 0 1;
+}
+
+#patch_editor_panel #patch_before_after_row {
+    layout: horizontal;
+    height: 1;
+}
+
+#patch_editor_panel #patch_saveback_buttons {
+    layout: horizontal;
+    height: 1;
+    padding: 0;
+}
+
+/* The Format chip's label changes length (Format: S19 → Format: Intel HEX),
+ * so a fixed width keeps Write file / Don't save in place (E2-3). 19 =
+ * len("Format: Intel HEX") + the Button's line-pad of 1 cell on each side;
+ * at 17 the label wraps and "HEX" is not painted (R-PE-EXPORT.9). */
+#patch_editor_panel #patch_saveback_format_button {
+    width: 19;
+}
+
+#patch_editor_panel #patch_saveback_apply_line {
+    height: auto;
 }
 
 #patch_editor_panel #patch_win_checks_body {

@@ -1624,7 +1624,7 @@ def test_tc_b100_53_session_writers_are_refused_during_a_save(
                 "v": lambda: pilot.press("v"),
                 "U": lambda: pilot.press("U"),
                 "save-back": lambda: app.on_patch_editor_panel_save_back_decision(
-                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32)),
+                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32, output_format="s19")),
                 "apply": lambda: panel.request_action("apply_doc"),
                 "undo": lambda: app.action_patch_undo(),
                 "ctrl+s": lambda: pilot.press("ctrl+s"),
@@ -1822,7 +1822,7 @@ def test_tc_b100_53_patch_editor_changes_are_refused_while_busy(
                 ("undo", lambda: app.on_patch_editor_panel_undo_requested(PatchEditorPanel.UndoRequested())),
                 ("redo", lambda: app.on_patch_editor_panel_redo_requested(PatchEditorPanel.RedoRequested())),
                 ("save-back", lambda: app.on_patch_editor_panel_save_back_decision(
-                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32))),
+                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32, output_format="s19"))),
                 ("edit json", lambda: app.on_patch_editor_panel_edit_json_requested(
                     PatchEditorPanel.EditJsonRequested(""))),
                 ("entry edit json", lambda: app.on_patch_editor_panel_entry_edit_json_requested(

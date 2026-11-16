@@ -1,0 +1,548 @@
+~/work/zq-x10/exact/s19_app/__init__.py
+tree: exact  HEAD f256579c (git archive)
+uptime:  02:39:34 up 1 day, 11:28,  7 users,  load average: 9.13, 7.59, 5.89
++ pytest -p no:cacheprovider -n 2 -q -rfE tests/test_b100_load_question.py
+bringing up nodes...
+bringing up nodes...
+
+..............F..................s..................F..F.F.              [100%]
+=================================== FAILURES ===================================
+_____________ test_tc_b100_44_project_load_asks_iff_a_flag_is_set ______________
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-15/popen-gw0/test_tc_b100_44_project_load_a0')
+
+    def test_tc_b100_44_project_load_asks_iff_a_flag_is_set(tmp_path: Path) -> None:
+        """LLR-174.1b, HLR-174a: project P open and nothing unsaved → a project
+        load of Q asks 0 questions and opens Q; a patch plus a Patch Editor
+        entry (through the panel's inputs) → Save project → a project load asks
+        0; with D only, W only and F only → 1 question each (5 of 5).
+    
+        Why: a project load replaces the image and resets the Patch Editor, so
+        any of the three unsaved flags must be asked about, and an open project
+        alone must not be (the ``pb_A`` prototype asked whenever a project was
+        open).
+        Negative control: the ``pb_A`` rule → the first arm asks → RED;
+        dropping F or W → that arm loads silently → RED. RED (base): the
+        single-flag arms ask nothing."""
+        scene = _scene(tmp_path)
+    
+        async def scenario(app, pilot, log):
+            out = {}
+            await _open_project(pilot, app, "P")
+            spy = PushSpy(app)
+            app._handle_load_dialog(LC("project", "Q"))
+            await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+            await _settle(pilot, 6)
+            out["open, nothing unsaved"] = (spy.questions(), app.current_project)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            await _patch(pilot, app)
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            await pilot.press("ctrl+a", "delete", *"0x80000010")
+            assert await pilot.click("#patch_entry_bytes_input")
+            await pilot.press("ctrl+a", "delete", *"AB")
+            assert await pilot.click("#patch_entry_add_button")
+            await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
+            messages = await projects.save_project(pilot, app, log, "S1")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            assert not _D(app) and not _panel(app)._dirty, "setup: Save project left a flag set"
+            mark = spy.questions()
+            app._handle_load_dialog(LC("project", "P"))
+            await ld.wait_for(pilot, lambda: app.current_project == "P" or is_question(app.screen), "P or the question")
+            await _settle(pilot, 6)
+            out["saved"] = (spy.questions() - mark, app.current_project)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            for flag in ("D", "W", "F"):
+                if flag == "D":
+                    await _patch(pilot, app)
+                elif flag == "W":
+                    await _set_w(pilot, app)
+                else:
+                    await _set_f(pilot, app)
+                mark = spy.questions()
+                app._handle_load_dialog(LC("project", "Q"))
+                await _wait_question(pilot, app)
+                out[flag] = spy.questions() - mark
+                await _answer(pilot, app, "n")
+                # back to nothing unsaved for the next single-flag arm
+                if flag == "D":
+                    app._change_service.mark_saved(app.current_file.mem_map)
+                elif flag == "W":
+                    _panel(app).mark_saved()
+                else:
+                    _flow(app).mark_saved("flow")
+                await _settle(pilot, 2)
+            return out
+    
+>       out = _run(scene.base, scenario)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_load_question.py:723: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f21a55593d0>
+
+    async def scenario(app, pilot, log):
+        out = {}
+        await _open_project(pilot, app, "P")
+        spy = PushSpy(app)
+        app._handle_load_dialog(LC("project", "Q"))
+        await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+        await _settle(pilot, 6)
+        out["open, nothing unsaved"] = (spy.questions(), app.current_project)
+        if is_question(app.screen):
+            await _answer(pilot, app, "n")
+        else:
+            await _close_result_panel(pilot, app)
+        await _patch(pilot, app)
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+        await _settle(pilot, 4)
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_load_question.py:683: AssertionError
+_____________ test_tc_b100_12_cancelled_question_rehomes_the_focus _____________
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-15/popen-gw1/test_tc_b100_12_cancelled_ques0')
+
+    def test_tc_b100_12_cancelled_question_rehomes_the_focus(tmp_path: Path) -> None:
+        """LLR-166.1 Inc 10 arm (C08, §C.2, corrected by orchestrator ruling 7):
+        after a cancelled question the focus follows ``_rehome_focus_after_load``
+        — a visible, healthy focus is kept. Patch window with the focus on the
+        visible ``#patch_entry_address_input`` and D set; ``ctrl+l``, a typed
+        data file, ``enter`` → the question → ``n`` → the re-home rule ran once
+        and the focus is still on ``patch_entry_address_input``. Workspace with
+        the focus on ``#files_list`` and D set; a pick of ``x.s19`` → the
+        question → ``escape`` → the re-home rule ran once and the focus is still
+        on ``files_list`` (2 of 2).
+    
+        Why: after a cancelled question the engineer must keep working where
+        they were; LLR-166.1 keeps a visible input in the active window and
+        moves only a stale focus.
+        Negative control: the cancel branch skips ``_rehome_focus_after_load`` →
+        the re-home count is 0 → RED. A cancel that moves a healthy input onto
+        the window target → the first arm lands on ``patch_editor_panel`` →
+        RED. RED (base): no question."""
+        scene = _scene(tmp_path)
+    
+        def spy_rehome(app, calls: list) -> None:
+            real = app._rehome_focus_after_load
+    
+            def spy():
+                calls.append(1)
+                return real()
+    
+            app._rehome_focus_after_load = spy
+    
+        async def patch_window(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await _patch(pilot, app)
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_address_input")) > 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            assert _focused_id(app) == "patch_entry_address_input"
+            await pilot.press("ctrl+l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(scene.src / "b.s19"))
+            await pilot.press("enter")
+            await _wait_question(pilot, app)
+            calls: list = []
+            spy_rehome(app, calls)
+            await _answer(pilot, app, "n")
+            await _settle(pilot, 6)
+            return len(calls), _focused_id(app)
+    
+        async def workspace(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await _patch(pilot, app)
+            await _pick_in_files_list(pilot, app, "x.s19")
+            await _wait_question(pilot, app)
+            calls: list = []
+            spy_rehome(app, calls)
+            await _answer(pilot, app, "escape")
+            await _settle(pilot, 6)
+            return len(calls), _focused_id(app)
+    
+>       assert _run(scene.base, patch_window) == (1, "patch_entry_address_input")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_load_question.py:2767: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f14eee780d0>
+
+    async def patch_window(app, pilot, log):
+        await _load(pilot, app, scene.src / "fw.s19")
+        await _patch(pilot, app)
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_address_input")) > 0, "the Patch Editor")
+        await _settle(pilot, 4)
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_load_question.py:2743: AssertionError
+_____ test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved _____
+[gw0] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-15/popen-gw0/test_tc_b100_70_project_load_a0')
+
+    def test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved(tmp_path: Path) -> None:
+        """LLR-167.8 Inc 10 arm (C31, §C.3): an entry added through the panel,
+        Save project (the file holds every entry) → a project load asks 0
+        questions; an entry added again and a refused Save project (empty name,
+        the flag stays set) → a project load asks 1 question naming ``Patch
+        Editor entries`` (2 of 2).
+    
+        Why: Save project is the way to make Patch Editor work safe; the
+        question must believe it, and must not believe a refused save.
+        Negative control: Save project skips the panel's ``mark_saved`` → the
+        first arm asks → RED. RED (base): the second arm asks nothing."""
+        from s19_app.tui.screens import SaveProjectPayload
+    
+        scene = _scene(tmp_path)
+    
+        async def add_entry(pilot, app, address: str) -> None:
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            await pilot.press("ctrl+a", "delete", *address)
+            assert await pilot.click("#patch_entry_bytes_input")
+            await pilot.press("ctrl+a", "delete", *"DE AD")
+            assert await pilot.click("#patch_entry_add_button")
+            await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
+    
+        async def scenario(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await add_entry(pilot, app, "0x8000007C")
+            messages = await projects.save_project(pilot, app, log, "S1")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            assert not _panel(app)._dirty, "setup: Save project left the flag set"
+            spy = PushSpy(app)
+            app._handle_load_dialog(LC("project", "Q"))
+            await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+            await _settle(pilot, 6)
+            saved = spy.questions()
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            await add_entry(pilot, app, "0x80000010")
+            mark = len(log.messages)
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=""))
+            await _settle(pilot, 4)
+            refused = [m for m in log.since(mark) if "NOT saved" in m]
+            assert refused and _panel(app)._dirty, (refused, _panel(app)._dirty)
+            mark = spy.questions()
+            await _ask(pilot, app, lambda: app._handle_load_dialog(LC("project", "P")))
+            body = q_body(app)
+            await _answer(pilot, app, "n")
+            return saved, spy.questions() - mark, body
+    
+>       saved, refused_asks, body = _run(scene.base, scenario)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_load_question.py:2825: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_load_question.py:2800: in scenario
+    await add_entry(pilot, app, "0x8000007C")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C'
+
+    async def add_entry(pilot, app, address: str) -> None:
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+        await _settle(pilot, 4)
+>       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests/test_b100_load_question.py:2791: AssertionError
+______ test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route ______
+[gw1] linux -- Python 3.11.18 ~/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('~/work/zq-x10/tmp/pytest-of-<user>/pytest-15/popen-gw1/test_at_b100_15_load_over_unsa0')
+
+    def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path: Path) -> None:
+        """AT-B100-15 (HLR-174, HLR-174a, HLR-174b, HLR-174c, HLR-174d), by keys
+        and widget ids only, in a scratch work area at 118x54:
+    
+          - question + keep halves: Load ``fw.s19``; a patch added and applied
+            in the Patch Editor; Load ``b.s19`` → one question titled
+            ``Replace fw.s19?`` naming the image, the focus on Cancel; ``enter``
+            keeps the patched image (the Loaded panel still names ``fw.s19``,
+            the patched byte still in the session image). A Workarea Files pick
+            of ``x.s19`` asks the same; ``escape`` keeps it.
+          - replace half: Load ``b.s19`` again, ``y`` → ``b.s19`` loads.
+          - after-save half: Apply on ``b.s19`` → Load ``fw.s19`` asks (``n``);
+            Save project ``PA`` → the same Load asks nothing and loads.
+          - ``v`` route: open ``PV``, patch, ``v`` to ``firmware_b`` → the
+            question naming ``firmware_b.s19``; ``n`` keeps ``firmware_a``.
+          - items half: Flow Builder edits plus the patched image, then a
+            project pick → one question naming the image and ``flow flow``.
+    
+        The panel's ``v`` is TC-B100-72's forced-state arm (ruling Q5).
+        Declared: the hex view does not repaint the applied bytes on the base
+        either (probe in the tester notes), so the kept patch is read from the
+        session image and the painted Loaded panel, not the hex view.
+    
+        Negative control: the base tree → Load over the patched image loads
+        with no question (P-17) → RED at the first question."""
+        from textual.widgets import Label
+    
+        from s19_app.tui.screens import SaveProjectScreen
+    
+        scene = _scene(tmp_path)
+    
+        def status(app) -> str:
+            return str(app.query_one("#log_line_4", Label).render())
+    
+        def loaded_names(app) -> str:
+            panel = app.screen_stack[0].query_one("#loaded_panel")
+            return " ".join(str(getattr(c.render(), "plain", c.render())) for c in panel.query(".loaded-detail"))
+    
+        async def load_by_keys(pilot, app, path: Path) -> None:
+            await pilot.press("l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(path))
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
+            await ld.wait_for_dialog_closed(pilot, app)
+    
+        async def add_and_apply(pilot, app, add: bool = True) -> None:
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            if add:
+                # A second add keeps the first add's text, and ``ctrl+a`` moves to
+                # the start rather than selecting it: clear both inputs first
+                # (the ``test_b100_document.py`` helper's pattern).
+                from textual.widgets import Input
+    
+                app.query_one("#patch_entry_address_input", Input).value = ""
+                app.query_one("#patch_entry_bytes_input", Input).value = ""
+                assert await pilot.click("#patch_entry_address_input")
+                await pilot.press("ctrl+a", "delete", *"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input")
+                await pilot.press("ctrl+a", "delete", *"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button")
+                await ld.wait_for(pilot, lambda: "entry added" in status(app), "the entry added")
+            assert await pilot.click("#patch_doc_apply_button")
+            await ld.wait_for(pilot, lambda: "1 applied" in status(app), "the apply")
+            await _settle(pilot, 4)
+    
+        async def scenario(app, pilot, log):
+            spy = PushSpy(app)
+            out = {}
+            # Load fw.s19 and patch it by keys.
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await ld.wait_for(pilot, lambda: app.current_file is not None, "the load of fw.s19")
+            await add_and_apply(pilot, app)
+            # Question + keep (Load route, enter).
+            await load_by_keys(pilot, app, scene.src / "b.s19")
+            await _wait_question(pilot, app)
+            out["load question"] = (q_title(app), q_body(app), _focused_id(app))
+            await _answer(pilot, app, "enter")
+            await _settle(pilot, 6)
+            out["kept"] = (
+                Path(app.current_file.path).name,
+                app.current_file.mem_map.get(PATCH_ADDRESS),
+                "fw.s19" in loaded_names(app),
+            )
+            # Workarea Files pick (escape).
+            await _pick_in_files_list(pilot, app, "x.s19")
+            await _wait_question(pilot, app)
+            out["workarea question"] = q_body(app)
+            await _answer(pilot, app, "escape")
+            await _settle(pilot, 6)
+            out["kept after workarea"] = Path(app.current_file.path).name
+            # Replace (y).
+            await load_by_keys(pilot, app, scene.src / "b.s19")
+            await _wait_question(pilot, app)
+            await pilot.press("y")
+            await ld.wait_for(pilot, lambda: Path(app.current_file.path).name == "b.s19", "the load of b.s19")
+            await _settle(pilot, 6)
+            out["replaced"] = ("b.s19" in loaded_names(app), is_question(app.screen))
+            # After-save: asks before the save, not after.
+            await add_and_apply(pilot, app, add=False)
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await _wait_question(pilot, app)
+            await _answer(pilot, app, "n")
+            await pilot.press("ctrl+s")
+            await ld.wait_for(pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog")
+            assert await pilot.click("#project_name")
+            # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+            # name, type it, and wait for its painted summary before Save.
+            await sd.type_and_await_summary(pilot, app, "PA")
+            assert await pilot.click("#save_ok")
+            await ld.wait_for(pilot, lambda: "Saved project" in status(app), "the save")
+            mark = spy.questions()
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await ld.wait_for(
+                pilot,
+                lambda: is_question(app.screen) or Path(app.current_file.path).name == "fw.s19",
+                "the load of fw.s19 after the save",
+            )
+            await _settle(pilot, 6)
+            out["after save"] = (spy.questions() - mark, Path(app.current_file.path).name)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            # v route.
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            await ld.open_project_through_dialog(pilot, app, "PV")
+            await projects.dismiss_load_result_panel(pilot, app)
+            await add_and_apply(pilot, app)
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            await _switch_variant_by_keys(pilot, app)
+            await _wait_question(pilot, app)
+            out["v question"] = (q_title(app), q_body(app))
+            await _answer(pilot, app, "n")
+            await _settle(pilot, 6)
+            out["v kept"] = (app._variant_set.active_id, Path(app.current_file.path).name)
+            # Items: Flow Builder edits + the patched image, then a project pick.
+            await pilot.press("8")
+            await _settle(pilot, 6)
+            assert await pilot.click("#flow_ref")
+            await pilot.press(*"fw.s19")
+            assert await pilot.click("#flow_add")
+            await ld.wait_for(
+                pilot, lambda: "sev-warning" in app.query_one("#flow_name_strip").classes, "the flow marked unsaved"
+            )
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            mark = spy.questions()
+            await ld.open_project_through_dialog(pilot, app, "PA")
+            await _wait_question(pilot, app)
+            out["items question"] = (spy.questions() - mark, q_body(app))
+            await _answer(pilot, app, "n")
+            return out
+    
+>       out = _run(scene.base, scenario)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_load_question.py:3031: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_load_question.py:2949: in scenario
+    await add_and_apply(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+add = True
+
+    async def add_and_apply(pilot, app, add: bool = True) -> None:
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
+        await _settle(pilot, 4)
+        if add:
+            # A second add keeps the first add's text, and ``ctrl+a`` moves to
+            # the start rather than selecting it: clear both inputs first
+            # (the ``test_b100_document.py`` helper's pattern).
+            from textual.widgets import Input
+    
+            app.query_one("#patch_entry_address_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+>           assert await pilot.click("#patch_entry_address_input")
+E           assert False
+
+tests/test_b100_load_question.py:2933: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set
+FAILED tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus
+FAILED tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved
+FAILED tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route
+4 failed, 54 passed, 1 skipped in 277.83s (0:04:37)
+RC=1
