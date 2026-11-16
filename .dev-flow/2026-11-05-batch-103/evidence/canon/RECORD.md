@@ -39,7 +39,7 @@ La precedencia es explícita: `1a → 1b → 2 → 3 → 4 → 5 → 6 → 7 →
 
 ## Corrección de la revisión NO-GO
 
-La salida de `de637bbe` usaba precedencia por nombre y dejaba a Inc 9 después de Inc 8b. El fold, inventario, informes, reconciliaciones y trazas se regeneraron desde `c1741dee`; no se corrigieron sólo las dos filas. `context-fold.patch` contiene únicamente los seis hunks de notas de contexto, sin filas de requisitos, y se aplicó al canon base antes de repetir `fold_canon.py` con la precedencia explícita.
+La salida de `de637bbe` usaba precedencia por nombre y dejaba a Inc 9 después de Inc 8b. El fold, inventario, informes, reconciliaciones y trazas se regeneraron desde `c1741dee`; no se corrigieron sólo las dos filas. Un patch temporal de seis hunks de notas de contexto, sin filas de requisitos, se aplicó al canon base antes de repetir `fold_canon.py` con la precedencia explícita; se retiró después de la regeneración porque las líneas de contexto de un unified diff no superan limpiamente `git diff --check` cuando el patch mismo se archiva como archivo nuevo.
 
 Con la precedencia corregida, `R-PE-BENCH.5` usa el view width de `CTX-PE-DEF` sin trailing ground y `R-PE-BENCH.17` usa range/no-limits de `CTX-PE-DEF`, eliminando la contradicción con el contexto. `R-PE-BENCH.11` y `.36` permanecen idénticas. El diff del canon contra `de637bbe` contiene únicamente `.5` y `.17`.
 
