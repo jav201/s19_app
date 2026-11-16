@@ -1,0 +1,24 @@
+SLICE  s19_app/tui/app/checks_diff.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/deps.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/file_load.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/flow.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/hex_view.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/issues_checks.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/loaded_state.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/mac_view.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/navigation.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/project_load.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/projects.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/reports.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/save_commit.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/save_plan.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/shared_io.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/app/workspace_view.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/ab_diff.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/check_editor.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/deps.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/loaded_artifacts.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/map_parts.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/memory_map.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+SLICE  s19_app/tui/screens_directionb/patch_editor/checks.py changed since 0c3a6bd4674c3f2df90a7399898fc98429f5a200 and no requirement file names it
+trace_check: 14 US, 752 active requirements (10 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, CANON, 23 gap(s)

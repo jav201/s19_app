@@ -1,14 +1,25 @@
 # Batch-103 full-suite gate
 
-**STATE: RUNNING — this is not a PASS or a completed gate.**
+**CURRENT STATE: BLOCKED — SSH connectivity to the registered hosts; there is no suite verdict.**
 
-**NEXT STEP:** wait for the eight sequential chunks on `<HOST>` to finish, collect the complete logs and summary, classify every failure against `origin/main` `0c3a6bd4674c3f2df90a7399898fc98429f5a200` and the batch records, then make any required test-first corrections and rerun the complete suite if product or tests change.
+- The central backup exists. The distributed runner is prepared for eight chunks on two hosts, four per host, but its self-test and the suite execution are **not run**.
+- No claim is made that an earlier runner process remains alive or has terminated. No host endpoint is copied into this record.
+- The new batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. There are no EVID or CANON gaps in that output. G3 is not closed.
+- No product or test file changed for this integration. No local pytest, dynamic runner self-test, app or clipboard access was performed.
 
-- Candidate and running clone HEAD: `18f2d92344d090049262be89343084bd45a582ec`; tree `8f2e388f1c6b38e5b6f96035c1a6d442e8a288c7`; clean detached fresh clone under `<HOME>/work/b103-close/repo`.
+---
+
+## Historical checkpoint on 18f2d923 — RUNNING at that write, not collected
+
+**This is not a PASS or a completed gate.** The checkpoint below was written while the run was believed active; it is historical and supplies no current liveness or completion claim.
+
+**Historical next step at that checkpoint:** wait for the eight sequential chunks on `<HOST>` to finish, collect the complete logs and summary, classify every failure against `origin/main` `0c3a6bd4674c3f2df90a7399898fc98429f5a200` and the batch records, then make any required test-first corrections and rerun the complete suite if product or tests change.
+
+- Candidate and then-running clone HEAD: `18f2d92344d090049262be89343084bd45a582ec`; tree `8f2e388f1c6b38e5b6f96035c1a6d442e8a288c7`; clean detached fresh clone under `<HOME>/work/b103-close/repo`.
 - Runner: the existing unmodified `run_sequential.py`, eight sequential chunks, `-I -B`, closed stdin, no bytecode or pytest cache, HT-02 paths under `<HOME>/work/b103-close`, never `/tmp`, and no whole-suite timeout.
 - Initial load: `0.13 0.14 0.33`; `s19_app.__file__` resolves inside the fresh clone. Full details are in `run-18f2d92344d090049262be89343084bd45a582ec/environment.txt`.
-- `chunk-01.txt` is a partial in-progress checkpoint, not a tally or failure classification. `launcher.txt` is empty because the runner has not completed a chunk. No gate verdict is claimed.
-- `run_candidate.sh` is the evidence launcher. No product, test, canon, E2, push, or CI change has been made.
+- `chunk-01.txt` is a partial in-progress checkpoint, not a tally or failure classification. `launcher.txt` is empty because the runner had not completed a chunk at that write. No gate verdict was claimed.
+- `run_candidate.sh` is the evidence launcher. No product, test, canon, E2, push, or CI change had been made at that checkpoint.
 
 ---
 
