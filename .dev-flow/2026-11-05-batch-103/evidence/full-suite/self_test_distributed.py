@@ -4,7 +4,51 @@ from pathlib import Path
 import shutil
 import sys
 
-from run_distributed import aggregate_run
+from run_distributed import aggregate_run, require_source_tip, validate_remote_root
+
+
+def static_controls():
+    rejected_paths = (
+        "/tmp",
+        "/tmp/",
+        "/tmp/.",
+        "/tmp//nested",
+        "/./tmp",
+        "//tmp",
+        "//tmp//nested",
+        "//./tmp",
+        "///tmp",
+        "///./tmp//nested",
+        "////tmp/nested",
+        "/tmp/../outside",
+        "relative/../../tmp",
+    )
+    for value in rejected_paths:
+        try:
+            validate_remote_root(value)
+        except ValueError:
+            continue
+        raise AssertionError(f"unsafe remote root accepted: {value!r}")
+
+    canonical_paths = {
+        "runs//b103/./distributed": "runs/b103/distributed",
+        "/srv//b103/./distributed": "/srv/b103/distributed",
+        "//srv///b103": "/srv/b103",
+        "/tmpish/run": "/tmpish/run",
+    }
+    for value, expected in canonical_paths.items():
+        actual = str(validate_remote_root(value))
+        if actual != expected:
+            raise AssertionError(f"wrong POSIX canonicalization: {value!r} -> {actual!r}")
+
+    require_source_tip("a" * 40, "a" * 40)
+    try:
+        require_source_tip("a" * 40, "b" * 40)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("non-tip commit accepted")
+    print("Static POSIX-path and exact-source-tip controls behaved as required.")
 
 
 def fixture_manifest():
@@ -27,6 +71,7 @@ def install_fixture(root, manifest, host_results, summaries):
         (host_dir / "environment.txt").write_text("fixture environment\n", encoding="utf-8")
         (host_dir / "completion.txt").write_text("fixture completion\n", encoding="utf-8")
         (host_dir / "launcher.txt").write_text("fixture launcher\n", encoding="utf-8")
+        (host_dir / "host-error.txt").write_text("", encoding="utf-8")
         (host_dir / "full_suite_exit.txt").write_text(
             f"{host_results[host_index - 1]['returncode']}\n", encoding="ascii"
         )
@@ -88,6 +133,7 @@ def scenario(root, name, manifest, host_results, summaries, expected):
 
 
 def main():
+    static_controls()
     output = Path.cwd() / "distributed-self-test-fixtures"
     if output.exists():
         raise SystemExit(f"refusing to overwrite {output}")

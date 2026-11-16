@@ -83,6 +83,7 @@ def main():
     }
     summary_path = out / "summary.json"
     write_json(summary_path, summary)
+    (out / "host-error.txt").write_text("", encoding="utf-8")
 
     try:
         if len(assigned) != 4 or len(set(assigned)) != 4:

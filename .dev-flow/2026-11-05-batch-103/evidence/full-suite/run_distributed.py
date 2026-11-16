@@ -23,6 +23,7 @@ HOST_FILES = (
     "completion.txt",
     "full_suite_exit.txt",
     "launcher.txt",
+    "host-error.txt",
 )
 
 
@@ -56,15 +57,15 @@ def partition_files(files):
     return chunks
 
 
+def require_source_tip(commit, source_commit):
+    if commit != source_commit:
+        raise RuntimeError(f"--commit must identify the exact tip of {SOURCE_REF}")
+
+
 def build_manifest(repo, revision):
     source_commit = git(repo, "rev-parse", "--verify", SOURCE_REF + "^{commit}")
     commit = git(repo, "rev-parse", "--verify", revision + "^{commit}")
-    ancestry = subprocess.run(
-        ["git", "-C", str(repo), "merge-base", "--is-ancestor", commit, source_commit],
-        stdin=subprocess.DEVNULL,
-    ).returncode
-    if ancestry != 0:
-        raise RuntimeError(f"requested commit is not contained in {SOURCE_REF}")
+    require_source_tip(commit, source_commit)
     tree = git(repo, "rev-parse", commit + "^{tree}")
     names = git(repo, "ls-tree", "-r", "--name-only", commit, "--", "tests").splitlines()
     files = sorted(
@@ -90,11 +91,17 @@ def is_tmp_path(path):
 
 
 def validate_remote_root(value):
-    path = PurePosixPath(value)
-    if not value or value.startswith("~") or "\n" in value or "\r" in value:
+    if not value or value.startswith("~") or any(char in value for char in "\0\n\r"):
         raise ValueError("remote root must be a literal path without tilde expansion")
-    if ".." in path.parts:
+    segments = value.split("/")
+    if ".." in segments:
         raise ValueError("remote root cannot contain '..'")
+    absolute = value.startswith("/")
+    canonical_segments = [segment for segment in segments if segment not in ("", ".")]
+    canonical = "/".join(canonical_segments)
+    if absolute:
+        canonical = "/" + canonical
+    path = PurePosixPath(canonical or ".")
     if path.is_absolute() and (path == PurePosixPath("/tmp") or PurePosixPath("/tmp") in path.parents):
         raise ValueError("remote root cannot be under /tmp")
     return path
@@ -376,7 +383,7 @@ def parse_args():
         required=True,
         help="SSH target and absolute remote Python; repeat exactly twice",
     )
-    parser.add_argument("--commit", default=SOURCE_REF, help="commit contained in " + SOURCE_REF)
+    parser.add_argument("--commit", default=SOURCE_REF, help="exact commit at the tip of " + SOURCE_REF)
     parser.add_argument("--output", type=Path, required=True, help="new local evidence directory, outside /tmp")
     parser.add_argument("--remote-root", default="b103-distributed-runs", help="new run's parent on each remote")
     parser.add_argument("--run-id", help="collision-resistant run name; default: UTC time plus random suffix")
