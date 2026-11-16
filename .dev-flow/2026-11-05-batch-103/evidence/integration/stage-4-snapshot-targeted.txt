@@ -1,0 +1,10 @@
+xxxxxxxx.                                                                [100%]
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m8[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=14010311;file://~/snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2;35m~/[0m[2;95msnapshot_report.html[0m
+
+1 passed, 24 deselected, 8 xfailed in 40.76s
