@@ -37,6 +37,7 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.app import S19TuiApp
+from tests.support.b100_workers import settle_workers
 
 # --------------------------------------------------------------------------
 # batch-78 Inc-1 — shared geometry harness for HLR-125
@@ -505,8 +506,7 @@ def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
             # the status is written after this handler returns. A bare pause()
             # passed only because the fake generators are instant — a race this
             # suite must not depend on.
-            await app.workers.wait_for_complete()
-            await pilot.pause()
+            await settle_workers(pilot)
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
@@ -553,8 +553,7 @@ def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
             # the status is written after this handler returns. A bare pause()
             # passed only because the fake generators are instant — a race this
             # suite must not depend on.
-            await app.workers.wait_for_complete()
-            await pilot.pause()
+            await settle_workers(pilot)
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
@@ -3714,7 +3713,9 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('pageup', 'page_up_context', 'Page-', False),
     ('period', 'hex_page_next', 'Hex+', True),
     ('plus', 'page_next_context', 'Page+', True),
-    ('q', 'quit', 'Quit', True),
+    # batch-103 Inc 1b (R-COPY.24): q opens the quit help; palette Quit keeps
+    # the separate immediate `quit` action, so the row count is unchanged.
+    ('q', 'help_quit', 'Quit', True),
     ('question_mark', 'show_help_panel', 'Help', True),
     ('r', 'refresh_files', 'Refresh workarea', False),
     ('s', 'save_project', 'Save project', False),

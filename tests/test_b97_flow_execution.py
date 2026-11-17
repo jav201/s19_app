@@ -267,7 +267,7 @@ from tests.b97_fixtures import (  # noqa: E402
     nul_flow,
     nul_set,
     open_flow_execution,
-    run_lanes,
+    run_lanes as _run_lanes,
 )
 from tests.b97_probes import (  # noqa: E402
     blank_panel_rows,
@@ -308,6 +308,22 @@ async def poll(pilot, predicate, attempts: int = 60) -> bool:
         if predicate():
             return True
     return False
+
+
+async def settle_run_paint(pilot, panel) -> None:
+    """Wait for the deferred attention stamp, which follows the painted run."""
+    painted = await poll(
+        pilot,
+        lambda: panel._attention is None or panel._attention_since is not None,
+        200,
+    )
+    assert painted, "the deferred attention paint did not finish"
+    await settle(pilot, 2)
+
+
+async def run_lanes(app, pilot, panel, *, key: bool = False) -> None:
+    await _run_lanes(app, pilot, panel, key=key)
+    await settle_run_paint(pilot, panel)
 
 
 def run_fx(tmp_path: Path, size, body, *, stems=(), run: bool = False, evidence: bool = False, project: bool = True):
@@ -2150,6 +2166,24 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     )
     inc8 = inserted("/* --- Filter row and bench state (batch-103 Inc 8", "#patch_editor_panel.-bench #patch_inspector", "894bb3db Inc 8 block")
     old = supersede(old, "/* batch-97 flow_builder", inc8 + "/* batch-97 flow_builder", "894bb3db Inc 8 anchor")
+
+    # batch-103 Inc 7 (D-2 A, E3A-10; E5 F-X7-1): the exact A2L regime
+    # block replaces the old two-pane rules, through the last list-mode rule.
+    old_a2l = old[old.index("#a2l_panes {"):old.index("/* --- MAC View")]
+    inc7 = sheet[sheet.index("/* --- A2L Explorer body regimes (batch-103 Inc 7"):sheet.index("/* --- MAC View")]
+    old = supersede(old, old_a2l, inc7, "batch-103 Inc 7 exact A2L regime block")
+
+    # batch-103 Inc 10 (I-10.4, R-PE-EXPORT.1/.9, E2-3/.5): the exact
+    # save-back dock block replaces the former two prompt rows and grid.
+    old_saveback = old[
+        old.index("#patch_editor_panel #patch_history_strip,"):
+        old.index("#patch_editor_panel #patch_win_checks_body")
+    ]
+    inc10 = sheet[
+        sheet.index("#patch_editor_panel #patch_history_strip,"):
+        sheet.index("#patch_editor_panel #patch_win_checks_body")
+    ]
+    old = supersede(old, old_saveback, inc10, "batch-103 Inc 10 exact export dock block")
     assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
     for head in (".flow-name-strip {", ".modal-hint", ".patch-docked-row, .patch-docked-group", ".sev-ok", ".sev-warning", ".sev-error", ".sev-neutral"):
         assert block(sheet, head) == block(old, head), head
@@ -2186,6 +2220,7 @@ def test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log(tmp_path: Pat
         await settle(pilot, 2)
         await pilot.click("#fx_run")
         await poll(pilot, lambda: panel.last_run_record is not None and not panel.query_one("#fx_run").disabled, 200)
+        await settle_run_paint(pilot, panel)
         await settle(pilot, 6)
         log = panel.run_log_plain()
         assert _spanish(log.splitlines()) == [], f"the run log is in English: {log!r}"

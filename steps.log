@@ -1,0 +1,10 @@
+2026-11-16T21:29:46-06:00 lane=b103-g3-oracles base=21ec06b2e668b76ec62e76b9c3c6eb7cf971f2b1; isolated worktree only; no push, main, reset, clean, or other-lane integration.
+2026-11-16T21:29:46-06:00 known RED rerun after fix: 14 collected, 14 passed, 0 failed, 0 errors, 0 skipped; includes all four lane-D residual nodeids and all 14 assigned-file failures from the supplied full-suite JUnit.
+2026-11-16T21:29:46-06:00 complete assigned files: 231 collected, 231 passed, 0 failed, 0 errors, 0 skipped; exit=0; seconds=1636.954; unredacted originals are outside the clone and redacted final JUnit/log copies are committed in the canonical lane evidence home.
+2026-11-16T21:29:46-06:00 first aggregate attempt was runner-aborted at 1200 seconds before JUnit; not a test verdict; repeated complete without the runner limit.
+2026-11-16T21:29:46-06:00 supplementary R-COPY.24 controls: 2 collected, 2 setup errors, 0 executed; the mandated unset clipboard/CI guards refused local setup; no guard was enabled.
+2026-11-16T21:29:46-06:00 ruff: 4 pre-existing findings on untouched lines (F401 x2, F541 x1, F841 x1); no unrelated edits.
+2026-11-16T21:29:46-06:00 canonical RESULT=.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-oracles/RESULT.md; redacted; updated sha256=7c131d341edd5f283f0ab90795b4199d2f9a17a293b87b8c604ec3367d9fa09f.
+2026-11-16T21:29:46-06:00 git diff --check and staged diff check: PASS; commit=5b980c43bc8afe17ab297e2aea8dd8e67f85b005; six intended files only.
+2026-11-16T21:29:46-06:00 git status after that commit: clean; this ignored steps.log is the only deliberate follow-up artifact and will be force-added for the close-out commit.
+2026-11-16T23:32:43-06:00 normalized evidence home with git mv; added redacted final known/full JUnit and logs; XML parse confirms 14 and 231 testcases with 0 failures/errors; SHA256SUMS verifies 5 stored files; project redaction reader reports 0 lane hits; no tests repeated.
