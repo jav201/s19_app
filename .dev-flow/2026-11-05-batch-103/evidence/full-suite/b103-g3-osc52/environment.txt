@@ -1,0 +1,24 @@
+HEAD=1223883042c59609e9feddc2946817220c0ad8fc
+TREE=75b0d49aa8072ba4d737cd41cffd925cde5ab8a7
+BASE=0c3a6bd4674c3f2df90a7399898fc98429f5a200
+FULL_SUITE_RED=3302854210a8a62637c37f9d59745d70ae8c8a2a (completed original <full-suite-33028542>; RED372 operator-supplied)
+EXISTING_RED=red-final-33028542.junit.xml and red-final-33028542.log (single-case excerpts)
+PYTHON=[USER_HOME]\anaconda3\python.exe
+PYTHON_VERSION=3.12.7
+PLATFORM=win32
+ARGS=-I -B -m pytest -p no:cacheprovider -n0 --color=yes -vv
+STDIN=closed
+CI=unset
+GITHUB_ACTIONS=unset
+RUNNER_ENVIRONMENT=unset
+PYTEST_ADDOPTS=unset
+NO_COLOR=unset
+CLICOLOR=unset
+DISPLAY=unset
+WAYLAND_DISPLAY=unset
+TERM=xterm-256color
+COLORTERM=truecolor
+PYTHONDONTWRITEBYTECODE=1
+PYTEST_CACHE=disabled
+HOME_XDG_LOCALAPPDATA_TMPDIR=isolated under <runtime>
+REAL_CLIPBOARD=blocked; target OS writer replaced by deterministic local False seam

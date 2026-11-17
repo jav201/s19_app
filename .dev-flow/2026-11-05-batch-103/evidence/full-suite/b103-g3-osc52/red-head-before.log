@@ -1,0 +1,75 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [USER_HOME]\anaconda3\python.exe
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-osc52
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 2 items
+
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single] FAILED [ 50%]
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] FAILED [100%]
+
+================================== FAILURES ===================================
+_____ test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single] ______
+
+item = <Function test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]>
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(item):
+        """Fail the call phase (outcome ``failed``, never ``error``) when the
+        isolation stand-ins recorded an OS-boundary attempt for this item."""
+        _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+        yield
+        attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+        if attempts:
+>           pytest.fail(
+                f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+                f"attempted {sorted(set(attempts))}"
+            )
+E           Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+
+tests\conftest.py:194: Failed
+------------------------------ Captured log call ------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+______ test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] ______
+
+item = <Function test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]>
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(item):
+        """Fail the call phase (outcome ``failed``, never ``error``) when the
+        isolation stand-ins recorded an OS-boundary attempt for this item."""
+        _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+        yield
+        attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+        if attempts:
+>           pytest.fail(
+                f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+                f"attempted {sorted(set(attempts))}"
+            )
+E           Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+
+tests\conftest.py:194: Failed
+------------------------------ Captured log call ------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:701 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:844 OS clipboard write failed; retained Textual internal clipboard only
+============================== warnings summary ===============================
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]
+  [USER_HOME]\anaconda3\Lib\site-packages\_pytest\runner.py:242: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.
+  Plugin: [USER_HOME]\Github\s19_app-b103-g3-osc52\tests\conftest.py, Hook: pytest_runtest_call
+  Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+  For more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-osc52-runtime\head-before\junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single] - Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] - Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+======================== 2 failed, 2 warnings in 5.51s ========================

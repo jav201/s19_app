@@ -1,0 +1,99 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [USER_HOME]\anaconda3\python.exe
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-osc52
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 87 items / 54 deselected / 33 selected
+
+tests/test_b103_clipboard_core.py::test_r_paste_1_1_terminal_paste_single_line_takes_first_line PASSED [  3%]
+tests/test_b103_clipboard_core.py::test_r_paste_1_2_terminal_paste_first_line_non_codepage PASSED [  6%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_4_1_terminal_paste_multi_line_inserts_every_line_once PASSED [  9%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_1_terminal_paste_single_line_capped PASSED [ 12%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_3_terminal_paste_multi_line_capped PASSED [ 15%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_5_load_path_box_keeps_its_own_limit PASSED [ 18%]
+tests/test_b103_clipboard_core.py::test_r_paste_34_1_terminal_paste_single_line_strips_unsafe PASSED [ 21%]
+tests/test_b103_clipboard_core.py::test_r_paste_35_1_terminal_paste_multi_line_strips PASSED [ 24%]
+tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips FAILED [ 27%]
+tests/test_b103_clipboard_core.py::test_r_loaddlg_20_1_terminal_paste_path_box_refuses_unsafe PASSED [ 30%]
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[c] PASSED [ 33%]
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[x] PASSED [ 36%]
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[x_multi] PASSED [ 39%]
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single] PASSED [ 42%]
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] PASSED [ 45%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input PASSED [ 48%]
+tests/test_b103_clipboard_core.py::test_r_paste_18_8_every_multi_line_box_is_capped_text_area PASSED [ 51%]
+tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes PASSED [ 54%]
+tests/test_b103_clipboard_core.py::test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests PASSED [ 57%]
+tests/test_b103_clipboard_core.py::test_r_paste_21_1_windows_not_github_hosted_stops_before_open PASSED [ 60%]
+tests/test_b103_clipboard_core.py::test_r_paste_21_2_x_display_session_did_not_start_stops PASSED [ 63%]
+tests/test_b103_clipboard_core.py::test_r_paste_21_3_isolated_clipboard_lets_the_test_go_on PASSED [ 66%]
+tests/test_b103_clipboard_core.py::test_r_paste_21_4_outside_clipboard_files_fails_before_open PASSED [ 69%]
+tests/test_b103_clipboard_core.py::test_r_paste_22_1_failed_probe_skips_os_clipboard_tests PASSED [ 72%]
+tests/test_b103_clipboard_core.py::test_r_paste_23_1_failed_probe_fails_the_probe_test PASSED [ 75%]
+tests/test_b103_clipboard_core.py::test_r_paste_23_2_passing_probe_passes_the_probe_test PASSED [ 78%]
+tests/test_b103_clipboard_core.py::test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks PASSED [ 81%]
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single] PASSED [ 84%]
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[multi] PASSED [ 87%]
+tests/test_b103_clipboard_core.py::test_r_paste_34_6_pasted_nul_kept_consumer_refuses PASSED [ 90%]
+tests/test_b103_clipboard_core.py::test_r_tui_043_6_4_linux_x_clipboard_is_not_read SKIPPED [ 93%]
+tests/test_b103_clipboard_core.py::test_r_paste_9_3_linux_copy_leaves_x_clipboard SKIPPED [ 96%]
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_8_win32_read_bounded_by_global_size PASSED [100%]
+
+================================== FAILURES ===================================
+____________ test_r_paste_35_4_right_click_paste_multi_line_strips ____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-osc52-runtime/non-os-after/tmp/test_r_paste_35_4_right_click_0')
+
+    def test_r_paste_35_4_right_click_paste_multi_line_strips(tmp_path: Path) -> None:
+        """R-PASTE.35/4 (LinuxH): a right-click paste strips as /1."""
+        _assert_linuxh_headless()
+
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                await show_patch_paste(app, pilot)
+                widget = app.query_one("#patch_paste_text", TextArea)
+                widget.text = ""
+                widget.focus()
+                app._clipboard = P_CTRL_M
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return _box_lines(widget)
+
+>       assert asyncio.run(_drive()) == ["A[13DB\x00C\tD", "E"]
+E       AssertionError: assert [''] == ['A[13DB\x00C\tD', 'E']
+E
+E         At index 0 diff: '' != 'A[13DB\x00C\tD'
+E         Right contains one more item: 'E'
+E
+E         Full diff:
+E           [
+E         -     'A[13DB\x00C\tD',
+E         -     'E',
+E         ?      -
+E         +     '',
+E           ]
+
+tests\test_b103_clipboard_core.py:624: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-osc52-runtime\non-os-after\junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips - AssertionError: assert [''] == ['A[13DB\x00C\tD', 'E']
+
+  At index 0 diff: '' != 'A[13DB\x00C\tD'
+  Right contains one more item: 'E'
+
+  Full diff:
+    [
+  -     'A[13DB\x00C\tD',
+  -     'E',
+  ?      -
+  +     '',
+    ]
+====== 1 failed, 30 passed, 2 skipped, 54 deselected in 64.28s (0:01:04) ======

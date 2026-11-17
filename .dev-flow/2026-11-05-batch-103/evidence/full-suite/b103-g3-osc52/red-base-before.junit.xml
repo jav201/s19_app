@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="5.245" timestamp="2026-11-17T09:19:51.424479-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_clipboard_core" name="test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]" time="2.017"><failure message="Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']">item = &lt;Function test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]&gt;
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(item):
+        """Fail the call phase (outcome ``failed``, never ``error``) when the
+        isolation stand-ins recorded an OS-boundary attempt for this item."""
+        _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+        yield
+        attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+        if attempts:
+&gt;           pytest.fail(
+                f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+                f"attempted {sorted(set(attempts))}"
+            )
+E           Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+
+tests\conftest.py:194: Failed</failure></testcase><testcase classname="tests.test_b103_clipboard_core" name="test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]" time="2.860"><failure message="Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']">item = &lt;Function test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]&gt;
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(item):
+        """Fail the call phase (outcome ``failed``, never ``error``) when the
+        isolation stand-ins recorded an OS-boundary attempt for this item."""
+        _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+        yield
+        attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+        if attempts:
+&gt;           pytest.fail(
+                f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+                f"attempted {sorted(set(attempts))}"
+            )
+E           Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['powershell', 'win32']
+
+tests\conftest.py:194: Failed</failure></testcase></testsuite></testsuites>

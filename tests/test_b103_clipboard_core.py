@@ -66,6 +66,7 @@ from tests.support.b103_clipboard import (
     show_patch_paste,
     terminal_paste,
     typed_key_time,
+    wait_for_copy_tail,
 )
 from tests.support.timing import report_margin, timing_bound
 
@@ -1270,10 +1271,24 @@ def test_r_paste_12_3_right_click_copy_over_limit(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
 def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
-    tmp_path: Path, box_kind: str
+    tmp_path: Path, box_kind: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """R-PASTE.15/6-7 (LinuxH): one OSC 52 request for a right-click copy."""
     _assert_linuxh_headless()
+    from s19_app.tui import os_clipboard_input as clipboard_module
+
+    tail_marker = {"started": False, "ended": False}
+    tail_payloads = []
+
+    def blocked_write(text):
+        tail_payloads.append(text)
+        tail_marker["started"] = True
+        try:
+            return False
+        finally:
+            tail_marker["ended"] = True
+
+    monkeypatch.setattr(clipboard_module, "write_os_clipboard", blocked_write)
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
@@ -1294,13 +1309,17 @@ def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
                 widget.select_all()
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, pilot, widget)
-            await pilot.pause()
+            await right_click_app_route(
+                app, pilot, widget, offset=(2, 1), wait_for_hit=True
+            )
+            await wait_for_copy_tail(pilot, tail_marker)
             return len(osc), osc[0] if osc else None
 
     count, payload = asyncio.run(_drive())
+    expected = P1 if box_kind == "input" else P2
+    assert tail_payloads == [expected]
     assert count == 1, (count, payload)
-    assert payload == (P1 if box_kind == "input" else P2), payload
+    assert payload == expected, payload
 
 
 def test_r_tui_043_6_5_right_click_no_selection_pastes_app_clipboard(

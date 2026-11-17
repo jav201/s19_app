@@ -380,16 +380,40 @@ async def show_patch_paste(app: App, pilot) -> None:
         await pilot.pause()
 
 
-async def right_click_app_route(app: App, pilot, widget: object) -> None:
+async def right_click_app_route(
+    app: App,
+    pilot,
+    widget: object,
+    *,
+    offset: tuple = (2, 0),
+    wait_for_hit: bool = False,
+) -> None:
     """Deliver the right-click through the App route: a button-3
     ``MouseDown`` then ``MouseUp`` posted to the App back to back (no
     pause), so ``App.on_event`` hit-tests the box and makes the ``Click``
-    (E3A-11 d). The post is followed by ``pilot.pause()`` so the App's own
-    run loop dispatches the pair — never ``app._process_messages()``, which
-    re-composes the screen and raises ``MountError``."""
-    region = widget.region
-    x = region.x + max(0, min(2, region.width - 1))
-    y = region.y
+    (E3A-11 d). Optionally wait until the current layout hit-tests the
+    requested widget at ``offset``. The post is followed by ``pilot.pause()``
+    so the App's own run loop dispatches the pair — never
+    ``app._process_messages()``, which re-composes the screen and raises
+    ``MountError``."""
+
+    def point() -> tuple:
+        region = widget.region
+        return (
+            region.x + max(0, min(offset[0], region.width - 1)),
+            region.y + max(0, min(offset[1], region.height - 1)),
+        )
+
+    if wait_for_hit:
+        def hit_target() -> bool:
+            try:
+                hit, _ = app.screen.get_widget_at(*point())
+            except Exception:
+                return False
+            return hit is widget
+
+        await _poll_until(pilot, hit_target)
+    x, y = point()
     down = events.MouseDown(widget, x, y, 0, 0, 3, False, False, False, x, y, None)
     up = events.MouseUp(widget, x, y, 0, 0, 3, False, False, False, x, y, None)
     app.post_message(down)
