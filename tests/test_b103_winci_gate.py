@@ -595,14 +595,15 @@ def test_artifact_scanner_known_bad_canary_forms(
     value = _canary_value(canary_id)
     payload = _canary_form(canary_id, form)
     if surface == "transcript":
-        transcript.write_text(payload, encoding="utf-8")
+        transcript.write_bytes(payload.encode("utf-8"))
     else:
-        junit.write_text(
-            f'<testsuite tests="1" skipped="0" failures="1" errors="0">'
-            f'<testcase classname="example" name="failure">'
-            f'<failure message="controlled failure">{payload}</failure>'
-            "</testcase></testsuite>",
-            encoding="utf-8",
+        junit.write_bytes(
+            (
+                f'<testsuite tests="1" skipped="0" failures="1" errors="0">'
+                f'<testcase classname="example" name="failure">'
+                f'<failure message="controlled failure">{payload}</failure>'
+                "</testcase></testsuite>"
+            ).encode("utf-8")
         )
     audit = safety.audit_artifacts(transcript, junit, gate_transcript)
     assert any(violation.startswith("CONTROL_CANARY") for violation in audit.violations)
