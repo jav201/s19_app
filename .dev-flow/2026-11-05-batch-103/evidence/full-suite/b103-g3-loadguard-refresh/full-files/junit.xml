@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="146" time="3422.253" timestamp="2026-11-17T09:22:33.859160-06:00" hostname="[HOST]"><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_before_after_report_001_1_1_offer_text_in_a_project" time="4.258" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_before_after_report_001_36_1_no_offer_without_a_project" time="4.021" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[load]" time="4.672" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[pick]" time="5.188" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[guarded]" time="5.200" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[project]" time="6.599" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[paste]" time="5.205" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[undo]" time="5.639" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[redo]" time="6.360" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_hidden[image]" time="16.394" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[load]" time="4.992" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[pick]" time="4.980" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[guarded]" time="5.605" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[project]" time="7.017" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[paste]" time="5.174" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[undo]" time="5.489" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[redo]" time="6.285" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[image]" time="17.447" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_1_control_kept_on_save_project" time="12.782"><failure message="AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r_tui_049_3_1_control_kep0')
+
+    def test_r_tui_049_3_1_control_kept_on_save_project(tmp_path: Path) -&gt; None:
+        """R-TUI-049.3.1/9 (negative arm): a Save project places the pasted
+        document and replaces none, so the control stays painted. Standing guard on
+        base (base hides nothing there)."""
+&gt;       projects.run_app(
+            tmp_path, lambda app, pilot, log: _save_project_keeps(app, pilot, log, tmp_path, "control"), size=SIZE
+        )
+
+tests\test_b101_patch_lifecycle.py:536: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b101_patch_lifecycle.py:525: in _save_project_keeps
+    await save_project_by_dialog(pilot, app, log)
+tests\test_b101_patch_lifecycle.py:316: in save_project_by_dialog
+    await sd.save_through_dialog(pilot, app, name)
+tests\support\b100_save_dialog.py:207: in save_through_dialog
+    await wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+predicate = &lt;function save_through_dialog.&lt;locals&gt;.&lt;lambda&gt; at 0x00000190FE2A2340&gt;
+description = "the target line naming 'proj' (painted: 'path too long — shorten the name.')"
+timeout = 6.0
+
+    async def wait_for(
+        pilot, predicate: Callable[[], bool], description: str, timeout: float = 6.0
+    ) -&gt; None:
+        """Wait (by the wall clock: the dialog's 150 ms recompute is a real
+        timer) until ``predicate()`` holds."""
+        deadline = time.monotonic() + timeout
+        while True:
+            if predicate():
+                return
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError(f"timed out waiting for {description}")
+E               AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')
+
+tests\support\b100_save_dialog.py:128: AssertionError</failure></testcase><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_kept_on_save_project" time="12.476"><failure message="AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r_tui_049_3_2_prompt_kept0')
+
+    def test_r_tui_049_3_2_prompt_kept_on_save_project(tmp_path: Path) -&gt; None:
+        """R-TUI-049.3.2/9 (negative arm): a Save project keeps the save-back
+        prompt painted. Standing guard on base."""
+&gt;       projects.run_app(
+            tmp_path, lambda app, pilot, log: _save_project_keeps(app, pilot, log, tmp_path, "prompt"), size=SIZE
+        )
+
+tests\test_b101_patch_lifecycle.py:544: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b101_patch_lifecycle.py:525: in _save_project_keeps
+    await save_project_by_dialog(pilot, app, log)
+tests\test_b101_patch_lifecycle.py:316: in save_project_by_dialog
+    await sd.save_through_dialog(pilot, app, name)
+tests\support\b100_save_dialog.py:207: in save_through_dialog
+    await wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+predicate = &lt;function save_through_dialog.&lt;locals&gt;.&lt;lambda&gt; at 0x0000019080478D60&gt;
+description = "the target line naming 'proj' (painted: 'path too long — shorten the name.')"
+timeout = 6.0
+
+    async def wait_for(
+        pilot, predicate: Callable[[], bool], description: str, timeout: float = 6.0
+    ) -&gt; None:
+        """Wait (by the wall clock: the dialog's 150 ms recompute is a real
+        timer) until ``predicate()`` holds."""
+        deadline = time.monotonic() + timeout
+        while True:
+            if predicate():
+                return
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError(f"timed out waiting for {description}")
+E               AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')
+
+tests\support\b100_save_dialog.py:128: AssertionError</failure></testcase><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it" time="7.224" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_008_subtitle[two]" time="4.627" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_008_subtitle[zero]" time="4.387" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_008_subtitle[revert]" time="7.348" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[load]" time="4.969" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[image]" time="14.832" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[project]" time="6.492" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[add]" time="6.158" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[apply]" time="5.484" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_009_no_run[mac]" time="16.921" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_010_status[load]" time="5.387" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_010_status[project]" time="6.575" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_011_strip[load]" time="4.831" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_011_strip[project]" time="6.542" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_012_rows[load]" time="5.331" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_012_rows[project]" time="6.648" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chk_pe_014_glyph_after_save_back" time="6.287" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_001_screen[current]" time="4.948" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_001_screen[stale]" time="5.335" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_004_note_after_image_load" time="16.838" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_004_note_while_displayed" time="18.078" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_009_zero_line" time="5.259" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_chks_009_zero_line_while_displayed" time="6.596" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r001_direct_attach_publication[R-A2L-REFRESH.001/1]" time="25.778" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r001_direct_attach_publication[R-A2L-REFRESH.001/2]" time="37.681" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r001_direct_attach_publication[R-A2L-REFRESH.001/3]" time="38.926" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1]" time="27.401" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2]" time="37.258" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3]" time="37.423" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r003_project_final_pair[R-A2L-REFRESH.003/1]" time="4.232" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r003_project_final_pair[R-A2L-REFRESH.003/2]" time="5.767" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r004_a2l_only_project[R-A2L-REFRESH.004/1]" time="3.411" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r004_a2l_only_project[R-A2L-REFRESH.004/2]" time="28.425" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r005_unload_publication[R-A2L-REFRESH.005/1]" time="39.151" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r005_unload_publication[R-A2L-REFRESH.005/2]" time="41.581" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r005_unload_publication[R-A2L-REFRESH.005/3]" time="39.672" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r005_unload_publication[R-A2L-REFRESH.005/4]" time="38.353" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r005_unload_publication[R-A2L-REFRESH.005/5]" time="3.630" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/1]" time="27.340" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/2]" time="38.668" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/3]" time="39.386" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/4]" time="5.221" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/5]" time="3.661" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r006_viewer_values[R-A2L-REFRESH.006/6]" time="26.388"><failure message="AssertionError: assert [('OLD_ONLY', 16, 1), ('AlphaShared', 32, 2), ('OUT_WARN', 48, 1), ('PAGE2_OLD', 112, 1)] == []&#10;  &#10;  Left contains 4 more items, first extra item: #x1B[0m(#x1B[33m'#x1B[39;49;00m#x1B[33mOLD_ONLY#x1B[39;49;00m#x1B[33m'#x1B[39;49;00m, #x1B[94m16#x1B[39;49;00m, #x1B[94m1#x1B[39;49;00m)#x1B[90m#x1B[39;49;00m&#10;  &#10;  Full diff:&#10;  #x1B[0m#x1B[91m- []#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ [#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         'OLD_ONLY',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         16,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         'AlphaShared',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         32,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         2,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         'OUT_WARN',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         48,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         'PAGE2_OLD',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         112,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ ]#x1B[39;49;00m#x1B[90m#x1B[39;49;00m">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r006_viewer_values_R_A2L_5')
+case = 'R-A2L-REFRESH.006/6'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.006/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r006_viewer_values(tmp_path: Path, case: str) -&gt; None:
+        async def scenario(app, pilot, f):
+            rows = OLD
+            image = IMG1
+            name = "old.a2l"
+            if case.endswith("/4"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+                await _load_project(app, pilot, "P_NEW")
+                rows, image, name = NEW, IMG2, "new.a2l"
+            elif case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+                rows, image, name = NEW, None, "new.a2l"
+            else:
+                if not case.endswith("/1"):
+                    await _load_image(app, pilot, f.img1)
+                    await _load_a2l(app, pilot, f.old)
+                else:
+                    await _load_image(app, pilot, f.img1)
+                if case.endswith("/1"):
+                    await _load_a2l(app, pilot, f.old)
+                elif case.endswith("/2"):
+                    await _load_a2l(app, pilot, f.new)
+                    rows, name = NEW, "new.a2l"
+                elif case.endswith("/3"):
+                    await _load_image(app, pilot, f.img2)
+                    image = IMG2
+                elif case.endswith("/6"):
+                    _unload(app, "a2l")
+                    await pilot.pause()
+                    rows, name = (), None
+            await _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, check_pick=False, loaded_mac=case.endswith("/4"))
+    
+&gt;       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:637: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+tests\test_b103_a2l_refresh.py:635: in scenario
+    await _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, check_pick=False, loaded_mac=case.endswith("/4"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+
+    async def _assert_snap(
+        app: S19TuiApp,
+        pilot,
+        *,
+        rows: tuple[tuple[str, int, int], ...] | None,
+        image: dict[int, int] | None,
+        a2l_name: str | None,
+        check_pick: bool = True,
+        loaded_mac: bool = False,
+        memory_names: list[str] | None = None,
+    ) -&gt; None:
+        expected = list(rows or ())
+        names = [row[0] for row in expected]
+&gt;       assert [(t["name"], t["address"], t["length"]) for t in app._a2l_enriched_tags] == expected
+E       AssertionError: assert [('OLD_ONLY', 16, 1), ('AlphaShared', 32, 2), ('OUT_WARN', 48, 1), ('PAGE2_OLD', 112, 1)] == []
+E         
+E         Left contains 4 more items, first extra item: #x1B[0m(#x1B[33m'#x1B[39;49;00m#x1B[33mOLD_ONLY#x1B[39;49;00m#x1B[33m'#x1B[39;49;00m, #x1B[94m16#x1B[39;49;00m, #x1B[94m1#x1B[39;49;00m)#x1B[90m#x1B[39;49;00m
+E         
+E         Full diff:
+E         #x1B[0m#x1B[91m- []#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+ [#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         'OLD_ONLY',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         16,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         'AlphaShared',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         32,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         2,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         'OUT_WARN',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         48,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     (#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         'PAGE2_OLD',#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         112,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+         1,#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+     ),#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E         #x1B[92m+ ]#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+
+tests\test_b103_a2l_refresh.py:251: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/1---]" time="26.294" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/2---]" time="39.624" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/3---]" time="5.697" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/4---]" time="26.647" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/5---]" time="26.726" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/6---]" time="37.222" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/1---]" time="27.536" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/2---]" time="40.206" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/3---]" time="5.624" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/4---]" time="27.886" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/5---]" time="27.765" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/6---]" time="38.225" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/7---]" time="40.133" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/1--]" time="42.915" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/2--]" time="38.428" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/3--]" time="40.876" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/4--]" time="39.958" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/5--]" time="25.980" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/6--]" time="27.434" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/7--]" time="6.145" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r009_mode_reset[R-A2L-REFRESH.009/8--]" time="38.359" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/1]" time="39.470" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/2]" time="55.866" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r015_memory_map[R-A2L-REFRESH.015/1]" time="28.241" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r015_memory_map[R-A2L-REFRESH.015/2]" time="41.306" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r015_memory_map[R-A2L-REFRESH.015/3]" time="30.017" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r016_split_join[R-A2L-REFRESH.016/1]" time="39.449" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r016_split_join[R-A2L-REFRESH.016/2]" time="42.938" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r016_split_join[R-A2L-REFRESH.016/3]" time="30.016" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r017_loaded_panel[R-A2L-REFRESH.017/1]" time="39.240" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r017_loaded_panel[R-A2L-REFRESH.017/2]" time="55.322" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r017_loaded_panel[R-A2L-REFRESH.017/3]" time="42.082" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r017_loaded_panel[R-A2L-REFRESH.017/4]" time="40.855" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r027_generations[R-A2L-REFRESH.027/1]" time="28.359" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r027_generations[R-A2L-REFRESH.027/2]" time="40.184" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r027_generations[R-A2L-REFRESH.027/3]" time="4.324" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r027_generations[R-A2L-REFRESH.027/4]" time="27.116" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/1]" time="40.866" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/2]" time="40.050" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/3]" time="6.839" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/4]" time="31.217" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/5]" time="27.108" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/6]" time="26.130"><failure message="AssertionError: assert 'OLD_ONLY' in '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535'&#10; +  where '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' = &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt;.plain&#10; +    where &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt; = render()&#10; +      where render = ListAwareDetailCard(id='a2l_detail_card').render&#10; +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)&#10; +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r010_detail_invalidation_5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000190FD973C50&gt;
+case = 'R-A2L-REFRESH.010/6'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.010/{i}" for i in range(1, 7)], ids=lambda x: x)
+    def test_r010_detail_invalidation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -&gt; None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                if case.endswith("/4"):
+                    _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            await _highlight_first_tag(app, pilot)
+            if case.endswith("/6"):
+                import importlib
+    
+                module = importlib.import_module("s19_app.tui.app")
+                real_parse = module.deps.parse_a2l_cached
+                started = threading.Event()
+                release = threading.Event()
+    
+                def gated(*args, **kwargs):
+                    started.set()
+                    assert release.wait(20)
+                    return real_parse(*args, **kwargs)
+    
+                monkeypatch.setattr(module.deps, "parse_a2l_cached", gated)
+                await _request_a2l(app, pilot, f.new)
+                await wait_until(pilot, started.is_set, "A2L worker did not reach its parse gate")
+                await pilot.press("d")
+                await pilot.pause()
+                assert type(app.screen).__name__ == "CurveDescriptionScreen"
+                release.set()
+                await settle_workers(pilot)
+                assert type(app.screen).__name__ != "CurveDescriptionScreen"
+            elif case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                await _load_image(app, pilot, f.img2)
+            elif case.endswith("/3"):
+                await _load_project(app, pilot, "P_NEW")
+            elif case.endswith("/4"):
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            await pilot.pause()
+            card = app.query_one("#a2l_detail_card", A2LDetailCard).render().plain
+            assert card == HINT
+            assert not any(type(screen).__name__ == "CurveDescriptionScreen" for screen in app.screen_stack)
+    
+&gt;       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:1008: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+tests\test_b103_a2l_refresh.py:969: in scenario
+    await _highlight_first_tag(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+
+    async def _highlight_first_tag(app: S19TuiApp, pilot) -&gt; None:
+        app.action_show_screen("a2l")
+        table = app.query_one("#a2l_tags_list", DataTable)
+        table.focus()
+        table.move_cursor(row=0)
+        await pilot.pause()
+        table.move_cursor(row=1)
+        await pilot.pause()
+        table.move_cursor(row=0)
+        await pilot.pause()
+&gt;       assert "OLD_ONLY" in app.query_one("#a2l_detail_card", A2LDetailCard).render().plain
+E       AssertionError: assert 'OLD_ONLY' in '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535'
+E        +  where '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' = &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt;.plain
+E        +    where &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt; = render()
+E        +      where render = ListAwareDetailCard(id='a2l_detail_card').render
+E        +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)
+E        +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one
+
+tests\test_b103_a2l_refresh.py:954: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r011_hex_span_repaint[R-A2L-REFRESH.011/1]" time="37.978" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r011_hex_span_repaint[R-A2L-REFRESH.011/2]" time="40.148" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r011_hex_span_repaint[R-A2L-REFRESH.011/3]" time="4.592"><failure message="AssertionError: assert 'OLD_ONLY' in '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535'&#10; +  where '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' = &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt;.plain&#10; +    where &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt; = render()&#10; +      where render = ListAwareDetailCard(id='a2l_detail_card').render&#10; +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)&#10; +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r011_hex_span_repaint_R_A2')
+case = 'R-A2L-REFRESH.011/3'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.011/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r011_hex_span_repaint(tmp_path: Path, case: str) -&gt; None:
+        async def scenario(app, pilot, f):
+            if case.endswith("/3"):
+                _project(f, "P_OLD", image=f.img1, a2l=f.old, mac=True)
+                _project(f, "P_NEW", image=f.img2, a2l=f.new, mac=True)
+                await _load_project(app, pilot, "P_OLD")
+            else:
+                if case.endswith("/4"):
+                    _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_image(app, pilot, f.img1)
+                await _load_a2l(app, pilot, f.old)
+            await _highlight_first_tag(app, pilot)
+            await pilot.press("enter")
+            await pilot.pause()
+            assert app._a2l_tag_hex_highlight == (0x0010, 1)
+            pane = app.query_one("#alt_hex_view", Static)
+            before = pane.render()
+            from s19_app.render.hexview import FOCUS_HIGHLIGHT_STYLE
+    
+            def has_focus_style(text) -&gt; bool:
+                return any(all(token in str(span.style) for token in FOCUS_HIGHLIGHT_STYLE.split()) for span in text.spans)
+    
+            assert has_focus_style(before)
+            first = app._alt_first_visible_address
+            if case.endswith("/1"):
+                await _load_a2l(app, pilot, f.new)
+            elif case.endswith("/2"):
+                await _load_image(app, pilot, f.img2)
+            elif case.endswith("/3"):
+                await _load_project(app, pilot, "P_NEW")
+            elif case.endswith("/4"):
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                _unload(app, "a2l")
+                await pilot.pause()
+            assert app._a2l_tag_hex_highlight is None
+            after = pane.render()
+            assert not has_focus_style(after)
+            if case.endswith("/4"):
+                assert _plain(after) == "No file loaded."
+                assert app.current_file is None
+            else:
+                expected_image = IMG2 if case.endswith("/2") or case.endswith("/3") else IMG1
+                assert app.current_file.mem_map == expected_image
+                assert app._alt_first_visible_address == first
+                for address, value in expected_image.items():
+                    if address &lt; first + 16:
+                        assert f"{value:02X}" in after.plain
+    
+&gt;       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:1061: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+tests\test_b103_a2l_refresh.py:1023: in scenario
+    await _highlight_first_tag(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+
+    async def _highlight_first_tag(app: S19TuiApp, pilot) -&gt; None:
+        app.action_show_screen("a2l")
+        table = app.query_one("#a2l_tags_list", DataTable)
+        table.focus()
+        table.move_cursor(row=0)
+        await pilot.pause()
+        table.move_cursor(row=1)
+        await pilot.pause()
+        table.move_cursor(row=0)
+        await pilot.pause()
+&gt;       assert "OLD_ONLY" in app.query_one("#a2l_detail_card", A2LDetailCard).render().plain
+E       AssertionError: assert 'OLD_ONLY' in '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535'
+E        +  where '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' = &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt;.plain
+E        +    where &lt;text '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''&gt; = render()
+E        +      where render = ListAwareDetailCard(id='a2l_detail_card').render
+E        +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)
+E        +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one
+
+tests\test_b103_a2l_refresh.py:954: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r011_hex_span_repaint[R-A2L-REFRESH.011/4]" time="27.719" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r011_hex_span_repaint[R-A2L-REFRESH.011/5]" time="26.792" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r012_visible_check_prefill[R-A2L-REFRESH.012/1]" time="26.337" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r012_visible_check_prefill[R-A2L-REFRESH.012/2]" time="38.546" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r012_visible_check_prefill[R-A2L-REFRESH.012/3]" time="42.404" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r012_visible_check_prefill[R-A2L-REFRESH.012/4]" time="28.878" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1]" time="27.822" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2]" time="40.493" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3]" time="39.890" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4]" time="29.239" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r018_mac_page_two[R-A2L-REFRESH.018/1]" time="50.783" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r018_mac_page_two[R-A2L-REFRESH.018/2]" time="41.106" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r019_issues_refresh[R-A2L-REFRESH.019/1]" time="51.998" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r019_issues_refresh[R-A2L-REFRESH.019/2]" time="52.424" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r019_issues_refresh[R-A2L-REFRESH.019/3]" time="40.023" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r020_replacement_question[R-A2L-REFRESH.020/1]" time="13.956" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r020_replacement_question[R-A2L-REFRESH.020/2]" time="15.868" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-]" time="14.681" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-]" time="15.649" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-]" time="15.659" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r022_confirmation_identity[R-A2L-REFRESH.022/1]" time="16.360" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r022_confirmation_identity[R-A2L-REFRESH.022/2]" time="15.346" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r022_confirmation_identity[R-A2L-REFRESH.022/3]" time="17.204" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r023_accepted_replacement[R-A2L-REFRESH.023/1]" time="16.569" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r023_accepted_replacement[R-A2L-REFRESH.023/2]" time="17.818" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1]" time="3.440" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2]" time="15.656" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3]" time="4.079" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4]" time="73.341"><failure message="AssertionError: the real session worker did not start">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r024_initial_busy_refusal3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000190FD433D70&gt;
+case = 'R-A2L-REFRESH.024/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.024/{i}" for i in range(1, 5)], ids=lambda x: x)
+    def test_r024_initial_busy_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -&gt; None:
+        async def scenario(app, pilot, f):
+            release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            before = _state_snapshot(app)
+            progress_before = str(app.query_one("#status_text").render())
+            worker_count = len(app.workers)
+            starts = []
+            real_start = app._start_a2l_load
+    
+            def start_spy(*args, **kwargs):
+                starts.append((args, kwargs))
+                return real_start(*args, **kwargs)
+    
+            monkeypatch.setattr(app, "_start_a2l_load", start_spy)
+            await pilot.press("ctrl+l")
+            await pilot.pause()
+            labels = ("Loading image.bin", "Loading old.a2l", "Loading project project_b", "Saving project project_b")
+            label = labels[int(case.rsplit("/", 1)[1]) - 1]
+            assert statuses == [f"busy: {label} is running — wait for it to finish."]
+            _assert_visible_log(app, statuses[0])
+            assert str(app.query_one("#status_text").render())[1:] == progress_before[1:]
+            assert starts == []
+            assert workers == []
+            assert len(app.workers) == worker_count
+            assert not isinstance(app.screen, ConfirmQuestionScreen)
+            assert _state_snapshot(app) == before
+            release.set()
+            await settle_workers(pilot)
+    
+&gt;       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:1614: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+tests\test_b103_a2l_refresh.py:1585: in scenario
+    release = await _start_busy_action(app, pilot, f, monkeypatch, case)
+tests\test_b103_a2l_refresh.py:1578: in _start_busy_action
+    await wait_until(pilot, started.is_set, "the real session worker did not start")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+predicate = &lt;bound method Event.is_set of &lt;threading.Event at 0x19081636180: unset&gt;&gt;
+failure = 'the real session worker did not start'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -&gt; None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the real session worker did not start
+
+tests\support\timing.py:66: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/1]" time="15.613" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2]" time="76.031"><failure message="AssertionError: the real session worker did not start">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r025_post_yes_busy_bounda1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000190831948C0&gt;
+case = 'R-A2L-REFRESH.025/2'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.025/{i}" for i in range(1, 3)], ids=lambda x: x)
+    def test_r025_post_yes_busy_boundaries(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -&gt; None:
+        async def scenario(app, pilot, f):
+            workers = _worker_spy(app, monkeypatch)
+            statuses = _status_recorder(app, monkeypatch)
+            await _open_replacement(app, pilot, f)
+            before = _state_snapshot(app)
+            if case.endswith("/1"):
+                real_call = app.call_after_refresh
+                held = []
+    
+                def hold(callback, *args, **kwargs):
+                    held.append((callback, args, kwargs))
+    
+                monkeypatch.setattr(app, "call_after_refresh", hold)
+                await pilot.press("y")
+                await pilot.pause()
+                assert held
+                monkeypatch.setattr(app, "call_after_refresh", real_call)
+                release = await _start_busy_action(app, pilot, f, monkeypatch, "R-A2L-REFRESH.024/1")
+                for callback, args, kwargs in held:
+                    real_call(callback, *args, **kwargs)
+                await pilot.pause()
+                expected = "busy: Loading image.bin is running — wait for it to finish."
+            else:
+                real_start = getattr(app, "_start_a2l_load", None)
+                held = []
+    
+                def hold(*args, **kwargs):
+                    held.append((args, kwargs))
+    
+                monkeypatch.setattr(app, "_start_a2l_load", hold, raising=False)
+                await pilot.press("y")
+                await wait_until(pilot, lambda: bool(held), "N3 was not reached")
+                release = await _start_busy_action(app, pilot, f, monkeypatch, "R-A2L-REFRESH.024/4")
+                assert real_start is not None
+                for args, kwargs in held:
+                    real_start(*args, **kwargs)
+                await pilot.pause()
+                expected = "busy: Saving project project_b is running — wait for it to finish."
+            assert expected in statuses
+            _assert_visible_log(app, expected)
+            assert workers == []
+            after = _state_snapshot(app)
+            assert after[:-1] == before[:-1]
+            assert after[-1] != before[-1]
+            assert app._running_session_action() is not None
+            release.set()
+            await settle_workers(pilot)
+    
+&gt;       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:1667: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+tests\test_b103_a2l_refresh.py:1651: in scenario
+    release = await _start_busy_action(app, pilot, f, monkeypatch, "R-A2L-REFRESH.024/4")
+tests\test_b103_a2l_refresh.py:1578: in _start_busy_action
+    await wait_until(pilot, started.is_set, "the real session worker did not start")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+predicate = &lt;bound method Event.is_set of &lt;threading.Event at 0x190fe6e72c0: unset&gt;&gt;
+failure = 'the real session worker did not start'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -&gt; None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the real session worker did not start
+
+tests\support\timing.py:66: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1]" time="27.121" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2]" time="26.431" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r026_all_painting_on_ui[R-A2L-REFRESH.026/3]" time="6.105" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1]" time="56.035" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2]" time="51.726" /></testsuite></testsuites>

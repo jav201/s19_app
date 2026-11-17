@@ -448,7 +448,12 @@ async def _replace_scenario(app, pilot, log, base: Path, alt: str, shown: str):
     elif alt == "guarded":
         p.query_one("#patch_doc_path_input", Input).value = str(c2)
         p.query_one("#patch_doc_load_button", Button).press()
-        await settled(pilot, lambda: isinstance(app.screen, LoadGuardScreen), "the unsaved-changes popup")
+        await settled(
+            pilot,
+            lambda: isinstance(app.screen, LoadGuardScreen)
+            and len(app.screen.query("#load_guard_accept")) == 1,
+            "the unsaved-changes popup mounted",
+        )
         app.screen.query_one("#load_guard_accept", Button).press()
         await settled(pilot, lambda: doc_name(app) == "c2.json", "the accepted load of c2.json")
     elif alt == "project":

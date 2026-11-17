@@ -1,0 +1,540 @@
+[HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [HOME]\anaconda3\python.exe
+rootdir: [FINAL_TREE]
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+[1mcollecting ... [0mcollected 23 items
+
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing [32mPASSED[0m[32m [  4%][0m
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked [31mFAILED[0m[31m [  8%][0m
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0] [32mPASSED[0m[31m [ 13%][0m
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1] [32mPASSED[0m[31m [ 17%][0m
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys [32mPASSED[0m[31m [ 21%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded] [31mFAILED[0m[31m [ 26%][0m
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves [32mPASSED[0m[31m [ 30%][0m
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values [31mFAILED[0m[31m [ 34%][0m
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object [31mFAILED[0m[31m [ 39%][0m
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table [31mFAILED[0m[31m [ 43%][0m
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout [31mFAILED[0m[31m [ 47%][0m
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid [31mFAILED[0m[31m [ 52%][0m
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1] [31mFAILED[0m[31m [ 56%][0m
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2] [32mPASSED[0m[31m [ 60%][0m
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call [32mPASSED[0m[31m [ 65%][0m
+tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result [32mPASSED[0m[31m [ 69%][0m
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs [32mPASSED[0m[31m [ 73%][0m
+tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled [32mPASSED[0m[31m [ 78%][0m
+tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths [32mPASSED[0m[31m [ 82%][0m
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment [32mPASSED[0m[31m       [ 86%][0m
+tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates [32mPASSED[0m[31m [ 91%][0m
+tests/test_tui_patch_history_strip.py::test_at081b_bounds [32mPASSED[0m[31m         [ 95%][0m
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80 [32mPASSED[0m[31m [100%][0m
+
+================================== FAILURES ===================================
+[31m[1m___ test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked ___[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_tc_b100_61_sec6_5_entries0')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked[39;49;00m([90m[39;49;00m
+        tmp_path: Path,[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Inc 7 corrective SEC7-1, re-pinned by corrective pass 2 (R2-2: the[39;49;00m
+    [33m    ceiling bounds distinct folders; the file an entry ends on is always[39;49;00m
+    [33m    checked): 3 x 1 000 entries under a real 8-level folder chain, so every[39;49;00m
+    [33m    entry's own name needs a filesystem check. Every entry is kept, no[39;49;00m
+    [33m    entry is unchecked, and every timing stays under 1 s.[39;49;00m
+    [33m[39;49;00m
+    [33m    RED (cp1 tree): 1 000 valid entries skipped unchecked past the[39;49;00m
+    [33m    2 000-call ceiling."""[39;49;00m[90m[39;49;00m
+        parent = [33m"[39;49;00m[33m/[39;49;00m[33m"[39;49;00m.join([[33m"[39;49;00m[33md[39;49;00m[33m"[39;49;00m] * [94m8[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        [94mdef[39;49;00m[90m [39;49;00m[92m_folders[39;49;00m(project_dir: Path) -> [94mNone[39;49;00m:[90m[39;49;00m
+            (project_dir / parent).mkdir(parents=[94mTrue[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        scene = _sec6_5_filesystem_scene([90m[39;49;00m
+            tmp_path, hostile.existing_parent_at_cap(parent), setup=_folders[90m[39;49;00m
+        )[90m[39;49;00m
+>       _assert_sec6_5_bounded(scene)[90m[39;49;00m
+
+[1m[31mtests\test_b100_project_check.py[0m:1293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 1.1715634999563918, 'load': 0.5529876999789849, 'manifest': ProjectManifest(schema_version=1, active_vari...)]}, issues=[], files={}, derived_from={}, unknown_keys=(), active_document=None), 'painted': 0.31968409998808056, ...}
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_assert_sec6_5_bounded[39;49;00m(scene: [96mdict[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        timings = {key: scene[key] [94mfor[39;49;00m key [95min[39;49;00m ([33m"[39;49;00m[33mread[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mload[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mpainted[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mappended[39;49;00m[33m"[39;49;00m)}[90m[39;49;00m
+        [96mprint[39;49;00m([33m"[39;49;00m[33mSEC6-5 timings (s):[39;49;00m[33m"[39;49;00m, {key: [96mround[39;49;00m(value, [94m3[39;49;00m) [94mfor[39;49;00m key, value [95min[39;49;00m timings.items()})[90m[39;49;00m
+        [94massert[39;49;00m scene[[33m"[39;49;00m[33mread[39;49;00m[33m"[39;49;00m] < report_margin([33m"[39;49;00m[33msec6_5 read[39;49;00m[33m"[39;49;00m, scene[[33m"[39;49;00m[33mread[39;49;00m[33m"[39;49;00m], timing_bound([94m1.0[39;49;00m)), timings[90m[39;49;00m
+        [94massert[39;49;00m scene[[33m"[39;49;00m[33mload[39;49;00m[33m"[39;49;00m] [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m [95mand[39;49;00m scene[[33m"[39;49;00m[33mload[39;49;00m[33m"[39;49;00m] < report_margin([90m[39;49;00m
+            [33m"[39;49;00m[33msec6_5 load[39;49;00m[33m"[39;49;00m, scene[[33m"[39;49;00m[33mload[39;49;00m[33m"[39;49;00m], timing_bound([94m1.0[39;49;00m)[90m[39;49;00m
+        ), timings[90m[39;49;00m
+        [94massert[39;49;00m scene[[33m"[39;49;00m[33mpainted[39;49;00m[33m"[39;49;00m] < report_margin([90m[39;49;00m
+            [33m"[39;49;00m[33msec6_5 painted[39;49;00m[33m"[39;49;00m, scene[[33m"[39;49;00m[33mpainted[39;49;00m[33m"[39;49;00m], timing_bound([94m1.0[39;49;00m)[90m[39;49;00m
+        ), timings[90m[39;49;00m
+>       [94massert[39;49;00m scene[[33m"[39;49;00m[33mappended[39;49;00m[33m"[39;49;00m] < report_margin([90m[39;49;00m
+            [33m"[39;49;00m[33msec6_5 appended[39;49;00m[33m"[39;49;00m, scene[[33m"[39;49;00m[33mappended[39;49;00m[33m"[39;49;00m], timing_bound([94m1.0[39;49;00m)[90m[39;49;00m
+        ), timings[90m[39;49;00m
+[1m[31mE       AssertionError: {'appended': 1.1715634999563918, 'load': 0.5529876999789849, 'painted': 0.31968409998808056, 'read': 0.20201649994123727}[0m
+[1m[31mE       assert 1.1715634999563918 < 1.0[0m
+[1m[31mE        +  where 1.0 = report_margin('sec6_5 appended', 1.1715634999563918, 1.0)[0m
+[1m[31mE        +    where 1.0 = timing_bound(1.0)[0m
+
+[1m[31mtests\test_b100_project_check.py[0m:1154: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.202, 'load': 0.553, 'painted': 0.32, 'appended': 1.172}
+[31m[1m__________________ test_r_tui_049_3_2_prompt_hidden[guarded] __________________[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_tui_049_3_2_prompt_hidd0')
+alt = 'guarded'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33malt[39;49;00m[33m"[39;49;00m, ALTERNATIVES)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_tui_049_3_2_prompt_hidden[39;49;00m(tmp_path: Path, alt: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image[39;49;00m
+    [33m    loaded) ``Save patched image as:`` is not painted. Base: stays after every[39;49;00m
+    [33m    alternative. (E5 C-5: no "no file written" clause; Write file is the[39;49;00m
+    [33m    prompt's own confirm, so no operator route reaches it once hidden.)"""[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, log):[90m[39;49;00m
+            needle = [94mawait[39;49;00m _replace_scenario(app, pilot, log, tmp_path, alt, [33m"[39;49;00m[33mprompt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m await_gone(pilot, app, needle, [33mf[39;49;00m[33m"[39;49;00m[33mafter [39;49;00m[33m{[39;49;00malt[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+>       projects.run_app(tmp_path, scenario, size=SIZE)[90m[39;49;00m
+
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\support\b100_projects.py[0m:615: in run_app
+    [0m[94mreturn[39;49;00m asyncio.run(_drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\support\b100_projects.py[0m:613: in _drive
+    [0m[94mreturn[39;49;00m [94mawait[39;49;00m scenario(app, pilot, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:504: in scenario
+    [0mneedle = [94mawait[39;49;00m _replace_scenario(app, pilot, log, tmp_path, alt, [33m"[39;49;00m[33mprompt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:452: in _replace_scenario
+    [0mapp.screen.query_one([33m"[39;49;00m[33m#load_guard_accept[39;49;00m[33m"[39;49;00m, Button).press()[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadGuardScreen(), selector = '#load_guard_accept'
+expect_type = <class 'textual.widgets._button.Button'>
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mquery_one[39;49;00m([90m[39;49;00m
+        [96mself[39;49;00m,[90m[39;49;00m
+        selector: [96mstr[39;49;00m | [96mtype[39;49;00m[QueryType],[90m[39;49;00m
+        expect_type: [96mtype[39;49;00m[QueryType] | [94mNone[39;49;00m = [94mNone[39;49;00m,[90m[39;49;00m
+    ) -> QueryType | Widget:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Get a widget from this widget's children that matches a selector or widget type.[39;49;00m
+    [33m[39;49;00m
+    [33m    Args:[39;49;00m
+    [33m        selector: A selector or widget type.[39;49;00m
+    [33m        expect_type: Require the object be of the supplied type, or None for any type.[39;49;00m
+    [33m[39;49;00m
+    [33m    Raises:[39;49;00m
+    [33m        WrongType: If the wrong type was found.[39;49;00m
+    [33m        NoMatches: If no node matches the query.[39;49;00m
+    [33m[39;49;00m
+    [33m    Returns:[39;49;00m
+    [33m        A widget matching the selector.[39;49;00m
+    [33m    """[39;49;00m[90m[39;49;00m
+        _rich_traceback_omit = [94mTrue[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        base_node = [96mself[39;49;00m._get_dom_base()[90m[39;49;00m
+    [90m[39;49;00m
+        [94mif[39;49;00m [96misinstance[39;49;00m(selector, [96mstr[39;49;00m):[90m[39;49;00m
+            query_selector = selector[90m[39;49;00m
+        [94melse[39;49;00m:[90m[39;49;00m
+            query_selector = selector.[91m__name__[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        [94mif[39;49;00m is_id_selector(query_selector):[90m[39;49;00m
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)[90m[39;49;00m
+            cached_result = base_node._query_one_cache.get(cache_key)[90m[39;49;00m
+            [94mif[39;49;00m cached_result [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                [94mreturn[39;49;00m cached_result[90m[39;49;00m
+            [94mif[39;49;00m ([90m[39;49;00m
+                node := walk_breadth_search_id([90m[39;49;00m
+                    base_node, query_selector[[94m1[39;49;00m:], with_root=[94mFalse[39;49;00m[90m[39;49;00m
+                )[90m[39;49;00m
+            ) [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                [94mif[39;49;00m expect_type [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m [95mand[39;49;00m [95mnot[39;49;00m [96misinstance[39;49;00m(node, expect_type):[90m[39;49;00m
+                    [94mraise[39;49;00m WrongType([90m[39;49;00m
+                        [33mf[39;49;00m[33m"[39;49;00m[33mNode matching [39;49;00m[33m{[39;49;00mquery_selector[33m!r}[39;49;00m[33m is the wrong type; expected type [39;49;00m[33m{[39;49;00mexpect_type.[91m__name__[39;49;00m[33m!r}[39;49;00m[33m, found [39;49;00m[33m{[39;49;00mnode[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                    )[90m[39;49;00m
+                base_node._query_one_cache[cache_key] = node[90m[39;49;00m
+                [94mreturn[39;49;00m node[90m[39;49;00m
+>           [94mraise[39;49;00m NoMatches([33mf[39;49;00m[33m"[39;49;00m[33mNo nodes match [39;49;00m[33m{[39;49;00mquery_selector[33m!r}[39;49;00m[33m on [39;49;00m[33m{[39;49;00mbase_node[33m!r}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE           textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()[0m
+
+[1m[31m..\..\anaconda3\Lib\site-packages\textual\dom.py[0m:1505: NoMatches
+[31m[1m_______________ test_r_a2l_def_148_18_long_tabref_empty_values ________________[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_148_18_long_tab1')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_a2l_def_148_18_long_tabref_empty_values[39;49;00m(tmp_path):[90m[39;49;00m
+        [94mdef[39;49;00m[90m [39;49;00m[92mcheck[39;49;00m(kib, a2l_data):[90m[39;49;00m
+            defs = a2ldef.describe_definitions(_names([33m"[39;49;00m[33mS[39;49;00m[33m"[39;49;00m), a2l_data)[90m[39;49;00m
+            [94mfor[39;49;00m name, d [95min[39;49;00m defs.items():[90m[39;49;00m
+                [94massert[39;49;00m d.refusal == a2ldef.Refusal([33m"[39;49;00m[33mA2L-DEF-TABLE-EMPTY[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+                                                  [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00mname[33m}[39;49;00m[33m: the table [39;49;00m[33m{[39;49;00m[33m'[39;49;00m[33mE[39;49;00m[33m'[39;49;00m[90m [39;49;00m*[90m [39;49;00m_ECHO[33m}[39;49;00m[33m{[39;49;00m_ELLIPSIS[33m}[39;49;00m[33m has no entries[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94massert[39;49;00m [96mlen[39;49;00m(d.refusal.message) <= MESSAGE_BOUND[90m[39;49;00m
+>       _measure(tmp_path, [33m"[39;49;00m[33m148/18 long COMPU_TAB_REF empty (VALUEs)[39;49;00m[33m"[39;49;00m, [94mlambda[39;49;00m p, k: _b148_18(p, k, [94mTrue[39;49;00m), check)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_definition_arrays_scale.py[0m:570: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_148_18_long_tab1')
+case_label = '148/18 long COMPU_TAB_REF empty (VALUEs)'
+build = <function test_r_a2l_def_148_18_long_tabref_empty_values.<locals>.<lambda> at 0x0000018F84CE4040>
+check = <function test_r_a2l_def_148_18_long_tabref_empty_values.<locals>.check at 0x0000018F84CE7920>
+image_of = None
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_measure[39;49;00m(tmp_path: Path, case_label: [96mstr[39;49;00m, build: Callable[[Path, [96mint[39;49;00m], [96mtuple[39;49;00m[[96mdict[39;49;00m, [96mlist[39;49;00m]],[90m[39;49;00m
+                 check: Callable[[[96mint[39;49;00m, [96mdict[39;49;00m], [94mNone[39;49;00m],[90m[39;49;00m
+                 image_of: Optional[Callable[[[96mstr[39;49;00m], [96mdict[39;49;00m]] = [94mNone[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)[39;49;00m
+    [33m    then the interleaved least-of-15 per-object ratio at 2S and 8S."""[39;49;00m[90m[39;49;00m
+        loaded = {kib: build(tmp_path, kib) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        names = loaded[S_KIB][[94m1[39;49;00m][90m[39;49;00m
+    [90m[39;49;00m
+        [90m# Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.[39;49;00m[90m[39;49;00m
+        runs = [][90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(LEAST_OF):[90m[39;49;00m
+            seconds, _ = _timed([94mlambda[39;49;00m: a2ldef.describe_definitions(names, loaded[S_KIB][[94m0[39;49;00m]), time.process_time)[90m[39;49;00m
+            runs.append(seconds)[90m[39;49;00m
+        [94massert[39;49;00m [96mmin[39;49;00m(runs) <= report_margin([33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-DEF.148 [39;49;00m[33m{[39;49;00mcase_label[33m}[39;49;00m[33m 400 names at 256 KiB[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+                                          [96mmin[39;49;00m(runs), timing_bound(ABS_BOUND_S)), runs[90m[39;49;00m
+        check(S_KIB, loaded[S_KIB][[94m0[39;49;00m])[90m[39;49;00m
+    [90m[39;49;00m
+        part = {kib: [96mfloat[39;49;00m([33m"[39;49;00m[33minf[39;49;00m[33m"[39;49;00m) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        results = {}[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(LEAST_OF):[90m[39;49;00m
+            [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB:  [90m# interleaved: S, 2S, 8S in turn within every round[39;49;00m[90m[39;49;00m
+                a2l_data, nms = loaded[kib][90m[39;49;00m
+                [94mif[39;49;00m image_of [95mis[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                    t_outer, (interval, results[kib]) = _timed([94mlambda[39;49;00m: _steady_describe(nms, a2l_data), time.process_time)[90m[39;49;00m
+                [94melse[39;49;00m:[90m[39;49;00m
+                    defs = a2ldef.describe_definitions(nms, a2l_data)[90m[39;49;00m
+                    t_outer, interval = _timed([94mlambda[39;49;00m: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)[90m[39;49;00m
+                    results[kib] = defs[90m[39;49;00m
+                part[kib] = [96mmin[39;49;00m(part[kib], [96mmax[39;49;00m(interval, [94m0.0[39;49;00m))[90m[39;49;00m
+>       ratio_2s = part[[94m2[39;49;00m * S_KIB] / part[S_KIB][90m[39;49;00m
+[1m[31mE       ZeroDivisionError: float division by zero[0m
+
+[1m[31mtests\test_b103_a2l_definition_arrays_scale.py[0m:179: ZeroDivisionError
+[31m[1m_ test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object _[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_10_long_nam0')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object[39;49;00m(tmp_path):[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-A2L-DEF.149/10 - a table named by a word of S ... 8S of E and holding no entries: echoed and found once per walk."""[39;49;00m[90m[39;49;00m
+        [94mdef[39;49;00m[90m [39;49;00m[92mcheck[39;49;00m(kib, c, result):[90m[39;49;00m
+            _first_last_alone(c, result)[90m[39;49;00m
+            _messages_bounded(result)[90m[39;49;00m
+            [94mfor[39;49;00m name, d [95min[39;49;00m result.items():[90m[39;49;00m
+                [94massert[39;49;00m d.kind == [33m"[39;49;00m[33menum[39;49;00m[33m"[39;49;00m [95mand[39;49;00m d.datatype == [33m"[39;49;00m[33mUBYTE[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                [94massert[39;49;00m d.refusal == Refusal([33m"[39;49;00m[33mA2L-DEF-TABLE-EMPTY[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00mname[33m}[39;49;00m[33m: the table [39;49;00m[33m{[39;49;00m[33m'[39;49;00m[33mE[39;49;00m[33m'[39;49;00m[90m [39;49;00m*[90m [39;49;00m[94m256[39;49;00m[33m}[39;49;00m[33m… has no entries[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+>       _gp2_run(tmp_path, [33m"[39;49;00m[33memptyname[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33m149/10 empty table name[39;49;00m[33m"[39;49;00m, _describe_all, check, steady=_describe_steady)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_10_long_nam0')
+case = 'emptyname', label = '149/10 empty table name'
+work = <function _describe_all at 0x0000018F849DD800>
+check = <function test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object.<locals>.check at 0x0000018F864DF060>
+image_byte = None, steady = <function _describe_steady at 0x0000018F849DD8A0>
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_gp2_run[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m, label: [96mstr[39;49;00m, work: Callable[[_Loaded], Any],[90m[39;49;00m
+                 check: Callable[[[96mint[39;49;00m, _Loaded, Any], [94mNone[39;49;00m], image_byte: Optional[[96mint[39;49;00m] = [94mNone[39;49;00m,[90m[39;49;00m
+                 steady: Optional[Callable[[_Loaded], [96mtuple[39;49;00m]] = [94mNone[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.[39;49;00m
+    [33m[39;49;00m
+    [33m    A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read[39;49;00m
+    [33m    inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of[39;49;00m
+    [33m    that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""[39;49;00m[90m[39;49;00m
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        runs, result = [], [94mNone[39;49;00m[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(LEAST_OF):[90m[39;49;00m
+            seconds, result = _timed([94mlambda[39;49;00m: work(loaded[SIZE_S_KIB]))[90m[39;49;00m
+            runs.append(seconds)[90m[39;49;00m
+            [94mif[39;49;00m seconds > HOPELESS_S:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+        least = [96mmin[39;49;00m(runs)[90m[39;49;00m
+        [94massert[39;49;00m least <= report_margin([33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-DEF.[39;49;00m[33m{[39;49;00mlabel[33m}[39;49;00m[33m 400 calls at 256 KiB[39;49;00m[33m"[39;49;00m, least, timing_bound(ABS_BOUND_S)), runs[90m[39;49;00m
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)[90m[39;49;00m
+    [90m[39;49;00m
+        part = {kib: [96mfloat[39;49;00m([33m"[39;49;00m[33minf[39;49;00m[33m"[39;49;00m) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        results = {}[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(SCALE_ROUNDS):[90m[39;49;00m
+            slow = [94mFalse[39;49;00m[90m[39;49;00m
+            [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB:                    [90m# interleaved: S, 2S, 8S in turn within every round[39;49;00m[90m[39;49;00m
+                [94mif[39;49;00m steady [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                    t_outer, (interval, results[kib]) = _timed([94mlambda[39;49;00m: steady(loaded[kib]), time.process_time)[90m[39;49;00m
+                [94melse[39;49;00m:[90m[39;49;00m
+                    t_outer, results[kib] = _timed([94mlambda[39;49;00m: work(loaded[kib]), time.process_time)[90m[39;49;00m
+                    interval = t_outer[90m[39;49;00m
+                part[kib] = [96mmin[39;49;00m(part[kib], interval)[90m[39;49;00m
+                slow = slow [95mor[39;49;00m t_outer > SLOW_RUN_S[90m[39;49;00m
+            [94mif[39;49;00m slow:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+        [94mif[39;49;00m steady [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+>           [94massert[39;49;00m part[SIZE_S_KIB] >= NON_VACUITY_S, part[90m[39;49;00m
+[1m[31mE           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}[0m
+[1m[31mE           assert 0.0 >= 0.002[0m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:458: AssertionError
+[31m[1m___________________ test_r_a2l_def_149_2_scaling_enum_table ___________________[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_2_scaling_e0')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_a2l_def_149_2_scaling_enum_table[39;49;00m(tmp_path):[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-A2L-DEF.149/2 scaling - as /1 for a COMPU_VTAB."""[39;49;00m[90m[39;49;00m
+>       _scaling(tmp_path, [33m"[39;49;00m[33mvtab[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33m/2 COMPU_VTAB[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_2_scaling_e0')
+case = 'vtab', label = '/2 COMPU_VTAB'
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_scaling[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m, label: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the[39;49;00m
+    [33m    first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time[39;49;00m
+    [33m    is the least of 31 rounds (one round once a run exceeds 2 s)."""[39;49;00m[90m[39;49;00m
+        loaded = {kib: _load(tmp_path, case, kib) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        part = {kib: [96mfloat[39;49;00m([33m"[39;49;00m[33minf[39;49;00m[33m"[39;49;00m) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        results = {}[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(SCALE_ROUNDS):[90m[39;49;00m
+            slow = [94mFalse[39;49;00m[90m[39;49;00m
+            [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB:                    [90m# interleaved: S, 2S, 8S in turn within every round[39;49;00m[90m[39;49;00m
+                a2l, names = loaded[kib][90m[39;49;00m
+                t_outer, (interval, results[kib]) = _timed([94mlambda[39;49;00m: _steady_describe(names, a2l), time.process_time)[90m[39;49;00m
+                part[kib] = [96mmin[39;49;00m(part[kib], interval)[90m[39;49;00m
+                slow = slow [95mor[39;49;00m t_outer > SLOW_RUN_S[90m[39;49;00m
+            [94mif[39;49;00m slow:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+>       [94massert[39;49;00m part[SIZE_S_KIB] >= NON_VACUITY_S, part[90m[39;49;00m
+[1m[31mE       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}[0m
+[1m[31mE       assert 0.0 >= 0.002[0m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:231: AssertionError
+[31m[1m_____________________ test_r_a2l_def_149_4_scaling_layout _____________________[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_4_scaling_l0')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_a2l_def_149_4_scaling_layout[39;49;00m(tmp_path):[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-A2L-DEF.149/4 scaling - as /1 for a RECORD_LAYOUT whose first line is long."""[39;49;00m[90m[39;49;00m
+>       _scaling(tmp_path, [33m"[39;49;00m[33mlayout[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33m/4 RECORD_LAYOUT[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_4_scaling_l0')
+case = 'layout', label = '/4 RECORD_LAYOUT'
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_scaling[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m, label: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the[39;49;00m
+    [33m    first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time[39;49;00m
+    [33m    is the least of 31 rounds (one round once a run exceeds 2 s)."""[39;49;00m[90m[39;49;00m
+        loaded = {kib: _load(tmp_path, case, kib) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        part = {kib: [96mfloat[39;49;00m([33m"[39;49;00m[33minf[39;49;00m[33m"[39;49;00m) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        results = {}[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(SCALE_ROUNDS):[90m[39;49;00m
+            slow = [94mFalse[39;49;00m[90m[39;49;00m
+            [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB:                    [90m# interleaved: S, 2S, 8S in turn within every round[39;49;00m[90m[39;49;00m
+                a2l, names = loaded[kib][90m[39;49;00m
+                t_outer, (interval, results[kib]) = _timed([94mlambda[39;49;00m: _steady_describe(names, a2l), time.process_time)[90m[39;49;00m
+                part[kib] = [96mmin[39;49;00m(part[kib], interval)[90m[39;49;00m
+                slow = slow [95mor[39;49;00m t_outer > SLOW_RUN_S[90m[39;49;00m
+            [94mif[39;49;00m slow:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+>       [94massert[39;49;00m part[SIZE_S_KIB] >= NON_VACUITY_S, part[90m[39;49;00m
+[1m[31mE       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}[0m
+[1m[31mE       assert 0.0 >= 0.002[0m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:231: AssertionError
+[31m[1m___ test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid ____[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_9_shared_la0')
+
+    [0m[37m@pytest[39;49;00m.mark.serial_timing[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid[39;49;00m(tmp_path):[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-A2L-DEF.149/9 - 400 CUBOIDs sharing a layout whose first line is S ... 8S: the layout step runs once per walk."""[39;49;00m[90m[39;49;00m
+        [94mdef[39;49;00m[90m [39;49;00m[92mcheck[39;49;00m(kib, c, result):[90m[39;49;00m
+            _first_last_alone(c, result)[90m[39;49;00m
+            _messages_bounded(result)[90m[39;49;00m
+            [94mfor[39;49;00m name, d [95min[39;49;00m result.items():[90m[39;49;00m
+                [94massert[39;49;00m d.datatype == [33m"[39;49;00m[33mUBYTE[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                [94massert[39;49;00m d.refusal == Refusal([33m"[39;49;00m[33mA2L-DEF-KIND[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00mname[33m}[39;49;00m[33m: the system has no definition for a CUBOID object[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+>       _gp2_run(tmp_path, [33m"[39;49;00m[33mcuboid[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33m149/9 CUBOID layout[39;49;00m[33m"[39;49;00m, _describe_all, check, steady=_describe_steady)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:552: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r_a2l_def_149_9_shared_la0')
+case = 'cuboid', label = '149/9 CUBOID layout'
+work = <function _describe_all at 0x0000018F849DD800>
+check = <function test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid.<locals>.check at 0x000001901D9C77E0>
+image_byte = None, steady = <function _describe_steady at 0x0000018F849DD8A0>
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92m_gp2_run[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m, label: [96mstr[39;49;00m, work: Callable[[_Loaded], Any],[90m[39;49;00m
+                 check: Callable[[[96mint[39;49;00m, _Loaded, Any], [94mNone[39;49;00m], image_byte: Optional[[96mint[39;49;00m] = [94mNone[39;49;00m,[90m[39;49;00m
+                 steady: Optional[Callable[[_Loaded], [96mtuple[39;49;00m]] = [94mNone[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.[39;49;00m
+    [33m[39;49;00m
+    [33m    A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read[39;49;00m
+    [33m    inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of[39;49;00m
+    [33m    that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""[39;49;00m[90m[39;49;00m
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        runs, result = [], [94mNone[39;49;00m[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(LEAST_OF):[90m[39;49;00m
+            seconds, result = _timed([94mlambda[39;49;00m: work(loaded[SIZE_S_KIB]))[90m[39;49;00m
+            runs.append(seconds)[90m[39;49;00m
+            [94mif[39;49;00m seconds > HOPELESS_S:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+        least = [96mmin[39;49;00m(runs)[90m[39;49;00m
+        [94massert[39;49;00m least <= report_margin([33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-DEF.[39;49;00m[33m{[39;49;00mlabel[33m}[39;49;00m[33m 400 calls at 256 KiB[39;49;00m[33m"[39;49;00m, least, timing_bound(ABS_BOUND_S)), runs[90m[39;49;00m
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)[90m[39;49;00m
+    [90m[39;49;00m
+        part = {kib: [96mfloat[39;49;00m([33m"[39;49;00m[33minf[39;49;00m[33m"[39;49;00m) [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB}[90m[39;49;00m
+        results = {}[90m[39;49;00m
+        [94mfor[39;49;00m _ [95min[39;49;00m [96mrange[39;49;00m(SCALE_ROUNDS):[90m[39;49;00m
+            slow = [94mFalse[39;49;00m[90m[39;49;00m
+            [94mfor[39;49;00m kib [95min[39;49;00m SIZES_KIB:                    [90m# interleaved: S, 2S, 8S in turn within every round[39;49;00m[90m[39;49;00m
+                [94mif[39;49;00m steady [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                    t_outer, (interval, results[kib]) = _timed([94mlambda[39;49;00m: steady(loaded[kib]), time.process_time)[90m[39;49;00m
+                [94melse[39;49;00m:[90m[39;49;00m
+                    t_outer, results[kib] = _timed([94mlambda[39;49;00m: work(loaded[kib]), time.process_time)[90m[39;49;00m
+                    interval = t_outer[90m[39;49;00m
+                part[kib] = [96mmin[39;49;00m(part[kib], interval)[90m[39;49;00m
+                slow = slow [95mor[39;49;00m t_outer > SLOW_RUN_S[90m[39;49;00m
+            [94mif[39;49;00m slow:[90m[39;49;00m
+                [94mbreak[39;49;00m[90m[39;49;00m
+        [94mif[39;49;00m steady [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+>           [94massert[39;49;00m part[SIZE_S_KIB] >= NON_VACUITY_S, part[90m[39;49;00m
+[1m[31mE           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}[0m
+[1m[31mE           assert 0.0 >= 0.002[0m
+
+[1m[31mtests\test_b103_a2l_definition_perf.py[0m:458: AssertionError
+[31m[1m__________________ test_r014_same_path[R-A2L-REFRESH.014/1] ___________________[0m
+
+tmp_path = WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r014_same_path_R_A2L_REFR0')
+case = 'R-A2L-REFRESH.014/1'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.014/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m3[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r014_same_path[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            same = f.src / [33m"[39;49;00m[33msame.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            same.write_bytes(f.old.read_bytes())[90m[39;49;00m
+            [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+            [94mawait[39;49;00m _load_a2l(app, pilot, same)[90m[39;49;00m
+            same.write_bytes(f.new.read_bytes())[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mProj1[39;49;00m[33m"[39;49;00m, image=[94mNone[39;49;00m, a2l=same, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m _load_image(app, pilot, f.mac)[90m[39;49;00m
+                app.current_project = [33m"[39;49;00m[33mProj One[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                app.current_project_dir = f.base / [33m"[39;49;00m[33m.s19tool[39;49;00m[33m"[39;49;00m / [33m"[39;49;00m[33mworkarea[39;49;00m[33m"[39;49;00m / [33m"[39;49;00m[33mProj1[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                project_hashes = _project_digests(app.current_project_dir)[90m[39;49;00m
+            old_generation = app._a2l_view_generation[90m[39;49;00m
+            image_generation = app._image_generation[90m[39;49;00m
+            [94mawait[39;49;00m _load_a2l(app, pilot, same)[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94massert[39;49;00m [96misinstance[39;49;00m(app.screen, ConfirmQuestionScreen)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33my[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m settle_workers(pilot)[90m[39;49;00m
+                [94massert[39;49;00m _project_digests(app.current_project_dir) == project_hashes[90m[39;49;00m
+            [94massert[39;49;00m app._a2l_view_generation > old_generation[90m[39;49;00m
+            [94massert[39;49;00m app._image_generation == image_generation[90m[39;49;00m
+            [94mawait[39;49;00m _assert_snap(app, pilot, rows=NEW, image=IMG1, a2l_name=[33m"[39;49;00m[33msame.a2l[39;49;00m[33m"[39;49;00m, loaded_mac=case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m))[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:782: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:447: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:445: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=WindowsPath('[EVIDENCE_SOURCE]/final/tmp/test_r014_same_path_R_A2L_REFR0...wsPath('[EVIDENCE_SOURCE]/final/tmp/test_r014_same_path_R_A2L_REFR0/src/records.mac'))
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+        same = f.src / [33m"[39;49;00m[33msame.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        same.write_bytes(f.old.read_bytes())[90m[39;49;00m
+        [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+        [94mawait[39;49;00m _load_a2l(app, pilot, same)[90m[39;49;00m
+        same.write_bytes(f.new.read_bytes())[90m[39;49;00m
+        [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+            _project(f, [33m"[39;49;00m[33mProj1[39;49;00m[33m"[39;49;00m, image=[94mNone[39;49;00m, a2l=same, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m _load_image(app, pilot, f.mac)[90m[39;49;00m
+            app.current_project = [33m"[39;49;00m[33mProj One[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            app.current_project_dir = f.base / [33m"[39;49;00m[33m.s19tool[39;49;00m[33m"[39;49;00m / [33m"[39;49;00m[33mworkarea[39;49;00m[33m"[39;49;00m / [33m"[39;49;00m[33mProj1[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            project_hashes = _project_digests(app.current_project_dir)[90m[39;49;00m
+        old_generation = app._a2l_view_generation[90m[39;49;00m
+        image_generation = app._image_generation[90m[39;49;00m
+        [94mawait[39;49;00m _load_a2l(app, pilot, same)[90m[39;49;00m
+        [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+            [94massert[39;49;00m [96misinstance[39;49;00m(app.screen, ConfirmQuestionScreen)[90m[39;49;00m
+            [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33my[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m settle_workers(pilot)[90m[39;49;00m
+            [94massert[39;49;00m _project_digests(app.current_project_dir) == project_hashes[90m[39;49;00m
+>       [94massert[39;49;00m app._a2l_view_generation > old_generation[90m[39;49;00m
+[1m[31mE       AssertionError: assert 1 > 1[0m
+[1m[31mE        +  where 1 = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})._a2l_view_generation[0m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:778: AssertionError
+- generated xml file: [EVIDENCE_SOURCE]\final\junit.xml -
+============================ QC-TM timing margins =============================
+LOW -17.2%  1.172 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+LOW 0.0%  2.000 s / 2.000 s  R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves
+40.6%  0.297 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+44.7%  0.553 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+58.3%  0.125 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+68.0%  0.320 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+78.1%  0.109 s / 0.500 s  R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves
+79.7%  0.102 s / 0.500 s  R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+79.8%  0.202 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values
+90.4%  0.048 s / 0.500 s  R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+QC-TM: 12 bounds, 2 under 20 % margin
+[36m[1m=========================== short test summary info ===========================[0m
+[31mFAILED[0m tests/test_b100_project_check.py::[1mtest_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked[0m - AssertionError: {'appended': 1.1715634999563918, 'load': 0.5529876999789849, 'painted': 0.31968409998808056, 'read': 0.20201649994123727}
+assert 1.1715634999563918 < 1.0
+ +  where 1.0 = report_margin('sec6_5 appended', 1.1715634999563918, 1.0)
+ +    where 1.0 = timing_bound(1.0)
+[31mFAILED[0m tests/test_b101_patch_lifecycle.py::[1mtest_r_tui_049_3_2_prompt_hidden[guarded][0m - textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+[31mFAILED[0m tests/test_b103_a2l_definition_arrays_scale.py::[1mtest_r_a2l_def_148_18_long_tabref_empty_values[0m - ZeroDivisionError: float division by zero
+[31mFAILED[0m tests/test_b103_a2l_definition_perf.py::[1mtest_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object[0m - AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002
+[31mFAILED[0m tests/test_b103_a2l_definition_perf.py::[1mtest_r_a2l_def_149_2_scaling_enum_table[0m - AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002
+[31mFAILED[0m tests/test_b103_a2l_definition_perf.py::[1mtest_r_a2l_def_149_4_scaling_layout[0m - AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002
+[31mFAILED[0m tests/test_b103_a2l_definition_perf.py::[1mtest_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid[0m - AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002
+[31mFAILED[0m tests/test_b103_a2l_refresh.py::[1mtest_r014_same_path[R-A2L-REFRESH.014/1][0m - AssertionError: assert 1 > 1
+ +  where 1 = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})._a2l_view_generation
+[31m================== [31m[1m8 failed[0m, [32m15 passed[0m[31m in 680.89s (0:11:20)[0m[31m ===================[0m
