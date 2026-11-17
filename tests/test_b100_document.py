@@ -67,6 +67,7 @@ from tests.support import b100_links
 from tests.support import b100_save_dialog as sd
 from tests.support import b100_manifests as documents
 from tests.support import b100_projects as projects
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.independent_reader import read_s19
 from tests.support.timing import report_margin
 from tests.support.timing import timing_bound
@@ -123,19 +124,20 @@ async def _add_through_the_panel(pilot, app, address: str, run: str, entries_aft
     await projects.wait_for(
         pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor panel"
     )
+    await show_tab(pilot, "patch_tab_inspector")
     from textual.widgets import Input
 
     # Clear both inputs first: a second add keeps the first add's text and
     # ctrl+a does not always select it (the inputs are the panel's own).
     app.query_one("#patch_entry_address_input", Input).value = ""
     app.query_one("#patch_entry_bytes_input", Input).value = ""
-    assert await pilot.click("#patch_entry_address_input")
+    assert await click_visible(pilot, "#patch_entry_address_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*address)
-    assert await pilot.click("#patch_entry_bytes_input")
+    assert await click_visible(pilot, "#patch_entry_bytes_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*run)
-    assert await pilot.click("#patch_entry_add_button")
+    assert await click_visible(pilot, "#patch_entry_add_button")
     await projects.wait_for(
         pilot,
         lambda: len(app._change_service.document.entries) == entries_after,
@@ -1943,10 +1945,10 @@ def _at_ledger(app) -> str:
 
 
 def _at_script_border(app) -> str:
-    """The SCRIPT window's bottom border row as the screen paints it (the
+    """The landing pane's bottom border row as the screen paints it (the
     composited strip; a widget's own ``render_line`` excludes its border):
     it carries ``N entries`` and the unsaved marker (LLR-005.1)."""
-    region = app.query_one("#patch_win_script").region
+    region = app.query_one("#patch_inspector").region
     strips = app.screen._compositor.render_strips()
     return strips[region.y + region.height - 1].text[region.x : region.x + region.width]
 
@@ -1983,24 +1985,29 @@ async def _at_paste_and_parse(pilot, app, text: str) -> None:
     await projects.wait_for(
         pilot, lambda: len(app.query("#patch_paste_parse_button")) > 0, "the Patch Editor"
     )
-    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+    await show_tab(pilot, "patch_tab_json")
     await projects.wait_for(
         pilot,
         lambda: app.query_one("#patch_paste_text").region.area > 0,
         "the painted paste buffer",
     )
-    assert await pilot.click("#patch_paste_text"), "click missed #patch_paste_text"
+    assert await click_visible(pilot, "#patch_paste_text"), "click missed #patch_paste_text"
     # ``f7`` is the paste buffer's select-all key (``ctrl+a`` moves to the
     # line start there); the paste then replaces the selection.
     await pilot.press("f7")
     app.post_message(events.Paste(text))
     buffer = app.query_one("#patch_paste_text", TextArea)
     await projects.wait_for(pilot, lambda: buffer.text == text, "the pasted text in the buffer")
-    assert await pilot.click("#patch_paste_parse_button"), "click missed Parse pasted"
-    await projects.wait_for(
+    assert await click_visible(pilot, "#patch_paste_parse_button"), "click missed Parse pasted"
+    await show_tab(pilot, "patch_tab_script")
+    await projects.wait_until(
         pilot,
         lambda: f"{PATCH_ADDRESS:08X}" in _at_ledger(app).upper(),
-        "the pasted entry painted in the ledger",
+        lambda: (
+            "the pasted entry painted in the ledger; "
+            f"status={_at_status(app)!r}; ledger={_at_ledger(app)!r}; "
+            f"log={list(app.log_lines)[-4:]!r}; buffer={buffer.text!r}"
+        ),
     )
 
 

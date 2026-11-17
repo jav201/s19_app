@@ -34,6 +34,7 @@ from s19_app.render.hexview import build_mem_map_s19, build_range_validity_s19
 from s19_app.tui.changes.apply import apply_change_document, save_patched_image
 from s19_app.tui.changes.model import ChangeDocument, ChangeEntry
 from s19_app.tui.app import S19TuiApp
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.independent_reader import read_hex, read_s19
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -393,9 +394,11 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
             await pilot.pause()
 
             async def _type(input_id: str, text: str) -> None:
-                assert await pilot.click(f"#{input_id}"), (
-                    f"click missed #{input_id}"
-                )
+                if input_id.startswith("patch_"):
+                    clicked = await click_visible(pilot, f"#{input_id}")
+                else:
+                    clicked = await pilot.click(f"#{input_id}")
+                assert clicked, f"click missed #{input_id}"
                 await pilot.press(*text)
             # 1. Load through the Load file dialog (rail key ``l``).
             await pilot.press("l")
@@ -415,6 +418,7 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
+            await show_tab(pilot, "patch_tab_inspector")
             addr = min(oracle.data)
             rewritten = [oracle.data[addr], oracle.data[addr + 1]]
             await _type("patch_entry_address_input", f"0x{addr:X}")
@@ -422,16 +426,16 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
                 "patch_entry_bytes_input",
                 " ".join(f"0x{b:02X}" for b in rewritten),
             )
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
                 lambda: "entry added" in _status_text(app),
                 "add status line",
             )
-            assert await pilot.click(
-                "#patch_doc_apply_button"
+            assert await click_visible(
+                pilot, "#patch_doc_apply_button"
             ), "click missed #patch_doc_apply_button"
             await _wait_for(
                 pilot,
@@ -445,22 +449,20 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
             #    by clicking its chip, then wait for the prompt's label to be
             #    PAINTED on the screen (the row reveal), instead of reading
             #    a CSS class.
-            assert await pilot.click("#patch_tab_json"), (
-                "click missed #patch_tab_json"
-            )
+            await show_tab(pilot, "patch_tab_json")
             await _wait_for(
                 pilot,
                 lambda: "patched" in _painted_text(app),
                 "save-back prompt painted",
             )
             # The prompt pre-fills the name: select all, replace by typing.
-            assert await pilot.click(
-                "#patch_saveback_name_input"
+            assert await click_visible(
+                pilot, "#patch_saveback_name_input"
             ), "click missed #patch_saveback_name_input"
             await pilot.press("ctrl+shift+a")
             await pilot.press(*"at_b99_02.s19")
-            assert await pilot.click(
-                "#patch_saveback_confirm_button"
+            assert await click_visible(
+                pilot, "#patch_saveback_confirm_button"
             ), "click missed #patch_saveback_confirm_button"
             target = None
             for _ in range(100):
@@ -504,6 +506,7 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
+            await show_tab(pilot, "patch_tab_inspector")
             doc_path = tmp_path / "only_s0_entry.json"
             doc_path.write_text(
                 json.dumps(
@@ -525,8 +528,8 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
                 encoding="utf-8",
             )
             await _type("patch_doc_path_input", str(doc_path))
-            assert await pilot.click(
-                "#patch_doc_load_button"
+            assert await click_visible(
+                pilot, "#patch_doc_load_button"
             ), "click missed #patch_doc_load_button"
             # The added entry left the draft dirty (LLR-005.1 w1): Load asks
             # first — the operator accepts the loss on the guard modal.
@@ -551,8 +554,8 @@ def test_at_b99_02_save_back_excludes_s0(tmp_path):
                 "document load status line",
             )
             previous = _status_text(app)
-            assert await pilot.click(
-                "#patch_doc_apply_button"
+            assert await click_visible(
+                pilot, "#patch_doc_apply_button"
             ), "click missed #patch_doc_apply_button"
             await _wait_for(
                 pilot,

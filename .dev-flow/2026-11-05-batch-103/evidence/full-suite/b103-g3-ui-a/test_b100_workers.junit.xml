@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="3" skipped="1" tests="83" time="2659.330" timestamp="2026-11-16T22:31:13.849920-06:00" hostname="REDACTED_HOST"><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_project_load_refuses_cheaply_then_returns_before_the_install" time="3.531" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_project_load_reads_every_file_on_a_worker" time="4.685" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_refuses_before_any_worker_then_writes_on_one" time="5.123" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker" time="14.986" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[files_list]" time="226.944" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[load_dialog]" time="246.441" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_workarea_pick_begins_a_file_load_and_never_syncs_the_project" time="4.180" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_case06_project_load_keeps_the_loop_free_and_reports_parse_bytes" time="457.086" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_case06_a2l_attach_keeps_the_loop_free_and_reports_parse_bytes" time="438.875" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_held_save_keeps_the_loop_free" time="9.336" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_reports_each_file_placed" time="6.778" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_a_two_thousand_file_save_moves_the_bar_ten_times" time="30.649" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_session_is_written_only_on_the_main_thread" time="7.106" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_workers_read_only_their_frozen_request" time="0.824" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_project_over_an_open_image_equals_a_cold_load" time="9.275" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install" time="4.579"><failure message="AssertionError: ['worker_end', 'reset@main']&#10;assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']&#10;  &#10;  Right contains 2 more items, first extra item: 'install'&#10;  Use -v to get more diff">tmp_path = WindowsPath('REDACTED_HOME/Github/s19_app-b103-g3-local-out/tmp/g3a-workers/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_53_reset_runs_aft0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A1E93C4E00&gt;
+
+    def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """LLR-177.1g, LLR-165.1 (P1-29): a call-order spy over the end of the
+        worker step (``_prepare_project_load``), ``_reset_project_session`` and
+        ``_apply_loaded_file`` â†’ ``["worker_end", "reset@main", "install",
+        "install"]`` for ``P2``; a ``PermissionError`` forced into
+        ``read_project_manifest`` â†’ 0 resets and the session kept.
+
+        Why: a reset before the worker leaves an empty session when the worker
+        fails (LLR-177.2); a reset after the first install wipes it.
+        Negative control: a reset in ``_handle_load_project`` before the
+        worker â†’ the failure arm leaves ``current_file is None`` â†’ RED; the
+        base (no worker step) â†’ no ``worker_end`` â†’ RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        trio(W(base) / "PF")
+        events: list = []
+        main_box = [threading.get_ident()]
+
+        def _end(*_a, **_k):
+            events.append("worker_end" if threading.get_ident() != main_box[0] else "worker_end@main")
+
+        def _reset(*_a, **_k):
+            events.append("reset@main" if threading.get_ident() == main_box[0] else "reset@worker")
+
+        Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
+        Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
+        Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
+        real_manifest = app_module.deps.read_project_manifest
+
+        def _manifest(project_dir, *a, **k):
+            if Path(project_dir).name == "PF":
+                raise PermissionError("synthetic")
+            return real_manifest(project_dir, *a, **k)
+
+        monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
+
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            ok = list(events)
+            events.clear()
+            try:
+                app._handle_load_project("PF")
+            except Exception:  # noqa: BLE001 â€” the base raises in the request frame
+                pass
+            await settle_workers(pilot)
+            return ok, list(events), app.current_project, app.current_file is not None
+
+        ok, failed, project, has_image = run(base, scenario)
+&gt;       assert ok == ["worker_end", "reset@main", "install", "install"], ok
+E       AssertionError: ['worker_end', 'reset@main']
+E       assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+E
+E         Right contains 2 more items, first extra item: 'install'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:1416: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_load_result_panel_opens_after_the_install" time="16.189" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_rederives_on_main_before_the_worker" time="5.201" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_adopts_only_after_the_commit" time="5.831" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_session_writers_are_refused_during_a_save" time="10.618" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_load_requests_are_refused_during_a_project_load" time="6.182" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_variant_unload_and_save_are_refused_while_busy" time="12.948" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_patch_editor_changes_are_refused_while_busy" time="12.105" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_patch_editor_continuations_are_refused_while_busy" time="6.958" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_busy_line_names_the_action_and_changes_nothing" time="6.113" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_busy_line_paints_a_hostile_name_literally[[b]P-[b]P]" time="4.893" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_busy_line_paints_a_hostile_name_literally[A\u202eB-AB]" time="4.713" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_refusals_stop_after_each_project_load_exit" time="6.494" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_action_starts_refuse_while_another_session_action_runs" time="5.616" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_running_session_action_ignores_reports" time="3.173" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_paste_box_is_read_only_during_a_project_load" time="6.168" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_a_load_queued_under_the_save_dialog_is_refused_at_its_commit" time="6.836" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_a_source_that_vanished_under_the_dialog_is_refused_by_the_save_worker" time="6.257"><skipped type="pytest.xfail" message="design silent: Inc 11 O-1" /></testcase><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_quit_asks_only_while_a_session_action_runs" time="16.135" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_quit_question_emphasises_the_safe_answer" time="5.646" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_idle_quit_under_the_load_question_keeps_the_key" time="6.060" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_stay_keeps_the_save_running" time="7.794" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_waits_for_the_end[save]" time="8.136" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_waits_for_the_end[save_fails]" time="68.645" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_waits_for_the_end[project]" time="4.596" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_waits_for_the_end[a2l]" time="5.553" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_quit_boundaries" time="14.462" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_project_worker_failure_keeps_the_session[PermissionError]" time="4.287" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_project_worker_failure_keeps_the_session[ValueError]" time="4.062" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_save_worker_non_os_error_rolls_back_and_reports" time="5.066" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_worker_failure_keeps_the_session[parse]" time="3.407" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_worker_failure_keeps_the_session[copy]" time="3.433" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_worker_failure_keeps_the_session[containment]" time="3.457" /><testcase classname="tests.test_b100_workers" name="test_at_b100_18_worker_half_case06_project_load_by_keys" time="395.722"><failure message="AssertionError: the P6 load never ended">tmp_path = WindowsPath('REDACTED_HOME/Github/s19_app-b103-g3-local-out/tmp/g3a-workers/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_18_worker_half_ca0')
+
+    def test_at_b100_18_worker_half_case06_project_load_by_keys(tmp_path: Path) -&gt; None:
+        """AT-B100-18 worker half, HLR-177 (P1-84): the engineer presses ``p``,
+        moves to the ``P6`` row (case_06 image, MAC and 37.7 MB A2L) and
+        presses ``enter`` â†’ while the load runs, ``#status_text`` shows the
+        progress line and its elapsed time changes at least once; when it ends
+        the status log's last line starts ``Loaded project 'P6' -&gt;
+        firmware.s19 + firmware.mac - variant 1 of 1`` and ``#status_text``
+        reads ``Loaded project 'P6' -&gt; firmware.s19 + firmware.mac``.
+
+        Why: an elapsed time that moves is what tells the engineer the app is
+        working, not frozen. Negative control (P12b-5, executed): the load
+        blocks the loop for 5.81 s â†’ no progress line is ever sampled â†’ RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P6", CASE06)
+        pattern = re.compile(r"^[" + FRAMES + r"] Loading project P6  Â·  step [1-4]/4 .+  Â·  (\d\d:\d\d)$")
+
+        async def scenario(app, pilot, log):
+            await ld.open_project_through_dialog(pilot, app, "P6", confirm="enter", wait_closed=False)
+            elapsed = []
+            deadline = time.monotonic() + 300
+            while True:
+                text = status(app)
+                m = pattern.match(text)
+                if m:
+                    elapsed.append(m.group(1))
+                elif elapsed or text.startswith("Loaded project"):
+                    break
+                if time.monotonic() &gt; deadline:
+                    raise AssertionError("the P6 load never ended")
+                await pilot.pause(0.05)
+            await wait(pilot, lambda: status(app).startswith("Loaded project"), "the end of the P6 load", 300)
+            for _ in range(4):
+                await pilot.pause()
+            return elapsed, painted_log(app)[-1], status(app)
+
+&gt;       elapsed, last, final = run(base, scenario)
+
+tests\test_b100_workers.py:2983:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_workers.py:335: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})&gt;
+log = &lt;tests.support.b100_projects.StatusLog object at 0x000001A1EC269EE0&gt;
+
+    async def scenario(app, pilot, log):
+        await ld.open_project_through_dialog(pilot, app, "P6", confirm="enter", wait_closed=False)
+        elapsed = []
+        deadline = time.monotonic() + 300
+        while True:
+            text = status(app)
+            m = pattern.match(text)
+            if m:
+                elapsed.append(m.group(1))
+            elif elapsed or text.startswith("Loaded project"):
+                break
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError("the P6 load never ended")
+E               AssertionError: the P6 load never ended
+
+tests\test_b100_workers.py:2976: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_at_b100_18_refusal_half_l_during_a_save_by_keys" time="11.111" /><testcase classname="tests.test_b100_workers" name="test_at_b100_18_quit_half_q_during_a_save_asks_with_stay_focused" time="6.770" /><testcase classname="tests.test_b100_workers" name="test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder" time="32.168" /><testcase classname="tests.test_b100_workers" name="test_at_b100_17_parse_half_case06_a2l_by_keys" time="300.804" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder]" time="1.717" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]" time="4.981"><failure message="AssertionError: []&#10;assert [] == ['A2L file no...firmware.a2l']&#10;  &#10;  Right contains one more item: 'A2L file not found: REDACTED_HOME\\Github\\s19_app-b103-g3-local-out\\tmp\\g3a-workers\\pytest-of-REDACTED_ACCOUNT\\pytest-0\\test_tc_b100_54_a2l_attach_ref1\\src\\firmware.a2l'&#10;  Use -v to get more diff">tmp_path = WindowsPath('REDACTED_HOME/Github/s19_app-b103-g3-local-out/tmp/g3a-workers/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_54_a2l_attach_ref1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001A1FD755D90&gt;
+gone = 'a2l_size'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -&gt; None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -&gt; 1 line ``A2L NOT loaded: project 'gone' could not be read â€”
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -&gt; 1 line ``A2L
+          file not found: &lt;typed&gt;``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded -&gt;
+        ``FileNotFoundError`` / ``OSError`` leaves the request -&gt; RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 â€” the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read â€” check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+        assert raised is None, f"{raised} left load_a2l_from_path"
+&gt;       assert lines == [expected], lines
+E       AssertionError: []
+E       assert [] == ['A2L file no...firmware.a2l']
+E
+E         Right contains one more item: 'A2L file not found: REDACTED_HOME\\Github\\s19_app-b103-g3-local-out\\tmp\\g3a-workers\\pytest-of-REDACTED_ACCOUNT\\pytest-0\\test_tc_b100_54_a2l_attach_ref1\\src\\firmware.a2l'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:3277: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone" time="3.960" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable" time="4.122" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save" time="3.623" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved" time="12.639" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved" time="18.490" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting" time="3.211" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[file_load_fails]" time="4.072" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_fails]" time="3.567" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused]" time="3.817" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_a_project_reload_reuses_the_a2l_parse" time="3.664" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[pasted]" time="3.800" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed]" time="4.345" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step" time="2.805" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly" time="3.446" /><testcase classname="tests.test_b100_workers" name="test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor" time="3.247" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-s19]" time="3.935" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-hex]" time="4.037" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-mac]" time="4.084" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-s19]" time="4.021" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-hex]" time="3.669" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-mac]" time="4.027" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_13_a2l_sync_refuses_when_the_project_folder_was_deleted_mid_attach" time="3.982" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]" time="4.204" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]" time="3.619" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]" time="4.066" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]" time="4.114" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_12_by_keys_a_load_over_unsaved_work_into_a_deleted_project_folder" time="12.720" /><testcase classname="tests.test_b100_workers" name="test_r_proj_002_13_by_keys_an_a2l_typed_into_the_load_dialog_into_a_deleted_project_folder" time="12.252" /></testsuite></testsuites>

@@ -2344,27 +2344,29 @@ def test_tc_b100_53_quit_asks_only_while_a_session_action_runs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """HLR-177b, LLR-177.4, LLR-177.4a, LLR-177.4d, Q-c2 (C12b-18, C12b-19,
-    C12b-20, C12b-27): idle ``q`` and idle ``ctrl+q`` exit at once with no
-    question; a report held alone does not make ``q`` ask. During a held
-    Save of ``P1``: ``q``, ``ctrl+q`` and the palette entry ``quit`` each
+    C12b-20, C12b-27): idle ``q`` opens the copy/quit fallback once and its
+    ``y`` exits; idle ``ctrl+q`` exits at once. A report held alone does not
+    make ``ctrl+q`` ask. During a held Save of ``P1``: ``q``, ``ctrl+q`` and
+    the palette entry ``quit`` each
     open the quit question — title ``Quit?``, text ``still working: Saving
     project P1 — wait, or quit after it finishes``, buttons ``Quit (y)`` /
     ``Stay (n)``, the focus on ``#confirm_no``, the app running, no
     ``Replace`` and no decision id; a second ``ctrl+q`` while it is open
     stacks nothing.
 
-    Why: quitting mid-save leaves a partial project; idle quit must stay
-    one key. Negative control (code read, base): no ``action_quit``
-    override → ``q`` exits at once during the save → RED."""
+    Why: quitting mid-save leaves a partial project; idle ``ctrl+q`` stays
+    direct and idle ``q`` keeps its one copy/quit fallback. Negative control
+    (code read, base): no ``action_quit`` override → ``q`` exits at once
+    during the save → RED."""
 
-    for key in ("q", "ctrl+q"):
+    for key, questions_after in (("q", 1), ("ctrl+q", 0)):
         exited, questions = run(tmp_path / f"idle-{key}", _idle_scene(key))
-        assert (exited, questions) == (True, 0), (key, exited, questions)
+        assert (exited, questions) == (True, questions_after), (key, exited, questions)
 
     async def report_only(app, pilot, log):
         app.begin_busy("report", "Generating the project report", REPORT_STEPS)
         neutral_focus(app)
-        await pilot.press("q")
+        await pilot.press("ctrl+q")
         return await wait_exit(app, 15)
 
     assert run(tmp_path / "report", report_only) is True
@@ -2471,8 +2473,14 @@ def _idle_scene(key: str):
     async def scenario(app, pilot, log):
         neutral_focus(app)
         await pilot.press(key)
+        if key == "q":
+            await wait(pilot, lambda: is_quit_question(app.screen), "the idle quit question", 10)
+            questions = sum(1 for s in app.screen_stack if is_quit_question(s))
+            await pilot.press("y")
+        else:
+            questions = 0
         exited = await wait_exit(app, 15)
-        return exited, sum(1 for s in app.screen_stack if is_quit_question(s))
+        return exited, questions
 
     return scenario
 

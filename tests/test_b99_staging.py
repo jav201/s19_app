@@ -146,6 +146,7 @@ from tests.support import independent_reader
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -1361,35 +1362,34 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
-            assert await pilot.click("#patch_entry_address_input"), (
+            await show_tab(pilot, "patch_tab_inspector")
+            assert await click_visible(pilot, "#patch_entry_address_input"), (
                 "click missed #patch_entry_address_input"
             )
             await pilot.press(*"0x2000")
-            assert await pilot.click("#patch_entry_bytes_input"), (
+            assert await click_visible(pilot, "#patch_entry_bytes_input"), (
                 "click missed #patch_entry_bytes_input"
             )
             await pilot.press(*"AA")
-            assert await pilot.click("#patch_entry_add_button"), (
+            assert await click_visible(pilot, "#patch_entry_add_button"), (
                 "click missed #patch_entry_add_button"
             )
             await _poll(pilot, lambda: "entry added" in _painted_status(app))
-            assert await pilot.click("#patch_doc_apply_button"), (
+            assert await click_visible(pilot, "#patch_doc_apply_button"), (
                 "click missed #patch_doc_apply_button"
             )
             await _poll(pilot, lambda: "Apply:" in _painted_status(app))
             # 3. Save-back under the loaded image's own name: the prompt
             #    renders in the editor's JSON pane — pick that tab by
             #    clicking its chip, then wait for the prompt to be PAINTED.
-            assert await pilot.click("#patch_tab_json"), (
-                "click missed #patch_tab_json"
-            )
+            await show_tab(pilot, "patch_tab_json")
             await _poll(pilot, lambda: "patched" in _painted_text(app))
-            assert await pilot.click("#patch_saveback_name_input"), (
+            assert await click_visible(pilot, "#patch_saveback_name_input"), (
                 "click missed #patch_saveback_name_input"
             )
             await pilot.press("ctrl+shift+a")
             await pilot.press(*"firmware.s19")
-            assert await pilot.click("#patch_saveback_confirm_button"), (
+            assert await click_visible(pilot, "#patch_saveback_confirm_button"), (
                 "click missed #patch_saveback_confirm_button"
             )
             await _poll(

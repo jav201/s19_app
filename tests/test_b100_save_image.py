@@ -79,6 +79,7 @@ from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
 from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -187,6 +188,7 @@ async def _load_image(pilot, app: S19TuiApp, path: Path) -> None:
 
 async def _load_project(pilot, app: S19TuiApp, name: str) -> None:
     app._handle_load_project(name)
+    await settle_workers(pilot)
     await _wait_for(
         pilot,
         lambda: app.current_project == name and app.current_file is not None,
@@ -902,6 +904,7 @@ async def _save_as_callback(pilot, app: S19TuiApp, name: str) -> None:
     app.call_next(app._handle_save_dialog, _payload(app, name))
     for _ in range(10):
         await pilot.pause()
+    await settle_workers(pilot)
 
 
 @pytest.mark.parametrize("locked", ["image", "a2l"])
@@ -924,6 +927,7 @@ def test_f2_unreadable_source_refuses_and_the_app_keeps_running(
             await _load_image(pilot, app, folder / "firmware.s19")
             if locked == "a2l":
                 app.load_a2l_from_path(folder / "firmware.a2l")
+                await settle_workers(pilot)
                 await _wait_for(
                     pilot, lambda: app.current_a2l_path is not None, "the A2L"
                 )
@@ -1178,6 +1182,7 @@ def test_tc_b100_59_fresh_folder(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
             await pilot.pause()
             await _load_image(pilot, app, folder / "firmware.s19")
             app.load_a2l_from_path(folder / "firmware.a2l")
+            await settle_workers(pilot)
             await _wait_for(
                 pilot, lambda: app.current_a2l_path is not None, "the A2L load"
             )
@@ -1231,6 +1236,7 @@ def test_tc_b100_59_files_row(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
             await pilot.pause()
             await _load_image(pilot, app, folder / "firmware.s19")
             app.load_a2l_from_path(folder / "firmware.a2l")
+            await settle_workers(pilot)
             await _wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L load")
             await _save(pilot, app, "P1")
             await _wait_for(
@@ -1832,13 +1838,14 @@ async def _add_entry_through_the_panel(
         lambda: len(app.query("#patch_entry_add_button")) > 0,
         "the Patch Editor panel",
     )
-    assert await pilot.click("#patch_entry_address_input")
+    await show_tab(pilot, "patch_tab_inspector")
+    assert await click_visible(pilot, "#patch_entry_address_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*address)
-    assert await pilot.click("#patch_entry_bytes_input")
+    assert await click_visible(pilot, "#patch_entry_bytes_input")
     await pilot.press("ctrl+a", "delete")
     await pilot.press(*run)
-    assert await pilot.click("#patch_entry_add_button")
+    assert await click_visible(pilot, "#patch_entry_add_button")
     await _wait_for(
         pilot,
         lambda: "Patch Editor: entry added." in _status_text(app)
@@ -2150,7 +2157,7 @@ def test_at_b100_05_save_project_saves_the_patched_image(
             await pilot.pause()
             await _load_file_through_dialog(pilot, app, src)
             await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
-            assert await pilot.click("#patch_doc_apply_button"), (
+            assert await click_visible(pilot, "#patch_doc_apply_button"), (
                 "click missed #patch_doc_apply_button"
             )
             await _wait_for(
@@ -2401,6 +2408,7 @@ def _merge_target_8b(base: Path, companion: str, payload: bytes) -> Path:
 async def _load_companion_8b(pilot, app: S19TuiApp, path: Path) -> None:
     if path.suffix.lower() == ".a2l":
         app.load_a2l_from_path(path)
+        await settle_workers(pilot)
         await _wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L load")
     else:
         app._load_path_from_user_input(path)
