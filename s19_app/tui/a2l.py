@@ -671,7 +671,6 @@ def _find_string_end(body: str, i: int) -> int:
     ``i``, or -1 when unclosed. A quote is escaped by an odd number of
     backslashes immediately before it (E3A-18: ``str.find``, no per-character
     alternation)."""
-    n = len(body)
     while True:
         j = body.find('"', i)
         if j < 0:

@@ -462,9 +462,10 @@ def _no_preview(definition, a2l_data, text, overlay) -> Preview:
 
 def _submit_stage(name: str, text: str):
     """The stage request of the formula bar (lazy import: this module stays toolkit-free)."""
-    from .screens_directionb.patch_editor.sheet import StagingSheet
+    from importlib import import_module
 
-    return StagingSheet.StageRequested(name, text)
+    sheet = import_module(".screens_directionb.patch_editor.sheet", __package__)
+    return sheet.StagingSheet.StageRequested(name, text)
 
 
 def _no_submit(name: str, text: str):

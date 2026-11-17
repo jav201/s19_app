@@ -93,7 +93,7 @@ def _file(text: str, tmp_path: Path, name: str = "x.a2l", raw: Optional[bytes] =
     if raw is not None:
         path.write_bytes(raw)
     else:
-        path.write_text(text, encoding="utf-8")
+        path.write_bytes(text.encode("utf-8"))
     return path
 
 

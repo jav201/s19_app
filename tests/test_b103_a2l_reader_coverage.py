@@ -1865,7 +1865,7 @@ def test_cov_read_56_cap_and_views(tmp_path: Path) -> None:
 
 def _file_w(tmp_path: Path, text: str) -> Path:
     path = tmp_path / "cap.a2l"
-    path.write_text(text, encoding="utf-8")
+    path.write_bytes(text.encode("utf-8"))
     return path
 
 
