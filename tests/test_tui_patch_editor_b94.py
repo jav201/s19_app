@@ -191,7 +191,7 @@ def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
 
 
 def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
-    """AT-B94-03 — table + expanded editor visible at 120x30; reachable at 80x24.
+    """AT-B94-03 — table and editor on sequential tabs; reachable at 80x24.
 
     The current composition puts them on Patch script and JSON respectively.
     Each is measured inside the landing pane at 120x30 and reached by scroll at
@@ -235,7 +235,7 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
     at_120 = asyncio.run(_drive((120, 30)))
     assert at_120["table_visible"], "the table is visible at 120x30"
     assert at_120["editor_visible"], (
-        "the expanded editor is visible with the table at 120x30"
+        "the expanded editor is visible on the JSON tab at 120x30"
     )
     at_80 = asyncio.run(_drive((80, 24)))
     # batch-97 Inc-4 (named supersession, LLR-149.6): below the range the

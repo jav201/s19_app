@@ -1285,7 +1285,8 @@ def test_ac1_editor_fills_json_window_when_room_exists() -> None:
     editor_h, editor_bottom, body_bottom = asyncio.run(_run())
     assert editor_h > 8, (
         f"the JSON editor must GROW past the old fixed cap of 8 when the window "
-        f"has free vertical space (120x50); painted region.height is {editor_h}"
+        f"has free vertical space (118x54, landing-pane height=60); "
+        f"painted region.height is {editor_h}"
     )
     # Fills flush: no empty gap between the editor and the bottom of the window
     # body (the visible defect was the empty band below a height-8 editor).
@@ -1490,7 +1491,9 @@ def test_ac5_gauge_stays_above_editor() -> None:
             return gauge.region.bottom, editor.region.y, editor.region.height
 
     gauge_bottom, editor_y, editor_h = asyncio.run(_run())
-    assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+    assert editor_h > 8, (
+        "precondition: the editor must have grown at 118x54 with landing-pane height=60"
+    )
     assert gauge_bottom <= editor_y, (
         f"the cap gauge must stay above the editor after it grows; gauge bottom "
         f"{gauge_bottom} is not above editor top {editor_y}"
