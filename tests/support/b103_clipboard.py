@@ -366,18 +366,19 @@ async def show_sje_manual(app: App, pilot) -> None:
 
 
 async def show_patch_paste(app: App, pilot) -> None:
-    """Show the Patch screen's JSON tab so ``#patch_paste_text`` is laid out.
+    """Show, reveal and focus the Patch screen's JSON paste buffer."""
+    from tests.support.b103_inc8_p import click_visible, show_tab
 
-    ``#patch_paste_text`` lives on the Patch screen's JSON tab and stays
-    unmounted (region 0x0) until the ``#patch_tab_json`` chip is pressed;
-    key-based paste reaches it through the focus, but a mouse right-click
-    needs the box to be visible."""
     app.action_show_screen("patch")
     for _ in range(4):
         await pilot.pause()
-    await pilot.click("#patch_tab_json")
-    for _ in range(4):
-        await pilot.pause()
+    await show_tab(pilot, "patch_tab_json")
+    widget = app.query_one("#patch_paste_text", TextArea)
+    await _poll_until(pilot, lambda: widget.region.area > 0)
+    assert await click_visible(pilot, "#patch_paste_text"), (
+        "click missed #patch_paste_text"
+    )
+    await _poll_until(pilot, lambda: app.focused is widget)
 
 
 async def right_click_app_route(

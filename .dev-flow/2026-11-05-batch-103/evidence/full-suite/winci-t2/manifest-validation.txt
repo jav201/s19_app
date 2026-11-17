@@ -1,0 +1,1 @@
+WINCI_MANIFEST_OK tests=260 obligations=108 at_p1=14 at_p2=14

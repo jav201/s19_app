@@ -2080,8 +2080,14 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
                     widget.text = ""
                 widget.focus()
                 await pilot.pause()
-                await right_click_app_route(app, pilot, widget)
-                await pilot.pause(0.2)
+                await right_click_app_route(
+                    app,
+                    pilot,
+                    widget,
+                    offset=(2, 1 if box_kind == "m" else 0),
+                    wait_for_hit=True,
+                )
+                await _wait_for_box(pilot, widget, "APP-TEXT")
                 return _box(widget)
 
         value = asyncio.run(_drive())
@@ -2113,7 +2119,13 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
             widget.focus()
             await pilot.pause()
             start = time.monotonic()
-            await right_click_app_route(app, pilot, widget)
+            await right_click_app_route(
+                app,
+                pilot,
+                widget,
+                offset=(2, 1 if box_kind == "m" else 0),
+                wait_for_hit=True,
+            )
             elapsed = await _wait_for_box(pilot, widget, "APP-TEXT")
             return elapsed
 
@@ -2146,8 +2158,14 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
                 widget.text = ""
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, pilot, widget)
-            await pilot.pause(0.2)
+            await right_click_app_route(
+                app,
+                pilot,
+                widget,
+                offset=(2, 1 if box_kind == "m" else 0),
+                wait_for_hit=True,
+            )
+            await _wait_for_box(pilot, widget, "APP-TEXT")
             return _box(widget)
 
     _assert_content_equal(asyncio.run(_drive()), "APP-TEXT", "R-TUI-043.6/5 right-click fallback")

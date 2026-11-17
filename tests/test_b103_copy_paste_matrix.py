@@ -142,10 +142,11 @@ def _help_text_widget(screen):
 
 
 async def _show_patch_json(app, pilot) -> None:
+    from tests.support.b103_inc8_p import show_tab
+
     await pilot.press("6")
     await _settle(pilot)
-    await pilot.click("#patch_tab_json")
-    await _settle(pilot)
+    await show_tab(pilot, "patch_tab_json")
     view = app.query_one("#patch_json_view")
     assert view.region.width > 0 and view.region.height > 0, (
         type(app.screen).__name__,
@@ -320,9 +321,15 @@ async def _prepare_target(app, pilot, target: str):
         assert widget.value == ""
         assert app.focused is widget
         return widget
+    from tests.support.b103_inc8_p import click_visible
+
     await _show_patch_json(app, pilot)
     widget = app.query_one("#patch_paste_text")
-    await pilot.click(widget, offset=(2, 1))
+    assert widget.region.area > 0
+    assert await click_visible(pilot, "#patch_paste_text"), (
+        "click missed #patch_paste_text"
+    )
+    assert app.focused is widget
     await pilot.press("f7")
     await _settle(pilot, 4)
     assert app.focused is widget

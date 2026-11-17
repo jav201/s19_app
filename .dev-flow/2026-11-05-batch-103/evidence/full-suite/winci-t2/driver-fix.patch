@@ -1,0 +1,120 @@
+diff --git a/tests/support/b103_clipboard.py b/tests/support/b103_clipboard.py
+index 08e7164c..ce770de6 100644
+--- a/tests/support/b103_clipboard.py
++++ b/tests/support/b103_clipboard.py
+@@ -366,18 +366,19 @@ async def show_sje_manual(app: App, pilot) -> None:
+ 
+ 
+ async def show_patch_paste(app: App, pilot) -> None:
+-    """Show the Patch screen's JSON tab so ``#patch_paste_text`` is laid out.
++    """Show, reveal and focus the Patch screen's JSON paste buffer."""
++    from tests.support.b103_inc8_p import click_visible, show_tab
+ 
+-    ``#patch_paste_text`` lives on the Patch screen's JSON tab and stays
+-    unmounted (region 0x0) until the ``#patch_tab_json`` chip is pressed;
+-    key-based paste reaches it through the focus, but a mouse right-click
+-    needs the box to be visible."""
+     app.action_show_screen("patch")
+     for _ in range(4):
+         await pilot.pause()
+-    await pilot.click("#patch_tab_json")
+-    for _ in range(4):
+-        await pilot.pause()
++    await show_tab(pilot, "patch_tab_json")
++    widget = app.query_one("#patch_paste_text", TextArea)
++    await _poll_until(pilot, lambda: widget.region.area > 0)
++    assert await click_visible(pilot, "#patch_paste_text"), (
++        "click missed #patch_paste_text"
++    )
++    await _poll_until(pilot, lambda: app.focused is widget)
+ 
+ 
+ async def right_click_app_route(
+diff --git a/tests/test_b103_clipboard_windows.py b/tests/test_b103_clipboard_windows.py
+index 8cee0c93..f159e13e 100644
+--- a/tests/test_b103_clipboard_windows.py
++++ b/tests/test_b103_clipboard_windows.py
+@@ -2080,8 +2080,14 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
+                     widget.text = ""
+                 widget.focus()
+                 await pilot.pause()
+-                await right_click_app_route(app, pilot, widget)
+-                await pilot.pause(0.2)
++                await right_click_app_route(
++                    app,
++                    pilot,
++                    widget,
++                    offset=(2, 1 if box_kind == "m" else 0),
++                    wait_for_hit=True,
++                )
++                await _wait_for_box(pilot, widget, "APP-TEXT")
+                 return _box(widget)
+ 
+         value = asyncio.run(_drive())
+@@ -2113,7 +2119,13 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
+             widget.focus()
+             await pilot.pause()
+             start = time.monotonic()
+-            await right_click_app_route(app, pilot, widget)
++            await right_click_app_route(
++                app,
++                pilot,
++                widget,
++                offset=(2, 1 if box_kind == "m" else 0),
++                wait_for_hit=True,
++            )
+             elapsed = await _wait_for_box(pilot, widget, "APP-TEXT")
+             return elapsed
+ 
+@@ -2146,8 +2158,14 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
+                 widget.text = ""
+             widget.focus()
+             await pilot.pause()
+-            await right_click_app_route(app, pilot, widget)
+-            await pilot.pause(0.2)
++            await right_click_app_route(
++                app,
++                pilot,
++                widget,
++                offset=(2, 1 if box_kind == "m" else 0),
++                wait_for_hit=True,
++            )
++            await _wait_for_box(pilot, widget, "APP-TEXT")
+             return _box(widget)
+ 
+     _assert_content_equal(asyncio.run(_drive()), "APP-TEXT", "R-TUI-043.6/5 right-click fallback")
+diff --git a/tests/test_b103_copy_paste_matrix.py b/tests/test_b103_copy_paste_matrix.py
+index eb8ff222..2a2defa5 100644
+--- a/tests/test_b103_copy_paste_matrix.py
++++ b/tests/test_b103_copy_paste_matrix.py
+@@ -142,10 +142,11 @@ def _help_text_widget(screen):
+ 
+ 
+ async def _show_patch_json(app, pilot) -> None:
++    from tests.support.b103_inc8_p import show_tab
++
+     await pilot.press("6")
+     await _settle(pilot)
+-    await pilot.click("#patch_tab_json")
+-    await _settle(pilot)
++    await show_tab(pilot, "patch_tab_json")
+     view = app.query_one("#patch_json_view")
+     assert view.region.width > 0 and view.region.height > 0, (
+         type(app.screen).__name__,
+@@ -320,9 +321,15 @@ async def _prepare_target(app, pilot, target: str):
+         assert widget.value == ""
+         assert app.focused is widget
+         return widget
++    from tests.support.b103_inc8_p import click_visible
++
+     await _show_patch_json(app, pilot)
+     widget = app.query_one("#patch_paste_text")
+-    await pilot.click(widget, offset=(2, 1))
++    assert widget.region.area > 0
++    assert await click_visible(pilot, "#patch_paste_text"), (
++        "click missed #patch_paste_text"
++    )
++    assert app.focused is widget
+     await pilot.press("f7")
+     await _settle(pilot, 4)
+     assert app.focused is widget
