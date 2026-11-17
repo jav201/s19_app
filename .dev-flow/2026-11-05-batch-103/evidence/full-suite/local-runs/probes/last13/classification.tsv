@@ -1,0 +1,14 @@
+nodeid	category	evidence
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]	contexto	full serial=failed 1.002/1.000 s; head=passed 0.519/1.000 s base=passed 0.922/1.000 s; no reproducido aislado
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling	contexto	full serial=failed load 1.123/1.000 s; head=passed load 0.716 s base=passed load 0.825 s; appended head=0.813 s LOW 18.7%
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06	contexto	full serial=failed paint 2.172/2.000 s; head=passed 0.391 s base=passed 0.422 s
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value	heredado	head=failed base=failed misma firma ZeroDivisionError; denominador process_time cero en tests/test_b103_a2l_definition_arrays_scale.py:179; instrumento Windows heredado, absoluto head/base=0.062/0.500 s
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object	contexto	full serial=failed ratio 2S/S=2.0; head=passed ratios 0.5/1.0 base=passed ratios 1.0/0.5
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table	contexto	full serial=failed ratio 2S/S=2.0; head=passed ratios 1.0/1.0 base=passed ratios 1.0/1.0
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced	instrumento	head=failed base=passed pero la firma es ZeroDivisionError por denominador process_time cero en tests/test_b103_a2l_definition_arrays_scale.py:179; absoluto head=0.094/0.500 s y base pasa todos los límites; no evidencia de regresión funcional
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---]	contexto	full main=failed WorkerFailed NoMatches #log_line_1; head=passed base=passed
+tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second	contexto	full serial=failed color #91abec; head=passed control=passed; cue head=0.265/0.500 s control=0.250/0.500 s
+tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]	contexto	full main=failed image did not load; head=passed control=passed
+tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded	contexto	full main=failed assert 0 == 1; head=passed base=passed
+tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0	contexto	full main=failed confirm must write a file; head=passed base=passed
+tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header	regresion_real	full main=failed y head aislado=failed con la misma firma the 32-byte confirm must write a file (2/2 en head); base=passed; written=None antes de las aserciones de contenido S0

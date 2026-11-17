@@ -1,0 +1,27 @@
+tree	nodeid	status	time_s	signature	qc_tm
+head	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]	passed	3.870		TC-B100-20 mac-sync|0.519|1.000|48.1
+head	tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling	passed	7.125		sec6_5 read|0.273|1.000|72.7; sec6_5 load|0.716|1.000|28.4; sec6_5 painted|0.478|1.000|52.2; sec6_5 appended|0.813|1.000|18.7
+head	tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06	passed	412.394		TC-B100-65 case06 paint|0.391|2.000|80.4
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value	failed	16.053	ZeroDivisionError: float division by zero	R-A2L-DEF.148 148/3 layout first line VALUE 400 names at 256 KiB|0.062|0.500|87.5
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object	passed	16.103		R-A2L-DEF.148 148/6 shared axis object 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/6 shared axis object per-object part 2S/S|0.500|1.500|66.7; R-A2L-DEF.148 148/6 shared axis object per-object part 8S/S|1.000|2.000|50.0
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table	passed	33.643		R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE 400 names at 256 KiB|0.156|0.500|68.8; R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 8S/S|1.000|2.000|50.0
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced	failed	16.188	ZeroDivisionError: float division by zero	R-A2L-DEF.148 150/arr-6 long matched range text referenced 400 names at 256 KiB|0.094|0.500|81.2
+head	tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---]	passed	16.979
+head	tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second	passed	30.034		R-PE-BENCH.94/1 cue after the key|0.265|0.500|47.0
+head	tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]	passed	6.451
+head	tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded	passed	4.686
+head	tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0	passed	2.576
+head	tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header	failed	2.588	AssertionError: the 32-byte confirm must write a file
+base	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]	passed	3.971		TC-B100-20 mac-sync|0.922|1.000|7.8
+base	tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling	passed	7.146		sec6_5 read|0.299|1.000|70.1; sec6_5 load|0.825|1.000|17.5; sec6_5 painted|0.346|1.000|65.4; sec6_5 appended|0.765|1.000|23.5
+base	tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06	passed	399.059		TC-B100-65 case06 paint|0.422|2.000|78.9
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value	failed	14.807	ZeroDivisionError: float division by zero	R-A2L-DEF.148 148/3 layout first line VALUE 400 names at 256 KiB|0.062|0.500|87.5
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object	passed	15.767		R-A2L-DEF.148 148/6 shared axis object 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/6 shared axis object per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/6 shared axis object per-object part 8S/S|0.500|2.000|75.0
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table	passed	32.865		R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE 400 names at 256 KiB|0.156|0.500|68.8; R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 8S/S|1.000|2.000|50.0
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced	passed	16.506		R-A2L-DEF.148 150/arr-6 long matched range text referenced 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 8S/S|1.000|2.000|50.0
+base	tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---]	passed	16.742
+base	tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded	passed	4.307
+base	tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0	passed	2.472
+base	tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header	passed	2.308
+control	tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second	passed	27.644		R-PE-BENCH.94/1 cue after the key|0.250|0.500|50.0
+control	tests/test_b103_inc9b_w.py::test_r_pe_bench_105_1_to_3_a_300_character_name_is_cut_with_an_ellipsis_and_the_title_fits[118x54]	passed	6.143

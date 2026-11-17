@@ -1,0 +1,101 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [USER_HOME]\anaconda3\python.exe
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-base
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 11 items
+
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] PASSED [  9%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling PASSED [ 18%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06 PASSED [ 27%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value FAILED [ 36%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object PASSED [ 45%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table PASSED [ 54%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced PASSED [ 63%]
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---] PASSED [ 72%]
+tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded PASSED [ 81%]
+tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0 PASSED [ 90%]
+tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header PASSED [100%]
+
+================================== FAILURES ===================================
+_____________ test_r_a2l_def_148_3_shared_layout_first_line_value _____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last13/base/t/pytest/test_r_a2l_def_148_3_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_3_shared_layout_first_line_value(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("S"), a2l_data)
+            for d in defs.values():
+                assert d.kind == "number" and d.datatype == "UBYTE" and d.refusal is None
+>       _measure(tmp_path, "148/3 layout first line VALUE", lambda p, k: _b148_2(p, k, "VALUE"), check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:402:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last13/base/t/pytest/test_r_a2l_def_148_3_shared_la0')
+case_label = '148/3 layout first line VALUE'
+build = <function test_r_a2l_def_148_3_shared_layout_first_line_value.<locals>.<lambda> at 0x000002BA3A20BE20>
+check = <function test_r_a2l_def_148_3_shared_layout_first_line_value.<locals>.check at 0x000002BA3C6AD800>
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -> None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) <= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+>       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-last13\base\junit.xml -
+============================ QC-TM timing margins =============================
+LOW 7.8%  0.922 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+LOW 17.5%  0.825 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+23.5%  0.765 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/6 shared axis object per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+65.4%  0.346 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+68.8%  0.156 s / 0.500 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+70.1%  0.299 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+75.0%  0.500 s / 2.000 s  R-A2L-DEF.148 148/6 shared axis object per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object
+78.9%  0.422 s / 2.000 s  TC-B100-65 case06 paint  tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/6 shared axis object 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+87.5%  0.062 s / 0.500 s  R-A2L-DEF.148 148/3 layout first line VALUE 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value
+QC-TM: 16 bounds, 2 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value - ZeroDivisionError: float division by zero
+================== 1 failed, 10 passed in 517.35s (0:08:37) ===================

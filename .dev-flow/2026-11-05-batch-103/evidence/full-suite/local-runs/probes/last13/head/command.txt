@@ -1,0 +1,1 @@
+[USER_HOME]/anaconda3/python.exe -I -B -m pytest -p no:cacheprovider -n0 --color=yes -vv --basetemp=[USER_HOME]/Github/s19_app-b103-g3-repro-last13/head/t/pytest --junitxml=[USER_HOME]/Github/s19_app-b103-g3-repro-last13/head/junit.xml <13 node ids from ../nodes.txt> < /dev/null > run.txt 2>&1

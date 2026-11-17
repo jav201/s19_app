@@ -1,0 +1,71 @@
+{
+  "trees": {
+    "head": {
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "3",
+        "skipped": "0",
+        "tests": "13",
+        "time": "570.180",
+        "timestamp": "2026-11-17T12:37:01.974914-06:00",
+        "hostname": "[HOST]"
+      },
+      "counts": {
+        "passed": 10,
+        "failed": 3,
+        "error": 0,
+        "skipped": 0
+      },
+      "records": 13,
+      "qc_tm_records": 15,
+      "qc_tm_low_margin_records": 1,
+      "qc_tm_over_bound_records": 0
+    },
+    "base": {
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "0",
+        "tests": "11",
+        "time": "517.280",
+        "timestamp": "2026-11-17T12:46:55.205257-06:00",
+        "hostname": "[HOST]"
+      },
+      "counts": {
+        "passed": 10,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "records": 11,
+      "qc_tm_records": 16,
+      "qc_tm_low_margin_records": 2,
+      "qc_tm_over_bound_records": 0
+    },
+    "control": {
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "2",
+        "time": "34.074",
+        "timestamp": "2026-11-17T12:55:52.623451-06:00",
+        "hostname": "[HOST]"
+      },
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "records": 2,
+      "qc_tm_records": 1,
+      "qc_tm_low_margin_records": 0,
+      "qc_tm_over_bound_records": 0
+    }
+  },
+  "nodes": 13
+}
