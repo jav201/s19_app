@@ -3,8 +3,8 @@
 Coverage map (test -> AT/TC -> LLR):
 
 - AT-B94-03 — ``test_at_b94_03_expanded_editor_primary_surface``: the entries
-  table and the expanded JSON editor are both visible without scroll at
-  120x30; reachable by panel scroll at 80x24 (HLR-003, the pe_b doctrine).
+  table and expanded JSON editor are measured on their current tabs at 120x30
+  and reached by scroll at 80x24 (HLR-003, the pe_b doctrine).
 - AT-B94-04 — ``test_at_b94_04_edit_json_valid_merges``: confirming valid
   JSON merges every declared entry into the entries table in document order
   (HLR-004 valid arm).
@@ -71,6 +71,7 @@ from s19_app.tui.json_highlight import JsonHighlightTextArea
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.rail import Rail
 from s19_app.tui.screens_directionb import LoadGuardScreen, PatchEditorPanel
+from tests.support.b103_inc8_p import show_tab
 
 VALID_TWO = """{
   "format": "s19app-changeset",
@@ -149,19 +150,10 @@ async def _press_screen_button(app: S19TuiApp, pilot, button_id: str) -> None:
 
 @pytest.mark.parametrize("size", [(120, 30), (80, 24)])
 def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
-    """The reworked panel composes 1 JsonHighlightTextArea + 1 entries table,
-    without exception, at 120x30 and 80x24 (LLR-003.1) — and the entries
-    table stays the measured bounded band (the geometry the fold certifies).
+    """Compose one JSON editor and one bounded entries table at both sizes.
 
-    FIX ROUND A (C-40): the plain widget census is geometry-blind — the
-    `styles.height 3 -> 30` mutation composes the same widgets and passed.
-    The fold's subject is the BAND: per the C-29 boxes
-    (``evidence/p1-pilot-measurements.txt``: workspace 96x18 at 120x30,
-    74x12 at 80x24) the shipped tree measures table 3 + editor 8 = 11 cells,
-    which must fit the boxed workspace together at every shipped regime; a
-    30-row table (38 cells) cannot. The widget-count census below is kept as
-    a labeled regression pin (C-40 corollary — legitimate, but not the arm's
-    kill subject).
+    The current tabs are measured separately: a 30-row table still fails the
+    landing-pane bound and the editor must retain its eight-row painted floor.
     """
 
     async def _drive() -> tuple:
@@ -177,25 +169,20 @@ def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
             await pilot.pause()
             editors = list(panel.query(JsonHighlightTextArea))
             tables = list(panel.query("#patch_doc_entries_table"))
-            workspace = app.query_one("#workspace_body").region
+            home = app.query_one("#patch_inspector").region
+            await show_tab(pilot, "patch_tab_script")
             table = app.query_one("#patch_doc_entries_table", DataTable).region
+            await show_tab(pilot, "patch_tab_json")
             editor = app.query_one("#patch_paste_text", TextArea).region
-            return (
-                len(editors),
-                len(tables),
-                table.height + editor.height,
-                workspace.height,
-            )
+            return len(editors), len(tables), table.height, editor.height, home.height
 
-    editors, tables, band, workspace_h = asyncio.run(_drive())
-    # Regression pin (C-40 corollary): the reworked composition census.
+    editors, tables, table_h, editor_h, home_h = asyncio.run(_drive())
     assert editors == 1, f"exactly 1 JsonHighlightTextArea, got {editors}"
     assert tables == 1, f"exactly 1 entries table, got {tables}"
-    # The kill subject: the bounded band fits the boxed workspace (C-29).
-    assert band <= workspace_h, (
-        f"table({band - 8}) + editor(8) must fit the boxed workspace "
-        f"{workspace_h} tall at {size}, got band {band}"
+    assert table_h <= home_h, (
+        f"the table must fit its landing pane at {size}: table={table_h}, home={home_h}"
     )
+    assert editor_h >= 8, f"the JSON editor lost its painted floor at {size}: {editor_h}"
 
 
 # ---------------------------------------------------------------------------
@@ -206,10 +193,9 @@ def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
 def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
     """AT-B94-03 — table + expanded editor visible at 120x30; reachable at 80x24.
 
-    Intent (HLR-003): at 120x30 (boxed workspace 96x18) the entries table
-    and the expanded JSON editor are both visible without scroll; at 80x24
-    (boxed 74x12) both are reachable by panel scroll. Geometry is measured,
-    not assumed (C-23/C-29): the A1 inner-split assumption's verification.
+    The current composition puts them on Patch script and JSON respectively.
+    Each is measured inside the landing pane at 120x30 and reached by scroll at
+    80x24; neither observation reads a hidden tab's stale region.
     """
 
     async def _drive(size) -> dict:
@@ -224,26 +210,22 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             panel.refresh_entries(service.rows(None), mem_map=None)
             await pilot.pause()
-            # batch-97 Inc-4 (named supersession, HLR-144): the editor is the
-            # paste buffer on the inspector's JSON tab, beside the ledger.
-            app.query_one("#patch_tab_json").press()
-            await pilot.pause()
             table = app.query_one("#patch_doc_entries_table", DataTable)
             editor = app.query_one("#patch_paste_text", TextArea)
-            workspace = app.query_one("#workspace_body").region
+            home = app.query_one("#patch_inspector").region
+            await show_tab(pilot, "patch_tab_script")
             visible = {
-                "table_visible": table.region.y >= workspace.y
-                and table.region.y + table.region.height
-                <= workspace.y + workspace.height,
-                "editor_visible": editor.region.y < workspace.y + workspace.height,
+                "table_visible": table.region.y >= home.y
+                and table.region.y + table.region.height <= home.bottom,
             }
             if size == (80, 24):
-                table.scroll_visible()
+                table.scroll_visible(animate=False)
                 await pilot.pause()
-                visible["table_reachable"] = (
-                    table.region.y < workspace.y + workspace.height
-                )
-                editor.scroll_visible()
+                visible["table_reachable"] = table.region.y < home.bottom
+            await show_tab(pilot, "patch_tab_json")
+            visible["editor_visible"] = editor.region.y < home.bottom
+            if size == (80, 24):
+                editor.scroll_visible(animate=False)
                 await pilot.pause()
                 visible["editor_reachable"] = (
                     editor.region.y < app.screen.region.height

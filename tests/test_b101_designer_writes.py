@@ -54,6 +54,8 @@ from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
+from tests.support.b103_inc10 import show_prompt_again
 from tests.support.b101_designer import (  # noqa: F401  (the fixture is used by name)
     designer_pending,
     designer_recompute_counter,
@@ -235,7 +237,7 @@ async def _show_rail(pilot, app, key: str, widget_id: str) -> None:
 async def _type_into(pilot, app, input_id: str, text: str) -> None:
     """Focus the input by a click, empty it with keys, type ``text`` key by key."""
     field = app.query_one(input_id, Input)
-    assert await pilot.click(input_id), f"click missed {input_id}"
+    assert await click_visible(pilot, input_id), f"click missed {input_id}"
     await pilot.press("end", *(["backspace"] * len(field.value)))
     if text:
         await pilot.press(*("space" if ch == " " else ch for ch in text))
@@ -289,7 +291,7 @@ async def _load_document(pilot, app, log, base: Path, name: str, entries: List[d
     write_change_document(document, entries)
     await _show_rail(pilot, app, "6", "#patch_doc_path_input")
     await _type_into(pilot, app, "#patch_doc_path_input", str(document))
-    assert await pilot.click("#patch_doc_load_button"), "click missed #patch_doc_load_button"
+    assert await click_visible(pilot, "#patch_doc_load_button"), "click missed #patch_doc_load_button"
     await wait_until(
         pilot,
         lambda: app._change_service.document.source_path is not None
@@ -302,46 +304,36 @@ async def _load_document(pilot, app, log, base: Path, name: str, entries: List[d
 
 async def _apply(pilot, app, log, expect_prefix: str) -> str:
     mark = len(log.messages)
-    assert await pilot.click("#patch_doc_apply_button"), "click missed #patch_doc_apply_button"
+    assert await click_visible(pilot, "#patch_doc_apply_button"), "click missed #patch_doc_apply_button"
     lines = await _status_since(
         pilot, log, mark, lambda m: m.startswith(expect_prefix), f"a status starting {expect_prefix!r}"
     )
-    for _ in range(3):
-        await pilot.pause()
+    await settle_workers(pilot)
     return next(m for m in lines if m.startswith(expect_prefix))
 
 
 async def _entry_op(pilot, app, log, button: str, address: str, data: str, status: str) -> None:
-    await _show_rail(pilot, app, "6", "#patch_entry_address_input")
+    await _show_rail(pilot, app, "6", "#patch_doc_path_input")
+    await show_tab(pilot, "patch_tab_inspector")
     mark = len(log.messages)
     await _type_into(pilot, app, "#patch_entry_address_input", address)
     await _type_into(pilot, app, "#patch_entry_bytes_input", data)
-    assert await pilot.click(button), f"click missed {button}"
+    assert await click_visible(pilot, button), f"click missed {button}"
     await _status_since(pilot, log, mark, lambda m: m == status, f"the status {status!r}")
 
 
 async def _save_back(pilot, app, log, name: str, expect: str) -> List[str]:
-    """Show the save-back row (JSON tab), type ``name`` into it, confirm, and
-    wait for a status containing ``expect``. The confirm is a press of the
-    shipped button (the row sits in the JSON pane below the clip of the
-    status bar at this size; the suite's save-back drives press it too)."""
-    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
-    await wait_until(
-        pilot,
-        lambda: app.query_one("#patch_saveback_confirm_button").region.width > 0,
-        "timed out waiting for the save-back row",
-    )
+    """Re-show the export prompt, type ``name``, click Write file and wait for
+    both its status and the worker's completion."""
+    await show_prompt_again(app, pilot, name=name)
     field = app.query_one("#patch_saveback_name_input", Input)
     if field.value != name:
-        assert await pilot.click("#patch_saveback_name_input"), "click missed the save-back name"
-        await pilot.press("end", *(["backspace"] * len(field.value)))
-        await pilot.press(*name)
+        await _type_into(pilot, app, "#patch_saveback_name_input", name)
     assert field.value == name, field.value
     mark = len(log.messages)
-    app.query_one("#patch_saveback_confirm_button", Button).press()
+    assert await click_visible(pilot, "#patch_saveback_confirm_button"), "click missed Write file"
     lines = await _status_since(pilot, log, mark, lambda m: expect in m, f"a save-back status with {expect!r}")
-    for _ in range(3):
-        await pilot.pause()
+    await settle_workers(pilot)
     return lines
 
 
@@ -897,19 +889,12 @@ def test_r_chked_057_3_save_project_commit_clears_the_validation_results(
 # R-CRC-PREVIEW-002.5/9 - a save-back that raises after the adopt ends the app
 # ---------------------------------------------------------------------------
 async def _confirm_save_back(pilot, app, name: str, *, by_keys: bool) -> None:
-    """The JSON tab clicked, ``name`` typed into the save-back field, then the
-    confirm: by ``tab`` to *Write file* and ``enter`` (``by_keys``), or a press
-    of the shipped button."""
-    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
-    await wait_until(
-        pilot,
-        lambda: app.query_one("#patch_saveback_confirm_button").region.width > 0,
-        "timed out waiting for the save-back row",
-    )
+    """Re-show the export prompt and confirm by keyboard or a visible click."""
+    await show_prompt_again(app, pilot, name=name)
     await _type_into(pilot, app, "#patch_saveback_name_input", name)
     confirm = app.query_one("#patch_saveback_confirm_button", Button)
     if not by_keys:
-        confirm.press()
+        assert await click_visible(pilot, "#patch_saveback_confirm_button"), "click missed Write file"
         return
     for _ in range(6):
         if app.focused is confirm:

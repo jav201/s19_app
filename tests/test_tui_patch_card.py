@@ -43,6 +43,7 @@ from s19_app.tui.screens_directionb import (
     before_after_card_text,
 )
 from s19_app.tui.services.change_service import ChangeEntryRow
+from tests.support.b103_inc8_p import show_tab
 
 _SIZES = ((80, 24), (120, 30))
 
@@ -101,8 +102,7 @@ async def _open_patch(app: S19TuiApp, pilot) -> PatchEditorPanel:
     panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
     # Inc 8 R-TUI-063.4: the Patch Editor opens on the Patch script tab (was: the Inspector
     # tab, where the before/after card lives), so the card's tab is selected through its chip.
-    panel.query_one("#patch_tab_inspector", Button).press()
-    await pilot.pause()
+    await show_tab(pilot, "patch_tab_inspector")
     return panel
 
 
@@ -422,6 +422,7 @@ _BUTTON_HOMES = (
     # Inc 8 R-TUI-063.3: "patch_win_a2l" leaves (the A2L tab is retired, D-1 A)
     "patch_doc_file_row",
     "patch_doc_controls",
+    "patch_export_dock",
 )
 
 
@@ -497,8 +498,7 @@ def _drive_reachability_with_card(tmp_path: Path, size) -> dict:
                     trapped.append(button.id or type(button).__name__)
             unreachable = []
             for chip, neighbors in _CARD_NEIGHBORS.items():
-                app.query_one(f"#{chip}", Button).press()
-                await pilot.pause()
+                await show_tab(pilot, chip)
                 for nid in neighbors:
                     target = app.query_one(f"#{nid}")
                     await _reach(app, pilot, target)

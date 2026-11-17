@@ -106,6 +106,7 @@ from s19_app.tui.json_highlight import (
 )
 from s19_app.tui.os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS
 from s19_app.tui.screens_directionb import PatchEditorPanel
+from tests.support.b103_inc8_p import show_tab
 
 # ---------------------------------------------------------------------------
 # The LLR-079.3 payload set — spelled ONCE, reused by every C-17 arm
@@ -136,17 +137,21 @@ _PAYLOADS = (
 
 
 
-async def _show_patch_json(app: S19TuiApp, pilot: object) -> None:
+async def _show_patch_json(app: S19TuiApp, pilot: object, *, room: bool = False) -> None:
     """Show the Patch Editor with its JSON tab open.
 
     batch-97 Inc-4 (named supersession, HLR-144): the paste buffer and its
     docked rows live on the inspector's JSON tab, so every observation of them
-    opens that tab first, as the operator does.
+    opens that tab first, as the operator does. Growth arms give the fixed-nine
+    landing pane a taller test region; merely enlarging the terminal cannot do so.
     """
     app.action_show_screen("patch")
     await pilot.pause()
-    app.query_one("#patch_tab_json", Button).press()
-    await pilot.pause()
+    await show_tab(pilot, "patch_tab_json")
+    if room:
+        app.query_one("#patch_inspector").styles.height = 60
+        await pilot.pause()
+        await pilot.pause()
 
 def _payload_buffer() -> str:
     """The payload set as a buffer: a control line, then ONE payload per line.
@@ -1190,22 +1195,11 @@ def test_tc079_5b_cap_gauge_escalates_without_verdict_hues() -> None:
 # so the fill cascades down the JSON window ONLY. Every assertion below reads the
 # PAINTED `region` (C-32 assert-the-painted-result), never a CSS constant.
 #
-# ⚠ **MEASURED CEILING — why the growth is observed at 120x50, not 120x30.** The
-# spec's AC-1 names 120x30, but a pilot region capture showed the whole
-# `#workspace_shell` is only ~15 rows tall at a 30-row terminal (the app's global
-# layout reserves the lower rows for another pane), so `#patch_editor_panel` maxes
-# at ~13 rows and the JSON window at ~9 content rows — the editor is capped at 8
-# by AVAILABLE ROOM there, identically under `height: 8` and under `1fr`. The
-# empty-space defect the fix targets only manifests once the JSON window has free
-# vertical space, i.e. at ~34+ rows. So the growth arm observes 120x50 (mutation-
-# discriminating: `height: 8` -> editor 8, `1fr` -> editor 26), and 120x30 is
-# covered by a no-regression / floor arm. This is a spec/reality reconciliation
-# surfaced in the review packet, not a silent test-size swap.
+# The current landing pane is nine rows at every terminal size. Growth arms
+# therefore give it a 60-row test region; the floor and primary arms retain the
+# shipped geometry. This keeps the painted `> 8` mutation oracle discriminating.
 
-#: batch-97 Inc-4 (named supersession, HLR-144 / design §3): the JSON tab
-#: shares its height between the read-only view and the paste buffer, so the
-#: growth regime is the in-range size 118x54 (12 + 12 rows), not 120x50.
-_FILL_TALL = (118, 54)  # JSON tab has real free vertical space here
+_FILL_TALL = (118, 54)
 _FLOOR = (80, 24)  # the tight floor (min-height keeps the editor usable)
 _PRIMARY = (120, 30)  # the spec's AC-1 size — panel too short to grow (see above)
 
@@ -1268,21 +1262,18 @@ def _json_window_bodies(app: S19TuiApp) -> dict[str, object]:
 
 
 def test_ac1_editor_fills_json_window_when_room_exists() -> None:
-    """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    """With a tall JSON test region the editor grows past 8 and fills it flush.
 
     C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
-    region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
-    is 26 rows and its bottom is flush with the JSON body's content region; under
-    a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
-    by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
-    which also fails the ``> 8`` assertion — so this arm cannot green on an
-    invisible widget.
+    region — not the CSS. Under the shipped ``height: 1fr`` its bottom is flush
+    with the JSON body's content region; a reverted ``height: 8`` fails the
+    growth assertion. A hidden or zero-area editor fails it too.
     """
 
     async def _run() -> tuple[int, int, int]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            await _show_patch_json(app, pilot)
+            await _show_patch_json(app, pilot, room=True)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             body = _json_window_bodies(app)["patch_win_json"]
             return (
@@ -1398,7 +1389,7 @@ def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
     async def _run() -> dict[str, object]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            await _show_patch_json(app, pilot)
+            await _show_patch_json(app, pilot, room=True)
             bodies = _json_window_bodies(app)
             view = app.query_one("#patch_json_view", TextArea)
             controls = app.query_one("#patch_paste_controls")
@@ -1409,8 +1400,7 @@ def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
                     bodies["patch_win_script"].region.height,
                 ),
             }
-            app.query_one("#patch_tab_checks", Button).press()
-            await pilot.pause()
+            await show_tab(pilot, "patch_tab_checks")
             out["checks"] = (
                 app.query_one("#patch_win_checks").content_region.height,
                 bodies["patch_win_checks"].region.height,
@@ -1487,15 +1477,14 @@ def test_ac4_hostile_paste_inert_after_resize() -> None:
 def test_ac5_gauge_stays_above_editor() -> None:
     """The cap gauge renders above the (now taller) editor and is not overlapped.
 
-    MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
-    region sits strictly above the editor's, so the editor's growth pushes DOWN
-    from the gauge rather than displacing or overlapping it.
+    In the tall test region the gauge's painted region sits strictly above the
+    editor's, so growth pushes DOWN from the gauge without overlapping it.
     """
 
     async def _run() -> tuple[int, int, int]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            await _show_patch_json(app, pilot)
+            await _show_patch_json(app, pilot, room=True)
             gauge = app.query_one("#patch_paste_gauge", Static)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             return gauge.region.bottom, editor.region.y, editor.region.height

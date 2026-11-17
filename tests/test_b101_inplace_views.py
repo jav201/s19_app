@@ -63,6 +63,8 @@ from s19_app.tui.segment_split_view import SplitJoinWindow  # noqa: E402
 from tests.support import b100_projects as projects  # noqa: E402
 from tests.support import b100_save_dialog as sd  # noqa: E402
 from tests.support.b100_workers import settle_workers  # noqa: E402
+from tests.support.b103_inc8_p import click_visible, show_tab  # noqa: E402
+from tests.support.b103_inc10 import show_prompt_again  # noqa: E402
 from tests.support.timing import report_margin, timing_bound, wait_until  # noqa: E402
 
 SEED = 20260001
@@ -301,12 +303,11 @@ async def open_patch(pilot, app) -> None:
 
 
 async def press_shown(pilot, button: Button) -> None:
-    """Press ``button`` once it is laid out on the screen (E5 QA-7: the route
-    the press stands for is shown, as ``write_file`` checks its button)."""
+    """Scroll the shipped button into view and deliver a real pointer click."""
     await wait_until(
         pilot, lambda: button.region.width > 0, f"#{button.id} is not shown on the screen"
     )
-    button.press()
+    assert await click_visible(pilot, f"#{button.id}"), f"click missed #{button.id}"
 
 
 async def load_doc(pilot, app, log, path: Path) -> None:
@@ -324,7 +325,7 @@ async def load_doc(pilot, app, log, path: Path) -> None:
 
 
 async def apply_loaded(pilot, app, log) -> None:
-    """Press Apply; wait for ``Apply: <n> applied``."""
+    """Click Apply; wait for its status and the worker's completion."""
     mark = len(log.messages)
     await press_shown(pilot, panel(app).query_one("#patch_doc_apply_button", Button))
     await wait_until(
@@ -332,11 +333,13 @@ async def apply_loaded(pilot, app, log) -> None:
         lambda: any(re.match(r"Apply: [1-9]\d* applied", m) for m in log.since(mark)),
         lambda: f"no apply line; got {log.since(mark)!r}",
     )
+    await settle_workers(pilot)
     await settle(pilot)
 
 
 async def edit_entry(pilot, app, log, address: str, data: str) -> None:
     """Edit the entry at ``address`` to ``data`` (no new apply)."""
+    await show_tab(pilot, "patch_tab_inspector")
     mark = len(log.messages)
     p = panel(app)
     p.query_one("#patch_entry_address_input", Input).value = address
@@ -351,15 +354,10 @@ async def edit_entry(pilot, app, log, address: str, data: str) -> None:
 
 
 async def write_file(pilot, app, log) -> None:
-    """Confirm *Save patched image as* (Write file); wait for its outcome."""
+    """Re-show the export prompt, click Write file and wait for its outcome."""
+    await show_prompt_again(app, pilot)
     mark = len(log.messages)
-    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
-    await wait_until(
-        pilot,
-        lambda: app.query_one("#patch_saveback_confirm_button").region.width > 0,
-        "the save-back row did not show",
-    )
-    app.query_one("#patch_saveback_confirm_button", Button).press()
+    assert await click_visible(pilot, "#patch_saveback_confirm_button"), "click missed Write file"
     await wait_until(
         pilot,
         lambda: any(

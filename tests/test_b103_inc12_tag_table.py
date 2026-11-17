@@ -46,6 +46,7 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.timing import report_margin, wait_until
 
 
@@ -825,7 +826,7 @@ def _panel(app) -> PatchEditorPanel:
 
 async def _press_shown(pilot, button: Button) -> None:
     await wait_until(pilot, lambda: button.region.width > 0, f"#{button.id} is not shown")
-    button.press()
+    assert await click_visible(pilot, f"#{button.id}"), f"click missed #{button.id}"
 
 
 async def _open_patch(pilot, app) -> None:
@@ -862,10 +863,12 @@ async def _apply_loaded(pilot, app, log) -> None:
         lambda: any(re.match(r"Apply: [1-9]\d* applied", m) for m in log.messages[mark:]),
         lambda: f"no apply line: {log.messages[mark:]!r}",
     )
+    await settle_workers(pilot)
     await _settle(pilot)
 
 
 async def _edit_entry(pilot, app, log, address: str, data: str) -> None:
+    await show_tab(pilot, "patch_tab_inspector")
     mark = len(log.messages)
     p = _panel(app)
     p.query_one("#patch_entry_address_input", Input).value = address
