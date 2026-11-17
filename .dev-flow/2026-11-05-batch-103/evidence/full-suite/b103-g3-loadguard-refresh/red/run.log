@@ -1,0 +1,106 @@
+[HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [HOME]\anaconda3\python.exe
+rootdir: [WORKTREE]
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+[1mcollecting ... [0mcollected 2 items
+
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded] [31mFAILED[0m[31m [ 50%][0m
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1] [32mPASSED[0m[31m [100%][0m
+
+================================== FAILURES ===================================
+[31m[1m__________________ test_r_tui_049_3_2_prompt_hidden[guarded] __________________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/red/tmp/pytest/test_r_tui_049_3_2_prompt_hidd0')
+alt = 'guarded'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33malt[39;49;00m[33m"[39;49;00m, ALTERNATIVES)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r_tui_049_3_2_prompt_hidden[39;49;00m(tmp_path: Path, alt: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image[39;49;00m
+    [33m    loaded) ``Save patched image as:`` is not painted. Base: stays after every[39;49;00m
+    [33m    alternative. (E5 C-5: no "no file written" clause; Write file is the[39;49;00m
+    [33m    prompt's own confirm, so no operator route reaches it once hidden.)"""[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, log):[90m[39;49;00m
+            needle = [94mawait[39;49;00m _replace_scenario(app, pilot, log, tmp_path, alt, [33m"[39;49;00m[33mprompt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m await_gone(pilot, app, needle, [33mf[39;49;00m[33m"[39;49;00m[33mafter [39;49;00m[33m{[39;49;00malt[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+>       projects.run_app(tmp_path, scenario, size=SIZE)[90m[39;49;00m
+
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\support\b100_projects.py[0m:615: in run_app
+    [0m[94mreturn[39;49;00m asyncio.run(_drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\support\b100_projects.py[0m:613: in _drive
+    [0m[94mreturn[39;49;00m [94mawait[39;49;00m scenario(app, pilot, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:504: in scenario
+    [0mneedle = [94mawait[39;49;00m _replace_scenario(app, pilot, log, tmp_path, alt, [33m"[39;49;00m[33mprompt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:452: in _replace_scenario
+    [0mapp.screen.query_one([33m"[39;49;00m[33m#load_guard_accept[39;49;00m[33m"[39;49;00m, Button).press()[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadGuardScreen(), selector = '#load_guard_accept'
+expect_type = <class 'textual.widgets._button.Button'>
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mquery_one[39;49;00m([90m[39;49;00m
+        [96mself[39;49;00m,[90m[39;49;00m
+        selector: [96mstr[39;49;00m | [96mtype[39;49;00m[QueryType],[90m[39;49;00m
+        expect_type: [96mtype[39;49;00m[QueryType] | [94mNone[39;49;00m = [94mNone[39;49;00m,[90m[39;49;00m
+    ) -> QueryType | Widget:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Get a widget from this widget's children that matches a selector or widget type.[39;49;00m
+    [33m[39;49;00m
+    [33m    Args:[39;49;00m
+    [33m        selector: A selector or widget type.[39;49;00m
+    [33m        expect_type: Require the object be of the supplied type, or None for any type.[39;49;00m
+    [33m[39;49;00m
+    [33m    Raises:[39;49;00m
+    [33m        WrongType: If the wrong type was found.[39;49;00m
+    [33m        NoMatches: If no node matches the query.[39;49;00m
+    [33m[39;49;00m
+    [33m    Returns:[39;49;00m
+    [33m        A widget matching the selector.[39;49;00m
+    [33m    """[39;49;00m[90m[39;49;00m
+        _rich_traceback_omit = [94mTrue[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        base_node = [96mself[39;49;00m._get_dom_base()[90m[39;49;00m
+    [90m[39;49;00m
+        [94mif[39;49;00m [96misinstance[39;49;00m(selector, [96mstr[39;49;00m):[90m[39;49;00m
+            query_selector = selector[90m[39;49;00m
+        [94melse[39;49;00m:[90m[39;49;00m
+            query_selector = selector.[91m__name__[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        [94mif[39;49;00m is_id_selector(query_selector):[90m[39;49;00m
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)[90m[39;49;00m
+            cached_result = base_node._query_one_cache.get(cache_key)[90m[39;49;00m
+            [94mif[39;49;00m cached_result [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                [94mreturn[39;49;00m cached_result[90m[39;49;00m
+            [94mif[39;49;00m ([90m[39;49;00m
+                node := walk_breadth_search_id([90m[39;49;00m
+                    base_node, query_selector[[94m1[39;49;00m:], with_root=[94mFalse[39;49;00m[90m[39;49;00m
+                )[90m[39;49;00m
+            ) [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m:[90m[39;49;00m
+                [94mif[39;49;00m expect_type [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m [95mand[39;49;00m [95mnot[39;49;00m [96misinstance[39;49;00m(node, expect_type):[90m[39;49;00m
+                    [94mraise[39;49;00m WrongType([90m[39;49;00m
+                        [33mf[39;49;00m[33m"[39;49;00m[33mNode matching [39;49;00m[33m{[39;49;00mquery_selector[33m!r}[39;49;00m[33m is the wrong type; expected type [39;49;00m[33m{[39;49;00mexpect_type.[91m__name__[39;49;00m[33m!r}[39;49;00m[33m, found [39;49;00m[33m{[39;49;00mnode[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                    )[90m[39;49;00m
+                base_node._query_one_cache[cache_key] = node[90m[39;49;00m
+                [94mreturn[39;49;00m node[90m[39;49;00m
+>           [94mraise[39;49;00m NoMatches([33mf[39;49;00m[33m"[39;49;00m[33mNo nodes match [39;49;00m[33m{[39;49;00mquery_selector[33m!r}[39;49;00m[33m on [39;49;00m[33m{[39;49;00mbase_node[33m!r}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE           textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()[0m
+
+[1m[31m..\..\anaconda3\Lib\site-packages\textual\dom.py[0m:1505: NoMatches
+- generated xml file: [WORKTREE]\.dev-flow\2026-11-05-batch-103\evidence\full-suite\b103-g3-loadguard-refresh\red\junit.xml -
+[36m[1m=========================== short test summary info ===========================[0m
+[31mFAILED[0m tests/test_b101_patch_lifecycle.py::[1mtest_r_tui_049_3_2_prompt_hidden[guarded][0m - textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+[31m======================== [31m[1m1 failed[0m, [32m1 passed[0m[31m in 41.00s[0m[31m =========================[0m

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="40.934" timestamp="2026-11-17T09:19:27.273835-06:00" hostname="[HOST]"><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[guarded]" time="3.790"><failure message="textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()">tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/red/tmp/pytest/test_r_tui_049_3_2_prompt_hidd0')
+alt = 'guarded'
+
+    @pytest.mark.parametrize("alt", ALTERNATIVES)
+    def test_r_tui_049_3_2_prompt_hidden(tmp_path: Path, alt: str) -&gt; None:
+        """R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image
+        loaded) ``Save patched image as:`` is not painted. Base: stays after every
+        alternative. (E5 C-5: no "no file written" clause; Write file is the
+        prompt's own confirm, so no operator route reaches it once hidden.)"""
+    
+        async def scenario(app, pilot, log):
+            needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "prompt")
+            await await_gone(pilot, app, needle, f"after {alt}")
+    
+&gt;       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests\test_b101_patch_lifecycle.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b101_patch_lifecycle.py:504: in scenario
+    needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "prompt")
+tests\test_b101_patch_lifecycle.py:452: in _replace_scenario
+    app.screen.query_one("#load_guard_accept", Button).press()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadGuardScreen(), selector = '#load_guard_accept'
+expect_type = &lt;class 'textual.widgets._button.Button'&gt;
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -&gt; QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+&gt;           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/1]" time="36.588" /></testsuite></testsuites>

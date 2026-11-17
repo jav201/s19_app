@@ -1,0 +1,788 @@
+[HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [HOME]\anaconda3\python.exe
+rootdir: [WORKTREE]
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+[1mcollecting ... [0mcollected 146 items
+
+tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_1_1_offer_text_in_a_project [32mPASSED[0m[32m [  0%][0m
+tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_36_1_no_offer_without_a_project [32mPASSED[0m[32m [  1%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[load] [32mPASSED[0m[32m [  2%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[pick] [32mPASSED[0m[32m [  2%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[guarded] [32mPASSED[0m[32m [  3%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] [32mPASSED[0m[32m [  4%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[paste] [32mPASSED[0m[32m [  4%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[undo] [32mPASSED[0m[32m [  5%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[redo] [32mPASSED[0m[32m [  6%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[image] [32mPASSED[0m[32m [  6%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[load] [32mPASSED[0m[32m [  7%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[pick] [32mPASSED[0m[32m [  8%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded] [32mPASSED[0m[32m [  8%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] [32mPASSED[0m[32m [  9%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[paste] [32mPASSED[0m[32m [ 10%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[undo] [32mPASSED[0m[32m [ 10%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[redo] [32mPASSED[0m[32m [ 11%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[image] [32mPASSED[0m[32m [ 12%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project [31mFAILED[0m[31m [ 13%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project [31mFAILED[0m[31m [ 13%][0m
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it [32mPASSED[0m[31m [ 14%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[two] [32mPASSED[0m[31m [ 15%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[zero] [32mPASSED[0m[31m [ 15%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] [32mPASSED[0m[31m [ 16%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[load] [32mPASSED[0m[31m [ 17%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[image] [32mPASSED[0m[31m [ 17%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] [32mPASSED[0m[31m [ 18%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] [32mPASSED[0m[31m [ 19%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[apply] [32mPASSED[0m[31m [ 19%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[mac] [32mPASSED[0m[31m [ 20%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[load] [32mPASSED[0m[31m [ 21%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] [32mPASSED[0m[31m [ 21%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[load] [32mPASSED[0m[31m [ 22%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] [32mPASSED[0m[31m [ 23%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[load] [32mPASSED[0m[31m  [ 23%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] [32mPASSED[0m[31m [ 24%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back [32mPASSED[0m[31m [ 25%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[current] [32mPASSED[0m[31m [ 26%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[stale] [32mPASSED[0m[31m [ 26%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_after_image_load [32mPASSED[0m[31m [ 27%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_while_displayed [32mPASSED[0m[31m [ 28%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line [32mPASSED[0m[31m     [ 28%][0m
+tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed [32mPASSED[0m[31m [ 29%][0m
+tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/1] [32mPASSED[0m[31m [ 30%][0m
+tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/2] [32mPASSED[0m[31m [ 30%][0m
+tests/test_b103_a2l_refresh.py::test_r001_direct_attach_publication[R-A2L-REFRESH.001/3] [32mPASSED[0m[31m [ 31%][0m
+tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/1] [32mPASSED[0m[31m [ 32%][0m
+tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/2] [32mPASSED[0m[31m [ 32%][0m
+tests/test_b103_a2l_refresh.py::test_r002_image_load_refreshes_pair[R-A2L-REFRESH.002/3] [32mPASSED[0m[31m [ 33%][0m
+tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/1] [32mPASSED[0m[31m [ 34%][0m
+tests/test_b103_a2l_refresh.py::test_r003_project_final_pair[R-A2L-REFRESH.003/2] [32mPASSED[0m[31m [ 34%][0m
+tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/1] [32mPASSED[0m[31m [ 35%][0m
+tests/test_b103_a2l_refresh.py::test_r004_a2l_only_project[R-A2L-REFRESH.004/2] [32mPASSED[0m[31m [ 36%][0m
+tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/1] [32mPASSED[0m[31m [ 36%][0m
+tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2] [32mPASSED[0m[31m [ 37%][0m
+tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3] [32mPASSED[0m[31m [ 38%][0m
+tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4] [32mPASSED[0m[31m [ 39%][0m
+tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/5] [32mPASSED[0m[31m [ 39%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/1] [32mPASSED[0m[31m [ 40%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/2] [32mPASSED[0m[31m [ 41%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/3] [32mPASSED[0m[31m [ 41%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/4] [32mPASSED[0m[31m [ 42%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/5] [32mPASSED[0m[31m [ 43%][0m
+tests/test_b103_a2l_refresh.py::test_r006_viewer_values[R-A2L-REFRESH.006/6] [31mFAILED[0m[31m [ 43%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/1---] [32mPASSED[0m[31m [ 44%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/2---] [32mPASSED[0m[31m [ 45%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/3---] [32mPASSED[0m[31m [ 45%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/4---] [32mPASSED[0m[31m [ 46%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/5---] [32mPASSED[0m[31m [ 47%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.007/6---] [32mPASSED[0m[31m [ 47%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/1---] [32mPASSED[0m[31m [ 48%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/2---] [32mPASSED[0m[31m [ 49%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/3---] [32mPASSED[0m[31m [ 50%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/4---] [32mPASSED[0m[31m [ 50%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---] [32mPASSED[0m[31m [ 51%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/6---] [32mPASSED[0m[31m [ 52%][0m
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/7---] [32mPASSED[0m[31m [ 52%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/1--] [32mPASSED[0m[31m [ 53%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/2--] [32mPASSED[0m[31m [ 54%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/3--] [32mPASSED[0m[31m [ 54%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/4--] [32mPASSED[0m[31m [ 55%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/5--] [32mPASSED[0m[31m [ 56%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/6--] [32mPASSED[0m[31m [ 56%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/7--] [32mPASSED[0m[31m [ 57%][0m
+tests/test_b103_a2l_refresh.py::test_r009_mode_reset[R-A2L-REFRESH.009/8--] [32mPASSED[0m[31m [ 58%][0m
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1] [32mPASSED[0m[31m [ 58%][0m
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2] [32mPASSED[0m[31m [ 59%][0m
+tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/1] [32mPASSED[0m[31m [ 60%][0m
+tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/2] [32mPASSED[0m[31m [ 60%][0m
+tests/test_b103_a2l_refresh.py::test_r015_memory_map[R-A2L-REFRESH.015/3] [32mPASSED[0m[31m [ 61%][0m
+tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/1] [32mPASSED[0m[31m [ 62%][0m
+tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/2] [32mPASSED[0m[31m [ 63%][0m
+tests/test_b103_a2l_refresh.py::test_r016_split_join[R-A2L-REFRESH.016/3] [32mPASSED[0m[31m [ 63%][0m
+tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/1] [32mPASSED[0m[31m [ 64%][0m
+tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/2] [32mPASSED[0m[31m [ 65%][0m
+tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/3] [32mPASSED[0m[31m [ 65%][0m
+tests/test_b103_a2l_refresh.py::test_r017_loaded_panel[R-A2L-REFRESH.017/4] [32mPASSED[0m[31m [ 66%][0m
+tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/1] [32mPASSED[0m[31m [ 67%][0m
+tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/2] [32mPASSED[0m[31m [ 67%][0m
+tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/3] [32mPASSED[0m[31m [ 68%][0m
+tests/test_b103_a2l_refresh.py::test_r027_generations[R-A2L-REFRESH.027/4] [32mPASSED[0m[31m [ 69%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1] [32mPASSED[0m[31m [ 69%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/2] [32mPASSED[0m[31m [ 70%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/3] [32mPASSED[0m[31m [ 71%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/4] [32mPASSED[0m[31m [ 71%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/5] [32mPASSED[0m[31m [ 72%][0m
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/6] [31mFAILED[0m[31m [ 73%][0m
+tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/1] [32mPASSED[0m[31m [ 73%][0m
+tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/2] [32mPASSED[0m[31m [ 74%][0m
+tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/3] [31mFAILED[0m[31m [ 75%][0m
+tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/4] [32mPASSED[0m[31m [ 76%][0m
+tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/5] [32mPASSED[0m[31m [ 76%][0m
+tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/1] [32mPASSED[0m[31m [ 77%][0m
+tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/2] [32mPASSED[0m[31m [ 78%][0m
+tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/3] [32mPASSED[0m[31m [ 78%][0m
+tests/test_b103_a2l_refresh.py::test_r012_visible_check_prefill[R-A2L-REFRESH.012/4] [32mPASSED[0m[31m [ 79%][0m
+tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/1] [32mPASSED[0m[31m [ 80%][0m
+tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/2] [32mPASSED[0m[31m [ 80%][0m
+tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/3] [32mPASSED[0m[31m [ 81%][0m
+tests/test_b103_a2l_refresh.py::test_r013_visible_patch_prefill[R-A2L-REFRESH.013/4] [32mPASSED[0m[31m [ 82%][0m
+tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/1] [32mPASSED[0m[31m [ 82%][0m
+tests/test_b103_a2l_refresh.py::test_r018_mac_page_two[R-A2L-REFRESH.018/2] [32mPASSED[0m[31m [ 83%][0m
+tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/1] [32mPASSED[0m[31m [ 84%][0m
+tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/2] [32mPASSED[0m[31m [ 84%][0m
+tests/test_b103_a2l_refresh.py::test_r019_issues_refresh[R-A2L-REFRESH.019/3] [32mPASSED[0m[31m [ 85%][0m
+tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/1] [32mPASSED[0m[31m [ 86%][0m
+tests/test_b103_a2l_refresh.py::test_r020_replacement_question[R-A2L-REFRESH.020/2] [32mPASSED[0m[31m [ 86%][0m
+tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/1-] [32mPASSED[0m[31m [ 87%][0m
+tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/2-] [32mPASSED[0m[31m [ 88%][0m
+tests/test_b103_a2l_refresh.py::test_r021_cancel_is_inert[R-A2L-REFRESH.021/3-] [32mPASSED[0m[31m [ 89%][0m
+tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/1] [32mPASSED[0m[31m [ 89%][0m
+tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/2] [32mPASSED[0m[31m [ 90%][0m
+tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3] [32mPASSED[0m[31m [ 91%][0m
+tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/1] [32mPASSED[0m[31m [ 91%][0m
+tests/test_b103_a2l_refresh.py::test_r023_accepted_replacement[R-A2L-REFRESH.023/2] [32mPASSED[0m[31m [ 92%][0m
+tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/1] [32mPASSED[0m[31m [ 93%][0m
+tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/2] [32mPASSED[0m[31m [ 93%][0m
+tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/3] [32mPASSED[0m[31m [ 94%][0m
+tests/test_b103_a2l_refresh.py::test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4] [31mFAILED[0m[31m [ 95%][0m
+tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/1] [32mPASSED[0m[31m [ 95%][0m
+tests/test_b103_a2l_refresh.py::test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2] [31mFAILED[0m[31m [ 96%][0m
+tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/1] [32mPASSED[0m[31m [ 97%][0m
+tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/2] [32mPASSED[0m[31m [ 97%][0m
+tests/test_b103_a2l_refresh.py::test_r026_all_painting_on_ui[R-A2L-REFRESH.026/3] [32mPASSED[0m[31m [ 98%][0m
+tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/1] [32mPASSED[0m[31m [ 99%][0m
+tests/test_b103_a2l_refresh.py::test_r028_superseded_prepared_load[R-A2L-REFRESH.028/2] [32mPASSED[0m[31m [100%][0m
+
+================================== FAILURES ===================================
+[31m[1m_______________ test_r_tui_049_3_1_control_kept_on_save_project _______________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r_tui_049_3_1_control_kep0')
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_r_tui_049_3_1_control_kept_on_save_project[39;49;00m(tmp_path: Path) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-TUI-049.3.1/9 (negative arm): a Save project places the pasted[39;49;00m
+    [33m    document and replaces none, so the control stays painted. Standing guard on[39;49;00m
+    [33m    base (base hides nothing there)."""[39;49;00m[90m[39;49;00m
+>       projects.run_app([90m[39;49;00m
+            tmp_path, [94mlambda[39;49;00m app, pilot, log: _save_project_keeps(app, pilot, log, tmp_path, [33m"[39;49;00m[33mcontrol[39;49;00m[33m"[39;49;00m), size=SIZE[90m[39;49;00m
+        )[90m[39;49;00m
+
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:536: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\support\b100_projects.py[0m:615: in run_app
+    [0m[94mreturn[39;49;00m asyncio.run(_drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\support\b100_projects.py[0m:613: in _drive
+    [0m[94mreturn[39;49;00m [94mawait[39;49;00m scenario(app, pilot, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:525: in _save_project_keeps
+    [0m[94mawait[39;49;00m save_project_by_dialog(pilot, app, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:316: in save_project_by_dialog
+    [0m[94mawait[39;49;00m sd.save_through_dialog(pilot, app, name)[90m[39;49;00m
+[1m[31mtests\support\b100_save_dialog.py[0m:207: in save_through_dialog
+    [0m[94mawait[39;49;00m wait_for([90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function save_through_dialog.<locals>.<lambda> at 0x00000190FE2A2340>
+description = "the target line naming 'proj' (painted: 'path too long — shorten the name.')"
+timeout = 6.0
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mwait_for[39;49;00m([90m[39;49;00m
+        pilot, predicate: Callable[[], [96mbool[39;49;00m], description: [96mstr[39;49;00m, timeout: [96mfloat[39;49;00m = [94m6.0[39;49;00m[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Wait (by the wall clock: the dialog's 150 ms recompute is a real[39;49;00m
+    [33m    timer) until ``predicate()`` holds."""[39;49;00m[90m[39;49;00m
+        deadline = time.monotonic() + timeout[90m[39;49;00m
+        [94mwhile[39;49;00m [94mTrue[39;49;00m:[90m[39;49;00m
+            [94mif[39;49;00m predicate():[90m[39;49;00m
+                [94mreturn[39;49;00m[90m[39;49;00m
+            [94mif[39;49;00m time.monotonic() > deadline:[90m[39;49;00m
+>               [94mraise[39;49;00m [96mAssertionError[39;49;00m([33mf[39;49;00m[33m"[39;49;00m[33mtimed out waiting for [39;49;00m[33m{[39;49;00mdescription[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE               AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')[0m
+
+[1m[31mtests\support\b100_save_dialog.py[0m:128: AssertionError
+[31m[1m_______________ test_r_tui_049_3_2_prompt_kept_on_save_project ________________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r_tui_049_3_2_prompt_kept0')
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_r_tui_049_3_2_prompt_kept_on_save_project[39;49;00m(tmp_path: Path) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""R-TUI-049.3.2/9 (negative arm): a Save project keeps the save-back[39;49;00m
+    [33m    prompt painted. Standing guard on base."""[39;49;00m[90m[39;49;00m
+>       projects.run_app([90m[39;49;00m
+            tmp_path, [94mlambda[39;49;00m app, pilot, log: _save_project_keeps(app, pilot, log, tmp_path, [33m"[39;49;00m[33mprompt[39;49;00m[33m"[39;49;00m), size=SIZE[90m[39;49;00m
+        )[90m[39;49;00m
+
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:544: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\support\b100_projects.py[0m:615: in run_app
+    [0m[94mreturn[39;49;00m asyncio.run(_drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\support\b100_projects.py[0m:613: in _drive
+    [0m[94mreturn[39;49;00m [94mawait[39;49;00m scenario(app, pilot, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:525: in _save_project_keeps
+    [0m[94mawait[39;49;00m save_project_by_dialog(pilot, app, log)[90m[39;49;00m
+[1m[31mtests\test_b101_patch_lifecycle.py[0m:316: in save_project_by_dialog
+    [0m[94mawait[39;49;00m sd.save_through_dialog(pilot, app, name)[90m[39;49;00m
+[1m[31mtests\support\b100_save_dialog.py[0m:207: in save_through_dialog
+    [0m[94mawait[39;49;00m wait_for([90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function save_through_dialog.<locals>.<lambda> at 0x0000019080478D60>
+description = "the target line naming 'proj' (painted: 'path too long — shorten the name.')"
+timeout = 6.0
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mwait_for[39;49;00m([90m[39;49;00m
+        pilot, predicate: Callable[[], [96mbool[39;49;00m], description: [96mstr[39;49;00m, timeout: [96mfloat[39;49;00m = [94m6.0[39;49;00m[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Wait (by the wall clock: the dialog's 150 ms recompute is a real[39;49;00m
+    [33m    timer) until ``predicate()`` holds."""[39;49;00m[90m[39;49;00m
+        deadline = time.monotonic() + timeout[90m[39;49;00m
+        [94mwhile[39;49;00m [94mTrue[39;49;00m:[90m[39;49;00m
+            [94mif[39;49;00m predicate():[90m[39;49;00m
+                [94mreturn[39;49;00m[90m[39;49;00m
+            [94mif[39;49;00m time.monotonic() > deadline:[90m[39;49;00m
+>               [94mraise[39;49;00m [96mAssertionError[39;49;00m([33mf[39;49;00m[33m"[39;49;00m[33mtimed out waiting for [39;49;00m[33m{[39;49;00mdescription[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE               AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')[0m
+
+[1m[31mtests\support\b100_save_dialog.py[0m:128: AssertionError
+[31m[1m________________ test_r006_viewer_values[R-A2L-REFRESH.006/6] _________________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r006_viewer_values_R_A2L_5')
+case = 'R-A2L-REFRESH.006/6'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.006/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m7[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r006_viewer_values[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            rows = OLD[90m[39;49;00m
+            image = IMG1[90m[39;49;00m
+            name = [33m"[39;49;00m[33mold.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m, image=f.img1, a2l=f.old, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m, image=f.img2, a2l=f.new, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                rows, image, name = NEW, IMG2, [33m"[39;49;00m[33mnew.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/5[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m, image=[94mNone[39;49;00m, a2l=f.new)[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                rows, image, name = NEW, [94mNone[39;49;00m, [33m"[39;49;00m[33mnew.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                [94mif[39;49;00m [95mnot[39;49;00m case.endswith([33m"[39;49;00m[33m/1[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+                    [94mawait[39;49;00m _load_a2l(app, pilot, f.old)[90m[39;49;00m
+                [94melse[39;49;00m:[90m[39;49;00m
+                    [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+                [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/1[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    [94mawait[39;49;00m _load_a2l(app, pilot, f.old)[90m[39;49;00m
+                [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    [94mawait[39;49;00m _load_a2l(app, pilot, f.new)[90m[39;49;00m
+                    rows, name = NEW, [33m"[39;49;00m[33mnew.a2l[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    [94mawait[39;49;00m _load_image(app, pilot, f.img2)[90m[39;49;00m
+                    image = IMG2[90m[39;49;00m
+                [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/6[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    _unload(app, [33m"[39;49;00m[33ma2l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                    [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+                    rows, name = (), [94mNone[39;49;00m[90m[39;49;00m
+            [94mawait[39;49;00m _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, check_pick=[94mFalse[39;49;00m, loaded_mac=case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m))[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:637: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:454: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:452: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:635: in scenario
+    [0m[94mawait[39;49;00m _assert_snap(app, pilot, rows=rows, image=image, a2l_name=name, check_pick=[94mFalse[39;49;00m, loaded_mac=case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m))[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92m_assert_snap[39;49;00m([90m[39;49;00m
+        app: S19TuiApp,[90m[39;49;00m
+        pilot,[90m[39;49;00m
+        *,[90m[39;49;00m
+        rows: [96mtuple[39;49;00m[[96mtuple[39;49;00m[[96mstr[39;49;00m, [96mint[39;49;00m, [96mint[39;49;00m], ...] | [94mNone[39;49;00m,[90m[39;49;00m
+        image: [96mdict[39;49;00m[[96mint[39;49;00m, [96mint[39;49;00m] | [94mNone[39;49;00m,[90m[39;49;00m
+        a2l_name: [96mstr[39;49;00m | [94mNone[39;49;00m,[90m[39;49;00m
+        check_pick: [96mbool[39;49;00m = [94mTrue[39;49;00m,[90m[39;49;00m
+        loaded_mac: [96mbool[39;49;00m = [94mFalse[39;49;00m,[90m[39;49;00m
+        memory_names: [96mlist[39;49;00m[[96mstr[39;49;00m] | [94mNone[39;49;00m = [94mNone[39;49;00m,[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+        expected = [96mlist[39;49;00m(rows [95mor[39;49;00m ())[90m[39;49;00m
+        names = [row[[94m0[39;49;00m] [94mfor[39;49;00m row [95min[39;49;00m expected][90m[39;49;00m
+>       [94massert[39;49;00m [(t[[33m"[39;49;00m[33mname[39;49;00m[33m"[39;49;00m], t[[33m"[39;49;00m[33maddress[39;49;00m[33m"[39;49;00m], t[[33m"[39;49;00m[33mlength[39;49;00m[33m"[39;49;00m]) [94mfor[39;49;00m t [95min[39;49;00m app._a2l_enriched_tags] == expected[90m[39;49;00m
+[1m[31mE       AssertionError: assert [('OLD_ONLY', 16, 1), ('AlphaShared', 32, 2), ('OUT_WARN', 48, 1), ('PAGE2_OLD', 112, 1)] == [][0m
+[1m[31mE         [0m
+[1m[31mE         Left contains 4 more items, first extra item: [0m([33m'[39;49;00m[33mOLD_ONLY[39;49;00m[33m'[39;49;00m, [94m16[39;49;00m, [94m1[39;49;00m)[90m[39;49;00m[0m
+[1m[31mE         [0m
+[1m[31mE         Full diff:[0m
+[1m[31mE         [0m[91m- [][39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+ [[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ([39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         'OLD_ONLY',[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         16,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         1,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ),[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ([39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         'AlphaShared',[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         32,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         2,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ),[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ([39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         'OUT_WARN',[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         48,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         1,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ),[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ([39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         'PAGE2_OLD',[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         112,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+         1,[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+     ),[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         [92m+ ][39;49;00m[90m[39;49;00m[0m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:251: AssertionError
+[31m[1m_____________ test_r010_detail_invalidation[R-A2L-REFRESH.010/6] ______________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r010_detail_invalidation_5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000190FD973C50>
+case = 'R-A2L-REFRESH.010/6'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.010/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m7[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r010_detail_invalidation[39;49;00m(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m, image=f.img1, a2l=f.old, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m, image=f.img2, a2l=f.new, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    _project(f, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m, image=[94mNone[39;49;00m, a2l=f.new)[90m[39;49;00m
+                [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+                [94mawait[39;49;00m _load_a2l(app, pilot, f.old)[90m[39;49;00m
+            [94mawait[39;49;00m _highlight_first_tag(app, pilot)[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/6[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mimport[39;49;00m[90m [39;49;00m[04m[96mimportlib[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+                module = importlib.import_module([33m"[39;49;00m[33ms19_app.tui.app[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                real_parse = module.deps.parse_a2l_cached[90m[39;49;00m
+                started = threading.Event()[90m[39;49;00m
+                release = threading.Event()[90m[39;49;00m
+    [90m[39;49;00m
+                [94mdef[39;49;00m[90m [39;49;00m[92mgated[39;49;00m(*args, **kwargs):[90m[39;49;00m
+                    started.set()[90m[39;49;00m
+                    [94massert[39;49;00m release.wait([94m20[39;49;00m)[90m[39;49;00m
+                    [94mreturn[39;49;00m real_parse(*args, **kwargs)[90m[39;49;00m
+    [90m[39;49;00m
+                monkeypatch.setattr(module.deps, [33m"[39;49;00m[33mparse_a2l_cached[39;49;00m[33m"[39;49;00m, gated)[90m[39;49;00m
+                [94mawait[39;49;00m _request_a2l(app, pilot, f.new)[90m[39;49;00m
+                [94mawait[39;49;00m wait_until(pilot, started.is_set, [33m"[39;49;00m[33mA2L worker did not reach its parse gate[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33md[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+                [94massert[39;49;00m [96mtype[39;49;00m(app.screen).[91m__name__[39;49;00m == [33m"[39;49;00m[33mCurveDescriptionScreen[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                release.set()[90m[39;49;00m
+                [94mawait[39;49;00m settle_workers(pilot)[90m[39;49;00m
+                [94massert[39;49;00m [96mtype[39;49;00m(app.screen).[91m__name__[39;49;00m != [33m"[39;49;00m[33mCurveDescriptionScreen[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/1[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_a2l(app, pilot, f.new)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_image(app, pilot, f.img2)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                _unload(app, [33m"[39;49;00m[33ma2l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+            [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+            card = app.query_one([33m"[39;49;00m[33m#a2l_detail_card[39;49;00m[33m"[39;49;00m, A2LDetailCard).render().plain[90m[39;49;00m
+            [94massert[39;49;00m card == HINT[90m[39;49;00m
+            [94massert[39;49;00m [95mnot[39;49;00m [96many[39;49;00m([96mtype[39;49;00m(screen).[91m__name__[39;49;00m == [33m"[39;49;00m[33mCurveDescriptionScreen[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m screen [95min[39;49;00m app.screen_stack)[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1008: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:454: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:452: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:969: in scenario
+    [0m[94mawait[39;49;00m _highlight_first_tag(app, pilot)[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92m_highlight_first_tag[39;49;00m(app: S19TuiApp, pilot) -> [94mNone[39;49;00m:[90m[39;49;00m
+        app.action_show_screen([33m"[39;49;00m[33ma2l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        table = app.query_one([33m"[39;49;00m[33m#a2l_tags_list[39;49;00m[33m"[39;49;00m, DataTable)[90m[39;49;00m
+        table.focus()[90m[39;49;00m
+        table.move_cursor(row=[94m0[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        table.move_cursor(row=[94m1[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        table.move_cursor(row=[94m0[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+>       [94massert[39;49;00m [33m"[39;49;00m[33mOLD_ONLY[39;49;00m[33m"[39;49;00m [95min[39;49;00m app.query_one([33m"[39;49;00m[33m#a2l_detail_card[39;49;00m[33m"[39;49;00m, A2LDetailCard).render().plain[90m[39;49;00m
+\x1b[1m\x1b[31mE       AssertionError: assert 'OLD_ONLY' in '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535'\x1b[0m
+\x1b[1m\x1b[31mE        +  where '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' = <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''>.plain\x1b[0m
+\x1b[1m\x1b[31mE        +    where <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''> = render()\x1b[0m
+[1m[31mE        +      where render = ListAwareDetailCard(id='a2l_detail_card').render[0m
+[1m[31mE        +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)[0m
+[1m[31mE        +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one[0m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:954: AssertionError
+[31m[1m_______________ test_r011_hex_span_repaint[R-A2L-REFRESH.011/3] _______________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r011_hex_span_repaint_R_A2')
+case = 'R-A2L-REFRESH.011/3'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.011/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m6[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r011_hex_span_repaint[39;49;00m(tmp_path: Path, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m, image=f.img1, a2l=f.old, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                _project(f, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m, image=f.img2, a2l=f.new, mac=[94mTrue[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_OLD[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                    _project(f, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m, image=[94mNone[39;49;00m, a2l=f.new)[90m[39;49;00m
+                [94mawait[39;49;00m _load_image(app, pilot, f.img1)[90m[39;49;00m
+                [94mawait[39;49;00m _load_a2l(app, pilot, f.old)[90m[39;49;00m
+            [94mawait[39;49;00m _highlight_first_tag(app, pilot)[90m[39;49;00m
+            [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33menter[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+            [94massert[39;49;00m app._a2l_tag_hex_highlight == ([94m0x0010[39;49;00m, [94m1[39;49;00m)[90m[39;49;00m
+            pane = app.query_one([33m"[39;49;00m[33m#alt_hex_view[39;49;00m[33m"[39;49;00m, Static)[90m[39;49;00m
+            before = pane.render()[90m[39;49;00m
+            [94mfrom[39;49;00m[90m [39;49;00m[04m[96ms19_app[39;49;00m[04m[96m.[39;49;00m[04m[96mrender[39;49;00m[04m[96m.[39;49;00m[04m[96mhexview[39;49;00m[90m [39;49;00m[94mimport[39;49;00m FOCUS_HIGHLIGHT_STYLE[90m[39;49;00m
+    [90m[39;49;00m
+            [94mdef[39;49;00m[90m [39;49;00m[92mhas_focus_style[39;49;00m(text) -> [96mbool[39;49;00m:[90m[39;49;00m
+                [94mreturn[39;49;00m [96many[39;49;00m([96mall[39;49;00m(token [95min[39;49;00m [96mstr[39;49;00m(span.style) [94mfor[39;49;00m token [95min[39;49;00m FOCUS_HIGHLIGHT_STYLE.split()) [94mfor[39;49;00m span [95min[39;49;00m text.spans)[90m[39;49;00m
+    [90m[39;49;00m
+            [94massert[39;49;00m has_focus_style(before)[90m[39;49;00m
+            first = app._alt_first_visible_address[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/1[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_a2l(app, pilot, f.new)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_image(app, pilot, f.img2)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_NEW[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94mawait[39;49;00m _load_project(app, pilot, [33m"[39;49;00m[33mP_ONLY[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                _unload(app, [33m"[39;49;00m[33ma2l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+            [94massert[39;49;00m app._a2l_tag_hex_highlight [95mis[39;49;00m [94mNone[39;49;00m[90m[39;49;00m
+            after = pane.render()[90m[39;49;00m
+            [94massert[39;49;00m [95mnot[39;49;00m has_focus_style(after)[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/4[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                [94massert[39;49;00m _plain(after) == [33m"[39;49;00m[33mNo file loaded.[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                [94massert[39;49;00m app.current_file [95mis[39;49;00m [94mNone[39;49;00m[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                expected_image = IMG2 [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/2[39;49;00m[33m"[39;49;00m) [95mor[39;49;00m case.endswith([33m"[39;49;00m[33m/3[39;49;00m[33m"[39;49;00m) [94melse[39;49;00m IMG1[90m[39;49;00m
+                [94massert[39;49;00m app.current_file.mem_map == expected_image[90m[39;49;00m
+                [94massert[39;49;00m app._alt_first_visible_address == first[90m[39;49;00m
+                [94mfor[39;49;00m address, value [95min[39;49;00m expected_image.items():[90m[39;49;00m
+                    [94mif[39;49;00m address < first + [94m16[39;49;00m:[90m[39;49;00m
+                        [94massert[39;49;00m [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00mvalue[33m:[39;49;00m[33m02X[39;49;00m[33m}[39;49;00m[33m"[39;49;00m [95min[39;49;00m after.plain[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1061: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:454: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:452: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1023: in scenario
+    [0m[94mawait[39;49;00m _highlight_first_tag(app, pilot)[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92m_highlight_first_tag[39;49;00m(app: S19TuiApp, pilot) -> [94mNone[39;49;00m:[90m[39;49;00m
+        app.action_show_screen([33m"[39;49;00m[33ma2l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        table = app.query_one([33m"[39;49;00m[33m#a2l_tags_list[39;49;00m[33m"[39;49;00m, DataTable)[90m[39;49;00m
+        table.focus()[90m[39;49;00m
+        table.move_cursor(row=[94m0[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        table.move_cursor(row=[94m1[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        table.move_cursor(row=[94m0[39;49;00m)[90m[39;49;00m
+        [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+>       [94massert[39;49;00m [33m"[39;49;00m[33mOLD_ONLY[39;49;00m[33m"[39;49;00m [95min[39;49;00m app.query_one([33m"[39;49;00m[33m#a2l_detail_card[39;49;00m[33m"[39;49;00m, A2LDetailCard).render().plain[90m[39;49;00m
+\x1b[1m\x1b[31mE       AssertionError: assert 'OLD_ONLY' in '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535'\x1b[0m
+\x1b[1m\x1b[31mE        +  where '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' = <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''>.plain\x1b[0m
+\x1b[1m\x1b[31mE        +    where <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''> = render()\x1b[0m
+[1m[31mE        +      where render = ListAwareDetailCard(id='a2l_detail_card').render[0m
+[1m[31mE        +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)[0m
+[1m[31mE        +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one[0m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:954: AssertionError
+[31m[1m_____________ test_r024_initial_busy_refusal[R-A2L-REFRESH.024/4] _____________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r024_initial_busy_refusal3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000190FD433D70>
+case = 'R-A2L-REFRESH.024/4'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.024/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m5[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r024_initial_busy_refusal[39;49;00m(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            release = [94mawait[39;49;00m _start_busy_action(app, pilot, f, monkeypatch, case)[90m[39;49;00m
+            workers = _worker_spy(app, monkeypatch)[90m[39;49;00m
+            statuses = _status_recorder(app, monkeypatch)[90m[39;49;00m
+            before = _state_snapshot(app)[90m[39;49;00m
+            progress_before = [96mstr[39;49;00m(app.query_one([33m"[39;49;00m[33m#status_text[39;49;00m[33m"[39;49;00m).render())[90m[39;49;00m
+            worker_count = [96mlen[39;49;00m(app.workers)[90m[39;49;00m
+            starts = [][90m[39;49;00m
+            real_start = app._start_a2l_load[90m[39;49;00m
+    [90m[39;49;00m
+            [94mdef[39;49;00m[90m [39;49;00m[92mstart_spy[39;49;00m(*args, **kwargs):[90m[39;49;00m
+                starts.append((args, kwargs))[90m[39;49;00m
+                [94mreturn[39;49;00m real_start(*args, **kwargs)[90m[39;49;00m
+    [90m[39;49;00m
+            monkeypatch.setattr(app, [33m"[39;49;00m[33m_start_a2l_load[39;49;00m[33m"[39;49;00m, start_spy)[90m[39;49;00m
+            [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33mctrl+l[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+            labels = ([33m"[39;49;00m[33mLoading image.bin[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mLoading old.a2l[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mLoading project project_b[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mSaving project project_b[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+            label = labels[[96mint[39;49;00m(case.rsplit([33m"[39;49;00m[33m/[39;49;00m[33m"[39;49;00m, [94m1[39;49;00m)[[94m1[39;49;00m]) - [94m1[39;49;00m][90m[39;49;00m
+            [94massert[39;49;00m statuses == [[33mf[39;49;00m[33m"[39;49;00m[33mbusy: [39;49;00m[33m{[39;49;00mlabel[33m}[39;49;00m[33m is running — wait for it to finish.[39;49;00m[33m"[39;49;00m][90m[39;49;00m
+            _assert_visible_log(app, statuses[[94m0[39;49;00m])[90m[39;49;00m
+            [94massert[39;49;00m [96mstr[39;49;00m(app.query_one([33m"[39;49;00m[33m#status_text[39;49;00m[33m"[39;49;00m).render())[[94m1[39;49;00m:] == progress_before[[94m1[39;49;00m:][90m[39;49;00m
+            [94massert[39;49;00m starts == [][90m[39;49;00m
+            [94massert[39;49;00m workers == [][90m[39;49;00m
+            [94massert[39;49;00m [96mlen[39;49;00m(app.workers) == worker_count[90m[39;49;00m
+            [94massert[39;49;00m [95mnot[39;49;00m [96misinstance[39;49;00m(app.screen, ConfirmQuestionScreen)[90m[39;49;00m
+            [94massert[39;49;00m _state_snapshot(app) == before[90m[39;49;00m
+            release.set()[90m[39;49;00m
+            [94mawait[39;49;00m settle_workers(pilot)[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1614: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:454: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:452: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1585: in scenario
+    [0mrelease = [94mawait[39;49;00m _start_busy_action(app, pilot, f, monkeypatch, case)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1578: in _start_busy_action
+    [0m[94mawait[39;49;00m wait_until(pilot, started.is_set, [33m"[39;49;00m[33mthe real session worker did not start[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <bound method Event.is_set of <threading.Event at 0x19081636180: unset>>
+failure = 'the real session worker did not start'
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mwait_until[39;49;00m([90m[39;49;00m
+        pilot,[90m[39;49;00m
+        predicate: Callable[[], [96mbool[39;49;00m],[90m[39;49;00m
+        failure: Union[[96mstr[39;49;00m, Callable[[], [96mstr[39;49;00m]],[90m[39;49;00m
+        *,[90m[39;49;00m
+        timeout: [96mfloat[39;49;00m = WAIT_TIMEOUT_S,[90m[39;49;00m
+        pause_first: [96mbool[39;49;00m = [94mFalse[39;49;00m,[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Poll ``predicate`` until it is truthy, yielding to the app between[39;49;00m
+    [33m    checks; raise ``AssertionError`` with ``failure`` at the deadline.[39;49;00m
+    [33m[39;49;00m
+    [33m    A callable ``failure`` is called only when this raises, so its text can[39;49;00m
+    [33m    show state accumulated up to the timeout.[39;49;00m
+    [33m    """[39;49;00m[90m[39;49;00m
+        deadline = time.monotonic() + timeout[90m[39;49;00m
+        [94mif[39;49;00m pause_first:[90m[39;49;00m
+            [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        [94mwhile[39;49;00m [94mTrue[39;49;00m:[90m[39;49;00m
+            [94mif[39;49;00m predicate():[90m[39;49;00m
+                [94mreturn[39;49;00m[90m[39;49;00m
+            [94mif[39;49;00m time.monotonic() > deadline:[90m[39;49;00m
+>               [94mraise[39;49;00m [96mAssertionError[39;49;00m(failure() [94mif[39;49;00m [96mcallable[39;49;00m(failure) [94melse[39;49;00m failure)[90m[39;49;00m
+[1m[31mE               AssertionError: the real session worker did not start[0m
+
+[1m[31mtests\support\timing.py[0m:66: AssertionError
+[31m[1m___________ test_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2] ___________[0m
+
+tmp_path = WindowsPath('[WORKTREE]/.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-loadguard-refresh/green-files/tmp/pytest/test_r025_post_yes_busy_bounda1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000190831948C0>
+case = 'R-A2L-REFRESH.025/2'
+
+    [0m[37m@pytest[39;49;00m.mark.parametrize([33m"[39;49;00m[33mcase[39;49;00m[33m"[39;49;00m, [[33mf[39;49;00m[33m"[39;49;00m[33mR-A2L-REFRESH.025/[39;49;00m[33m{[39;49;00mi[33m}[39;49;00m[33m"[39;49;00m [94mfor[39;49;00m i [95min[39;49;00m [96mrange[39;49;00m([94m1[39;49;00m, [94m3[39;49;00m)], ids=[94mlambda[39;49;00m x: x)[90m[39;49;00m
+    [94mdef[39;49;00m[90m [39;49;00m[92mtest_r025_post_yes_busy_boundaries[39;49;00m(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: [96mstr[39;49;00m) -> [94mNone[39;49;00m:[90m[39;49;00m
+        [94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mscenario[39;49;00m(app, pilot, f):[90m[39;49;00m
+            workers = _worker_spy(app, monkeypatch)[90m[39;49;00m
+            statuses = _status_recorder(app, monkeypatch)[90m[39;49;00m
+            [94mawait[39;49;00m _open_replacement(app, pilot, f)[90m[39;49;00m
+            before = _state_snapshot(app)[90m[39;49;00m
+            [94mif[39;49;00m case.endswith([33m"[39;49;00m[33m/1[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+                real_call = app.call_after_refresh[90m[39;49;00m
+                held = [][90m[39;49;00m
+    [90m[39;49;00m
+                [94mdef[39;49;00m[90m [39;49;00m[92mhold[39;49;00m(callback, *args, **kwargs):[90m[39;49;00m
+                    held.append((callback, args, kwargs))[90m[39;49;00m
+    [90m[39;49;00m
+                monkeypatch.setattr(app, [33m"[39;49;00m[33mcall_after_refresh[39;49;00m[33m"[39;49;00m, hold)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33my[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+                [94massert[39;49;00m held[90m[39;49;00m
+                monkeypatch.setattr(app, [33m"[39;49;00m[33mcall_after_refresh[39;49;00m[33m"[39;49;00m, real_call)[90m[39;49;00m
+                release = [94mawait[39;49;00m _start_busy_action(app, pilot, f, monkeypatch, [33m"[39;49;00m[33mR-A2L-REFRESH.024/1[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mfor[39;49;00m callback, args, kwargs [95min[39;49;00m held:[90m[39;49;00m
+                    real_call(callback, *args, **kwargs)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+                expected = [33m"[39;49;00m[33mbusy: Loading image.bin is running — wait for it to finish.[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94melse[39;49;00m:[90m[39;49;00m
+                real_start = [96mgetattr[39;49;00m(app, [33m"[39;49;00m[33m_start_a2l_load[39;49;00m[33m"[39;49;00m, [94mNone[39;49;00m)[90m[39;49;00m
+                held = [][90m[39;49;00m
+    [90m[39;49;00m
+                [94mdef[39;49;00m[90m [39;49;00m[92mhold[39;49;00m(*args, **kwargs):[90m[39;49;00m
+                    held.append((args, kwargs))[90m[39;49;00m
+    [90m[39;49;00m
+                monkeypatch.setattr(app, [33m"[39;49;00m[33m_start_a2l_load[39;49;00m[33m"[39;49;00m, hold, raising=[94mFalse[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.press([33m"[39;49;00m[33my[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94mawait[39;49;00m wait_until(pilot, [94mlambda[39;49;00m: [96mbool[39;49;00m(held), [33m"[39;49;00m[33mN3 was not reached[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                release = [94mawait[39;49;00m _start_busy_action(app, pilot, f, monkeypatch, [33m"[39;49;00m[33mR-A2L-REFRESH.024/4[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94massert[39;49;00m real_start [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m[90m[39;49;00m
+                [94mfor[39;49;00m args, kwargs [95min[39;49;00m held:[90m[39;49;00m
+                    real_start(*args, **kwargs)[90m[39;49;00m
+                [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+                expected = [33m"[39;49;00m[33mbusy: Saving project project_b is running — wait for it to finish.[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m expected [95min[39;49;00m statuses[90m[39;49;00m
+            _assert_visible_log(app, expected)[90m[39;49;00m
+            [94massert[39;49;00m workers == [][90m[39;49;00m
+            after = _state_snapshot(app)[90m[39;49;00m
+            [94massert[39;49;00m after[:-[94m1[39;49;00m] == before[:-[94m1[39;49;00m][90m[39;49;00m
+            [94massert[39;49;00m after[-[94m1[39;49;00m] != before[-[94m1[39;49;00m][90m[39;49;00m
+            [94massert[39;49;00m app._running_session_action() [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m[90m[39;49;00m
+            release.set()[90m[39;49;00m
+            [94mawait[39;49;00m settle_workers(pilot)[90m[39;49;00m
+    [90m[39;49;00m
+>       _run(tmp_path, scenario)[90m[39;49;00m
+
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1667: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+[1m[31mtests\test_b103_a2l_refresh.py[0m:454: in _run
+    [0masyncio.run(drive())[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:194: in run
+    [0m[94mreturn[39;49;00m runner.run(main)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\runners.py[0m:118: in run
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._loop.run_until_complete(task)[90m[39;49;00m
+[1m[31m..\..\anaconda3\Lib\asyncio\base_events.py[0m:687: in run_until_complete
+    [0m[94mreturn[39;49;00m future.result()[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:452: in drive
+    [0m[94mawait[39;49;00m scenario(app, pilot, fixture)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1651: in scenario
+    [0mrelease = [94mawait[39;49;00m _start_busy_action(app, pilot, f, monkeypatch, [33m"[39;49;00m[33mR-A2L-REFRESH.024/4[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mtests\test_b103_a2l_refresh.py[0m:1578: in _start_busy_action
+    [0m[94mawait[39;49;00m wait_until(pilot, started.is_set, [33m"[39;49;00m[33mthe real session worker did not start[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <bound method Event.is_set of <threading.Event at 0x190fe6e72c0: unset>>
+failure = 'the real session worker did not start'
+
+    [0m[94masync[39;49;00m [94mdef[39;49;00m[90m [39;49;00m[92mwait_until[39;49;00m([90m[39;49;00m
+        pilot,[90m[39;49;00m
+        predicate: Callable[[], [96mbool[39;49;00m],[90m[39;49;00m
+        failure: Union[[96mstr[39;49;00m, Callable[[], [96mstr[39;49;00m]],[90m[39;49;00m
+        *,[90m[39;49;00m
+        timeout: [96mfloat[39;49;00m = WAIT_TIMEOUT_S,[90m[39;49;00m
+        pause_first: [96mbool[39;49;00m = [94mFalse[39;49;00m,[90m[39;49;00m
+    ) -> [94mNone[39;49;00m:[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Poll ``predicate`` until it is truthy, yielding to the app between[39;49;00m
+    [33m    checks; raise ``AssertionError`` with ``failure`` at the deadline.[39;49;00m
+    [33m[39;49;00m
+    [33m    A callable ``failure`` is called only when this raises, so its text can[39;49;00m
+    [33m    show state accumulated up to the timeout.[39;49;00m
+    [33m    """[39;49;00m[90m[39;49;00m
+        deadline = time.monotonic() + timeout[90m[39;49;00m
+        [94mif[39;49;00m pause_first:[90m[39;49;00m
+            [94mawait[39;49;00m pilot.pause()[90m[39;49;00m
+        [94mwhile[39;49;00m [94mTrue[39;49;00m:[90m[39;49;00m
+            [94mif[39;49;00m predicate():[90m[39;49;00m
+                [94mreturn[39;49;00m[90m[39;49;00m
+            [94mif[39;49;00m time.monotonic() > deadline:[90m[39;49;00m
+>               [94mraise[39;49;00m [96mAssertionError[39;49;00m(failure() [94mif[39;49;00m [96mcallable[39;49;00m(failure) [94melse[39;49;00m failure)[90m[39;49;00m
+[1m[31mE               AssertionError: the real session worker did not start[0m
+
+[1m[31mtests\support\timing.py[0m:66: AssertionError
+- generated xml file: [WORKTREE]\.dev-flow\2026-11-05-batch-103\evidence\full-suite\b103-g3-loadguard-refresh\green-files\junit.xml -
+[36m[1m=========================== short test summary info ===========================[0m
+[31mFAILED[0m tests/test_b101_patch_lifecycle.py::[1mtest_r_tui_049_3_1_control_kept_on_save_project[0m - AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')
+[31mFAILED[0m tests/test_b101_patch_lifecycle.py::[1mtest_r_tui_049_3_2_prompt_kept_on_save_project[0m - AssertionError: timed out waiting for the target line naming 'proj' (painted: 'path too long — shorten the name.')
+[31mFAILED[0m tests/test_b103_a2l_refresh.py::[1mtest_r006_viewer_values[R-A2L-REFRESH.006/6][0m - AssertionError: assert [('OLD_ONLY', 16, 1), ('AlphaShared', 32, 2), ('OUT_WARN', 48, 1), ('PAGE2_OLD', 112, 1)] == []
+  
+  Left contains 4 more items, first extra item: [0m([33m'[39;49;00m[33mOLD_ONLY[39;49;00m[33m'[39;49;00m, [94m16[39;49;00m, [94m1[39;49;00m)[90m[39;49;00m
+  
+  Full diff:
+  [0m[91m- [][39;49;00m[90m[39;49;00m
+  [92m+ [[39;49;00m[90m[39;49;00m
+  [92m+     ([39;49;00m[90m[39;49;00m
+  [92m+         'OLD_ONLY',[39;49;00m[90m[39;49;00m
+  [92m+         16,[39;49;00m[90m[39;49;00m
+  [92m+         1,[39;49;00m[90m[39;49;00m
+  [92m+     ),[39;49;00m[90m[39;49;00m
+  [92m+     ([39;49;00m[90m[39;49;00m
+  [92m+         'AlphaShared',[39;49;00m[90m[39;49;00m
+  [92m+         32,[39;49;00m[90m[39;49;00m
+  [92m+         2,[39;49;00m[90m[39;49;00m
+  [92m+     ),[39;49;00m[90m[39;49;00m
+  [92m+     ([39;49;00m[90m[39;49;00m
+  [92m+         'OUT_WARN',[39;49;00m[90m[39;49;00m
+  [92m+         48,[39;49;00m[90m[39;49;00m
+  [92m+         1,[39;49;00m[90m[39;49;00m
+  [92m+     ),[39;49;00m[90m[39;49;00m
+  [92m+     ([39;49;00m[90m[39;49;00m
+  [92m+         'PAGE2_OLD',[39;49;00m[90m[39;49;00m
+  [92m+         112,[39;49;00m[90m[39;49;00m
+  [92m+         1,[39;49;00m[90m[39;49;00m
+  [92m+     ),[39;49;00m[90m[39;49;00m
+  [92m+ ][39;49;00m[90m[39;49;00m
+\x1b[31mFAILED\x1b[0m tests/test_b103_a2l_refresh.py::\x1b[1mtest_r010_detail_invalidation[R-A2L-REFRESH.010/6]\x1b[0m - AssertionError: assert 'OLD_ONLY' in '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535'\n +  where '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' = <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''>.plain\n +    where <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''> = render()\n +      where render = ListAwareDetailCard(id='a2l_detail_card').render\n +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)\n +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one
+\x1b[31mFAILED\x1b[0m tests/test_b103_a2l_refresh.py::\x1b[1mtest_r011_hex_span_repaint[R-A2L-REFRESH.011/3]\x1b[0m - AssertionError: assert 'OLD_ONLY' in '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535'\n +  where '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' = <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''>.plain\n +    where <text '\u2713 AlphaShared  0x00000020\\ndesc AlphaShared description\\nunit u16 \xb7 conv CM_IDENT\\nlayout RL_U16\\nbyteorder little\\nlimits 0..65535' [Span(0, 2, '#54efae'), Span(2, 13, '#e9e9e9'), Span(15, 25, '#7dd3fc'), Span(26, 31, '#c5c7d2'), Span(31, 54, '#e9e9e9'), Span(55, 60, '#c5c7d2'), Span(60, 63, '#e9e9e9'), Span(63, 71, '#c5c7d2'), Span(71, 79, '#e9e9e9'), Span(80, 87, '#c5c7d2'), Span(87, 93, '#e9e9e9'), Span(94, 104, '#c5c7d2'), Span(104, 110, '#e9e9e9'), Span(111, 118, '#c5c7d2'), Span(118, 119, '#e9e9e9'), Span(119, 121, '#e9e9e9'), Span(121, 126, '#e9e9e9')] ''> = render()\n +      where render = ListAwareDetailCard(id='a2l_detail_card').render\n +        where ListAwareDetailCard(id='a2l_detail_card') = query_one('#a2l_detail_card', A2LDetailCard)\n +          where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).query_one
+[31mFAILED[0m tests/test_b103_a2l_refresh.py::[1mtest_r024_initial_busy_refusal[R-A2L-REFRESH.024/4][0m - AssertionError: the real session worker did not start
+[31mFAILED[0m tests/test_b103_a2l_refresh.py::[1mtest_r025_post_yes_busy_boundaries[R-A2L-REFRESH.025/2][0m - AssertionError: the real session worker did not start
+[31m================= [31m[1m7 failed[0m, [32m139 passed[0m[31m in 3422.36s (0:57:02)[0m[31m ==================[0m

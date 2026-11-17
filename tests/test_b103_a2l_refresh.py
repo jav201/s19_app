@@ -390,8 +390,15 @@ async def _request_a2l(app: S19TuiApp, pilot, path: Path) -> None:
 
 
 async def _load_a2l(app: S19TuiApp, pilot, path: Path) -> None:
+    generation = app._a2l_view_generation
     await _request_a2l(app, pilot, path)
     await settle_workers(pilot)
+    if not isinstance(app.screen, ConfirmQuestionScreen):
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path == path and app._a2l_view_generation > generation,
+            f"the load of {path.name} did not publish a new A2L generation",
+        )
     assert app.current_a2l_path == path, list(app.log_lines)
 
 
