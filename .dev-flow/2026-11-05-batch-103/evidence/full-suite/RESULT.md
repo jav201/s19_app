@@ -1,12 +1,13 @@
 # Batch-103 full-suite gate
 
-**CURRENT STATE: BLOCKED — the local full-suite is still running; there is no suite verdict and G3 is not closed.**
+**CURRENT STATE: BLOCKED — the full-suite remains RED / pending corrections; G3 is not closed.**
 
-- The central backup exists. The distributed runner's self-test and suite execution remain **not run** because of SSH connectivity. Separately, the local full-suite is **running** in an exact clone of `35fabb25c42d752216433c095eb0d29024027294`; no full-suite PASS is claimed.
+- The central backup exists. The full-suite remains **RED / pending corrections**; no full-suite PASS is claimed.
+- **Static fixes integrated:** reviewed GO lane `b103-g3-static-fixes` `85466c5db3cfb06dfbbfbbddaec490e5e3c93f18`, merged with provenance in `c6bdb13e6257364c5c6cf3e5b3cb8118c3e30507`. Its directed results and static runner self-test are recorded in `fix-g3-static/RESULT.md`; they do not change the RED full-suite state.
 - **Review page: PREPARADA — [g3-review.html](../review/g3-review.html).** The operator's literal decision is: «Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.» This is **provisional approval of the decisions and page**, with validation continuing during user use/tests. AT-I1b-8 is **deferred-to-user-validation / not_run**, not executed and no longer a required prior execution for that provisional approval. The form's approve control remains disabled until the local full-suite is GREEN. G3 remains **BLOCKED**.
 - No claim is made that an earlier runner process remains alive or has terminated. No host endpoint is copied into this record.
 - The initial batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. The corrected full trace is `g3-batch-trace-final.txt`: **0 gaps**, with exit status 0. G3 is still not closed because the suite remains blocked.
-- No product or test file changed for this integration. No local pytest, dynamic runner self-test, app or clipboard access was performed.
+- The static-fix merge carried the reviewed product/test changes listed in `fix-g3-static/RESULT.md`. This integration pass performed no local pytest, dynamic runner self-test, app or clipboard access.
 
 ## G3 trace correction invocation
 
