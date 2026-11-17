@@ -43,4 +43,13 @@ Supplementary external Quit controls (`test_b103_copy_quit_dialog.py`, R-COPY.24
 - `git diff --check`: PASS.
 - Ruff over the five files: 4 pre-existing findings on untouched lines (two F401, one F541, one F841); no unrelated cleanup performed.
 
-All raw logs, JUnit files, temporary directories, and isolated homes live outside the clone under the lane's local output directory. This committed RESULT is redacted and contains no home paths or account names.
+## Committed audit artifacts
+
+Canonical home: `.dev-flow/2026-11-05-batch-103/evidence/full-suite/b103-g3-oracles/`.
+
+- `known-final-junit.xml` — 14 testcases, 0 failures/errors; SHA-256 `e029b373a2acefee39dbc3e824e80318eb2970ded3d786ce7d212734c58c8559`.
+- `known-final.txt` — log ending `14 passed`; SHA-256 `3b9cdc98536ca2fa4a72dc131eb09af56b48e6c114d2e3fa11a3437abf36187d`.
+- `full-files-final-junit.xml` — 231 testcases, 0 failures/errors; SHA-256 `a82e94bb23327820370e96014a8d28092de2e070686234a190fcd98428bae9ff`.
+- `full-files-final.txt` — log ending `231 passed`; SHA-256 `374086961db0519a8197fbb5ef96d4342d2d18061f77836ae479ee30fcb303b2`.
+
+`SHA256SUMS` records these four artifacts and this RESULT. Both XML files were parsed after redaction. The committed logs are UTF-8 with normalized line endings; local paths, identities and host attributes are replaced by placeholders. The project's redaction reader reports 0 hits in this lane directory. Unredacted originals and temporary/isolated homes remain outside the clone.
